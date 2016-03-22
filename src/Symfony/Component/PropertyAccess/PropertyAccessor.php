@@ -748,30 +748,13 @@ class PropertyAccessor implements PropertyAccessorInterface
             return false;
         }
 
-        $reflClass = new \ReflectionClass($object);
+        $access = $this->getWriteAccessInfo(get_class($object), $property, array());
 
-        $camelized = $this->camelize($property);
-        $setter = 'set'.$camelized;
-        $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
-        $classHasProperty = $reflClass->hasProperty($property);
-
-        if ($this->isMethodAccessible($reflClass, $setter, 1)
-            || $this->isMethodAccessible($reflClass, $getsetter, 1)
-            || $this->isMethodAccessible($reflClass, '__set', 2)
-            || ($classHasProperty && $reflClass->getProperty($property)->isPublic())
-            || (!$classHasProperty && property_exists($object, $property))
-            || ($this->magicCall && $this->isMethodAccessible($reflClass, '__call', 2))) {
-            return true;
-        }
-
-        $singulars = (array) StringUtil::singularify($camelized);
-
-        // Any of the two methods is required, but not yet known
-        if (null !== $this->findAdderAndRemover($reflClass, $singulars)) {
-            return true;
-        }
-
-        return false;
+        return self::ACCESS_TYPE_METHOD === $access[self::ACCESS_TYPE]
+            || self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]
+            || self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]
+            || (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property))
+            || self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE];
     }
 
     /**
@@ -783,7 +766,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function camelize($string)
     {
-        return strtr(ucwords(strtr($string, array('_' => ' '))), array(' ' => ''));
+        return str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
     }
 
     /**

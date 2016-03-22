@@ -143,4 +143,16 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('AAAA', Email::HOST_CHECK_FAILED_ERROR),
         );
     }
+
+    public function testHostnameIsProperlyParsed()
+    {
+        DnsMock::withMockedHosts(array('baz.com' => array(array('type' => 'MX'))));
+
+        $this->validator->validate(
+            '"foo@bar"@baz.com',
+            new Email(array('checkMX' => true))
+        );
+
+        $this->assertNoViolation();
+    }
 }

@@ -93,7 +93,7 @@ class EmailValidator extends ConstraintValidator
             return;
         }
 
-        $host = substr($value, strpos($value, '@') + 1);
+        $host = substr($value, strrpos($value, '@') + 1);
 
         // Check for host DNS resource records
         if ($constraint->checkMX) {

@@ -231,24 +231,18 @@ class NumberFormatter
     );
 
     /**
-     * The maximum values of the integer type in 32 bit platforms.
+     * The maximum value of the integer type in 32 bit platforms.
      *
-     * @var array
+     * @var int
      */
-    private static $int32Range = array(
-        'positive' => 2147483647,
-        'negative' => -2147483648,
-    );
+    private static $int32Max = 2147483647;
 
     /**
-     * The maximum values of the integer type in 64 bit platforms.
+     * The maximum value of the integer type in 64 bit platforms.
      *
-     * @var array
+     * @var int|float
      */
-    private static $int64Range = array(
-        'positive' => 9223372036854775807,
-        'negative' => -9223372036854775808,
-    );
+    private static $int64Max = 9223372036854775807;
 
     private static $enSymbols = array(
         self::DECIMAL => array('.', ',', ';', '%', '0', '#', '-', '+', '¤', '¤¤', '.', 'E', '‰', '*', '∞', 'NaN', '@', ','),
@@ -526,7 +520,7 @@ class NumberFormatter
      * @param int    $type     Type of the formatting, one of the format type constants. NumberFormatter::TYPE_DOUBLE by default
      * @param int    $position Offset to begin the parsing on return this value will hold the offset at which the parsing ended
      *
-     * @return bool|string The parsed value of false on error
+     * @return int|float|false The parsed value of false on error
      *
      * @see http://www.php.net/manual/en/numberformatter.parse.php
      */
@@ -835,7 +829,7 @@ class NumberFormatter
      */
     private function getInt32Value($value)
     {
-        if ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative']) {
+        if ($value > self::$int32Max || $value < -self::$int32Max - 1) {
             return false;
         }
 
@@ -848,20 +842,18 @@ class NumberFormatter
      * @param mixed $value The value to be converted
      *
      * @return int|float|false The converted value
-     *
-     * @see https://bugs.php.net/bug.php?id=59597 Bug #59597
      */
     private function getInt64Value($value)
     {
-        if ($value > self::$int64Range['positive'] || $value < self::$int64Range['negative']) {
+        if ($value > self::$int64Max || $value < -self::$int64Max - 1) {
             return false;
         }
 
-        if (PHP_INT_SIZE !== 8 && ($value > self::$int32Range['positive'] || $value <= self::$int32Range['negative'])) {
+        if (PHP_INT_SIZE !== 8 && ($value > self::$int32Max || $value <= -self::$int32Max - 1)) {
             // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
             // The negative PHP_INT_MAX was being converted to float
             if (
-                $value == self::$int32Range['negative'] &&
+                $value == -self::$int32Max - 1 &&
                 ((PHP_VERSION_ID < 50400 && PHP_VERSION_ID >= 50314) || PHP_VERSION_ID >= 50404 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone')))
             ) {
                 return (int) $value;
@@ -874,7 +866,7 @@ class NumberFormatter
             // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
             // A 32 bit integer was being generated instead of a 64 bit integer
             if (
-                  ($value > self::$int32Range['positive'] || $value < self::$int32Range['negative']) &&
+                  ($value > self::$int32Max || $value < -self::$int32Max - 1) &&
                   (PHP_VERSION_ID < 50314 || (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID < 50404)) &&
                   !(extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))
             ) {

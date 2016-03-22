@@ -406,7 +406,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      * @expectedExceptionMessage Expected argument of type "DateTime", "string" given
      */
     public function testThrowTypeError()

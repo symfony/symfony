@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess;
 
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
@@ -31,6 +32,11 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @internal
      */
     const REF = 1;
+
+    /**
+     * @internal
+     */
+    const IS_REF_CHAINED = 2;
 
     /**
      * @internal
@@ -87,16 +93,29 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     const ACCESS_TYPE_NOT_FOUND = 4;
 
+    /**
+     * @var bool
+     */
     private $magicCall;
+
+    /**
+     * @var array
+     */
     private $readPropertyCache = array();
+
+    /**
+     * @var array
+     */
     private $writePropertyCache = array();
-    private static $previousErrorHandler;
+    private static $previousErrorHandler = false;
     private static $errorHandler = array(__CLASS__, 'handleError');
     private static $resultProto = array(self::VALUE => null);
 
     /**
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
+     *
+     * @param bool $magicCall
      */
     public function __construct($magicCall = false)
     {
@@ -137,7 +156,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $overwrite = true;
 
         try {
-            if (PHP_VERSION_ID < 70000) {
+            if (PHP_VERSION_ID < 70000 && false === self::$previousErrorHandler) {
                 self::$previousErrorHandler = set_error_handler(self::$errorHandler);
             }
 
@@ -145,6 +164,17 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $zval = $propertyValues[$i];
                 unset($propertyValues[$i]);
 
+                // You only need set value for current element if:
+                // 1. it's the parent of the last index element
+                // OR
+                // 2. its child is not passed by reference
+                //
+                // This may avoid uncessary value setting process for array elements.
+                // For example:
+                // '[a][b][c]' => 'old-value'
+                // If you want to change its value to 'new-value',
+                // you only need set value for '[a][b][c]' and it's safe to ignore '[a][b]' and '[a]'
+                //
                 if ($overwrite) {
                     $property = $propertyPath->getElement($i);
 
@@ -159,22 +189,31 @@ class PropertyAccessor implements PropertyAccessorInterface
                     } else {
                         $this->writeProperty($zval, $property, $value);
                     }
+
+                    // if current element is an object
+                    // OR
+                    // if current element's reference chain is not broken - current element
+                    // as well as all its ancients in the property path are all passed by reference,
+                    // then there is no need to continue the value setting process
+                    if (is_object($zval[self::VALUE]) || isset($zval[self::IS_REF_CHAINED])) {
+                        return;
+                    }
                 }
 
                 $value = $zval[self::VALUE];
             }
         } catch (\TypeError $e) {
             try {
-                self::throwUnexpectedTypeException($e->getMessage(), $e->getTrace(), 0);
-            } catch (UnexpectedTypeException $e) {
+                self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0);
+            } catch (InvalidArgumentException $e) {
             }
         } catch (\Exception $e) {
         } catch (\Throwable $e) {
         }
 
-        if (PHP_VERSION_ID < 70000) {
+        if (PHP_VERSION_ID < 70000 && false !== self::$previousErrorHandler) {
             restore_error_handler();
-            self::$previousErrorHandler = null;
+            self::$previousErrorHandler = false;
         }
         if (isset($e)) {
             throw $e;
@@ -187,19 +226,21 @@ class PropertyAccessor implements PropertyAccessorInterface
     public static function handleError($type, $message, $file, $line, $context)
     {
         if (E_RECOVERABLE_ERROR === $type) {
-            self::throwUnexpectedTypeException($message, debug_backtrace(false), 1);
+            self::throwInvalidArgumentException($message, debug_backtrace(false), 1);
         }
 
         return null !== self::$previousErrorHandler && false !== call_user_func(self::$previousErrorHandler, $type, $message, $file, $line, $context);
     }
 
-    private static function throwUnexpectedTypeException($message, $trace, $i)
+    private static function throwInvalidArgumentException($message, $trace, $i)
     {
         if (isset($trace[$i]['file']) && __FILE__ === $trace[$i]['file']) {
             $pos = strpos($message, $delim = 'must be of the type ') ?: strpos($message, $delim = 'must be an instance of ');
             $pos += strlen($delim);
+            $type = $trace[$i]['args'][0];
+            $type = is_object($type) ? get_class($type) : gettype($type);
 
-            throw new UnexpectedTypeException($trace[$i]['args'][0], substr($message, $pos, strpos($message, ',', $pos) - $pos));
+            throw new InvalidArgumentException(sprintf('Expected argument of type "%s", "%s" given', substr($message, $pos, strpos($message, ',', $pos) - $pos), $type));
         }
     }
 
@@ -229,14 +270,15 @@ class PropertyAccessor implements PropertyAccessorInterface
 
             if ($isIndex) {
                 // Create missing nested arrays on demand
-                if ($i + 1 < $propertyPath->getLength() && (
-                    ($zval[self::VALUE] instanceof \ArrayAccess && !$zval[self::VALUE]->offsetExists($property)) ||
+                if (($zval[self::VALUE] instanceof \ArrayAccess && !$zval[self::VALUE]->offsetExists($property)) ||
                     (is_array($zval[self::VALUE]) && !isset($zval[self::VALUE][$property]) && !array_key_exists($property, $zval[self::VALUE]))
-                )) {
-                    $zval[self::VALUE][$property] = array();
+                ) {
+                    if ($i + 1 < $propertyPath->getLength()) {
+                        $zval[self::VALUE][$property] = array();
 
-                    if (isset($zval[self::REF])) {
-                        $zval[self::REF] = $zval[self::VALUE];
+                        if (isset($zval[self::REF])) {
+                            $zval[self::REF] = $zval[self::VALUE];
+                        }
                     }
                 }
 
@@ -248,6 +290,15 @@ class PropertyAccessor implements PropertyAccessorInterface
             // the final value of the path must not be validated
             if ($i + 1 < $propertyPath->getLength() && !is_object($zval[self::VALUE]) && !is_array($zval[self::VALUE])) {
                 throw new UnexpectedTypeException($zval[self::VALUE], 'object or array');
+            }
+
+            if (isset($zval[self::REF]) && (0 === $i || isset($propertyValues[$i - 1][self::IS_REF_CHAINED]))) {
+                // Set the IS_REF_CHAINED flag to true if:
+                // current property is passed by reference and
+                // it is the first element in the property path or
+                // the IS_REF_CHAINED flag of its parent element is true
+                // Basically, this flag is true only when the reference chain from the top element to current element is not broken
+                $zval[self::IS_REF_CHAINED] = true;
             }
 
             $propertyValues[] = $zval;
@@ -412,7 +463,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Sets the value of the property at the given index in the path.
+     * Sets the value of an index in a given array-accessible value.
      *
      * @param array      $zval  The array containing the array or \ArrayAccess object to write to
      * @param string|int $index The index to write at
@@ -430,7 +481,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Sets the value of the property at the given index in the path.
+     * Sets the value of a property in the given object.
      *
      * @param array  $zval     The array containing the object to write to
      * @param string $property The property to write
@@ -452,32 +503,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         } elseif (self::ACCESS_TYPE_PROPERTY === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]} = $value;
         } elseif (self::ACCESS_TYPE_ADDER_AND_REMOVER === $access[self::ACCESS_TYPE]) {
-            // At this point the add and remove methods have been found
-            $previousValue = $this->readProperty($zval, $property);
-            $previousValue = $previousValue[self::VALUE];
-
-            if ($previousValue instanceof \Traversable) {
-                $previousValue = iterator_to_array($previousValue);
-            }
-            if ($previousValue && is_array($previousValue)) {
-                if (is_object($value)) {
-                    $value = iterator_to_array($value);
-                }
-                foreach ($previousValue as $key => $item) {
-                    if (!in_array($item, $value, true)) {
-                        unset($previousValue[$key]);
-                        $object->{$access[self::ACCESS_REMOVER]}($item);
-                    }
-                }
-            } else {
-                $previousValue = false;
-            }
-
-            foreach ($value as $item) {
-                if (!$previousValue || !in_array($item, $previousValue, true)) {
-                    $object->{$access[self::ACCESS_ADDER]}($item);
-                }
-            }
+            $this->writeCollection($zval, $property, $value, $access[self::ACCESS_ADDER], $access[self::ACCESS_REMOVER]);
         } elseif (!$access[self::ACCESS_HAS_PROPERTY] && property_exists($object, $property)) {
             // Needed to support \stdClass instances. We need to explicitly
             // exclude $classHasProperty, otherwise if in the previous clause
@@ -490,6 +516,45 @@ class PropertyAccessor implements PropertyAccessorInterface
             $object->{$access[self::ACCESS_NAME]}($value);
         } else {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
+        }
+    }
+
+    /**
+     * Adjusts a collection-valued property by calling add*() and remove*() methods.
+     *
+     * @param array              $zval         The array containing the object to write to
+     * @param string             $property     The property to write
+     * @param array|\Traversable $collection   The collection to write
+     * @param string             $addMethod    The add*() method
+     * @param string             $removeMethod The remove*() method
+     */
+    private function writeCollection($zval, $property, $collection, $addMethod, $removeMethod)
+    {
+        // At this point the add and remove methods have been found
+        $previousValue = $this->readProperty($zval, $property);
+        $previousValue = $previousValue[self::VALUE];
+
+        if ($previousValue instanceof \Traversable) {
+            $previousValue = iterator_to_array($previousValue);
+        }
+        if ($previousValue && is_array($previousValue)) {
+            if (is_object($collection)) {
+                $collection = iterator_to_array($collection);
+            }
+            foreach ($previousValue as $key => $item) {
+                if (!in_array($item, $collection, true)) {
+                    unset($previousValue[$key]);
+                    $zval[self::VALUE]->{$removeMethod}($item);
+                }
+            }
+        } else {
+            $previousValue = false;
+        }
+
+        foreach ($collection as $item) {
+            if (!$previousValue || !in_array($item, $previousValue, true)) {
+                $zval[self::VALUE]->{$addMethod}($item);
+            }
         }
     }
 
@@ -618,7 +683,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * Returns whether a method is public and has a specific number of required parameters.
+     * Returns whether a method is public and has the number of required parameters.
      *
      * @param \ReflectionClass $class      The class of the method
      * @param string           $methodName The method name

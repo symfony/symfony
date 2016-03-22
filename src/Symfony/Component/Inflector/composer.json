@@ -1,14 +1,21 @@
 {
-    "name": "symfony/property-access",
+    "name": "symfony/inflector",
     "type": "library",
-    "description": "Symfony PropertyAccess Component",
-    "keywords": ["property", "index", "access", "object", "array", "extraction", "injection", "reflection", "property path"],
+    "description": "Symfony Inflector Component",
+    "keywords": [
+        "string",
+        "inflection",
+        "singularize",
+        "pluralize",
+        "words",
+        "symfony"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
-            "name": "Fabien Potencier",
-            "email": "fabien@symfony.com"
+            "name": "Bernhard Schussek",
+            "email": "bschussek@gmail.com"
         },
         {
             "name": "Symfony Community",
@@ -16,12 +23,10 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
-        "symfony/polyfill-php70": "~1.0",
-        "symfony/inflector": "~3.1"
+        "php": ">=5.5.9"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Component\\PropertyAccess\\": "" },
+        "psr-4": { "Symfony\\Component\\Inflector\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

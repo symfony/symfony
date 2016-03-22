@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess;
 
+use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -680,7 +681,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             $reflClass = new \ReflectionClass($class);
             $access[self::ACCESS_HAS_PROPERTY] = $reflClass->hasProperty($property);
             $camelized = $this->camelize($property);
-            $singulars = (array) StringUtil::singularify($camelized);
+            $singulars = (array) Inflector::singularize($camelized);
 
             if (is_array($value) || $value instanceof \Traversable) {
                 $methods = $this->findAdderAndRemover($reflClass, $singulars);

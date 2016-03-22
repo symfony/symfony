@@ -48,24 +48,34 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteMetadataToCache()
     {
-        $cache = $this->getMock('Symfony\Component\PropertyAccess\Mapping\Cache\CacheInterface');
+        $cache = $this->getMock('Psr\Cache\CacheItemPoolInterface');
         $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
 
         $properties = array(
             self::PARENTCLASS => new PropertyMetadata(self::PARENTCLASS),
         );
 
-        $cache->expects($this->never())
-              ->method('has');
+        $cacheItem = $this->getMock('Psr\Cache\CacheItemInterface');
+
         $cache->expects($this->once())
-              ->method('read')
-              ->with($this->equalTo(self::PARENTCLASS))
-              ->will($this->returnValue(false));
-        $cache->expects($this->once())
-              ->method('write')
-              ->will($this->returnCallback(function ($metadata) use ($properties) {
+            ->method('getItem')
+            ->with($this->equalTo($this->escapeClassName(self::PARENTCLASS)))
+            ->will($this->returnValue($cacheItem));
+
+        $cacheItem->expects($this->once())
+            ->method('isHit')
+            ->will($this->returnValue(false));
+
+        $cacheItem->expects($this->once())
+            ->method('set')
+            ->will($this->returnCallback(function ($metadata) use ($properties) {
                   $this->assertEquals($properties, $metadata->getPropertiesMetadata());
               }));
+
+        $cache->expects($this->once())
+            ->method('save')
+            ->with($this->equalTo($cacheItem))
+            ->will($this->returnValue(true));
 
         $metadata = $factory->getMetadataFor(self::PARENTCLASS);
 
@@ -76,7 +86,7 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testReadMetadataFromCache()
     {
         $loader = $this->getMock('Symfony\Component\PropertyAccess\Mapping\Loader\LoaderInterface');
-        $cache = $this->getMock('Symfony\Component\PropertyAccess\Mapping\Cache\CacheInterface');
+        $cache = $this->getMock('Psr\Cache\CacheItemPoolInterface');
         $factory = new LazyLoadingMetadataFactory($loader, $cache);
 
         $metadata = new ClassMetadata(self::PARENTCLASS);
@@ -85,13 +95,40 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $loader->expects($this->never())
                ->method('loadClassMetadata');
 
-        $cache->expects($this->never())
-              ->method('has');
+        $cacheItem = $this->getMock('Psr\Cache\CacheItemInterface');
+
         $cache->expects($this->once())
-              ->method('read')
-              ->will($this->returnValue($metadata));
+            ->method('getItem')
+            ->with($this->equalTo($this->escapeClassName(self::PARENTCLASS)))
+            ->will($this->returnValue($cacheItem));
+
+        $cacheItem->expects($this->once())
+            ->method('isHit')
+            ->will($this->returnValue(true));
+
+        $cacheItem->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($metadata));
+
+        $cacheItem->expects($this->never())
+            ->method('set');
+
+        $cache->expects($this->never())
+            ->method('save');
 
         $this->assertEquals($metadata, $factory->getMetadataFor(self::PARENTCLASS));
+    }
+
+    /**
+     * Replaces backslashes by dots in a class name.
+     *
+     * @param string $class
+     *
+     * @return string
+     */
+    private function escapeClassName($class)
+    {
+        return str_replace('\\', '.', $class);
     }
 }
 

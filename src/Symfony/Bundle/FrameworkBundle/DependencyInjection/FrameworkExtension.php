@@ -987,11 +987,6 @@ class FrameworkExtension extends Extension
         $chainLoader->replaceArgument(0, $serializerLoaders);
 
         if (isset($config['cache']) && $config['cache']) {
-            $container->setParameter(
-                'property_access.mapping.cache.prefix',
-                'property_access_'.$this->getKernelRootHash($container)
-            );
-
             $container->getDefinition('property_access.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );

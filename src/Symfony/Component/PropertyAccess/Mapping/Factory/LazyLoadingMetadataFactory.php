@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\PropertyAccess\Mapping\Factory;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchMetadataException;
-use Symfony\Component\PropertyAccess\Mapping\Cache\CacheInterface;
 use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 use Symfony\Component\PropertyAccess\Mapping\Loader\LoaderInterface;
 
@@ -62,11 +62,11 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
     /**
      * Creates a new metadata factory.
      *
-     * @param LoaderInterface|null $loader The loader for configuring new metadata
-     * @param CacheInterface|null  $cache  The cache for persisting metadata
-     *                                     between multiple PHP requests
+     * @param LoaderInterface|null        $loader The loader for configuring new metadata
+     * @param CacheItemPoolInterface|null $cache  The PSR-6 cache for persisting metadata
+     *                                            between multiple PHP requests
      */
-    public function __construct(LoaderInterface $loader = null, CacheInterface $cache = null)
+    public function __construct(LoaderInterface $loader = null, CacheItemPoolInterface $cache = null)
     {
         $this->loader = $loader;
         $this->cache = $cache;
@@ -99,8 +99,11 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
             return $this->loadedClasses[$class];
         }
 
-        if (null !== $this->cache && false !== ($this->loadedClasses[$class] = $this->cache->read($class))) {
-            return $this->loadedClasses[$class];
+        if (null !== $this->cache) {
+            $item = $this->cache->getItem($this->escapeClassName($class));
+            if ($item->isHit()) {
+                return $this->loadedClasses[$class] = $item->get();
+            }
         }
 
         if (!class_exists($class) && !interface_exists($class)) {
@@ -124,7 +127,8 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
         }
 
         if (null !== $this->cache) {
-            $this->cache->write($metadata);
+            $item->set($metadata);
+            $this->cache->save($item);
         }
 
         return $this->loadedClasses[$class] = $metadata;
@@ -146,5 +150,17 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
         }
 
         return false;
+    }
+
+    /**
+     * Replaces backslashes by dots in a class name.
+     *
+     * @param string $class
+     *
+     * @return string
+     */
+    private function escapeClassName($class)
+    {
+        return str_replace('\\', '.', $class);
     }
 }

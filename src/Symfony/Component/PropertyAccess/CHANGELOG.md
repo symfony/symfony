@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.1.0
+------
+ * added custom method calling for properties.
+
 2.7.0
 ------
 

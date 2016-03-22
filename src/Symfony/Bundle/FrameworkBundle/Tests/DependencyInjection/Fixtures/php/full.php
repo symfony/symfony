@@ -67,7 +67,6 @@ $container->loadFromExtension('framework', array(
         'magic_call' => false,
         'throw_exception_on_invalid_index' => false,
         'enable_annotations' => true,
-        'cache' => 'property_access.mapping.cache.doctrine.apc',
     ),
     'serializer' => array(
         'enabled' => true,

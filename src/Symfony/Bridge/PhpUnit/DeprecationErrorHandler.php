@@ -131,7 +131,7 @@ class DeprecationErrorHandler
                 restore_error_handler();
                 self::register($mode);
             }
-        } elseif (!isset($mode[0]) || '/' !== $mode[0]) {
+        } else {
             self::$isRegistered = true;
             if (self::hasColorSupport()) {
                 $colorize = function ($str, $red) {
@@ -144,6 +144,9 @@ class DeprecationErrorHandler
             }
             register_shutdown_function(function () use ($getMode, &$deprecations, $deprecationHandler, $colorize) {
                 $mode = $getMode();
+                if (isset($mode[0]) && '/' === $mode[0]) {
+                    return;
+                }
                 $currErrorHandler = set_error_handler('var_dump');
                 restore_error_handler();
 

@@ -13,6 +13,7 @@
     <testsuites>
         <testsuite name="Symfony PHPUnit Bridge Test Suite">
             <directory>./Tests/</directory>
+            <directory suffix=".phpt">./Tests/DeprecationErrorHandler/</directory>
         </testsuite>
     </testsuites>
 

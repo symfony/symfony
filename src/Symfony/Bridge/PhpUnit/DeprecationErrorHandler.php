@@ -25,6 +25,20 @@ class DeprecationErrorHandler
         if (self::$isRegistered) {
             return;
         }
+
+        $getMode = function () use ($mode) {
+            static $memoizedMode = false;
+
+            if (false !== $memoizedMode) {
+                return $memoizedMode;
+            }
+            if (false === $mode) {
+                $mode = getenv('SYMFONY_DEPRECATIONS_HELPER') ?: '';
+            }
+
+            return $memoizedMode = $mode;
+        };
+
         $deprecations = array(
             'unsilencedCount' => 0,
             'remainingCount' => 0,
@@ -35,27 +49,36 @@ class DeprecationErrorHandler
             'legacy' => array(),
             'other' => array(),
         );
-        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $mode) {
+        $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $getMode) {
             if (E_USER_DEPRECATED !== $type) {
                 return \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
 
-            $trace = debug_backtrace(PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT : true);
+            $mode = $getMode();
+            $trace = debug_backtrace(true);
+            $group = 'other';
 
             $i = count($trace);
-            while (isset($trace[--$i]['class']) && ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_'))) {
+            while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_')))) {
                 // No-op
             }
 
-            if (0 !== error_reporting()) {
-                $group = 'unsilenced';
-                $ref = &$deprecations[$group][$msg]['count'];
-                ++$ref;
-            } elseif (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
+            if (isset($trace[$i]['object']) || isset($trace[$i]['class'])) {
                 $class = isset($trace[$i]['object']) ? get_class($trace[$i]['object']) : $trace[$i]['class'];
                 $method = $trace[$i]['function'];
 
-                $group = 0 === strpos($method, 'testLegacy') || 0 === strpos($method, 'provideLegacy') || 0 === strpos($method, 'getLegacy') || strpos($class, '\Legacy') || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true) ? 'legacy' : 'remaining';
+                if (0 !== error_reporting()) {
+                    $group = 'unsilenced';
+                } elseif (0 === strpos($method, 'testLegacy')
+                    || 0 === strpos($method, 'provideLegacy')
+                    || 0 === strpos($method, 'getLegacy')
+                    || strpos($class, '\Legacy')
+                    || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
+                ) {
+                    $group = 'legacy';
+                } else {
+                    $group = 'remaining';
+                }
 
                 if ('legacy' !== $group && 'weak' !== $mode) {
                     $ref = &$deprecations[$group][$msg]['count'];
@@ -63,8 +86,7 @@ class DeprecationErrorHandler
                     $ref = &$deprecations[$group][$msg][$class.'::'.$method];
                     ++$ref;
                 }
-            } else {
-                $group = 'other';
+            } elseif ('weak' !== $mode) {
                 $ref = &$deprecations[$group][$msg]['count'];
                 ++$ref;
             }
@@ -89,10 +111,14 @@ class DeprecationErrorHandler
             } else {
                 $colorize = function ($str) {return $str;};
             }
-            register_shutdown_function(function () use ($mode, &$deprecations, $deprecationHandler, $colorize) {
+            register_shutdown_function(function () use ($getMode, &$deprecations, $deprecationHandler, $colorize) {
+                $mode = $getMode();
                 $currErrorHandler = set_error_handler('var_dump');
                 restore_error_handler();
 
+                if ('weak' === $mode) {
+                    $colorize = function ($str) {return $str;};
+                }
                 if ($currErrorHandler !== $deprecationHandler) {
                     echo "\n", $colorize('THE ERROR HANDLER HAS CHANGED!', true), "\n";
                 }
@@ -123,6 +149,7 @@ class DeprecationErrorHandler
                 if (!empty($notices)) {
                     echo "\n";
                 }
+
                 if ('weak' !== $mode && ($deprecations['unsilenced'] || $deprecations['remaining'] || $deprecations['other'])) {
                     exit(1);
                 }

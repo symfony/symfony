@@ -99,7 +99,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));
+        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-03-23T15:05:22Z
+
+@nicolas-grekas please make ``./phpunit install`` exit with a failure exit code when composer fails, to avoid the weird build issues we got here
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-23T16:09:36Z
+
+@stof good idea, done (and workaround reverted thx to v3.1.1)

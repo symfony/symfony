@@ -261,44 +261,6 @@ class ControllerTest extends TestCase
 
         $this->assertTrue($controller->isCsrfTokenValid('foo', 'bar'));
     }
-}
-
-class TestController extends Controller
-{
-    public function forward($controller, array $path = array(), array $query = array())
-    {
-        return parent::forward($controller, $path, $query);
-    }
-
-    public function getUser()
-    {
-        return parent::getUser();
-    }
-
-    public function isGranted($attributes, $object = null)
-    {
-        return parent::isGranted($attributes, $object);
-    }
-
-    public function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
-    {
-        parent::denyAccessUnlessGranted($attributes, $object, $message);
-    }
-
-    public function redirectToRoute($route, array $parameters = array(), $status = 302)
-    {
-        return parent::redirectToRoute($route, $parameters, $status);
-    }
-
-    public function addFlash($type, $message)
-    {
-        parent::addFlash($type, $message);
-    }
-
-    public function isCsrfTokenValid($id, $token)
-    {
-        return parent::isCsrfTokenValid($id, $token);
-    }
 
     public function testGenerateUrl()
     {
@@ -330,7 +292,8 @@ class TestController extends Controller
         $templating->expects($this->once())->method('render')->willReturn('bar');
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->at(0))->method('get')->will($this->returnValue($templating));
+        $container->expects($this->at(0))->method('has')->willReturn(true);
+        $container->expects($this->at(1))->method('get')->will($this->returnValue($templating));
 
         $controller = new Controller();
         $controller->setContainer($container);
@@ -344,7 +307,8 @@ class TestController extends Controller
         $templating->expects($this->once())->method('renderResponse')->willReturn(new Response('bar'));
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->at(0))->method('get')->will($this->returnValue($templating));
+        $container->expects($this->at(0))->method('has')->willReturn(true);
+        $container->expects($this->at(1))->method('get')->will($this->returnValue($templating));
 
         $controller = new Controller();
         $controller->setContainer($container);
@@ -357,7 +321,8 @@ class TestController extends Controller
         $templating = $this->getMock('Symfony\Component\Routing\RouterInterface');
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->at(0))->method('get')->will($this->returnValue($templating));
+        $container->expects($this->at(0))->method('has')->willReturn(true);
+        $container->expects($this->at(1))->method('get')->will($this->returnValue($templating));
 
         $controller = new Controller();
         $controller->setContainer($container);
@@ -416,5 +381,43 @@ class TestController extends Controller
         $controller->setContainer($container);
 
         $this->assertEquals($doctrine, $controller->getDoctrine());
+    }
+}
+
+class TestController extends Controller
+{
+    public function forward($controller, array $path = array(), array $query = array())
+    {
+        return parent::forward($controller, $path, $query);
+    }
+
+    public function getUser()
+    {
+        return parent::getUser();
+    }
+
+    public function isGranted($attributes, $object = null)
+    {
+        return parent::isGranted($attributes, $object);
+    }
+
+    public function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
+    {
+        parent::denyAccessUnlessGranted($attributes, $object, $message);
+    }
+
+    public function redirectToRoute($route, array $parameters = array(), $status = 302)
+    {
+        return parent::redirectToRoute($route, $parameters, $status);
+    }
+
+    public function addFlash($type, $message)
+    {
+        parent::addFlash($type, $message);
+    }
+
+    public function isCsrfTokenValid($id, $token)
+    {
+        return parent::isCsrfTokenValid($id, $token);
     }
 }

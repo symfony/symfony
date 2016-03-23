@@ -16,6 +16,7 @@ CHANGELOG
  * added `Definition::setShared()` and `Definition::isShared()`
  * added ResettableContainerInterface to be able to reset the container to release memory on shutdown
  * added a way to define the priority of service decoration
+ * added support for service autowiring
 
 2.7.0
 -----

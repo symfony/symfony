@@ -51,10 +51,10 @@ install:
     - cd c:\projects\symfony
     - mkdir %APPDATA%\Composer
     - IF %APPVEYOR_REPO_NAME%==symfony/symfony copy /Y .composer\* %APPDATA%\Composer\
-    - IF %APPVEYOR_REPO_NAME%==symfony/symfony composer global install --prefer-dist --no-progress --ansi || echo curl.cainfo needs PHP 5.3.7
+    - IF %APPVEYOR_REPO_NAME%==symfony/symfony composer global install --no-progress --ansi || echo curl.cainfo needs PHP 5.3.7
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
-    - composer update --prefer-dist --no-progress --ansi
+    - composer update --no-progress --ansi
 
 test_script:
     - cd c:\projects\symfony

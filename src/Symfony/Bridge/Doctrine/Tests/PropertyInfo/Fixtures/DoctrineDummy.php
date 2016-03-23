@@ -70,5 +70,10 @@ class DoctrineDummy
      */
     private $binary;
 
+    /**
+     * @Column(type="custom_foo")
+     */
+    private $customFoo;
+
     public $notMapped;
 }

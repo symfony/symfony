@@ -49,7 +49,8 @@
         "symfony/validator": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/property-info": "~2.8|~3.0",
-        "phpdocumentor/reflection": "^1.0.7"
+        "phpdocumentor/reflection": "^1.0.7",
+        "twig/twig": "~1.23|~2.0"
     },
     "suggest": {
         "symfony/console": "For using the console commands",

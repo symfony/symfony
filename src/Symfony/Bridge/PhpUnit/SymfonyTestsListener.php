@@ -26,11 +26,22 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
     private $wasSkipped = array();
     private $isSkipped = array();
 
-    public function __construct(array $extraClockMockedNamespaces = array())
+    /**
+     * @param array $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive).
+     */
+    public function __construct(array $mockedNamespaces = array())
     {
-        if ($extraClockMockedNamespaces) {
-            foreach ($extraClockMockedNamespaces as $ns) {
-                ClockMock::register($ns.'\DummyClass');
+        foreach ($mockedNamespaces as $type => $namespaces) {
+            if (!is_array($namespaces)) {
+                $namespaces = array($namespaces);
+            }
+            if (is_int($type)) {
+                $type = 'time-sensitive';
+            }
+            if ('time-sensitive' === $type) {
+                foreach ($namespaces as $ns) {
+                    ClockMock::register($ns.'\DummyClass');
+                }
             }
         }
         if (self::$globallyEnabled) {
@@ -75,10 +86,13 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             for ($i = 0; isset($testSuites[$i]); ++$i) {
                 foreach ($testSuites[$i]->tests() as $test) {
                     if ($test instanceof \PHPUnit_Framework_TestSuite) {
-                        if (class_exists($test->getName(), false) && in_array('time-sensitive', \PHPUnit_Util_Test::getGroups($test->getName()), true)) {
-                            ClockMock::register($test->getName());
-                        } else {
+                        if (!class_exists($test->getName(), false)) {
                             $testSuites[] = $test;
+                            continue;
+                        }
+                        $groups = \PHPUnit_Util_Test::getGroups($test->getName());
+                        if (in_array('time-sensitive', $groups, true)) {
+                            ClockMock::register($test->getName());
                         }
                     }
                 }

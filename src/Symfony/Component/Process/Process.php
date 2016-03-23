@@ -464,13 +464,7 @@ class Process
      */
     public function getOutput()
     {
-        if ($this->outputDisabled) {
-            throw new LogicException('Output has been disabled.');
-        }
-
-        $this->requireProcessIsStarted(__FUNCTION__);
-
-        $this->readPipes(false, '\\' === DIRECTORY_SEPARATOR ? !$this->processInformation['running'] : true);
+        $this->readPipesForOutput(__FUNCTION__);
 
         if (false === $ret = stream_get_contents($this->stdout, -1, 0)) {
             return '';
@@ -492,11 +486,7 @@ class Process
      */
     public function getIncrementalOutput()
     {
-        if ($this->outputDisabled) {
-            throw new LogicException('Output has been disabled.');
-        }
-
-        $this->requireProcessIsStarted(__FUNCTION__);
+        $this->readPipesForOutput(__FUNCTION__);
 
         $latest = stream_get_contents($this->stdout, -1, $this->incrementalOutputOffset);
         $this->incrementalOutputOffset = ftell($this->stdout);
@@ -532,13 +522,7 @@ class Process
      */
     public function getErrorOutput()
     {
-        if ($this->outputDisabled) {
-            throw new LogicException('Output has been disabled.');
-        }
-
-        $this->requireProcessIsStarted(__FUNCTION__);
-
-        $this->readPipes(false, '\\' === DIRECTORY_SEPARATOR ? !$this->processInformation['running'] : true);
+        $this->readPipesForOutput(__FUNCTION__);
 
         if (false === $ret = stream_get_contents($this->stderr, -1, 0)) {
             return '';
@@ -561,11 +545,7 @@ class Process
      */
     public function getIncrementalErrorOutput()
     {
-        if ($this->outputDisabled) {
-            throw new LogicException('Output has been disabled.');
-        }
-
-        $this->requireProcessIsStarted(__FUNCTION__);
+        $this->readPipesForOutput(__FUNCTION__);
 
         $latest = stream_get_contents($this->stderr, -1, $this->incrementalErrorOutputOffset);
         $this->incrementalErrorOutputOffset = ftell($this->stderr);
@@ -1308,6 +1288,24 @@ class Process
         phpinfo(INFO_GENERAL);
 
         return self::$sigchild = false !== strpos(ob_get_clean(), '--enable-sigchild');
+    }
+
+    /**
+     * Reads pipes for the freshest output.
+     *
+     * @param $caller The name of the method that needs fresh outputs
+     *
+     * @throws LogicException in case output has been disabled or process is not started
+     */
+    private function readPipesForOutput($caller)
+    {
+        if ($this->outputDisabled) {
+            throw new LogicException('Output has been disabled.');
+        }
+
+        $this->requireProcessIsStarted($caller);
+
+        $this->updateStatus(false);
     }
 
     /**

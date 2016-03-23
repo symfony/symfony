@@ -45,10 +45,7 @@ interface PropertyAccessorInterface
      *
      * @throws Exception\InvalidArgumentException If the property path is invalid
      * @throws Exception\AccessException          If a property/index does not exist or is not public
-     * @throws Exception\UnexpectedTypeException  If a value within the path is neither object
-     *                                            nor array
-     * @throws \TypeError                         If a the type of the value does not match the type
-     *                                            of the parameter of the mutator method
+     * @throws Exception\UnexpectedTypeException  If a value within the path is neither object nor array
      */
     public function setValue(&$objectOrArray, $propertyPath, $value);
 

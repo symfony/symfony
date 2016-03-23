@@ -50,7 +50,8 @@
         "symfony/validator": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
         "symfony/property-info": "~2.8|~3.0",
-        "phpdocumentor/reflection-docblock": "^3.0"
+        "phpdocumentor/reflection-docblock": "^3.0",
+        "twig/twig": "~1.23|~2.0"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0"

@@ -9,16 +9,16 @@
     "packages": [
         {
             "name": "hirak/prestissimo",
-            "version": "0.1.15",
+            "version": "0.1.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hirak/prestissimo.git",
-                "reference": "f735c4f92061dae7829a6797d74bd543501d7d05"
+                "reference": "84e9fb79ec18a4428c5a0c032eacac640d89be5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hirak/prestissimo/zipball/f735c4f92061dae7829a6797d74bd543501d7d05",
-                "reference": "f735c4f92061dae7829a6797d74bd543501d7d05",
+                "url": "https://codeload.github.com/hirak/prestissimo/legacy.zip/84e9fb79ec18a4428c5a0c032eacac640d89be5d",
+                "reference": "84e9fb79ec18a4428c5a0c032eacac640d89be5d",
                 "shasum": ""
             },
             "require": {
@@ -56,7 +56,7 @@
                 "parallel",
                 "speedup"
             ],
-            "time": "2016-03-07 10:12:34"
+            "time": "2016-03-17 13:53:53"
         }
     ],
     "packages-dev": [],

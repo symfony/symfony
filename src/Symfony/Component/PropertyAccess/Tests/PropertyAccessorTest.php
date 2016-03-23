@@ -19,6 +19,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassIsWritable;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -512,17 +513,18 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \TypeError
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Expected argument of type "DateTime", "string" given
      */
     public function testThrowTypeError()
     {
-        $this->propertyAccessor->setValue(new TestClass('Kévin'), 'date', 'This is a string, \DateTime excepted.');
+        $this->propertyAccessor->setValue(new TypeHinted(), 'date', 'This is a string, \DateTime expected.');
     }
 
     public function testSetTypeHint()
     {
-        $date = new \DateTimeImmutable();
-        $object = new TestClass('Kévin');
+        $date = new \DateTime();
+        $object = new TypeHinted();
 
         $this->propertyAccessor->setValue($object, 'date', $date);
         $this->assertSame($date, $object->getDate());

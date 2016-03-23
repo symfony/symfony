@@ -411,7 +411,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowTypeError()
     {
-        $this->propertyAccessor->setValue(new TypeHinted(), 'date', 'This is a string, \DateTime excepted.');
+        $this->propertyAccessor->setValue(new TypeHinted(), 'date', 'This is a string, \DateTime expected.');
     }
 
     public function testSetTypeHint()

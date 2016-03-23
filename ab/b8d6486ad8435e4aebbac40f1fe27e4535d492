@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by staabm at 2016-03-21T13:24:04Z
+
+did you profile how much faster it is?
+
+---------------------------------------------------------------------------
+
+by masterklavi at 2016-03-21T13:44:04Z
+
+Yes. The new method is faster in ~4 times.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-03-21T13:48:00Z
+
+Is it possible to have a Backfire profile of it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-21T14:13:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by masterklavi at 2016-03-21T14:16:58Z
+
+> Is it possible to have a Backfire profile of it?
+
+5 values: https://blackfire.io/profiles/6a1e8027-1375-4a93-b46e-14ccbc2c639a/graph
+100 values: https://blackfire.io/profiles/a4587d2b-c39d-4e54-9d79-d4d90f565c98/graph
+
+100Kb per value:
+5 values: https://blackfire.io/profiles/5232a511-a7c3-4cc1-9bb7-6f5b12ef83f1/graph
+100 values: https://blackfire.io/profiles/1f7af696-fef9-41b4-8d51-05b12c37fa98/graph
+
+`doSave1()` is the old method.
+`doSave2()` is the new method.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-21T14:54:52Z
+
+@masterklavi what we would need is a backfire comparison between profiles of the old code and the new code. This would be much easier to analyze than some code running both methods one after the other with different names.
+
+---------------------------------------------------------------------------
+
+by masterklavi at 2016-03-21T15:05:24Z
+
+Ok. https://blackfire.io/profiles/compare/b801ec2e-967b-4961-9b28-f96db157a212/graph

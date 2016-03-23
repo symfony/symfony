@@ -402,7 +402,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('class_not_exist', 'Class\Not\Exist');
+        $container->register('class_not_exist', __NAMESPACE__.'\OptionalServiceClass');
 
         $barDefinition = $container->register('bar', __NAMESPACE__.'\Bar');
         $barDefinition->setAutowired(true);

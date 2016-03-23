@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-19T11:16:50Z
+
+Status: needs work, for 5.3 support
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-03-19T11:34:07Z
+
+>In weak mode, this PR also disables colors.
+
+That's the only change I'm not really fond of to be honest: if you don't want colors I would expect to set the PHPUnit colors configuration at `false`.
+
+Otherwise :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-19T12:18:08Z
+
+@theofidry we don't access to phpunit configuration. PR welcomed if anyone thinks this is of importance.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-03-19T12:26:03Z
+
+>we don't access to phpunit configuration
+
+Is it because it's something that has been needed until now or there is a reason behind that?
+
+>PR welcomed if anyone thinks this is of importance.
+
+In the example of the color, it doesn't really make sense (at least to me) to set this at the bridge level. But I have no idea of how you access to PHPUnit config so if it's too troublesome then it's understandable. It's just a color setting after all...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-19T16:20:02Z
+
+Status: needs review
+Code updated to work on 5.3
+
+@theofidry that's it: nobody spent time looking for a way to have tighter phpunit integration, because as you said:
+>It's just a color setting after all...
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-03-19T16:41:06Z
+
+Fair.
+
+This PR will require to update the doc though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-19T16:50:34Z
+
+@theofidry would you like opening it please?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-19T17:18:13Z
+
+Tests added
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-21T10:04:36Z
+
+@nicolas-grekas shouldn't most of these tests actually be added in older branches ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-21T10:07:48Z
+
+@stof right, but it's much simpler for me to make them work on master first, and backport afterwards
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-21T13:04:15Z
+
+Status: needs review
+The testing framework for the phpunit bridge now prefers the local implementation when on master, and the one provided by packagist for other branches.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-21T15:39:14Z
+
+> right, but it's much simpler for me to make them work on master first, and backport afterwards
+
+Will you backport them before merging this PR though ? It would make the git history cleaner by avoiding to add them twice.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-23T09:31:04Z
+
+Looks good to me. :+1:
+
+@nicolas-grekas can you answer my previous question ?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-23T09:31:13Z
+
+Status: reviewed

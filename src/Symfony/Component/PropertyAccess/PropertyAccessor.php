@@ -206,7 +206,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     // as well as all its ancients in the property path are all passed by reference,
                     // then there is no need to continue the value setting process
                     if (is_object($zval[self::VALUE]) || isset($zval[self::IS_REF_CHAINED])) {
-                        return;
+                        break;
                     }
                 }
 

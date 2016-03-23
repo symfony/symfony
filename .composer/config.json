@@ -1,0 +1,7 @@
+{
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        }
+    }
+}

@@ -486,13 +486,13 @@ class Filesystem
     {
         list($scheme, $hierarchy) = $this->getSchemeAndHierarchy($dir);
 
-        // If no scheme or scheme is "file" create temp file in local filesystem
-        if (null === $scheme || 'file' === $scheme) {
+        // If no scheme or scheme is "file" or "gs" create temp file in local filesystem
+        if (null === $scheme || 'file' === $scheme || 'gs' === $scheme) {
             $tmpFile = tempnam($hierarchy, $prefix);
 
             // If tempnam failed or no scheme return the filename otherwise prepend the scheme
             if (false !== $tmpFile) {
-                if (null !== $scheme) {
+                if (null !== $scheme && 'gs' !== $scheme) {
                     return $scheme.'://'.$tmpFile;
                 }
 

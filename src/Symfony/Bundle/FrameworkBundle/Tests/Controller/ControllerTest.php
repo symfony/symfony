@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\User;
@@ -270,7 +272,7 @@ class ControllerTest extends TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->at(0))->method('get')->will($this->returnValue($router));
 
-        $controller = new Controller();
+        $controller = new TestController();
         $controller->setContainer($container);
 
         $this->assertEquals('/foo', $controller->generateUrl('foo'));
@@ -278,7 +280,7 @@ class ControllerTest extends TestCase
 
     public function testRedirect()
     {
-        $controller = new Controller();
+        $controller = new TestController();
         $response = $controller->redirect('http://dunglas.fr', 301);
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);
@@ -295,7 +297,7 @@ class ControllerTest extends TestCase
         $container->expects($this->at(0))->method('has')->willReturn(true);
         $container->expects($this->at(1))->method('get')->will($this->returnValue($templating));
 
-        $controller = new Controller();
+        $controller = new TestController();
         $controller->setContainer($container);
 
         $this->assertEquals('bar', $controller->renderView('foo'));
@@ -310,7 +312,7 @@ class ControllerTest extends TestCase
         $container->expects($this->at(0))->method('has')->willReturn(true);
         $container->expects($this->at(1))->method('get')->will($this->returnValue($templating));
 
-        $controller = new Controller();
+        $controller = new TestController();
         $controller->setContainer($container);
 
         $this->assertEquals('bar', $controller->render('foo')->getContent());
@@ -324,7 +326,7 @@ class ControllerTest extends TestCase
         $container->expects($this->at(0))->method('has')->willReturn(true);
         $container->expects($this->at(1))->method('get')->will($this->returnValue($templating));
 
-        $controller = new Controller();
+        $controller = new TestController();
         $controller->setContainer($container);
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $controller->stream('foo'));
@@ -332,7 +334,7 @@ class ControllerTest extends TestCase
 
     public function testCreateNotFoundException()
     {
-        $controller = new Controller();
+        $controller = new TestController();
 
         $this->assertInstanceOf('Symfony\Component\HttpKernel\Exception\NotFoundHttpException', $controller->createNotFoundException());
     }
@@ -347,7 +349,7 @@ class ControllerTest extends TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->at(0))->method('get')->will($this->returnValue($formFactory));
 
-        $controller = new Controller();
+        $controller = new TestController();
         $controller->setContainer($container);
 
         $this->assertEquals($form, $controller->createForm('foo'));
@@ -363,7 +365,7 @@ class ControllerTest extends TestCase
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->at(0))->method('get')->will($this->returnValue($formFactory));
 
-        $controller = new Controller();
+        $controller = new TestController();
         $controller->setContainer($container);
 
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
@@ -377,7 +379,7 @@ class ControllerTest extends TestCase
         $container->expects($this->at(0))->method('has')->will($this->returnValue(true));
         $container->expects($this->at(1))->method('get')->will($this->returnValue($doctrine));
 
-        $controller = new Controller();
+        $controller = new TestController();
         $controller->setContainer($container);
 
         $this->assertEquals($doctrine, $controller->getDoctrine());
@@ -386,6 +388,16 @@ class ControllerTest extends TestCase
 
 class TestController extends Controller
 {
+    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return parent::generateUrl($route, $parameters, $referenceType);
+    }
+
+    public function redirect($url, $status = 302)
+    {
+        return parent::redirect($url, $status);
+    }
+
     public function forward($controller, array $path = array(), array $query = array())
     {
         return parent::forward($controller, $path, $query);
@@ -419,5 +431,45 @@ class TestController extends Controller
     public function isCsrfTokenValid($id, $token)
     {
         return parent::isCsrfTokenValid($id, $token);
+    }
+
+    public function renderView($view, array $parameters = array())
+    {
+        return parent::renderView($view, $parameters);
+    }
+
+    public function render($view, array $parameters = array(), Response $response = null)
+    {
+        return parent::render($view, $parameters, $response);
+    }
+
+    public function stream($view, array $parameters = array(), StreamedResponse $response = null)
+    {
+        return parent::stream($view, $parameters, $response);
+    }
+
+    public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    {
+        return parent::createNotFoundException($message, $previous);
+    }
+
+    public function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
+    {
+        return parent::createAccessDeniedException($message, $previous);
+    }
+
+    public function createForm($type, $data = null, array $options = array())
+    {
+        return parent::createForm($type, $data, $options);
+    }
+
+    public function createFormBuilder($data = null, array $options = array())
+    {
+        return parent::createFormBuilder($data, $options);
+    }
+
+    public function getDoctrine()
+    {
+        return parent::getDoctrine();
     }
 }

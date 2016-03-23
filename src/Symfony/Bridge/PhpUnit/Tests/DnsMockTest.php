@@ -13,8 +13,6 @@ namespace Symfony\Bridge\PhpUnit\Tests;
 
 use Symfony\Bridge\PhpUnit\DnsMock;
 
-require_once __DIR__.'/../DnsMock.php';
-
 class DnsMockTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()

@@ -34,10 +34,8 @@ install:
     - IF %PHP%==1 echo max_execution_time=1200 >> php.ini-min
     - IF %PHP%==1 echo date.timezone="UTC" >> php.ini-min
     - IF %PHP%==1 echo extension_dir=ext >> php.ini-min
-    - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-min
-    - IF %PHP%==1 echo extension=php_curl.dll >> php.ini-min
-    - IF %PHP%==1 echo curl.cainfo=c:\php\cacert.pem >> php.ini-min
     - IF %PHP%==1 copy /Y php.ini-min php.ini-max
+    - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_apcu.dll >> php.ini-max
     - IF %PHP%==1 echo apc.enable_cli=1 >> php.ini-max
     - IF %PHP%==1 echo extension=php_memcache.dll >> php.ini-max
@@ -46,6 +44,8 @@ install:
     - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_pdo_sqlite.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_ldap.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_curl.dll >> php.ini-max
+    - IF %PHP%==1 echo curl.cainfo=c:\php\cacert.pem >> php.ini-max
     - appveyor DownloadFile https://getcomposer.org/composer.phar
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony

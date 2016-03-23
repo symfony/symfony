@@ -28,6 +28,7 @@ class ProjectServiceContainer extends Container
         $this->services = array();
         $this->methodMap = array(
             'bar' => 'getBarService',
+            'bar\\fooclass' => 'getBar_FooclassService',
             'baz' => 'getBazService',
             'configured_service' => 'getConfiguredServiceService',
             'decorator_service' => 'getDecoratorServiceService',
@@ -42,10 +43,12 @@ class ProjectServiceContainer extends Container
             'new_factory_service' => 'getNewFactoryServiceService',
             'request' => 'getRequestService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
+            'stdclass' => 'getStdclassService',
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',
+            'bazclass' => 'foo.baz',
             'decorated' => 'decorator_service_with_name',
         );
     }
@@ -75,6 +78,19 @@ class ProjectServiceContainer extends Container
         $a->configure($instance);
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'bar\fooclass' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Bar\FooClass A Bar\FooClass instance.
+     */
+    protected function getBar_FooclassService()
+    {
+        return $this->services['bar\fooclass'] = \Symfony\Component\DependencyInjection\AmbiguousService::throwException('Bar\\FooClass', array(0 => 'foo', 1 => 'bar', 2 => 'foo_bar', 3 => 'method_call1', 4 => 'service_from_static_method'));
     }
 
     /**
@@ -308,6 +324,19 @@ class ProjectServiceContainer extends Container
     protected function getServiceFromStaticMethodService()
     {
         return $this->services['service_from_static_method'] = \Bar\FooClass::getInstance();
+    }
+
+    /**
+     * Gets the 'stdclass' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance.
+     */
+    protected function getStdclassService()
+    {
+        return $this->services['stdclass'] = \Symfony\Component\DependencyInjection\AmbiguousService::throwException('stdClass', array(0 => 'configured_service', 1 => 'decorator_service', 2 => 'decorator_service_with_name', 3 => 'deprecated_service', 4 => 'decorator_service.inner'));
     }
 
     /**

@@ -48,6 +48,7 @@ class PassConfig
             new DecoratorServicePass(),
             new ResolveParameterPlaceHoldersPass(),
             new CheckDefinitionValidityPass(),
+            new RegisterClassNamedServicesPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
             new AutowirePass(),
@@ -57,6 +58,7 @@ class PassConfig
         );
 
         $this->removingPasses = array(
+            new CheckAmbiguousReferencesPass(),
             new RemovePrivateAliasesPass(),
             new RemoveAbstractDefinitionsPass(),
             new ReplaceAliasByActualDefinitionPass(),

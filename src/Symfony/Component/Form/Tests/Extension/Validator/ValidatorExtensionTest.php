@@ -38,10 +38,6 @@ class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('addPropertyConstraint')
             ->with('children', $this->isInstanceOf('Symfony\Component\Validator\Constraints\Valid'));
 
-        $validator
-            ->expects($this->never())
-            ->method('getMetadataFactory');
-
         $extension = new ValidatorExtension($validator);
         $guesser = $extension->loadTypeGuesser();
 

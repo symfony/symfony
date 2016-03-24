@@ -72,6 +72,12 @@ Serializer
    deprecated and will not be supported in Symfony 4.0. You should use the
    `CacheClassMetadataFactory` class instead.
 
+Translation
+-----------
+
+ * Deprecated the backup feature of the file dumper classes. It will be removed
+   in Symfony 4.0.
+
 Yaml
 ----
 

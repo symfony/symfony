@@ -29,6 +29,9 @@ class FileDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(file_exists($tempDir.'/messages.en.concrete'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testDumpBackupsFileIfExisting()
     {
         $tempDir = sys_get_temp_dir();

@@ -68,6 +68,11 @@ Serializer
    class has been removed. You should use the `CacheClassMetadataFactory` class
    instead.
 
+Translation
+-----------
+
+ * Removed the backup feature from the file dumper classes.
+
 Yaml
 ----
 

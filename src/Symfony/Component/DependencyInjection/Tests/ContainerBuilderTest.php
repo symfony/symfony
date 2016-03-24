@@ -61,24 +61,27 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateDeprecatedService()
     {
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED !== $type) {
+                restore_error_handler();
+
+                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+            }
+
+            $deprecations[] = $msg;
+        });
+
         $definition = new Definition('stdClass');
         $definition->setDeprecated(true);
-
-        $that = $this;
-        $wasTriggered = false;
-
-        set_error_handler(function ($errno, $errstr) use ($that, &$wasTriggered) {
-            $that->assertSame(E_USER_DEPRECATED, $errno);
-            $that->assertSame('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', $errstr);
-            $wasTriggered = true;
-        });
 
         $builder = new ContainerBuilder();
         $builder->createService($definition, 'deprecated_foo');
 
         restore_error_handler();
 
-        $this->assertTrue($wasTriggered);
+        $this->assertCount(1, $deprecations);
+        $this->assertContains('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', $deprecations[0]);
     }
 
     public function testRegister()

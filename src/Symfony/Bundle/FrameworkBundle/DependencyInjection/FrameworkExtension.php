@@ -695,11 +695,10 @@ class FrameworkExtension extends Extension
         }
 
         foreach ($config['paths'] as $dir) {
-            if (is_dir($dir)) {
-                $dirs[] = $dir;
-            } else {
+            if (!is_dir($dir)) {
                 throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
             }
+            $dirs[] = $dir;
         }
 
         if (is_dir($dir = $rootDir.'/Resources/translations')) {
@@ -721,9 +720,8 @@ class FrameworkExtension extends Extension
                 ->in($dirs)
             ;
 
-            $locales = array();
             foreach ($finder as $file) {
-                list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
+                list(, $locale) = explode('.', $file->getBasename(), 3);
                 if (!isset($files[$locale])) {
                     $files[$locale] = array();
                 }

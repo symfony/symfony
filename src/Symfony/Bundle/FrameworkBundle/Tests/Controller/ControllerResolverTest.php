@@ -87,6 +87,8 @@ class ControllerResolverTest extends BaseControllerResolverTest
 
     public function testGetControllerInvokableService()
     {
+        $invokableController = new InvokableController('bar');
+
         $container = $this->createMockContainer();
         $container->expects($this->once())
             ->method('has')
@@ -96,7 +98,7 @@ class ControllerResolverTest extends BaseControllerResolverTest
         $container->expects($this->once())
             ->method('get')
             ->with('foo')
-            ->will($this->returnValue($this))
+            ->will($this->returnValue($invokableController))
         ;
 
         $resolver = $this->createControllerResolver(null, null, $container);
@@ -105,7 +107,33 @@ class ControllerResolverTest extends BaseControllerResolverTest
 
         $controller = $resolver->getController($request);
 
-        $this->assertInstanceOf(get_class($this), $controller);
+        $this->assertEquals($invokableController, $controller);
+    }
+
+    public function testGetControllerInvokableServiceWithClassNameAsName()
+    {
+        $invokableController = new InvokableController('bar');
+        $className = __NAMESPACE__.'\InvokableController';
+
+        $container = $this->createMockContainer();
+        $container->expects($this->once())
+            ->method('has')
+            ->with($className)
+            ->will($this->returnValue(true))
+        ;
+        $container->expects($this->once())
+            ->method('get')
+            ->with($className)
+            ->will($this->returnValue($invokableController))
+        ;
+
+        $resolver = $this->createControllerResolver(null, null, $container);
+        $request = Request::create('/');
+        $request->attributes->set('_controller', $className);
+
+        $controller = $resolver->getController($request);
+
+        $this->assertEquals($invokableController, $controller);
     }
 
     /**
@@ -171,6 +199,17 @@ class ContainerAwareController implements ContainerAwareInterface
     }
 
     public function testAction()
+    {
+    }
+
+    public function __invoke()
+    {
+    }
+}
+
+class InvokableController
+{
+    public function __construct($bar) // mandatory argument to prevent automatic instantiation
     {
     }
 

@@ -41,7 +41,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      * login page directly), this returns the URL the user should be redirected
      * to after logging in successfully (e.g. your homepage).
      *
-     * @deprecated Implement onAuthenticationFailure() instead of needing this function.
+     * @deprecated Implement onAuthenticationSuccess() instead of needing this function.
      *
      * @return string
      */
@@ -79,7 +79,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     {
         @trigger_error(sprintf('The AbstractFormLoginAuthenticator::onAuthenticationSuccess() implementation was deprecated in Symfony 3.1 and will be removed in Symfony 4.0. You should implement this method yourself in %s and remove getDefaultSuccessRedirectUrl().', get_class($this)), E_USER_DEPRECATED);
 
-        // if the user hit a secure page and start() was called, this was
+        // if the user hits a secure page and start() was called, this was
         // the URL they were on, and probably where you want to redirect to
         $targetPath = $this->getTargetPath($request->getSession(), $providerKey);
 

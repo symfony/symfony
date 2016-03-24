@@ -34,10 +34,7 @@ class AbstractFormLoginAuthenticatorTest extends \PHPUnit_Framework_TestCase
             'provider_key'
         );
 
-        $this->assertEquals(
-            '/default_url',
-            $actualResponse->getTargetUrl()
-        );
+        $this->assertEquals('/default_url', $actualResponse->getTargetUrl());
     }
 }
 
@@ -64,4 +61,3 @@ class LegacyFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     {
     }
 }
-

@@ -58,7 +58,7 @@ interface DataTransformerInterface
      *
      * This method must be able to deal with empty values. Usually this will
      * be an empty string, but depending on your implementation other empty
-     * values are possible as well (such as empty strings). The reasoning behind
+     * values are possible as well (such as NULL). The reasoning behind
      * this is that value transformers must be chainable. If the
      * reverseTransform() method of the first value transformer outputs an
      * empty string, the second value transformer must be able to process that

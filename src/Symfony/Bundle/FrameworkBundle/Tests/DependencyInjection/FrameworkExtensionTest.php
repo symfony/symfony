@@ -117,6 +117,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() does not load collectors.xml');
     }
 
+    public function testWorkflow()
+    {
+        $container = $this->createContainerFromFile('workflow');
+
+        $this->assertTrue($container->hasDefinition('workflow.my_workflow'));
+    }
+
     public function testRouter()
     {
         $container = $this->createContainerFromFile('full');

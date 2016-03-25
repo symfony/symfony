@@ -11,33 +11,55 @@
 
 namespace Symfony\Component\Workflow;
 
+use Symfony\Component\Workflow\Exception\InvalidArgumentException;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class Registry
 {
     private $workflows = array();
 
-    public function __construct(array $workflows = array())
+    /**
+     * @param Workflow $workflow
+     * @param string   $classname
+     */
+    public function add(Workflow $workflow, $classname)
     {
-        foreach ($workflows as $workflow) {
-            $this->add($workflow);
-        }
+        $this->workflows[] = array($workflow, $classname);
     }
 
-    public function add(Workflow $workflow)
+    public function get($subject, $workflowName = null)
     {
-        $this->workflows[] = $workflow;
-    }
+        $matched = null;
 
-    public function get($object)
-    {
-        foreach ($this->workflows as $workflow) {
-            if ($workflow->supports($object)) {
-                return $workflow;
+        foreach ($this->workflows as list($workflow, $classname)) {
+            if ($this->supports($workflow, $classname, $subject, $workflowName)) {
+                if ($matched) {
+                    throw new InvalidArgumentException('At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.');
+                }
+                $matched = $workflow;
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', get_class($object)));
+        if (!$matched) {
+            throw new InvalidArgumentException(sprintf('Unable to find a workflow for class "%s".', get_class($subject)));
+        }
+
+        return $matched;
+    }
+
+    private function supports(Workflow $workflow, $classname, $subject, $name)
+    {
+        if (!$subject instanceof $classname) {
+            return false;
+        }
+
+        if (null === $name) {
+            return true;
+        }
+
+        return $name === $workflow->getName();
     }
 }

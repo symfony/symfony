@@ -11,33 +11,46 @@
 
 namespace Symfony\Component\Workflow\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Workflow\Event\Event;
 
+/**
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ */
 class AuditTrailListener implements EventSubscriberInterface
 {
-    public function onEnter(Event $event)
+    private $logger;
+
+    public function __construct(LoggerInterface $logger)
     {
-// FIXME: object "identity", timestamp, who, ...
-error_log('entering "'.$event->getState().'" generic for object of class '.get_class($event->getObject()));
+        $this->logger = $logger;
     }
 
     public function onLeave(Event $event)
     {
-error_log('leaving "'.$event->getState().'" generic for object of class '.get_class($event->getObject()));
+        foreach ($event->getTransition()->getFroms() as $place) {
+            $this->logger->info(sprintf('leaving "%s" for subject of class "%s"', $place, get_class($event->getSubject())));
+        }
     }
 
     public function onTransition(Event $event)
     {
-error_log('transition "'.$event->getState().'" generic for object of class '.get_class($event->getObject()));
+        $this->logger->info(sprintf('transition "%s" for subject of class "%s"', $event->getTransition()->getName(), get_class($event->getSubject())));
+    }
+
+    public function onEnter(Event $event)
+    {
+        foreach ($event->getTransition()->getTos() as $place) {
+            $this->logger->info(sprintf('entering "%s" for subject of class "%s"', $place, get_class($event->getSubject())));
+        }
     }
 
     public static function getSubscribedEvents()
     {
         return array(
-// FIXME: add a way to listen to workflow.XXX.*
-            'workflow.transition' => array('onTransition'),
             'workflow.leave' => array('onLeave'),
+            'workflow.transition' => array('onTransition'),
             'workflow.enter' => array('onEnter'),
         );
     }

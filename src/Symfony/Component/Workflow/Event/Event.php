@@ -12,40 +12,47 @@
 namespace Symfony\Component\Workflow\Event;
 
 use Symfony\Component\EventDispatcher\Event as BaseEvent;
+use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Transition;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class Event extends BaseEvent
 {
-    private $object;
-    private $state;
-    private $attributes;
+    private $subject;
 
-    public function __construct($object, $state, array $attributes = array())
+    private $marking;
+
+    private $transition;
+
+    /**
+     * Event constructor.
+     *
+     * @param mixed      $subject
+     * @param Marking    $marking
+     * @param Transition $transition
+     */
+    public function __construct($subject, Marking $marking, Transition $transition)
     {
-        $this->object = $object;
-        $this->state = $state;
-        $this->attributes = $attributes;
+        $this->subject = $subject;
+        $this->marking = $marking;
+        $this->transition = $transition;
     }
 
-    public function getState()
+    public function getMarking()
     {
-        return $this->state;
+        return $this->marking;
     }
 
-    public function getObject()
+    public function getSubject()
     {
-        return $this->object;
+        return $this->subject;
     }
 
-    public function getAttribute($key)
+    public function getTransition()
     {
-        return isset($this->attributes[$key]) ? $this->attributes[$key] : null;
-    }
-
-    public function hastAttribute($key)
-    {
-        return isset($this->attributes[$key]);
+        return $this->transition;
     }
 }

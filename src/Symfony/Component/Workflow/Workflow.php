@@ -14,195 +14,261 @@ namespace Symfony\Component\Workflow;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
-use Symfony\Component\Workflow\Event\TransitionEvent;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Workflow\Exception\LogicException;
+use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
+use Symfony\Component\Workflow\MarkingStore\UniqueTransitionOutputInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class Workflow
 {
-    private $name;
+    private $definition;
+    private $markingStore;
     private $dispatcher;
-    private $propertyAccessor;
-    private $property = 'state';
-    private $stateTransitions = array();
-    private $states;
-    private $initialState;
-    private $class;
+    private $name;
 
-    public function __construct($name, Definition $definition, EventDispatcherInterface $dispatcher = null)
+    public function __construct(Definition $definition, MarkingStoreInterface $markingStore, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
     {
-        $this->name = $name;
+        $this->definition = $definition;
+        $this->markingStore = $markingStore;
         $this->dispatcher = $dispatcher;
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->name = $name;
 
-        $this->states = $definition->getStates();
-        $this->class = $definition->getClass();
-        $this->initialState = $definition->getInitialState();
-        foreach ($definition->getTransitions() as $name => $transition) {
-            $this->transitions[$name] = $transition;
-            foreach ($transition->getFroms() as $from) {
-                $this->stateTransitions[$from][$name] = $name;
+        // If the marking can contain only one place, we should control the definition
+        if ($markingStore instanceof UniqueTransitionOutputInterface) {
+            foreach ($definition->getTransitions() as $transition) {
+                if (1 < count($transition->getTos())) {
+                    throw new LogicException(sprintf('The marking store (%s) of workflow "%s" can not store many places. But the transition "%s" has too many output (%d). Only one is accepted.', get_class($markingStore), $this->name, $transition->getName(), count($transition->getTos())));
+                }
             }
         }
     }
 
-    public function supports($class)
+    /**
+     * Returns the object's Marking.
+     *
+     * @param object $subject A subject
+     *
+     * @return Marking The Marking
+     *
+     * @throws LogicException
+     */
+    public function getMarking($subject)
     {
-        return $class instanceof $this->class;
-    }
+        $marking = $this->markingStore->getMarking($subject);
 
-    public function can($object, $transition)
-    {
-        if (!isset($this->transitions[$transition])) {
-            throw new \LogicException(sprintf('Transition "%s" does not exist for workflow "%s".', $transition, $this->name));
+        if (!$marking instanceof Marking) {
+            throw new LogicException(sprintf('The value returned by the MarkingStore is not an instance of "%s" for workflow "%s".', Marking::class, $this->name));
         }
 
-        if (null !== $this->dispatcher) {
-            $event = new GuardEvent($object, $this->getState($object));
+        // check if the subject is already in the workflow
+        if (!$marking->getPlaces()) {
+            if (!$this->definition->getInitialPlace()) {
+                throw new LogicException(sprintf('The Marking is empty and there is no initial place for workflow "%s".', $this->name));
+            }
+            $marking->mark($this->definition->getInitialPlace());
+        }
 
-            $this->dispatcher->dispatch(sprintf('workflow.%s.guard.%s', $this->name, $transition), $event);
+        // check that the subject has a known place
+        $places = $this->definition->getPlaces();
+        foreach ($marking->getPlaces() as $placeName => $nbToken) {
+            if (!isset($places[$placeName])) {
+                $message = sprintf('Place "%s" is not valid for workflow "%s".', $placeName, $this->name);
+                if (!$places) {
+                    $message .= ' It seems you forgot to add places to the current workflow.';
+                }
 
-            if (null !== $ret = $event->isAllowed()) {
-                return $ret;
+                throw new LogicException($message);
             }
         }
 
-        return isset($this->stateTransitions[$this->getState($object)][$transition]);
+        // Because the marking could have been initialized, we update the subject
+        $this->markingStore->setMarking($subject, $marking);
+
+        return $marking;
     }
 
-    public function getState($object)
+    /**
+     * Returns true if the transition is enabled.
+     *
+     * @param object $subject        A subject
+     * @param string $transitionName A transition
+     *
+     * @return bool true if the transition is enabled
+     *
+     * @throws LogicException If the transition does not exist
+     */
+    public function can($subject, $transitionName)
     {
-        $state = $this->propertyAccessor->getValue($object, $this->property);
+        $transitions = $this->definition->getTransitions();
 
-        // check if the object is already in the workflow
-        if (null === $state) {
-            $this->enter($object, $this->initialState, array());
-
-            $state = $this->propertyAccessor->getValue($object, $this->property);
+        if (!isset($transitions[$transitionName])) {
+            throw new LogicException(sprintf('Transition "%s" does not exist for workflow "%s".', $transitionName, $this->name));
         }
 
-        // check that the object has a known state
-        if (!isset($this->states[$state])) {
-            throw new \LogicException(sprintf('State "%s" is not valid for workflow "%s".', $transition, $this->name));
-        }
+        $transition = $transitions[$transitionName];
 
-        return $state;
+        $marking = $this->getMarking($subject);
+
+        return $this->doCan($subject, $marking, $transition);
     }
 
-    public function apply($object, $transition, array $attributes = array())
+    /**
+     * Fire a transition.
+     *
+     * @param object $subject        A subject
+     * @param string $transitionName A transition
+     *
+     * @return Marking The new Marking
+     *
+     * @throws LogicException If the transition is not applicable
+     * @throws LogicException If the transition does not exist
+     */
+    public function apply($subject, $transitionName)
     {
-        $current = $this->getState($object);
-
-        if (!$this->can($object, $transition)) {
-            throw new \LogicException(sprintf('Unable to apply transition "%s" from state "%s" for workflow "%s".', $transition, $current, $this->name));
+        if (!$this->can($subject, $transitionName)) {
+            throw new LogicException(sprintf('Unable to apply transition "%s" for workflow "%s".', $transitionName, $this->name));
         }
 
-        $transition = $this->determineTransition($current, $transition);
+        // We can shortcut the getMarking method in order to boost performance,
+        // since the "can" method already checks the Marking state
+        $marking = $this->markingStore->getMarking($subject);
 
-        $this->leave($object, $current, $attributes);
+        $transition = $this->definition->getTransitions()[$transitionName];
 
-        $state = $this->transition($object, $current, $transition, $attributes);
+        $this->leave($subject, $transition, $marking);
 
-        $this->enter($object, $state, $attributes);
+        $this->transition($subject, $transition, $marking);
+
+        $this->enter($subject, $transition, $marking);
+
+        $this->announce($subject, $transition, $marking);
+
+        $this->markingStore->setMarking($subject, $marking);
+
+        return $marking;
     }
 
-    public function getAvailableTransitions($object)
+    /**
+     * Returns all enabled transitions.
+     *
+     * @param object $subject A subject
+     *
+     * @return Transition[] All enabled transitions
+     */
+    public function getEnabledTransitions($subject)
     {
-        return array_keys($this->stateTransitions[$this->getState($object)]);
-    }
+        $enabled = array();
 
-    public function getNextStates($object)
-    {
-        if (!$stateTransitions = $this->stateTransitions[$this->getState($object)]) {
-            return array();
-        }
+        $marking = $this->getMarking($subject);
 
-        $states = array();
-        foreach ($stateTransitions as $transition) {
-            foreach ($this->transitions[$transition]->getTos() as $to) {
-                $states[] = $to;
+        foreach ($this->definition->getTransitions() as $transition) {
+            if ($this->doCan($subject, $marking, $transition)) {
+                $enabled[$transition->getName()] = $transition;
             }
         }
 
-        return $states;
+        return $enabled;
     }
 
-    public function setStateProperty($property)
+    public function getName()
     {
-        $this->property = $property;
+        return $this->name;
     }
 
-    public function setPropertyAccessor(PropertyAccessor $propertyAccessor)
+    private function doCan($subject, Marking $marking, Transition $transition)
     {
-        $this->propertyAccessor = $propertyAccessor;
-    }
-
-    public function __call($method, $arguments)
-    {
-        if (!count($arguments)) {
-            throw new BadMethodCallException();
+        foreach ($transition->getFroms() as $place) {
+            if (!$marking->has($place)) {
+                return false;
+            }
         }
 
-        return $this->apply($arguments[0], $method, array_slice($arguments, 1));
+        if (true === $this->guardTransition($subject, $marking, $transition)) {
+            return false;
+        }
+
+        return true;
     }
 
-    private function leave($object, $state, $attributes)
+    private function guardTransition($subject, Marking $marking, Transition $transition)
     {
         if (null === $this->dispatcher) {
             return;
         }
 
-        $this->dispatcher->dispatch(sprintf('workflow.leave', $this->name), new Event($object, $state, $attributes));
-        $this->dispatcher->dispatch(sprintf('workflow.%s.leave', $this->name), new Event($object, $state, $attributes));
-        $this->dispatcher->dispatch(sprintf('workflow.%s.leave.%s', $this->name, $state), new Event($object, $state, $attributes));
+        $event = new GuardEvent($subject, $marking, $transition);
+
+        $this->dispatcher->dispatch('workflow.guard', $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.guard', $this->name), $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.guard.%s', $this->name, $transition->getName()), $event);
+
+        return $event->isBlocked();
     }
 
-    private function transition($object, $current, Transition $transition, $attributes)
+    private function leave($subject, Transition $transition, Marking $marking)
     {
-        $state = null;
-        $tos = $transition->getTos();
-
         if (null !== $this->dispatcher) {
-            // the generic event cannot change the next state
-            $this->dispatcher->dispatch(sprintf('workflow.transition', $this->name), new Event($object, $current, $attributes));
-            $this->dispatcher->dispatch(sprintf('workflow.%s.transition', $this->name), new Event($object, $current, $attributes));
+            $event = new Event($subject, $marking, $transition);
 
-            $event = new TransitionEvent($object, $current, $attributes);
-            $this->dispatcher->dispatch(sprintf('workflow.%s.transition.%s', $this->name, $transition->getName()), $event);
-            $state = $event->getNextState();
+            $this->dispatcher->dispatch('workflow.leave', $event);
+            $this->dispatcher->dispatch(sprintf('workflow.%s.leave', $this->name), $event);
+        }
 
-            if (null !== $state && !in_array($state, $tos)) {
-                throw new \LogicException(sprintf('Transition "%s" cannot go to state "%s" for workflow "%s"', $transition->getName(), $state, $this->name));
+        foreach ($transition->getFroms() as $place) {
+            $marking->unmark($place);
+
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(sprintf('workflow.%s.leave.%s', $this->name, $place), $event);
             }
         }
-
-        if (null === $state) {
-            if (count($tos) > 1) {
-                throw new \LogicException(sprintf('Unable to apply transition "%s" as the new state is not unique for workflow "%s".', $transition->getName(), $this->name));
-            }
-
-            $state = $tos[0];
-        }
-
-        return $state;
     }
 
-    private function enter($object, $state, $attributes)
+    private function transition($subject, Transition $transition, Marking $marking)
     {
-        $this->propertyAccessor->setValue($object, $this->property, $state);
+        if (null === $this->dispatcher) {
+            return;
+        }
 
+        $event = new Event($subject, $marking, $transition);
+
+        $this->dispatcher->dispatch('workflow.transition', $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.transition', $this->name), $event);
+        $this->dispatcher->dispatch(sprintf('workflow.%s.transition.%s', $this->name, $transition->getName()), $event);
+    }
+
+    private function enter($subject, Transition $transition, Marking $marking)
+    {
         if (null !== $this->dispatcher) {
-            $this->dispatcher->dispatch(sprintf('workflow.enter', $this->name), new Event($object, $state, $attributes));
-            $this->dispatcher->dispatch(sprintf('workflow.%s.enter', $this->name), new Event($object, $state, $attributes));
-            $this->dispatcher->dispatch(sprintf('workflow.%s.enter.%s', $this->name, $state), new Event($object, $state, $attributes));
+            $event = new Event($subject, $marking, $transition);
+
+            $this->dispatcher->dispatch('workflow.enter', $event);
+            $this->dispatcher->dispatch(sprintf('workflow.%s.enter', $this->name), $event);
+        }
+
+        foreach ($transition->getTos() as $place) {
+            $marking->mark($place);
+
+            if (null !== $this->dispatcher) {
+                $this->dispatcher->dispatch(sprintf('workflow.%s.enter.%s', $this->name, $place), $event);
+            }
         }
     }
 
-    private function determineTransition($current, $transition)
+    private function announce($subject, Transition $initialTransition, Marking $marking)
     {
-        return $this->transitions[$transition];
+        if (null === $this->dispatcher) {
+            return;
+        }
+
+        $event = new Event($subject, $marking, $initialTransition);
+
+        foreach ($this->definition->getTransitions() as $transition) {
+            if ($this->doCan($subject, $marking, $transition)) {
+                $this->dispatcher->dispatch(sprintf('workflow.%s.announce.%s', $this->name, $transition->getName()), $event);
+            }
+        }
     }
 }

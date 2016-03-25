@@ -9,23 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Workflow\Event;
+namespace Symfony\Component\Workflow\Exception;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class GuardEvent extends Event
+class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
-    private $blocked = false;
-
-    public function isBlocked()
-    {
-        return $this->blocked;
-    }
-
-    public function setBlocked($blocked)
-    {
-        $this->blocked = (bool) $blocked;
-    }
 }

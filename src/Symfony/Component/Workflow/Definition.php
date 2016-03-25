@@ -11,29 +11,41 @@
 
 namespace Symfony\Component\Workflow;
 
+use Symfony\Component\Workflow\Exception\InvalidArgumentException;
+use Symfony\Component\Workflow\Exception\LogicException;
+
 /**
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class Definition
 {
-    private $class;
-    private $states = array();
+    private $places = array();
+
     private $transitions = array();
-    private $initialState;
 
-    public function __construct($class)
+    private $initialPlace;
+
+    /**
+     * Definition constructor.
+     *
+     * @param string[]     $places
+     * @param Transition[] $transitions
+     */
+    public function __construct(array $places = array(), array $transitions = array())
     {
-        $this->class = $class;
+        $this->addPlaces($places);
+        $this->addTransitions($transitions);
     }
 
-    public function getClass()
+    public function getInitialPlace()
     {
-        return $this->class;
+        return $this->initialPlace;
     }
 
-    public function getStates()
+    public function getPlaces()
     {
-        return $this->states;
+        return $this->places;
     }
 
     public function getTransitions()
@@ -41,47 +53,58 @@ class Definition
         return $this->transitions;
     }
 
-    public function getInitialState()
+    public function setInitialPlace($place)
     {
-        return $this->initialState;
-    }
-
-    public function setInitialState($name)
-    {
-        if (!isset($this->states[$name])) {
-            throw new \LogicException(sprintf('State "%s" cannot be the initial state as it does not exist.', $name));
+        if (!isset($this->places[$place])) {
+            throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
         }
 
-        $this->initialState = $name;
+        $this->initialPlace = $place;
     }
 
-    public function addState($name)
+    public function addPlace($place)
     {
-        if (!count($this->states)) {
-            $this->initialState = $name;
+        if (!preg_match('{^[\w\d_-]+$}', $place)) {
+            throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $name));
         }
 
-        $this->states[$name] = $name;
+        if (!count($this->places)) {
+            $this->initialPlace = $place;
+        }
+
+        $this->places[$place] = $place;
+    }
+
+    public function addPlaces(array $places)
+    {
+        foreach ($places as $place) {
+            $this->addPlace($place);
+        }
+    }
+
+    public function addTransitions(array $transitions)
+    {
+        foreach ($transitions as $transition) {
+            $this->addTransition($transition);
+        }
     }
 
     public function addTransition(Transition $transition)
     {
-        if (isset($this->transitions[$transition->getName()])) {
-            throw new \LogicException(sprintf('Transition "%s" is already defined.', $transition->getName()));
-        }
+        $name = $transition->getName();
 
         foreach ($transition->getFroms() as $from) {
-            if (!isset($this->states[$from])) {
-                throw new \LogicException(sprintf('State "%s" referenced in transition "%s" does not exist.', $from, $name));
+            if (!isset($this->places[$from])) {
+                throw new LogicException(sprintf('Place "%s" referenced in transition "%s" does not exist.', $from, $name));
             }
         }
 
         foreach ($transition->getTos() as $to) {
-            if (!isset($this->states[$to])) {
-                throw new \LogicException(sprintf('State "%s" referenced in transition "%s" does not exist.', $to, $name));
+            if (!isset($this->places[$to])) {
+                throw new LogicException(sprintf('Place "%s" referenced in transition "%s" does not exist.', $to, $name));
             }
         }
 
-        $this->transitions[$transition->getName()] = $transition;
+        $this->transitions[$name] = $transition;
     }
 }

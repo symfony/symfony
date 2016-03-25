@@ -83,10 +83,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
 
-        $loadOptions = isset($context['xml_load_options']) ? $context['xml_load_options'] : $this->loadOptions;
-
         $dom = new \DOMDocument();
-        $dom->loadXML($data, $loadOptions);
+        $dom->loadXML($data, $this->loadOptions);
 
         libxml_use_internal_errors($internalErrors);
         libxml_disable_entity_loader($disableEntities);

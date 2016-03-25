@@ -523,7 +523,10 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertGroupedView($view);
     }
 
-    public function testCreateViewFlatAttrAsArray()
+    /**
+     * @group legacy
+     */
+    public function testLegacyCreateViewFlatAttrAsArray()
     {
         $view = $this->factory->createView(
             $this->list,
@@ -535,6 +538,20 @@ class DefaultChoiceListFactoryTest extends TestCase
                 'B' => array('attr1' => 'value1'),
                 'C' => array('attr2' => 'value2'),
             )
+        );
+
+        $this->assertFlatViewWithDynamicAttr($view);
+    }
+
+    public function testCreateViewFlatAttrAsArray()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            array($this->obj2, $this->obj3),
+            null, // label
+            null, // index
+            null, // group
+            array('attr' => 'value')
         );
 
         $this->assertFlatViewWithAttr($view);
@@ -565,7 +582,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             array($this, 'getAttr')
         );
 
-        $this->assertFlatViewWithAttr($view);
+        $this->assertFlatViewWithDynamicAttr($view);
     }
 
     public function testCreateViewFlatAttrAsClosure()
@@ -581,7 +598,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             }
         );
 
-        $this->assertFlatViewWithAttr($view);
+        $this->assertFlatViewWithDynamicAttr($view);
     }
 
     public function testCreateViewFlatAttrClosureReceivesKey()
@@ -601,7 +618,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             }
         );
 
-        $this->assertFlatViewWithAttr($view);
+        $this->assertFlatViewWithDynamicAttr($view);
     }
 
     public function testCreateViewFlatAttrClosureReceivesValue()
@@ -621,7 +638,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             }
         );
 
-        $this->assertFlatViewWithAttr($view);
+        $this->assertFlatViewWithDynamicAttr($view);
     }
 
     private function assertScalarListWithChoiceValues(ChoiceListInterface $list)
@@ -726,7 +743,7 @@ class DefaultChoiceListFactoryTest extends TestCase
         ), $view);
     }
 
-    private function assertFlatViewWithAttr($view)
+    private function assertFlatViewWithDynamicAttr($view)
     {
         $this->assertEquals(new ChoiceListView(
                 array(
@@ -744,6 +761,39 @@ class DefaultChoiceListFactoryTest extends TestCase
                         '2',
                         'C',
                         array('attr2' => 'value2')
+                    ),
+                )
+        ), $view);
+    }
+
+    private function assertFlatViewWithAttr($view)
+    {
+        $this->assertEquals(new ChoiceListView(
+                array(
+                    0 => new ChoiceView(
+                        $this->obj1,
+                        '0',
+                        'A',
+                        array('attr' => 'value')
+                    ),
+                    3 => new ChoiceView(
+                        $this->obj4,
+                        '3',
+                        'D',
+                        array('attr' => 'value')
+                    ),
+                ), array(
+                    1 => new ChoiceView(
+                        $this->obj2,
+                        '1',
+                        'B',
+                        array('attr' => 'value')
+                    ),
+                    2 => new ChoiceView(
+                        $this->obj3,
+                        '2',
+                        'C',
+                        array('attr' => 'value')
                     ),
                 )
         ), $view);

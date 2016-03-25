@@ -7,6 +7,7 @@ CHANGELOG
  * added `Symfony\Component\Form\FormErrorIterator::findByCodes()`
  * added `getTypedExtensions`, `getTypes`, and `getTypeGuessers` to `Symfony\Component\Form\Test\FormIntegrationTestCase`
  * added `FormPass`
+ * deprecated `choice_attr` option as array of nested arrays mapped by indexes
 
 3.2.0
 -----

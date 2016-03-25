@@ -329,7 +329,7 @@ class ChoiceType extends AbstractType
             'choice_label' => null,
             'choice_name' => null,
             'choice_value' => null,
-            'choice_attr' => null,
+            'choice_attr' => array(),
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,

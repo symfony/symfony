@@ -131,13 +131,31 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $label = false === $dynamicLabel ? false : (string) $dynamicLabel;
         }
 
+        // BC
+        if (is_array($attr)) {
+            if (isset($attr[$key])) {
+                @trigger_error('Passing an array of arrays to the "choice_attr" option with choice keys as keys is deprecated since version 3.3 and will no longer be supported in 4.0. Use a "\Closure" instead.', E_USER_DEPRECATED);
+                $attr = $attr[$key];
+            } else {
+                foreach ($attr as $a) {
+                    if (is_array($a)) {
+                        // Using the deprecated way of choice keys as keys allows to not define all choices.
+                        // When $attr[$key] is not set for this one but is for another we need to
+                        // prevent using an array as HTML attribute
+                        $attr = array();
+
+                        break;
+                    }
+                }
+            }
+        }
+
         $view = new ChoiceView(
             $choice,
             $value,
             $label,
-            // The attributes may be a callable or a mapping from choice indices
-            // to nested arrays
-            is_callable($attr) ? call_user_func($attr, $choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : array())
+            // The attributes may be a callable or an array
+            is_callable($attr) ? call_user_func($attr, $choice, $key, $value) : (null !== $attr ? $attr : array())
         );
 
         // $isPreferred may be null if no choices are preferred

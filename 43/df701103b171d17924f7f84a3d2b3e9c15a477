@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-24T20:39:50Z
+
+Note to merger: line 32 with `choices_as_values` can be removed in 3.0+.
+
+---------------------------------------------------------------------------
+
+by phansys at 2016-03-24T21:54:39Z
+
+Indeed, in 3.0+ the FQCN string representation could be replaced with the `class` constant of each class.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-24T22:01:44Z
+
+@phansys It may not be necessary as that would mean to add the corresponding `use` statement...
+
+---------------------------------------------------------------------------
+
+by phansys at 2016-03-24T22:07:35Z
+
+IMO, it would be better to import the classes with `use` instead of hardcoding the FQCN, which could lead to typos and haven't IDE support. Obviously, I'm talking about the real use cases, not about those examples, in which I think you can use `FQCN::class` syntax.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-24T22:31:24Z
+
+I'm fine either way :)

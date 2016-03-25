@@ -55,7 +55,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $this->request->expects($this->any())->method('get')->with('_switch_user')->will($this->returnValue(null));
 
         $this->event->expects($this->never())->method('setResponse');
-        $this->tokenStorage->expects($this->never())->method('setToken');
+        $this->securityContext->expects($this->never())->method('setToken');
 
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $listener->handle($this->event);

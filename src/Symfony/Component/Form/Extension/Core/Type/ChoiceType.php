@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\Factory\ExpandedChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
@@ -339,6 +340,7 @@ class ChoiceType extends AbstractType
             'choice_name' => null,
             'choice_value' => null,
             'choice_attr' => array(),
+            'choice_label_attr' => array(),
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,
@@ -364,6 +366,7 @@ class ChoiceType extends AbstractType
         $resolver->setAllowedTypes('choice_name', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('choice_value', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('choice_attr', array('null', 'array', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
+        $resolver->setAllowedTypes('choice_label_attr', array('array', 'callable'));
         $resolver->setAllowedTypes('preferred_choices', array('array', '\Traversable', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('group_by', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
     }
@@ -415,6 +418,7 @@ class ChoiceType extends AbstractType
             'value' => $choiceView->value,
             'label' => $choiceView->label,
             'attr' => $choiceView->attr,
+            'label_attr' => $choiceView->labelAttr,
             'translation_domain' => $options['translation_domain'],
             'block_name' => 'entry',
         );
@@ -448,6 +452,18 @@ class ChoiceType extends AbstractType
 
     private function createChoiceListView(ChoiceListInterface $choiceList, array $options)
     {
+        if ($this->choiceListFactory instanceof ExpandedChoiceListFactoryInterface) {
+            return $this->choiceListFactory->createExpandedView(
+                $choiceList,
+                $options['preferred_choices'],
+                $options['choice_label'],
+                $options['choice_name'],
+                $options['group_by'],
+                $options['choice_attr'],
+                $options['choice_label_attr']
+            );
+        }
+
         return $this->choiceListFactory->createView(
             $choiceList,
             $options['preferred_choices'],

@@ -39,7 +39,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class PropertyAccessDecorator implements ChoiceListFactoryInterface
+class PropertyAccessDecorator implements ExpandedChoiceListFactoryInterface
 {
     /**
      * @var ChoiceListFactoryInterface
@@ -139,6 +139,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
         return $this->decoratedFactory->createListFromLoader($loader, $value);
     }
 
+    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    {
+        return $this->createExpandedView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -148,10 +153,11 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
      * @param null|callable|string|PropertyPath       $index            The callable or path generating the view indices
      * @param null|callable|string|PropertyPath       $groupBy          The callable or path generating the group names
      * @param null|array|callable|string|PropertyPath $attr             The callable or path generating the HTML attributes
+     * @param null|array|callable                     $labelAttr        The array or callable generating the label HTML attributes
      *
      * @return ChoiceListView The choice list view
      */
-    public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    public function createExpandedView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         $accessor = $this->propertyAccessor;
 
@@ -225,6 +231,13 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             };
         }
 
-        return $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+        // BC Layer
+        if ($this->decoratedFactory instanceof ExpandedChoiceListFactoryInterface) {
+            $choiceView = $this->decoratedFactory->createExpandedView($list, $preferredChoices, $label, $index, $groupBy, $attr, $labelAttr);
+        } else {
+            $choiceView = $this->decoratedFactory->createView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+        }
+
+        return $choiceView;
     }
 }

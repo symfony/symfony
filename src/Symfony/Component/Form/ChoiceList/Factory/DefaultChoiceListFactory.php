@@ -24,7 +24,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class DefaultChoiceListFactory implements ChoiceListFactoryInterface
+class DefaultChoiceListFactory implements ExpandedChoiceListFactoryInterface
 {
     /**
      * {@inheritdoc}
@@ -46,6 +46,14 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      * {@inheritdoc}
      */
     public function createView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null)
+    {
+        return $this->createExpandedView($list, $preferredChoices, $label, $index, $groupBy, $attr);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createExpandedView(ChoiceListInterface $list, $preferredChoices = null, $label = null, $index = null, $groupBy = null, $attr = null, $labelAttr = null)
     {
         $preferredViews = array();
         $otherViews = array();
@@ -76,6 +84,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                     $keys,
                     $index,
                     $attr,
+                    $labelAttr,
                     $preferredChoices,
                     $preferredViews,
                     $otherViews
@@ -90,6 +99,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $keys,
                 $index,
                 $attr,
+                $labelAttr,
                 $preferredChoices,
                 $preferredViews,
                 $otherViews
@@ -113,7 +123,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         return new ChoiceListView($otherViews, $preferredViews);
     }
 
-    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceView($choice, $value, $label, $keys, &$index, $attr, $labelAttr, $isPreferred, &$preferredViews, &$otherViews)
     {
         // $value may be an integer or a string, since it's stored in the array
         // keys. We want to guarantee it's a string though.
@@ -155,7 +165,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $value,
             $label,
             // The attributes may be a callable or an array
-            is_callable($attr) ? call_user_func($attr, $choice, $key, $value) : (null !== $attr ? $attr : array())
+            is_callable($attr) ? call_user_func($attr, $choice, $key, $value) : (null !== $attr ? $attr : array()),
+            is_callable($labelAttr) ? call_user_func($labelAttr, $choice, $key, $value) : (null !== $labelAttr ? $labelAttr : array())
         );
 
         // $isPreferred may be null if no choices are preferred
@@ -166,7 +177,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addChoiceViewsGroupedBy($groupBy, $label, $choices, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViewsGroupedBy($groupBy, $label, $choices, $keys, &$index, $attr, $labelAttr, $isPreferred, &$preferredViews, &$otherViews)
     {
         foreach ($groupBy as $key => $value) {
             if (null === $value) {
@@ -185,6 +196,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                     $keys,
                     $index,
                     $attr,
+                    $labelAttr,
                     $isPreferred,
                     $preferredViewsForGroup,
                     $otherViewsForGroup
@@ -209,6 +221,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $keys,
                 $index,
                 $attr,
+                $labelAttr,
                 $isPreferred,
                 $preferredViews,
                 $otherViews
@@ -216,7 +229,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         }
     }
 
-    private static function addChoiceViewGroupedBy($groupBy, $choice, $value, $label, $keys, &$index, $attr, $isPreferred, &$preferredViews, &$otherViews)
+    private static function addChoiceViewGroupedBy($groupBy, $choice, $value, $label, $keys, &$index, $attr, $labelAttr, $isPreferred, &$preferredViews, &$otherViews)
     {
         $groupLabel = call_user_func($groupBy, $choice, $keys[$value], $value);
 
@@ -229,6 +242,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $keys,
                 $index,
                 $attr,
+                $labelAttr,
                 $isPreferred,
                 $preferredViews,
                 $otherViews
@@ -253,6 +267,7 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $keys,
             $index,
             $attr,
+            $labelAttr,
             $isPreferred,
             $preferredViews[$groupLabel]->choices,
             $otherViews[$groupLabel]->choices

@@ -9,6 +9,7 @@ CHANGELOG
  * added `FormPass`
  * deprecated `choice_attr` option as array of nested arrays mapped by indexes
  * deprecated `choice_attr` option as string or `PropertyPath` instance
+ * added `choice_label_attr` option to `ChoiceType` to use when expanded
 
 3.2.0
 -----

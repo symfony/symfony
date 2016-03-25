@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-25T15:31:16Z
+
+Looks like there are more to fix :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-25T15:44:43Z
+
+Rebasing to include the changes from #18306 should be enough. Let's see if Travis and AppVeyor agree.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-25T17:01:54Z
+
+The Travis build succeeded, AppVeyor seemed to time out before actually running any test.

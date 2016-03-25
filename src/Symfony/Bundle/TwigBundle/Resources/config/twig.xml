@@ -59,6 +59,9 @@
             <argument type="service" id="twig" />
             <argument type="service" id="templating.name_parser" />
             <argument type="service" id="templating.locator" />
+
+            <autowiring-type>Symfony\Component\Templating\EngineInterface</autowiring-type>
+            <autowiring-type>Symfony\Bundle\FrameworkBundle\Templating\EngineInterface</autowiring-type>
         </service>
 
         <service id="twig.extension.profiler" class="Symfony\Bridge\Twig\Extension\ProfilerExtension" public="false">

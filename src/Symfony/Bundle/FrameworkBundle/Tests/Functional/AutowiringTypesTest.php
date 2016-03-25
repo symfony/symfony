@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 
 class AutowiringTypesTest extends WebTestCase
 {
@@ -32,6 +33,16 @@ class AutowiringTypesTest extends WebTestCase
 
         $annotationReader = $container->get('test.autowiring_types.autowired_services')->getAnnotationReader();
         $this->assertInstanceOf(CachedReader::class, $annotationReader);
+    }
+
+    public function testTemplatingAutowiring()
+    {
+        static::bootKernel();
+        $container = static::$kernel->getContainer();
+
+        $autowiredServices = $container->get('test.autowiring_types.autowired_services');
+        $this->assertInstanceOf(DelegatingEngine::class, $autowiredServices->getFrameworkBundleEngine());
+        $this->assertInstanceOf(DelegatingEngine::class, $autowiredServices->getEngine());
     }
 
     protected static function createKernel(array $options = array())

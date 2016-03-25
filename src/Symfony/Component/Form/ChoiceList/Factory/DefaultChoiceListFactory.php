@@ -77,6 +77,21 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
         $choices = $list->getChoices();
         $keys = $list->getOriginalKeys();
 
+        // BC, to be removed in 6.0
+        if (\is_array($attr)) {
+            foreach ($attr as $choiceIndex => $choiceAttr) {
+                if (\is_array($choiceAttr) && false !== array_search($choiceIndex, $keys)) {
+                    trigger_deprecation('symfony/form', '5.1', 'Using an array of arrays mapped by choice indexes to define the "choice_attr" option is deprecated. Use a callable or a unique array for all choices instead.');
+
+                    $attr = static function ($choice, $index) use ($attr) {
+                        return $attr[$index] ?? [];
+                    };
+                }
+
+                break;
+            }
+        }
+
         if (!\is_callable($preferredChoices)) {
             if (empty($preferredChoices)) {
                 $preferredChoices = null;
@@ -184,9 +199,8 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             $choice,
             $value,
             $label,
-            // The attributes may be a callable or a mapping from choice indices
-            // to nested arrays
-            \is_callable($attr) ? $attr($choice, $key, $value) : (isset($attr[$key]) ? $attr[$key] : [])
+            // The attributes may be a callable or a unique array
+            \is_callable($attr) ? $attr($choice, $key, $value) : (null !== $attr ? $attr : [])
         );
 
         // $isPreferred may be null if no choices are preferred

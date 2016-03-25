@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3LayoutTest
 {
     public function testLabelOnForm()
@@ -211,6 +213,42 @@ abstract class AbstractBootstrap3HorizontalLayoutTest extends AbstractBootstrap3
         [
             ./span[text() = "[trans]really helpful text[/trans]"]
         ]
+    ]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedAttributes()
+    {
+        $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
+            'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
+            'choice_attr' => ['class' => 'foo&bar'],
+            'multiple' => false,
+            'expanded' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/div
+    [
+        ./div
+            [@class="radio"]
+            [
+                ./label
+                    [.=" [trans]Choice&A[/trans]"]
+                    [
+                        input[@type="radio"][@name="name"][@id="name_0"][@value="&a"][@checked][@class="foo&bar"]
+                    ]
+            ]
+        /following-sibling::div
+            [@class="radio"]
+            [
+                ./label
+                    [.=" [trans]Choice&B[/trans]"]
+                    [
+                        input[@type="radio"][@name="name"][@id="name_1"][@value="&b"][not(@checked)][@class="foo&bar"]
+                    ]
+            ]
+        /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
 '
         );

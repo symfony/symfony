@@ -22,6 +22,50 @@ Form
  * Added the `getIsEmptyCallback()` method to the `FormConfigInterface`.
  * Added the `setIsEmptyCallback()` method to the `FormConfigBuilderInterface`.
  * Added argument `callable|null $filter` to `ChoiceListFactoryInterface::createListFromChoices()` and `createListFromLoader()`.
+ * Usage of `choice_attr` option as an array of nested arrays has been removed
+   and indexes are considered as attributes. Use a unique array for all choices or a `callable` instead.
+
+   Before:
+   ```php
+   // Single array for all choices using callable
+   'choice_attr' => function () {
+       return ['class' => 'choice-options'];
+   },
+
+   // Different arrays per choice using array
+   'choices' => [
+       'Yes' => true,
+       'No' => false,
+       'Maybe' => null,
+   ],
+   'choice_attr' => [
+       'Yes' => ['class' => 'option-green'],
+       'No' => ['class' => 'option-red'],
+   ],
+   ```
+
+   After:
+   ```php
+   // Single array for all choices using array
+   'choice_attr' => ['class' => 'choice-options'],
+
+   // Different arrays per choice using callable
+   'choices' => [
+       'Yes' => true,
+       'No' => false,
+       'Maybe' => null,
+   ],
+   'choice_attr' => function ($choice, $index, $value) {
+       if ('Yes' === $index) {
+           return ['class' => 'option-green'];
+       }
+       if ('No' === $index) {
+           return ['class' => 'option-red'];
+       }
+
+       return [];
+   },
+   ```
 
 FrameworkBundle
 ---------------

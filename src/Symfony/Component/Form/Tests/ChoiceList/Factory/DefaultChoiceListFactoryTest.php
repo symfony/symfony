@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Tests\ChoiceList\Factory;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
@@ -23,6 +24,8 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
 class DefaultChoiceListFactoryTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     private $obj1;
 
     private $obj2;
@@ -652,8 +655,13 @@ class DefaultChoiceListFactoryTest extends TestCase
         $this->assertGroupedView($view);
     }
 
-    public function testCreateViewFlatAttrAsArray()
+    /**
+     * @group legacy
+     */
+    public function testLegacyCreateViewFlatAttrAsArray()
     {
+        $this->expectDeprecation('Since symfony/form 5.1: Using an array of arrays mapped by choice indexes to define the "choice_attr" option is deprecated. Use a callable or a unique array for all choices instead.');
+
         $view = $this->factory->createView(
             $this->list,
             [$this->obj2, $this->obj3],
@@ -664,6 +672,20 @@ class DefaultChoiceListFactoryTest extends TestCase
                 'B' => ['attr1' => 'value1'],
                 'C' => ['attr2' => 'value2'],
             ]
+        );
+
+        $this->assertFlatViewWithDynamicAttr($view);
+    }
+
+    public function testCreateViewFlatAttrAsArray()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj3], // preferred choices
+            null, // label
+            null, // index
+            null, // group
+            ['attribute_name' => 'attribute_value']
         );
 
         $this->assertFlatViewWithAttr($view);
@@ -694,7 +716,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             [$this, 'getAttr']
         );
 
-        $this->assertFlatViewWithAttr($view);
+        $this->assertFlatViewWithDynamicAttr($view);
     }
 
     public function testCreateViewFlatAttrAsClosure()
@@ -710,7 +732,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             }
         );
 
-        $this->assertFlatViewWithAttr($view);
+        $this->assertFlatViewWithDynamicAttr($view);
     }
 
     public function testCreateViewFlatAttrClosureReceivesKey()
@@ -730,7 +752,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             }
         );
 
-        $this->assertFlatViewWithAttr($view);
+        $this->assertFlatViewWithDynamicAttr($view);
     }
 
     public function testCreateViewFlatAttrClosureReceivesValue()
@@ -750,7 +772,7 @@ class DefaultChoiceListFactoryTest extends TestCase
             }
         );
 
-        $this->assertFlatViewWithAttr($view);
+        $this->assertFlatViewWithDynamicAttr($view);
     }
 
     private function assertScalarListWithChoiceValues(ChoiceListInterface $list)
@@ -859,7 +881,7 @@ class DefaultChoiceListFactoryTest extends TestCase
         ), $view);
     }
 
-    private function assertFlatViewWithAttr($view)
+    private function assertFlatViewWithDynamicAttr($view)
     {
         $this->assertEquals(new ChoiceListView(
                 [
@@ -892,6 +914,49 @@ class DefaultChoiceListFactoryTest extends TestCase
                     ),
                 ]
         ), $view);
+    }
+
+    private function assertFlatViewWithAttr($view)
+    {
+        $this->assertEquals(new ChoiceListView([
+            0 => new ChoiceView(
+                $this->obj1,
+                '0',
+                'A',
+                ['attribute_name' => 'attribute_value']
+            ),
+            1 => new ChoiceView(
+                $this->obj2,
+                '1',
+                'B',
+                ['attribute_name' => 'attribute_value']
+            ),
+            2 => new ChoiceView(
+                $this->obj3,
+                '2',
+                'C',
+                ['attribute_name' => 'attribute_value']
+            ),
+            3 => new ChoiceView(
+                $this->obj4,
+                '3',
+                'D',
+                ['attribute_name' => 'attribute_value']
+            ),
+        ], [
+            1 => new ChoiceView(
+                $this->obj2,
+                '1',
+                'B',
+                ['attribute_name' => 'attribute_value']
+            ),
+            2 => new ChoiceView(
+                $this->obj3,
+                '2',
+                'C',
+                ['attribute_name' => 'attribute_value']
+            ),
+        ]), $view);
     }
 
     private function assertGroupedView($view)

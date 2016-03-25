@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-16T15:54:10Z
+
+Can you explain the use case where it is important to determine if the request came from a trusted proxy? This method is already used in several places in the `Request` class. So maybe it would be more reasonable if you called one the other methods of the `Request` class.
+
+---------------------------------------------------------------------------
+
+by sjamaan at 2016-03-16T19:40:21Z
+
+I'm using this to determine whether to trust a custom `X-Base-Url` header that's added by our [Vagrant reverse proxy setup](https://github.com/CodeYellowBV/vagrant-reverse-proxy). It's a nonstandard header, so I think none of the existing methods are sufficient to extract it.
+
+More concretely, we have a small middleware plugin for Laravel which sets the root URL for the application:
+```php
+class ProxiedBaseUrlMiddleware
+{
+    public function handle($request, Closure $next)
+    {
+        $request = CustomRequest::createFromBase($request);
+        $baseUrl = $request->maybeGetProxiedBaseUrl();
+        if ($baseUrl) \URL::forceRootUrl($baseUrl);
+        return $next($request);
+    }
+}
+```
+
+And `CustomRequest` looks like this:
+
+```php
+class CustomRequest extends IlluminateRequest
+{
+    public function maybeGetProxiedBaseUrl()
+    {
+        $isFromTrustedProxy = self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR'), self::$trustedProxies);
+        /* $this->isFromTrustedProxy() is private... */
+        if ($isFromTrustedProxy) return $this->headers->get('X-Base-Url');
+        else return null;
+    }
+}
+```
+
+Here, `IlluminateRequest` is Laravel's `Request` class which extends from Symfony's. If the Request class would expose `isFromTrustedProxy()`, we could move the check to our middleware and get rid of the custom subclass as well as the creation of another `Request` object with the `createFromBase()` method (though this latter part is a shortcoming of Laravel's dependency injection, not a problem with Symfony).
+
+---------------------------------------------------------------------------
+
+by sjamaan at 2016-03-17T10:04:10Z
+
+A slightly longer explanation can be found in [my blog post](http://www.codeyellow.nl/vagrant-reverse-proxy.html) about how we're using this plugin.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-18T16:13:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-23T20:32:30Z
+
+:+1:
+
+Status: Reviewed

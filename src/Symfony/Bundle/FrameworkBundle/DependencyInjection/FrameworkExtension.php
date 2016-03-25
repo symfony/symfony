@@ -709,9 +709,8 @@ class FrameworkExtension extends Extension
                 ->in($dirs)
             ;
 
-            $locales = array();
             foreach ($finder as $file) {
-                list($domain, $locale, $format) = explode('.', $file->getBasename(), 3);
+                list(, $locale) = explode('.', $file->getBasename(), 3);
                 if (!isset($files[$locale])) {
                     $files[$locale] = array();
                 }

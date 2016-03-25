@@ -98,7 +98,7 @@ class KernelTest extends \PHPUnit_Framework_TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));
+        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
@@ -687,21 +687,17 @@ EOF;
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
     {
         // does not implement TerminableInterface
-        $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $httpKernelMock
-            ->expects($this->never())
-            ->method('terminate');
+        $httpKernel = new TestKernel();
 
         $kernel = $this->getKernel(array('getHttpKernel'));
         $kernel->expects($this->once())
             ->method('getHttpKernel')
-            ->will($this->returnValue($httpKernelMock));
+            ->willReturn($httpKernel);
 
         $kernel->boot();
         $kernel->terminate(Request::create('/'), new Response());
+
+        $this->assertFalse($httpKernel->terminateCalled, 'terminate() is never called if the kernel class does not implement TerminableInterface');
 
         // implements TerminableInterface
         $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
@@ -802,5 +798,19 @@ EOF;
         $p->setValue($kernel, __DIR__.'/Fixtures');
 
         return $kernel;
+    }
+}
+
+class TestKernel implements HttpKernelInterface
+{
+    public $terminateCalled = false;
+
+    public function terminate()
+    {
+        $this->terminateCalled = true;
+    }
+
+    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
+    {
     }
 }

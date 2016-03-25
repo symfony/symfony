@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ControllerResolver extends ArgumentResolver implements ControllerResolverInterface
+class ControllerResolver extends LegacyArgumentResolver implements ControllerResolverInterface
 {
     private $logger;
 
@@ -85,21 +85,21 @@ class ControllerResolver extends ArgumentResolver implements ControllerResolverI
     /**
      * {@inheritdoc}
      *
-     * @deprecated this method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the ArgumentResolver instead.
+     * @deprecated this method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the LegacyArgumentResolver instead.
      */
     public function getArguments(Request $request, $controller)
     {
-        @trigger_error(sprintf('%s is deprecated as of 3.1 and will be removed in 4.0. Implement the %s or extend the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('%s is deprecated as of 3.1 and will be removed in 4.0. Implement the %s or extend the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class, LegacyArgumentResolver::class), E_USER_DEPRECATED);
 
         return parent::getArguments($request, $controller);
     }
 
     /**
-     * @deprecated this method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the ArgumentResolver instead.
+     * @deprecated this method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the LegacyArgumentResolver instead.
      */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
-        @trigger_error(sprintf('%s is deprecated as of 3.1 and will be removed in 4.0. Implement the %s or extend the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('%s is deprecated as of 3.1 and will be removed in 4.0. Implement the %s or extend the %s and inject it in the HttpKernel instead.', __METHOD__, ArgumentResolverInterface::class, LegacyArgumentResolver::class), E_USER_DEPRECATED);
 
         return parent::doGetArguments($request, $controller, $parameters);
     }

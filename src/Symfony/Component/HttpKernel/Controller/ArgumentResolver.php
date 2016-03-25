@@ -12,57 +12,64 @@
 namespace Symfony\Component\HttpKernel\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactoryInterface;
 
 /**
- * Responsible for the creation of the action arguments.
+ * Responsible for the resolving of arguments passed to an action.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Iltar van der Berg <kjarli@gmail.com>
  */
-class ArgumentResolver implements ArgumentResolverInterface
+final class ArgumentResolver implements ArgumentResolverInterface
 {
+    private $argumentMetadataFactory;
+
+    /**
+     * @var ArgumentValueResolverInterface[]
+     */
+    private $argumentValueResolvers;
+
+    public function __construct(ArgumentMetadataFactoryInterface $argumentMetadataFactory = null, array $argumentValueResolvers = array())
+    {
+        $this->argumentMetadataFactory = $argumentMetadataFactory;
+        $this->argumentValueResolvers = $argumentValueResolvers;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getArguments(Request $request, $controller)
     {
-        if (is_array($controller)) {
-            $r = new \ReflectionMethod($controller[0], $controller[1]);
-        } elseif (is_object($controller) && !$controller instanceof \Closure) {
-            $r = new \ReflectionObject($controller);
-            $r = $r->getMethod('__invoke');
-        } else {
-            $r = new \ReflectionFunction($controller);
-        }
-
-        return $this->doGetArguments($request, $controller, $r->getParameters());
-    }
-
-    protected function doGetArguments(Request $request, $controller, array $parameters)
-    {
-        $attributes = $request->attributes->all();
         $arguments = array();
-        foreach ($parameters as $param) {
-            if (array_key_exists($param->name, $attributes)) {
-                if (PHP_VERSION_ID >= 50600 && $param->isVariadic() && is_array($attributes[$param->name])) {
-                    $arguments = array_merge($arguments, array_values($attributes[$param->name]));
-                } else {
-                    $arguments[] = $attributes[$param->name];
-                }
-            } elseif ($param->getClass() && $param->getClass()->isInstance($request)) {
-                $arguments[] = $request;
-            } elseif ($param->isDefaultValueAvailable()) {
-                $arguments[] = $param->getDefaultValue();
-            } else {
-                if (is_array($controller)) {
-                    $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);
-                } elseif (is_object($controller)) {
-                    $repr = get_class($controller);
-                } else {
-                    $repr = $controller;
+
+        foreach ($this->argumentMetadataFactory->createArgumentMetadata($controller) as $metadata) {
+            foreach ($this->argumentValueResolvers as $resolver) {
+                if (!$resolver->supports($request, $metadata)) {
+                    continue;
                 }
 
-                throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $repr, $param->name));
+                $resolved = $resolver->resolve($request, $metadata);
+
+                if (!$resolved instanceof \Generator) {
+                    throw new \InvalidArgumentException(sprintf('%s::resolve() must yield at least one value.', get_class($resolver)));
+                }
+
+                foreach ($resolved as $append) {
+                    $arguments[] = $append;
+                }
+
+                // continue to the next controller argument
+                continue 2;
             }
+
+            $representative = $controller;
+
+            if (is_array($representative)) {
+                $representative = sprintf('%s::%s()', get_class($representative[0]), $representative[1]);
+            } elseif (is_object($representative)) {
+                $representative = get_class($representative);
+            }
+
+            throw new \RuntimeException(sprintf('Controller "%s" requires that you provide a value for the "$%s" argument (because there is no default value or because there is a non optional argument after this one).', $representative, $metadata->getName()));
         }
 
         return $arguments;

@@ -11,29 +11,16 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\ArgumentFromAttributeResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\DefaultArgumentValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\RequestResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\VariadicArgumentValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
-use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Controller\LegacyArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 use Symfony\Component\HttpFoundation\Request;
 
-class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
+class LegacyArgumentResolverTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetArguments()
     {
-        $factory = new ArgumentMetadataFactory();
-        $argumentValueResolvers = array(
-            new ArgumentFromAttributeResolver(),
-            new VariadicArgumentValueResolver(),
-            new RequestResolver(),
-            new DefaultArgumentValueResolver(),
-        );
-
-        $resolver = new ArgumentResolver($factory, $argumentValueResolvers);
+        $resolver = new LegacyArgumentResolver();
 
         $request = Request::create('/');
         $controller = array(new self(), 'testGetArguments');
@@ -72,7 +59,7 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('foobar', 'foobar');
-        $controller = 'Symfony\Component\HttpKernel\Tests\Controller\argument_resolver_controller_function';
+        $controller = 'Symfony\Component\HttpKernel\Tests\Controller\another_controller_function';
         $this->assertEquals(array('foo', 'foobar'), $resolver->getArguments($request, $controller));
 
         $request = Request::create('/');
@@ -97,64 +84,13 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetVariadicArguments()
     {
-        $factory = new ArgumentMetadataFactory();
-        $argumentValueResolvers = array(
-            new ArgumentFromAttributeResolver(),
-            new VariadicArgumentValueResolver(),
-            new RequestResolver(),
-            new DefaultArgumentValueResolver(),
-        );
-
-        $resolver = new ArgumentResolver($factory, $argumentValueResolvers);
+        $resolver = new ControllerResolver();
 
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', array('foo', 'bar'));
         $controller = array(new VariadicController(), 'action');
         $this->assertEquals(array('foo', 'foo', 'bar'), $resolver->getArguments($request, $controller));
-    }
-
-    /**
-     * @requires PHP 5.6
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGetVariadicArgumentsWithoutArrayInRequest()
-    {
-        $factory = new ArgumentMetadataFactory();
-        $argumentValueResolvers = array(
-            new ArgumentFromAttributeResolver(),
-            new VariadicArgumentValueResolver(),
-            new RequestResolver(),
-            new DefaultArgumentValueResolver(),
-        );
-
-        $resolver = new ArgumentResolver($factory, $argumentValueResolvers);
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $request->attributes->set('bar', 'foo');
-        $controller = array(new VariadicController(), 'action');
-        $resolver->getArguments($request, $controller);
-    }
-
-    /**
-     * @requires PHP 5.6
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGetArgumentWithoutArray()
-    {
-        $factory = new ArgumentMetadataFactory();
-        $valueResolver = $this->getMock(ArgumentValueResolverInterface::class);
-        $resolver = new ArgumentResolver($factory, array($valueResolver));
-
-        $valueResolver->expects($this->any())->method('supports')->willReturn(true);
-        $valueResolver->expects($this->any())->method('resolve')->willReturn('foo');
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $request->attributes->set('bar', 'foo');
-        $controller = array($this, 'controllerMethod2');
-        $resolver->getArguments($request, $controller);
     }
 
     public function __invoke($foo, $bar = null)
@@ -182,6 +118,6 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-function argument_resolver_controller_function($foo, $foobar)
+function another_controller_function($foo, $foobar)
 {
 }

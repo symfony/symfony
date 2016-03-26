@@ -970,4 +970,32 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $form = new Form($nodes->item(0), 'http://example.com');
         $this->assertEquals($form->getPhpValues(), array('example' => ''));
     }
+
+    public function testLabelNotAssignedIfNoneIsDefined()
+    {
+        $form = $this->createForm('<form><input type="text" id="foo" name="foo" value="foo" /><input type="submit" /></form>');
+
+        $this->assertNull($form->get('foo')->getLabel(), '->getLabel() returns null if no label is defined');
+    }
+
+    public function testLabelIsAssignedByForAttribute()
+    {
+        $form = $this->createForm('<form>
+            <label for="foo">Foo label</label>
+            <input type="text" id="foo" name="foo" value="foo" />
+            <input type="submit" />
+        </form>');
+
+        $this->assertEquals('Foo label', $form->get('foo')->getLabel()->textContent, '->getLabel() returns the associated label');
+    }
+
+    public function testLabelIsAssignedByParentingRelation()
+    {
+        $form = $this->createForm('<form>
+            <label for="foo">Foo label<input type="text" id="foo" name="foo" value="foo" /></label>
+            <input type="submit" />
+        </form>');
+
+        $this->assertEquals('Foo label', $form->get('foo')->getLabel()->textContent, '->getLabel() returns the parent label');
+    }
 }

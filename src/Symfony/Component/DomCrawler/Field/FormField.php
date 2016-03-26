@@ -64,7 +64,7 @@ abstract class FormField
     }
 
     /**
-     * Returns the label tag associated to the field or null if none
+     * Returns the label tag associated to the field or null if none.
      *
      * @return \DOMElement|null
      */

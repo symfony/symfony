@@ -475,7 +475,7 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
-     * Finds the associated label to a given field node
+     * Finds the associated label to a given field node.
      *
      * @param \DOMElement $node The \DOMElement instance of the field
      *
@@ -497,6 +497,6 @@ class Form extends Link implements \ArrayAccess
             }
         }
 
-        return null;
+        return;
     }
 }

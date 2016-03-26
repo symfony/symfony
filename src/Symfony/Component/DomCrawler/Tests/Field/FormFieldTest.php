@@ -35,4 +35,16 @@ class FormFieldTest extends FormFieldTestCase
 
         $this->assertTrue($field->hasValue(), '->hasValue() always returns true');
     }
+
+    public function testGetLabel()
+    {
+        $node = $this->createNode('input', '', array());
+        $label = $this->createNode('label', '', array());
+
+        $field = new InputFormField($node);
+        $this->assertNull($field->getLabel(), '->getLabel() returns null if none associated');
+
+        $field = new InputFormField($node, $label);
+        $this->assertEquals($label, $field->getLabel(), '->getLabel() returns the field label');
+    }
 }

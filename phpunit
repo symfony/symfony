@@ -51,6 +51,7 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     $zip->extractTo(getcwd());
     $zip->close();
     chdir("phpunit-$PHPUNIT_VERSION");
+    passthru("$COMPOSER remove --no-update phpspec/prophecy");
     passthru("$COMPOSER remove --no-update symfony/yaml");
     passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=3.1@dev\"");
     passthru("$COMPOSER install --prefer-dist --no-progress --ansi", $exit);

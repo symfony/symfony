@@ -30,8 +30,8 @@ class ChainAdapter implements AdapterInterface
     private $saveUp;
 
     /**
-     * @param CacheItemPoolInterface[] $adapters    The ordered list of adapters used to fetch cached items.
-     * @param int                      $maxLifetime The max lifetime of items propagated from lower adapters to upper ones.
+     * @param CacheItemPoolInterface[] $adapters    The ordered list of adapters used to fetch cached items
+     * @param int                      $maxLifetime The max lifetime of items propagated from lower adapters to upper ones
      */
     public function __construct(array $adapters, $maxLifetime = 0)
     {

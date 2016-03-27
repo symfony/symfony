@@ -36,7 +36,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * Construct new XmlEncoder and allow to change the root node element name.
      *
      * @param string   $rootNodeName
-     * @param int|null $loadOptions A bit field of LIBXML_* constants
+     * @param int|null $loadOptions  A bit field of LIBXML_* constants
      */
     public function __construct($rootNodeName = 'response', $loadOptions = null)
     {

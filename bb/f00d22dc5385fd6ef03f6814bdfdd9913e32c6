@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-03-25T09:13:58Z
+
+> phpunit-mock-objects is forced to v3.1.1 until we fix our test suite
+
+Isn't it fixed already ? A bunch of PRs related to it have been merged already
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-25T09:14:25Z
+
+you forgot to update the cache id
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-25T09:22:50Z
+
+@nicolas-grekas can you also try to debug failures in https://travis-ci.org/symfony/symfony/jobs/118326801#L1867 ? This looks weird as the PropertyAccess 2.3.0 component is installed, and it contains this class. This makes me think there might be a corruption of the installation in our Travis setup
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-25T09:30:52Z
+
+@stof I fixed a lot of mocks Sebastian Bergmann reported for the `master` branch. But we still have some issues that are only present on the other branches. I am going to prepare pull requests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-25T09:40:08Z
+
+@stof comments addressed
+@xabbuh don't forget to change the cache id and revert forcing mock-objects to 3.1.1 in your PRs
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-25T09:59:20Z
+
+Rebased on top of #18306
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-25T09:59:43Z
+
+No need to change the cache id btw here
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-25T10:31:49Z
+
+@nicolas-grekas What is the point in adding this but not updating the cache id? This way it doesn't have any affect, does it (seems I do miss something)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-25T10:52:04Z
+
+The real cache-id is the md5 of the phpunit file itself. The cache id in the comment is just a way to change this md5 without changing actual code.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-25T18:23:28Z
+
+A PR to fix Prophecy is ready: phpspec/prophecy#264
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-27T09:43:09Z
+
+@dunglas we don't use prophecy in Symfony's test suite. Should we allow using it? Until now, we've asked people submitting prophecy tests to rewrite them to regular phpunit mock tests. If we stick to this policy, then we should merge this PR. If we should allow prophecy, then not of course.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-27T10:04:32Z
+
+IIUC, prophecy is not a direct dep, but installed but phpunit, right? In any case, we are not using prophecy in Symfony, so let's drop it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-27T10:05:17Z
+
+And if we start using it, we would then be able to add it explicitly.

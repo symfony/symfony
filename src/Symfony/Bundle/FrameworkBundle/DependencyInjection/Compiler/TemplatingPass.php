@@ -21,8 +21,7 @@ class TemplatingPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if ($container->hasAlias('templating')) {
-            $alias = $container->getAlias('templating');
-            $definition = $container->getDefinition($alias->__toString());
+            $definition = $container->findDefinition('templating');
             $definition->setAutowiringTypes(array(EngineInterface::class, FrameworkBundleEngineInterface::class));
         }
 

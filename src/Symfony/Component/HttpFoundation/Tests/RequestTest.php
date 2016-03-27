@@ -325,6 +325,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testGetFormatWithCustomMimeType()
+    {
+        $request = new Request();
+        $request->setFormat('custom', 'application/vnd.foo.api;myversion=2.3');
+        $this->assertEquals('custom', $request->getFormat('application/vnd.foo.api;myversion=2.3'));
+    }
+
     public function getFormatToMimeTypeMapProvider()
     {
         return array(

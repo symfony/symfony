@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * added `CallbackChoiceLoader`
+ * implemented `ChoiceLoaderInterface` in children of `ChoiceType`
 
 3.1.0
 -----

@@ -315,10 +315,9 @@
 
 {%- block widget_attributes -%}
     id="{{ id }}" name="{{ full_name }}"
-    {%- if read_only %} readonly="readonly"{% endif -%}
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
-    {%- for attrname, attrvalue in attr if 'readonly' != attrname -%}
+    {%- for attrname, attrvalue in attr -%}
         {{- " " -}}
         {%- if attrname in ['placeholder', 'title'] -%}
             {{- attrname }}="{{ translation_domain is same as(false) ? attrvalue : attrvalue|trans({}, translation_domain) }}"

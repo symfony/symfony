@@ -11,13 +11,21 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\Templating\EngineInterface;
 
 class TemplatingPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        if ($container->hasAlias('templating')) {
+            $alias = $container->getAlias('templating');
+            $definition = $container->getDefinition($alias->__toString());
+            $definition->setAutowiringTypes(array(EngineInterface::class, FrameworkBundleEngineInterface::class));
+        }
+
         if ($container->hasDefinition('templating')) {
             return;
         }

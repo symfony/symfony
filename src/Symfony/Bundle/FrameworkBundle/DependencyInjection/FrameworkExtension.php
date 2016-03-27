@@ -27,8 +27,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
-use Symfony\Component\Templating\EngineInterface;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -521,16 +519,13 @@ class FrameworkExtension extends Extension
 
         // Use a delegation unless only a single engine was registered
         if (1 === count($engines)) {
-            $aliased = (string) reset($engines);
+            $container->setAlias('templating', (string) reset($engines));
         } else {
             foreach ($engines as $engine) {
                 $container->getDefinition('templating.engine.delegating')->addMethodCall('addEngine', array($engine));
             }
-
-            $aliased = 'templating.engine.delegating';
+            $container->setAlias('templating', 'templating.engine.delegating');
         }
-
-        $container->setAlias('templating', $aliased);
 
         $container->getDefinition('fragment.renderer.hinclude')
             ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
@@ -562,9 +557,6 @@ class FrameworkExtension extends Extension
                 $container->removeDefinition('templating.helper.assets');
             }
         }
-
-        $definition = $container->getDefinition($aliased);
-        $definition->setAutowiringTypes(array(EngineInterface::class, FrameworkBundleEngineInterface::class));
     }
 
     /**

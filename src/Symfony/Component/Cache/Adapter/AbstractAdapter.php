@@ -12,7 +12,6 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Cache\CacheItem;
@@ -21,7 +20,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractAdapter implements CacheItemPoolInterface, LoggerAwareInterface
+abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 

@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ProxyAdapter implements CacheItemPoolInterface
+class ProxyAdapter implements AdapterInterface
 {
     private $pool;
     private $namespace;

@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-23T13:42:47Z
+
+ref https://github.com/symfony/symfony/pull/14403/files/f0dfd2faaba4eb7848d3e1b8a7add7da302d8cae#r57138850
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-23T13:43:03Z
+
+Note to merger: to revert in 3.0
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-23T14:02:36Z
+
+Why is the order of the attributes important? Imo you should not rely on it.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-23T14:06:54Z
+
+@xabbuh we don't have the choice IMHO.
+
+The component themes need to print the value independently from `attr` so they can be overridden with:
+```twig
+{% set read_only = true %}
+{{ block('parent_block') }}
+```
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2016-03-23T14:16:32Z
+
+:+1: however I think the tests need to be reverted too to ensure that we are fixing the problem (see https://github.com/symfony/symfony/pull/14403#discussion_r57133978)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-23T14:18:46Z
+
+@mnapoli Thanks for the review, the tests are already reverted (otherwise they would fail).
+
+Failures are unrelated.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-25T18:08:05Z
+
+You will now need to update the lowest version of the Form component required by the FrameworkBundle to `^2.8.4`.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-25T18:18:16Z
+
+@xabbuh so it should be done in a second commit since this one is supposed to be reverted in 3.0, right ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-25T18:21:01Z
+
+Not necessarily if I don't misunderstand you. We need to revert all the changes here in the `3.0` branch, don't we?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-25T18:22:18Z
+
+Yes we do.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-25T18:45:01Z
+
+Thanks @xabbuh tests are all green now (excepted appveyor being unusually long).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-25T19:38:56Z
+
+It seems appveyor has bugged, why does it still try to install icu v51 ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-26T16:20:02Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-26T16:43:02Z
+
+@xabbuh Do I need to upgrade the `composer.json` of `TwigBridge` too ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-26T18:48:38Z
+
+@HeahDude Usually you would have to do that. But this time that's not necessary as this was apparently done in another pull request before: https://github.com/symfony/symfony/blob/2.8/src/Symfony/Bridge/Twig/composer.json#L25
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-26T18:51:01Z
+
+@xabbuh Thanks for your leading :)

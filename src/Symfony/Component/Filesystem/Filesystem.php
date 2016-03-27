@@ -486,7 +486,7 @@ class Filesystem
     {
         list($scheme, $hierarchy) = $this->getSchemeAndHierarchy($dir);
 
-        // If no scheme or scheme is "file" or "gs" create temp file in local filesystem
+        // If no scheme or scheme is "file" or "gs" (Google Cloud) create temp file in local filesystem
         if (null === $scheme || 'file' === $scheme || 'gs' === $scheme) {
             $tmpFile = tempnam($hierarchy, $prefix);
 

@@ -22,6 +22,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
+use Symfony\Component\Form\ChoiceList\Factory\FilteringFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -111,10 +112,12 @@ abstract class DoctrineType extends AbstractType
     public function __construct(ManagerRegistry $registry, PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
     {
         $this->registry = $registry;
-        $this->choiceListFactory = $choiceListFactory ?: new CachingFactoryDecorator(
-            new PropertyAccessDecorator(
-                new DefaultChoiceListFactory(),
-                $propertyAccessor
+        $this->choiceListFactory = $choiceListFactory ?: new FilteringFactoryDecorator(
+            new CachingFactoryDecorator(
+                new PropertyAccessDecorator(
+                    new DefaultChoiceListFactory(),
+                    $propertyAccessor
+                )
             )
         );
     }

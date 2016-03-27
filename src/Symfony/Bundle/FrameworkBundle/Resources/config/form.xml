@@ -59,7 +59,11 @@
             <argument type="service" id="form.choice_list_factory.property_access"/>
         </service>
 
-        <service id="form.choice_list_factory" alias="form.choice_list_factory.cached" public="false"/>
+        <service id="form.choice_list_factory.filtered" class="Symfony\Component\Form\ChoiceList\Factory\FilteringFactoryDecorator" public="false">
+            <argument type="service" id="form.choice_list_factory.cached"/>
+        </service>
+
+        <service id="form.choice_list_factory" alias="form.choice_list_factory.filtered" public="false"/>
 
         <service id="form.type.form" class="Symfony\Component\Form\Extension\Core\Type\FormType">
             <argument type="service" id="form.property_accessor" />

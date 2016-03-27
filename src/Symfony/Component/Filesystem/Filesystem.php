@@ -12,6 +12,8 @@
 namespace Symfony\Component\Filesystem;
 
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * Provides basic utility to manipulate the file system.
@@ -311,6 +313,13 @@ class Filesystem
             }
         }
 
+
+        if ($this->existsJunctionExecutable()) {
+            $this->createWindowsJunction($originDir, $targetDir);
+            $ok = true;
+        }
+
+
         if (!$ok && true !== @symlink($originDir, $targetDir)) {
             $report = error_get_last();
             if (is_array($report)) {
@@ -320,6 +329,35 @@ class Filesystem
             }
             throw new IOException(sprintf('Failed to create symbolic link from %s to %s', $originDir, $targetDir));
         }
+    }
+
+    protected function existsJunctionExecutable()
+    {
+        if ($this->getJunctionExecutable()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function getJunctionExecutable()
+    {
+        $executableFinder = new ExecutableFinder();
+
+        return $executableFinder->find('junction');
+    }
+
+    protected function createWindowsJunction($originDir, $targetDir)
+    {
+        $junction = $this->getJunctionExecutable();
+
+        $processBuilder = new ProcessBuilder();
+        $process = $processBuilder
+            ->setPrefix($junction)
+            ->setArguments(array($targetDir, $originDir))
+            ->getProcess()
+        ;
+        $process->run();
     }
 
     /**

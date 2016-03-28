@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-26T09:08:07Z
+
+Did this cause issues somewhere? The docs state that the return value will also be `false` on failures.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-26T09:11:25Z
+
+Its false on failure, but also false when false is the cached value... $success is the way to check for cache hit or miss.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-26T09:14:00Z
+
+:+1: ah of course
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-26T20:47:52Z
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-27T09:31:00Z
+
+@Tobion fixed
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-27T11:39:03Z
+
+`ApcUniversalClassLoader` needs the same fix.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-28T08:35:19Z
+
+@Tobion PR updated

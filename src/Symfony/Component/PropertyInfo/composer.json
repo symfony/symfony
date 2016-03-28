@@ -27,7 +27,7 @@
     },
     "require-dev": {
         "symfony/serializer": "~2.8|~3.0",
-        "symfony/property-acccess": "~2.8|~3.0",
+        "symfony/property-access": "~2.8|~3.0",
         "symfony/cache": "~3.1",
         "phpdocumentor/reflection-docblock": "^3.0",
         "doctrine/annotations": "~1.0"

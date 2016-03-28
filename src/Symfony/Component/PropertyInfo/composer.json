@@ -23,7 +23,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9"
+        "php": ">=5.5.9",
+        "symfony/inflector": "~3.1"
     },
     "require-dev": {
         "symfony/serializer": "~2.8|~3.0",

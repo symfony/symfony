@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -118,5 +119,12 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'd', array()));
         $this->assertTrue($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'e', array()));
         $this->assertTrue($this->extractor->isWritable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'f', array()));
+    }
+
+    public function testSingularize()
+    {
+        $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'analyses'));
+        $this->assertTrue($this->extractor->isWritable(AdderRemoverDummy::class, 'feet'));
+        $this->assertEquals(array('analyses', 'feet'), $this->extractor->getProperties(AdderRemoverDummy::class));
     }
 }

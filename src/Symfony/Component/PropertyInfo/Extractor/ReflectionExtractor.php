@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
+use Symfony\Component\PropertyAccess\StringUtil;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -40,7 +41,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * @internal
      *
-     * @var array[]
+     * @var string[]
      */
     public static $arrayMutatorPrefixes = array('add', 'remove');
 
@@ -55,13 +56,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return;
         }
 
+        $reflectionProperties = $reflectionClass->getProperties();
+
         $properties = array();
-        foreach ($reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflectionProperty) {
-            $properties[$reflectionProperty->name] = true;
+        foreach ($reflectionProperties as $reflectionProperty) {
+            if ($reflectionProperty->isPublic()) {
+                $properties[$reflectionProperty->name] = true;
+            }
         }
 
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
-            $propertyName = $this->getPropertyName($reflectionMethod->name);
+            $propertyName = $this->getPropertyName($reflectionMethod->name, $reflectionProperties);
             if (!$propertyName || isset($properties[$propertyName])) {
                 continue;
             }
@@ -312,17 +317,28 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private function getMutatorMethod($class, $property)
     {
         $ucProperty = ucfirst($property);
+        $singulars = $this->getSingulars($ucProperty);
 
         foreach (self::$mutatorPrefixes as $prefix) {
-            try {
-                $reflectionMethod = new \ReflectionMethod($class, $prefix.$ucProperty);
 
-                // Parameter can be optional to allow things like: method(array $foo = null)
-                if ($reflectionMethod->getNumberOfParameters() >= 1) {
-                    return array($reflectionMethod, $prefix);
+            if (null !== $singulars && in_array($prefix, self::$arrayMutatorPrefixes)) {
+                $names = $singulars;
+                $names[] = $ucProperty;
+            } else {
+                $names = array($ucProperty);
+            }
+
+            foreach ($names as $name) {
+                try {
+                    $reflectionMethod = new \ReflectionMethod($class, $prefix.$name);
+
+                    // Parameter can be optional to allow things like: method(array $foo = null)
+                    if ($reflectionMethod->getNumberOfParameters() >= 1) {
+                        return array($reflectionMethod, $prefix);
+                    }
+                } catch (\ReflectionException $reflectionException) {
+                    // Try the next prefix if the method doesn't exist
                 }
-            } catch (\ReflectionException $reflectionException) {
-                // Try the next prefix if the method doesn't exist
             }
         }
     }
@@ -330,16 +346,50 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * Extracts a property name from a method name.
      *
-     * @param string $methodName
+     * @param string                $methodName
+     * @param \ReflectionProperty[] $reflectionProperties
      *
      * @return string
      */
-    private function getPropertyName($methodName)
+    private function getPropertyName($methodName, array $reflectionProperties)
     {
         $pattern = implode('|', array_merge(self::$accessorPrefixes, self::$mutatorPrefixes));
 
         if (preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
+            if (!in_array($matches[1], self::$arrayMutatorPrefixes)) {
+                return $matches[2];
+            }
+
+            foreach ($reflectionProperties as $reflectionProperty) {
+                foreach ($this->getSingulars($reflectionProperty->name) as $name) {
+                    if ($name === lcfirst($matches[2])) {
+                        return $reflectionProperty->name;
+                    }
+                }
+            }
+
             return $matches[2];
         }
+    }
+
+    /**
+     * Gets singulars of a word.
+     *
+     * @param string $plural
+     *
+     * @return array|null Returns null if cannot guess.
+     */
+    private function getSingulars($plural)
+    {
+        if (!class_exists('Symfony\Component\PropertyAccess\StringUtil')) {
+            return;
+        }
+
+        $singulars = StringUtil::singularify($plural);
+        if (is_string($singulars)) {
+            $singulars = array($singulars);
+        }
+
+        return $singulars;
     }
 }

@@ -197,6 +197,12 @@ class ErrorHandler
         $exceptionHandler = set_exception_handler(function () {});
         restore_exception_handler();
 
+        if (PHP_VERSION_ID >= 70000 && $exceptionHandler instanceof \Closure) {
+            $reflector = new \ReflectionFunction($exceptionHandler);
+            foreach ($reflector->getStaticVariables() as $exceptionHandler) {
+                break;
+            }
+        }
         if (is_array($exceptionHandler) && $exceptionHandler[0] instanceof ExceptionHandler) {
             $level = isset($this->levels[$type]) ? $this->levels[$type] : $type;
             $message = sprintf('%s: %s in %s line %d', $level, $error['message'], $error['file'], $error['line']);

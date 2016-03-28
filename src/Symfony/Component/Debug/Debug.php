@@ -46,6 +46,30 @@ class Debug
         ErrorHandler::register($errorReportingLevel, $displayErrors);
         if ('cli' !== PHP_SAPI) {
             ExceptionHandler::register();
+
+            if (PHP_VERSION_ID >= 70000) {
+                $exceptionHandler = set_exception_handler(function ($throwable) use (&$exceptionHandler) {
+                    if ($throwable instanceof \Exception) {
+                        $exception = $throwable;
+                    } else {
+                        static $refl = null;
+
+                        if (null === $refl) {
+                            $refl = array();
+                            foreach (array('file', 'line', 'trace') as $prop) {
+                                $prop = new \ReflectionProperty('Exception', $prop);
+                                $prop->setAccessible(true);
+                                $refl[] = $prop;
+                            }
+                        }
+                        $exception = new \Exception($throwable->getMessage(), $throwable->getCode());
+                        foreach ($refl as $prop) {
+                            $prop->setValue($exception, $throwable->{'get'.$prop->name}());
+                        }
+                    }
+                    $exceptionHandler($exception);
+                });
+            }
         // CLI - display errors only if they're not already logged to STDERR
         } elseif ($displayErrors && (!ini_get('log_errors') || ini_get('error_log'))) {
             ini_set('display_errors', 1);

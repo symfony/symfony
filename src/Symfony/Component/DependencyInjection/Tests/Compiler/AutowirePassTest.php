@@ -413,6 +413,29 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
             $definition->getArguments()
         );
     }
+
+    public function testGlobalParameterMapSet()
+    {
+        $container = new ContainerBuilder();
+
+        // two services matching CollisionInterface
+        // c1 is configured to autowire for CollisionInterface
+        $container->register('c1', __NAMESPACE__.'\CollisionA')
+            ->addAutowiringType(__NAMESPACE__.'\CollisionInterface');
+        $container->register('c2', __NAMESPACE__.'\CollisionB');
+        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $aDefinition->setAutowired(true);
+
+        $container->setParameter('autowiring.map', array(
+            __NAMESPACE__.'\CollisionInterface' => 'c2'
+        ));
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $aDefinition = $container->getDefinition('a');
+        $this->assertEquals(array(new Reference('c2')), $aDefinition->getArguments());
+    }
 }
 
 class Foo

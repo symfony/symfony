@@ -1200,6 +1200,9 @@ class Process
      */
     private function getDescriptors()
     {
+        if ($this->input instanceof \Iterator) {
+            $this->input->rewind();
+        }
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->processPipes = WindowsPipes::create($this, $this->input);
         } else {

@@ -73,4 +73,12 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
             $this->autowiringMetadata
         ) = unserialize($serialized);
     }
+
+    /**
+     * @deprecated Implemented for compatibility with Symfony 2.8
+     */
+    public function getResource()
+    {
+        return $this->filePath;
+    }
 }

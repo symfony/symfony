@@ -902,23 +902,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * provides default method names for simple getter/setter.
-     */
-    public function methodProvider()
-    {
-        $defaults = array(
-            array('CommandLine'),
-            array('Timeout'),
-            array('WorkingDirectory'),
-            array('Env'),
-            array('Stdin'),
-            array('Options'),
-        );
-
-        return $defaults;
-    }
-
-    /**
      * @param string $commandline
      * @param null   $cwd
      * @param array  $env

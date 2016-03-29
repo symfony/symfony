@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-27T12:53:44Z
+
+As this is not a bug fix, it should be done in master.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-27T12:54:23Z
+
+Alright, I've got a bigger plan for master after that done :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-27T12:56:19Z
+
+@fabpot But we may keep the cs fix of d1f0ffa for 2.3, right ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-27T12:58:57Z
+
+Sure, remove the other commits and this one would be ready to be merged
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-27T13:00:08Z
+
+Done :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-29T06:43:17Z
+
+:+1:

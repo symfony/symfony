@@ -198,7 +198,7 @@ class DateTimeType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $compound = function (Options $options) {
-            return $options['widget'] !== 'single_text';
+            return 'single_text' !== $options['widget'];
         };
 
         // Defaults to the value of "widget"

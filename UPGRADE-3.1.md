@@ -25,6 +25,39 @@ FrameworkBundle
  * As it was never an officially supported feature, the support for absolute
    template paths has been deprecated and will be removed in Symfony 4.0.
 
+ * The following form types registered as services are deprecated since 3.1
+   and will be removed in 4.0; use their fully-qualified class name instead:
+
+    - `"form.type.birthday"`
+    - `"form.type.checkbox"`
+    - `"form.type.collection"`
+    - `"form.type.country"`
+    - `"form.type.currency"`
+    - `"form.type.date"`
+    - `"form.type.datetime"`
+    - `"form.type.email"`
+    - `"form.type.file"`
+    - `"form.type.hidden"`
+    - `"form.type.integer"`
+    - `"form.type.language"`
+    - `"form.type.locale"`
+    - `"form.type.money"`
+    - `"form.type.number"`
+    - `"form.type.password"`
+    - `"form.type.percent"`
+    - `"form.type.radio"`
+    - `"form.type.range"`
+    - `"form.type.repeated"`
+    - `"form.type.search"`
+    - `"form.type.textarea"`
+    - `"form.type.text"`
+    - `"form.type.time"`
+    - `"form.type.timezone"`
+    - `"form.type.url"`
+    - `"form.type.button"`
+    - `"form.type.submit"`
+    - `"form.type.reset"`
+
 HttpKernel
 ----------
 

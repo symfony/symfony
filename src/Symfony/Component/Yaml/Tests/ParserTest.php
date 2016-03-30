@@ -889,9 +889,13 @@ EOF;
 
         $deprecations = array();
         set_error_handler(function ($type, $msg) use (&$deprecations) {
-            if (E_USER_DEPRECATED === $type) {
-                $deprecations[] = $msg;
+            if (E_USER_DEPRECATED !== $type) {
+                restore_error_handler();
+
+                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
             }
+
+            $deprecations[] = $msg;
         });
 
         $this->parser->parse($yaml);

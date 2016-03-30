@@ -123,8 +123,10 @@ class WinCacheClassLoader
      */
     public function findFile($class)
     {
-        if (false === $file = wincache_ucache_get($this->prefix.$class)) {
-            wincache_ucache_set($this->prefix.$class, $file = $this->decorated->findFile($class), 0);
+        $file = wincache_ucache_get($this->prefix.$class, $success);
+
+        if (!$success) {
+            wincache_ucache_set($this->prefix.$class, $file = $this->decorated->findFile($class) ?: null, 0);
         }
 
         return $file;

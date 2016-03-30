@@ -201,7 +201,7 @@ class Inline
                 return $repr;
             case '' == $value:
                 return "''";
-            case Yaml::DUMP_BASE64_BINARY_DATA & $flags && self::isBinaryString($value):
+            case self::isBinaryString($value):
                 return '!!binary '.base64_encode($value);
             case Escaper::requiresDoubleQuoting($value):
                 return Escaper::escapeWithDoubleQuotes($value);
@@ -627,7 +627,7 @@ class Inline
 
     private static function isBinaryString($value)
     {
-        return preg_match('/[^\x09-\x0d\x20-\xff]/', $value);
+        return !preg_match('//u', $value) || preg_match('/[^\x09-\x0d\x20-\xff]/', $value);
     }
 
     /**

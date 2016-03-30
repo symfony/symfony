@@ -216,20 +216,20 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * Called before dispatching the event.
      *
-     * @param string         $eventName The event name
-     * @param EventInterface $event     The event
+     * @param string $eventName The event name
+     * @param Event      $event The event
      */
-    protected function preDispatch($eventName, EventInterface $event)
+    protected function preDispatch($eventName, Event $event)
     {
     }
 
     /**
      * Called after dispatching the event.
      *
-     * @param string         $eventName The event name
-     * @param EventInterface $event     The event
+     * @param string $eventName The event name
+     * @param Event      $event The event
      */
-    protected function postDispatch($eventName, EventInterface $event)
+    protected function postDispatch($eventName, Event $event)
     {
     }
 

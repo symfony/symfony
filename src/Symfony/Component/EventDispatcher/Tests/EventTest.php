@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\Event;
 class EventTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Symfony\Component\EventDispatcher\Event
+     * @var \Symfony\Component\EventDispatcher\EventInterface
      */
     protected $event;
 

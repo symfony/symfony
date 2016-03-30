@@ -13,6 +13,7 @@ namespace Symfony\Component\EventDispatcher\Tests\Debug;
 
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
@@ -108,11 +109,11 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $tdispatcher = null;
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $dispatcher->addListener('foo', function (Event $event, $eventName, $dispatcher) use (&$tdispatcher) {
+        $dispatcher->addListener('foo', function (EventInterface $event, $eventName, $dispatcher) use (&$tdispatcher) {
             $tdispatcher = $dispatcher;
             $dispatcher->dispatch('bar');
         });
-        $dispatcher->addListener('bar', function (Event $event) {});
+        $dispatcher->addListener('bar', function (EventInterface $event) {});
         $dispatcher->dispatch('foo');
         $this->assertSame($dispatcher, $tdispatcher);
         $this->assertCount(2, $dispatcher->getCalledListeners());
@@ -139,7 +140,7 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch(), $logger);
-        $tdispatcher->addListener('foo', $listener1 = function (Event $event) { $event->stopPropagation(); });
+        $tdispatcher->addListener('foo', $listener1 = function (EventInterface $event) { $event->stopPropagation(); });
         $tdispatcher->addListener('foo', $listener2 = function () {});
 
         $logger->expects($this->at(0))->method('debug')->with('Notified event "{event}" to listener "{listener}".', array('event' => 'foo', 'listener' => 'closure'));
@@ -181,10 +182,10 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $nestedCall = false;
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $dispatcher->addListener('foo', function (Event $e) use ($dispatcher) {
+        $dispatcher->addListener('foo', function (EventInterface $e) use ($dispatcher) {
             $dispatcher->dispatch('bar', $e);
         });
-        $dispatcher->addListener('bar', function (Event $e) use (&$nestedCall) {
+        $dispatcher->addListener('bar', function (EventInterface $e) use (&$nestedCall) {
             $nestedCall = true;
         });
 

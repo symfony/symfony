@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-24T13:50:59Z
+
+@xabbuh what about creating helper train inside phpunit bridge?
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-24T13:52:10Z
+
+Similar to https://github.com/rquadling/phpunit-errorhandler/blob/master/src/PHPUnit/ErrorHandler.php
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-24T13:56:51Z
+
+I think some PHP versions have a bug with restoring inside an error handler. I'm not sure this has been fixed. We should check.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-24T15:11:26Z
+
+@nicolas-grekas I didn't find anything related to that. Do you remember where this was reported in the past?
+
+@Koc Might be an idea.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-24T15:22:34Z
+
+https://bugs.php.net/63206
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-24T15:25:22Z
+
+what we do in other places is to add a try/catch block, which creates a lot of boilerplates I agree...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-24T15:30:52Z
+
+If I do not misunderstand the bug report, that one only affects us when passing a bit mask of error types to `set_error_handler()` which we don't do.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-29T19:04:00Z
+
+updated to call PHPUnit's error handler
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-30T10:03:54Z
+
+:+1:

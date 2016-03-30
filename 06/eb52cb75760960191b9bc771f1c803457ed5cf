@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-29T19:09:12Z
+
+Can we also deprecate `DUMP_BASE64_BINARY_DATA` here as well?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-29T19:20:13Z
+
+Imo that does not make much sense. We will introduce the flag in 3.1 and people will need it to be able to dump binary. Deprecating it in the same instance would be weird for users of the dumper. And we cannot dump them as binary strings by default as that would be a BC break, wouldn't it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-29T19:21:37Z
+
+I forgot that this was introduced in 3.1. So, I propose to drop it altogether and always do the right thing by default. As Symfony YAML load is able to deal with binaries, I don't see any BC break.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-29T20:39:45Z
+
+Fair enough. I removed the flag, fixed the tests, and updated the changelog.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-30T09:46:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-30T14:38:42Z
+
+@nicolas-grekas I updated the check.

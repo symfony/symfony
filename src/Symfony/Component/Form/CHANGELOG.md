@@ -7,6 +7,7 @@ CHANGELOG
  * deprecated the "choices_as_values" option of ChoiceType
  * deprecated support for data objects that implements both `Traversable` and
    `ArrayAccess` in `ResizeFormListener::preSubmit` method
+ * implemented `DataTransformerInterface` in `TextType`
 
 3.0.0
 -----

@@ -18,6 +18,8 @@ Form
  * Support for data objects that implements both `Traversable` and `ArrayAccess`
    in `ResizeFormListener::preSubmit` method has been deprecated and will be
    removed in Symfony 4.0.
+ * `TextType` now implements `DataTransformerInterface` and will always return
+   an empty string when `empty_data` option is explicitly assigned to it.
 
 FrameworkBundle
 ---------------

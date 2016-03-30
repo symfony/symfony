@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-26T02:10:22Z
+
+Note to the merger: sorry for the conflict in 3.0 :/
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-26T02:20:05Z
+
+:+1: Good catch. This piece of code does not seem to have any effect as a `group_by` with an array is ignored.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-26T02:22:54Z
+
+@Tobion thanks for the review :) The effect I'm interested in is a comparison with backfire profiling!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-26T14:20:55Z
+
+This is due to [this](https://github.com/symfony/symfony/blob/2.8/UPGRADE-2.7.md#form-1).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-26T16:55:00Z
+
+Ref this [change](https://github.com/symfony/symfony/pull/15061/files#diff-ca1123eff9e0aa207aaec667aa16c8e8R116) in #15061.

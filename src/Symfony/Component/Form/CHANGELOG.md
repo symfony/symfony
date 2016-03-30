@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * added `CallbackChoiceLoader`
+
 3.1.0
 -----
 

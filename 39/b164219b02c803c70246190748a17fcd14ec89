@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-25T22:37:45Z
+
+@hason Is this related to #17910 and #17915?
+
+---------------------------------------------------------------------------
+
+by hason at 2016-03-14T10:49:47Z
+
+@xabbuh No
+
+At present, ``ReplaceAliasByActualDefinitionPass`` class is coupled with [configuration](https://github.com/symfony/symfony/blob/2.3/src/Symfony/Bundle/FrameworkBundle/Resources/config/services.xml#L45) in FrameworkBundle. And that is the problem.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-14T10:53:08Z
+
+:+1:
+
+Status: Reviewed

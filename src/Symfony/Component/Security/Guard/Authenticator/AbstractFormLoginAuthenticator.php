@@ -36,21 +36,6 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     abstract protected function getLoginUrl();
 
     /**
-     * The user will be redirected to the secure page they originally tried
-     * to access. But if no such page exists (i.e. the user went to the
-     * login page directly), this returns the URL the user should be redirected
-     * to after logging in successfully (e.g. your homepage).
-     *
-     * @deprecated Implement onAuthenticationSuccess() instead of needing this function.
-     *
-     * @return string
-     */
-    protected function getDefaultSuccessRedirectUrl()
-    {
-        throw new \Exception(sprintf('You must implement onAuthenticationSuccess() or getDefaultSuccessRedirectURL() in %s.', get_class($this)));
-    }
-
-    /**
      * Override to change what happens after a bad username/password is submitted.
      *
      * @param Request                 $request
@@ -78,6 +63,10 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
         @trigger_error(sprintf('The AbstractFormLoginAuthenticator::onAuthenticationSuccess() implementation was deprecated in Symfony 3.1 and will be removed in Symfony 4.0. You should implement this method yourself in %s and remove getDefaultSuccessRedirectUrl().', get_class($this)), E_USER_DEPRECATED);
+
+        if (!method_exists($this, 'getDefaultSuccessRedirectUrl')) {
+            throw new \Exception(sprintf('You must implement onAuthenticationSuccess() or getDefaultSuccessRedirectURL() in %s.', get_class($this)));
+        }
 
         // if the user hits a secure page and start() was called, this was
         // the URL they were on, and probably where you want to redirect to

@@ -25,7 +25,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -323,7 +322,7 @@ class Controller extends ContainerAware
     /**
      * Shortcut to return the Doctrine Registry service.
      *
-     * @return Registry
+     * @return \Doctrine\Bundle\DoctrineBundle\Registry
      *
      * @throws \LogicException If DoctrineBundle is not available
      */

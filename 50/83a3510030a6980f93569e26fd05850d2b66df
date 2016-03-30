@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-03-29T17:48:01Z
+
+Looks like deps=high needs some fixing.
+
+regarding this PR, this looks good to me. :+1:
+
+---------------------------------------------------------------------------
+
+by alexchip64 at 2016-03-30T07:21:50Z
+
+With this fix, in Windows system, $caseCheck is set to "0", whereas it should be set to "1" (filesystem is NOT case sensitive) as in previous versions.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-30T07:29:27Z
+
+@alexchip64 can you detail why it ends up being set to zero in your case?
+
+---------------------------------------------------------------------------
+
+by alexchip64 at 2016-03-30T07:40:47Z
+
+Because, in my case, the situation of the checking is as follow:
+
+$file = C:\Users\cipriano\Documents\NetBeansProjects\zoe\vendor\symfony\symfony\src\Symfony\Component\Debug\DebugClassLoader.php
+
+$fileTest = C:\USERS\CIPRIANO\DOCUMENTS\NETBEANSPROJECTS\ZOE\VENDOR\SYMFONY\SYMFONY\SRC\SYMFONY\COMPONENT\DEBUG\DEBUGCLASSLOADER.PHP
+
+_but_
+
+realpath($fileTest) = C:\Users\cipriano\DOCUMENTS\NETBEANSPROJECTS\zoe\vendor\symfony\symfony\src\Symfony\Component\Debug\DebugClassLoader.php
+
+so the check `realpath($fileTest) === $file` fails.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-30T07:52:13Z
+
+does it work better if you use strtolower instead of strtoupper?
+
+---------------------------------------------------------------------------
+
+by alexchip64 at 2016-03-30T08:02:07Z
+
+I've done it, it but final result does not change:
+
+`$fileTest = 'c:\users\cipriano\documents\netbeansprojects\zoe\vendor\symfony\symfony\src\symfony\component\debug\debugclassloader.php'`
+
+_but_
+
+`realpath($fileTest) = 'C:\Users\cipriano\documents\netbeansprojects\zoe\vendor\symfony\symfony\src\Symfony\Component\Debug\DebugClassLoader.php'`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-30T08:04:54Z
+
+strange... this means it couldn't work previously and caseCheck ended up being 2, not 1, isn't it?
+
+---------------------------------------------------------------------------
+
+by alexchip64 at 2016-03-30T08:12:37Z
+
+Version 2.8.4 does not work in Windows as I indicated in my #18344, because final value is 2 and Symfony hangs.
+Previous versions used different way for checking:
+
+`self::$caseCheck = false !== stripos(PHP_OS, 'win') ? (false !== stripos(PHP_OS, 'darwin') ? 2 : 1) : 0;`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-30T08:46:29Z
+
+@alexchip64 PR updated, can you please check the new patch?
+
+---------------------------------------------------------------------------
+
+by alexchip64 at 2016-03-30T09:12:47Z
+
+Nothing changes.
+
+`$test = 'C:\Users\cipriano\Documents\NetBeansProjects\zoe\vendor\symfony\symfony\src\Symfony\Component\Debug\DebugClassLoader.php'`
+
+and
+
+`$file = 'DebugClassLoader.php'`
+
+so the checking:
+`elseif (substr($test, -strlen($file)) !== $file)`
+
+returns false
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-30T09:14:47Z
+
+My bad, it should be `===` instead of `!==`. Fixed.
+
+---------------------------------------------------------------------------
+
+by alexchip64 at 2016-03-30T09:23:44Z
+
+Now it is ok. At least it appears ok for Windows systems.
+I've understood what you have done: you ignore the path and focus on the filename only.

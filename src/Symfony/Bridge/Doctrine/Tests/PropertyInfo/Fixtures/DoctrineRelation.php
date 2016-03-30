@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\PropertyInfo\Fixtures;
 
 use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 
 /**
@@ -26,4 +27,9 @@ class DoctrineRelation
      * @Column(type="smallint")
      */
     public $id;
+
+    /**
+     * @Column(type="guid")
+     */
+    protected $guid;
 }

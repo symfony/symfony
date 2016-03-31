@@ -1,0 +1,181 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-03-22T09:47:40Z
+
+We need to keep some legacy test for the StringUtil class
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T09:53:01Z
+
+@stof
+> We need to keep some legacy test for the StringUtil class
+
+Should the test be duplicated?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-22T10:03:24Z
+
+> Should the test be duplicated?
+
+no need to duplicate the whole tests (as the new component is tested). But we at least need a simple test, which would catch mistakes in the BC class
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-22T10:14:49Z
+
+What about using [Doctrine Inflector](https://github.com/doctrine/inflector) library instead of creating a new component?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T10:18:17Z
+
+@javiereguiluz To me that'd be preferable too. But we need to use the same inflector for both PropertyAccess and PropertyInfo, according to @dunglas: https://github.com/symfony/symfony/issues/18166#issuecomment-196707518
+
+And if we switch both to the Doctrine Inflector, how should we handle the BC break?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-22T11:37:26Z
+
+I think it would be preferable for the community to use only 1 inflector library. Would it be an idea to use the doctrine variant instead and start patching that one to cover more use-cases when needed?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T11:40:11Z
+
+How do we handle the BC break? Or would it not be considered a BC break? :stuck_out_tongue_winking_eye:
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-22T11:43:07Z
+
+@teohhanhui I don't see why it would be. You can leave the deprecation as is and leave the tests as is. If the tests fail, you can patch those missing use-cases in the doctrine inflector. The only BC break would be tests failing because the doctrine inflector misses cases, but you will find out by hooking it up.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T11:45:25Z
+
+@iltar I'm thinking BC breaks for applications due to different result of the singularization. It seems impossible for us to catch them all...
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T11:46:26Z
+
+But alas, it'd be for the best. What do you think, @dunglas?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-22T12:33:07Z
+
+> I'm thinking BC breaks for applications due to different result of the singularization.
+
+How could be any difference if both libraries supposedly do the same: transform English words into/from singular/plural?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-22T12:34:53Z
+
+> How could be any difference if both libraries supposedly do the same: transform English words into/from singular/plural?
+
+Given that the conversion rules are quite complex, they may behave differently for some cases (common rules should work fine, but the component would be useless if the rule was as simple as removing the final ``s``)
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T12:41:16Z
+
+If the application previously used the wrong singular form which matches what is produced by `StringUtil::singularify`, it'll stop working once we switch to Doctrine Inflector (given that the singular form is now correct); and vice versa, what used to be correct could now be wrong.
+
+It's not really possible for us to ensure consistent before/after results. Now the question is whether this is part of our BC promise (of course, surprises like this would still be unwelcome and annoying for an application developer).
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-22T12:44:10Z
+
+Luckily we have tests to verify the symfony variant still works, if they pass, no problem. If they fail: patch the inflector on doctrine's side.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-22T12:44:47Z
+
+The compatibility test between both library would be as follow:
+- run the Symfony StringUtil testcases against the doctrine/inflector implementation
+- run the doctrine/inflector testcases against the StringUtil implementation (for relevant tests of course, as doctrine/inflector contains more methods than just singularify).
+
+Test failures there would show us known incompatibilities (we may still have incompatibilities in things not covered by any of the testsuites). This would help us to make the decision.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T13:18:30Z
+
+> run the Symfony StringUtil testcases against the doctrine/inflector implementation
+
+There are many failures: https://travis-ci.org/teohhanhui/symfony/jobs/117700871#L4206-L4791
+
+~~And there's a bigger problem... Doctrine Inflector's `singularize` method doesn't support multiple singular forms (even though StringUtil mostly returned bogus results, but there are many valid cases for this...)~~
+
+edit: Yes, there are still some valid use cases: https://www.quora.com/What-is-the-plural-of-axis
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T15:53:55Z
+
+After clean-up: https://travis-ci.org/teohhanhui/symfony/jobs/117721231#L4099-L4348
+
+There are still a number of failures, and a few that we have no real way of fixing in the Doctrine Inflector (multiple words with the same plural form):
+
+- axes => axe, ax, axis
+- bases => base, basis
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-22T16:59:52Z
+
+> There are still a number of failures, and a few that we have no real way of fixing in the Doctrine Inflector (multiple words with the same plural form):
+
+And this is the difference between the doctrine inflector and the Symfony StringUtil: the doctrine inflector aims to provide a single singular string (which make sense as their primary usage of the inflector is generating method names during code generation, so they must settle on a single singular), while the goal of the StringUtil is to find all potential singular, to be able to call the method named by the developer with one of them.
+
+and this difference of goal of the project is probably the main reason why we won't be able to switch to doctrine/inflector (as they won't change the focus of the Doctrine project just to allow us to use it)
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-22T17:55:39Z
+
+@stof It looks like I have to continue with this PR then...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T05:48:51Z
+
+@teohhanhui Do you think you can finish (not sure what's left) this PR is the next couple of days? I'd like to get this in for 3.1 as it seems quite easy to acheive. Marking the whole component as being internal also gives us the opportunity to add more or even drop it if we find a better replacement in the meantime.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-31T06:21:26Z
+
+What else do I need to do, other than adding `@internal` to the classes and methods?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-31T06:34:26Z
+
+Marked as internal and added a disclaimer in the README
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-03-31T06:42:15Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T07:12:36Z
+
+:+1: (after the minor comments have been fixed)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-31T08:11:19Z
+
+:+1:

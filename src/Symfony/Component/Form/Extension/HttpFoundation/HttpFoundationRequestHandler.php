@@ -58,7 +58,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
         // For request methods that must not have a request body we fetch data
         // from the query string. Otherwise we look for data in the request body.
         if ('GET' === $method || 'HEAD' === $method || 'TRACE' === $method) {
-            if ('' === $name) {
+            if ('' === $name || $form->getConfig()->getOption('force_submit')) {
                 $data = $request->query->all();
             } else {
                 // Don't submit GET requests if the form's name does not exist
@@ -89,7 +89,7 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 return;
             }
 
-            if ('' === $name) {
+            if ('' === $name || $form->getConfig()->getOption('force_submit')) {
                 $params = $request->request->all();
                 $files = $request->files->all();
             } elseif ($request->request->has($name) || $request->files->has($name)) {

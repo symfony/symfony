@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-21T10:17:44Z
+
+:+1: great addition
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-02T15:03:31Z
+
+@fabpot `strict` renamed to `detectCorrupted`. Added new error message and code. Travis is green except php7 branch - twig bridge failures
+
+---------------------------------------------------------------------------
+
+by ProPheT777 at 2016-03-02T17:53:53Z
+
+May be we should add a note on this feature in the docs about memory issue? Because default configuration of php is not fit to open HD image in memory via `imagecreatefromstring`and that will trigger a `Fatal error: Allowed memory size`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-04T11:26:44Z
+
+I think we could accept this PR if the new constraint is disabled by default, and also if the check is done after getimagesize validation
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-06T08:57:57Z
+
+I agree with @nicolas-grekas.
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-15T12:58:17Z
+
+Are there any things that should to be done which blocks PR merging? @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-29T23:19:13Z
+
+@fabpot I've added `imagedestroy` call and test for valid image. Travis is green.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T18:21:11Z
+
+Thanks for that PR!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-30T19:50:26Z
+
+@Koc please move corruption check after image size validation.
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-30T20:42:39Z
+
+@nicolas-grekas done. Travis failure looks unrelated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-30T21:17:30Z
+
+:+1: with one minor comment

@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-30T00:26:37Z
+
+LGTM :+1:
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T06:51:34Z
+
+Should we add a note in the UPGRADE file ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-30T07:28:52Z
+
+@HeahDude I think so.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T07:43:53Z
+
+@xabbuh Thanks for the review. Done. is the "before/after" really needed?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T14:09:57Z
+
+Ok this one might be ready now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-30T17:06:44Z
+
+@HeahDude In the 4.0 upgrade file the same services should be listed to, but they should there be mentioned as being removed.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T17:11:08Z
+
+@xabbuh Ok I was not aware of it, thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T17:14:16Z
+
+Done, feels weird :)

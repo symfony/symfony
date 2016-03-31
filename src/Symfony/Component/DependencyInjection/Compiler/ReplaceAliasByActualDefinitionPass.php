@@ -42,6 +42,10 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
         foreach ($container->getAliases() as $id => $alias) {
             $aliasId = (string) $alias;
 
+            if ('service_container' === $aliasId) {
+                continue;
+            }
+
             try {
                 $definition = $container->getDefinition($aliasId);
             } catch (InvalidArgumentException $e) {

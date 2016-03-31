@@ -36,6 +36,8 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
         $container->setAlias('a_alias', 'a');
         $container->setAlias('b_alias', 'b');
 
+        $container->setAlias('container', 'service_container');
+
         $this->process($container);
 
         $this->assertTrue($container->has('a'), '->process() does nothing to public definitions.');
@@ -47,6 +49,7 @@ class ReplaceAliasByActualDefinitionPassTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame('b_alias', $aDefinition->getFactoryService(false));
+        $this->assertTrue($container->has('container'));
 
         $resolvedFactory = $aDefinition->getFactory(false);
         $this->assertSame('b_alias', (string) $resolvedFactory[0]);

@@ -1,0 +1,188 @@
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-22T14:02:09Z
+
+Note: patch applies to master with minor modification (tested).
+
+---------------------------------------------------------------------------
+
+by lstrojny at 2016-03-22T14:18:49Z
+
+Improves container dump times from ~40s to ~16s in real world applications.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-22T15:13:55Z
+
+This looks great :+1:
+Thank you @ajb-in :smile:
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-22T15:17:02Z
+
+Thanks @Ener-Getick ^_^
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-23T13:22:19Z
+
+@stof re chains: I played with the existing testcase for 2.3 to see what happens with chained aliases. I ran this code:
+
+        $container = new ContainerBuilder();
+
+        $aDefinition = $container->register('a', '\stdClass');
+        $aDefinition->setFactory(array(new Reference('b'), 'createA'));
+
+        $bDefinition = new Definition('\stdClass');
+        $bDefinition->setPublic(false);
+        $container->setDefinition('b', $bDefinition);
+
+        $container->setAlias('a_alias', 'a');
+        $container->setAlias('b_alias', 'b');
+
+        // I added these three lines:
+        $container->setAlias('c_alias', 'b');
+        $container->setAlias('d_alias', 'c_alias');
+        $container->setAlias('e_alias', 'd_alias');
+
+        $this->process($container);
+
+and it 'sploded *on 2.3*:
+
+<pre>There was 1 error:
+
+1) Symfony\Component\DependencyInjection\Tests\Compiler\ReplaceAliasByActualDefinitionPassTest::testProcess
+Symfony\Component\DependencyInjection\Exception\InvalidArgumentException: Unable to replace alias "d_alias" with actual definition "c_alias".
+
+/code/symfony/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php:48
+/code/symfony/src/Symfony/Component/DependencyInjection/Compiler/ReplaceAliasByActualDefinitionPass.php:63
+/code/symfony/src/Symfony/Component/DependencyInjection/Tests/Compiler/ReplaceAliasByActualDefinitionPassTest.php:69
+/code/symfony/src/Symfony/Component/DependencyInjection/Tests/Compiler/ReplaceAliasByActualDefinitionPassTest.php:40
+
+Caused by
+Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException: You have requested a non-existent service "c_alias".</pre>
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-23T13:28:19Z
+
+It explodes also if I change the extra part to this:
+
+        // I added these two lines:
+        $container->setAlias('c_alias', 'b_alias');
+        $container->setAlias('d_alias', 'c_alias');
+
+---------------------------------------------------------------------------
+
+by tadcka at 2016-03-23T20:59:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by egils at 2016-03-23T21:04:58Z
+
+Lovely! :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-25T11:58:12Z
+
+@ajb-in Aliases that refer to other aliases should have been resolved in the `ResolveReferencesToAliasesPass` which is run before the `ReplaceAliasByActualDefinitionPass`.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-27T00:46:14Z
+
+:+1: apart from those small doc fixes.
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-27T11:39:37Z
+
+@Tobion @Ener-Getick Did doc and variable name fixes; looks better?
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-27T11:40:38Z
+
+@xabbuh @stof Then this pass doesn't need to be concerned with chains whatsoever, right?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-27T12:56:08Z
+
+As this is not a bug fix, it should be merged in master, not 2.3
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-27T13:00:59Z
+
+@fabpot When I asked in #symfony I was told that it could count as a performance bug, so that's why I went with 2.3; @javiereguiluz seemed to agree since he labeled this PR as 'bug'.
+I'll rebase it onto master if needed, of course.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-27T13:05:21Z
+
+Sorry about the confusion. It's true that we've been more willing to merge PRs that do not strictly fix bugs in maintained branches (and I probably merged some myself), but I think this is a mistake. First, we want old branches to be as stable as possible, and merging non-bug fixes can introduce subtle regressions (happened in the past). Then, improving performance in new versions is a great incentive for people to upgrade, which is always a good idea.
+
+/cc @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-28T19:23:41Z
+
+I'd prefer to merge refactorings like this one in maitainance branches as it will make maintaining branches easier when they are more similar and do not diverge that much just because of refactorings.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-28T19:26:45Z
+
+And introducing suble behavior changes should not be an argument. It just means we do not have enough tests (or it's really an edge case that wasn't meant to be like this). E.g. the refactoring in the templating parser actually revealed that people use absolute paths that wasn't intended that way.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-30T14:40:21Z
+
+@ajb-in Can you rebase on current 2.3? Thanks.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-30T15:42:35Z
+
+In general, I'd prefer things like this to be merged into master. If this causes a subtle behavior change that isn't caught by our tests, that should be our problem, not a problem that is discovered by users in a patch update. We need users to have very high confidence in upgrading patch versions (otherwise, they may stay on insecure versions!)
+
+But it's not black and white - a performance issue could be a bug, so we can do anything here.
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-31T08:55:26Z
+
+Rebased on latest 2.3; also squashed, added a comment, and added a plug to this review on the commit message :3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T09:08:46Z
+
+@ajb-in Can you remove the reference in the commit message? We already have everything in place to automatically get that in Git notes.
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-31T09:21:55Z
+
+@fabpot Done; just wanted to give some due credit :3
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T09:27:52Z
+
+Tests are broken apparently.
+
+---------------------------------------------------------------------------
+
+by ajb-in at 2016-03-31T09:30:52Z
+
+@fabpot I forgot to rename a variable =P
+Fixed it now

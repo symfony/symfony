@@ -809,7 +809,7 @@ class NumberFormatter
             return false;
         }
 
-        if (PHP_INT_SIZE !== 8 && ($value > self::$int32Max || $value <= -self::$int32Max - 1)) {
+        if (PHP_INT_SIZE !== 8 && ($value > self::$int32Max || $value < -self::$int32Max - 1)) {
             // Bug #59597 was fixed on PHP 5.3.14 and 5.4.4
             // The negative PHP_INT_MAX was being converted to float
             if (

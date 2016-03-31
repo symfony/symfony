@@ -120,6 +120,7 @@ abstract class AbstractPipes implements PipesInterface
                     return array($this->pipes[0]);
                 }
             }
+
             if ($input) {
                 for (;;) {
                     $data = fread($input, self::CHUNK_SIZE);

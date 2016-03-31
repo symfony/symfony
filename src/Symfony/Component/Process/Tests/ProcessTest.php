@@ -209,6 +209,24 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
     }
 
+    public function testLiveStreamAsInput()
+    {
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, 'hello');
+        rewind($stream);
+
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);')));
+        $p->setInput($stream);
+        $p->start(function ($type, $data) use ($stream) {
+            if ('hello' === $data) {
+                fclose($stream);
+            }
+        });
+        $p->wait();
+
+        $this->assertSame('hello', $p->getOutput());
+    }
+
     /**
      * @expectedException \Symfony\Component\Process\Exception\LogicException
      * @expectedExceptionMessage Input can not be set while the process is running.

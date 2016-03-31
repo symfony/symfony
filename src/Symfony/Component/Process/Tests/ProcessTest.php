@@ -14,6 +14,7 @@ namespace Symfony\Component\Process\Tests;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Pipes\PipesInterface;
 use Symfony\Component\Process\Process;
@@ -1176,31 +1177,97 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testIteratorInput()
     {
-        $nextData = 'ping';
-        $input = function () use (&$nextData) {
-            while (false !== $nextData) {
-                yield $nextData;
-                yield $nextData = '';
-            }
+        $input = function () {
+            yield 'ping';
+            yield 'pong';
         };
-        $input = $input();
 
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'), null, null, $input());
+        $process->run();
+        $this->assertSame('pingpong', $process->getOutput());
+    }
+
+    public function testSimpleInputStream()
+    {
+        $input = new InputStream();
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('echo \'ping\'; stream_copy_to_stream(STDIN, STDOUT);'));
         $process->setInput($input);
-        $process->start(function ($type, $data) use ($input, &$nextData) {
+
+        $process->start(function ($type, $data) use ($input) {
             if ('ping' === $data) {
-                $h = fopen('php://memory', 'r+');
-                fwrite($h, 'pong');
-                rewind($h);
-                $nextData = $h;
-                $input->next();
-            } else {
-                $nextData = false;
+                $input->write('pang');
+            } elseif (!$input->isClosed()) {
+                $input->write('pong');
+                $input->close();
             }
         });
 
         $process->wait();
+        $this->assertSame('pingpangpong', $process->getOutput());
+    }
+
+    public function testInputStreamWithCallable()
+    {
+        $i = 0;
+        $stream = fopen('php://memory', 'w+');
+        $stream = function () use ($stream, &$i) {
+            if ($i < 3) {
+                rewind($stream);
+                fwrite($stream, ++$i);
+                rewind($stream);
+
+                return $stream;
+            }
+        };
+
+        $input = new InputStream();
+        $input->onEmpty($stream);
+        $input->write($stream());
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
+        $process->setInput($input);
+        $process->start(function ($type, $data) use ($input) {
+            $input->close();
+        });
+
+        $process->wait();
+        $this->assertSame('123', $process->getOutput());
+    }
+
+    public function testInputStreamWithGenerator()
+    {
+        $input = new InputStream();
+        $input->onEmpty(function ($input) {
+            yield 'pong';
+            $input->close();
+        });
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
+        $process->setInput($input);
+        $process->start();
+        $input->write('ping');
+        $process->wait();
         $this->assertSame('pingpong', $process->getOutput());
+    }
+
+    public function testInputStreamOnEmpty()
+    {
+        $i = 0;
+        $input = new InputStream();
+        $input->onEmpty(function () use (&$i) {++$i;});
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('echo 123; echo fread(STDIN, 1); echo 456;'));
+        $process->setInput($input);
+        $process->start(function ($type, $data) use ($input) {
+            if ('123' === $data) {
+                $input->close();
+            }
+        });
+        $process->wait();
+
+        $this->assertSame(0, $i, 'InputStream->onEmpty callback should be called only when the input *becomes* empty');
+        $this->assertSame('123456', $process->getOutput());
     }
 
     /**

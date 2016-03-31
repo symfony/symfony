@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process\Pipes;
 
+use Symfony\Component\Process\Exception\InvalidArgumentException;
+
 /**
  * @author Romain Neutron <imprec@gmail.com>
  *
@@ -23,7 +25,7 @@ abstract class AbstractPipes implements PipesInterface
 
     /** @var string */
     private $inputBuffer = '';
-    /** @var resource|\Iterator|null */
+    /** @var resource|scalar|\Iterator|null */
     private $input;
     /** @var bool */
     private $blocked = true;
@@ -84,6 +86,8 @@ abstract class AbstractPipes implements PipesInterface
 
     /**
      * Writes input to stdin.
+     *
+     * @throws InvalidArgumentException When an input iterator yields a non supported value
      */
     protected function write()
     {
@@ -97,9 +101,17 @@ abstract class AbstractPipes implements PipesInterface
                 $input = null;
             } elseif (is_resource($input = $input->current())) {
                 stream_set_blocking($input, 0);
-            } else {
-                $this->inputBuffer .= $input;
+            } elseif (!isset($this->inputBuffer[0])) {
+                if (!is_string($input)) {
+                    if (!is_scalar($input)) {
+                        throw new InvalidArgumentException(sprintf('%s yielded a value of type "%s", but only scalars and stream resources are supported', get_class($this->input), gettype($input)));
+                    }
+                    $input = (string) $input;
+                }
+                $this->inputBuffer = $input;
                 $this->input->next();
+                $input = null;
+            } else {
                 $input = null;
             }
         }

@@ -1,0 +1,679 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-01-29T10:15:28Z
+
+Made some changes to allow catch redirections as well, and use only the master request attributes (`ParameterBag`) instead of the whole request to handle forward interception as @stof suggested.
+Also updated title and description.
+Now need some reviews, thanks.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-01-30T02:09:49Z
+
+I wonder if it would be useful to add the redirection code to quickly see if it's the same as expected
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-01T10:50:11Z
+
+The designer just sent me the icons which match the style of the toolbar:
+
+`redirect.svg`
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.06,7.83L14,0.38a1.25,1.25,0,0,0-2,.89V4.09a13.61,13.61,0,0,1-2.2.61l-1.3.47C8,5.35,7.59,5.6,7.12,5.81l-0.69.35-0.72.45a10.62,10.62,0,0,0-1.41,1A13.22,13.22,0,0,0,3,8.82a15.31,15.31,0,0,0-1.13,1.46A17.63,17.63,0,0,0,1,11.93c-0.18.58-.34,1.16-0.48,1.71S0.45,14.76.43,15.29a10.2,10.2,0,0,0,.16,1.5,5.72,5.72,0,0,0,.33,1.34c0.14,0.41.26,0.82,0.42,1.19,0.37,0.71.67,1.38,1,1.94l1,1.46c0.32,0.41.63,0.75,0.87,1s0.51,0.09.43-.22-0.23-.75-0.35-1.23L4,20.69c-0.1-.58-0.09-1.22-0.14-1.86,0-.32.05-0.65,0.08-1a3.44,3.44,0,0,1,.16-1A6.44,6.44,0,0,1,4.41,16l0.41-.8c0.2-.22.38-0.44,0.55-0.65L6,14c0.23-.14.5-0.24,0.72-0.37a7.52,7.52,0,0,1,.79-0.25,4.48,4.48,0,0,1,.84-0.15l0.41-.06H9.22c0.3,0,.56,0,0.85,0l0.72,0.07a3.77,3.77,0,0,1,1.2.21v3.17a1.25,1.25,0,0,0,2,.89l9-7.45A1.46,1.46,0,0,0,23.06,7.83Z" style="fill:#aaa"/></svg>
+```
+
+`forward.svg`
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M23.61,11.07L17.07,4.35A1.2,1.2,0,0,0,15,5.28V9H1.4A1.82,1.82,0,0,0,0,10.82v2.61A1.55,1.55,0,0,0,1.4,15H15v3.72a1.2,1.2,0,0,0,2.07.93l6.63-6.72A1.32,1.32,0,0,0,23.61,11.07Z" style="fill:#aaa"/></svg>
+```
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-01T12:05:21Z
+
+Thanks @javiereguiluz, committed and updated description screenshots.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-01T23:00:11Z
+
+@javiereguiluz WDYT of a redirect arrow pointing left instead of right, it would be less confusing and consistent with mail buttons definition for example.
+
+Here's a screenshot from Mail app in OS X :
+
+![mail](https://cloud.githubusercontent.com/assets/10107633/12734269/c9506f22-c93f-11e5-8ce8-b86b6621a615.jpg)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-02T09:48:48Z
+
+@HeahDude I don't agree with the last proposal. The reason is that our toolbar displays "redirected to" and the mail app shows "redirected/replied from". The tip of the arrow should point to the route name because that route is the result of the redirection or forward.
+
+* `200 -> @route` can be read as "a 200 response redirected to @route".
+* `200 <- @route` can be read as "@route redirects to 200".
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-02T12:43:05Z
+
+@javiereguiluz alright. WDYT about collecting the redirected controller and/or redirect status code ? (see my notes)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-15T09:46:59Z
+
+Hi @javiereguiluz, do I have to write some tests for this PR ?
+
+Otherwise it is finished, I'm just waiting for some feedbacks on catching the redirection status code, and/or the route name which we've been redirected from.
+
+Any lead ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-15T12:52:58Z
+
+What when there is more than one redirection before the WDT is shown again?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-15T13:36:04Z
+
+@xabbuh for chained redirection see my [comment above](https://github.com/symfony/symfony/pull/17589#discussion_r51422405) but I could add a link in the top panel of the profiler for the case where `intercept_redirect` is false.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-15T13:39:28Z
+
+So in that it could worth to catch controller and route info from the redirection response
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-24T08:49:39Z
+
+Ok, I've squashed things up !
+
+So now there is two different commit for each feature :
+-   3dc8844 for redirections profiling.
+
+    In the scope of `RedirectResponse` sent by the kernel it will pass the request attributes to the next request through the session if it is enabled.
+
+  It's seems consistent as the implementation globally remains in the `RequestDataCollector` from the HttpKernel component with requires HttpFoundation for request, response and session objects.
+
+  I've refactored a bit since I've noticed that actually there is absolutely no information in the profiler when you are redirected unless you turn on interceptions (which is not by default), even with my previous implementation, excepted a residue of my collect deep in the session tab of the request panel.
+
+  So I've added a little info (a simple block) in the summury in the main profiler layout, plus the status code in the wdt. Here's what it looks like :
+  (the route name may be a link to the controller)
+![redirect_wdt](https://cloud.githubusercontent.com/assets/10107633/13279850/b3dba8da-dada-11e5-9b95-c4b676941336.jpg)
+
+  If you click on the linked profile token you can see it is a chained redirection :
+![redirection_profile](https://cloud.githubusercontent.com/assets/10107633/13279958/6439ea3e-dadb-11e5-8398-3fd058d160c7.jpg)
+
+- 79e5464 for a shorcut to the forward profile.
+
+  Since this feature depends on the `Symfony\Bundle\FramworkBundle\Controller\Controller` it may not be consistent to put its logic in the `RequestDataCollector`, especially as it tests on every request if there is a forwarded attribute on the kernel controller event.
+
+    May be I should add a dedicated listener like `\Symfony\Bundle\FrameworkBundle\DataCollector\ForwardRequestCollector`.
+
+    Or maybe you don't want this feature after all, what do you think symfony deciders ?
+
+@javiereguiluz, can you have a look please ? :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T16:53:21Z
+
+@javiereguiluz Can you have a look at this one? If we are able to manage redirections directly from the toolbar, I suggest that we remove the setting for the intermediate page as it would not be that useful anymore.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-02-29T16:55:16Z
+
+I'm gonna review this soon. @HeahDude sorry for the delay.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-29T17:06:18Z
+
+For what it's worth, I don't think this is redundant with the interception page as in case of chain redirections there are complementary (ref https://github.com/symfony/symfony/pull/17589#discussion_r51422405).
+
+As an option set false by default, it should be up to the developer to decide if he wants to use intercept page.
+
+It can allow to check some dumps or profile data before dealing with the next request.
+
+The wdt info is just a helper but may not be replacement for intercept option IMHO.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-29T19:07:33Z
+
+@javiereguiluz no worry :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T09:11:15Z
+
+Ok I've pushed a new commit 6b7991b, to move the forward catching logic in the FrameworkBundle.
+
+That makes the tip for Silex in the description obsolete but I would be bad to check on each controller event if it is a forward since it's a framework controller specific method.
+
+If you agree, I'll squash the alternative.
+
+Beside that, I think it's done here.
+
+Needs final review.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-02T14:16:17Z
+
+I've reviewed this feature and it worked for me. @HeahDude thanks for this great work!
+
+Now I'd like to propose some minor changes.
+
+---
+
+In the toolbar, redirects are displayed like this:
+
+![before_toolbar_redirect](https://cloud.githubusercontent.com/assets/73419/13462505/08ff73c0-e088-11e5-9a4f-2bb55390b795.png)
+
+I'd like to separate the redirection information and to reword its contents:
+
+![after_toolbar_redirect](https://cloud.githubusercontent.com/assets/73419/13462813/8e623bfa-e089-11e5-8556-b7e286d5731c.png)
+
+Same idea for forwards:
+
+![after_toolbar_forward](https://cloud.githubusercontent.com/assets/73419/13462525/2bfe0e40-e088-11e5-8ef5-cc0a994cf037.png)
+
+---
+
+In the profiler, the redirection information is displayed at the end of the second line in the green section:
+
+![before_profiler_redirect](https://cloud.githubusercontent.com/assets/73419/13462556/4462fd92-e088-11e5-9e76-5b8a2c13e3e2.png)
+
+Since this information can be very important, I'd like to show it more prominently:
+
+![after_profiler_redirect](https://cloud.githubusercontent.com/assets/73419/13462569/58596980-e088-11e5-9eed-b0c0b41bf80e.png)
+
+And the same idea for forward:
+
+![after_profiler_forward](https://cloud.githubusercontent.com/assets/73419/13462581/5e8d3f8e-e088-11e5-93ea-d803bcf5a0c8.png)
+
+---
+
+I attach you a patch with these changes in case Symfony Deciders agree with them:
+
+```diff
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/request.html.twig b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/request.html.twig
+index 3be795e..58fcac9 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/request.html.twig
++++ b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Collector/request.html.twig
+@@ -25,60 +25,68 @@
+     {% set icon %}
+         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
+         {% if collector.route %}
+-            {% if collector.redirect %}&nbsp;{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
+-            {% if collector.forward %}&nbsp;{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
++            {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
++            {% if collector.forward %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
+             <span class="sf-toolbar-label">@</span>
+             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
+         {% endif %}
+     {% endset %}
+
+     {% set text %}
+-        <div class="sf-toolbar-info-piece">
+-            <b>HTTP status</b>
+-            <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
+-        </div>
+-
+-        <div class="sf-toolbar-info-piece">
+-            <b>Controller</b>
+-            <span>{{ request_handler }}</span>
+-        </div>
++        <div class="sf-toolbar-info-group">
++            <div class="sf-toolbar-info-piece">
++                <b>HTTP status</b>
++                <span>{{ collector.statuscode }} {{ collector.statustext }}</span>
++            </div>
+
+-        {% if collector.controller.class is defined %}
+             <div class="sf-toolbar-info-piece">
+-                <b>Controller class</b>
+-                <span>{{ collector.controller.class }}</span>
++                <b>Controller</b>
++                <span>{{ request_handler }}</span>
+             </div>
+-        {% endif %}
+
+-        <div class="sf-toolbar-info-piece">
+-            <b>Route name</b>
+-            <span>{{ collector.route|default('NONE') }}</span>
+-        </div>
++            {% if collector.controller.class is defined %}
++                <div class="sf-toolbar-info-piece">
++                    <b>Controller class</b>
++                    <span>{{ collector.controller.class }}</span>
++                </div>
++            {% endif %}
+
+-        <div class="sf-toolbar-info-piece">
+-            <b>Has session</b>
+-            <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
+-        </div>
++            <div class="sf-toolbar-info-piece">
++                <b>Route name</b>
++                <span>{{ collector.route|default('NONE') }}</span>
++            </div>
+
+-        {% if collector.redirect %}
+             <div class="sf-toolbar-info-piece">
+-            <b>Redirected from</b>
+-            <span>
+-                <span class="sf-toolbar-redirection-status sf-toolbar-status-yellow">{{ collector.redirect.status_code }}</span>
+-                {{ redirect_handler }}
+-                (<a href="{{ path('_profiler', { token: collector.redirect.token }) }}">{{ collector.redirect.token }}</a>)
+-            </span>
++                <b>Has session</b>
++                <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
++            </div>
+         </div>
++
++        {% if collector.redirect %}
++            <div class="sf-toolbar-info-group">
++                <div class="sf-toolbar-info-piece">
++                    <b>
++                        <span class="sf-toolbar-redirection-status sf-toolbar-status-yellow">{{ collector.redirect.status_code }}</span>
++                        Redirect from
++                    </b>
++                    <span>
++                        {{ redirect_handler }}
++                        (<a href="{{ path('_profiler', { token: collector.redirect.token }) }}">{{ collector.redirect.token }}</a>)
++                    </span>
++                </div>
++            </div>
+         {% endif %}
+
+         {% if forward_handler is defined %}
+-            <div class="sf-toolbar-info-piece">
+-            <b>Forwarded to</b>
+-            <span>
+-                {{ forward_handler }}
+-                (<a href="{{ path('_profiler', { token: collector.forward.token }) }}">{{ collector.forward.token }}</a>)
+-            </span>
+-        </div>
++            <div class="sf-toolbar-info-group">
++                <div class="sf-toolbar-info-piece">
++                    <b>Forwarded to</b>
++                    <span>
++                        {{ forward_handler }}
++                        (<a href="{{ path('_profiler', { token: collector.forward.token }) }}">{{ collector.forward.token }}</a>)
++                    </span>
++                </div>
++            </div>
+         {% endif %}
+     {% endset %}
+
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/layout.html.twig b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/layout.html.twig
+index 7518b49..3d3d423 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/layout.html.twig
++++ b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/layout.html.twig
+@@ -19,6 +19,44 @@
+                             {% endif %}
+                         </h2>
+
++                        {% if profile.collectors.request is defined and profile.collectors.request.redirect %}
++                            {% set redirect = profile.collectors.request.redirect %}
++                            {% set controller = redirect.controller %}
++                            <dl class="metadata">
++                                <dt>
++                                    <span class="label">{{ redirect.status_code }}</span>
++                                    Redirect from
++                                </dt>
++                                <dd>
++                                    {% if redirect.controller.class is defined %}
++                                        {% set link = controller.file|file_link(controller.line) %}
++                                        {% if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif %}
++                                            @{{ redirect.route }}
++                                        {% if link %}</a>{% endif %}
++                                    {% else %}
++                                            @{{ redirect.route }}
++                                    {% endif %}
++                                    (<a href="{{ path('_profiler', { token: redirect.token }) }}">{{ redirect.token }}</a>)
++                                </dd>
++                            </dl>
++                        {% endif %}
++
++                        {% if profile.collectors.request is defined and profile.collectors.request.forward and profile.collectors.request.forward.controller.class is defined %}
++                            {% set forward = profile.collectors.request.forward %}
++                            {% set controller = forward.controller %}
++                            <dl class="metadata">
++                                <dt>Forwarded to</dt>
++                                <dd>
++                                    {% set link = controller.file|file_link(controller.line) %}
++                                    {% if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif %}
++                                        {{- controller.class|abbr_class|striptags -}}
++                                        {{- controller.method ? ' :: ' ~ controller.method -}}
++                                    {% if link %}</a>{% endif %}
++                                    (<a href="{{ path('_profiler', { token: forward.token }) }}">{{ forward.token }}</a>)
++                                </dd>
++                            </dl>
++                        {% endif %}
++
+                         <dl class="metadata">
+                             <dt>Method</dt>
+                             <dd>{{ profile.method|upper }}</dd>
+@@ -34,26 +72,6 @@
+
+                             <dt>Token</dt>
+                             <dd>{{ profile.token }}</dd>
+-
+-                            {% if profile.collectors.request is defined and profile.collectors.request.redirect -%}
+-                            {%- set redirect = profile.collectors.request.redirect -%}
+-                                <dt>Redirected from</dt>
+-                                <dd>
+-                                    {% set controller = redirect.controller -%}
+-                                    {%- if redirect.controller.class is defined -%}
+-                                    {%- set link = controller.file|file_link(controller.line) -%}
+-                                        {% if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
+-
+-                                        @{{- redirect.route -}}
+-
+-                                        {%- if link %}</a>{% endif -%}
+-                                    {%- else -%}
+-                                            @{{ redirect.route }}
+-                                    {%- endif %}
+-                                    - {{ redirect.status_code }}&nbsp;{{ redirect.status_text }}
+-                                    (<a href="{{ path('_profiler', { token: redirect.token }) }}">{{ redirect.token }}</a>)
+-                                </dd>
+-                            {%- endif %}
+                         </dl>
+                     </div>
+                 </div>
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/profiler.css.twig b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/profiler.css.twig
+index 21e74b9..7621fd3 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/profiler.css.twig
++++ b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/profiler.css.twig
+@@ -503,6 +503,9 @@ tr.status-warning td {
+ #summary dl.metadata dd {
+     margin: 0 1.5em 0 0;
+ }
++#summary dl.metadata .label {
++    background: rgba(255, 255, 255, 0.2);
++}
+
+ {# Sidebar
+    ========================================================================= #}
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
+index 8cd00f6..218cb32 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
++++ b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
+@@ -233,7 +233,8 @@
+     text-decoration: underline;
+ }
+ .sf-toolbar-block-request .sf-toolbar-redirection-status {
+-    padding: 0 4px;
++    font-weight: normal;
++    padding: 2px 4px;
+     line-height: 18px;
+ }
+
+@@ -453,8 +454,11 @@
+         padding-left: 0;
+         padding-right: 0;
+     }
+-    .sf-toolbar-block-request .sf-toolbar-status + .sf-toolbar-label {
+-        margin-left: 4px;
++    .sf-toolbar-block-request .sf-toolbar-status {
++        margin-right: 5px;
++    }
++    .sf-toolbar-block-request .sf-toolbar-icon svg + .sf-toolbar-label {
++        margin-left: 0;
+     }
+     .sf-toolbar-block-request .sf-toolbar-label + .sf-toolbar-value {
+         margin-right: 10px;
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T14:17:56Z
+
+@javiereguiluz looks good to me.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T16:39:19Z
+
+Thanks @javiereguiluz for the review, I work on it.
+
+@fabpot what about https://github.com/symfony/symfony/pull/17589#issuecomment-191144427 was it part of your last agreement ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T17:22:31Z
+
+@javiereguiluz, I propose to either use "Redirected from" and  "Forwarded to", or "Redirect from" and "Forward to", (I vote for the passive form) but a mix of both looks weird to me.
+
+What do you think ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-02T18:54:18Z
+
+@HeahDude I know that they differ ... but I proposed that on purpose. It's part of the "conversational UI" trend. A person speaking in English would always say *"a permanent redirect to/from ..."* or *"a temporary redirect to/from..."*.
+
+That's what the interface is trying to "say" in this screen:
+
+![after_toolbar_redirect](https://cloud.githubusercontent.com/assets/73419/13471319/561fd672-e0b0-11e5-9844-7c27be3bdafa.png)
+
+And this also allows us to align the two different HTTP status, which improves the overall readability.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T19:27:31Z
+
+@javiereguiluz thank you very much for explaining this to me, as a french php self-learner, it's a kind of nuance very useful to learn :)
+
+---------------------------------------------------------------------------
+
+by dkisselev at 2016-03-02T19:30:39Z
+
+@HeahDude, English is difficult that way, I'm a native speaker and still had to stop and think about the correct phrasing when you mentioned that. I agree with @javiereguiluz on conversational UI though.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-02T19:54:31Z
+
+Ok I'm almost done addressing last @javiereguiluz comment. Just need to know if I discard or squash 6b7991b alternative.
+
+ping @javiereguiluz @fabpot
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-03T10:47:45Z
+
+Ok, I've rebased. Here's a new summary (EDITED):
+
+1. 81b1a88 Handle redirection profiling
+  last @javiereguiluz's comment addressed.
+  Also I've tweaked the macro to be consistent with the proposed diff (see [here](https://github.com/symfony/symfony/pull/17589/files#diff-42750072126a9fed4fad2f43c4b73d03R277)).
+
+2. 1b281b4 A new proposal to show the redirected method when different from 'GET'
+  Kernel redirections are often triggered to change the http verb, so it might be useful to show it when needed. Here's a glimpse :
+  ![hint method redirect](https://cloud.githubusercontent.com/assets/10107633/13548842/99503630-e2f9-11e5-8c8c-0cf6fb230eef.jpg)
+  ![hint method redirect layout](https://cloud.githubusercontent.com/assets/10107633/13548848/aab64748-e2f9-11e5-88d9-f94bcd1708e5.jpg)
+
+  ------------------
+  >If accepted, 2 will be squashed in 1.
+
+  -----------------
+
+3. e22811e Forward profiling
+  As it has been added in profiler main layout too, I've set a view var `request_collector` to ease reading.
+  `{% if profile.collectors.request is defined and profile.collectors.request.forward and profile.collectors.request.forward.controller.class is defined %}`
+  This is crazy!
+
+4. 5073f30 Alternative of 3, separation of concerns, may be discarded or squashed in 3.
+
+  There is a point to discard this one imo, because keeping the logic in http-foundation allows to catch global custom forward implementation.
+
+  If the sub request built in some controller is not only a fragment but the return statement from a controller, this should be considered as a forward action.
+  So to specifically profile this sub request, one just have to set it an attribute with the key "_forwarded" and the profiler collects the controller, route and profile token from it.
+
+  Actually it does pretty much the same thing as for the redirection feature.
+
+  The FrameworkBundle and the WebProfilerBundle may just use one of many possible implementations of a forward profiling feature for a base controller class.
+  This may have even more sense if the HttpProfiler had its own component (ref #.
+
+  My example in the [description](#) of this PR with Silex shows a supported implementation, but this method could be in a trait of any app or base controller class.
+
+  Then it should be part of the profiler dx to support this option out of the box.
+
+  Otherwise it's the framework bundle only responsibility to handle the forward feature, hence I would squash it as I think that anyone willing to implement a custom forward feature pattern should extend the `RequestDataCollector` to profile it.
+
+5. 02d2086 My last proposal
+
+  IIRC, with the "old" profiler the route was displayed in the wdt with the http method (`GET@route_name`).
+  Like in point 2, I think it would be useful to show it only when the method is different form 'GET'.
+  Here's a glimpse :
+  ![hint method](https://cloud.githubusercontent.com/assets/10107633/13548870/68b4f8fc-e2fa-11e5-976a-3099b5ccaa8a.jpg)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-03T10:59:38Z
+
+@HeahDude thanks for the updates. I will review everything soon, but I have a quick comment. The `@` in `@a_string` syntax is used to denote that the string is in fact a route name. I wouldn't add the HTTP method information to the `@` character.
+
+If this info is needed, we could show it like this:
+
+![patch_method](https://cloud.githubusercontent.com/assets/73419/13492243/4b8fbb82-e137-11e5-9d7e-54a156f16b84.png)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-05T16:54:44Z
+
+Ok @javiereguiluz, I took care of your last comment and updated my [summary](https://github.com/symfony/symfony/pull/17589#issuecomment-191703462). Ready for review.
+
+You should try chained redirects and/with the interception page.
+
+Maybe you'll have some ideas to enhance it or agree with Fabien's https://github.com/symfony/symfony/pull/17589#issuecomment-190285961
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-30T07:51:58Z
+
+I've tested everything again and it works as expected:
+
+### Redirect in the toolbar
+
+![normal_redirect_toolbar](https://cloud.githubusercontent.com/assets/73419/14135229/a9ad63b0-f65c-11e5-992a-8ccb11fa0125.png)
+
+### Redirect in the profiler
+
+![normal_redirect_profiler](https://cloud.githubusercontent.com/assets/73419/14135240/adc2eb5a-f65c-11e5-8e9a-10974bb080ec.png)
+
+### Intercepted Redirect
+
+![captured_redirect](https://cloud.githubusercontent.com/assets/73419/14135243/b158f520-f65c-11e5-8184-15b7bd5673b8.png)
+
+### Forward in the toolbar
+
+![forward_toolbar](https://cloud.githubusercontent.com/assets/73419/14135247/b588e5ba-f65c-11e5-89c7-7b209fed088d.png)
+
+### Forward in the profiler
+
+![forward_profiler](https://cloud.githubusercontent.com/assets/73419/14135254/bfe1d09e-f65c-11e5-8086-41455a2282cd.png)
+
+---
+
+@HeahDude do you think you could take care of the test fails before tomorrow's feature freeze? I'd like Symfony 3.1 to include this great feature. Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T07:57:45Z
+
+@javiereguiluz Thanks very much for the review :)
+
+I'll take a look before this evening.
+
+I've still have concerns about the refactoring of 5073f30, and should I make only one commit in your opinion ?
+
+There is actually 3 commits, each holding a single feature: redirect, forward and method hints.
+
+cc/ @fabpot
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T08:00:57Z
+
+Oops, missed this [test](https://travis-ci.org/symfony/symfony/jobs/113912575#L2570) is that a BC break ? :fearful:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-30T10:53:36Z
+
+There is no BC promise on the data collected by the profiler from one version to the next. Profiles are for debugging only, so format compatibility is not needed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-30T10:56:28Z
+
+The tests need to be fixed though.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T11:00:25Z
+
+Cool!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T17:09:48Z
+
+It should be ok now. Actually I had to change that test because I did not just move the controller resolution in a private method, I also add these [3 lines](https://github.com/symfony/symfony/pull/17589/commits/0a1b2841f7ca964551c8339ef031ae2fb84c50b5#diff-e8f5b14fbfbbeac60fc9f3abe310c3b0R342) to help dealing with both redirection and forward controllers' data.
+
+@javiereguiluz In your last review it looks like you missed to test method hint. Could you please try with a simple post / post @ redirect. Thank you very much for your leading on this PR :)
+
+Please any reviewers, try to look at this PR by commit, they all have a summary block.
+
+ping __@symfony/deciders__
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-31T09:01:13Z
+
+This feature looks ready to be merged into 3.1 before the "feature freeze".
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T09:04:14Z
+
+:) So there is no squashing needed here ? 4f020b5 could be "fixup" in 227ac77 if we intend to keep it.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T09:09:50Z
+
+@HeahDude If you want to rearrange the commits before merge, please do so.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T09:19:47Z
+
+@fabpot The question is, is it needed to keep them separately ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T09:28:31Z
+
+I don't mind keeping several commits if they make sense and it seems they do :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T09:30:20Z
+
+Agreed :)
+
+So we're done here :tada:

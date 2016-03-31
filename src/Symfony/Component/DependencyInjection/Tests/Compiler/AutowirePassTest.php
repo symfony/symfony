@@ -397,6 +397,21 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
             $definition->getArguments()
         );
     }
+
+    public function testIgnoreServiceWithClassNotExisting()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('class_not_exist', __NAMESPACE__.'\OptionalServiceClass');
+
+        $barDefinition = $container->register('bar', __NAMESPACE__.'\Bar');
+        $barDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertTrue($container->hasDefinition('bar'));
+    }
 }
 
 class Foo

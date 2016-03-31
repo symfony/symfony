@@ -21,12 +21,14 @@
     "require-dev": {
         "symfony/yaml": "~2.8|~3.0",
         "symfony/config": "~2.8|~3.0",
-        "symfony/expression-language": "~2.8|~3.0"
+        "symfony/expression-language": "~2.8|~3.0",
+        "goaop/parser-reflection": "^1.0"
     },
     "suggest": {
         "symfony/yaml": "",
         "symfony/config": "",
-        "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
+        "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them",
+        "goaop/parser-reflection": "Use static reflection for autowiring"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },

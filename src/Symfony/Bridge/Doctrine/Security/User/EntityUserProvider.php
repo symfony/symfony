@@ -76,24 +76,24 @@ class EntityUserProvider implements UserProviderInterface
 
         $repository = $this->getRepository();
         if ($repository instanceof UserProviderInterface) {
-            $refreshedUser = $repository->refreshUser($user);
-        } else {
-            // The user must be reloaded via the primary key as all other data
-            // might have changed without proper persistence in the database.
-            // That's the case when the user has been changed by a form with
-            // validation errors.
-            if (!$id = $this->getClassMetadata()->getIdentifierValues($user)) {
-                throw new \InvalidArgumentException('You cannot refresh a user '.
-                    'from the EntityUserProvider that does not contain an identifier. '.
-                    'The user object has to be serialized with its own identifier '.
-                    'mapped by Doctrine.'
-                );
-            }
+            return $repository->refreshUser($user);
+        }
 
-            $refreshedUser = $repository->find($id);
-            if (null === $refreshedUser) {
-                throw new UsernameNotFoundException(sprintf('User with id %s not found', json_encode($id)));
-            }
+        // The user must be reloaded via the primary key as all other data
+        // might have changed without proper persistence in the database.
+        // That's the case when the user has been changed by a form with
+        // validation errors.
+        if (!$id = $this->getClassMetadata()->getIdentifierValues($user)) {
+            throw new \InvalidArgumentException('You cannot refresh a user '.
+                'from the EntityUserProvider that does not contain an identifier. '.
+                'The user object has to be serialized with its own identifier '.
+                'mapped by Doctrine.'
+            );
+        }
+
+        $refreshedUser = $repository->find($id);
+        if (null === $refreshedUser) {
+            throw new UsernameNotFoundException(sprintf('User with id %s not found', json_encode($id)));
         }
 
         return $refreshedUser;

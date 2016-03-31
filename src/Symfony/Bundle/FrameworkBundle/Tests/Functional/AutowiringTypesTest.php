@@ -13,7 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Component\Templating\EngineInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
 
 class AutowiringTypesTest extends WebTestCase
 {
@@ -41,8 +42,8 @@ class AutowiringTypesTest extends WebTestCase
         $container = static::$kernel->getContainer();
 
         $autowiredServices = $container->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(DelegatingEngine::class, $autowiredServices->getFrameworkBundleEngine());
-        $this->assertInstanceOf(DelegatingEngine::class, $autowiredServices->getEngine());
+        $this->assertInstanceOf(FrameworkBundleEngineInterface::class, $autowiredServices->getFrameworkBundleEngine());
+        $this->assertInstanceOf(EngineInterface::class, $autowiredServices->getEngine());
     }
 
     protected static function createKernel(array $options = array())

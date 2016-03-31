@@ -13,6 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -568,6 +571,16 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('property_info'));
     }
 
+    public function testCachePoolServices()
+    {
+        $container = $this->createContainerFromFile('cache');
+
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'foo', 'apcu', array('index_1' => 30), 0);
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'bar', 'doctrine', array('index_0' => new Reference('app.doctrine_cache_provider'), 'index_1' => 5));
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'baz', 'filesystem', array('index_0' => 'app/cache/psr', 'index_1' => 7));
+        $this->assertCachePoolServiceDefinitionIsCreated($container, 'foobar', 'psr6', array('index_0' => new Reference('app.cache_pool'), 'index_1' => 10));
+    }
+
     protected function createContainer(array $data = array())
     {
         return new ContainerBuilder(new ParameterBag(array_merge(array(
@@ -634,6 +647,41 @@ abstract class FrameworkExtensionTest extends TestCase
             $this->assertEquals('assets.static_version_strategy', $versionStrategy->getParent());
             $this->assertEquals($version, $versionStrategy->getArgument(0));
             $this->assertEquals($format, $versionStrategy->getArgument(1));
+        }
+    }
+
+    private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $name, $type, array $arguments, $namespaceArgumentIndex = null)
+    {
+        $id = 'cache.pool.'.$name;
+
+        $this->assertTrue($container->has($id), sprintf('Service definition "%s" for cache pool of type "%s" is registered', $id, $type));
+
+        $poolDefinition = $container->getDefinition($id);
+
+        $this->assertInstanceOf(DefinitionDecorator::class, $poolDefinition, sprintf('Cache pool "%s" is based on an abstract cache adapter.', $name));
+        $this->assertEquals($arguments, $poolDefinition->getArguments());
+
+        $adapterDefinition = $container->getDefinition($poolDefinition->getParent());
+
+        switch ($type) {
+            case 'apcu':
+                $this->assertSame(ApcuAdapter::class, $adapterDefinition->getClass());
+                break;
+            case 'doctrine':
+                $this->assertSame(DoctrineAdapter::class, $adapterDefinition->getClass());
+                break;
+            case 'filesystem':
+                $this->assertSame(FilesystemAdapter::class, $adapterDefinition->getClass());
+                break;
+        }
+
+        $this->assertTrue($adapterDefinition->hasTag('cache.adapter'), sprintf('Service definition "%s" is tagged with the "cache.adapter" tag.', $id));
+
+        $tag = $adapterDefinition->getTag('cache.adapter');
+
+        if (null !== $namespaceArgumentIndex) {
+            $this->assertTrue(isset($tag[0]['namespace-arg-index']), 'The namespace argument index is given by the "namespace-arg-index" attribute of the "cache.adapter" tag.');
+            $this->assertSame($namespaceArgumentIndex, $tag[0]['namespace-arg-index'], 'The namespace argument index is given by the "namespace-arg-index" attribute of the "cache.adapter" tag.');
         }
     }
 }

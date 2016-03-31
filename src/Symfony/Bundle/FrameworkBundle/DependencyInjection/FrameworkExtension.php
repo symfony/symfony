@@ -138,6 +138,10 @@ class FrameworkExtension extends Extension
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
+        if (isset($config['cache'])) {
+            $this->registerCacheConfiguration($config['cache'], $container, $loader);
+        }
+
         $loader->load('debug_prod.xml');
         $definition = $container->findDefinition('debug.debug_handlers_listener');
 
@@ -1013,6 +1017,27 @@ class FrameworkExtension extends Extension
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
+        }
+    }
+
+    private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!empty($config['pools'])) {
+            $loader->load('cache_adapters.xml');
+        }
+
+        foreach ($config['pools'] as $name => $poolConfig) {
+            $poolDefinition = new DefinitionDecorator('cache.adapter.'.$poolConfig['type']);
+            $poolDefinition->replaceArgument(1, $poolConfig['default_lifetime']);
+
+            if ('doctrine' === $poolConfig['type'] || 'psr6' === $poolConfig['type']) {
+                $poolDefinition->replaceArgument(0, new Reference($poolConfig['cache_provider_service']));
+            } elseif ('filesystem' === $poolConfig['type'] && isset($poolConfig['directory'][0])) {
+                $poolDefinition->replaceArgument(0, $poolConfig['directory']);
+            }
+
+            $poolDefinition->addTag('cache.pool');
+            $container->setDefinition('cache.pool.'.$name, $poolDefinition);
         }
     }
 

@@ -114,6 +114,7 @@ class Configuration implements ConfigurationInterface
         $this->addSerializerSection($rootNode);
         $this->addPropertyAccessSection($rootNode);
         $this->addPropertyInfoSection($rootNode);
+        $this->addCacheSection($rootNode);
 
         return $treeBuilder;
     }
@@ -543,6 +544,35 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('property_info')
                     ->info('Property info configuration')
                     ->canBeEnabled()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addCacheSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('cache')
+                    ->info('Cache configuration')
+                    ->fixXmlConfig('pool')
+                    ->children()
+                        ->arrayNode('pools')
+                            ->useAttributeAsKey('name')
+                            ->prototype('array')
+                                ->children()
+                                    ->enumNode('type')
+                                        ->info('The cache pool type (one of "apcu", "doctrine", "psr6" or "filesystem")')
+                                        ->isRequired()
+                                        ->values(array('apcu', 'doctrine', 'psr6', 'filesystem'))
+                                    ->end()
+                                    ->integerNode('default_lifetime')->defaultValue(0)->end()
+                                    ->scalarNode('cache_provider_service')->defaultNull()->end()
+                                    ->scalarNode('directory')->defaultNull()->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

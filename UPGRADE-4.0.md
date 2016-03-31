@@ -13,8 +13,42 @@ Form
 ----
 
  * The `choices_as_values` option of the `ChoiceType` has been removed.
+
  * Support for data objects that implements both `Traversable` and
    `ArrayAccess` in `ResizeFormListener::preSubmit` method has been removed
+
+ * The following form types registered as services has been removed; use
+   their fully-qualified class name instead:
+
+    - `"form.type.birthday"`
+    - `"form.type.checkbox"`
+    - `"form.type.collection"`
+    - `"form.type.country"`
+    - `"form.type.currency"`
+    - `"form.type.date"`
+    - `"form.type.datetime"`
+    - `"form.type.email"`
+    - `"form.type.file"`
+    - `"form.type.hidden"`
+    - `"form.type.integer"`
+    - `"form.type.language"`
+    - `"form.type.locale"`
+    - `"form.type.money"`
+    - `"form.type.number"`
+    - `"form.type.password"`
+    - `"form.type.percent"`
+    - `"form.type.radio"`
+    - `"form.type.range"`
+    - `"form.type.repeated"`
+    - `"form.type.search"`
+    - `"form.type.textarea"`
+    - `"form.type.text"`
+    - `"form.type.time"`
+    - `"form.type.timezone"`
+    - `"form.type.url"`
+    - `"form.type.button"`
+    - `"form.type.submit"`
+    - `"form.type.reset"`
 
 FrameworkBundle
 ---------------

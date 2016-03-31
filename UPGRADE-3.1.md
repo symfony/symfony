@@ -31,6 +31,10 @@ HttpKernel
  * Passing objects as URI attributes to the ESI and SSI renderers has been
    deprecated and will be removed in Symfony 4.0. The inline fragment
    renderer should be used with object attributes.
+ * The `ControllerResolver::getArguments()` method is deprecated and will be
+   removed in 4.0. If you have your own `ControllerResolverInterface`
+   implementation, you should replace this method by implementing the
+   `ArgumentResolverInterface` and injecting it in the HttpKernel.
 
 Serializer
 ----------

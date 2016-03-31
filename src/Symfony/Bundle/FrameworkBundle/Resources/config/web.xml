@@ -17,6 +17,8 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
+        <service id="argument_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver" public="false" />
+
         <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.charset%</argument>

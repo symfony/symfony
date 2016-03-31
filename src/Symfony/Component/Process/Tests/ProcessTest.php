@@ -231,7 +231,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideInvalidInputValues
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings or stream resources.
+     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings, Traversable objects or stream resources.
      */
     public function testInvalidInput($value)
     {
@@ -1154,6 +1154,35 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             array('php://stdout', 'getIncrementalOutput'),
             array('php://stderr', 'getIncrementalErrorOutput'),
         );
+    }
+
+    public function testIteratorInput()
+    {
+        $nextData = 'ping';
+        $input = function () use (&$nextData) {
+            while (false !== $nextData) {
+                yield $nextData;
+                yield $nextData = '';
+            }
+        };
+        $input = $input();
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
+        $process->setInput($input);
+        $process->start(function ($type, $data) use ($input, &$nextData) {
+            if ('ping' === $data) {
+                $h = fopen('php://memory', 'r+');
+                fwrite($h, 'pong');
+                rewind($h);
+                $nextData = $h;
+                $input->next();
+            } else {
+                $nextData = false;
+            }
+        });
+
+        $process->wait();
+        $this->assertSame('pingpong', $process->getOutput());
     }
 
     /**

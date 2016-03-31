@@ -731,11 +731,7 @@ class Form implements \IteratorAggregate, FormInterface
             return true;
         }
 
-        if (count($this->getErrors(true)) > 0) {
-            return false;
-        }
-
-        return true;
+        return count($this->getErrors(true)) === 0;
     }
 
     /**

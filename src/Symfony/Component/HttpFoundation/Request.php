@@ -1370,7 +1370,7 @@ class Request
      * Here is the process to determine the format:
      *
      *  * format defined by the user (with setRequestFormat())
-     *  * _format request parameter
+     *  * _format request attribute
      *  * $default
      *
      * @param string $default The default format

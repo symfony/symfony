@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-31T20:08:52Z
+
+Be careful when merging up: 2.7 has more usages of DnsMock that'd also need the annotation.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-31T21:09:23Z
+
+:+1:

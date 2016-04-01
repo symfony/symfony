@@ -12,12 +12,13 @@
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\ArgumentFromAttributeResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\DefaultArgumentValueResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\RequestResolver;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\VariadicArgumentValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,13 +31,19 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new ArgumentMetadataFactory();
         $argumentValueResolvers = array(
-            new ArgumentFromAttributeResolver(),
-            new VariadicArgumentValueResolver(),
-            new RequestResolver(),
-            new DefaultArgumentValueResolver(),
+            new RequestAttributeValueResolver(),
+            new RequestValueResolver(),
+            new DefaultValueResolver(),
+            new VariadicValueResolver(),
         );
 
         self::$resolver = new ArgumentResolver($factory, $argumentValueResolvers);
+    }
+
+    public function testDefaultState()
+    {
+        $this->assertEquals(self::$resolver, new ArgumentResolver());
+        $this->assertNotEquals(self::$resolver, new ArgumentResolver(null, array(new RequestAttributeValueResolver())));
     }
 
     public function testGetArguments()
@@ -140,6 +147,14 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($request), self::$resolver->getArguments($request, $controller), '->getArguments() injects the request');
     }
 
+    public function testGetArgumentsInjectsExtendingRequest()
+    {
+        $request = ExtendingRequest::create('/');
+        $controller = array(new self(), 'controllerWithExtendingRequest');
+
+        $this->assertEquals(array($request), self::$resolver->getArguments($request, $controller), '->getArguments() injects the request when extended');
+    }
+
     /**
      * @requires PHP 5.6
      */
@@ -208,6 +223,10 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     protected function controllerWithRequest(Request $request)
+    {
+    }
+
+    protected function controllerWithExtendingRequest(ExtendingRequest $request)
     {
     }
 }

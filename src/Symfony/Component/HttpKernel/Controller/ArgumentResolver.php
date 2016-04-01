@@ -12,6 +12,11 @@
 namespace Symfony\Component\HttpKernel\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactoryInterface;
 
 /**
@@ -30,8 +35,13 @@ final class ArgumentResolver implements ArgumentResolverInterface
 
     public function __construct(ArgumentMetadataFactoryInterface $argumentMetadataFactory = null, array $argumentValueResolvers = array())
     {
-        $this->argumentMetadataFactory = $argumentMetadataFactory;
-        $this->argumentValueResolvers = $argumentValueResolvers;
+        $this->argumentMetadataFactory = $argumentMetadataFactory ?: new ArgumentMetadataFactory();
+        $this->argumentValueResolvers = $argumentValueResolvers ?: array(
+            new RequestAttributeValueResolver(),
+            new RequestValueResolver(),
+            new DefaultValueResolver(),
+            new VariadicValueResolver(),
+        );
     }
 
     /**

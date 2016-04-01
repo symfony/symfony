@@ -9,25 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Controller\ArgumentValueResolver;
+namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
- * Yields the same instance as the request object passed along.
+ * Yields a non-variadic argument's value from the request attributes.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-final class RequestResolver implements ArgumentValueResolverInterface
+final class RequestAttributeValueResolver implements ArgumentValueResolverInterface
 {
     /**
      * {@inheritdoc}
      */
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        return $argument->getType() === Request::class || is_subclass_of(Request::class, $argument->getType());
+        return !$argument->isVariadic() && $request->attributes->has($argument->getName());
     }
 
     /**
@@ -35,6 +35,6 @@ final class RequestResolver implements ArgumentValueResolverInterface
      */
     public function resolve(Request $request, ArgumentMetadata $argument)
     {
-        yield $request;
+        yield $request->attributes->get($argument->getName());
     }
 }

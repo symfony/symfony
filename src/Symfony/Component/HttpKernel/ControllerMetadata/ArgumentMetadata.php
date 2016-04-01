@@ -87,12 +87,16 @@ class ArgumentMetadata
     /**
      * Returns the default value of the argument.
      *
-     * Make sure to call {@see self::hasDefaultValue()} first to see if a default value is possible.
+     * @throws \LogicException if no default value is present; {@see self::hasDefaultValue()}
      *
      * @return mixed
      */
     public function getDefaultValue()
     {
+        if (!$this->hasDefaultValue) {
+            throw new \LogicException(sprintf('Argument $%s does not have a default value. Use %s::hasDefaultValue() to avoid this exception.', $this->name, __CLASS__));
+        }
+
         return $this->defaultValue;
     }
 }

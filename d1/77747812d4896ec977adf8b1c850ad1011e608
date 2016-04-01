@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-29T07:45:34Z
+
+@xabbuh @aitboudad what if we remove this backup feature altogether for the Translation component? My feel is that we're trying to do "too much" here. In Symfony we do more "dangerous" things (e.g. the SensioGeneratorBundle) without providing a backup feature.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-29T07:48:46Z
+
+I agree with @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-03-29T10:42:41Z
+
+I agree too.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-29T10:49:51Z
+
+I agree too. I'm always disabling this backup, as git already gives me a way to get the old file if something goes wrong, and backup files only lead to mistakes in such cases
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-29T11:02:13Z
+
+I am not too familiar with the Translation component internals. But if you all agree on this, I will revert the new interface and instead deprecate the `setBackup()` method. What do you think about that?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-03-29T11:06:14Z
+
+@xabbuh I think so and deprecate backup for the `translation:update` command too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-29T18:39:41Z
+
+:+1: for deprecation
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-31T18:25:44Z
+
+I added deprecation trigger for the backup feature. I couldn't deprecate the `--no-backup` option of the command nor the `disableBackup()` method of the `TranslationWriter` class as people will need to use them to prepare for the 4.0 upgrade. Though we have to deprecate them in 4.1.

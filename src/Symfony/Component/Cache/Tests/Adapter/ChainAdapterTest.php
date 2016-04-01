@@ -28,7 +28,7 @@ class ChainAdapterTest extends CachePoolTest
             $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
         }
 
-        return new ChainAdapter(array(new ArrayAdapter(), new ExternalAdapter(), new FilesystemAdapter(null)));
+        return new ChainAdapter(array(new ArrayAdapter(), new ExternalAdapter(), new FilesystemAdapter()));
     }
 
     /**

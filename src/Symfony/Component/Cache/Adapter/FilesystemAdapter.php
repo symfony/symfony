@@ -20,7 +20,7 @@ class FilesystemAdapter extends AbstractAdapter
 {
     private $directory;
 
-    public function __construct($directory, $defaultLifetime = 0, $namespace = '')
+    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
     {
         parent::__construct('', $defaultLifetime);
 

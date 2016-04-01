@@ -23,7 +23,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetArguments()
+    /** @var ArgumentResolver */
+    private static $resolver;
+
+    public static function setUpBeforeClass()
     {
         $factory = new ArgumentMetadataFactory();
         $argumentValueResolvers = array(
@@ -33,63 +36,108 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
             new DefaultArgumentValueResolver(),
         );
 
-        $resolver = new ArgumentResolver($factory, $argumentValueResolvers);
+        self::$resolver = new ArgumentResolver($factory, $argumentValueResolvers);
+    }
 
-        $request = Request::create('/');
-        $controller = array(new self(), 'testGetArguments');
-        $this->assertEquals(array(), $resolver->getArguments($request, $controller), '->getArguments() returns an empty array if the method takes no arguments');
-
-        $request = Request::create('/');
-        $request->attributes->set('foo', 'foo');
-        $controller = array(new self(), 'controllerMethod1');
-        $this->assertEquals(array('foo'), $resolver->getArguments($request, $controller), '->getArguments() returns an array of arguments for the controller method');
-
+    public function testGetArguments()
+    {
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
-        $controller = array(new self(), 'controllerMethod2');
-        $this->assertEquals(array('foo', null), $resolver->getArguments($request, $controller), '->getArguments() uses default values if present');
+        $controller = array(new self(), 'controllerWithFoo');
 
+        $this->assertEquals(array('foo'), self::$resolver->getArguments($request, $controller), '->getArguments() returns an array of arguments for the controller method');
+    }
+
+    public function testGetArgumentsReturnsEmptyArrayWhenNoArguments()
+    {
+        $request = Request::create('/');
+        $controller = array(new self(), 'controllerWithoutArguments');
+
+        $this->assertEquals(array(), self::$resolver->getArguments($request, $controller), '->getArguments() returns an empty array if the method takes no arguments');
+    }
+
+    public function testGetArgumentsUsesDefaultValue()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('foo', 'foo');
+        $controller = array(new self(), 'controllerWithFooAndDefaultBar');
+
+        $this->assertEquals(array('foo', null), self::$resolver->getArguments($request, $controller), '->getArguments() uses default values if present');
+    }
+
+    public function testGetArgumentsOverrideDefaultValueByRequestAttribute()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'bar');
-        $this->assertEquals(array('foo', 'bar'), $resolver->getArguments($request, $controller), '->getArguments() overrides default values if provided in the request attributes');
+        $controller = array(new self(), 'controllerWithFooAndDefaultBar');
 
+        $this->assertEquals(array('foo', 'bar'), self::$resolver->getArguments($request, $controller), '->getArguments() overrides default values if provided in the request attributes');
+    }
+
+    public function testGetArgumentsFromClosure()
+    {
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $controller = function ($foo) {};
-        $this->assertEquals(array('foo'), $resolver->getArguments($request, $controller));
 
+        $this->assertEquals(array('foo'), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetArgumentsUsesDefaultValueFromClosure()
+    {
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $controller = function ($foo, $bar = 'bar') {};
-        $this->assertEquals(array('foo', 'bar'), $resolver->getArguments($request, $controller));
 
+        $this->assertEquals(array('foo', 'bar'), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetArgumentsFromInvokableObject()
+    {
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $controller = new self();
-        $this->assertEquals(array('foo', null), $resolver->getArguments($request, $controller));
+
+        $this->assertEquals(array('foo', null), self::$resolver->getArguments($request, $controller));
+
+        // Test default bar overridden by request attribute
         $request->attributes->set('bar', 'bar');
-        $this->assertEquals(array('foo', 'bar'), $resolver->getArguments($request, $controller));
 
+        $this->assertEquals(array('foo', 'bar'), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetArgumentsFromFunctionName()
+    {
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('foobar', 'foobar');
-        $controller = 'Symfony\Component\HttpKernel\Tests\Controller\argument_resolver_controller_function';
-        $this->assertEquals(array('foo', 'foobar'), $resolver->getArguments($request, $controller));
+        $controller = __NAMESPACE__.'\controller_function';
 
+        $this->assertEquals(array('foo', 'foobar'), self::$resolver->getArguments($request, $controller));
+    }
+
+    public function testGetArgumentsFailsOnUnresolvedValue()
+    {
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('foobar', 'foobar');
-        $controller = array(new self(), 'controllerMethod3');
+        $controller = array(new self(), 'controllerWithFooBarFoobar');
 
         try {
-            $resolver->getArguments($request, $controller);
+            self::$resolver->getArguments($request, $controller);
             $this->fail('->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\RuntimeException', $e, '->getArguments() throws a \RuntimeException exception if it cannot determine the argument value');
         }
+    }
 
+    public function testGetArgumentsInjectsRequest()
+    {
         $request = Request::create('/');
-        $controller = array(new self(), 'controllerMethod5');
-        $this->assertEquals(array($request), $resolver->getArguments($request, $controller), '->getArguments() injects the request');
+        $controller = array(new self(), 'controllerWithRequest');
+
+        $this->assertEquals(array($request), self::$resolver->getArguments($request, $controller), '->getArguments() injects the request');
     }
 
     /**
@@ -97,21 +145,12 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetVariadicArguments()
     {
-        $factory = new ArgumentMetadataFactory();
-        $argumentValueResolvers = array(
-            new ArgumentFromAttributeResolver(),
-            new VariadicArgumentValueResolver(),
-            new RequestResolver(),
-            new DefaultArgumentValueResolver(),
-        );
-
-        $resolver = new ArgumentResolver($factory, $argumentValueResolvers);
-
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', array('foo', 'bar'));
         $controller = array(new VariadicController(), 'action');
-        $this->assertEquals(array('foo', 'foo', 'bar'), $resolver->getArguments($request, $controller));
+
+        $this->assertEquals(array('foo', 'foo', 'bar'), self::$resolver->getArguments($request, $controller));
     }
 
     /**
@@ -120,21 +159,12 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetVariadicArgumentsWithoutArrayInRequest()
     {
-        $factory = new ArgumentMetadataFactory();
-        $argumentValueResolvers = array(
-            new ArgumentFromAttributeResolver(),
-            new VariadicArgumentValueResolver(),
-            new RequestResolver(),
-            new DefaultArgumentValueResolver(),
-        );
-
-        $resolver = new ArgumentResolver($factory, $argumentValueResolvers);
-
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'foo');
         $controller = array(new VariadicController(), 'action');
-        $resolver->getArguments($request, $controller);
+
+        self::$resolver->getArguments($request, $controller);
     }
 
     /**
@@ -153,7 +183,7 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
         $request->attributes->set('bar', 'foo');
-        $controller = array($this, 'controllerMethod2');
+        $controller = array($this, 'controllerWithFooAndDefaultBar');
         $resolver->getArguments($request, $controller);
     }
 
@@ -161,27 +191,27 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    public function controllerMethod1($foo)
+    public function controllerWithFoo($foo)
     {
     }
 
-    protected function controllerMethod2($foo, $bar = null)
+    public function controllerWithoutArguments()
     {
     }
 
-    protected function controllerMethod3($foo, $bar, $foobar)
+    protected function controllerWithFooAndDefaultBar($foo, $bar = null)
     {
     }
 
-    protected static function controllerMethod4()
+    protected function controllerWithFooBarFoobar($foo, $bar, $foobar)
     {
     }
 
-    protected function controllerMethod5(Request $request)
+    protected function controllerWithRequest(Request $request)
     {
     }
 }
 
-function argument_resolver_controller_function($foo, $foobar)
+function controller_function($foo, $foobar)
 {
 }

@@ -58,8 +58,8 @@ class CliDumper extends AbstractDumper
     {
         parent::__construct($output, $charset, $flags);
 
-        if ('\\' === DIRECTORY_SEPARATOR && false !== @getenv('ANSICON')) {
-            // Use only the base 16 xterm colors when using ANSICON
+        if ('\\' === DIRECTORY_SEPARATOR && 'ON' !== @getenv('ConEmuANSI') && 'xterm' !== @getenv('TERM')) {
+            // Use only the base 16 xterm colors when using ANSICON or standard Windows 10 CLI
             $this->setStyles(array(
                 'default' => '31',
                 'num' => '1;34',

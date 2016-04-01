@@ -33,7 +33,10 @@ class RedisAdapterTest extends CachePoolTest
     public static function setupBeforeClass()
     {
         self::$redis = new \Redis();
-        self::$redis->connect('127.0.0.1');
+        if (!@self::$redis->connect('127.0.0.1')) {
+            $e = error_get_last();
+            self::markTestSkipped($e['message']);
+        }
         self::$redis->select(1993);
     }
 

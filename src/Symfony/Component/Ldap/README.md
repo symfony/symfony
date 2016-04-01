@@ -11,14 +11,10 @@ have been marked as internal as they still needed some work.
 Breaking changes were introduced in Symfony 3.1, so code relying on
 previous version of the component will break with this version.
 
-Documentation
--------------
-
-The documentation for the component can be found [online] [0].
-
 Resources
 ---------
 
+  * [Documentation](https://symfony.com/doc/current/components/filesystem/index.html)
   * [Contributing](https://symfony.com/doc/current/contributing/index.html)
   * [Report issues](https://github.com/symfony/symfony/issues) and
     [send Pull Requests](https://github.com/symfony/symfony/pulls)

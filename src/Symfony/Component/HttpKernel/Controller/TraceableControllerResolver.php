@@ -38,7 +38,7 @@ class TraceableControllerResolver implements ControllerResolverInterface, Argume
         $this->stopwatch = $stopwatch;
         $this->argumentResolver = $argumentResolver;
 
-        // required for BC reasons
+        // BC
         if (null === $this->argumentResolver) {
             $this->argumentResolver = $resolver;
         }

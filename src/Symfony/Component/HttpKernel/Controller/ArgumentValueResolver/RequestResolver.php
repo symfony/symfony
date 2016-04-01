@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
- * Supports the same instance as the request object passed along.
+ * Yields the same instance as the request object passed along.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
@@ -27,7 +27,7 @@ final class RequestResolver implements ArgumentValueResolverInterface
      */
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        return $argument->getType() === Request::class || is_subclass_of($request, $argument->getType());
+        return $argument->getType() === Request::class || is_subclass_of(Request::class, $argument->getType());
     }
 
     /**

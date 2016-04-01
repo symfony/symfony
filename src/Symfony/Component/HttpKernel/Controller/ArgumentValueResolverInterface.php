@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 interface ArgumentValueResolverInterface
 {
     /**
-     * Whether this resolver can resolve can resolve the value for the given ArgumentMetadata.
+     * Whether this resolver can resolve the value for the given ArgumentMetadata.
      *
      * @param Request          $request
      * @param ArgumentMetadata $argument
@@ -33,8 +33,6 @@ interface ArgumentValueResolverInterface
 
     /**
      * Yield the possible value(s).
-     *
-     * An implementation must yield at least one value.
      *
      * @param Request          $request
      * @param ArgumentMetadata $argument

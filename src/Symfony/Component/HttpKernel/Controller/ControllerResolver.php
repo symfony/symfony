@@ -85,7 +85,7 @@ class ControllerResolver extends LegacyArgumentResolver implements ControllerRes
     /**
      * {@inheritdoc}
      *
-     * @deprecated this method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the LegacyArgumentResolver instead.
+     * @deprecated This method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the LegacyArgumentResolver instead.
      */
     public function getArguments(Request $request, $controller)
     {
@@ -95,7 +95,7 @@ class ControllerResolver extends LegacyArgumentResolver implements ControllerRes
     }
 
     /**
-     * @deprecated this method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the LegacyArgumentResolver instead.
+     * @deprecated This method is deprecated as of 3.1 and will be removed in 4.0. Implement the ArgumentResolverInterface or extend the LegacyArgumentResolver instead.
      */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {

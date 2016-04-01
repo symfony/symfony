@@ -34,7 +34,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         }
 
         foreach ($reflection->getParameters() as $param) {
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaulValue($param), $this->getDefaulValue($param));
+            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param));
         }
 
         return $arguments;
@@ -59,7 +59,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      *
      * @return bool
      */
-    private function hasDefaulValue(\ReflectionParameter $parameter)
+    private function hasDefaultValue(\ReflectionParameter $parameter)
     {
         return $parameter->isDefaultValueAvailable();
     }
@@ -71,9 +71,9 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      *
      * @return mixed|null
      */
-    private function getDefaulValue(\ReflectionParameter $parameter)
+    private function getDefaultValue(\ReflectionParameter $parameter)
     {
-        return $this->hasDefaulValue($parameter) ? $parameter->getDefaultValue() : null;
+        return $this->hasDefaultValue($parameter) ? $parameter->getDefaultValue() : null;
     }
 
     /**

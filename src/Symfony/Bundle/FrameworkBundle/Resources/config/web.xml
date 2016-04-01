@@ -17,12 +17,12 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
+        <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" public="false" />
+
         <service id="argument_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver" public="false">
             <argument type="service" id="argument_metadata_factory" />
             <argument type="collection" />
         </service>
-
-        <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" public="false" />
 
         <service id="argument_value_resolver.argument_from_attribute" class="Symfony\Component\HttpKernel\Controller\ArgumentValueResolver\ArgumentFromAttributeResolver" public="false">
             <tag name="controller_argument.value_resolver" priority="100" />

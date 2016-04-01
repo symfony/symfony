@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpKernel\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * An ArgumentResolverInterface implementation knows how to determine the
+ * An ArgumentResolverInterface instance knows how to determine the
  * arguments for a specific action.
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -29,7 +29,7 @@ interface ArgumentResolverInterface
      *
      * @return array An array of arguments to pass to the controller
      *
-     * @throws \RuntimeException When value for argument given is not provided
+     * @throws \RuntimeException When no value could be provided for a required argument
      */
     public function getArguments(Request $request, $controller);
 }

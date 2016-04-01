@@ -27,7 +27,7 @@ class LegacyArgumentResolver implements ArgumentResolverInterface
      */
     public function getArguments(Request $request, $controller)
     {
-        // only trigger the deprecation notice if actually used, the ControllerResolver still extends this for BC reasons
+        // only trigger the deprecation notice if actually used, the ControllerResolver still extends it for BC
         @trigger_error(sprintf('The %s class is deprecated since 3.1 and will be removed in 4.0. Please use the %s instead.', __CLASS__, ArgumentResolver::class), E_USER_DEPRECATED);
 
         if (is_array($controller)) {

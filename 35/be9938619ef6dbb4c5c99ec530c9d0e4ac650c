@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-14T19:31:04Z
+
+I'm afraid that @xabbuh is already trying to fix this issue in #18028. Maybe you can join forces?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-14T19:36:38Z
+
+@javiereguiluz yeah I know but as @stof said https://github.com/symfony/symfony/pull/18028#issuecomment-196449943, @xabbuh can't use a black list without this :-/
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-14T19:41:37Z
+
+Thank you @javiereguiluz, I fixed your comments
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-15T08:28:46Z
+
+Thanks for taking care of this @Ener-Getick! I like the approach in general and just left some suggestions to improve it a bit.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-16T15:33:50Z
+
+there is a another nice side-effect of this PR: ``Container::camelize`` can generate the same output for several service ids (due to method name being case insensitive), so this could allow fixing this case too
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-16T16:59:39Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-16T17:49:02Z
+
+I updated the ``ProxyDumper`` as the method name was hardcoded.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T10:04:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-31T10:46:52Z
+
+:+1:
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-31T11:55:19Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-31T14:17:19Z
+
+@trousers this issues aren't related to this PR as there were already present.

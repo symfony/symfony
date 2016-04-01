@@ -46,9 +46,7 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
             return false;
         }
 
-        $newResource = AutowirePass::createResourceForClass($reflectionClass);
-
-        return $newResource == $this;
+        return AutowirePass::createResourceForClass($reflectionClass);
     }
 
     public function __toString()
@@ -58,20 +56,12 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
 
     public function serialize()
     {
-        return serialize(array(
-            $this->class,
-            $this->filePath,
-            $this->autowiringMetadata,
-        ));
+        return serialize(array($this->class, $this->filePath, $this->autowiringMetadata));
     }
 
     public function unserialize($serialized)
     {
-        list(
-            $this->class,
-            $this->filePath,
-            $this->autowiringMetadata
-        ) = unserialize($serialized);
+        list($this->class, $this->filePath, $this->autowiringMetadata) = unserialize($serialized);
     }
 
     /**

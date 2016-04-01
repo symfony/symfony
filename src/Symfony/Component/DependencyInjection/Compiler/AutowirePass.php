@@ -76,11 +76,7 @@ class AutowirePass implements CompilerPassInterface
             $metadata[$name] = self::getResourceMetadataForMethod($reflectionMethod);
         }
 
-        return new AutowireServiceResource(
-            $reflectionClass->name,
-            $reflectionClass->getFileName(),
-            $metadata
-        );
+        return new AutowireServiceResource($reflectionClass->name, $reflectionClass->getFileName(), $metadata);
     }
 
     /**

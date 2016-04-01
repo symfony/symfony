@@ -453,8 +453,6 @@ class CliDumper extends AbstractDumper
 
         if ('\\' === DIRECTORY_SEPARATOR) {
             static::$defaultColors = @(
-                defined('PHP_WINDOWS_VERSION_MAJOR')
-                &&
                 version_compare(
                     PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD,
                     '10.0.10586'

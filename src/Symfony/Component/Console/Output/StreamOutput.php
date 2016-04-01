@@ -94,8 +94,6 @@ class StreamOutput extends Output
     {
         if (DIRECTORY_SEPARATOR === '\\') {
             return
-                defined('PHP_WINDOWS_VERSION_MAJOR')
-                &&
                 version_compare(
                     PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD,
                     '10.0.10586'

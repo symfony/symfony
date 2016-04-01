@@ -315,7 +315,18 @@ class AutowirePass implements CompilerPassInterface
     {
         $methodArgumentsMetadata = array();
         foreach ($method->getParameters() as $parameter) {
-            $methodArgumentsMetadata[] = (string) $parameter;
+            try {
+                $class = $parameter->getClass();
+            } catch (\ReflectionException $e) {
+                // type-hint is against a non-existent class
+                $class = false;
+            }
+
+            $methodArgumentsMetadata[] = array(
+                'class' => $class,
+                'isOptional' => $parameter->isOptional(),
+                'defaultValue' => $parameter->isOptional() ? $parameter->getDefaultValue() : null,
+            );
         }
 
         return $methodArgumentsMetadata;

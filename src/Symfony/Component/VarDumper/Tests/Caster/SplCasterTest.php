@@ -55,12 +55,6 @@ SplFileInfo {
   pathname: "https://google.com/about"
   extension: ""
   realPath: false
-  writable: false
-  readable: false
-  executable: false
-  file: false
-  dir: false
-  link: false
 %A}
 EOTXT
             ),

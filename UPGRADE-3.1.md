@@ -15,6 +15,7 @@ Form
 
  * The `choices_as_values` option of the `ChoiceType` has been deprecated and
    will be removed in Symfony 4.0.
+
  * Support for data objects that implements both `Traversable` and `ArrayAccess`
    in `ResizeFormListener::preSubmit` method has been deprecated and will be
    removed in Symfony 4.0.
@@ -25,8 +26,8 @@ FrameworkBundle
  * As it was never an officially supported feature, the support for absolute
    template paths has been deprecated and will be removed in Symfony 4.0.
 
- * The following form types registered as services are deprecated since 3.1
-   and will be removed in 4.0; use their fully-qualified class name instead:
+ * The following form types registered as services have been deprecated and
+   will be removed in Symfony 4.0; use their fully-qualified class name instead:
 
     - `"form.type.birthday"`
     - `"form.type.checkbox"`
@@ -75,7 +76,8 @@ Serializer
 Yaml
 ----
 
- * Deprecated usage of `%` at the beginning of an unquoted string.
+ * Usage of `%` at the beginning of an unquoted string has been deprecated and
+   will lead to a `ParseException` in Symfony 4.0.
 
  * The `Dumper::setIndentation()` method is deprecated and will be removed in
    Symfony 4.0. Pass the indentation level to the constructor instead.
@@ -140,7 +142,8 @@ Yaml
    Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
    ```
 
- * Deprecated support for passing `true`/`false` as the fifth argument to the `dump()` method to toggle object support.
+ * Deprecated support for passing `true`/`false` as the fifth argument to the
+   `dump()` method to toggle object support.
 
    Before:
 
@@ -160,5 +163,5 @@ Yaml
 Validator
 ---------
 
- * The `DateTimeValidator::PATTERN` constant is deprecated and will be removed in
-   Symfony 4.0.
+ * The `DateTimeValidator::PATTERN` constant has been deprecated and will be
+   removed in Symfony 4.0.

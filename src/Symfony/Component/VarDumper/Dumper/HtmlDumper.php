@@ -48,7 +48,7 @@ class HtmlDumper extends CliDumper
 
     protected $displayOptions = array(
         'initDepth' => 1,
-        'maxDepth'  => 1,
+        'maxDepth' => 1,
         'maxStringLength' => 160,
     );
 
@@ -181,11 +181,8 @@ function toggle(a, depth) {
             a = s.querySelectorAll('.'+oldClass);
 
             for (i = 0; i < a.length; ++i) {
-                console.log(depth, depth != 'ALL', isNaN(depth) == false);
                 if (depth != 'ALL' && isNaN(depth) == false) {
-                    console.log(getLevelNodeForParent(s, a[i]), depth, getLevelNodeForParent(s, a[i]));
                     if (getLevelNodeForParent(s, a[i]) >= depth) {
-                        console.log("IGNORE");
                         continue;
                     }
                 }
@@ -529,7 +526,7 @@ EOHTML;
             $this->line .= sprintf(
                 $this->dumpSuffix,
                 $this->dumpId,
-                ','.json_encode($this->displayOptions)
+                $this->displayOptions ? ','.json_encode($this->displayOptions) : ''
             );
         }
         $this->lastDepth = $depth;

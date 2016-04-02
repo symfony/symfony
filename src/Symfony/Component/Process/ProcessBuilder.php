@@ -175,7 +175,7 @@ class ProcessBuilder
      */
     public function setInput($input)
     {
-        $this->input = ProcessUtils::validateInput(sprintf('%s::%s', __CLASS__, __FUNCTION__), $input);
+        $this->input = ProcessUtils::validateInput(__METHOD__, $input);
 
         return $this;
     }

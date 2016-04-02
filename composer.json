@@ -89,7 +89,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Symfony\\Bridge\\": "src/Symfony/Bridge/",
+            "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",
+            "Symfony\\Bridge\\Monolog\\": "src/Symfony/Bridge/Monolog/",
+            "Symfony\\Bridge\\ProxyManager\\": "src/Symfony/Bridge/ProxyManager/",
+            "Symfony\\Bridge\\Swiftmailer\\": "src/Symfony/Bridge/Swiftmailer/",
+            "Symfony\\Bridge\\Twig\\": "src/Symfony/Bridge/Twig/",
             "Symfony\\Bundle\\": "src/Symfony/Bundle/",
             "Symfony\\Component\\": "src/Symfony/Component/"
         },
@@ -99,6 +103,11 @@
         "exclude-from-classmap": [
             "**/Tests/"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Symfony\\Bridge\\PhpUnit\\": "src/Symfony/Bridge/PhpUnit/"
+        }
     },
     "minimum-stability": "dev",
     "extra": {

@@ -7,6 +7,7 @@ CHANGELOG
  * Added `Controller::json` to simplify creating JSON responses when using the Serializer component
  * Deprecated absolute template paths support in the template name parser
  * Deprecated using core form types without dependencies as services
+ * added `Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector`
 
 3.0.0
 -----

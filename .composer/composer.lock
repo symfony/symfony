@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "aa7aa2d143fd85800595242996021ada",
-    "content-hash": "51e9161b78dda1fe149a9e9c106be90b",
+    "hash": "e02685ff7d2409d34fa87e306fc86ec5",
+    "content-hash": "2854c05c76a78113c693dbbdd3f9c518",
     "packages": [
         {
             "name": "hirak/prestissimo",
@@ -65,8 +65,6 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {
-        "php": ">=5.3.7"
-    },
+    "platform": [],
     "platform-dev": []
 }

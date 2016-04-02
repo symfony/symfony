@@ -52,7 +52,7 @@ class HtmlDumper extends CliDumper
         'maxStringLength' => 160,
     );
 
-    protected $displayOptionsUpdated = false;
+    protected $displayOptionsIsUpdated = false;
 
     /**
      * {@inheritdoc}
@@ -93,8 +93,8 @@ class HtmlDumper extends CliDumper
     {
         if ($displayOptions)
         {
-            $this->displayOptionsUpdated = true;
-            $this->displayOptions = array_merge($this->displayOptions, $displayOptions);
+            $this->displayOptionsIsUpdated = true;
+            $this->displayOptions = $displayOptions + $this->displayOptions;
         }
     }
 
@@ -539,7 +539,7 @@ EOHTML;
             $this->line .= sprintf(
                 $this->dumpSuffix,
                 $this->dumpId,
-                $this->displayOptionsUpdated ? ','.json_encode($this->displayOptions) : ''
+                $this->displayOptionsIsUpdated ? ','.json_encode($this->displayOptions) : ''
             );
         }
         $this->lastDepth = $depth;

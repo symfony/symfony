@@ -65,7 +65,7 @@ class YamlFileLoader extends FileLoader
             $yaml = $this->classes[$classMetadata->getName()];
 
             if (isset($yaml['properties']) && is_array($yaml['properties'])) {
-                $attributesMetadata = $classMetadata->getPropertiesMetadata();
+                $attributesMetadata = $classMetadata->getPropertyMetadataCollection();
 
                 foreach ($yaml['properties'] as $attribute => $data) {
                     if (isset($attributesMetadata[$attribute])) {

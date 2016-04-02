@@ -50,7 +50,7 @@ class AnnotationLoader implements LoaderInterface
         $className = $reflectionClass->name;
         $loaded = false;
 
-        $propertiesMetadata = $classMetadata->getPropertiesMetadata();
+        $propertiesMetadata = $classMetadata->getPropertyMetadataCollection();
 
         foreach ($reflectionClass->getProperties() as $property) {
             if (!isset($propertiesMetadata[$property->name])) {

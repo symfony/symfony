@@ -30,7 +30,7 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             self::PARENTCLASS => new PropertyMetadata(self::PARENTCLASS),
         );
 
-        $this->assertEquals($properties, $metadata->getPropertiesMetadata());
+        $this->assertEquals($properties, $metadata->getPropertyMetadataCollection());
     }
 
     public function testMergeParentMetadata()
@@ -43,7 +43,7 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             self::CLASSNAME => new PropertyMetadata(self::CLASSNAME),
         );
 
-        $this->assertEquals($properties, $metadata->getPropertiesMetadata());
+        $this->assertEquals($properties, $metadata->getPropertyMetadataCollection());
     }
 
     public function testWriteMetadataToCache()
@@ -69,7 +69,7 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $cacheItem->expects($this->once())
             ->method('set')
             ->will($this->returnCallback(function ($metadata) use ($properties) {
-                  $this->assertEquals($properties, $metadata->getPropertiesMetadata());
+                  $this->assertEquals($properties, $metadata->getPropertyMetadataCollection());
               }));
 
         $cache->expects($this->once())
@@ -80,7 +80,7 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $metadata = $factory->getMetadataFor(self::PARENTCLASS);
 
         $this->assertEquals(self::PARENTCLASS, $metadata->getName());
-        $this->assertEquals($properties, $metadata->getPropertiesMetadata());
+        $this->assertEquals($properties, $metadata->getPropertyMetadataCollection());
     }
 
     public function testReadMetadataFromCache()

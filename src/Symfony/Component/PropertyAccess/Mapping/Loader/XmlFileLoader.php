@@ -44,7 +44,7 @@ class XmlFileLoader extends FileLoader
             }
         }
 
-        $attributesMetadata = $classMetadata->getPropertiesMetadata();
+        $attributesMetadata = $classMetadata->getPropertyMetadataCollection();
 
         if (isset($this->classes[$classMetadata->getName()])) {
             $xml = $this->classes[$classMetadata->getName()];

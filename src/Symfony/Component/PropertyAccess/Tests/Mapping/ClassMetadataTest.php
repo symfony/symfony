@@ -37,7 +37,7 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $classMetadata->addPropertyMetadata($a1);
         $classMetadata->addPropertyMetadata($a2);
 
-        $this->assertEquals(array('a1' => $a1, 'a2' => $a2), $classMetadata->getPropertiesMetadata());
+        $this->assertEquals(array('a1' => $a1, 'a2' => $a2), $classMetadata->getPropertyMetadataCollection());
     }
 
     public function testSerialize()

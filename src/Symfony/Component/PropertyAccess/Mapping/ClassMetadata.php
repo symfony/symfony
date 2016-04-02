@@ -32,9 +32,9 @@ class ClassMetadata
      *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
-     *           {@link getPropertiesMetadata()} instead.
+     *           {@link getPropertyMetadataCollection()} instead.
      */
-    public $propertiesMetadata = array();
+    public $propertyMetadataCollection = array();
 
     /**
      * @var \ReflectionClass
@@ -68,7 +68,7 @@ class ClassMetadata
      */
     public function addPropertyMetadata(PropertyMetadata $propertyMetadata)
     {
-        $this->propertiesMetadata[$propertyMetadata->getName()] = $propertyMetadata;
+        $this->propertyMetadataCollection[$propertyMetadata->getName()] = $propertyMetadata;
     }
 
     /**
@@ -76,9 +76,9 @@ class ClassMetadata
      *
      * @return PropertyMetadata[]
      */
-    public function getPropertiesMetadata()
+    public function getPropertyMetadataCollection()
     {
-        return $this->propertiesMetadata;
+        return $this->propertyMetadataCollection;
     }
 
     /**
@@ -88,9 +88,9 @@ class ClassMetadata
      */
     public function merge(ClassMetadata $classMetadata)
     {
-        foreach ($classMetadata->getPropertiesMetadata() as $attributeMetadata) {
-            if (isset($this->propertiesMetadata[$attributeMetadata->getName()])) {
-                $this->propertiesMetadata[$attributeMetadata->getName()]->merge($attributeMetadata);
+        foreach ($classMetadata->getPropertyMetadataCollection() as $attributeMetadata) {
+            if (isset($this->propertyMetadataCollection[$attributeMetadata->getName()])) {
+                $this->propertyMetadataCollection[$attributeMetadata->getName()]->merge($attributeMetadata);
             } else {
                 $this->addPropertyMetadata($attributeMetadata);
             }
@@ -120,7 +120,7 @@ class ClassMetadata
     {
         return array(
             'name',
-            'propertiesMetadata',
+            'propertyMetadataCollection',
         );
     }
 }

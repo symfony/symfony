@@ -7,6 +7,9 @@
   </definition>
   <definition id="definition_2" class="Full\Qualified\Class2" public="false" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" file="/path/to/file">
     <factory service="factory.service" method="get"/>
+    <calls>
+      <call method="setMailer"/>
+    </calls>
     <tags>
       <tag name="tag1">
         <parameter name="attr1">val1</parameter>

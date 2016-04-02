@@ -214,6 +214,11 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
+        $calls = $definition->getMethodCalls();
+        foreach ($calls as $callData) {
+            $output .= "\n".'- Call: `'.$callData[0].'`';
+        }
+
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
             foreach ($definition->getTags() as $tagName => $tagData) {
                 foreach ($tagData as $parameters) {

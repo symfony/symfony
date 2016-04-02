@@ -17,6 +17,7 @@ definition_2
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
+- Call: `setMailer`
 
 
 tag2
@@ -35,3 +36,4 @@ definition_2
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
+- Call: `setMailer`

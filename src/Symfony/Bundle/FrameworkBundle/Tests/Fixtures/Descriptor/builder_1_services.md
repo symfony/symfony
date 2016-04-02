@@ -30,6 +30,7 @@ definition_2
 - File: `/path/to/file`
 - Factory Service: `factory.service`
 - Factory Method: `get`
+- Call: `setMailer`
 - Tag: `tag1`
     - Attr1: val1
     - Attr2: val2

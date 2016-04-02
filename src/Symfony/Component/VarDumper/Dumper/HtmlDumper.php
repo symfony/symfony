@@ -181,9 +181,11 @@ function toggle(a, depth) {
             a = s.querySelectorAll('.'+oldClass);
 
             for (i = 0; i < a.length; ++i) {
-
-                if (depth !== 'ALL' && isNaN(depth) == false) {
-                    if (getLevelNodeForParent(s, a[i]) > depth) {
+                console.log(depth, depth != 'ALL', isNaN(depth) == false);
+                if (depth != 'ALL' && isNaN(depth) == false) {
+                    console.log(getLevelNodeForParent(s, a[i]), depth, getLevelNodeForParent(s, a[i]));
+                    if (getLevelNodeForParent(s, a[i]) >= depth) {
+                        console.log("IGNORE");
                         continue;
                     }
                 }

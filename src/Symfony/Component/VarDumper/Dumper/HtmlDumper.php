@@ -52,6 +52,8 @@ class HtmlDumper extends CliDumper
         'maxStringLength' => 160,
     );
 
+    protected $displayOptionsUpdated = false;
+
     /**
      * {@inheritdoc}
      */
@@ -89,7 +91,11 @@ class HtmlDumper extends CliDumper
      */
     public function setDisplayOptions(array $displayOptions)
     {
-        $this->displayOptions = array_merge($this->displayOptions, $displayOptions);
+        if ($displayOptions)
+        {
+            $this->displayOptionsUpdated = true;
+            $this->displayOptions = array_merge($this->displayOptions, $displayOptions);
+        }
     }
 
     /**
@@ -117,9 +123,12 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function dump(Data $data, $output = null, $displayOptions = [])
+    public function dump(Data $data, $output = null, array $displayOptions = [])
     {
-        $this->setDisplayOptions($displayOptions);
+        if ($displayOptions) {
+            $this->setDisplayOptions($displayOptions);
+        }
+
         parent::dump($data, $output);
         $this->dumpId = 'sf-dump-'.mt_rand();
     }
@@ -214,7 +223,11 @@ function getLevelNodeForParent(parentNode, currentNode, level) {
 
 return function (root, options) {
     root = doc.getElementById(root);
+EOHTML;
 
+    $line .= 'options = options || '.json_encode($this->displayOptions).';';
+
+    $line .= <<<'EOHTML'
     function a(e, f) {
         addEventListener(root, e, function (e) {
             if ('A' == e.target.tagName) {
@@ -358,6 +371,12 @@ return function (root, options) {
 
         t = root.querySelectorAll('.max-string-length span b');
 
+        for (i = 0; i < t.length; ++i) {
+            t[i].addEventListener("click", function(e) {
+                toggleMaxStringLength(e.target.parentNode.parentNode);
+            });
+        }
+
         function toggleMaxStringLength(elt) {
 
             if (elt.className == 'max-string-length expanded') {
@@ -365,12 +384,6 @@ return function (root, options) {
             }else{
                 elt.className = 'max-string-length expanded';
             }
-        }
-
-        for (i = 0; i < t.length; ++i) {
-            t[i].addEventListener("click", function(e) {
-                toggleMaxStringLength(e.target.parentNode.parentNode);
-            });
         }
     }
 };
@@ -526,7 +539,7 @@ EOHTML;
             $this->line .= sprintf(
                 $this->dumpSuffix,
                 $this->dumpId,
-                $this->displayOptions ? ','.json_encode($this->displayOptions) : ''
+                $this->displayOptionsUpdated ? ','.json_encode($this->displayOptions) : ''
             );
         }
         $this->lastDepth = $depth;

@@ -125,10 +125,7 @@ class HtmlDumper extends CliDumper
      */
     public function dump(Data $data, $output = null, array $displayOptions = [])
     {
-        if ($displayOptions) {
-            $this->setDisplayOptions($displayOptions);
-        }
-
+        $this->setDisplayOptions($displayOptions);
         parent::dump($data, $output);
         $this->dumpId = 'sf-dump-'.mt_rand();
     }

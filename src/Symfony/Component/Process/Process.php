@@ -132,7 +132,7 @@ class Process
      * @param string         $commandline The command line to run
      * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
      * @param array|null     $env         The environment variables or null to use the same environment as the current PHP process
-     * @param string|null    $input       The input
+     * @param mixed|null     $input       The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout     The timeout in seconds or null to disable
      * @param array          $options     An array of options for proc_open
      *
@@ -1027,7 +1027,7 @@ class Process
     /**
      * Gets the Process input.
      *
-     * @return null|string The Process input
+     * @return resource|string|\Iterator|null The Process input
      */
     public function getInput()
     {
@@ -1039,7 +1039,7 @@ class Process
      *
      * This content will be passed to the underlying process standard input.
      *
-     * @param mixed $input The content
+     * @param resource|scalar|\Traversable|null $input The content
      *
      * @return self The current Process instance
      *

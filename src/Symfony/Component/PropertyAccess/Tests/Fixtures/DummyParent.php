@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
-use Symfony\Component\PropertyAccess\Annotation\Getter;
+use Symfony\Component\PropertyAccess\Annotation\PropertyGetter;
 
 /**
  * Fixtures for testing metadata.
@@ -19,7 +19,7 @@ use Symfony\Component\PropertyAccess\Annotation\Getter;
 class DummyParent
 {
     /**
-     * @Getter(property="test")
+     * @PropertyGetter(property="test")
      */
     public function testParent()
     {

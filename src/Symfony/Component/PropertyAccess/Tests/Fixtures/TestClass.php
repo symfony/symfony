@@ -12,8 +12,8 @@
 namespace Symfony\Component\PropertyAccess\Tests\Fixtures;
 
 use Symfony\Component\PropertyAccess\Annotation\Property;
-use Symfony\Component\PropertyAccess\Annotation\Getter;
-use Symfony\Component\PropertyAccess\Annotation\Setter;
+use Symfony\Component\PropertyAccess\Annotation\PropertyGetter;
+use Symfony\Component\PropertyAccess\Annotation\PropertySetter;
 
 class TestClass
 {
@@ -217,7 +217,7 @@ class TestClass
     }
 
     /**
-     * @Getter(property="total")
+     * @PropertyGetter(property="total")
      */
     public function getTotal()
     {
@@ -225,7 +225,7 @@ class TestClass
     }
 
     /**
-     * @Setter(property="total")
+     * @PropertySetter(property="total")
      *
      * @param mixed $total
      */

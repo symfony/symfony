@@ -19,10 +19,10 @@ namespace Symfony\Component\PropertyAccess\Annotation;
  *
  * @author Luis Ramón López <lrlopez@gmail.com>
  */
-class Remover
+class PropertyRemover
 {
     /**
-     * Associates this method to the setter of this property.
+     * Associates this method to the remover of this property.
      *
      * @var string
      */

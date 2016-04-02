@@ -13,9 +13,9 @@ namespace Symfony\Component\PropertyAccess\Tests;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Symfony\Component\PropertyAccess\Annotation\Adder;
-use Symfony\Component\PropertyAccess\Annotation\Getter;
-use Symfony\Component\PropertyAccess\Annotation\Remover;
+use Symfony\Component\PropertyAccess\Annotation\PropertyAdder;
+use Symfony\Component\PropertyAccess\Annotation\PropertyGetter;
+use Symfony\Component\PropertyAccess\Annotation\PropertyRemover;
 use Symfony\Component\PropertyAccess\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -43,7 +43,7 @@ class PropertyAccessorCollectionTest_Car
 
     // In the test, use a name that StringUtil can't uniquely singularify
     /**
-     * @Adder(property="customVirtualAxes")
+     * @PropertyAdder(property="customVirtualAxes")
      * @param $axis
      */
     public function addAxisTest($axis)
@@ -63,7 +63,7 @@ class PropertyAccessorCollectionTest_Car
     }
 
     /**
-     * @Remover(property="customVirtualAxes")
+     * @PropertyRemover(property="customVirtualAxes")
      * @param $axis
      */
     public function removeAxisTest($axis)
@@ -83,7 +83,7 @@ class PropertyAccessorCollectionTest_Car
     }
 
     /**
-     * @Getter(property="customVirtualAxes")
+     * @PropertyGetter(property="customVirtualAxes")
      * @return null
      */
     public function getCustomAxes()

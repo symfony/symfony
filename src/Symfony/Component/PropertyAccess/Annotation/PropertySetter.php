@@ -12,17 +12,17 @@
 namespace Symfony\Component\PropertyAccess\Annotation;
 
 /**
- * Property accessor getter configuration annotation.
+ * Property accessor setter configuration annotation.
  *
  * @Annotation
  * @Target({"METHOD"})
  *
  * @author Luis Ramón López <lrlopez@gmail.com>
  */
-class Getter
+class PropertySetter
 {
     /**
-     * Associates this method to the getter of this property.
+     * Associates this method to the setter of this property.
      *
      * @var string
      */

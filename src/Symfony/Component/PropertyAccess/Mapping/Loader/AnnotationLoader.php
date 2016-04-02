@@ -12,11 +12,11 @@
 namespace Symfony\Component\PropertyAccess\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
-use Symfony\Component\PropertyAccess\Annotation\Adder;
-use Symfony\Component\PropertyAccess\Annotation\Getter;
+use Symfony\Component\PropertyAccess\Annotation\PropertyAdder;
+use Symfony\Component\PropertyAccess\Annotation\PropertyGetter;
 use Symfony\Component\PropertyAccess\Annotation\Property;
-use Symfony\Component\PropertyAccess\Annotation\Remover;
-use Symfony\Component\PropertyAccess\Annotation\Setter;
+use Symfony\Component\PropertyAccess\Annotation\PropertyRemover;
+use Symfony\Component\PropertyAccess\Annotation\PropertySetter;
 use Symfony\Component\PropertyAccess\Mapping\PropertyMetadata;
 use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
 
@@ -76,28 +76,28 @@ class AnnotationLoader implements LoaderInterface
             if ($method->getDeclaringClass()->name === $className) {
 
                 foreach ($this->reader->getMethodAnnotations($method) as $annotation) {
-                    if ($annotation instanceof Getter) {
+                    if ($annotation instanceof PropertyGetter) {
                         if (!isset($propertiesMetadata[$annotation->property])) {
                             $propertiesMetadata[$annotation->property] = new PropertyMetadata($annotation->property);
                             $classMetadata->addPropertyMetadata($propertiesMetadata[$annotation->property]);
                         }
                         $propertiesMetadata[$annotation->property]->setGetter($method->getName());
                     }
-                    if ($annotation instanceof Setter) {
+                    if ($annotation instanceof PropertySetter) {
                         if (!isset($propertiesMetadata[$annotation->property])) {
                             $propertiesMetadata[$annotation->property] = new PropertyMetadata($annotation->property);
                             $classMetadata->addPropertyMetadata($propertiesMetadata[$annotation->property]);
                         }
                         $propertiesMetadata[$annotation->property]->setSetter($method->getName());
                     }
-                    if ($annotation instanceof Adder) {
+                    if ($annotation instanceof PropertyAdder) {
                         if (!isset($propertiesMetadata[$annotation->property])) {
                             $propertiesMetadata[$annotation->property] = new PropertyMetadata($annotation->property);
                             $classMetadata->addPropertyMetadata($propertiesMetadata[$annotation->property]);
                         }
                         $propertiesMetadata[$annotation->property]->setAdder($method->getName());
                     }
-                    if ($annotation instanceof Remover) {
+                    if ($annotation instanceof PropertyRemover) {
                         if (!isset($propertiesMetadata[$annotation->property])) {
                             $propertiesMetadata[$annotation->property] = new PropertyMetadata($annotation->property);
                             $classMetadata->addPropertyMetadata($propertiesMetadata[$annotation->property]);

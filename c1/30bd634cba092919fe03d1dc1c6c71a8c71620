@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-13T15:40:05Z
+
+I had an idea: we could make the new resource checker "generic" - something that accepts any class-related information (method + arg info, annotation info, etc). Then it could be used by autowiring, but also by the `@Route` system in SensioFrameworkExtraBundle. It would then be "fine" to add it as a new, hardcoded resource checker.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-27T17:02:04Z
+
+This is idea is now working, and it's quite simple and self-contained :). /cc @dunglas
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-27T17:14:14Z
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-29T01:53:22Z
+
+@stof yes, thank you so much! Those were really great cases I hadn't thought of before! I refactored to store a string representation of the arguments in the resource, which pretty much catches all the cases in a very simple way. It may over-match on some things, like changing an argument's name, but not its type-hint - but I think that's a micro-optimization (for the dev env) that would be much more complex to implement.
+
+The one case that's still not covered - and never was with the old method - is a non-existent class type hint suddenly *becoming* existent (i.e. a new lib was installed). But, in practice, this is quite rare and installing new packages cause a cache refresh. Also, that is the current behavior anyways.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-29T13:14:49Z
+
+Awesome, thanks again! Changes made, tests are green.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-30T20:53:51Z
+
+Ping @symfony/deciders
+
+This is a "nice to have" for autowiring on bigger systems.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-30T21:08:58Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-04-01T15:37:22Z
+
+Comments handled!
+
+In the last commit, I tried to get more fine-grained on the argument info we need. I had this at one point earlier, but decided to use the string-casting method because it makes the code simpler and potentially less buggy (i.e. is there some edge-case that this is missing?). The string casting is overly-eager, but that means it errs on the side of clearing the cache too often, which is not a big deal. If you guys do like the simple method better, we can revert my most recent commit and go back. That would still be *way* better than the current situation :).
+
+Thanks!

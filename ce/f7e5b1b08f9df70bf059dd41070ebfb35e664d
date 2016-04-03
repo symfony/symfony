@@ -1,0 +1,470 @@
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-25T10:48:07Z
+
+What benefits of `ArgumentMetadata` class instead of passing `ReflectionProperty`? https://github.com/symfony/symfony/pull/11457/files#diff-e00e36af5c58d36a069a385025be4f34R22 looks better than your `ArgumentIsRequest`
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-25T10:51:35Z
+
+Also #11457 wasn't merged because of lack of performance tests. Maybe you should add blackfire comparation before and after.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-25T10:51:47Z
+
+@koc for the simple reason that it's reflection. When this PR is merged, I can add a cache warmer that calculates all this information already so no reflection would be required run-time (unless not in cache).
+
+Additionally it also avoids PHP_VERSION_ID checks because types and variadic differs between 5.5, 5.6 and 7.0, see https://github.com/symfony/symfony/pull/18308/commits/6496e673696e7261f4f075ce78ee023495690bec#diff-4cbcb4a4736436b811aa3f5059ca46b1R19
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-25T10:56:39Z
+
+@koc how would I do that? I have to admit that I've never used blackfire yet. In terms of performance this might actually be slightly slower (minimally) until a cached variant has been added.
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-03-25T11:05:27Z
+
+https://blackfire.io/docs/up-and-running/installation
+http://blog.blackfire.io/profiles-public-sharing.html
+
+Create simple app based on symfony-standard, create profile, replace symfony's version with your patched, create profile again and compare them.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-25T11:10:38Z
+
+@koc alright, I will see if I can do that
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-25T13:55:58Z
+
+@Koc I made an application that can be tested https://github.com/iltar/blackfire-symfony-18308
+
+Sadly I cannot run blackfire here due to system permissions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-28T08:22:50Z
+
+This is an interesting topic as we've been talking about doing this kind of changes for years now.
+
+Having more flexibility looks good on paper but we need to keep complexity as low as possible (that's why I'm quite reluctant on adding interfaces and factories when not needed -- see my comments). Also, we need to keep good performance. This last point is probably the only blocker if any. Can you profile the old and the new code on a "typical Symfony app" (not an hello world one) to see if there is an impact and what kind if impact these changes have if any?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-28T09:40:15Z
+
+@fabpot I'll hook it up somewhere this week and check the performance. Ideally I'd also implement a cache for the benchmarks (because that's what this is all pre-work for).
+
+I agree about the complexity, that's why I want to keep this as simple as possible. Here's a list of the classes/interfaces and what they are designed for:
+ - `ArgumentResolver(Interface)`; This is from the previous PR, making it easier to implement your own variant (this PR). This also allows the `LegacyArgumentResolver` (currently in `ControllerResolver`) to be injected.
+ - `ArgumentValueResolverInterface`; This is what can actually be used on an application level for action arguments, think about: [ParamConverter to inject the current user #327](https://github.com/sensiolabs/SensioFrameworkExtraBundle/pull/327). Parameter converters are nice, but slow(er than when this is cached) due to their reflection. This involves less magic to implement and a clear trace for developers where it hooks in. It also avoids injecting objects in the Request object, scoping them more effectively.
+ - `ArgumentMetadataInterface`; As I have commented before, this is a nice way to use the following bullet point to return a cached variant if generating classes.
+ - `ArgumentMetadataFactoryInterface`; This allows multiple implementations to accommodate a cache layer. My idea is to decorate the real-time resolver, when the cached version does not exist, I can fall back to the real-time and still provide the same functionality. I think this interface should be marked with `@internal` but I'm not 100% sure, in case someone wants to provide their own layer (like never resolving due to performance?).
+
+Regarding the cache implementation I want to open a new PR so it can focus on that specific subject as I'm inexperienced with caching.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-28T09:44:34Z
+
+Caching should indeed be part of another PR. Performance without caching should stay in the same range as the current performance. Adding a cache layer is adding another layer of complexity by itself and won't be implemented by everyone (think Silex for instance). That's why performance optimization *without* caching is very important.
+
+But then again, without numbers, we cannot really reason about the proposed changes.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-28T09:46:57Z
+
+You've got a fair point there. In any case, I could rename the `LegacyArgumentResolver` to something else and make sure everyone can keep using that regarding performance.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-29T07:02:38Z
+
+@iltar thanks for working on this. Although I cannot provide specific details, I agree with Fabien and this looks a bit over engineered. The fact that adds +1,200 lines of code and removes just 111 might be an warning about this.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-29T07:48:20Z
+
+@fabpot here are the results of my real-world application with the code as-is in this PR.
+
+@javiereguiluz a lot of those lines are actually test duplication to provide 100% BC and a lot of those lines are also comments because a lot of small files got added. If you look at executable lines of code excluding tests, the difference is a lot less.
+
+I agree that it's a bit of complexity added, but it would solve a lot of other problems; Mainly DX wise. Right now it's a pain to customize this code and is highly dependent on the default implementation. With this PR (e.g.) [Drupal could significantly reduce the complexity in their code if they want](https://github.com/drupal/drupal/blob/8.1.x/core/lib/Drupal/Core/Controller/ControllerResolver.php#L137-L175). It also means that they would not have to backport the current fix for the variadic functionality either.
+
+It means that I could add the following code instead of a `ParamConverter`
+```php
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(Request $request, ArgumentMetadataInterface $argument)
+    {
+        return $argument->getArgumentType() === MyUser::class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValue(Request $request, ArgumentMetadataInterface $argument)
+    {
+        return $this->tokenStorage->getToken()->getUser();
+    }
+```
+
+The initial overhead is a bit more, but a `ParamConverter` is conceptually wrong here and causes a lot more overhead as it uses reflection to determine the same information yet again. For Developers it will be easier
+
+----
+
+_Conclusion: it's slower in this PR, not by much but it is slower. The difference with 0 parameters is minimal and gains ~initial time*N Arguments._ I think the added DX and flexibility is worth the minimal overhead, especially when you can avoid some of the magic done by `ParamConverters`.
+
+*note that if this functionality is not desired in the core, I can always publish it myself if #18187 gets accepted*
+
+```php
+// code used in HttpKernel
+$sw = new Stopwatch();
+$sw->start('18308');
+// controller arguments
+for ($i = 0; $i < 1000; $i++) {
+    $arguments = $this->argumentResolver->getArguments($request, $controller);
+}
+$event = $sw->stop('18308');
+$class = explode('\\', get_class($controller[0]));
+dump(end($class).': '.$event.'; arguments: '.count($arguments).', '.$i.' iteration(s); branch: feature/argument-resolver-extention-point');
+```
+
+1 iteration on getArguments (master)
+![](http://i.imgur.com/DffvUqY.png)
+
+1 iteration on getArguments (feature/argument-resolver-extention-point)
+![](http://i.imgur.com/ojDbUgb.png)
+
+1000 iterations on getArguments (master)
+![](http://i.imgur.com/U2XCUh4.png)
+
+1000 iterations on getArguments (feature/argument-resolver-extention-point)
+![](http://i.imgur.com/36PIXwn.png)
+
+Same as the above but changed the variadic priority to -150 (as it cannot have a default value and is a rare case)
+![](http://i.imgur.com/zkTQJ3g.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-29T07:55:05Z
+
+@iltar Don't get me wrong, I like the decoupling and the flexibility it adds. I just want to be sure that it does not affect performance too much.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-29T08:03:42Z
+
+@fabpot I've considered showing results what would happen if I were to cache the arguments away based on `$class::$method` in an array within the factory, but this would give more overhead while in fact it doesn't happen too often that 1 action is resolved twice. You can see it in my result, but this is a rather specific case.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-29T10:42:10Z
+
+@fabpot I think I've got every docblock and added the return type to be an array for the value resolvers. I couldn't get it to work with `$arguments += $resolved` and instead of doing an `array_merge` it simply loops over the resolved values and appends (1 iteration by default unless variadic). I was thinking a yield construction could be fancy too, but not sure if this would be desired. This would be cleaner way than returning an array in my opinion.
+
+```php
+public function getValue(...)
+{
+    // normal
+    yield $request->attributes->get($argument->getArgumentName());
+
+    // variadic
+    foreach ($request->attributes->get($argument->getArgumentName()) as $value) {
+        yield $value;
+    }
+}
+```
+
+The only docblock I've kept is `@var ArgumentValueResolverInterface[]`, as it's a typed array which helps IDEs guess the available methods. Additionally I've simplified the exception logic in the argument resolver when nothing could be resolved.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-29T11:41:31Z
+
+yielding looks like a good idea indeed :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-29T11:42:59Z
+
+If we are yielding from `getValue()`, the method name should probably change
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-29T12:10:28Z
+
+What about `yieldValues()` or `yieldArguments()`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-29T12:30:23Z
+
+`yieldArgument()`?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-29T12:34:02Z
+
+I was personally aiming towards the plural because I was looking at the perspective of the foreach. It also looks a bit off if you yield more than once and the method name implies a singlular. In the end it's a potayto/potahto so I don't mind either way
+```php
+foreach ($resolver->yieldArguments() as $value);
+```
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-29T12:36:26Z
+
+What about:
+```php
+while ($value = $resolver->yieldArgument()) {}
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-29T12:46:14Z
+
+@HeahDude this is not how ``yield`` works in PHP, so naming it ``yield*`` would be wrong (and the implementation would be a pain as it would require a stateful method to return multiple times, which is a no-go for a service)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-29T12:51:17Z
+
+@stof are you against naming it `yield*()` in general? If so, do you have any other ideas?
+
+edit: What about naming it `resolve()`?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-30T07:03:23Z
+
+Small summary on my last changes:
+ - using yield instead of returns
+ - slightly reduced complexity by using `continue 2;` in the ArgumentResolver instead of tracking with a boolean
+ - ArgumentIsRequest -> RequestResolver and I've renamed the others to be consistent as well
+ - Renamed `getArgumentName()` and `getArgumentType()` to `getName()` and `getType()`
+
+I've done benchmarking with the yield and at first it showed me 10mb usage and increasing to 16mb. After I tried to verify this a few times, it went back to the 2mb shown in the screenshots without a performance gain/loss so I guess php(7) was being quircky.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-30T08:12:02Z
+
+@iltar I think I'm going to have some more comments but I like the current direction. I will try to play with the code a bit later today.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-30T10:01:17Z
+
+While thinking about the impact of this PR on SensioFrameworkExtraBundle, I opened https://github.com/symfony/symfony/issues/18362 with a missing point
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-31T09:51:43Z
+
+@fabpot tests are failing because the framework bundle itself cannot get the correct httpkernel version on the lowest dependency. it will fetch the master instead of my version, which doesn't have the old files. Is there a way I can fix this pre-merge or will merging this solve it automatically?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-31T09:55:23Z
+
+@iltar ignore this failure for now, as it will be solved once the PR is merged (as you updated the min requirement to ``~3.1`` and ``~3.1`` will have this code)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-31T11:58:25Z
+
+Alright, seems like everything is fixed now. If you find any other issues, I'll work on them asap as I would also like to finish this before the big freeze.
+
+Should I squash the commits?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T13:09:27Z
+
+@trousers Please stop spamming.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T14:39:23Z
+
+@iltar Thanks for that PR! This is very good! Sorry for my minor comments, it's mainly about typo...
+
+I can send you a PR on your fork to deal with these doc blocks if you need it.
+
+Thanks for this great job!
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-31T14:44:37Z
+
+@fabpot when comparing this to ParamConverters, I found one difference: param converters can say that they support an argument and then still fail to convert it. In this case, the manager will try the next converter supporting the argument. I'm not sure whether this feature is necessary here (among existing param converters in the bundle, only the DatetimeConverter can return ``false`` for a supported argument)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-31T15:08:04Z
+
+@stof Can you check `ArgumentMetadataFactoryTest` and see if I missed any cases? I've ran both on 56 and 70, I don't have 55 at my disposal locally.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-31T15:26:24Z
+
+@stof in that case the support should just return false and it will end up the same. The whole true/false thing is quite annoying and confusing in param converters, caused me a few bugs.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-03-31T15:30:37Z
+
+I'm already 1 hour over-due so I'm heading off now. I can make small fixes at home (no proper environment) but anything else, feel free to make a PR to this branch and I will merge them.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T07:03:02Z
+
+@HeahDude There was still a small bug in resolving the custom request object extending the `Request`, see https://github.com/symfony/symfony/pull/18308/commits/4bf38261b56d01cd323c0e6f3b4791ea2bf7fb48
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T07:22:19Z
+
+Thanks the test :) Nice!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T07:27:54Z
+
+Note that the diff of the profiling was correct :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T07:30:26Z
+
+Yes that's what I thought as well, this was an error in the initial change on my side
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T07:43:04Z
+
+Actually I think I made that mistake in the PR even if the test profiled was good.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T07:45:30Z
+
+@HeahDude The original commit already had them turned around: https://github.com/symfony/symfony/pull/18308/commits/cc50bd0818b3e0ff51fd12820e00fe8bcd5e1218#diff-e385c6f132fb54407aa050eb59fedf0aR30
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T07:47:18Z
+
+Right! looks like I missed that too :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T09:29:36Z
+
+@fabpot @stof are there any issues I forgot to fix? If not, should I squash some commits?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-01T09:33:24Z
+
+@iltar 2 possibilities: squash everything as one commit or keep atomic relevant commits (without commits for merges, CS, ...). Up to you.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T09:50:40Z
+
+@fabpot I've cleaned up the list a bit, from 29 commits to 6 which should indicate the biggest changes. If all 6 are merged it should be doable to bisect for people in case of unexpected bugs.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T10:48:58Z
+
+@iltar having separated commits will certainly ease reviews, but once done you should squash mines, they are not relevant. Thank you ;)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T12:50:38Z
+
+Docs PR is made regarding the controller resolver / argument resolver, so that should be ready before 3.1 arrives. I will start working on writing something for the new extension point (otherwise it's pretty useless imo).
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T14:29:00Z
+
+@fabpot I'm having doubts about the resolvers:
+
+| service (prefixed by `argument_value_resolver.`) | class
+| ---- | ---
+| `...argument_from_attribute` | `ArgumentFromAttributeResolver`
+| `...argument_is_request` | `DefaultArgumentValueResolver`
+| `...default_argument_value` | `RequestResolver`
+| `...variadic_argument_from_attribute` | `VariadicArgumentValueResolver`
+
+I would like to propose the following naming before this is merged:
+
+| service | class
+| ---- | ---
+| `argument_value_resolver.request_attribute` | `RequestAttributeValueResolver`
+| `argument_value_resolver.default` | `DefaultValueResolver`
+| `argument_value_resolver.request` | `RequestValueResolver`
+| `argument_value_resolver.variadic` | `VariadicValueResolver`
+
+While writing the docs I noticed it's still fairly inconsistent and a lot to write.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-01T14:32:07Z
+
+@iltar don't you think the `_value_` part in `argument_value_resolver.*` is a bit redundant? What about:
+
+| service | class
+| ---- | ---
+| `argument_resolver.request_attribute` | `RequestAttributeValueResolver`
+| `argument_resolver.default` | `DefaultValueResolver`
+| `argument_resolver.request` | `RequestValueResolver`
+| `argument_resolver.variadic` | `VariadicValueResolver`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-01T15:19:36Z
+
+the new names are indeed much more consistent. I also like @javiereguiluz shorter proposal. Up to you between the 2 new proposals.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T15:22:22Z
+
+I like that, less is more in this case. I was running into another DX issue; when showing the `ArgumentResolver` in the documentation, I always have to pass an array of 4 items which together mimic the 3.0 behaviour. If I were to make the argument of the value resolvers nullable, I could set those 4 resolvers by default in the constructor. Or is an empty array enough? This implies you cannot ever have no resolvers.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-01T17:53:29Z
+
+Okay, small update:
+ - The `ArgumentResolver` arguments were optional (don't know why, lost in rebase). I've made use of that and initialized the objects with the defaults that symfony is using now.
+ - The HttpKernel now gives a slightly different deprecation about a behavioral change in 4.0 (BC break)
+ - DX is improved for people who don't know anything about the inner workings of the `ArgumentResolver`, it now works out of the box with the current default behavior.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-03T09:07:29Z
+
+@fabpot I think it's ready to be merged, all tests are passing without issues and I think most edge-cases are covered now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-03T09:24:26Z
+
+Apart from my comment about the default value resolvers, I'm :+1: to merge this PR.

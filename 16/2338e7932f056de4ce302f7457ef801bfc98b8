@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-01T17:34:40Z
+
+I think we should better remove the link for the moment as the documentation isn't available yet.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-04-01T19:08:55Z
+
+Well, the doc PR is in progress, as mentioned [here](https://github.com/symfony/symfony-docs/pull/6402)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-03T11:30:49Z
+
+@xabbuh the first version of the doc will be available very soon, so I think we could merge this fix.

@@ -311,7 +311,7 @@ class AutowirePass implements CompilerPassInterface
         $this->ambiguousServiceTypes[$type][] = $id;
     }
 
-    static private function getResourceMetadataForMethod(\ReflectionMethod $method)
+    private static function getResourceMetadataForMethod(\ReflectionMethod $method)
     {
         $methodArgumentsMetadata = array();
         foreach ($method->getParameters() as $parameter) {

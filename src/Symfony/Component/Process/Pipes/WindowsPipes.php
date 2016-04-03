@@ -38,7 +38,7 @@ class WindowsPipes extends AbstractPipes
     /** @var bool */
     private $haveReadSupport;
 
-    public function __construct($haveReadSupport, $input)
+    public function __construct($input, $haveReadSupport)
     {
         $this->haveReadSupport = (bool) $haveReadSupport;
 
@@ -158,19 +158,6 @@ class WindowsPipes extends AbstractPipes
             fclose($handle);
         }
         $this->fileHandles = array();
-    }
-
-    /**
-     * Creates a new WindowsPipes instance.
-     *
-     * @param Process $process The process
-     * @param $input
-     *
-     * @return WindowsPipes
-     */
-    public static function create(Process $process, $input)
-    {
-        return new static(!$process->isOutputDisabled() || $process->hasCallback(), $input);
     }
 
     /**

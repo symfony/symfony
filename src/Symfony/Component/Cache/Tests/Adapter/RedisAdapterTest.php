@@ -27,13 +27,16 @@ class RedisAdapterTest extends CachePoolTest
             $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
         }
 
-        return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__));
+        return new RedisAdapter(self::$redis, 0, str_replace('\\', '.', __CLASS__));
     }
 
     public static function setupBeforeClass()
     {
         self::$redis = new \Redis();
-        self::$redis->connect('127.0.0.1');
+        if (!@self::$redis->connect('127.0.0.1')) {
+            $e = error_get_last();
+            self::markTestSkipped($e['message']);
+        }
         self::$redis->select(1993);
     }
 

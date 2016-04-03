@@ -20,7 +20,7 @@ class RedisAdapter extends AbstractAdapter
 {
     private $redis;
 
-    public function __construct(\Redis $redisConnection, $namespace = '', $defaultLifetime = 0)
+    public function __construct(\Redis $redisConnection, $defaultLifetime = 0, $namespace = '')
     {
         $this->redis = $redisConnection;
 

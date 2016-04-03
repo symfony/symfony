@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Config\AutowireServiceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -50,6 +51,35 @@ class AutowirePass implements CompilerPassInterface
     }
 
     /**
+     * Creates a resource to help know if this service has changed.
+     *
+     * @param \ReflectionClass $reflectionClass
+     *
+     * @return AutowireServiceResource
+     */
+    public static function createResourceForClass(\ReflectionClass $reflectionClass)
+    {
+        $metadata = array();
+
+        if ($constructor = $reflectionClass->getConstructor()) {
+            $metadata['__construct'] = self::getResourceMetadataForMethod($constructor);
+        }
+
+        // todo - when #17608 is merged, could refactor to private function to remove duplication
+        // of determining valid "setter" methods
+        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            $name = $reflectionMethod->getName();
+            if ($reflectionMethod->isStatic() || 1 !== $reflectionMethod->getNumberOfParameters() || 0 !== strpos($name, 'set')) {
+                continue;
+            }
+
+            $metadata[$name] = self::getResourceMetadataForMethod($reflectionMethod);
+        }
+
+        return new AutowireServiceResource($reflectionClass->name, $reflectionClass->getFileName(), $metadata);
+    }
+
+    /**
      * Wires the given definition.
      *
      * @param string     $id
@@ -63,7 +93,9 @@ class AutowirePass implements CompilerPassInterface
             return;
         }
 
-        $this->container->addClassResource($reflectionClass);
+        if ($this->container->isTrackingResources()) {
+            $this->container->addResource(static::createResourceForClass($reflectionClass));
+        }
 
         if (!$constructor = $reflectionClass->getConstructor()) {
             return;
@@ -277,5 +309,26 @@ class AutowirePass implements CompilerPassInterface
             );
         }
         $this->ambiguousServiceTypes[$type][] = $id;
+    }
+
+    static private function getResourceMetadataForMethod(\ReflectionMethod $method)
+    {
+        $methodArgumentsMetadata = array();
+        foreach ($method->getParameters() as $parameter) {
+            try {
+                $class = $parameter->getClass();
+            } catch (\ReflectionException $e) {
+                // type-hint is against a non-existent class
+                $class = false;
+            }
+
+            $methodArgumentsMetadata[] = array(
+                'class' => $class,
+                'isOptional' => $parameter->isOptional(),
+                'defaultValue' => $parameter->isOptional() ? $parameter->getDefaultValue() : null,
+            );
+        }
+
+        return $methodArgumentsMetadata;
     }
 }

@@ -66,6 +66,11 @@ HttpKernel
    deprecated and will be removed in Symfony 4.0. The inline fragment
    renderer should be used with object attributes.
 
+ * The `ControllerResolver::getArguments()` method has been deprecated and will
+   be removed in 4.0. If you have your own `ControllerResolverInterface`
+   implementation, you should inject either an `ArgumentResolverInterface`
+   instance or the new `ArgumentResolver` in the `HttpKernel`.
+
 Serializer
 ----------
 

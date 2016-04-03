@@ -17,6 +17,29 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
+        <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" public="false" />
+
+        <service id="argument_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver" public="false">
+            <argument type="service" id="argument_metadata_factory" />
+            <argument type="collection" />
+        </service>
+
+        <service id="argument_resolver.request_attribute" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver" public="false">
+            <tag name="controller_argument.value_resolver" priority="100" />
+        </service>
+
+        <service id="argument_resolver.request" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver" public="false">
+            <tag name="controller_argument.value_resolver" priority="50" />
+        </service>
+
+        <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver" public="false">
+            <tag name="controller_argument.value_resolver" priority="-100" />
+        </service>
+
+        <service id="argument_resolver.variadic" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver" public="false">
+            <tag name="controller_argument.value_resolver" priority="-150" />
+        </service>
+
         <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">
             <tag name="kernel.event_subscriber" />
             <argument>%kernel.charset%</argument>

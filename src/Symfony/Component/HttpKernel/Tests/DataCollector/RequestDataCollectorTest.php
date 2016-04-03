@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
@@ -191,7 +192,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     protected function injectController($collector, $controller, $request)
     {
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver);
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->getMock(ArgumentResolverInterface::class));
         $event = new FilterControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
         $collector->onKernelController($event);
     }

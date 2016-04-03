@@ -103,7 +103,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testValidateIfChildWithValidConstraint()
+    public function testValidateChildIfValidConstraint()
     {
         $object = $this->getMock('\stdClass');
 
@@ -161,7 +161,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
-    public function testValidateConstraintsOptionEvenIfParentWithoutValidConstraint()
+    public function testValidateConstraintsOptionEvenIfNoValidConstraint()
     {
         $object = $this->getMock('\stdClass');
         $constraint1 = new NotNull(array('groups' => array('group1', 'group2')));

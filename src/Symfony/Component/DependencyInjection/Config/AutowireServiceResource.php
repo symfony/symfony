@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Config;
 
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
-use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 
 class AutowireServiceResource implements SelfCheckingResourceInterface, \Serializable
 {
@@ -46,7 +45,7 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
             return false;
         }
 
-        return AutowirePass::createResourceForClass($reflectionClass);
+        return false;
     }
 
     public function __toString()

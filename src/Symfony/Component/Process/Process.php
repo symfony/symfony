@@ -27,7 +27,7 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Romain Neutron <imprec@gmail.com>
  */
-class Process
+class Process implements \IteratorAggregate
 {
     const ERR = 'err';
     const OUT = 'out';
@@ -496,6 +496,54 @@ class Process
         }
 
         return $latest;
+    }
+
+    /**
+     * Returns an iterator to the output of the process, with the output type as keys (Process::OUT/ERR).
+     *
+     * @param bool $blocking    Whether to use a blocking read call.
+     * @param bool $clearOutput Whether to clear or keep output in memory.
+     *
+     * @throws LogicException in case the output has been disabled
+     * @throws LogicException In case the process is not started
+     *
+     * @return \Generator
+     */
+    public function getIterator($blocking = true, $clearOutput = true)
+    {
+        $this->readPipesForOutput(__FUNCTION__, false);
+
+        while (null !== $this->callback) {
+            $out = stream_get_contents($this->stdout, -1, $this->incrementalOutputOffset);
+
+            if (isset($out[0])) {
+                if ($clearOutput) {
+                    $this->clearOutput();
+                } else {
+                    $this->incrementalOutputOffset = ftell($this->stdout);
+                }
+
+                yield self::OUT => $out;
+            }
+
+            $err = stream_get_contents($this->stderr, -1, $this->incrementalErrorOutputOffset);
+
+            if (isset($err[0])) {
+                if ($clearOutput) {
+                    $this->clearErrorOutput();
+                } else {
+                    $this->incrementalErrorOutputOffset = ftell($this->stderr);
+                }
+
+                yield self::ERR => $err;
+            }
+
+            if (!$blocking && !isset($out[0]) && !isset($err[0])) {
+                yield self::OUT => '';
+            }
+
+            $this->readPipesForOutput(__FUNCTION__, $blocking);
+        }
     }
 
     /**
@@ -1296,11 +1344,12 @@ class Process
     /**
      * Reads pipes for the freshest output.
      *
-     * @param $caller The name of the method that needs fresh outputs
+     * @param string $caller   The name of the method that needs fresh outputs
+     * @param bool   $blocking Whether to use blocking calls or not.
      *
      * @throws LogicException in case output has been disabled or process is not started
      */
-    private function readPipesForOutput($caller)
+    private function readPipesForOutput($caller, $blocking = false)
     {
         if ($this->outputDisabled) {
             throw new LogicException('Output has been disabled.');
@@ -1308,7 +1357,7 @@ class Process
 
         $this->requireProcessIsStarted($caller);
 
-        $this->updateStatus(false);
+        $this->updateStatus($blocking);
     }
 
     /**

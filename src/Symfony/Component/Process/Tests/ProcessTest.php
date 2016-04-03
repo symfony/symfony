@@ -1270,6 +1270,42 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('123456', $process->getOutput());
     }
 
+    public function testIteratorOutput()
+    {
+        $input = new InputStream();
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('fwrite(STDOUT, 123); fwrite(STDERR, 234); fwrite(STDOUT, fread(STDIN, 3)); fwrite(STDERR, 456);'));
+        $process->setInput($input);
+        $process->start();
+        $output = array();
+
+        foreach ($process as $type => $data) {
+            $output[] = array($type, $data);
+            break;
+        }
+        $expectedOutput = array(
+            array($process::OUT, '123'),
+        );
+        $this->assertSame($expectedOutput, $output);
+
+        $input->write(345);
+
+        foreach ($process as $type => $data) {
+            $output[] = array($type, $data);
+        }
+
+        $this->assertSame('', $process->getOutput());
+        $this->assertFalse($process->isRunning());
+
+        $expectedOutput = array(
+            array($process::OUT, '123'),
+            array($process::ERR, '234'),
+            array($process::OUT, '345'),
+            array($process::ERR, '456'),
+        );
+        $this->assertSame($expectedOutput, $output);
+    }
+
     /**
      * @param string      $commandline
      * @param null|string $cwd

@@ -27,36 +27,47 @@ class CachePoolPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $attributes = array(
-            'provider_service',
+            'provider',
             'namespace',
             'default_lifetime',
-            'directory',
         );
         foreach ($container->findTaggedServiceIds('cache.pool') as $id => $tags) {
             $adapter = $pool = $container->getDefinition($id);
-            $tags[0] += array('namespace' => $this->getNamespace($id));
-
+            if ($pool->isAbstract()) {
+                continue;
+            }
+            if (!isset($tags[0]['namespace'])) {
+                $tags[0]['namespace'] = $this->getNamespace($id);
+            }
             while ($adapter instanceof DefinitionDecorator) {
                 $adapter = $container->findDefinition($adapter->getParent());
                 if ($t = $adapter->getTag('cache.pool')) {
                     $tags[0] += $t[0];
                 }
             }
-            if ($pool->isAbstract()) {
-                continue;
+            if (isset($tags[0]['clearer'])) {
+                $clearer = $container->getDefinition($tags[0]['clearer']);
+            } else {
+                $clearer = null;
             }
-            if (isset($tags[0]['provider_service']) && is_string($tags[0]['provider_service'])) {
-                $tags[0]['provider_service'] = new Reference($tags[0]['provider_service']);
+            unset($tags[0]['clearer']);
+
+            if (isset($tags[0]['provider']) && is_string($tags[0]['provider'])) {
+                $tags[0]['provider'] = new Reference($tags[0]['provider']);
             }
             $i = 0;
             foreach ($attributes as $attr) {
                 if (isset($tags[0][$attr])) {
                     $pool->replaceArgument($i++, $tags[0][$attr]);
-                    unset($tags[0][$attr]);
                 }
+                unset($tags[0][$attr]);
             }
             if (!empty($tags[0])) {
-                throw new \InvalidArgumentException(sprintf('Invalid "cache.pool" tag for service "%s": accepted attributes are "provider_service", "namespace", "default_lifetime" and "directory", found "%s".', $id, implode('", "', array_keys($tags[0]))));
+                throw new \InvalidArgumentException(sprintf('Invalid "cache.pool" tag for service "%s": accepted attributes are "provider", "namespace" and "default_lifetime", found "%s".', $id, implode('", "', array_keys($tags[0]))));
+            }
+
+            if (null !== $clearer) {
+                $clearer->addMethodCall('addPool', array(new Reference($id)));
             }
         }
     }

@@ -1027,9 +1027,9 @@ class FrameworkExtension extends Extension
         }
 
         foreach ($config['pools'] as $name => $poolConfig) {
-            $poolDefinition = new DefinitionDecorator($poolConfig['adapter_service']);
+            $poolDefinition = new DefinitionDecorator($poolConfig['adapter']);
             $poolDefinition->setPublic($poolConfig['public']);
-            unset($poolConfig['adapter_service'], $poolConfig['public']);
+            unset($poolConfig['adapter'], $poolConfig['public']);
 
             $poolDefinition->addTag('cache.pool', $poolConfig);
             $container->setDefinition('cache.pool.'.$name, $poolDefinition);

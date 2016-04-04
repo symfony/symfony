@@ -28,6 +28,9 @@ class FilesystemAdapter extends AbstractAdapter
             $directory = sys_get_temp_dir().'/symfony-cache';
         }
         if (isset($namespace[0])) {
+            if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
+                throw new InvalidArgumentException(sprintf('FilesystemAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
+            }
             $directory .= '/'.$namespace;
         }
         if (!file_exists($dir = $directory.'/.')) {

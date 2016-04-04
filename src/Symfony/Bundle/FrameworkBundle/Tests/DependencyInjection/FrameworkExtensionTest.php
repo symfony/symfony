@@ -683,7 +683,6 @@ abstract class FrameworkExtensionTest extends TestCase
                 break;
         }
 
-        $this->assertTrue($adapterDefinition->hasTag('cache.pool'), sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $adapterId));
         $this->assertTrue($adapterDefinition->isAbstract(), sprintf('Service definition "%s" is abstract.', $adapterId));
     }
 }

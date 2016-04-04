@@ -19,7 +19,7 @@
         "php": ">=5.5.9",
         "symfony/asset": "~2.8|~3.0",
         "symfony/class-loader": "~2.8|~3.0",
-        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/dependency-injection": "~3.1",
         "symfony/config": "~2.8|~3.0",
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/http-foundation": "~3.1",
@@ -38,6 +38,7 @@
     },
     "require-dev": {
         "symfony/browser-kit": "~2.8|~3.0",
+        "symfony/cache": "~3.1",
         "symfony/console": "~2.8|~3.0",
         "symfony/css-selector": "~2.8|~3.0",
         "symfony/dom-crawler": "~2.8|~3.0",

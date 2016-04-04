@@ -49,7 +49,7 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $cachePool = new Definition();
         $cachePool->addTag('cache.pool', array(
-            'provider_service' => 'foobar',
+            'provider' => 'foobar',
             'default_lifetime' => 3,
         ));
         $cachePool->addArgument(null);

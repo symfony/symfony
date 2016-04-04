@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by unkind at 2016-04-03T22:10:41Z
+
+Does it make sense to dispatch stopped event? Raising exception here seems more appropriate.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T08:30:22Z
+
+> Does it make sense to dispatch stopped event? Raising exception here seems more appropriate.
+
+I don't think so, because it will make userland code harder to write.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-04T09:15:22Z
+
+@lyrixx I think such case should add a log message in the traceable event dispatcher, as it could also be a mistake in the userland code (people not knowing that stopping the the propagation of the first event will impact the next event because they reused the same event object)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T09:23:09Z
+
+@stof Good idea. I added it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-04T09:42:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-04-04T10:04:56Z
+
+> I don't think so, because it will make userland code harder to write.
+
+How does error reporting make harder to write?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-04T10:07:45Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T12:29:25Z
+
+> How does error reporting make harder to write?
+
+there is not error IMHO. see this for instance: https://github.com/symfony/symfony/pull/11882/files#diff-6d1e8dc0d2c0e7c4ab206d0efbb71516R161

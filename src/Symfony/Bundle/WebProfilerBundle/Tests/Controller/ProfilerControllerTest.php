@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
+use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -44,17 +45,11 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testReturns404onTokenNotFound()
+    /**
+     * @dataProvider provideController
+     */
+    public function testReturns404onTokenNotFound($controller, $profiler, $twig)
     {
-        $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
-        $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
-        $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array());
-
         $profiler
             ->expects($this->exactly(2))
             ->method('loadProfile')
@@ -72,17 +67,11 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(404, $response->getStatusCode());
     }
 
-    public function testSearchResult()
+    /**
+     * @dataProvider provideController
+     */
+    public function testSearchResult($controller, $profiler, $twig, $nonceGenerator = null)
     {
-        $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
-        $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
-        $profiler = $this
-            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $controller = new ProfilerController($urlGenerator, $profiler, $twig, array());
-
         $tokens = array(
             array(
                 'token' => 'token1',
@@ -115,6 +104,12 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
                 'url' => 'http://example.com/',
         ));
 
+        if ($nonceGenerator) {
+            $nonceGenerator->expects($this->exactly(2))
+                ->method('generate')
+                ->will($this->returnValue('123456'));
+        }
+
         $twig->expects($this->once())
             ->method('render')
             ->with($this->stringEndsWith('results.html.twig'), $this->equalTo(array(
@@ -129,9 +124,35 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
                 'limit' => 2,
                 'panel' => null,
                 'request' => $request,
+                'csp_script_nonce' => $nonceGenerator ? '123456' : null,
+                'csp_style_nonce' => $nonceGenerator ? '123456' : null,
             )));
 
         $response = $controller->searchResultsAction($request, 'empty');
         $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function provideController()
+    {
+        $urlGenerator1 = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+        $twig1 = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
+        $profiler1 = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $urlGenerator2 = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+        $twig2 = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
+        $profiler2 = $this
+            ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $nonceGenerator = $this->getMock('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator');
+
+        return array(
+            array(new ProfilerController($urlGenerator1, $profiler1, $twig1, array(), 'normal'), $profiler1, $twig1, null),
+            array(new ProfilerController($urlGenerator2, $profiler2, $twig2, array(), 'normal', new ContentSecurityPolicyHandler($nonceGenerator)), $profiler2, $twig2, $nonceGenerator),
+        );
     }
 }

@@ -2,7 +2,7 @@
 
 {% block head %}
     {% if collector.hasexception %}
-        <style>
+        <style{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
             {{ render(path('_profiler_exception_css', { token: token })) }}
         </style>
     {% endif %}

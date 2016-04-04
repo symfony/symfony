@@ -1306,6 +1306,42 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedOutput, $output);
     }
 
+    public function testNonBlockingNorClearingIteratorOutput()
+    {
+        $input = new InputStream();
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('fwrite(STDOUT, fread(STDIN, 3));'));
+        $process->setInput($input);
+        $process->start();
+        $output = array();
+
+        foreach ($process->getIterator(false, false) as $type => $data) {
+            $output[] = array($type, $data);
+            break;
+        }
+        $expectedOutput = array(
+            array($process::OUT, ''),
+        );
+        $this->assertSame($expectedOutput, $output);
+
+        $input->write(123);
+
+        foreach ($process->getIterator(false, false) as $type => $data) {
+            if ('' !== $data) {
+                $output[] = array($type, $data);
+            }
+        }
+
+        $this->assertSame('123', $process->getOutput());
+        $this->assertFalse($process->isRunning());
+
+        $expectedOutput = array(
+            array($process::OUT, ''),
+            array($process::OUT, '123'),
+        );
+        $this->assertSame($expectedOutput, $output);
+    }
+
     /**
      * @param string      $commandline
      * @param null|string $cwd

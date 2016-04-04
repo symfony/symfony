@@ -44,6 +44,7 @@ class Process implements \IteratorAggregate
     const TIMEOUT_PRECISION = 0.2;
 
     private $callback;
+    private $hasCallback = false;
     private $commandline;
     private $cwd;
     private $env;
@@ -257,6 +258,7 @@ class Process implements \IteratorAggregate
         $this->resetProcessData();
         $this->starttime = $this->lastOutputTime = microtime(true);
         $this->callback = $this->buildCallback($callback);
+        $this->hasCallback = null !== $callback;
         $descriptors = $this->getDescriptors();
 
         $commandline = $this->commandline;
@@ -513,7 +515,7 @@ class Process implements \IteratorAggregate
     {
         $this->readPipesForOutput(__FUNCTION__, false);
 
-        while (null !== $this->callback) {
+        while (null !== $this->callback || !feof($this->stdout) || !feof($this->stderr)) {
             $out = stream_get_contents($this->stdout, -1, $this->incrementalOutputOffset);
 
             if (isset($out[0])) {
@@ -1230,18 +1232,6 @@ class Process implements \IteratorAggregate
     }
 
     /**
-     * Returns whether a callback is used on underlying process output.
-     *
-     * @internal
-     *
-     * @return bool
-     */
-    public function hasCallback()
-    {
-        return (bool) $this->callback;
-    }
-
-    /**
      * Creates the descriptors needed by the proc_open.
      *
      * @return array
@@ -1252,9 +1242,9 @@ class Process implements \IteratorAggregate
             $this->input->rewind();
         }
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->processPipes = WindowsPipes::create($this, $this->input);
+            $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $this->hasCallback);
         } else {
-            $this->processPipes = UnixPipes::create($this, $this->input);
+            $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $this->hasCallback);
         }
 
         return $this->processPipes->getDescriptors();

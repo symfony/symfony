@@ -136,6 +136,10 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
             $event = new Event();
         }
 
+        if (null !== $this->logger && $event->isPropagationStopped()) {
+            $this->logger->debug(sprintf('The "%s" event is already stopped. No listeners have been called.', $eventName));
+        }
+
         $eventId = ++$this->lastEventId;
 
         $this->preDispatch($eventName, $eventId, $event);

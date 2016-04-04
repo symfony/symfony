@@ -155,10 +155,10 @@ class EventDispatcher implements EventDispatcherInterface
     protected function doDispatch($listeners, $eventName, Event $event)
     {
         foreach ($listeners as $listener) {
-            call_user_func($listener, $event);
             if ($event->isPropagationStopped()) {
                 break;
             }
+            call_user_func($listener, $event);
         }
     }
 

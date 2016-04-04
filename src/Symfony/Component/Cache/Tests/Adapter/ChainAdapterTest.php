@@ -12,7 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
@@ -27,11 +27,8 @@ class ChainAdapterTest extends CachePoolTest
         if (defined('HHVM_VERSION')) {
             $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
         }
-        if (!function_exists('apcu_fetch') || !ini_get('apc.enabled') || ('cli' === PHP_SAPI && !ini_get('apc.enable_cli'))) {
-            $this->markTestSkipped('APCu extension is required.');
-        }
 
-        return new ChainAdapter(array(new ArrayAdapter(), new ExternalAdapter(), new ApcuAdapter()));
+        return new ChainAdapter(array(new ArrayAdapter(), new ExternalAdapter(), new FilesystemAdapter(null)));
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Config;
 
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
+use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 
 class AutowireServiceResource implements SelfCheckingResourceInterface, \Serializable
 {
@@ -32,7 +33,19 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
             return false;
         }
 
-        return @filemtime($this->filePath) <= $timestamp;
+        // has the file *not* been modified? Definitely fresh
+        if (@filemtime($this->filePath) <= $timestamp) {
+            return true;
+        }
+
+        try {
+            $reflectionClass = new \ReflectionClass($this->class);
+        } catch (\ReflectionException $e) {
+            // the class does not exist anymore!
+            return false;
+        }
+
+        return (array) $this === (array) AutowirePass::createResourceForClass($reflectionClass);
     }
 
     public function __toString()

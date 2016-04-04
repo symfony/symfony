@@ -32,20 +32,7 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
             return false;
         }
 
-        // has the file *not* been modified? Definitely fresh
-        if (@filemtime($this->filePath) <= $timestamp) {
-            return true;
-        }
-
-        try {
-            $reflectionClass = new \ReflectionClass($this->class);
-        } catch (\ReflectionException $e) {
-            // the class does not exist anymore!
-
-            return false;
-        }
-
-        return false;
+        return @filemtime($this->filePath) <= $timestamp;
     }
 
     public function __toString()

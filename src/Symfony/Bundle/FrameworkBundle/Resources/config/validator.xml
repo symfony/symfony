@@ -48,7 +48,8 @@
         </service>
 
         <service id="validator.email" class="Symfony\Component\Validator\Constraints\EmailValidator">
-            <argument></argument>
+            <argument /> <!-- Strict (deprecated) -->
+            <argument /> <!-- Profile -->
             <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\EmailValidator" />
         </service>
     </services>

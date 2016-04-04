@@ -22,13 +22,22 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class EmailValidator extends ConstraintValidator
 {
     /**
-     * @var bool
+     * @var string
      */
-    private $isStrict;
+    private $defaultProfile;
 
-    public function __construct($strict = false)
+    /**
+     * @param bool   $strict  Deprecated. If the constraint does not define a
+     *                        validation profile, this will determine if
+     *                        rfc-no-warn should be used as the default profile.
+     * @param string $profile If the constraint does not define a validation
+     *                        profile, this will specify which profile to use.
+     */
+    public function __construct($strict = false, $profile = Email::PROFILE_BASIC_REGX)
     {
-        $this->isStrict = $strict;
+        $this->defaultProfile = $strict
+            ? Email::PROFILE_RFC_DISALLOW_WARNINGS
+            : $profile;
     }
 
     /**
@@ -50,26 +59,44 @@ class EmailValidator extends ConstraintValidator
 
         $value = (string) $value;
 
-        if (null === $constraint->strict) {
-            $constraint->strict = $this->isStrict;
+        if (isset($constraint->strict)) {
+            $constraint->profile = $constraint->strict
+                ? Email::PROFILE_RFC_DISALLOW_WARNINGS
+                : Email::PROFILE_BASIC_REGX;
         }
 
-        if ($constraint->strict) {
-            if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
-                throw new RuntimeException('Strict email validation requires egulias/email-validator');
-            }
+        if (null === $constraint->profile) {
+            $constraint->profile = $this->defaultProfile;
+        }
 
-            $strictValidator = new \Egulias\EmailValidator\EmailValidator();
+        // Determine if the email address is valid
+        switch ($constraint->profile) {
+            case Email::PROFILE_BASIC_REGX:
+            case Email::PROFILE_HTML5_REGX:
+                $regex = ($constraint->profile === Email::PROFILE_BASIC_REGX)
+                    ? '/^.+\@\S+\.\S+$/'
+                    : '/^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/';
+                $emailAddressIsValid = (bool) preg_match($regex, $value);
+                break;
+            case Email::PROFILE_RFC_ALLOW_WARNINGS:
+            case Email::PROFILE_RFC_DISALLOW_WARNINGS:
+                if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
+                    throw new RuntimeException(
+                        'Standards-compliant email validation requires egulias/email-validator'
+                    );
+                }
+                $rfcValidator = new \Egulias\EmailValidator\EmailValidator();
+                $emailAddressIsValid = $rfcValidator->isValid(
+                    $value,
+                    false,
+                    $constraint->profile === Email::PROFILE_RFC_DISALLOW_WARNINGS
+                );
+                break;
+            default:
+                throw new RuntimeException('Unrecognized email validation profile');
+        }
 
-            if (!$strictValidator->isValid($value, false, true)) {
-                $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($value))
-                    ->setCode(Email::INVALID_FORMAT_ERROR)
-                    ->addViolation();
-
-                return;
-            }
-        } elseif (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
+        if (!$emailAddressIsValid) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Email::INVALID_FORMAT_ERROR)

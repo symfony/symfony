@@ -479,7 +479,8 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
-                        ->booleanNode('strict_email')->defaultFalse()->end()
+                        ->booleanNode('strict_email')->defaultFalse()->end() // deprecated
+                        ->scalarNode('email_profile')->defaultValue('basic')->end()
                     ->end()
                 ->end()
             ->end()

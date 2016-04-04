@@ -43,7 +43,8 @@ class HelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider formatTimeProvider
-     * @param int $secs
+     *
+     * @param int    $secs
      * @param string $expectedFormat
      */
     public function testFormatTime($secs, $expectedFormat)

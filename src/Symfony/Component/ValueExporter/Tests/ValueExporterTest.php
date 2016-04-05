@@ -39,7 +39,7 @@ class ValueExporterTest extends \PHPUnit_Framework_TestCase
 
         $exportedValue = <<<EOT
 array(
-  0 => array(0 => "Symfony\Component\ValueExporter\ValueExporter", 1 => "export")
+  0 => (callable) "Symfony\Component\ValueExporter\ValueExporter::export"
 )
 EOT;
 
@@ -68,6 +68,13 @@ EOT;
                 array(0 => 0, '1' => 'un', 'key' => 4.5),
                 'array(0 => (int) 0, 1 => "un", \'key\' => (float) 4.5)',
             ),
+            'closure' => array(function() {}, 'object(Closure)'),
+            'callable string' => array('strlen', '(function) "strlen"'),
+            'callable array' => array(
+                array($this, 'testExportValue'),
+                '(callable) "Symfony\Component\ValueExporter\Tests\ValueExporterTest::testExportValue"',
+            ),
+            'invokable object' => array($this, '(invokable) "Symfony\Component\ValueExporter\Tests\ValueExporterTest"'),
             'datetime' => array(
                 new \DateTime('2014-06-10 07:35:40', new \DateTimeZone('UTC')),
                 'object(DateTime) - 2014-06-10T07:35:40+0000',
@@ -78,5 +85,10 @@ EOT;
             ),
             'php incomplete class' => array($foo, '__PHP_Incomplete_Class(AppBundle/Foo)'),
         );
+    }
+
+    public function __invoke()
+    {
+        return 'TEST';
     }
 }

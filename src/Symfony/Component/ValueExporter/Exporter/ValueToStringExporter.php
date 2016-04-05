@@ -30,7 +30,7 @@ class ValueToStringExporter extends AbstractValueExporter
         // Therefor, \Traversable instances might be treated as objects unless
         // implementing a {@link StringFormatterInterface} and passing it to
         // the exporter in order to support them.
-        if (is_array($value)) {
+        if (is_array($value) && !is_callable($value)) {
             if (empty($value)) {
                 return 'array()';
             }

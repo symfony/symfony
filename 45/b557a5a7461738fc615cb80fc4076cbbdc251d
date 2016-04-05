@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2016-03-31T21:43:51Z
+
+Since I haven't changed any code, I'd guess the CI build fails are unrelated to my change.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T05:57:34Z
+
+On second thought, if the method is overridden everything should work fine, doesn't it ?
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-04-01T06:24:49Z
+
+@HeahDude: If the signatures of the methods don't match, php will throw a fatal error.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-04-01T06:26:31Z
+
+I don't think many people will run into this. Nevertheless, I think it's worth documenting.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T06:26:53Z
+
+Of courses! ping @dunglas
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-04-01T06:34:30Z
+
+I see a warning about signature mismatch, but not a fatal error, just did a little check
+
+    class A {
+        public function func() {
+        }
+    }
+
+    class B extends A {
+        public function func($a) {
+        }
+    }
+
+    new B();
+
+    Warning: Declaration of B::func($a) should be compatible with A::func()
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T06:35:17Z
+
+@mcfedr PHP version ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T06:37:51Z
+
+~~I confirm the fatal error~~ on PHP 5.6:
+`Strict Standards: Declaration of ChildTest::test() should be compatible with Test::test() in /Users/Heah/Sites/home/web/test.php on line 30
+true`
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-04-01T06:49:24Z
+
+I am use php 7, I also see the Strict warning on php 5
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-04-01T06:51:52Z
+
+Either way, its probably worth noting in the UPDATE log
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T06:54:40Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-03T17:02:24Z
+
+As this is not part of [the symfony BC policy](https://symfony.com/doc/current/contributing/code/bc.html), I'm not sure this should be specified in the upgrade file. Maybe only in the changelog?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-05T11:14:10Z
+
+We didn't do that in the past when introducing more helper methods in Symfony 2.8. On the other hand it doesn't really hurt to add this and having a `json()` method might be more like than any of the other method names we added in the past.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-04-05T13:10:32Z
+
+I've added the extra blank line as requested by @HeahDude and rebased against master to resolve conflicts.

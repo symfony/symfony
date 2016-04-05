@@ -715,7 +715,7 @@ class Request
      * public property instead (query, attributes, request).
      *
      * @param string $key     the key
-     * @param mixed  $default the default value
+     * @param mixed  $default the default value if the parameter key does not exist
      * @param bool   $deep    is parameter deep in multidimensional array
      *
      * @return mixed

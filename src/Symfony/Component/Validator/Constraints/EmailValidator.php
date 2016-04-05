@@ -27,16 +27,19 @@ class EmailValidator extends ConstraintValidator
     private $defaultProfile;
 
     /**
-     * @param bool   $strict  Deprecated. If the constraint does not define a
-     *                        validation profile, this will determine if
-     *                        rfc-no-warn should be used as the default profile.
-     * @param string $profile If the constraint does not define a validation
-     *                        profile, this will specify which profile to use.
+     * @param bool        $strict  Deprecated. If the constraint does not define
+     *                             a validation profile, this will determine if
+     *                             'rfc-no-warn' or 'basic' should be used as
+     *                             the default profile.
+     * @param string|null $profile If the constraint does not define a validation
+     *                             profile, this will specify which profile to use.
      */
-    public function __construct($strict = false, $profile = Email::PROFILE_BASIC_REGX)
+    public function __construct($strict = false, $profile = null)
     {
-        $this->defaultProfile = $strict
-            ? Email::PROFILE_RFC_DISALLOW_WARNINGS
+        $this->defaultProfile = (null === $profile)
+            ? $strict
+                ? Email::PROFILE_RFC_DISALLOW_WARNINGS
+                : Email::PROFILE_BASIC_REGEX
             : $profile;
     }
 
@@ -62,7 +65,7 @@ class EmailValidator extends ConstraintValidator
         if (isset($constraint->strict)) {
             $constraint->profile = $constraint->strict
                 ? Email::PROFILE_RFC_DISALLOW_WARNINGS
-                : Email::PROFILE_BASIC_REGX;
+                : Email::PROFILE_BASIC_REGEX;
         }
 
         if (null === $constraint->profile) {
@@ -71,9 +74,9 @@ class EmailValidator extends ConstraintValidator
 
         // Determine if the email address is valid
         switch ($constraint->profile) {
-            case Email::PROFILE_BASIC_REGX:
-            case Email::PROFILE_HTML5_REGX:
-                $regex = ($constraint->profile === Email::PROFILE_BASIC_REGX)
+            case Email::PROFILE_BASIC_REGEX:
+            case Email::PROFILE_HTML5_REGEX:
+                $regex = (Email::PROFILE_BASIC_REGEX === $constraint->profile)
                     ? '/^.+\@\S+\.\S+$/'
                     : '/^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/';
                 $emailAddressIsValid = (bool) preg_match($regex, $value);
@@ -89,7 +92,7 @@ class EmailValidator extends ConstraintValidator
                 $emailAddressIsValid = $rfcValidator->isValid(
                     $value,
                     false,
-                    $constraint->profile === Email::PROFILE_RFC_DISALLOW_WARNINGS
+                    Email::PROFILE_RFC_DISALLOW_WARNINGS === $constraint->profile
                 );
                 break;
             default:

@@ -54,7 +54,7 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testBasicValidationProfile($emailData)
     {
-        $this->runValidationProfileTest(Email::PROFILE_BASIC_REGX, $emailData);
+        $this->runValidationProfileTest(Email::PROFILE_BASIC_REGEX, $emailData);
     }
 
     /**
@@ -64,7 +64,7 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testHtml5ValidationProfile($emailData)
     {
-        $this->runValidationProfileTest(Email::PROFILE_HTML5_REGX, $emailData);
+        $this->runValidationProfileTest(Email::PROFILE_HTML5_REGEX, $emailData);
     }
 
     /**
@@ -189,8 +189,8 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array(
                 $email,
                 array(
-                    Email::PROFILE_BASIC_REGX => $basic,
-                    Email::PROFILE_HTML5_REGX => $html5,
+                    Email::PROFILE_BASIC_REGEX => $basic,
+                    Email::PROFILE_HTML5_REGEX => $html5,
                     Email::PROFILE_RFC_ALLOW_WARNINGS => $rfc,
                     Email::PROFILE_RFC_DISALLOW_WARNINGS => $rfcNoWarn,
                 ),

@@ -21,8 +21,8 @@ use Symfony\Component\Validator\Constraint;
  */
 class Email extends Constraint
 {
-    const PROFILE_BASIC_REGX = 'basic';
-    const PROFILE_HTML5_REGX = 'html5';
+    const PROFILE_BASIC_REGEX = 'basic';
+    const PROFILE_HTML5_REGEX = 'html5';
     const PROFILE_RFC_ALLOW_WARNINGS = 'rfc';
     const PROFILE_RFC_DISALLOW_WARNINGS = 'rfc-no-warn';
 

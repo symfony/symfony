@@ -137,6 +137,14 @@ EOF
         libxml_use_internal_errors($internalErrors);
     }
 
+    public function testAddHtmlContentWithNullCharacter()
+    {
+        $crawler = new Crawler();
+        $crawler->addHtmlContent("<html>\x00<div class=\"foo\"></html>", 'UTF-8');
+
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'));
+    }
+
     public function testAddXmlContent()
     {
         $crawler = new Crawler();

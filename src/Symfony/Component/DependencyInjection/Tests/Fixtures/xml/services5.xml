@@ -14,8 +14,11 @@
         </service>
       </argument>
       <property name="p" type="service">
-        <service class="BazClass" />
+        <service class="BuzClass" />
       </property>
+    </service>
+    <service class="BizClass">
+        <tag name="biz_tag" />
     </service>
   </services>
 </container>

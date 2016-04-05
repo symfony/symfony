@@ -62,6 +62,11 @@ class SimpleXMLElement extends \SimpleXMLElement
 
             switch ($arg['type']) {
                 case 'service':
+                    if (!isset($arg['id'])) {
+                        $arguments[$key] = new DefinitionDecorator((string) $arg['parent']);
+                        break;
+                    }
+
                     $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
                     if (isset($arg['on-invalid']) && 'ignore' == $arg['on-invalid']) {
                         $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;

@@ -67,7 +67,7 @@
             {% if 'n/a' != collector.debug %}
                 <div class="sf-toolbar-info-piece">
                     <b>Debug</b>
-                    <span class="{{ debug_status_class }}">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
+                    <span class="sf-toolbar-status sf-toolbar-status-{{ collector.debug ? 'green' : 'red' }}">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
                 </div>
             {% endif %}
         </div>

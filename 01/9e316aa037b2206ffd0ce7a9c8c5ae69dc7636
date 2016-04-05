@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-05T10:09:34Z
+
+:+1: (should be merged into the `2.3` branch)
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-05T11:26:13Z
+
+In case you accept suggestions for the new doc, what about changing this:
+
+```
+@param mixed  $default the default value if the parameter key does not exist
+```
+
+by this:
+
+```
+@param mixed  $default the value returned when the parameter key does not exist
+```
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2016-04-05T12:12:16Z
+
+@javiereguiluz :+1: how about this:
+
+> the value to return if the parameter key does not exist
+
+?

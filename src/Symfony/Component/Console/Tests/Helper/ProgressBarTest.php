@@ -13,6 +13,8 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
@@ -233,7 +235,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput('  0/50 [>---------------------------]   0%').
             $this->generateOutput('  0/50 [>---------------------------]   0%').
             $this->generateOutput('  1/50 [>---------------------------]   2%').
-            $this->generateOutput('  2/50 [=>--------------------------]     '),
+            $this->generateOutput('  2/50 [=>--------------------------]'),
             stream_get_contents($output->getStream())
         );
     }
@@ -356,7 +358,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $this->generateOutput('  0/50 [>---------------------------]   0%').
             $this->generateOutput(' 25/50 [==============>-------------]  50%').
-            $this->generateOutput('                                          '),
+            $this->generateOutput(''),
             stream_get_contents($output->getStream())
         );
     }
@@ -554,9 +556,9 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         rewind($output->getStream());
         $this->assertEquals(
             $this->generateOutput(">---------------------------\nfoobar").
-            $this->generateOutput("=========>------------------\nfoobar                      ").
-            $this->generateOutput("                            \n                            ").
-            $this->generateOutput("============================\nfoobar                      "),
+            $this->generateOutput("=========>------------------\nfoobar").
+            "\x0D\x1B[2K\x1B[1A\x1B[2K".
+            $this->generateOutput("============================\nfoobar"),
             stream_get_contents($output->getStream())
         );
     }
@@ -665,6 +667,6 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
     {
         $count = substr_count($expected, "\n");
 
-        return "\x0D".($count ? sprintf("\033[%dA", $count) : '').$expected;
+        return "\x0D\x1B[2K".($count ? str_repeat("\x1B[1A\x1B[2K", $count) : '').$expected;
     }
 }

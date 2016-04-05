@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-05T07:22:15Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-05T10:14:23Z
+
+:+1:
+
+Status: Reviewed
+
+In the long term we should probably rather make this information somehow accessible in the base handler to not need to duplicate it (see Seldaek/monolog#761).

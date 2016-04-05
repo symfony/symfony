@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-04T09:14:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-04T10:18:54Z
+
+@lyrixx are you really allowing anonymous users to impersonate users ? This looks weird.
+
+But the fix is indeed valid
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T12:26:06Z
+
+@stof Yes I do that. It's an awesome idea for demo app (you may see it on thursday).
+With very few line of code, you can add simple login / logout feature for some hardcoded users.
+
+```
+security:
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_WRITTER, ROLE_SPELLCHECKER, ROLE_JOURNALIST]
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    alice: { password: password, roles: ROLE_WRITTER }
+                    spellchecker: { password: password , roles: ROLE_SPELLCHECKER }
+                    journalist: { password: password , roles: ROLE_JOURNALIST }
+                    admin: { password: password , roles: ROLE_ADMIN }
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            pattern: ^/
+            anonymous: true
+            logout: true
+            switch_user:
+                role: IS_AUTHENTICATED_ANONYMOUSLY
+```

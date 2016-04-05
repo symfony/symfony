@@ -27,7 +27,7 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Romain Neutron <imprec@gmail.com>
  */
-class Process
+class Process implements \IteratorAggregate
 {
     const ERR = 'err';
     const OUT = 'out';
@@ -44,6 +44,7 @@ class Process
     const TIMEOUT_PRECISION = 0.2;
 
     private $callback;
+    private $hasCallback = false;
     private $commandline;
     private $cwd;
     private $env;
@@ -132,7 +133,7 @@ class Process
      * @param string         $commandline The command line to run
      * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
      * @param array|null     $env         The environment variables or null to use the same environment as the current PHP process
-     * @param string|null    $input       The input
+     * @param mixed|null     $input       The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout     The timeout in seconds or null to disable
      * @param array          $options     An array of options for proc_open
      *
@@ -158,7 +159,7 @@ class Process
             $this->setEnv($env);
         }
 
-        $this->input = $input;
+        $this->setInput($input);
         $this->setTimeout($timeout);
         $this->useFileHandles = '\\' === DIRECTORY_SEPARATOR;
         $this->pty = false;
@@ -257,6 +258,7 @@ class Process
         $this->resetProcessData();
         $this->starttime = $this->lastOutputTime = microtime(true);
         $this->callback = $this->buildCallback($callback);
+        $this->hasCallback = null !== $callback;
         $descriptors = $this->getDescriptors();
 
         $commandline = $this->commandline;
@@ -496,6 +498,54 @@ class Process
         }
 
         return $latest;
+    }
+
+    /**
+     * Returns an iterator to the output of the process, with the output type as keys (Process::OUT/ERR).
+     *
+     * @param bool $blocking    Whether to use a blocking read call.
+     * @param bool $clearOutput Whether to clear or keep output in memory.
+     *
+     * @throws LogicException in case the output has been disabled
+     * @throws LogicException In case the process is not started
+     *
+     * @return \Generator
+     */
+    public function getIterator($blocking = true, $clearOutput = true)
+    {
+        $this->readPipesForOutput(__FUNCTION__, false);
+
+        while (null !== $this->callback || !feof($this->stdout) || !feof($this->stderr)) {
+            $out = stream_get_contents($this->stdout, -1, $this->incrementalOutputOffset);
+
+            if (isset($out[0])) {
+                if ($clearOutput) {
+                    $this->clearOutput();
+                } else {
+                    $this->incrementalOutputOffset = ftell($this->stdout);
+                }
+
+                yield self::OUT => $out;
+            }
+
+            $err = stream_get_contents($this->stderr, -1, $this->incrementalErrorOutputOffset);
+
+            if (isset($err[0])) {
+                if ($clearOutput) {
+                    $this->clearErrorOutput();
+                } else {
+                    $this->incrementalErrorOutputOffset = ftell($this->stderr);
+                }
+
+                yield self::ERR => $err;
+            }
+
+            if (!$blocking && !isset($out[0]) && !isset($err[0])) {
+                yield self::OUT => '';
+            }
+
+            $this->readPipesForOutput(__FUNCTION__, $blocking);
+        }
     }
 
     /**
@@ -1027,7 +1077,7 @@ class Process
     /**
      * Gets the Process input.
      *
-     * @return null|string The Process input
+     * @return resource|string|\Iterator|null The Process input
      */
     public function getInput()
     {
@@ -1039,7 +1089,7 @@ class Process
      *
      * This content will be passed to the underlying process standard input.
      *
-     * @param mixed $input The content
+     * @param resource|scalar|\Traversable|null $input The content
      *
      * @return self The current Process instance
      *
@@ -1051,7 +1101,7 @@ class Process
             throw new LogicException('Input can not be set while the process is running.');
         }
 
-        $this->input = ProcessUtils::validateInput(sprintf('%s::%s', __CLASS__, __FUNCTION__), $input);
+        $this->input = ProcessUtils::validateInput(__METHOD__, $input);
 
         return $this;
     }
@@ -1182,28 +1232,19 @@ class Process
     }
 
     /**
-     * Returns whether a callback is used on underlying process output.
-     *
-     * @internal
-     *
-     * @return bool
-     */
-    public function hasCallback()
-    {
-        return (bool) $this->callback;
-    }
-
-    /**
      * Creates the descriptors needed by the proc_open.
      *
      * @return array
      */
     private function getDescriptors()
     {
+        if ($this->input instanceof \Iterator) {
+            $this->input->rewind();
+        }
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->processPipes = WindowsPipes::create($this, $this->input);
+            $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $this->hasCallback);
         } else {
-            $this->processPipes = UnixPipes::create($this, $this->input);
+            $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $this->hasCallback);
         }
 
         return $this->processPipes->getDescriptors();
@@ -1293,11 +1334,12 @@ class Process
     /**
      * Reads pipes for the freshest output.
      *
-     * @param $caller The name of the method that needs fresh outputs
+     * @param string $caller   The name of the method that needs fresh outputs
+     * @param bool   $blocking Whether to use blocking calls or not.
      *
      * @throws LogicException in case output has been disabled or process is not started
      */
-    private function readPipesForOutput($caller)
+    private function readPipesForOutput($caller, $blocking = false)
     {
         if ($this->outputDisabled) {
             throw new LogicException('Output has been disabled.');
@@ -1305,7 +1347,7 @@ class Process
 
         $this->requireProcessIsStarted($caller);
 
-        $this->updateStatus(false);
+        $this->updateStatus($blocking);
     }
 
     /**

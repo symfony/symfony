@@ -14,6 +14,7 @@ namespace Symfony\Component\Process\Tests;
 use Symfony\Component\Process\Exception\LogicException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
+use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Pipes\PipesInterface;
 use Symfony\Component\Process\Process;
@@ -209,6 +210,24 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
     }
 
+    public function testLiveStreamAsInput()
+    {
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, 'hello');
+        rewind($stream);
+
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);')));
+        $p->setInput($stream);
+        $p->start(function ($type, $data) use ($stream) {
+            if ('hello' === $data) {
+                fclose($stream);
+            }
+        });
+        $p->wait();
+
+        $this->assertSame('hello', $p->getOutput());
+    }
+
     /**
      * @expectedException \Symfony\Component\Process\Exception\LogicException
      * @expectedExceptionMessage Input can not be set while the process is running.
@@ -231,7 +250,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideInvalidInputValues
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings or stream resources.
+     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings, Traversable objects or stream resources.
      */
     public function testInvalidInput($value)
     {
@@ -1156,22 +1175,171 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * provides default method names for simple getter/setter.
-     */
-    public function methodProvider()
+    public function testIteratorInput()
     {
-        $defaults = array(
-            array('CommandLine'),
-            array('Timeout'),
-            array('WorkingDirectory'),
-            array('Env'),
-            array('Stdin'),
-            array('Input'),
-            array('Options'),
-        );
+        $input = function () {
+            yield 'ping';
+            yield 'pong';
+        };
 
-        return $defaults;
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'), null, null, $input());
+        $process->run();
+        $this->assertSame('pingpong', $process->getOutput());
+    }
+
+    public function testSimpleInputStream()
+    {
+        $input = new InputStream();
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('echo \'ping\'; stream_copy_to_stream(STDIN, STDOUT);'));
+        $process->setInput($input);
+
+        $process->start(function ($type, $data) use ($input) {
+            if ('ping' === $data) {
+                $input->write('pang');
+            } elseif (!$input->isClosed()) {
+                $input->write('pong');
+                $input->close();
+            }
+        });
+
+        $process->wait();
+        $this->assertSame('pingpangpong', $process->getOutput());
+    }
+
+    public function testInputStreamWithCallable()
+    {
+        $i = 0;
+        $stream = fopen('php://memory', 'w+');
+        $stream = function () use ($stream, &$i) {
+            if ($i < 3) {
+                rewind($stream);
+                fwrite($stream, ++$i);
+                rewind($stream);
+
+                return $stream;
+            }
+        };
+
+        $input = new InputStream();
+        $input->onEmpty($stream);
+        $input->write($stream());
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
+        $process->setInput($input);
+        $process->start(function ($type, $data) use ($input) {
+            $input->close();
+        });
+
+        $process->wait();
+        $this->assertSame('123', $process->getOutput());
+    }
+
+    public function testInputStreamWithGenerator()
+    {
+        $input = new InputStream();
+        $input->onEmpty(function ($input) {
+            yield 'pong';
+            $input->close();
+        });
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
+        $process->setInput($input);
+        $process->start();
+        $input->write('ping');
+        $process->wait();
+        $this->assertSame('pingpong', $process->getOutput());
+    }
+
+    public function testInputStreamOnEmpty()
+    {
+        $i = 0;
+        $input = new InputStream();
+        $input->onEmpty(function () use (&$i) {++$i;});
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('echo 123; echo fread(STDIN, 1); echo 456;'));
+        $process->setInput($input);
+        $process->start(function ($type, $data) use ($input) {
+            if ('123' === $data) {
+                $input->close();
+            }
+        });
+        $process->wait();
+
+        $this->assertSame(0, $i, 'InputStream->onEmpty callback should be called only when the input *becomes* empty');
+        $this->assertSame('123456', $process->getOutput());
+    }
+
+    public function testIteratorOutput()
+    {
+        $input = new InputStream();
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('fwrite(STDOUT, 123); fwrite(STDERR, 234); fwrite(STDOUT, fread(STDIN, 3)); fwrite(STDERR, 456);'));
+        $process->setInput($input);
+        $process->start();
+        $output = array();
+
+        foreach ($process as $type => $data) {
+            $output[] = array($type, $data);
+            break;
+        }
+        $expectedOutput = array(
+            array($process::OUT, '123'),
+        );
+        $this->assertSame($expectedOutput, $output);
+
+        $input->write(345);
+
+        foreach ($process as $type => $data) {
+            $output[] = array($type, $data);
+        }
+
+        $this->assertSame('', $process->getOutput());
+        $this->assertFalse($process->isRunning());
+
+        $expectedOutput = array(
+            array($process::OUT, '123'),
+            array($process::ERR, '234'),
+            array($process::OUT, '345'),
+            array($process::ERR, '456'),
+        );
+        $this->assertSame($expectedOutput, $output);
+    }
+
+    public function testNonBlockingNorClearingIteratorOutput()
+    {
+        $input = new InputStream();
+
+        $process = new Process(self::$phpBin.' -r '.escapeshellarg('fwrite(STDOUT, fread(STDIN, 3));'));
+        $process->setInput($input);
+        $process->start();
+        $output = array();
+
+        foreach ($process->getIterator(false, false) as $type => $data) {
+            $output[] = array($type, $data);
+            break;
+        }
+        $expectedOutput = array(
+            array($process::OUT, ''),
+        );
+        $this->assertSame($expectedOutput, $output);
+
+        $input->write(123);
+
+        foreach ($process->getIterator(false, false) as $type => $data) {
+            if ('' !== $data) {
+                $output[] = array($type, $data);
+            }
+        }
+
+        $this->assertSame('123', $process->getOutput());
+        $this->assertFalse($process->isRunning());
+
+        $expectedOutput = array(
+            array($process::OUT, ''),
+            array($process::OUT, '123'),
+        );
+        $this->assertSame($expectedOutput, $output);
     }
 
     /**

@@ -13,19 +13,54 @@ Form
 ----
 
  * The `choices_as_values` option of the `ChoiceType` has been removed.
+
  * Support for data objects that implements both `Traversable` and
-   `ArrayAccess` in `ResizeFormListener::preSubmit` method has been removed
+   `ArrayAccess` in `ResizeFormListener::preSubmit` method has been removed.
 
 FrameworkBundle
 ---------------
 
- * Support for absolute template paths has been removed from the template name parser.
+ * Support for absolute template paths has been removed.
+
+ * The following form types registered as services have been removed; use their
+   fully-qualified class name instead:
+
+    - `"form.type.birthday"`
+    - `"form.type.checkbox"`
+    - `"form.type.collection"`
+    - `"form.type.country"`
+    - `"form.type.currency"`
+    - `"form.type.date"`
+    - `"form.type.datetime"`
+    - `"form.type.email"`
+    - `"form.type.file"`
+    - `"form.type.hidden"`
+    - `"form.type.integer"`
+    - `"form.type.language"`
+    - `"form.type.locale"`
+    - `"form.type.money"`
+    - `"form.type.number"`
+    - `"form.type.password"`
+    - `"form.type.percent"`
+    - `"form.type.radio"`
+    - `"form.type.range"`
+    - `"form.type.repeated"`
+    - `"form.type.search"`
+    - `"form.type.textarea"`
+    - `"form.type.text"`
+    - `"form.type.time"`
+    - `"form.type.timezone"`
+    - `"form.type.url"`
+    - `"form.type.button"`
+    - `"form.type.submit"`
+    - `"form.type.reset"`
 
 HttpKernel
 ----------
 
  * Possibility to pass objects as URI attributes to the ESI and SSI renderers
-   has been removed. The inline fragment renderer should be used with object attributes.
+   has been removed. The inline fragment renderer should be used with object
+   attributes.
 
 Serializer
 ----------
@@ -33,6 +68,11 @@ Serializer
  * The ability to pass a Doctrine `Cache` instance to the `ClassMetadataFactory`
    class has been removed. You should use the `CacheClassMetadataFactory` class
    instead.
+
+Translation
+-----------
+
+ * Removed the backup feature from the file dumper classes.
 
 Yaml
 ----
@@ -102,7 +142,8 @@ Yaml
    Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
    ```
 
- * Removed support for passing `true`/`false` as the fifth argument to the `dump()` method to toggle object support.
+ * Removed support for passing `true`/`false` as the fifth argument to the
+   `dump()` method to toggle object support.
 
    Before:
 

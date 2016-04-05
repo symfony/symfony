@@ -15,6 +15,7 @@ Form
 
  * The `choices_as_values` option of the `ChoiceType` has been deprecated and
    will be removed in Symfony 4.0.
+
  * Support for data objects that implements both `Traversable` and `ArrayAccess`
    in `ResizeFormListener::preSubmit` method has been deprecated and will be
    removed in Symfony 4.0.
@@ -25,12 +26,50 @@ FrameworkBundle
  * As it was never an officially supported feature, the support for absolute
    template paths has been deprecated and will be removed in Symfony 4.0.
 
+ * The following form types registered as services have been deprecated and
+   will be removed in Symfony 4.0; use their fully-qualified class name instead:
+
+    - `"form.type.birthday"`
+    - `"form.type.checkbox"`
+    - `"form.type.collection"`
+    - `"form.type.country"`
+    - `"form.type.currency"`
+    - `"form.type.date"`
+    - `"form.type.datetime"`
+    - `"form.type.email"`
+    - `"form.type.file"`
+    - `"form.type.hidden"`
+    - `"form.type.integer"`
+    - `"form.type.language"`
+    - `"form.type.locale"`
+    - `"form.type.money"`
+    - `"form.type.number"`
+    - `"form.type.password"`
+    - `"form.type.percent"`
+    - `"form.type.radio"`
+    - `"form.type.range"`
+    - `"form.type.repeated"`
+    - `"form.type.search"`
+    - `"form.type.textarea"`
+    - `"form.type.text"`
+    - `"form.type.time"`
+    - `"form.type.timezone"`
+    - `"form.type.url"`
+    - `"form.type.button"`
+    - `"form.type.submit"`
+    - `"form.type.reset"`
+
 HttpKernel
 ----------
 
  * Passing objects as URI attributes to the ESI and SSI renderers has been
    deprecated and will be removed in Symfony 4.0. The inline fragment
    renderer should be used with object attributes.
+
+ * The `ControllerResolver::getArguments()` method has been deprecated and will
+   be removed in 4.0. If you have your own `ControllerResolverInterface`
+   implementation, you should inject either an `ArgumentResolverInterface`
+   instance or the new `ArgumentResolver` in the `HttpKernel`.
 
 Serializer
 ----------
@@ -39,10 +78,17 @@ Serializer
    deprecated and will not be supported in Symfony 4.0. You should use the
    `CacheClassMetadataFactory` class instead.
 
+Translation
+-----------
+
+ * Deprecated the backup feature of the file dumper classes. It will be removed
+   in Symfony 4.0.
+
 Yaml
 ----
 
- * Deprecated usage of `%` at the beginning of an unquoted string.
+ * Usage of `%` at the beginning of an unquoted string has been deprecated and
+   will lead to a `ParseException` in Symfony 4.0.
 
  * The `Dumper::setIndentation()` method is deprecated and will be removed in
    Symfony 4.0. Pass the indentation level to the constructor instead.
@@ -107,7 +153,8 @@ Yaml
    Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
    ```
 
- * Deprecated support for passing `true`/`false` as the fifth argument to the `dump()` method to toggle object support.
+ * Deprecated support for passing `true`/`false` as the fifth argument to the
+   `dump()` method to toggle object support.
 
    Before:
 
@@ -127,5 +174,5 @@ Yaml
 Validator
 ---------
 
- * The `DateTimeValidator::PATTERN` constant is deprecated and will be removed in
-   Symfony 4.0.
+ * The `DateTimeValidator::PATTERN` constant has been deprecated and will be
+   removed in Symfony 4.0.

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;

@@ -483,11 +483,11 @@ tr.status-warning td {
 #summary .status-error   { background: {{ colors.error|raw }};   }
 
 #summary .status-success h2,
-#summary .status-success h2 a,
+#summary .status-success a,
 #summary .status-warning h2,
-#summary .status-warning h2 a,
+#summary .status-warning a,
 #summary .status-error h2,
-#summary .status-error h2 a {
+#summary .status-error a {
     color: #FFF;
 }
 
@@ -510,6 +510,10 @@ tr.status-warning td {
     margin: 0 1.5em 0 0;
 }
 
+#summary dl.metadata .label {
+    background: rgba(255, 255, 255, 0.2);
+}
+
 {# Sidebar
    ========================================================================= #}
 #sidebar {
@@ -519,7 +523,9 @@ tr.status-warning td {
     margin-bottom: -99999px; {# needed for 'same-height columns' trick #}
     margin-left: -100%;
     padding-bottom: 99999px; {# needed for 'same-height columns' trick #}
+    position: relative;
     width: 220px;
+    z-index: 9999;
 }
 #sidebar .module {
     padding: 10px;

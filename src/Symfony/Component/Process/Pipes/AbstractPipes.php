@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process\Pipes;
 
+use Symfony\Component\Process\Exception\InvalidArgumentException;
+
 /**
  * @author Romain Neutron <imprec@gmail.com>
  *
@@ -22,16 +24,15 @@ abstract class AbstractPipes implements PipesInterface
     public $pipes = array();
 
     /** @var string */
-    protected $inputBuffer = '';
-    /** @var resource|null */
-    protected $input;
-
+    private $inputBuffer = '';
+    /** @var resource|scalar|\Iterator|null */
+    private $input;
     /** @var bool */
     private $blocked = true;
 
     public function __construct($input)
     {
-        if (is_resource($input)) {
+        if (is_resource($input) || $input instanceof \Iterator) {
             $this->input = $input;
         } elseif (is_string($input)) {
             $this->inputBuffer = $input;
@@ -76,7 +77,7 @@ abstract class AbstractPipes implements PipesInterface
         foreach ($this->pipes as $pipe) {
             stream_set_blocking($pipe, 0);
         }
-        if (null !== $this->input) {
+        if (is_resource($this->input)) {
             stream_set_blocking($this->input, 0);
         }
 
@@ -85,15 +86,37 @@ abstract class AbstractPipes implements PipesInterface
 
     /**
      * Writes input to stdin.
+     *
+     * @throws InvalidArgumentException When an input iterator yields a non supported value
      */
     protected function write()
     {
         if (!isset($this->pipes[0])) {
             return;
         }
+        $input = $this->input;
 
-        $e = array();
-        $r = null !== $this->input ? array($this->input) : $e;
+        if ($input instanceof \Iterator) {
+            if (!$input->valid()) {
+                $input = null;
+            } elseif (is_resource($input = $input->current())) {
+                stream_set_blocking($input, 0);
+            } elseif (!isset($this->inputBuffer[0])) {
+                if (!is_string($input)) {
+                    if (!is_scalar($input)) {
+                        throw new InvalidArgumentException(sprintf('%s yielded a value of type "%s", but only scalars and stream resources are supported', get_class($this->input), gettype($input)));
+                    }
+                    $input = (string) $input;
+                }
+                $this->inputBuffer = $input;
+                $this->input->next();
+                $input = null;
+            } else {
+                $input = null;
+            }
+        }
+
+        $r = $e = array();
         $w = array($this->pipes[0]);
 
         // let's have a look if something changed in streams
@@ -110,7 +133,7 @@ abstract class AbstractPipes implements PipesInterface
                 }
             }
 
-            foreach ($r as $input) {
+            if ($input) {
                 for (;;) {
                     $data = fread($input, self::CHUNK_SIZE);
                     if (!isset($data[0])) {
@@ -124,16 +147,19 @@ abstract class AbstractPipes implements PipesInterface
                         return array($this->pipes[0]);
                     }
                 }
-                if (!isset($data[0]) && feof($input)) {
-                    // no more data to read on input resource
-                    // use an empty buffer in the next reads
-                    $this->input = null;
+                if (feof($input)) {
+                    if ($this->input instanceof \Iterator) {
+                        $this->input->next();
+                    } else {
+                        $this->input = null;
+                    }
                 }
             }
         }
 
         // no input to read on resource, buffer is empty
-        if (null === $this->input && !isset($this->inputBuffer[0])) {
+        if (!isset($this->inputBuffer[0]) && !($this->input instanceof \Iterator ? $this->input->valid() : $this->input)) {
+            $this->input = null;
             fclose($this->pipes[0]);
             unset($this->pipes[0]);
         }

@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/polyfill-php70": "~1.0"
+        "symfony/polyfill-php70": "~1.0",
+        "symfony/inflector": "~3.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\PropertyAccess\\": "" },

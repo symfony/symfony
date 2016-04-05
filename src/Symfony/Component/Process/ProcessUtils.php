@@ -80,7 +80,7 @@ class ProcessUtils
      * @param string $caller The name of method call that validates the input
      * @param mixed  $input  The input to validate
      *
-     * @return string The validated input
+     * @return mixed The validated input
      *
      * @throws InvalidArgumentException In case the input is not valid
      */
@@ -90,11 +90,20 @@ class ProcessUtils
             if (is_resource($input)) {
                 return $input;
             }
+            if (is_string($input)) {
+                return $input;
+            }
             if (is_scalar($input)) {
                 return (string) $input;
             }
+            if ($input instanceof \Iterator) {
+                return $input;
+            }
+            if ($input instanceof \Traversable) {
+                return new \IteratorIterator($input);
+            }
 
-            throw new InvalidArgumentException(sprintf('%s only accepts strings or stream resources.', $caller));
+            throw new InvalidArgumentException(sprintf('%s only accepts strings, Traversable objects or stream resources.', $caller));
         }
 
         return $input;

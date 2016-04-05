@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by sergeyfedotov at 2016-03-26T08:46:19Z
+
+Possible BC break, see the test: https://github.com/sergeyfedotov/symfony-form/blob/8647aac0e7648252de197021f46e5c4d69a97dba/Tests/Extension/Core/Type/CollectionTypeTest.php#L337
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-26T11:41:01Z
+
+@sergeyfedotov The assertion in your last test looks wrong, "prototype" should not be required in that case, and the test is passing while it's not as expected. I don't think there is a BC break here.
+
+---------------------------------------------------------------------------
+
+by sergeyfedotov at 2016-03-26T12:01:09Z
+
+Ok. I really don't know should it be interpreted as a BC break or not. But currently `entry_options` overrides the prototype options and this PR changes the behaviour.
+
+---------------------------------------------------------------------------
+
+by sergeyfedotov at 2016-03-26T12:37:59Z
+
+Seems like this line https://github.com/HeahDude/symfony/blob/bug-prototype_required/src/Symfony/Component/Form/Extension/Core/Type/CollectionType.php#L31 is not needed anymore.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-26T12:56:34Z
+
+@sergeyfedotov Yes it is, if the parent does not override the prototype options, `entry_options` should do it.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T12:30:12Z
+
+Status: Ready
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-05T11:46:09Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-05T14:50:36Z
+
+Note to the merger: in 2.8 `options` option in the two tests added needs to be renamed `entry_options`. Thanks

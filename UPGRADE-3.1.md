@@ -26,6 +26,11 @@ FrameworkBundle
  * As it was never an officially supported feature, the support for absolute
    template paths has been deprecated and will be removed in Symfony 4.0.
 
+ * The abstract `Controller` class now has a `json()` helper method that creates
+   a `JsonResponse`. If you have existing controllers extending `Controller`
+   that contain a method with this name, you need to rename that method to avoid
+   conflicts.
+
  * The following form types registered as services have been deprecated and
    will be removed in Symfony 4.0; use their fully-qualified class name instead:
 

@@ -53,8 +53,6 @@ class FilterControllerEvent extends KernelEvent
      * Sets a new controller.
      *
      * @param callable $controller
-     *
-     * @throws \LogicException
      */
     public function setController(callable $controller)
     {

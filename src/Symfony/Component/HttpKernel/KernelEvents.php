@@ -77,6 +77,19 @@ final class KernelEvents
     const CONTROLLER = 'kernel.controller';
 
     /**
+     * The CONTROLLER_ARGUMENTS event occurs once controller arguments have been resolved.
+     *
+     * This event allows you to change the arguments that will be passed to
+     * the controller. The event listener method receives a
+     * Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent instance.
+     *
+     * @Event
+     *
+     * @var string
+     */
+    const CONTROLLER_ARGUMENTS = 'kernel.controller_arguments';
+
+    /**
      * The RESPONSE event occurs once a response was created for
      * replying to a request.
      *

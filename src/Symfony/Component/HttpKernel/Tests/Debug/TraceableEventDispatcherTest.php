@@ -34,6 +34,7 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
             '__section__',
             'kernel.request',
             'kernel.controller',
+            'kernel.controller_arguments',
             'controller',
             'kernel.response',
             'kernel.terminate',

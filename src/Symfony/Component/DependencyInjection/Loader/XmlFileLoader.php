@@ -233,10 +233,10 @@ class XmlFileLoader extends FileLoader
         if (false !== $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+                $node['parent'] = sprintf('%s_%d', md5($file), ++$count);
 
-                $definitions[(string) $node['id']] = array($node->service, $file, false);
-                $node->service['id'] = (string) $node['id'];
+                $definitions[(string) $node['parent']] = array($node->service, $file, false);
+                $node->service['id'] = (string) $node['parent'];
             }
         }
 

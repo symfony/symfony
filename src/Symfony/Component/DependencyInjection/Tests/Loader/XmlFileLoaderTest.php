@@ -121,31 +121,44 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services5.xml');
         $services = $container->getDefinitions();
-        $this->assertCount(4, $services, '->load() attributes unique ids to anonymous services');
+        $this->assertCount(5, $services, '->load() attributes unique ids to anonymous services');
 
         // anonymous service as an argument
         $args = $services['foo']->getArguments();
         $this->assertCount(1, $args, '->load() references anonymous services as "normal" ones');
-        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $args[0], '->load() converts anonymous services to references to "normal" services');
-        $this->assertTrue(isset($services[(string) $args[0]]), '->load() makes a reference to the created ones');
-        $inner = $services[(string) $args[0]];
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\DefinitionDecorator', $args[0], '->load() converts anonymous services to references to "normal" services');
+        $this->assertTrue(isset($services[$args[0]->getParent()]), '->load() makes a reference to the created ones');
+        $inner = $services[$args[0]->getParent()];
         $this->assertEquals('BarClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertFalse($inner->isPublic());
 
         // inner anonymous services
         $args = $inner->getArguments();
         $this->assertCount(1, $args, '->load() references anonymous services as "normal" ones');
-        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $args[0], '->load() converts anonymous services to references to "normal" services');
-        $this->assertTrue(isset($services[(string) $args[0]]), '->load() makes a reference to the created ones');
-        $inner = $services[(string) $args[0]];
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\DefinitionDecorator', $args[0], '->load() converts anonymous services to references to "normal" services');
+        $this->assertTrue(isset($services[$args[0]->getParent()]), '->load() makes a reference to the created ones');
+        $inner = $services[$args[0]->getParent()];
         $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertFalse($inner->isPublic());
 
         // anonymous service as a property
         $properties = $services['foo']->getProperties();
         $property = $properties['p'];
-        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $property, '->load() converts anonymous services to references to "normal" services');
-        $this->assertTrue(isset($services[(string) $property]), '->load() makes a reference to the created ones');
-        $inner = $services[(string) $property];
-        $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\DefinitionDecorator', $property, '->load() converts anonymous services to references to "normal" services');
+        $this->assertTrue(isset($services[$property->getParent()]), '->load() makes a reference to the created ones');
+        $inner = $services[$property->getParent()];
+        $this->assertEquals('BuzClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertFalse($inner->isPublic());
+
+        // "wild" service
+        $service = $container->findTaggedServiceIds('biz_tag');
+        $this->assertCount(1, $service);
+
+        foreach ($service as $id => $tag) {
+            $service = $container->getDefinition($id);
+        }
+        $this->assertEquals('BizClass', $service->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertFalse($service->isPublic());
     }
 
     public function testLoadServices()
@@ -374,10 +387,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $services = $container->getDefinitions();
         $args1 = $services['extension1.foo']->getArguments();
-        $inner1 = $services[(string) $args1[0]];
+        $inner1 = $services[$args1[0]->getParent()];
         $this->assertEquals('BarClass1', $inner1->getClass(), '->load() uses the same configuration as for the anonymous ones');
         $args2 = $services['extension2.foo']->getArguments();
-        $inner2 = $services[(string) $args2[0]];
+        $inner2 = $services[$args2[0]->getParent()];
         $this->assertEquals('BarClass2', $inner2->getClass(), '->load() uses the same configuration as for the anonymous ones');
     }
 

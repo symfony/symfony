@@ -187,9 +187,15 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $this
             ->request
             ->expects($this->any())
-            ->method('all')
+            ->method('get')
             ->with('_switch_user')
             ->willReturn('_exit');
+        $this
+            ->request
+            ->query
+            ->expects($this->any())
+            ->method('all')
+            ->will($this->returnValue(array()));
         $this
             ->request
             ->expects($this->any())

@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * This replaces all DefinitionDecorator instances with their equivalent fully
@@ -97,12 +96,11 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
      */
     private function resolveDefinition(ContainerBuilder $container, DefinitionDecorator $definition)
     {
-        try {
-            $parentDef = $container->findDefinition($parent = $definition->getParent());
-        } catch (ServiceNotFoundException $e) {
+        if (!$container->has($parent = $definition->getParent())) {
             throw new RuntimeException(sprintf('The parent definition "%s" defined for definition "%s" does not exist.', $parent, $this->currentId));
         }
 
+        $parentDef = $container->findDefinition($parent);
         if ($parentDef instanceof DefinitionDecorator) {
             $id = $this->currentId;
             $this->currentId = $parent;

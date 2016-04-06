@@ -122,6 +122,7 @@ class FrameworkExtension extends Extension
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+        $this->registerCacheConfiguration($config['cache'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
@@ -136,10 +137,6 @@ class FrameworkExtension extends Extension
 
         if (isset($config['property_info'])) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
-        }
-
-        if (isset($config['cache'])) {
-            $this->registerCacheConfiguration($config['cache'], $container, $loader);
         }
 
         $loader->load('debug_prod.xml');
@@ -1022,9 +1019,7 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!empty($config['pools'])) {
-            $loader->load('cache_pools.xml');
-        }
+        $loader->load('cache_pools.xml');
 
         foreach ($config['pools'] as $name => $poolConfig) {
             $poolDefinition = new DefinitionDecorator($poolConfig['adapter']);
@@ -1034,6 +1029,14 @@ class FrameworkExtension extends Extension
             $poolDefinition->addTag('cache.pool', $poolConfig);
             $container->setDefinition('cache.pool.'.$name, $poolDefinition);
         }
+
+        $this->addClassesToCompile(array(
+            'Psr\Cache\CacheItemInterface',
+            'Psr\Cache\CacheItemPoolInterface',
+            'Symfony\Component\Cache\Adapter\AdapterInterface',
+            'Symfony\Component\Cache\Adapter\AbstractAdapter',
+            'Symfony\Component\Cache\CacheItem',
+        ));
     }
 
     /**

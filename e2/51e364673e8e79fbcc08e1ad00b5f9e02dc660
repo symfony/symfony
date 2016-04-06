@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-05T22:27:19Z
+
+:+1: Good catch, I failed to understand when you first proposed it in #18317.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-04-06T09:50:56Z
+
+This basically reverts #16959. So the issue that it fixed (#15544) was not actually broken as the test still passes?
+
+---------------------------------------------------------------------------
+
+by sergeyfedotov at 2016-04-06T10:02:38Z
+
+#18317 resolves the issue #15544 by the new way. Tests that have been introduced in the #16959 still pass.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-06T10:16:15Z
+
+:+1:

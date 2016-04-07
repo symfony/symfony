@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="cache.default_pools_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer" public="false">
+            <tag name="kernel.cache_clearer" />
+        </service>
+
+        <service id="cache.adapter.shared" alias="cache.adapter.filesystem" />
+        <service id="cache.adapter.local" alias="cache.adapter.filesystem" />
+
+        <service id="cache.pool.shared" parent="cache.adapter.shared">
+            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
+        </service>
+
+        <service id="cache.pool.local" parent="cache.adapter.local">
+            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
+        </service>
+
+        <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
+            <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
+        </service>
+
+        <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
+            <argument /> <!-- Doctrine provider service -->
+            <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
+        </service>
+
+        <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true">
+            <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
+            <argument>%kernel.cache_dir%/pools</argument>
+        </service>
+
+        <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
+            <argument /> <!-- PSR-6 provider service -->
+            <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
+        </service>
+
+        <service id="cache.adapter.redis" class="Symfony\Component\Cache\Adapter\RedisAdapter" abstract="true">
+            <argument /> <!-- Redis connection object -->
+            <argument /> <!-- namespace -->
+            <argument /> <!-- default lifetime -->
+        </service>
+
+    </services>
+</container>

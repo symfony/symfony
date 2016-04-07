@@ -122,6 +122,7 @@ class FrameworkExtension extends Extension
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
         $this->registerTranslatorConfiguration($config['translator'], $container);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
+        $this->registerCacheConfiguration($config['cache'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
@@ -1014,6 +1015,28 @@ class FrameworkExtension extends Extension
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
         }
+    }
+
+    private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('cache_pools.xml');
+
+        foreach ($config['pools'] as $name => $poolConfig) {
+            $poolDefinition = new DefinitionDecorator($poolConfig['adapter']);
+            $poolDefinition->setPublic($poolConfig['public']);
+            unset($poolConfig['adapter'], $poolConfig['public']);
+
+            $poolDefinition->addTag('cache.pool', $poolConfig);
+            $container->setDefinition('cache.pool.'.$name, $poolDefinition);
+        }
+
+        $this->addClassesToCompile(array(
+            'Psr\Cache\CacheItemInterface',
+            'Psr\Cache\CacheItemPoolInterface',
+            'Symfony\Component\Cache\Adapter\AdapterInterface',
+            'Symfony\Component\Cache\Adapter\AbstractAdapter',
+            'Symfony\Component\Cache\CacheItem',
+        ));
     }
 
     /**

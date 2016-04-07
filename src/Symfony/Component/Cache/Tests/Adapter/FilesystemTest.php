@@ -25,6 +25,6 @@ class FilesystemAdapterTest extends CachePoolTest
             $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
         }
 
-        return new FilesystemAdapter(sys_get_temp_dir().DIRECTORY_SEPARATOR.'sf-cache');
+        return new FilesystemAdapter('sf-cache');
     }
 }

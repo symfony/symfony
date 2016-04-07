@@ -21,6 +21,6 @@ class NamespacedProxyAdapterTest extends ProxyAdapterTest
 {
     public function createCachePool()
     {
-        return new ProxyAdapter(new ArrayAdapter(), 0, 'foo');
+        return new ProxyAdapter(new ArrayAdapter(), 'foo');
     }
 }

@@ -37,7 +37,6 @@ class RedisAdapterTest extends CachePoolTest
             $e = error_get_last();
             self::markTestSkipped($e['message']);
         }
-        self::$redis->select(1993);
     }
 
     public static function tearDownAfterClass()

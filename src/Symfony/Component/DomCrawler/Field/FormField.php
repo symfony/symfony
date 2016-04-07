@@ -23,10 +23,6 @@ abstract class FormField
      */
     protected $node;
     /**
-     * @var \DOMElement
-     */
-    protected $label;
-    /**
      * @var string
      */
     protected $name;
@@ -50,13 +46,11 @@ abstract class FormField
     /**
      * Constructor.
      *
-     * @param \DOMElement      $node  The node associated with this field
-     * @param \DOMElement|null $label The label associated with this field
+     * @param \DOMElement $node The node associated with this field
      */
-    public function __construct(\DOMElement $node, \DOMElement $label = null)
+    public function __construct(\DOMElement $node)
     {
         $this->node = $node;
-        $this->label = $label;
         $this->name = $node->getAttribute('name');
         $this->xpath = new \DOMXPath($node->ownerDocument);
 
@@ -70,7 +64,21 @@ abstract class FormField
      */
     public function getLabel()
     {
-        return $this->label;
+        $xpath = new \DOMXPath($this->node->ownerDocument);
+
+        $labels = $xpath->query('ancestor::label[1]', $this->node);
+        if ($labels->length > 0) {
+            return $labels->item(0);
+        }
+
+        if ($this->node->hasAttribute('id')) {
+            $labels = $xpath->query(sprintf('descendant::label[@for="%s"]', $this->node->getAttribute('id')));
+            if ($labels->length > 0) {
+                return $labels->item(0);
+            }
+        }
+
+        return;
     }
 
     /**

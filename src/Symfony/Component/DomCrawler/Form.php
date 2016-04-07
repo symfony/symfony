@@ -454,49 +454,22 @@ class Form extends Link implements \ArrayAccess
         }
 
         $nodeName = $node->nodeName;
-        $label = $this->findAssociatedLabel($node);
         if ('select' == $nodeName || 'input' == $nodeName && 'checkbox' == strtolower($node->getAttribute('type'))) {
-            $this->set(new Field\ChoiceFormField($node, $label));
+            $this->set(new Field\ChoiceFormField($node));
         } elseif ('input' == $nodeName && 'radio' == strtolower($node->getAttribute('type'))) {
             // there may be other fields with the same name that are no choice
             // fields already registered (see https://github.com/symfony/symfony/issues/11689)
             if ($this->has($node->getAttribute('name')) && $this->get($node->getAttribute('name')) instanceof ChoiceFormField) {
                 $this->get($node->getAttribute('name'))->addChoice($node);
             } else {
-                $this->set(new Field\ChoiceFormField($node, $label));
+                $this->set(new Field\ChoiceFormField($node));
             }
         } elseif ('input' == $nodeName && 'file' == strtolower($node->getAttribute('type'))) {
-            $this->set(new Field\FileFormField($node, $label));
+            $this->set(new Field\FileFormField($node));
         } elseif ('input' == $nodeName && !in_array(strtolower($node->getAttribute('type')), array('submit', 'button', 'image'))) {
-            $this->set(new Field\InputFormField($node, $label));
+            $this->set(new Field\InputFormField($node));
         } elseif ('textarea' == $nodeName) {
-            $this->set(new Field\TextareaFormField($node, $label));
+            $this->set(new Field\TextareaFormField($node));
         }
-    }
-
-    /**
-     * Finds the associated label to a given field node.
-     *
-     * @param \DOMElement $node The \DOMElement instance of the field
-     *
-     * @return \DOMNode|null The \DOMElement of the associated label tag or null if none was found
-     */
-    private function findAssociatedLabel(\DOMElement $node)
-    {
-        $xpath = new \DOMXPath($this->node->ownerDocument);
-
-        $labels = $xpath->query('ancestor::label[1]', $node);
-        if ($labels->length > 0) {
-            return $labels->item(0);
-        }
-
-        if ($node->hasAttribute('id')) {
-            $labels = $xpath->query(sprintf('descendant::label[@for="%s"]', $node->getAttribute('id')));
-            if ($labels->length > 0) {
-                return $labels->item(0);
-            }
-        }
-
-        return;
     }
 }

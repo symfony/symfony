@@ -336,6 +336,14 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo', $field->getValue(), '->select() changes the selected option');
     }
 
+    public function testSelectWithEmptyValue()
+    {
+        $node = $this->createSelectNodeWithEmptyOption(array('' => true, 'Female' => false, 'Male' => false));
+        $field = new ChoiceFormField($node);
+
+        $this->assertSame('', $field->getValue());
+    }
+
     protected function createSelectNode($options, $attributes = array(), $selectedAttrText = 'selected')
     {
         $document = new \DOMDocument();

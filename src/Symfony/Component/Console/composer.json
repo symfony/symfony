@@ -21,11 +21,13 @@
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/filesystem": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
         "psr/log": "~1.0"
     },
     "suggest": {
         "symfony/event-dispatcher": "",
+        "symfony/filesystem": "",
         "symfony/process": "",
         "psr/log": "For using the console logger"
     },

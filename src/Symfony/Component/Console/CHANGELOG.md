@@ -7,6 +7,7 @@ CHANGELOG
 * added `setInputs()` method to CommandTester for ease testing of commands expecting inputs
 * added `setStream()` and `getStream()` methods to Input (implement StreamableInputInterface)
 * added StreamableInputInterface
+* added LockableTrait
 
 3.1.0
 -----

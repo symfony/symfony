@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-04-06T10:41:39Z
+
+@javiereguiluz thanks for writing the doc PR
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-06T10:42:19Z
+
+@fabpot @nicolas-grekas can you give your mind on whether this PR can still be considered for 3.1 ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-06T10:43:35Z
+
+That's going to be for 3.2 as we are in feature freeze now (except for old PRs that are about to be finished).
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T13:08:51Z
+
+@fabpot this means that SensioFrameworkExtraBundle ``@Security`` annotation will be incompatible with argument resolvers in 3.1 (as it must be evaluated with converted arguments), and so we cannot replace ParamConverter by argument resolvers in the bundle until 3.2.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-07T13:26:17Z
+
+This event was on the table the day before the feature freeze, it's a nice following of https://github.com/symfony/symfony/pull/18308, it deserves a nice exception :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-07T13:36:51Z
+
+I agree that this might be a nice addition to speed up the development by ~6 months
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T14:56:29Z
+
+As requested by @fabpot in person, I made the controller callable mutable as well during this event, making it possible to replace the controller by a different callable, after arguments of the original controller are resolved. This is great when wanting to wrap the controller into a callable having a different signature than the original one for instance (@fabpot has such a use case for blackfire btw). And there is a test covering this use case.
+As the controller is mutable now, the new event class now extends the FilterControllerEvent

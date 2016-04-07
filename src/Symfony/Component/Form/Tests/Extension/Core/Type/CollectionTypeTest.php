@@ -365,14 +365,14 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPrototypeSetNotRequiredIfParentNotRequired()
     {
-        $child = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $child = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\FileType',
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
         ));
 
-        $parent = $this->factory->create('form', array(), array(
+        $parent = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', array(), array(
             'required' => false,
         ));
 
@@ -384,17 +384,17 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testPrototypeNotOverrideRequiredByEntryOptionsInFavorOfParent()
     {
-        $child = $this->factory->create('collection', array(), array(
-            'type' => 'file',
+        $child = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\FileType',
             'allow_add' => true,
             'prototype' => true,
             'prototype_name' => '__test__',
-            'options' => array(
+            'entry_options' => array(
                 'required' => true,
             ),
         ));
 
-        $parent = $this->factory->create('form', array(), array(
+        $parent = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', array(), array(
             'required' => false,
         ));
 

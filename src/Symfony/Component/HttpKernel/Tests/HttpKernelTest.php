@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -233,6 +234,42 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $kernel->handle(new Request())->getContent());
     }
 
+    public function testHandleAllowChangingControllerArguments()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::CONTROLLER_ARGUMENTS, function (FilterControllerArgumentsEvent $event) {
+            $event->setArguments(array('foo'));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function ($content) { return new Response($content); });
+
+        $this->assertResponseEquals(new Response('foo'), $kernel->handle(new Request()));
+    }
+
+    public function testHandleAllowChangingControllerAndArguments()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::CONTROLLER_ARGUMENTS, function (FilterControllerArgumentsEvent $event) {
+            $oldController = $event->getController();
+            $oldArguments = $event->getArguments();
+
+            $newController = function ($id) use ($oldController, $oldArguments) {
+                $response = call_user_func_array($oldController, $oldArguments);
+
+                $response->headers->set('X-Id', $id);
+
+                return $response;
+            };
+
+            $event->setController($newController);
+            $event->setArguments(array('bar'));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, function ($content) { return new Response($content); }, null, array('foo'));
+
+        $this->assertResponseEquals(new Response('foo', 200, array('X-Id' => 'bar')), $kernel->handle(new Request()));
+    }
+
     public function testTerminate()
     {
         $dispatcher = new EventDispatcher();
@@ -265,7 +302,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST);
     }
 
-    private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null)
+    private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = array())
     {
         if (null === $controller) {
             $controller = function () { return new Response('Hello'); };
@@ -281,7 +318,7 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $argumentResolver
             ->expects($this->any())
             ->method('getArguments')
-            ->will($this->returnValue(array()));
+            ->will($this->returnValue($arguments));
 
         return new HttpKernel($eventDispatcher, $controllerResolver, $requestStack, $argumentResolver);
     }

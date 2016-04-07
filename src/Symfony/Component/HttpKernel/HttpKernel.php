@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -137,6 +138,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
         // controller arguments
         $arguments = $this->argumentResolver->getArguments($request, $controller);
+
+        $event = new FilterControllerArgumentsEvent($this, $controller, $arguments, $request, $type);
+        $this->dispatcher->dispatch(KernelEvents::CONTROLLER_ARGUMENTS, $event);
+        $controller = $event->getController();
+        $arguments = $event->getArguments();
 
         // call controller
         $response = call_user_func_array($controller, $arguments);

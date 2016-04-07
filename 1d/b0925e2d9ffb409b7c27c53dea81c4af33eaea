@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-06T07:33:56Z
+
+@simonsargeant thanks for fixing this. It looks good to me :+1:
+
+---
+
+However, there is a big problem with the code we use for this:
+
+```twig
+{% if 'n/a' != collector.debug %}
+    ...
+{% endif %}
+```
+
+`collector.debug` is a boolean value and we're comparing it with a string (`n/a`). In this case `n/a` is transformed to `true` and the comparison is `if true != collector.debug`. That's why we never see this information in the toolbar.
+
+Should we fix that in this PR or create a new PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-06T07:36:20Z
+
+@javiereguiluz do we actually need the color here ?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-06T07:40:01Z
+
+@stof I don't have a strong opinion about this. But the color may be consistent with other colored blocks in that panel and it doesn't hurt:
+
+| Color | No Color
+| --- | ---
+| ![color](https://cloud.githubusercontent.com/assets/73419/14309231/64dc0d70-fbdb-11e5-9684-038f0fbfb329.png) | ![no_color](https://cloud.githubusercontent.com/assets/73419/14309234/6628e0f4-fbdb-11e5-9069-c5d31ae3e1c6.png)
+
+---------------------------------------------------------------------------
+
+by simonsargeant at 2016-04-06T17:29:02Z
+
+@javiereguiluz I think this is now expected behavior as collector.debug could be boolean or 'n/a'  https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/DataCollector/ConfigDataCollector.php#L69. Does not show the debug status if 'n/a', shows activated or deactivated if true or false.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-06T17:54:17Z
+
+@simonsargeant yes, the collector can be `true`, `false` or `'n/a'` ... but the problem is in the condition:
+
+| Env | `collector.debug` | `'n/a' != collector.debug` | Result
+| --- | ----------------- | ----------------------------------- | -------------
+| `dev`  | `true`          | `false` | You don't see this in the toolbar
+| `prod` | `false`         | `true`  | You see this in the toolbar ... but there is no toolbar because we are in `prod`
+| `-`    | `n/a`           | `false` | You don't see this in the toolbar ... but I've never faced this condition
+
+So the only scenario where this is `true` is in the `prod` environment, where the toolbar is not displayed
+
+---------------------------------------------------------------------------
+
+by simonsargeant at 2016-04-06T18:12:00Z
+
+@javiereguiluz Sorry, I meant I had updated the PR so the behaviour is now:
+
+`collector.debug`|`'n/a' is not same as collector.debug`|Result
+---|---|---
+`true`|`true`|Shown in toolbar (green)
+`false`|`true`|Shown in toolbar (red)
+`'n/a'`|`false`|Not shown in toolbar
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-06T18:14:49Z
+
+:+1: Thanks @simonsargeant
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T08:15:00Z
+
+:+1:

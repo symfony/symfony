@@ -10,6 +10,8 @@ CHANGELOG
  * added `Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface`
  * added `Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface` as argument to `HttpKernel`
  * added `Symfony\Component\HttpKernel\Controller\ArgumentResolver`
+ * added `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector::getMethod()`
+ * added `Symfony\Component\HttpKernel\DataCollector\RequestDataCollector::getRedirect()`
 
 3.0.0
 -----

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * added information about redirected and forwarded requests to the profiler
+
 3.0.0
 -----
 

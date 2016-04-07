@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-03-09T18:55:25Z
+
+Args, should be merged into 3.0.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-03-09T19:13:37Z
+
+I see some tests are failing, but only with some deps versions. Does anyone have a hint in this regards?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-03-09T21:27:46Z
+
+Does it make sense to keep https://github.com/symfony/symfony/pull/18081/files#diff-86f250a5f79b284f5926aa0f63e1c836R130 and https://github.com/symfony/symfony/pull/18081/files#diff-86f250a5f79b284f5926aa0f63e1c836R164?
+
+---------------------------------------------------------------------------
+
+by sustmi at 2016-03-09T22:50:39Z
+
+I would rename:
+
+`testDontValidateIfParentWithoutCascadeValidation`
+to `testDontValidateIfChildWithoutValidConstraint`
+because there is another test `testValidateIfChildWithValidConstraint` testing the opposite.
+
+and `testValidateConstraintsEvenIfNoCascadeValidation`
+to `testValidateChildConstraintsEvenWithoutValidConstraint`.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-03-10T06:38:42Z
+
+Updated, just the PHP 7 test with the low deps fails, is this maybe due to subtree split or so?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-03-16T07:43:31Z
+
+Any further feedback?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-19T14:10:58Z
+
+:+1: to be merged in 3.0
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by sustmi at 2016-03-19T16:16:01Z
+
+After re-reading the tests I came to the following conclusions:
+
+`testValidateConstraintsEvenIfNoValidConstraint` (originally `testValidateConstraintsEvenIfNoCascadeValidation`) tests that child form data is validated by constraints defined in the child form even if the child form has no `@Valid` constraint.
+I would rename the test to `testChildFormDataAreValidatedByFormConstraintsEvenWithoutValidConstraint`.
+
+`testValidateIfChildWithValidConstraint` tests that child form data is validated if the child form has `@Valid` constraint.
+I am not sure if the test makes sense since (as you can see in previous test) constraints defined on subforms are by default always validated (because form's `children` property has always constraint `@Valid`; see https://github.com/symfony/symfony/blob/3.0/src/Symfony/Component/Form/Resources/config/validation.xml).
+We could rename the test to: `testChildFormDataAreValidatedByFormConstraintsIfValidConstraint`, but I am not sure if the test makes sense. Also I think that the test should assert that some other constraints are validated too, not just the `@Valid`.
+
+`testDontValidateIfParentWithoutValidConstraint` (originally `testDontValidateIfParentWithoutCascadeValidation`) tests that no validation is run on child form data when it has no constraints.
+I would rename the test to `testChildFormDataAreNotValidatedByFormConstraintsIfNoConstraints`. And I guess this test makes sense only as a sanity check.
+
+EDIT: Added *byFormConstraints* into the new test names as there is a difference between validating form data by constraints defined in form and constraints defined on the class of the form data object.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-03-29T20:35:53Z
+
+@webmozart Updated.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-04-01T08:11:27Z
+
+:+1: apart from my last remark
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-04-03T16:14:58Z
+
+@webmozart: Updated, I hope it is as per your request.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-04T07:06:33Z
+
+Looks like you need to fix the tests:
+
+```
+Fatal error: Cannot redeclare Symfony\Component\Form\Tests\Extension\Validator\Constraints\FormValidatorTest::testValidateConstraintsOptionEvenIfNoValidConstraint() in /home/travis/build/symfony/symfony/src/Symfony/Component/Form/Tests/Extension/Validator/Constraints/FormValidatorTest.php on line 165
+
+PHP Fatal error:  Cannot redeclare Symfony\Component\Form\Tests\Extension\Validator\Constraints\FormValidatorTest::testValidateConstraintsOptionEvenIfNoValidConstraint() in /home/travis/build/symfony/symfony/src/Symfony/Component/Form/Tests/Extension/Validator/Constraints/FormValidatorTest.php on line 165
+```
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-04-04T18:32:38Z
+
+Updated.

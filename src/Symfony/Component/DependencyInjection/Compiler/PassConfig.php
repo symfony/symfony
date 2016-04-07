@@ -59,8 +59,8 @@ class PassConfig
 
         $this->removingPasses = array(
             new RemovePrivateAliasesPass(),
-            new RemoveAbstractDefinitionsPass(),
             new ReplaceAliasByActualDefinitionPass(),
+            new RemoveAbstractDefinitionsPass(),
             new RepeatedPass(array(
                 new AnalyzeServiceReferencesPass(),
                 new InlineServiceDefinitionsPass(),
@@ -103,8 +103,7 @@ class PassConfig
             throw new InvalidArgumentException(sprintf('Invalid type "%s".', $type));
         }
 
-        $passes = &$this->$property;
-        $passes[] = $pass;
+        $this->{$property}[] = $pass;
     }
 
     /**

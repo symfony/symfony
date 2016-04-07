@@ -1,0 +1,217 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-31T14:33:10Z
+
+I am not convinced that people will need to create services starting with `cache.adapter.` to register their own adapters. This will prevent us from being able to add new adapters in the core in future releases as we would otherwise risk to break BC. I think we should, for now, restrict the configuration to the built-in adapters. We can then think of a clean way to let users register their own adapters for 3.2 (probably with another yet to be introduced DI tag).
+
+Besides that I am :+1: on the current state of this feature.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-31T14:33:25Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-31T18:16:46Z
+
+@xabbuh second review please :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-31T21:05:08Z
+
+Not sure it's the best idea from the DX perspective when I have to pass the service name instead of a simple key, but I think we can live with that. :)
+
+So to me this is ready to be merged.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-01T06:42:31Z
+
+I'm really not a big fan of the `arg-index` thing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-01T06:44:24Z
+
+Please suggest any alternatives...
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T06:49:46Z
+
+Since it should be documented maybe the "arg" part could be dropped.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-01T06:59:00Z
+
+@nicolas-grekas the alternative would be to replace this handy argument resolver:
+
+```php
+foreach ($tags[0] as $argName => $argValue) {
+    if (isset($tags[0][$argName.'_arg_index']) && 0 <= $tags[0][$argName.'_arg_index']) {
+        $pool->replaceArgument($tags[0][$argName.'_arg_index'], $argValue);
+    }
+}
+```
+
+And replace it with a `switch ... case` to treat the arguments of each cache type differently.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T07:01:48Z
+
+@javiereguiluz it's a very nice workaround to use the better name, but would `default-lifetime="0"` not be misleading ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-01T07:37:25Z
+
+The drawback of that is that we wouldn't be able to support every kind of custom cache adapter a user might want to create, but we would stick to the built-in adapters instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-01T08:01:58Z
+
+This PR introduces two concepts:
+- cache pools: each cache pool is one single logical set of cache items of the same kind and in the same scope (e.g. one pool for caching SQL queries, another pool for caching html fragments, another one for caching parsed annotations, etc.). The kind of storage (apcu, redis, etc.) is a technical requirement but not a semantic requirement for the definition of a cache pool.
+- cache adapters: a cache adapter is well, a php class that implements a particular storage.
+
+This PR provides a way to manipulate both concepts separately:
+- app authors need to define cache pools. This is easily done by using the semantic configuration so that one can configure e.g. `cache.pools.foobar` and that's it. By default, the concrete storage implementation will be the one implemented by the `cache.adapter.default` service, which is `cache.adapter.filesystem` by default. But the main idea is that when one creates `cache.pools.foobar`, it's a one-liner.
+
+Then, devs can work on optimizing the cache storages. There are two ways to do so:
+- the first is to redefine the `cache.adapter.default` service/alias. Again, it's a one-liner in the service definition file to redefine it to e.g. `cache.adapter.apcu` instead of `cache.adapter.filesystem`. This way, all cache pools that have no explicit adapter configured switch to apcu storage instead of filesystem.
+- the second way is per cache pool, by explicitly configuring a cache adapter for each of them. Using semantic configuration, this is done with the "type" option. A "type" here, is the name of another cache pool, whose adapter configuration is reused (by service decoration). This allows grouping/factorizing adapters definitions.
+
+On the service definitions side, a cache pool is any service that has the `cache.pool` tag.
+A cache adapter is any service that has the `cache.pool` tag AND is abstract.
+Concrete cache pools are usually defined as decorated cache adapter or cache pool definitions.
+Thus, we need a way to map configuration parameters from concrete definitions to decorated definitions, and this is what `cache.pool` is used for: its attributes allow one to say: I want a cache pool that decorates the `cache.adapter.apcu` service with a default lifetime of 60s and a namespace of foobar. Then the `*-arg-index` attributes, defined at the abstract `cache.adapter.apcu` service definition level, allow mapping these namespace+default-lifetime to the correct constructor argument of the apcu service class.
+
+In short: defining `*-arg-index` attributes won't be part of the daily work to do on a Symfony app. The list of cache storage adapter implementations is short. This PR provides a few, a bundle can provide more.
+What people will do in there app is reuse these. They won't have to manipulate `*-arg-index` attributes. Still, `*-arg-index` attributes provides extensibility, which is an important target to me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-03T08:31:05Z
+
+Btw, `*-arg-index` could be made useless if the DI component had a "parameterized abstract service definition decoration" feature.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-03T16:07:32Z
+
+I replaced `*arg-index` wiring by a conventional constructor arguments ordering.
+Better DYT?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-03T16:38:14Z
+
+@nicolas-grekas much better! Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-04T08:56:39Z
+
+Just added and wired a Psr6CacheClearer so that the e.g. cache:clear command clears all cache.pool tagged services.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-04T15:10:03Z
+
+All green, ping @symfony/deciders
+I also added functional tests, with an example configuring a default Redis adapter in https://github.com/symfony/symfony/pull/18371/files#diff-3ed79b3403a07c5e56afea9b4023eae2
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-04T16:35:03Z
+
+:+1: BUT I'd like to get feedback from the community about the way things are configured; it's powerful but not easy. Documentation is going to help, but let see what users think about the current state. We still have about 2 months to tweak the configuration and we still have the option to remove this before 3.1 if it proves to be difficult to find a better way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-06T17:56:04Z
+
+Since this is not yet merged, I added one more commit:
+- add a `cache.pool.default` service so that one could use caching without configuring anything to begin with (ping @javiereguiluz )
+- throw LogicException when one want to configure a pool but the Cache component is not loaded
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-06T18:05:12Z
+
+@nicolas-grekas to check if this is optimized for the expected default behavior, please tell me what should a developer do by hand to achieve this:
+
+1. I have a server with APCu enabled.
+2. I execute `symfony new my_project` to create a 3.1-based project
+3. I want to boost the performance of my app. I want to cache anything that is cacheable: serializer, entities metadata, validator, property path, forms, etc. (If possible, third-party bundles too)
+
+And now, what should that same developer do to achieve this:
+
+1. I've installed Redis in that same server and now I want to keep caching everything, but using Redis instead of APCu.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-06T19:30:48Z
+
+@javiereguiluz in fact our expectations are too low here: Cache integration should not be limited to pre-computed information about the app itself. We should also ease caching of cluster wide items. APCu is not suited for them, because APCu doesn't allow a shared cache pool amongst e.g. several fronts.
+This means we should allow grouping cache pools by cache items scope: APCu is perfect for reflection-related info. Redis is a good fit for cluster wide items.
+My recommendation would be to configure at least two main abstract pools. They would both default to a filesystem cache adapter, but one could then easily change the configuration of each of those abstract pools, effectively reconfiguring all concrete pools that rely on them.
+The goal of this PR is *not* to do this configuration, but to provide the basis to work on it in a later PR (during the feature freeze 3.1).
+As an example, the current state of this PR is to provide a single `cache.pool.default`, that is designed to store only app-related items.
+Symfony-related things should go in other pools that we'll add later.
+As you can read in the attached functional tests, changing all adapters at once is as easy as redefining the `cache.adapter.default` service (in one test, the default filesystem adapter is changed for a redis one).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-06T20:03:36Z
+
+The Cache component is now a mandatory dep of the framework bundle, and a `cache.adapter.system` is created that auto-selects apcu when available at compile time and is the adapter to use for any reflection-related cache pools.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-04-07T07:31:29Z
+
+@nicolas-grekas if the apcu is automatic this will probably bring problems when deploys are made. e.g the deploy would require php-fpm or apache restart.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-07T08:16:51Z
+
+@mvrhov if you're referring to restarting for the purpose of cache clearing, this is already handled with a cache clearer, so that clearing the cache does not require any reboot but is automatic when the cache:clear command is called.
+Or did you have something else in mind?
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-04-07T09:10:08Z
+
+I haven't looked at the driver implementation, but I'm pretty sure that in the case of apcu is not. Because apcu has a different cache on cli, in apache , when running via php-fpm each pool has a different cache.
+
+To clear a apcu cache one of the following has to be made
+* http request [apache,php-fpm]
+* apache restarted,
+* php-fpm restarted,
+* direct fast-cgi request made to correct pool [php-fpm]
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-07T11:11:47Z
+
+Online & offline comments addressed (hello from Symfony Live Paris).
+The config now defines two default cache adapters: `cache.adapter.shared` & `cache.adapter.local`,
+and two cache pools for the user/dev side of the app only: `cache.pool.shared` & `cache.pool.local`.
+We'll have to create symfony-related pools in other PRs.
+I also reverted the auto-magic selecting apcu when avail: filesystem is now always the default, don't forget to change the config when you need something else. (e.g. cache.adapter.redis for cache.adapter.shared and cache.adapter.apcu for cache.adapter.local).
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-04-07T11:23:20Z
+
+@nicolas-grekas: even if you removed the apcu being default, the problem with it still persists. IMO this requires a fat warning message in the docs. Because probably most people are not aware of that problem.

@@ -15,6 +15,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Author;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Magician;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\MagicianCall;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\Ticket5775Object;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 
@@ -421,5 +422,15 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->propertyAccessor->setValue($object, 'date', $date);
         $this->assertSame($date, $object->getDate());
+    }
+
+    public function testArrayNotBeeingOverwritten()
+    {
+        $value = array('value1' => 'foo', 'value2' => 'bar');
+        $object = new TestClass($value);
+
+        $this->propertyAccessor->setValue($object, 'publicAccessor[value2]', 'baz');
+        $this->assertSame('baz', $this->propertyAccessor->getValue($object, 'publicAccessor[value2]'));
+        $this->assertSame(array('value1' => 'foo', 'value2' => 'baz'), $object->getPublicAccessor());
     }
 }

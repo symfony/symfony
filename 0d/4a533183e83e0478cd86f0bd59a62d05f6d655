@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-02T09:42:05Z
+
+I added a second commit with cs fixes, as it goes in master it should not be a pain to merge older branches as it would to merge it upward, right ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T17:22:26Z
+
+Updated here, I've forgotten one method...
+
+Is the second commit needed ? I can remove it. Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-03T17:24:25Z
+
+@HeahDude when a CS fix could be applied on lower branches, it must be applied there.
+Which means you can't trick the process this way :)
+I'd recommend you revert the last commit, and *maybe* submit it to the lowest applicable branches.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T17:31:02Z
+
+@nicolas-grekas thanks, since this fixes are needed for a long time I thought it did not happens because it would have been a pain to merge upward from lower branches.
+
+I revert it right away :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T17:32:26Z
+
+Ready!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-06T18:10:43Z
+
+@xabbuh fixed! Thanks.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-06T18:17:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T13:50:28Z
+
+> I thought it did not happens because it would have been a pain to merge upward from lower branches.
+
+@HeahDude actually, applying a CS fix only to the latest version would make any future upward merge painful due to conflicts.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-07T13:54:00Z
+
+Good to know!

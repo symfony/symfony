@@ -66,16 +66,16 @@ abstract class FormField
     {
         $xpath = new \DOMXPath($this->node->ownerDocument);
 
-        $labels = $xpath->query('ancestor::label[1]', $this->node);
-        if ($labels->length > 0) {
-            return $labels->item(0);
-        }
-
         if ($this->node->hasAttribute('id')) {
             $labels = $xpath->query(sprintf('descendant::label[@for="%s"]', $this->node->getAttribute('id')));
             if ($labels->length > 0) {
                 return $labels->item(0);
             }
+        }
+
+        $labels = $xpath->query('ancestor::label[1]', $this->node);
+        if ($labels->length > 0) {
+            return $labels->item(0);
         }
 
         return;

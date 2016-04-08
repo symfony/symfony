@@ -21,7 +21,7 @@ class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
         $services = array(
             'my_cache_warmer_service1' => array(0 => array('priority' => 100)),
             'my_cache_warmer_service2' => array(0 => array('priority' => 200)),
-            'my_cache_warmer_service3' => array(),
+            'my_cache_warmer_service3' => array(0 => array()),
         );
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');

@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Adds extractors to the property_info service.
@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class PropertyInfoPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -44,35 +46,5 @@ class PropertyInfoPass implements CompilerPassInterface
 
         $accessExtractors = $this->findAndSortTaggedServices('property_info.access_extractor', $container);
         $definition->replaceArgument(3, $accessExtractors);
-    }
-
-    /**
-     * Finds all services with the given tag name and order them by their priority.
-     *
-     * @param string           $tagName
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
-    private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
-    {
-        $services = $container->findTaggedServiceIds($tagName);
-
-        $sortedServices = array();
-        foreach ($services as $serviceId => $tags) {
-            foreach ($tags as $attributes) {
-                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-                $sortedServices[$priority][] = new Reference($serviceId);
-            }
-        }
-
-        if (empty($sortedServices)) {
-            return array();
-        }
-
-        krsort($sortedServices);
-
-        // Flatten the array
-        return call_user_func_array('array_merge', $sortedServices);
     }
 }

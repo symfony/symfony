@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers the cache warmers.
@@ -22,6 +22,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddCacheWarmerPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -31,19 +33,11 @@ class AddCacheWarmerPass implements CompilerPassInterface
             return;
         }
 
-        $warmers = array();
-        foreach ($container->findTaggedServiceIds('kernel.cache_warmer') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $warmers[$priority][] = new Reference($id);
-        }
+        $warmers = $this->findAndSortTaggedServices('kernel.cache_warmer', $container);
 
         if (empty($warmers)) {
             return;
         }
-
-        // sort by priority and flatten
-        krsort($warmers);
-        $warmers = call_user_func_array('array_merge', $warmers);
 
         $container->getDefinition('cache_warmer')->replaceArgument(0, $warmers);
     }

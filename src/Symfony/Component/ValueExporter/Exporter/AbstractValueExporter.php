@@ -12,6 +12,7 @@
 namespace Symfony\Component\ValueExporter\Exporter;
 
 use Symfony\Component\ValueExporter\Exception\InvalidFormatterException;
+use Symfony\Component\ValueExporter\Formatter\ExpandedFormatter;
 use Symfony\Component\ValueExporter\Formatter\FormatterInterface;
 
 /**
@@ -54,11 +55,17 @@ abstract class AbstractValueExporter implements ValueExporterInterface
             if (!$append instanceof $this->formatterInterface) {
                 throw new InvalidFormatterException(get_class($append), self::class, $this->formatterInterface);
             }
+            if ($append instanceof ExpandedFormatter) {
+                $append->setExporter($this);
+            }
             $this->formatters[] = $append;
         }
         foreach (array_reverse($prepends) as $prepend) {
             if (!$prepend instanceof $this->formatterInterface) {
                 throw new InvalidFormatterException(get_class($prepend), self::class, $this->formatterInterface);
+            }
+            if ($prepend instanceof ExpandedFormatter) {
+                $prepend->setExporter($this);
             }
             array_unshift($this->formatters, $prepend);
         }

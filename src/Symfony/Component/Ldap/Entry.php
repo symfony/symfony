@@ -36,6 +36,18 @@ class Entry
     }
 
     /**
+     * Returns whether an attribute exists.
+     *
+     * @param $name string The name of the attribute
+     *
+     * @return bool
+     */
+    public function hasAttribute($name)
+    {
+        return isset($this->attributes[$name]);
+    }
+
+    /**
      * Returns a specific attribute's value.
      *
      * As LDAP can return multiple values for a single attribute,

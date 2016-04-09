@@ -72,6 +72,17 @@ class ApcuAdapter extends AbstractAdapter
      */
     protected function doSave(array $values, $lifetime)
     {
-        return array_keys(apcu_store($values, null, $lifetime));
+        try {
+            return array_keys(apcu_store($values, null, $lifetime));
+        } catch (\Error $e) {
+        } catch (\Exception $e) {
+        }
+
+        if (1 === count($values)) {
+            // Workaround https://github.com/krakjoe/apcu/issues/170
+            apcu_delete(key($values));
+        }
+
+        throw $e;
     }
 }

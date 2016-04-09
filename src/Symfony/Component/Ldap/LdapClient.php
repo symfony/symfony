@@ -77,13 +77,13 @@ class LdapClient implements LdapClientInterface
     /**
      * {@inheritdoc}
      */
-    public function find($dn, $query, $filter = '*')
+    public function find($dn, $query, $filter = '*', $limit = 0, $timeLimit = 0)
     {
         if (!is_array($filter)) {
             $filter = array($filter);
         }
 
-        $search = ldap_search($this->connection, $dn, $query, $filter);
+        $search = ldap_search($this->connection, $dn, $query, $filter, 0, $limit, $timeLimit);
         $infos = ldap_get_entries($this->connection, $search);
 
         if (0 === $infos['count']) {

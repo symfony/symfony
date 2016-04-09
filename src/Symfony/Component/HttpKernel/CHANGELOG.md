@@ -4,9 +4,7 @@ CHANGELOG
 3.1.0
 -----
  * deprecated passing objects as URI attributes to the ESI and SSI renderers
- * added `Symfony\Component\HttpKernel\Controller\LegacyArgumentResolver`
  * deprecated `ControllerResolver::getArguments()`
- * made `ControllerResolver` extend the `LegacyArgumentResolver` for BC
  * added `Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface`
  * added `Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface` as argument to `HttpKernel`
  * added `Symfony\Component\HttpKernel\Controller\ArgumentResolver`

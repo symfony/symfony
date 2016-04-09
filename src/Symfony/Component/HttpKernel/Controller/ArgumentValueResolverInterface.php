@@ -32,7 +32,7 @@ interface ArgumentValueResolverInterface
     public function supports(Request $request, ArgumentMetadata $argument);
 
     /**
-     * Yield the possible value(s).
+     * Returns the possible value(s).
      *
      * @param Request          $request
      * @param ArgumentMetadata $argument

@@ -36,13 +36,15 @@ interface LdapClientInterface
     /*
      * Find a username into ldap connection.
      *
-     * @param string $dn
-     * @param string $query
-     * @param mixed  $filter
+     * @param string  $dn
+     * @param string  $query
+     * @param mixed   $filter
+     * @param integer $limit
+     * @param integer $timeLimit
      *
      * @return array|null
      */
-    public function find($dn, $query, $filter = '*');
+    public function find($dn, $query, $filter = '*', $limit = 0, $timeLimit = 0);
 
     /**
      * Escape a string for use in an LDAP filter or DN.

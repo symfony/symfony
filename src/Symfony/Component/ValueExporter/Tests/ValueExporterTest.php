@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\ValueExporter\Tests;
 
+use Symfony\Component\ValueExporter\Formatter\TraversableToStringFormatter;
+use Symfony\Component\ValueExporter\Tests\Fixtures\TraversableInstance;
 use Symfony\Component\ValueExporter\ValueExporter;
 
 class ValueExporterTest extends \PHPUnit_Framework_TestCase
@@ -44,6 +46,21 @@ array(
 EOT;
 
         $this->assertSame($exportedValue, ValueExporter::export($value, 1, true));
+    }
+
+    public function testExportTraversable()
+    {
+        ValueExporter::appendFormatter(new TraversableToStringFormatter());
+
+        $value = new TraversableInstance();
+        $exportedValue = <<<EOT
+Traversable:"Symfony\Component\ValueExporter\Tests\Fixtures\TraversableInstance"(
+  'property1' => "value1",
+  'property2' => "value2"
+)
+EOT;
+
+        $this->assertSame($exportedValue, ValueExporter::export($value));
     }
 
     public function valueProvider()

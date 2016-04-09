@@ -62,6 +62,10 @@ HttpKernel
    has been removed. The inline fragment renderer should be used with object
    attributes.
 
+ * The `ControllerResolver::getArguments()` method has been removed. If you
+   have your own `ControllerResolverInterface` implementation, you should
+   inject an `ArgumentResolverInterface` instance.
+
 Serializer
 ----------
 

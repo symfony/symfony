@@ -161,7 +161,6 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
     public function testExitUserDoesNotDispatchEventWithStringUser()
     {
         $originalUser = 'anon.';
-        $refreshedUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $this
             ->userProvider
             ->expects($this->never())

@@ -165,7 +165,7 @@ abstract class Controller implements ContainerAwareInterface
             );
         }
 
-        if($disposition === null) {
+        if ($disposition === null) {
             $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT;
         }
 

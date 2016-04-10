@@ -215,7 +215,7 @@ class ControllerTest extends TestCase
     public function testFile()
     {
         $controller = new TestController();
-        /** @var BinaryFileResponse $response */
+        /* @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__));
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
@@ -228,7 +228,7 @@ class ControllerTest extends TestCase
     public function testFileAsInline()
     {
         $controller = new TestController();
-        /** @var BinaryFileResponse $response */
+        /* @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__), null, ResponseHeaderBag::DISPOSITION_INLINE);
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
@@ -241,7 +241,7 @@ class ControllerTest extends TestCase
     public function testFileWithOwnFileName()
     {
         $controller = new TestController();
-        /** @var BinaryFileResponse $response */
+        /* @var BinaryFileResponse $response */
         $fileName = 'test.php';
         $response = $controller->file(new File(__FILE__), $fileName);
 
@@ -255,7 +255,7 @@ class ControllerTest extends TestCase
     public function testFileWithOwnFileNameAsInline()
     {
         $controller = new TestController();
-        /** @var BinaryFileResponse $response */
+        /* @var BinaryFileResponse $response */
         $fileName = 'test.php';
         $response = $controller->file(new File(__FILE__), $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
 
@@ -269,7 +269,7 @@ class ControllerTest extends TestCase
     public function testFileFromString()
     {
         $controller = new TestController();
-        /** @var BinaryFileResponse $response */
+        /* @var BinaryFileResponse $response */
         $fileName = 'test.txt';
         $content = 'This is my testing file';
         $response = $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
@@ -284,7 +284,7 @@ class ControllerTest extends TestCase
     public function testFileFromStringWithoutFileName()
     {
         $controller = new TestController();
-        /** @var BinaryFileResponse $response */
+        /* @var BinaryFileResponse $response */
         $fileName = '';
         $content = 'This is my testing file';
         $this->setExpectedException(\InvalidArgumentException::class);
@@ -294,7 +294,7 @@ class ControllerTest extends TestCase
     public function testFileFromStringWithoutContent()
     {
         $controller = new TestController();
-        /** @var BinaryFileResponse $response */
+        /* @var BinaryFileResponse $response */
         $fileName = 'test.txt';
         $content = '';
         $this->setExpectedException(\InvalidArgumentException::class);
@@ -304,7 +304,7 @@ class ControllerTest extends TestCase
     public function testFileFromStringWithoutSpecifiedMimeType()
     {
         $controller = new TestController();
-        /** @var BinaryFileResponse $response */
+        /* @var BinaryFileResponse $response */
         $fileName = 'test.txt';
         $content = 'This is my testing file';
         $this->setExpectedException(\InvalidArgumentException::class);

@@ -13,9 +13,12 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -121,6 +124,65 @@ abstract class Controller implements ContainerAwareInterface
         }
 
         return new JsonResponse($data, $status, $headers);
+    }
+
+    /**
+     * Returns a Response (or BinaryFileResponse) object with original or customized file name and disposition header.
+     *
+     * @param File|string $file        File object (or string with content) to be sent as response
+     * @param null        $fileName    File name to be sent to response or null (will use original file name)
+     * @param string      $disposition Disposition of response (attachment is default, other type is inline)
+     * @param string      $mimeType    Mime type of file will be auto detected on File object (so it can be null) but is mandatory for string
+     *
+     * @return Response|BinaryFileResponse
+     *
+     * @throws \LogicException|\InvalidArgumentException
+     */
+    protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT, $mimeType = null)
+    {
+        if ($file instanceof File && $file->isReadable()) {
+            $response = new BinaryFileResponse($file);
+            $mimeType = $file->getMimeType();
+        } elseif (is_string($file)) {
+            if ($mimeType === null) {
+                throw new \InvalidArgumentException('You must specify mime type for file from string.');
+            }
+            if (empty($file)) {
+                throw new \InvalidArgumentException('File content can\'t be empty.');
+            }
+            if (empty($fileName)) {
+                throw new \InvalidArgumentException('File name can\'t be empty.');
+            }
+            $response = new Response($file);
+        } else {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    '"%s" can\'t be passed as parameter to "%s" method of "%s" class.',
+                    is_object($file) ? 'Instance of '.get_class($file) : $file,
+                    __CLASS__,
+                    __METHOD__
+                )
+            );
+        }
+
+        if($disposition === null) {
+            $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT;
+        }
+
+        if (!in_array($disposition, [ResponseHeaderBag::DISPOSITION_INLINE, ResponseHeaderBag::DISPOSITION_ATTACHMENT])) {
+            throw new \LogicException(
+                sprintf('You can\'t use disposition "%s". Use "attachment" or "inline".', $disposition)
+            );
+        }
+
+        $response->headers->set('Content-Type', $mimeType);
+        $disposition = $response->headers->makeDisposition(
+            $disposition,
+            $fileName === null ? $file->getFileName() : $fileName
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+
+        return $response;
     }
 
     /**

@@ -14,10 +14,13 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -207,6 +210,105 @@ class ControllerTest extends TestCase
         $this->assertEquals('[]', $response->getContent());
         $response->setEncodingOptions(JSON_FORCE_OBJECT);
         $this->assertEquals('{}', $response->getContent());
+    }
+
+    public function testFile()
+    {
+        $controller = new TestController();
+        /** @var BinaryFileResponse $response */
+        $response = $controller->file(new File(__FILE__));
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
+    }
+
+    public function testFileAsInline()
+    {
+        $controller = new TestController();
+        /** @var BinaryFileResponse $response */
+        $response = $controller->file(new File(__FILE__), null, ResponseHeaderBag::DISPOSITION_INLINE);
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
+        $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
+    }
+
+    public function testFileWithOwnFileName()
+    {
+        $controller = new TestController();
+        /** @var BinaryFileResponse $response */
+        $fileName = 'test.php';
+        $response = $controller->file(new File(__FILE__), $fileName);
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains($fileName, $response->headers->get('content-disposition'));
+    }
+
+    public function testFileWithOwnFileNameAsInline()
+    {
+        $controller = new TestController();
+        /** @var BinaryFileResponse $response */
+        $fileName = 'test.php';
+        $response = $controller->file(new File(__FILE__), $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
+        $this->assertContains($fileName, $response->headers->get('content-disposition'));
+    }
+
+    public function testFileFromString()
+    {
+        $controller = new TestController();
+        /** @var BinaryFileResponse $response */
+        $fileName = 'test.txt';
+        $content = 'This is my testing file';
+        $response = $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('text/plain', $response->headers->get('content-type'));
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains($fileName, $response->headers->get('content-disposition'));
+    }
+
+    public function testFileFromStringWithoutFileName()
+    {
+        $controller = new TestController();
+        /** @var BinaryFileResponse $response */
+        $fileName = '';
+        $content = 'This is my testing file';
+        $this->setExpectedException(\InvalidArgumentException::class);
+        $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
+    }
+
+    public function testFileFromStringWithoutContent()
+    {
+        $controller = new TestController();
+        /** @var BinaryFileResponse $response */
+        $fileName = 'test.txt';
+        $content = '';
+        $this->setExpectedException(\InvalidArgumentException::class);
+        $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
+    }
+
+    public function testFileFromStringWithoutSpecifiedMimeType()
+    {
+        $controller = new TestController();
+        /** @var BinaryFileResponse $response */
+        $fileName = 'test.txt';
+        $content = 'This is my testing file';
+        $this->setExpectedException(\InvalidArgumentException::class);
+        $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
     }
 
     public function testIsGranted()
@@ -492,6 +594,11 @@ class TestController extends Controller
     public function json($data, $status = 200, $headers = array(), $context = array())
     {
         return parent::json($data, $status, $headers, $context);
+    }
+
+    public function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT, $mimeType = null)
+    {
+        return parent::file($file, $fileName, $disposition, $mimeType);
     }
 
     public function isGranted($attributes, $object = null)

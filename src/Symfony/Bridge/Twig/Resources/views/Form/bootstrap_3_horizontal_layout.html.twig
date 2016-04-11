@@ -25,13 +25,18 @@ col-sm-2
 {# Rows #}
 
 {% block form_row -%}
-    <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
-        {{- form_label(form) -}}
-        <div class="{{ block('form_group_class') }}">
-            {{- form_widget(form) -}}
-            {{- form_errors(form) -}}
+    {% set displayMarkup = form.children|length == 0 or form.vars.label is not same as(false) %}
+    {%- if displayMarkup -%}
+        <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+            {{- form_label(form) -}}
+            <div class="{{ block('form_group_class') }}">
+    {%- endif -%}
+    {{- form_widget(form) -}}
+    {{- form_errors(form) -}}
+    {%- if displayMarkup -%}
+            </div>
         </div>
-{##}</div>
+    {%- endif -%}
 {%- endblock form_row %}
 
 {% block checkbox_row -%}

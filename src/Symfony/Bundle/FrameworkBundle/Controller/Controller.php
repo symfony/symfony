@@ -129,7 +129,7 @@ abstract class Controller implements ContainerAwareInterface
     /**
      * Returns a BinaryFileResponse object with original or customized file name and disposition header.
      *
-     * @param File|string $file        File object (or string with content) to be sent as response
+     * @param File|string $file        File object, path to file or string with content to be sent as response
      * @param null        $fileName    File name to be sent to response or null (will use original file name)
      * @param string      $disposition Disposition of response (attachment is default, other type is inline)
      *
@@ -140,10 +140,18 @@ abstract class Controller implements ContainerAwareInterface
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
         $deleteFileAfterSend = false;
+
+        // Test if path to file is given
+        if (is_string($file) && file_exists($file)) {
+            $file = new File($file);
+        }
+
+        // Test if is content in string is given
         if (is_string($file)) {
             if (empty($file)) {
                 throw new \InvalidArgumentException('File content can\'t be empty.');
             }
+
             if (empty($fileName)) {
                 throw new \InvalidArgumentException('File name can\'t be empty.');
             }

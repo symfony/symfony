@@ -334,6 +334,34 @@ class ControllerTest extends TestCase
         $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
     }
 
+    public function testFileFromPath()
+    {
+        $controller = new TestController();
+
+        /* @var BinaryFileResponse $response */
+        $response = $controller->file(__FILE__);
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
+    }
+
+    public function testFileFromPathWithCustomizedFileName()
+    {
+        $controller = new TestController();
+
+        /* @var BinaryFileResponse $response */
+        $response = $controller->file(__FILE__, 'test.php');
+
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
+        $this->assertContains('test.php', $response->headers->get('content-disposition'));
+    }
+
     public function testIsGranted()
     {
         $authorizationChecker = $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');

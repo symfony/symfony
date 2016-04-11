@@ -1,7 +1,7 @@
 {% extends "::base.html.twig" %}
 
 {% block body %}
-    Hello {{ app.user.username }}!<br /><br />
+    Hello {{ user.username }}!<br /><br />
     You're browsing to path "{{ app.request.pathInfo }}".
 
     <a href="{{ logout_path('default') }}">Log out</a>.

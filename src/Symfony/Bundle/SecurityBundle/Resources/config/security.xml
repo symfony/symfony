@@ -20,6 +20,11 @@
 
         <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" />
 
+        <service id="security.user_value_resolver" class="Symfony\Bundle\SecurityBundle\SecurityUserValueResolver" public="false">
+            <argument type="service" id="security.token_storage" />
+            <tag name="controller.argument_value_resolver" priority="40" />
+        </service>
+
         <!-- Authentication related services -->
         <service id="security.authentication.manager" class="Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager" public="false">
             <argument type="collection" />

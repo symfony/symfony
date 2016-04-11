@@ -56,6 +56,9 @@ class ControllerTest extends TestCase
         $this->assertEquals('xml--fr', $response->getContent());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetUser()
     {
         $user = new User('user', 'pass');
@@ -67,6 +70,9 @@ class ControllerTest extends TestCase
         $this->assertSame($controller->getUser(), $user);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetUserAnonymousUserConvertedToNull()
     {
         $token = new AnonymousToken('default', 'anon.');
@@ -77,6 +83,9 @@ class ControllerTest extends TestCase
         $this->assertNull($controller->getUser());
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetUserWithEmptyTokenStorage()
     {
         $controller = new TestController();
@@ -86,6 +95,7 @@ class ControllerTest extends TestCase
     }
 
     /**
+     * @group legacy
      * @expectedException \LogicException
      * @expectedExceptionMessage The SecurityBundle is not registered in your application.
      */

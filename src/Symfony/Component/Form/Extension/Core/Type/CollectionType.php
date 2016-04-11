@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\EventListener\ResizeFormListener;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -27,16 +28,7 @@ class CollectionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['allow_add'] && $options['prototype']) {
-            $prototypeOptions = array_replace(array(
-                'required' => $options['required'],
-                'label' => $options['prototype_name'].'label__',
-            ), $options['entry_options']);
-
-            if (null !== $options['prototype_data']) {
-                $prototypeOptions['data'] = $options['prototype_data'];
-            }
-
-            $prototype = $builder->create($options['prototype_name'], $options['entry_type'], $prototypeOptions);
+            $prototype = $builder->create($options['prototype_name'], $options['entry_type'], $options['prototype_options']);
             $builder->setAttribute('prototype', $prototype->getForm());
         }
 
@@ -81,24 +73,80 @@ class CollectionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $entryOptionsNormalizer = function (Options $options, $value) {
-            $value['block_name'] = 'entry';
+        $entryOptionsNormalizer = function (Options $options, $entryOptions) {
+            if (is_callable($entryOptions)) {
+                // Wrap the callable to override 'block_name' option value
+                return function ($entry) use ($entryOptions) {
+                    $dynamicOptions = call_user_func($entryOptions, $entry);
 
-            return $value;
+                    if (!is_array($dynamicOptions)) {
+                        throw new InvalidOptionsException(sprintf('The "entry_options" callable should return an array but got %s', is_object($dynamicOptions) ? get_class($dynamicOptions) : gettype($dynamicOptions)));
+                    }
+
+                    $dynamicOptions['block_name'] = 'entry';
+
+                    return $dynamicOptions;
+                };
+            }
+
+            // Else $entryOption is an array
+            $entryOptions['block_name'] = 'entry';
+
+            return $entryOptions;
+        };
+
+        $prototypeOptionsNormalizer = function (Options $options, $value) {
+            if (is_callable($options['entry_options'])) {
+                // Pass the prototype data to the callable
+                $entryOptions = call_user_func(
+                    $options['entry_options'],
+                    // BC, 'prototype_data' will be removed in 4.0.
+                    $options['prototype_data'] ?: (isset($value['data']) ? $value['data'] : null)
+                );
+            } else {
+                $entryOptions = $options['entry_options'];
+            }
+
+            // Default to 'entry_options' option
+            $prototypeOptions = array_replace($entryOptions, $value);
+
+            if (null !== $options['prototype_data']) {
+                @trigger_error('The "prototype_data" option is deprecated since version 3.1 and will be removed in 4.0. You should use "prototype_options" option instead.', E_USER_DEPRECATED);
+
+                // BC, Let 'prototype_data' option override `$entryOptions['data']`
+                $prototypeOptions['data'] = $options['prototype_data'];
+            }
+
+            return array_replace(array(
+                // Use the collection required state
+                'required' => $options['required'],
+                'label' => $options['prototype_name'].'label__',
+            ), $prototypeOptions);
         };
 
         $resolver->setDefaults(array(
-            'allow_add' => false,
-            'allow_delete' => false,
-            'prototype' => true,
-            'prototype_data' => null,
-            'prototype_name' => '__name__',
             'entry_type' => __NAMESPACE__.'\TextType',
             'entry_options' => array(),
+            'prototype' => true,
+            'prototype_data' => null, // deprecated
+            'prototype_name' => '__name__',
+            'prototype_options' => array(),
+            'allow_add' => false,
+            'allow_delete' => false,
             'delete_empty' => false,
         ));
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
+        $resolver->setNormalizer('prototype_options', $prototypeOptionsNormalizer);
+
+        $resolver->setAllowedTypes('entry_type', array('string', 'Symfony\Component\Form\FormTypeInterface'));
+        $resolver->setAllowedTypes('entry_options', array('array', 'callable'));
+        $resolver->setAllowedTypes('prototype', 'bool');
+        $resolver->setAllowedTypes('prototype_name', 'string');
+        $resolver->setAllowedTypes('prototype_options', 'array');
+        $resolver->setAllowedTypes('allow_add', 'bool');
+        $resolver->setAllowedTypes('allow_delete', 'bool');
+        $resolver->setAllowedTypes('delete_empty', 'bool');
     }
 
     /**

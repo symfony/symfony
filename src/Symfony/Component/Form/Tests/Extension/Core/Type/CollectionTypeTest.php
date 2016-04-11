@@ -273,6 +273,9 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('__test__label__', $form->createView()->vars['prototype']->vars['label']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testPrototypeData()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
@@ -288,6 +291,31 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
         $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
+    }
+
+    public function testPrototypeOptions()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
+            'allow_add' => true,
+            'prototype' => true,
+            'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'entry_options' => array(
+                'data' => 'foo',
+                'label' => 'Item:',
+                'attr' => array('class' => 'my&item&class'),
+                'label_attr' => array('class' => 'my&item&label&class'),
+            ),
+            'prototype_options' => array(
+                'data' => 'bar',
+                'label' => false,
+                'attr' => array('class' => 'my&prototype&class'),
+            ),
+        ));
+
+        $this->assertSame('bar', $form->createView()->vars['prototype']->vars['value']);
+        $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
+        $this->assertSame('my&prototype&class', $form->createView()->vars['prototype']->vars['attr']['class']);
+        $this->assertSame('my&item&label&class', $form->createView()->vars['prototype']->vars['label_attr']['class']);
     }
 
     public function testPrototypeDefaultRequired()
@@ -314,5 +342,183 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertFalse($form->createView()->vars['required'], 'collection is not required');
         $this->assertFalse($form->createView()->vars['prototype']->vars['required'], '"prototype" should not be required');
+    }
+
+    public function testEntryOptions()
+    {
+        $data = array(
+            'foo',
+            'bar',
+        );
+
+        $expectedAttr = array('class' => 'my&item&class', 'data-value' => 'my&value');
+
+        $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', $data, array(
+            'allow_add' => true,
+            'prototype' => true,
+            'prototype_name' => '__test__',
+            'entry_options' => array(
+                'label' => 'Item Label:',
+                'attr' => $expectedAttr,
+            ),
+        ))->createView();
+
+        $this->assertSame('Item Label:', $view->children[0]->vars['label']);
+        $this->assertSame('Item Label:', $view->children[1]->vars['label']);
+        $this->assertSame($expectedAttr, $view->children[0]->vars['attr']);
+        $this->assertSame($expectedAttr, $view->children[1]->vars['attr']);
+        $this->assertSame('_collection_entry', $view->children[0]->vars['unique_block_prefix']);
+        $this->assertSame('_collection_entry', $view->children[1]->vars['unique_block_prefix']);
+    }
+
+    public function testEntryOptionsAsCallable()
+    {
+        $data = array(
+            'foo',
+            'bar',
+        );
+
+        $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', $data, array(
+            'allow_add' => true,
+            'prototype' => true,
+            'prototype_name' => '__test__',
+            'entry_options' => function ($entry) {
+                return array(
+                    'label' => ucfirst($entry).':',
+                    'attr' => array('class' => $entry.'&class', 'data-upper' => strtoupper($entry)),
+                );
+            },
+        ))->createView();
+
+        $expectedAttr = array(
+            array('class' => 'foo&class', 'data-upper' => 'FOO'),
+            array('class' => 'bar&class', 'data-upper' => 'BAR'),
+        );
+
+        $this->assertSame('Foo:', $view->children[0]->vars['label']);
+        $this->assertSame('Bar:', $view->children[1]->vars['label']);
+        $this->assertSame($expectedAttr[0], $view->children[0]->vars['attr']);
+        $this->assertSame($expectedAttr[1], $view->children[1]->vars['attr']);
+        $this->assertSame('_collection_entry', $view->children[0]->vars['unique_block_prefix']);
+        $this->assertSame('_collection_entry', $view->children[1]->vars['unique_block_prefix']);
+    }
+
+    public function setEntryOptions($entry)
+    {
+        return array(
+            'label' => ucfirst($entry).':',
+            'attr' => array('class' => $entry.'&class', 'data-upper' => strtoupper($entry)),
+        );
+    }
+
+    public function testEntryOptionsAsCallableInArray()
+    {
+        $data = array(
+            'foo',
+            'bar',
+        );
+
+        $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', $data, array(
+            'allow_add' => true,
+            'prototype' => true,
+            'prototype_name' => '__test__',
+            'entry_options' => array($this, 'setEntryOptions'),
+        ))->createView();
+
+        $expectedAttr = array(
+            array('class' => 'foo&class', 'data-upper' => 'FOO'),
+            array('class' => 'bar&class', 'data-upper' => 'BAR'),
+        );
+
+        $this->assertSame('Foo:', $view->children[0]->vars['label']);
+        $this->assertSame('Bar:', $view->children[1]->vars['label']);
+        $this->assertSame($expectedAttr[0], $view->children[0]->vars['attr']);
+        $this->assertSame($expectedAttr[1], $view->children[1]->vars['attr']);
+        $this->assertSame('_collection_entry', $view->children[0]->vars['unique_block_prefix']);
+        $this->assertSame('_collection_entry', $view->children[1]->vars['unique_block_prefix']);
+    }
+
+    public function testEntryOptionsAsCallableWithPrototypeUsePrototypeOptionsData()
+    {
+        $data = array(
+            'foo',
+            'bar',
+        );
+
+        $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', $data, array(
+            'allow_add' => true,
+            'prototype' => true,
+            'prototype_name' => '__test__',
+            'entry_options' => function ($entry) {
+                return array(
+                    'label' => ucfirst($entry).':',
+                    'attr' => array('class' => $entry.'&class', 'data-upper' => strtoupper($entry)),
+                );
+            },
+            'prototype_options' => array(
+                'data' => 'baz',
+                'required' => false,
+            ),
+        ))->createView();
+
+        $expectedAttr = array(
+            'entry1' => array('class' => 'foo&class', 'data-upper' => 'FOO'),
+            'entry2' => array('class' => 'bar&class', 'data-upper' => 'BAR'),
+            'prototype' => array('class' => 'baz&class', 'data-upper' => 'BAZ'),
+        );
+
+        $this->assertSame('Foo:', $view->children[0]->vars['label']);
+        $this->assertSame('Bar:', $view->children[1]->vars['label']);
+        $this->assertSame($expectedAttr['entry1'], $view->children[0]->vars['attr']);
+        $this->assertSame($expectedAttr['entry2'], $view->children[1]->vars['attr']);
+        $this->assertSame($expectedAttr['prototype'], $view->vars['prototype']->vars['attr']);
+        $this->assertFalse($view->vars['prototype']->vars['required']);
+        $this->assertSame('_collection_entry', $view->children[0]->vars['unique_block_prefix']);
+        $this->assertSame('_collection_entry', $view->children[1]->vars['unique_block_prefix']);
+        $this->assertSame('_collection_entry', $view->vars['prototype']->vars['unique_block_prefix']);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testEntryOptionsAsCallableWithPrototypeUsePrototypeData()
+    {
+        $data = array(
+            'foo',
+            'bar',
+        );
+
+        $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', $data, array(
+            'allow_add' => true,
+            'prototype' => true,
+            'prototype_name' => '__test__',
+            'entry_options' => function ($entry) {
+                return array(
+                    'label' => ucfirst($entry).':',
+                    'attr' => array('class' => $entry.'&class', 'data-upper' => strtoupper($entry)),
+                );
+            },
+            'prototype_options' => array(
+                'required' => false,
+            ),
+            'prototype_data' => 'baz',
+        ))->createView();
+
+        $expectedAttr = array(
+            'entry1' => array('class' => 'foo&class', 'data-upper' => 'FOO'),
+            'entry2' => array('class' => 'bar&class', 'data-upper' => 'BAR'),
+            'prototype' => array('class' => 'baz&class', 'data-upper' => 'BAZ'),
+        );
+
+        $this->assertSame('Foo:', $view->children[0]->vars['label']);
+        $this->assertSame('Bar:', $view->children[1]->vars['label']);
+        $this->assertSame('Baz:', $view->vars['prototype']->vars['label']);
+        $this->assertSame($expectedAttr['entry1'], $view->children[0]->vars['attr']);
+        $this->assertSame($expectedAttr['entry2'], $view->children[1]->vars['attr']);
+        $this->assertSame($expectedAttr['prototype'], $view->vars['prototype']->vars['attr']);
+        $this->assertFalse($view->vars['prototype']->vars['required']);
+        $this->assertSame('_collection_entry', $view->children[0]->vars['unique_block_prefix']);
+        $this->assertSame('_collection_entry', $view->children[1]->vars['unique_block_prefix']);
+        $this->assertSame('_collection_entry', $view->vars['prototype']->vars['unique_block_prefix']);
     }
 }

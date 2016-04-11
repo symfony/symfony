@@ -20,10 +20,14 @@ class PriorityTaggedServiceTraitTest extends \PHPUnit_Framework_TestCase
     public function testThatCacheWarmersAreProcessedInPriorityOrder()
     {
         $services = array(
-            'my_service1' => array(0 => array('priority' => 100)),
-            'my_service2' => array(0 => array('priority' => 200)),
-            'my_service3' => array(0 => array('priority' => -500)),
-            'my_service4' => array(0 => array()),
+            'my_service1' => array(array('priority' => 100)),
+            'my_service2' => array(array('priority' => 200)),
+            'my_service3' => array(array('priority' => -500)),
+            'my_service4' => array(array()),
+            'my_service5' => array(array()),
+            'my_service6' => array(array('priority' => -500)),
+            'my_service7' => array(array('priority' => -499)),
+            'my_service8' => array(array('priority' => 1)),
         );
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
@@ -48,8 +52,12 @@ class PriorityTaggedServiceTraitTest extends \PHPUnit_Framework_TestCase
             ->with(0, array(
                 new Reference('my_service2'),
                 new Reference('my_service1'),
+                new Reference('my_service8'),
                 new Reference('my_service4'),
+                new Reference('my_service5'),
+                new Reference('my_service7'),
                 new Reference('my_service3'),
+                new Reference('my_service6'),
             ));
 
         (new PriorityTaggedServiceTraitImplementation())->test('my_custom_tag', $container);

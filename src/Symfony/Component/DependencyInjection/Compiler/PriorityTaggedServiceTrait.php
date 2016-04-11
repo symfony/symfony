@@ -33,21 +33,15 @@ trait PriorityTaggedServiceTrait
     {
         $services = $container->findTaggedServiceIds($tagName);
 
-        $sortedServices = array();
+        $queue = new \SplPriorityQueue();
+
         foreach ($services as $serviceId => $tags) {
             foreach ($tags as $attributes) {
                 $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-                $sortedServices[$priority][] = new Reference($serviceId);
+                $queue->insert(new Reference($serviceId), $priority * -1);
             }
         }
 
-        if (empty($sortedServices)) {
-            return array();
-        }
-
-        krsort($sortedServices);
-
-        // Flatten the array
-        return call_user_func_array('array_merge', $sortedServices);
+        return iterator_to_array($queue);
     }
 }

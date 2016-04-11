@@ -40,8 +40,6 @@ class Definition
     protected $arguments;
 
     /**
-     * Constructor.
-     *
      * @param string $class     The service class
      * @param array  $arguments An array of arguments to pass to the service constructor
      */

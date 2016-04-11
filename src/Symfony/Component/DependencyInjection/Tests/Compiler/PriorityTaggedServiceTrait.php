@@ -28,6 +28,11 @@ class PriorityTaggedServiceTraitTest extends \PHPUnit_Framework_TestCase
             'my_service6' => array(array('priority' => -500)),
             'my_service7' => array(array('priority' => -499)),
             'my_service8' => array(array('priority' => 1)),
+            'my_service9' => array(array()),
+            'my_service10' => array(array('priority' => -1000)),
+            'my_service11' => array(array('priority' => -1000)),
+            'my_service12' => array(array('priority' => -1000)),
+            'my_service13' => array(array('priority' => -1000)),
         );
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
@@ -55,9 +60,14 @@ class PriorityTaggedServiceTraitTest extends \PHPUnit_Framework_TestCase
                 new Reference('my_service8'),
                 new Reference('my_service4'),
                 new Reference('my_service5'),
+                new Reference('my_service9'),
                 new Reference('my_service7'),
                 new Reference('my_service3'),
                 new Reference('my_service6'),
+                new Reference('my_service10'),
+                new Reference('my_service11'),
+                new Reference('my_service12'),
+                new Reference('my_service13'),
             ));
 
         (new PriorityTaggedServiceTraitImplementation())->test('my_custom_tag', $container);

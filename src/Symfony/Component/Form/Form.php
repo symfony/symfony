@@ -325,7 +325,11 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         if (is_object($modelData) && !$this->config->getByReference()) {
-            $modelData = clone $modelData;
+            if ($modelData instanceof \Traversable) {
+                $modelData = iterator_to_array($modelData);
+            } else {
+                $modelData = clone $modelData;
+            }
         }
 
         if ($this->lockSetData) {

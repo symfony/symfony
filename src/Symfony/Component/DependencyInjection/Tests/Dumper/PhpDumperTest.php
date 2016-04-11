@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Variable;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class PhpDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -99,6 +100,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array('foo' => new Definition('stdClass'))),
+            array(array('foo' => new Expression('service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")'))),
             array(array('foo' => new Reference('foo'))),
             array(array('foo' => new Variable('foo'))),
         );

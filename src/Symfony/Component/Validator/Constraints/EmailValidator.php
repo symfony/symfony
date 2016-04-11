@@ -84,9 +84,7 @@ class EmailValidator extends ConstraintValidator
             case Email::PROFILE_RFC_ALLOW_WARNINGS:
             case Email::PROFILE_RFC_DISALLOW_WARNINGS:
                 if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
-                    throw new RuntimeException(
-                        'Standards-compliant email validation requires egulias/email-validator'
-                    );
+                    throw new RuntimeException('Standards-compliant email validation requires egulias/email-validator');
                 }
                 $rfcValidator = new \Egulias\EmailValidator\EmailValidator();
                 $emailAddressIsValid = $rfcValidator->isValid(

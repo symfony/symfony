@@ -127,33 +127,46 @@ abstract class Controller implements ContainerAwareInterface
     }
 
     /**
-     * Returns a Response (or BinaryFileResponse) object with original or customized file name and disposition header.
+     * Returns a BinaryFileResponse object with original or customized file name and disposition header.
      *
      * @param File|string $file        File object (or string with content) to be sent as response
      * @param null        $fileName    File name to be sent to response or null (will use original file name)
      * @param string      $disposition Disposition of response (attachment is default, other type is inline)
-     * @param string      $mimeType    Mime type of file will be auto detected on File object (so it can be null) but is mandatory for string
      *
-     * @return Response|BinaryFileResponse
+     * @return BinaryFileResponse
      *
-     * @throws \LogicException|\InvalidArgumentException
+     * @throws \LogicException|\InvalidArgumentException|\Exception
      */
-    protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT, $mimeType = null)
+    protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
-        if ($file instanceof File && $file->isReadable()) {
-            $response = new BinaryFileResponse($file);
-            $mimeType = $file->getMimeType();
-        } elseif (is_string($file)) {
-            if ($mimeType === null) {
-                throw new \InvalidArgumentException('You must specify mime type for file from string.');
-            }
+        $deleteFileAfterSend = false;
+        if (is_string($file)) {
             if (empty($file)) {
                 throw new \InvalidArgumentException('File content can\'t be empty.');
             }
             if (empty($fileName)) {
                 throw new \InvalidArgumentException('File name can\'t be empty.');
             }
-            $response = new Response($file);
+            $cacheDir = $this->container->get('kernel')->getCacheDir();
+            $tmpName = md5($fileName);
+            $tmpPath = $cacheDir.DIRECTORY_SEPARATOR.$tmpName;
+
+            try {
+                file_put_contents($tmpPath, $file);
+            } catch (\Exception $e) {
+                throw $e;
+            }
+
+            $deleteFileAfterSend = true;
+            $file = new File($tmpPath);
+        }
+
+        if ($file instanceof File && $file->isReadable()) {
+            $response = new BinaryFileResponse($file);
+            $mimeType = $file->getMimeType();
+            if ($deleteFileAfterSend === true) {
+                $response->deleteFileAfterSend($deleteFileAfterSend);
+            }
         } else {
             throw new \InvalidArgumentException(
                 sprintf(

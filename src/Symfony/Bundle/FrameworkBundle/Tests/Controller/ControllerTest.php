@@ -214,7 +214,14 @@ class ControllerTest extends TestCase
 
     public function testFile()
     {
+        /* @var ContainerInterface $container */
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $container->set('kernel', $kernel);
+
         $controller = new TestController();
+        $controller->setContainer($container);
+
         /* @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__));
 
@@ -227,7 +234,10 @@ class ControllerTest extends TestCase
 
     public function testFileAsInline()
     {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $controller = new TestController();
+        $controller->setContainer($container);
+
         /* @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__), null, ResponseHeaderBag::DISPOSITION_INLINE);
 
@@ -240,7 +250,10 @@ class ControllerTest extends TestCase
 
     public function testFileWithOwnFileName()
     {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $controller = new TestController();
+        $controller->setContainer($container);
+
         /* @var BinaryFileResponse $response */
         $fileName = 'test.php';
         $response = $controller->file(new File(__FILE__), $fileName);
@@ -254,7 +267,10 @@ class ControllerTest extends TestCase
 
     public function testFileWithOwnFileNameAsInline()
     {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $controller = new TestController();
+        $controller->setContainer($container);
+
         /* @var BinaryFileResponse $response */
         $fileName = 'test.php';
         $response = $controller->file(new File(__FILE__), $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
@@ -268,22 +284,36 @@ class ControllerTest extends TestCase
 
     public function testFileFromString()
     {
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel->expects($this->at(0))->method('getCacheDir')->will($this->returnValue(sys_get_temp_dir()));
+
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container->expects($this->at(0))->method('get')->will($this->returnValue($kernel));
+
         $controller = new TestController();
+        $controller->setContainer($container);
+
         /* @var BinaryFileResponse $response */
         $fileName = 'test.txt';
+        $tmpName = md5($fileName);
         $content = 'This is my testing file';
         $response = $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
+        $response->sendContent();
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('text/plain', $response->headers->get('content-type'));
         $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
         $this->assertContains($fileName, $response->headers->get('content-disposition'));
+        $this->assertFileNotExists(sys_get_temp_dir().DIRECTORY_SEPARATOR.md5($fileName));
     }
 
     public function testFileFromStringWithoutFileName()
     {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $controller = new TestController();
+        $controller->setContainer($container);
+
         /* @var BinaryFileResponse $response */
         $fileName = '';
         $content = 'This is my testing file';
@@ -293,22 +323,15 @@ class ControllerTest extends TestCase
 
     public function testFileFromStringWithoutContent()
     {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $controller = new TestController();
+        $controller->setContainer($container);
+
         /* @var BinaryFileResponse $response */
         $fileName = 'test.txt';
         $content = '';
         $this->setExpectedException(\InvalidArgumentException::class);
         $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
-    }
-
-    public function testFileFromStringWithoutSpecifiedMimeType()
-    {
-        $controller = new TestController();
-        /* @var BinaryFileResponse $response */
-        $fileName = 'test.txt';
-        $content = 'This is my testing file';
-        $this->setExpectedException(\InvalidArgumentException::class);
-        $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
     }
 
     public function testIsGranted()
@@ -596,9 +619,9 @@ class TestController extends Controller
         return parent::json($data, $status, $headers, $context);
     }
 
-    public function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT, $mimeType = null)
+    public function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
-        return parent::file($file, $fileName, $disposition, $mimeType);
+        return parent::file($file, $fileName, $disposition);
     }
 
     public function isGranted($attributes, $object = null)

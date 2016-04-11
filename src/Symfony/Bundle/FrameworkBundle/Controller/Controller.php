@@ -146,7 +146,7 @@ abstract class Controller implements ContainerAwareInterface
             $file = new File($file);
         }
 
-        // Test if is content in string is given
+        // Test if content in string is given
         if (is_string($file)) {
             if (empty($file)) {
                 throw new \InvalidArgumentException('File content can\'t be empty.');

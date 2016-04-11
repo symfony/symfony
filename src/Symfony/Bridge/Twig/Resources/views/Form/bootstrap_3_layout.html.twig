@@ -94,14 +94,12 @@
 
 {% block choice_widget_expanded -%}
     {% if '-inline' in label_attr.class|default('') -%}
-        <div class="control-group">
-            {%- for child in form %}
-                {{- form_widget(child, {
-                    parent_label_class: label_attr.class|default(''),
-                    translation_domain: choice_translation_domain,
-                }) -}}
-            {% endfor -%}
-        </div>
+        {%- for child in form %}
+            {{- form_widget(child, {
+                parent_label_class: label_attr.class|default(''),
+                translation_domain: choice_translation_domain,
+            }) -}}
+        {% endfor -%}
     {%- else -%}
         <div {{ block('widget_container_attributes') }}>
             {%- for child in form %}

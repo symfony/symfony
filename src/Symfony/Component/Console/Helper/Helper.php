@@ -62,26 +62,28 @@ abstract class Helper implements HelperInterface
     {
         static $timeFormats = array(
             array(0, '< 1 sec'),
-            array(2, '1 sec'),
-            array(59, 'secs', 1),
+            array(1, '1 sec'),
+            array(2, 'secs', 1),
             array(60, '1 min'),
-            array(3600, 'mins', 60),
-            array(5400, '1 hr'),
-            array(86400, 'hrs', 3600),
-            array(129600, '1 day'),
-            array(604800, 'days', 86400),
+            array(120, 'mins', 60),
+            array(3600, '1 hr'),
+            array(7200, 'hrs', 3600),
+            array(86400, '1 day'),
+            array(172800, 'days', 86400),
         );
 
-        foreach ($timeFormats as $format) {
+        foreach ($timeFormats as $index => $format) {
             if ($secs >= $format[0]) {
-                continue;
-            }
+                if ((isset($timeFormats[$index + 1]) && $secs < $timeFormats[$index + 1][0])
+                    || $index == count($timeFormats) - 1
+                ) {
+                    if (2 == count($format)) {
+                        return $format[1];
+                    }
 
-            if (2 == count($format)) {
-                return $format[1];
+                    return floor($secs / $format[2]).' '.$format[1];
+                }
             }
-
-            return ceil($secs / $format[2]).' '.$format[1];
         }
     }
 

@@ -163,7 +163,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services5.xml');
         $services = $container->getDefinitions();
-        $this->assertCount(4, $services, '->load() attributes unique ids to anonymous services');
+        $this->assertCount(6, $services, '->load() attributes unique ids to anonymous services');
 
         // anonymous service as an argument
         $args = $services['foo']->getArguments();
@@ -172,6 +172,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($services[(string) $args[0]]), '->load() makes a reference to the created ones');
         $inner = $services[(string) $args[0]];
         $this->assertEquals('BarClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertFalse($inner->isPublic());
 
         // inner anonymous services
         $args = $inner->getArguments();
@@ -188,7 +189,25 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Reference', $property, '->load() converts anonymous services to references to "normal" services');
         $this->assertTrue(isset($services[(string) $property]), '->load() makes a reference to the created ones');
         $inner = $services[(string) $property];
-        $this->assertEquals('BazClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertEquals('BuzClass', $inner->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertFalse($inner->isPublic());
+
+        // "wild" service
+        $service = $container->findTaggedServiceIds('biz_tag');
+        $this->assertCount(1, $service);
+
+        foreach ($service as $id => $tag) {
+            $service = $container->getDefinition($id);
+        }
+        $this->assertEquals('BizClass', $service->getClass(), '->load() uses the same configuration as for the anonymous ones');
+        $this->assertFalse($service->isPublic());
+
+        // anonymous services are shared when using decoration definitions
+        $container->compile();
+        $services = $container->getDefinitions();
+        $fooArgs = $services['foo']->getArguments();
+        $barArgs = $services['bar']->getArguments();
+        $this->assertSame($fooArgs[0], $barArgs[0]);
     }
 
     /**

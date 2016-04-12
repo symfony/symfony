@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-09T14:51:31Z
+
+Thanks! It's been an hour since I'm trying to understand what's wrong with this :)
+
+This change you mention might be useless after https://github.com/symfony/symfony/commit/9802a41b3cdd90bc9a4e625d6043859153ce67de.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-12T14:37:59Z
+
+:+1:

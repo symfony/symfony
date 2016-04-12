@@ -145,6 +145,11 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setHelp('');
         $this->assertContains('description', $command->getProcessedHelp(), '->getProcessedHelp() falls back to the description');
+
+        $command = new \TestCommand();
+        $command->setFullName(sprintf('custom %s', $command->getName()));
+        $command->setHelp('The %command.name% command does... Example: %command.full_name%.');
+        $this->assertContains('Example: custom namespace:name.', $command->getProcessedHelp(), '->getProcessedHelp() uses predefined full_name');
     }
 
     public function testGetSetAliases()

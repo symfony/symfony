@@ -31,6 +31,7 @@ class Command
 {
     private $application;
     private $name;
+    private $fullName;
     private $processTitle;
     private $aliases = array();
     private $definition;
@@ -60,6 +61,7 @@ class Command
         }
 
         $this->configure();
+        $this->setFullName(sprintf('%s %s', $_SERVER['PHP_SELF'], $this->getName()));
 
         if (!$this->name) {
             throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
@@ -418,6 +420,20 @@ class Command
     }
 
     /**
+     * Sets the full name of the command.
+     *
+     * @param string $fullName The full command name
+     *
+     * @return Command The current instance
+     */
+    public function setFullName($fullName)
+    {
+        $this->fullName = $fullName;
+
+        return $this;
+    }
+
+    /**
      * Sets the process title of the command.
      *
      * This feature should be used only when creating a long process command,
@@ -503,6 +519,7 @@ class Command
     public function getProcessedHelp()
     {
         $name = $this->name;
+        $fullName = $this->fullName;
 
         $placeholders = array(
             '%command.name%',
@@ -510,7 +527,7 @@ class Command
         );
         $replacements = array(
             $name,
-            $_SERVER['PHP_SELF'].' '.$name,
+            $fullName,
         );
 
         return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());

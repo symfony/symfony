@@ -1154,7 +1154,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      * @dataProvider provideVariousIncrementals
      */
     public function testIncrementalOutputDoesNotRequireAnotherCall($stream, $method) {
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\''.$stream.'\', $n, 1); $n++; usleep(1000); }'), null, null, null, null);
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\''.$stream.'\', $n, 1); $n++; usleep(1000); }'), null, null, null, null);
         $process->start();
         $result = '';
         $limit = microtime(true) + 3;
@@ -1182,7 +1182,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             yield 'pong';
         };
 
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'), null, null, $input());
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'), null, null, $input());
         $process->run();
         $this->assertSame('pingpong', $process->getOutput());
     }
@@ -1191,7 +1191,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $input = new InputStream();
 
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('echo \'ping\'; stream_copy_to_stream(STDIN, STDOUT);'));
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo \'ping\'; stream_copy_to_stream(STDIN, STDOUT);'));
         $process->setInput($input);
 
         $process->start(function ($type, $data) use ($input) {
@@ -1225,7 +1225,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $input->onEmpty($stream);
         $input->write($stream());
 
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo fread(STDIN, 3);'));
         $process->setInput($input);
         $process->start(function ($type, $data) use ($input) {
             $input->close();
@@ -1243,7 +1243,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             $input->close();
         });
 
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);'));
         $process->setInput($input);
         $process->start();
         $input->write('ping');
@@ -1257,7 +1257,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $input = new InputStream();
         $input->onEmpty(function () use (&$i) {++$i;});
 
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('echo 123; echo fread(STDIN, 1); echo 456;'));
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo 123; echo fread(STDIN, 1); echo 456;'));
         $process->setInput($input);
         $process->start(function ($type, $data) use ($input) {
             if ('123' === $data) {
@@ -1274,7 +1274,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $input = new InputStream();
 
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('fwrite(STDOUT, 123); fwrite(STDERR, 234); fwrite(STDOUT, fread(STDIN, 3)); fwrite(STDERR, 456);'));
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('fwrite(STDOUT, 123); fwrite(STDERR, 234); flush(); usleep(10000); fwrite(STDOUT, fread(STDIN, 3)); fwrite(STDERR, 456);'));
         $process->setInput($input);
         $process->start();
         $output = array();
@@ -1310,12 +1310,12 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $input = new InputStream();
 
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('fwrite(STDOUT, fread(STDIN, 3));'));
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('fwrite(STDOUT, fread(STDIN, 3));'));
         $process->setInput($input);
         $process->start();
         $output = array();
 
-        foreach ($process->getIterator(false, false) as $type => $data) {
+        foreach ($process->getIterator($process::ITER_NON_BLOCKING | $process::ITER_KEEP_OUTPUT) as $type => $data) {
             $output[] = array($type, $data);
             break;
         }
@@ -1326,7 +1326,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         $input->write(123);
 
-        foreach ($process->getIterator(false, false) as $type => $data) {
+        foreach ($process->getIterator($process::ITER_NON_BLOCKING | $process::ITER_KEEP_OUTPUT) as $type => $data) {
             if ('' !== $data) {
                 $output[] = array($type, $data);
             }
@@ -1340,6 +1340,21 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             array($process::OUT, '123'),
         );
         $this->assertSame($expectedOutput, $output);
+    }
+
+    public function testChainedProcesses()
+    {
+        $p1 = new Process(self::$phpBin.' -r '.escapeshellarg('fwrite(STDERR, 123); fwrite(STDOUT, 456);'));
+        $p2 = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);')));
+        $p2->setInput($p1);
+
+        $p1->start();
+        $p2->run();
+
+        $this->assertSame('123', $p1->getErrorOutput());
+        $this->assertSame('', $p1->getOutput());
+        $this->assertSame('', $p2->getErrorOutput());
+        $this->assertSame('456', $p2->getOutput());
     }
 
     /**

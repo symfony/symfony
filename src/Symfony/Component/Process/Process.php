@@ -43,6 +43,11 @@ class Process implements \IteratorAggregate
     // Timeout Precision in seconds.
     const TIMEOUT_PRECISION = 0.2;
 
+    const ITER_NON_BLOCKING = 1; // By default, iterating over outputs is a blocking call, use this flag to make it non-blocking
+    const ITER_KEEP_OUTPUT = 2;  // By default, outputs are cleared while iterating, use this flag to keep them in memory
+    const ITER_SKIP_OUT = 4;     // Use this flag to skip STDOUT while iterating
+    const ITER_SKIP_ERR = 8;     // Use this flag to skip STDERR while iterating
+
     private $callback;
     private $hasCallback = false;
     private $commandline;
@@ -503,41 +508,49 @@ class Process implements \IteratorAggregate
     /**
      * Returns an iterator to the output of the process, with the output type as keys (Process::OUT/ERR).
      *
-     * @param bool $blocking    Whether to use a blocking read call.
-     * @param bool $clearOutput Whether to clear or keep output in memory.
+     * @param int $flags A bit field of Process::ITER_* flags.
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
      *
      * @return \Generator
      */
-    public function getIterator($blocking = true, $clearOutput = true)
+    public function getIterator($flags = 0)
     {
         $this->readPipesForOutput(__FUNCTION__, false);
 
-        while (null !== $this->callback || !feof($this->stdout) || !feof($this->stderr)) {
-            $out = stream_get_contents($this->stdout, -1, $this->incrementalOutputOffset);
+        $clearOutput = !(self::ITER_KEEP_OUTPUT & $flags);
+        $blocking = !(self::ITER_NON_BLOCKING & $flags);
+        $yieldOut = !(self::ITER_SKIP_OUT & $flags);
+        $yieldErr = !(self::ITER_SKIP_ERR & $flags);
 
-            if (isset($out[0])) {
-                if ($clearOutput) {
-                    $this->clearOutput();
-                } else {
-                    $this->incrementalOutputOffset = ftell($this->stdout);
+        while (null !== $this->callback || ($yieldOut && !feof($this->stdout)) || ($yieldErr && !feof($this->stderr))) {
+            if ($yieldOut) {
+                $out = stream_get_contents($this->stdout, -1, $this->incrementalOutputOffset);
+
+                if (isset($out[0])) {
+                    if ($clearOutput) {
+                        $this->clearOutput();
+                    } else {
+                        $this->incrementalOutputOffset = ftell($this->stdout);
+                    }
+
+                    yield self::OUT => $out;
                 }
-
-                yield self::OUT => $out;
             }
 
-            $err = stream_get_contents($this->stderr, -1, $this->incrementalErrorOutputOffset);
+            if ($yieldErr) {
+                $err = stream_get_contents($this->stderr, -1, $this->incrementalErrorOutputOffset);
 
-            if (isset($err[0])) {
-                if ($clearOutput) {
-                    $this->clearErrorOutput();
-                } else {
-                    $this->incrementalErrorOutputOffset = ftell($this->stderr);
+                if (isset($err[0])) {
+                    if ($clearOutput) {
+                        $this->clearErrorOutput();
+                    } else {
+                        $this->incrementalErrorOutputOffset = ftell($this->stderr);
+                    }
+
+                    yield self::ERR => $err;
                 }
-
-                yield self::ERR => $err;
             }
 
             if (!$blocking && !isset($out[0]) && !isset($err[0])) {

@@ -31,7 +31,7 @@ class Command
 {
     private $application;
     private $name;
-    private $fullName;
+    private $fullNamePrefix;
     private $processTitle;
     private $aliases = array();
     private $definition;
@@ -61,7 +61,6 @@ class Command
         }
 
         $this->configure();
-        $this->setFullName(sprintf('%s %s', $_SERVER['PHP_SELF'], $this->getName()));
 
         if (!$this->name) {
             throw new LogicException(sprintf('The command defined in "%s" cannot have an empty name.', get_class($this)));
@@ -422,13 +421,13 @@ class Command
     /**
      * Sets the full name of the command.
      *
-     * @param string $fullName The full command name
+     * @param string $fullNamePrefix The full command name
      *
      * @return Command The current instance
      */
-    public function setFullName($fullName)
+    public function setFullNamePrefix($fullNamePrefix)
     {
-        $this->fullName = $fullName;
+        $this->fullNamePrefix = $fullNamePrefix;
 
         return $this;
     }
@@ -519,7 +518,7 @@ class Command
     public function getProcessedHelp()
     {
         $name = $this->name;
-        $fullName = $this->fullName;
+        $fullNamePrefix = $this->fullNamePrefix ?: $_SERVER['PHP_SELF'];
 
         $placeholders = array(
             '%command.name%',
@@ -527,7 +526,7 @@ class Command
         );
         $replacements = array(
             $name,
-            $fullName,
+            sprintf('%s %s', $fullNamePrefix, $name),
         );
 
         return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());

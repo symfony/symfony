@@ -29,8 +29,6 @@ class ServiceReferenceGraphNode
     private $value;
 
     /**
-     * Constructor.
-     *
      * @param string $id    The node identifier
      * @param mixed  $value The node value
      */

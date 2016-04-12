@@ -28,9 +28,6 @@ class ServiceReferenceGraph
      */
     private $nodes;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->nodes = array();

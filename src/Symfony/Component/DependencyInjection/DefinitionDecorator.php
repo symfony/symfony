@@ -25,8 +25,6 @@ class DefinitionDecorator extends Definition
     private $changes;
 
     /**
-     * Constructor.
-     *
      * @param string $parent The id of Definition instance to decorate.
      */
     public function __construct($parent)

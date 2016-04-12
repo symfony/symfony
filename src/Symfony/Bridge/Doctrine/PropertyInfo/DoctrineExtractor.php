@@ -71,7 +71,9 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
 
             if ($metadata->isSingleValuedAssociation($property)) {
                 if ($metadata instanceof ClassMetadataInfo) {
-                    $nullable = isset($metadata->discriminatorColumn['nullable']) ? $metadata->discriminatorColumn['nullable'] : false;
+                    $associationMapping = $metadata->getAssociationMapping($property);
+
+                    $nullable = $this->isAssociationNullable($associationMapping);
                 } else {
                     $nullable = false;
                 }
@@ -79,12 +81,25 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 return array(new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $class));
             }
 
+            $collectionKeyType = Type::BUILTIN_TYPE_INT;
+
+            if ($metadata instanceof ClassMetadataInfo) {
+                $associationMapping = $metadata->getAssociationMapping($property);
+
+                if (isset($associationMapping['indexBy'])) {
+                    $indexProperty = $associationMapping['indexBy'];
+                    $typeOfField = $metadata->getTypeOfField($indexProperty);
+
+                    $collectionKeyType = $this->getPhpType($typeOfField);
+                }
+            }
+
             return array(new Type(
                 Type::BUILTIN_TYPE_OBJECT,
                 false,
                 'Doctrine\Common\Collections\Collection',
                 true,
-                new Type(Type::BUILTIN_TYPE_INT),
+                new Type($collectionKeyType),
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
             ));
         }
@@ -116,6 +131,35 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                     return $builtinType ? array(new Type($builtinType, $nullable)) : null;
             }
         }
+    }
+
+    /**
+     * Determines whether an association is nullable.
+     *
+     * @param array $associationMapping
+     *
+     * @return bool
+     *
+     * @see https://github.com/doctrine/doctrine2/blob/v2.5.4/lib/Doctrine/ORM/Tools/EntityGenerator.php#L1221-L1246
+     */
+    private function isAssociationNullable(array $associationMapping)
+    {
+        if (isset($associationMapping['id']) && $associationMapping['id']) {
+            return false;
+        }
+
+        if (!isset($associationMapping['joinColumns'])) {
+            return true;
+        }
+
+        $joinColumns = $associationMapping['joinColumns'];
+        foreach ($joinColumns as $joinColumn) {
+            if (isset($joinColumn['nullable']) && !$joinColumn['nullable']) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

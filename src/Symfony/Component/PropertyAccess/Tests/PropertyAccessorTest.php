@@ -529,4 +529,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($object, 'date', $date);
         $this->assertSame($date, $object->getDate());
     }
+
+    public function testArrayNotBeeingOverwritten()
+    {
+        $value = array('value1' => 'foo', 'value2' => 'bar');
+        $object = new TestClass($value);
+
+        $this->propertyAccessor->setValue($object, 'publicAccessor[value2]', 'baz');
+        $this->assertSame('baz', $this->propertyAccessor->getValue($object, 'publicAccessor[value2]'));
+        $this->assertSame(array('value1' => 'foo', 'value2' => 'baz'), $object->getPublicAccessor());
+    }
 }

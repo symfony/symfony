@@ -30,4 +30,17 @@ class ApcuAdapterTest extends CachePoolTest
 
         return new ApcuAdapter(str_replace('\\', '.', __CLASS__));
     }
+
+    public function testUnserializable()
+    {
+        $pool = $this->createCachePool();
+
+        $item = $pool->getItem('foo');
+        $item->set(function() {});
+
+        $this->assertFalse($pool->save($item));
+
+        $item = $pool->getItem('foo');
+        $this->assertFalse($item->isHit());
+    }
 }

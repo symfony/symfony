@@ -77,7 +77,7 @@ Use the <info>--parameters</info> option to display all parameters:
 
   <info>php %command.full_name% --parameters</info>
 
-Display a specific parameter by specifying his name with the <info>--parameter</info> option:
+Display a specific parameter by specifying its name with the <info>--parameter</info> option:
 
   <info>php %command.full_name% --parameter=kernel.debug</info>
 

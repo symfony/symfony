@@ -687,6 +687,21 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($second, $first), $configs);
     }
 
+    public function testAbstractAlias()
+    {
+        $container = new ContainerBuilder();
+
+        $abstract = new Definition('AbstractClass');
+        $abstract->setAbstract(true);
+
+        $container->setDefinition('abstract_service', $abstract);
+        $container->setAlias('abstract_alias', 'abstract_service');
+
+        $container->compile();
+
+        $this->assertSame('abstract_service', (string) $container->getAlias('abstract_alias'));
+    }
+
     public function testLazyLoadedService()
     {
         $loader = new ClosureLoader($container = new ContainerBuilder());

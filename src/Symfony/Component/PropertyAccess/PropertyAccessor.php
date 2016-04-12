@@ -192,6 +192,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     if ($propertyPath->isIndex($i)) {
                         if ($overwrite = !isset($zval[self::REF])) {
                             $ref = &$zval[self::REF];
+                            $ref = $zval[self::VALUE];
                         }
                         $this->writeIndex($zval, $property, $value);
                         if ($overwrite) {

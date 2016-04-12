@@ -158,6 +158,59 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($this->event);
     }
 
+    public function testExitUserDoesNotDispatchEventWithStringUser()
+    {
+        $originalUser = 'anon.';
+        $this
+            ->userProvider
+            ->expects($this->never())
+            ->method('refreshUser');
+        $originalToken = $this->getToken();
+        $originalToken
+            ->expects($this->any())
+            ->method('getUser')
+            ->willReturn($originalUser);
+        $role = $this
+            ->getMockBuilder('Symfony\Component\Security\Core\Role\SwitchUserRole')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $role
+            ->expects($this->any())
+            ->method('getSource')
+            ->willReturn($originalToken);
+        $this
+            ->tokenStorage
+            ->expects($this->any())
+            ->method('getToken')
+            ->willReturn($this->getToken(array($role)));
+        $this
+            ->request
+            ->expects($this->any())
+            ->method('get')
+            ->with('_switch_user')
+            ->willReturn('_exit');
+        $this
+            ->request
+            ->query
+            ->expects($this->any())
+            ->method('all')
+            ->will($this->returnValue(array()));
+        $this
+            ->request
+            ->expects($this->any())
+            ->method('getUri')
+            ->willReturn('/');
+
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher
+            ->expects($this->never())
+            ->method('dispatch')
+        ;
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
+        $listener->handle($this->event);
+    }
+
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */

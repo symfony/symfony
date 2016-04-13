@@ -38,6 +38,11 @@ class PhpGeneratorDumper extends GeneratorDumper
             'base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
         ), $options);
 
+        // On PHP 5.6, OPcache is able to keep statically declared arrays in shared memory,
+        // but only up to 32767 elements (See https://bugs.php.net/68057).
+        // On PHP 7.0+, all static arrays are kept in shared memory, statically declared or not.
+        $static = count($this->getRoutes()) > 32767 ? '' : 'static ';
+
         return <<<EOF
 <?php
 
@@ -63,7 +68,9 @@ class {$options['class']} extends {$options['base_class']}
         \$this->context = \$context;
         \$this->logger = \$logger;
         if (null === self::\$declaredRoutes) {
-            self::\$declaredRoutes = {$this->generateDeclaredRoutes()};
+            $static\$declaredRoutes = {$this->generateDeclaredRoutes()};
+            self::\$declaredRoutes =& \$declaredRoutes;
+            unset(\$declaredRoutes);
         }
     }
 
@@ -92,9 +99,9 @@ EOF;
             $properties[] = $compiledRoute->getTokens();
             $properties[] = $compiledRoute->getHostTokens();
 
-            $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
+            $routes .= sprintf("                '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
         }
-        $routes .= '    )';
+        $routes .= '            )';
 
         return $routes;
     }

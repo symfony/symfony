@@ -96,6 +96,9 @@ class ProcessUtils
             if (is_scalar($input)) {
                 return (string) $input;
             }
+            if ($input instanceof Process) {
+                return $input->getIterator($input::ITER_SKIP_ERR);
+            }
             if ($input instanceof \Iterator) {
                 return $input;
             }

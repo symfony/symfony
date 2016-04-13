@@ -28,7 +28,7 @@ trait NormalizerAwareTrait
      *
      * @param NormalizerInterface $normalizer A NormalizerInterface instance
      */
-    public function setSerializer(NormalizerInterface $normalizer)
+    public function setNormalizer(NormalizerInterface $normalizer)
     {
         $this->normalizer = $normalizer;
     }

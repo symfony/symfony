@@ -28,7 +28,7 @@ trait DenormalizerAwareTrait
      *
      * @param DenormalizerInterface $denormalizer A DenormalizerInterface instance
      */
-    public function setSerializer(DenormalizerInterface $denormalizer)
+    public function setDenormalizer(DenormalizerInterface $denormalizer)
     {
         $this->denormalizer = $denormalizer;
     }

@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-11T12:45:00Z
+
+ping @csarrazi
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2016-04-11T20:39:34Z
+
+I've updated the code to check for errors during the search of free.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-04-11T21:03:38Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-04-11T21:04:33Z
+
+LGTM. Just 2 comments regarding style, so it is consistent with the rest.
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2016-04-12T07:28:37Z
+
+I've updated the spacing.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-04-12T07:31:10Z
+
+By the way, could you add a few functional tests?
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2016-04-12T09:01:00Z
+
+I've added a `find` test and a few for checking the (new) exceptions.
+
+I hope the Travis test-config is correct (taken from the `master` branch), I do not have a lot of experience in that area.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-04-12T09:36:09Z
+
+Nevermind my comment.
+
+I thought you were in the `master` branch. Could you revert the last commit, then squash your all your commits in a single one? Thanks!
+
+While we could add functional tests, these will most likely break when merging back to the `master` branch.
+
+---------------------------------------------------------------------------
+
+by hiddewie at 2016-04-12T09:43:46Z
+
+Yes, reverted last commits.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-04-12T11:02:07Z
+
+:+1:

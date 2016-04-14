@@ -189,6 +189,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="property_access">
+        <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="magic-call" type="xsd:boolean" />
         <xsd:attribute name="throw-exception-on-invalid-index" type="xsd:boolean" />
     </xsd:complexType>

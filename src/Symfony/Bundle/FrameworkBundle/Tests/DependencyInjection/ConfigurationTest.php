@@ -213,6 +213,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'strict_email' => false,
             ),
             'annotations' => array(
+                'enabled' => true,
                 'cache' => 'file',
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
                 'debug' => true,
@@ -222,6 +223,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enable_annotations' => false,
             ),
             'property_access' => array(
+                'enabled' => true,
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
             ),

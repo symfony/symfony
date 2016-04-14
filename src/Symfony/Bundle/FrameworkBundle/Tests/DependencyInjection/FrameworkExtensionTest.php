@@ -60,6 +60,12 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($def->getArgument(1));
     }
 
+    public function testPropertyAccessDisabled()
+    {
+        $container = $this->createContainerFromFile('property_accessor_disabled');
+        $this->assertFalse($container->hasDefinition('property_accessor'));
+    }
+
     /**
      * @expectedException \LogicException
      * @expectedExceptionMessage CSRF protection needs sessions to be enabled.

@@ -41,6 +41,8 @@ class FrameworkExtension extends Extension
     private $formConfigEnabled = false;
     private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
+    private $propertyAccessConfigEnabled = false;
+    private $annotationsConfigEnabled = false;
 
     /**
      * @var string|null
@@ -68,9 +70,6 @@ class FrameworkExtension extends Extension
         // will be used and everything will still work as expected.
         $loader->load('translation.xml');
 
-        // Property access is used by both the Form and the Validator component
-        $loader->load('property_access.xml');
-
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
@@ -92,6 +91,16 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
+        if ($this->isConfigEnabled($container, $config['property_access'])) {
+            $this->propertyAccessConfigEnabled = true;
+            $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['annotations'])) {
+            $this->annotationsConfigEnabled = true;
+            $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
+        }
+
         if ($this->isConfigEnabled($container, $config['request'])) {
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }
@@ -106,7 +115,9 @@ class FrameworkExtension extends Extension
             }
         }
 
-        $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+        if ($this->isConfigEnabled($container, $config['csrf_protection'])) {
+            $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
+        }
 
         if ($this->isConfigEnabled($container, $config['assets'])) {
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
@@ -116,11 +127,27 @@ class FrameworkExtension extends Extension
             $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
         }
 
-        $this->registerValidationConfiguration($config['validation'], $container, $loader);
-        $this->registerEsiConfiguration($config['esi'], $container, $loader);
-        $this->registerSsiConfiguration($config['ssi'], $container, $loader);
-        $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
-        $this->registerTranslatorConfiguration($config['translator'], $container);
+        if ($this->isConfigEnabled($container, $config['validation'])) {
+            $this->registerValidationConfiguration($config['validation'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['esi'])) {
+            $loader->load('esi.xml');
+        }
+
+        if ($this->isConfigEnabled($container, $config['ssi'])) {
+            $loader->load('ssi.xml');
+        }
+
+        if ($this->isConfigEnabled($container, $config['fragments'])) {
+            $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
+        }
+
+        if ($this->isConfigEnabled($container, $config['translator'])) {
+            $this->translationConfigEnabled = true;
+            $this->registerTranslatorConfiguration($config['translator'], $container);
+        }
+
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerCacheConfiguration($config['cache'], $container, $loader);
 
@@ -128,14 +155,11 @@ class FrameworkExtension extends Extension
             $this->registerRouterConfiguration($config['router'], $container, $loader);
         }
 
-        $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-        $this->registerPropertyAccessConfiguration($config['property_access'], $container);
-
-        if (isset($config['serializer'])) {
+        if ($this->isConfigEnabled($container, $config['serializer'])) {
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
-        if (isset($config['property_info'])) {
+        if ($this->isConfigEnabled($container, $config['property_info'])) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
@@ -209,6 +233,10 @@ class FrameworkExtension extends Extension
      */
     private function registerFormConfiguration($config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        if (!$this->propertyAccessConfigEnabled) {
+            throw new LogicException('"framework.property_access" must be enabled when "framework.form" is enabled.');
+        }
+
         $loader->load('form.xml');
         if (null === $config['form']['csrf_protection']['enabled']) {
             $config['form']['csrf_protection']['enabled'] = $config['csrf_protection']['enabled'];
@@ -222,22 +250,6 @@ class FrameworkExtension extends Extension
         } else {
             $container->setParameter('form.type_extension.csrf.enabled', false);
         }
-    }
-
-    /**
-     * Loads the ESI configuration.
-     *
-     * @param array            $config    An ESI configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
-    private function registerEsiConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
-    {
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
-        }
-
-        $loader->load('esi.xml');
     }
 
     /**
@@ -655,11 +667,6 @@ class FrameworkExtension extends Extension
      */
     private function registerTranslatorConfiguration(array $config, ContainerBuilder $container)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
-        }
-        $this->translationConfigEnabled = true;
-
         // Use the "real" translator instead of the identity default
         $container->setAlias('translator', 'translator.default');
         $translator = $container->findDefinition('translator.default');
@@ -753,6 +760,10 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        if (!$this->propertyAccessConfigEnabled) {
+            throw new LogicException('"framework.property_access" must be enabled when "framework.validator" is enabled.');
+        }
+
         $loader->load('validator.xml');
 
         $validatorBuilder = $container->getDefinition('validator.builder');
@@ -772,6 +783,9 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['strict_email']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"framework.annotations" must be enabled when "framework.serializer.enable_annotations" is set to true.');
+            }
             $validatorBuilder->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')));
         }
 
@@ -858,8 +872,11 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container)
+    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        // Property access is used by the Form, the Validator and the Serializer component
+        $loader->load('property_access.xml');
+
         $container
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
@@ -878,10 +895,6 @@ class FrameworkExtension extends Extension
      */
     private function registerSecurityCsrfConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
-        }
-
         if (!$this->sessionConfigEnabled) {
             throw new \LogicException('CSRF protection needs sessions to be enabled.');
         }
@@ -899,8 +912,8 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
+        if (!$this->propertyAccessConfigEnabled) {
+            throw new LogicException('"framework.property_access" must be enabled when "framework.serializer" is enabled.');
         }
 
         if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
@@ -929,6 +942,9 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = array();
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"framework.annotations" must be enabled when "framework.serializer.enable_annotations" is set to true.');
+            }
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
                  array(new Reference('annotation_reader'))

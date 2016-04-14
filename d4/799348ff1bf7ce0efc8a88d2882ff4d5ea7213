@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-03T09:02:24Z
+
+What does it look like with multiple calls?
+
+---------------------------------------------------------------------------
+
+by JhonnyL at 2016-04-03T10:27:38Z
+
+It will look like this.
+
+![screen shot 2016-04-03 at 12 20 47](https://cloud.githubusercontent.com/assets/1104667/14231958/9cdba61e-f996-11e5-8694-fc58144afcfd.png)
+
+![screen shot 2016-04-03 at 13 16 29](https://cloud.githubusercontent.com/assets/1104667/14232132/5ede3e78-f99e-11e5-8ae6-db0bd78b53de.png)
+
+![screen shot 2016-04-03 at 13 20 08](https://cloud.githubusercontent.com/assets/1104667/14232141/d09982ac-f99e-11e5-9432-4d97eb7db05b.png)
+
+![screen shot 2016-04-03 at 13 16 43](https://cloud.githubusercontent.com/assets/1104667/14232134/6dad5f92-f99e-11e5-826f-db2d4a84145f.png)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-03T11:29:50Z
+
+I think this would be a nice addition :+1:  Thanks @JhonnyL
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-03T13:27:20Z
+
+Would it be possible to show arguments of the setters as well? I think that
+would be an even greater addition
+
+On Sun, 3 Apr 2016 13:30 Javier Eguiluz, <notifications@github.com> wrote:
+
+> I think this would be a nice addition [image: :+1:] Thanks @JhonnyL
+> <https://github.com/JhonnyL>
+>
+> —
+> You are receiving this because you commented.
+>
+> Reply to this email directly or view it on GitHub
+> <https://github.com/symfony/symfony/pull/18416#issuecomment-204947725>
+>
+
+---------------------------------------------------------------------------
+
+by JhonnyL at 2016-04-04T08:32:32Z
+
+It is possible. Still the command doesn't even show arguments for the debugged service itself. I would hope we can have this merged first and then save arguments support for service and calls etc. to another PR.
+
+We would also need to consider if it's worth it e.g. private services as arguments will make output look really ugly and bloated.
+
+---------------------------------------------------------------------------
+
+by JhonnyL at 2016-04-04T09:50:31Z
+
+Updated PR. Removed useless count check.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T13:52:04Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-04-13T12:26:16Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-13T18:44:42Z
+
+:+1:

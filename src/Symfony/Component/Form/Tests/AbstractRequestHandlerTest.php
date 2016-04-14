@@ -375,7 +375,7 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         $this->requestHandler = $this->getRequestHandler($translator);
 
         $options = array('post_max_size_message' => 'old max {{ max }}!');
-        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
+        $form = $this->factory->createNamed('name', 'text', null, $options);
         $this->setRequestData('POST', array(), array());
 
         $this->requestHandler->handleRequest($form, $this->request);

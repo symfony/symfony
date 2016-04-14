@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-11T12:53:11Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-14T06:53:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-14T07:09:48Z
+
+ANSI codes are very "unreadable". So, what do you think changing code like this:
+
+```php
+// Erase the line
+$this->output->write("\x1B[2K");
+```
+
+By something like this?
+
+```php
+$eraseLineCode = "\x1B[2K";
+
+// ...
+
+$this->output->write($eraseLineCode);
+```
+
+Or:
+
+```php
+$ansiCodes = array(
+    'eraseLine' => "\x1B[2K"
+);
+
+// ...
+
+$this->output->write($ansiCodes['eraseLine']);
+```
+
+Maybe in a separate PR?
+
+---------------------------------------------------------------------------
+
+by alekitto at 2016-04-14T11:44:55Z
+
+We can write them as class constants, but what do you think about implementing a class to build escape sequences?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-14T11:49:37Z
+
+@alekitto Probably a very good idea but out of the scope of this PR.

@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "doctrine/common": "~2.4"
+        "doctrine/common": "~2.4",
+        "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.2|~3.0.0",

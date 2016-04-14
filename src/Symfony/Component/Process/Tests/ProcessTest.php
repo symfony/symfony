@@ -1163,7 +1163,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      * @dataProvider provideVariousIncrementals
      */
     public function testIncrementalOutputDoesNotRequireAnotherCall($stream, $method) {
-        $process = new Process(self::$phpBin.' -r '.escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\''.$stream.'\', $n, 1); $n++; usleep(1000); }'), null, null, null, null);
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\''.$stream.'\', $n, 1); $n++; usleep(1000); }'), null, null, null, null);
         $process->start();
         $result = '';
         $limit = microtime(true) + 3;

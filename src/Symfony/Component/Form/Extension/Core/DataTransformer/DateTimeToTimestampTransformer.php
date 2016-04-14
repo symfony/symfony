@@ -29,20 +29,19 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      * @return int A timestamp
      *
      * @throws TransformationFailedException If the given value is not an instance
-     *                                       of \DateTime or if the output
-     *                                       timezone is not supported.
+     *                                       of \DateTime or \DateTimeInterface
      */
-    public function transform($value)
+    public function transform($dateTime)
     {
-        if (null === $value) {
+        if (null === $dateTime) {
             return;
         }
 
-        if (!$value instanceof \DateTime && !$value instanceof \DateTimeInterface) {
+        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
             throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
         }
 
-        return $value->getTimestamp();
+        return $dateTime->getTimestamp();
     }
 
     /**
@@ -53,7 +52,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
      * @return \DateTime A \DateTime object
      *
      * @throws TransformationFailedException If the given value is not a timestamp
-     *                                       or if the given timestamp is invalid.
+     *                                       or if the given timestamp is invalid
      */
     public function reverseTransform($value)
     {

@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Util\ServerParams;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * A request handler using PHP's super globals $_GET, $_POST and $_SERVER.
@@ -27,11 +28,23 @@ class NativeRequestHandler implements RequestHandlerInterface
     private $serverParams;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
+
+    /**
      * {@inheritdoc}
      */
-    public function __construct(ServerParams $params = null)
+    public function __construct(ServerParams $params = null, TranslatorInterface $translator = null, $translationDomain = null)
     {
         $this->serverParams = $params ?: new ServerParams();
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
     }
 
     /**
@@ -88,8 +101,14 @@ class NativeRequestHandler implements RequestHandlerInterface
                 // Submit the form, but don't clear the default values
                 $form->submit(null, false);
 
+                $errorMessage = $form->getConfig()->getOption('post_max_size_message');
+
+                if (null !== $this->translator) {
+                    $errorMessage = $this->translator->trans($errorMessage, array(), $this->translationDomain);
+                }
+
                 $form->addError(new FormError(
-                    $form->getConfig()->getOption('post_max_size_message'),
+                    $errorMessage,
                     null,
                     array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
                 ));

@@ -172,6 +172,8 @@
         <!-- HttpFoundationRequestHandler -->
         <service id="form.type_extension.form.request_handler" class="%form.type_extension.form.request_handler.class%" public="false">
             <argument type="service" id="form.server_params" />
+            <argument type="service" id="translator.default" />
+            <argument>%validator.translation_domain%</argument>
         </service>
 
         <service id="form.server_params" class="Symfony\Component\Form\Util\ServerParams" public="false">

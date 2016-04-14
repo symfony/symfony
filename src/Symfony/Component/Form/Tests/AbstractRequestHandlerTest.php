@@ -355,9 +355,41 @@ abstract class AbstractRequestHandlerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testPostMaxSizeExceededTranslation()
+    {
+        $this->serverParams->expects($this->once())
+            ->method('getContentLength')
+            ->will($this->returnValue(pow(1024, 3) + 1));
+
+        $this->serverParams->expects($this->any())
+            ->method('getNormalizedIniPostMaxSize')
+            ->will($this->returnValue('1G'));
+
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+
+        $translator->expects($this->any())
+            ->method('trans')
+            ->with($this->equalTo('old max {{ max }}!'))
+            ->willReturn('translated max {{ max }}!');
+
+        $this->requestHandler = $this->getRequestHandler($translator);
+
+        $options = array('post_max_size_message' => 'old max {{ max }}!');
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, $options);
+        $this->setRequestData('POST', array(), array());
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $error = new FormError('translated max {{ max }}!', null, array('{{ max }}' => '1G'));
+        $error->setOrigin($form);
+
+        $this->assertEquals(array($error), iterator_to_array($form->getErrors()));
+        $this->assertTrue($form->isSubmitted());
+    }
+
     abstract protected function setRequestData($method, $data, $files = array());
 
-    abstract protected function getRequestHandler();
+    abstract protected function getRequestHandler($translator = null);
 
     abstract protected function getMockFile($suffix = '');
 

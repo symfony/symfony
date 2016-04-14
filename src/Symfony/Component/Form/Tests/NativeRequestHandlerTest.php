@@ -201,9 +201,9 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTest
         );
     }
 
-    protected function getRequestHandler()
+    protected function getRequestHandler($translator = null)
     {
-        return new NativeRequestHandler($this->serverParams);
+        return new NativeRequestHandler($this->serverParams, $translator);
     }
 
     protected function getMockFile($suffix = '')

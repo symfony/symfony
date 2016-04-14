@@ -24,8 +24,6 @@ class ParameterNotFoundException extends InvalidArgumentException
     private $alternatives;
 
     /**
-     * Constructor.
-     *
      * @param string     $key          The requested parameter key
      * @param string     $sourceId     The service id that references the non-existent parameter
      * @param string     $sourceKey    The parameter key that references the non-existent parameter

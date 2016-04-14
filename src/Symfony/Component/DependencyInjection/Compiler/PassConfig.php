@@ -35,9 +35,6 @@ class PassConfig
     private $optimizationPasses;
     private $removingPasses;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->mergePass = new MergeExtensionConfigurationPass();

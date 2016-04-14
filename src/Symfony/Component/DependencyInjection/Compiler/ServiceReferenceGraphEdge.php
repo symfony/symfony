@@ -25,8 +25,6 @@ class ServiceReferenceGraphEdge
     private $value;
 
     /**
-     * Constructor.
-     *
      * @param ServiceReferenceGraphNode $sourceNode
      * @param ServiceReferenceGraphNode $destNode
      * @param string                    $value

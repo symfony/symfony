@@ -29,8 +29,6 @@ class Variable
     private $name;
 
     /**
-     * Constructor.
-     *
      * @param string $name
      */
     public function __construct($name)

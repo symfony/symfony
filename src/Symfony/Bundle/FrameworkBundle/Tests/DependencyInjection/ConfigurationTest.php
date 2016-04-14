@@ -210,7 +210,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enable_annotations' => false,
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
-                'strict_email' => false,
+                'strict_email' => false, // deprecated
+                'email_profile' => null,
             ),
             'annotations' => array(
                 'cache' => 'file',

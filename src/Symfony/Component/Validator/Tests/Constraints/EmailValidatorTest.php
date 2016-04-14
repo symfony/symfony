@@ -48,51 +48,142 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
     }
 
     /**
-     * @dataProvider getValidEmails
+     * @dataProvider provideEmailAddresses
+     *
+     * @param array $emailData
      */
-    public function testValidEmails($email)
+    public function testBasicValidationProfile($emailData)
     {
-        $this->validator->validate($email, new Email());
-
-        $this->assertNoViolation();
+        $this->runValidationProfileTest(Email::PROFILE_BASIC_REGEX, $emailData);
     }
 
-    public function getValidEmails()
+    /**
+     * @dataProvider provideEmailAddresses
+     *
+     * @param array $emailData
+     */
+    public function testHtml5ValidationProfile($emailData)
+    {
+        $this->runValidationProfileTest(Email::PROFILE_HTML5_REGEX, $emailData);
+    }
+
+    /**
+     * @dataProvider provideEmailAddresses
+     *
+     * @param array $emailData
+     */
+    public function testRfcValidationProfile($emailData)
+    {
+        $this->runValidationProfileTest(Email::PROFILE_RFC_ALLOW_WARNINGS, $emailData);
+    }
+
+    /**
+     * @dataProvider provideEmailAddresses
+     *
+     * @param array $emailData
+     */
+    public function testRfcNoWarnValidationProfile($emailData)
+    {
+        $this->runValidationProfileTest(Email::PROFILE_RFC_DISALLOW_WARNINGS, $emailData);
+    }
+
+    /**
+     * @param string $validationProfile
+     * @param array  $emailData
+     */
+    protected function runValidationProfileTest($validationProfile, $emailData)
+    {
+        $emailAddress = $emailData[0];
+        $isValidForProfile = $emailData[1][$validationProfile];
+
+        $constraint = new Email(array(
+            'profile' => $validationProfile,
+            'message' => 'error message',
+        ));
+
+        $this->validator->validate($emailAddress, $constraint);
+
+        if ($isValidForProfile) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('error message')
+                ->setParameter('{{ value }}', '"'.$emailAddress.'"')
+                ->setCode(Email::INVALID_FORMAT_ERROR)
+                ->assertRaised();
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function provideEmailAddresses()
     {
         return array(
-            array('fabien@symfony.com'),
-            array('example@example.co.uk'),
-            array('fabien_potencier@example.fr'),
+            // Valid for all validation profiles.
+            $this->buildEmailData('hello@world.com',   true,  true,  true,  true),
+            $this->buildEmailData('gday@mate.co.uk',   true,  true,  true,  true),
+            $this->buildEmailData('bon@jour.fr',       true,  true,  true,  true),
+            $this->buildEmailData('aa+@bb.com',        true,  true,  true,  true),
+            $this->buildEmailData('aa+b@cc.com',       true,  true,  true,  true),
+            $this->buildEmailData('aa.bb-cc@dd.com',   true,  true,  true,  true),
+            // Invalid for all validation profiles.
+            $this->buildEmailData('test',              false, false, false, false),
+            $this->buildEmailData('test@',             false, false, false, false),
+            $this->buildEmailData('foo@bar.com baz',   false, false, false, false),
+            $this->buildEmailData('aa@local\host',     false, false, false, false),
+            $this->buildEmailData('aa@localhost.',     false, false, false, false),
+            $this->buildEmailData('aa@bb.com test',    false, false, false, false),
+            $this->buildEmailData('aa@ bb . com',      false, false, false, false),
+            $this->buildEmailData('aa@bb,com',         false, false, false, false),
+            // Validity depends on the chosen validation profile.
+            $this->buildEmailData('test@localhost',    false, true,  true,  true),
+            $this->buildEmailData('test@email&',       false, false, true,  true),
+            $this->buildEmailData('.abc@localhost',    false, true,  false, false),
+            $this->buildEmailData('example.@aa.co.uk', true,  true,  false, false),
+            $this->buildEmailData("fab'ien@test.com",  true,  false, true,  true),
+            $this->buildEmailData('aa((bb))@cc.co.uk', true,  false, true,  false),
+            $this->buildEmailData('aa@bb(cc).co.uk',   true,  false, true,  false),
+            $this->buildEmailData('инфо@письмо.рф',    true,  false, true,  true),
+            $this->buildEmailData('"\""@iana.org',     true,  false, true,  false),
+            $this->buildEmailData('""@iana.org',       true,  false, true,  false),
+            $this->buildEmailData('aa@(bb).com',       true,  false, false, false),
+            $this->buildEmailData('aa@(bb.com',        true,  false, false, false),
+            $this->buildEmailData('aa@bb@cc.co.uk',    true,  false, false, false),
+            $this->buildEmailData('(aa@bb.cc)',        true,  false, false, false),
+            $this->buildEmailData('aa(bb)cc@dd.co.uk', true,  false, false, false),
+            $this->buildEmailData('user name@aa.com',  true,  false, false, false),
+            $this->buildEmailData('test@example..com', true,  false, false, false),
+            $this->buildEmailData('test@ema[il.com',   true,  false, false, false),
         );
     }
 
     /**
-     * @dataProvider getInvalidEmails
+     * @param string $email     The email address to validate.
+     * @param bool   $basic     Whether the email is valid per the 'basic' profile.
+     * @param bool   $html5     Whether the email is valid per the 'html5' profile.
+     * @param bool   $rfc       Whether the email is valid per the 'rfc' profile.
+     * @param bool   $rfcNoWarn Whether the email is valid per the 'rfc-no-warn' profile.
+     *
+     * @return array
      */
-    public function testInvalidEmails($email)
-    {
-        $constraint = new Email(array(
-            'message' => 'myMessage',
-        ));
-
-        $this->validator->validate($email, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$email.'"')
-            ->setCode(Email::INVALID_FORMAT_ERROR)
-            ->assertRaised();
-    }
-
-    public function getInvalidEmails()
+    protected function buildEmailData($email, $basic, $html5, $rfc, $rfcNoWarn)
     {
         return array(
-            array('example'),
-            array('example@'),
-            array('example@localhost'),
-            array('foo@example.com bar'),
+            array(
+                $email,
+                array(
+                    Email::PROFILE_BASIC_REGEX => $basic,
+                    Email::PROFILE_HTML5_REGEX => $html5,
+                    Email::PROFILE_RFC_ALLOW_WARNINGS => $rfc,
+                    Email::PROFILE_RFC_DISALLOW_WARNINGS => $rfcNoWarn,
+                ),
+            ),
         );
     }
 
+    /**
+     * @deprecated
+     */
     public function testStrict()
     {
         $constraint = new Email(array('strict' => true));

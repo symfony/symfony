@@ -181,3 +181,11 @@ Validator
 
  * The `DateTimeValidator::PATTERN` constant has been deprecated and will be
    removed in Symfony 4.0.
+
+ * Two new types of email address validation have been added to `EmailValidator`:
+   "HTML5 regex" and "RFC (allow warnings)". They supplement the two existing
+   types "basic regex" and "RFC (disallow warnings)". The desired mode of 
+   validation can be specified using the `Email` constraint's new `profile`
+   option. The constraint's `strict` option (equivalent to the 'rfc-no-warn'
+   profile) has been deprecated and will be removed in Symfony 4.0. 
+   

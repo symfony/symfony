@@ -26,6 +26,14 @@ class CachePoolPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $namespaceSuffix = '';
+
+        foreach (array('name', 'root_dir', 'environment', 'debug') as $key) {
+            if ($container->hasParameter('kernel.'.$key)) {
+                $namespaceSuffix .= '.'.$container->getParameter('kernel.'.$key);
+            }
+        }
+
         $attributes = array(
             'provider',
             'namespace',
@@ -36,9 +44,7 @@ class CachePoolPass implements CompilerPassInterface
             if ($pool->isAbstract()) {
                 continue;
             }
-            if (!isset($tags[0]['namespace'])) {
-                $tags[0]['namespace'] = $this->getNamespace($id);
-            }
+            $tags[0]['namespace'] = $this->getNamespace($namespaceSuffix, isset($tags[0]['namespace']) ? $tags[0]['namespace'] : $id);
             while ($adapter instanceof DefinitionDecorator) {
                 $adapter = $container->findDefinition($adapter->getParent());
                 if ($t = $adapter->getTag('cache.pool')) {
@@ -72,8 +78,8 @@ class CachePoolPass implements CompilerPassInterface
         }
     }
 
-    private function getNamespace($id)
+    private function getNamespace($namespaceSuffix, $id)
     {
-        return substr(str_replace('/', '-', base64_encode(md5('symfony.'.$id, true))), 0, 10);
+        return substr(str_replace('/', '-', base64_encode(md5($id.$namespaceSuffix, true))), 0, 10);
     }
 }

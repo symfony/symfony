@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-04-14T13:36:01Z
+
+Shouldn't this be part of the `Bridge\Doctrine` namespace? It feels really weird to have a `Doctrine` cache provider (which is specific) within the core component...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-14T13:50:00Z
+
+Doctrine Cache is [so dominating](https://packagist.org/search/?q=cache) on the cache "market" that I considered supporting it as a special requirement of the Cache component.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-04-14T13:56:26Z
+
+I understand.
+
+I assume another class namespace is not so much the problem.. but requiring an extra package (`symfony/doctrine-bridge`) is so.
+
+What about a PR on `doctrine/cache` introducing a `SymfonyAdapter` which would have my vote :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-14T13:57:16Z
+
+See DoctrineAdapter in the Adapter sub-namespace, this is what you're looking for, no need for patching doctrine
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-04-14T14:05:53Z
+
+That one works the other way around...
+
+It's legit to have 2 variants, depending on which system is providing cache in your application;
+- A `doctrine cache provider` delegating to ~~`symfony cache adapter`~~ `psr cache pool` (from this PR)
+- A `symfony cache adapter` delegating to `doctrine cache provider` (already there)
+
+However, imho, I still feel symfony should provide a `DoctrineAdapter` and doctrine a `SymfonyCache` provider.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-14T14:11:46Z
+
+In fact, the DoctrineProdiver has nothing specific about Symfony. If Doctrine were to add something, it would be named Psr6Cache. You could open an issue/a PR there, I wish you good luck (please search their issue/PR history before doing so) :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-04-14T14:20:46Z
+
+Point taken. I'm just reviewing this from a technical/architecture POV.
+
+I kinda assumed the `DoctrineProvider` typechecks on `Symfony/.../AdapterInterface` but it isn't.. it delegates directly to the PSR interface, which can be any symfony adapter by definition.
+
+And yes... doctrine should add a `PsrCache` provider which makes it indirectly compatible with any symfony cache adapter, imho offcourse ;-)

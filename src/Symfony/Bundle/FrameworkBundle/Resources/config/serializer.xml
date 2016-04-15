@@ -38,6 +38,10 @@
         </service>
 
         <!-- Cache -->
+        <service id="serializer.mapping.cache.symfony" class="Symfony\Component\Cache\DoctrineProvider" public="false">
+            <argument type="service" id="cache.pool.serializer" />
+        </service>
+
         <service id="serializer.mapping.cache.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
             <call method="setNamespace">
                 <argument>%serializer.mapping.cache.prefix%</argument>

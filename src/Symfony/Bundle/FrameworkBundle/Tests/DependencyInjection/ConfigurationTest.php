@@ -221,6 +221,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'serializer' => array(
                 'enabled' => false,
                 'enable_annotations' => false,
+                'cache' => 'serializer.mapping.cache.symfony',
             ),
             'property_access' => array(
                 'magic_call' => false,

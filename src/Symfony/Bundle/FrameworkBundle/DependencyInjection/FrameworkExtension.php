@@ -982,7 +982,7 @@ class FrameworkExtension extends Extension
 
         $chainLoader->replaceArgument(0, $serializerLoaders);
 
-        if (isset($config['cache']) && $config['cache']) {
+        if (!$container->getParameter('kernel.debug')) {
             $container->setParameter(
                 'serializer.mapping.cache.prefix',
                 'serializer_'.$this->getKernelRootHash($container)

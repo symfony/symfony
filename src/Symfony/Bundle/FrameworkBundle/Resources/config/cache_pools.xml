@@ -25,6 +25,10 @@
             <tag name="cache.pool" clearer="cache.default_pools_clearer" />
         </service>
 
+        <service id="cache.pool.serializer" parent="cache.adapter.local" public="false">
+            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
+        </service>
+
         <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->

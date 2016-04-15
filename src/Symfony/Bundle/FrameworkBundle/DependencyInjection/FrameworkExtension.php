@@ -71,6 +71,9 @@ class FrameworkExtension extends Extension
         // Property access is used by both the Form and the Validator component
         $loader->load('property_access.xml');
 
+        // Load Cache configuration first as it is used by other components
+        $loader->load('cache_pools.xml');
+
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
@@ -781,7 +784,7 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (isset($config['cache'])) {
+        if (!$container->getParameter('kernel.debug')) {
             $container->setParameter(
                 'validator.mapping.cache.prefix',
                 'validator_'.$this->getKernelRootHash($container)
@@ -1019,8 +1022,6 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        $loader->load('cache_pools.xml');
-
         foreach ($config['pools'] as $name => $poolConfig) {
             $poolDefinition = new DefinitionDecorator($poolConfig['adapter']);
             $poolDefinition->setPublic($poolConfig['public']);

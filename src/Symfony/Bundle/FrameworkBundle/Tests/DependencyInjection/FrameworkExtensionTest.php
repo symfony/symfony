@@ -323,7 +323,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testValidationService()
     {
-        $container = $this->createContainerFromFile('validation_annotations');
+        $container = $this->createContainerFromFile('validation_annotations', array('kernel.charset' => 'UTF-8'), false);
 
         $this->assertInstanceOf('Symfony\Component\Validator\Validator\ValidatorInterface', $container->get('validator'));
     }
@@ -350,11 +350,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(6, $calls);
+        $this->assertCount(7, $calls);
         $this->assertSame('enableAnnotationMapping', $calls[4][0]);
         $this->assertEquals(array(new Reference('annotation_reader')), $calls[4][1]);
         $this->assertSame('addMethodMapping', $calls[5][0]);
         $this->assertSame(array('loadValidatorMetadata'), $calls[5][1]);
+        $this->assertSame('setMetadataCache', $calls[6][0]);
+        $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[6][1]);
         // no cache this time
     }
 
@@ -368,12 +370,14 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(7, $calls);
+        $this->assertCount(8, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame('addYamlMappings', $calls[4][0]);
         $this->assertSame('enableAnnotationMapping', $calls[5][0]);
         $this->assertSame('addMethodMapping', $calls[6][0]);
         $this->assertSame(array('loadValidatorMetadata'), $calls[6][1]);
+        $this->assertSame('setMetadataCache', $calls[7][0]);
+        $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[7][1]);
 
         $xmlMappings = $calls[3][1][0];
         $this->assertCount(2, $xmlMappings);
@@ -397,8 +401,10 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(4, $calls);
+        $this->assertCount(5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
+        $this->assertSame('setMetadataCache', $calls[4][0]);
+        $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[4][1]);
         // no cache, no annotations, no static methods
     }
 
@@ -594,7 +600,7 @@ abstract class FrameworkExtensionTest extends TestCase
         ), $data)));
     }
 
-    protected function createContainerFromFile($file, $data = array())
+    protected function createContainerFromFile($file, $data = array(), $resetCompilerPasses = true)
     {
         $cacheKey = md5(get_class($this).$file.serialize($data));
         if (isset(self::$containerCache[$cacheKey])) {
@@ -604,8 +610,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $container->registerExtension(new FrameworkExtension());
         $this->loadFromFile($container, $file);
 
-        $container->getCompilerPassConfig()->setOptimizationPasses(array());
-        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        if ($resetCompilerPasses) {
+            $container->getCompilerPassConfig()->setOptimizationPasses(array());
+            $container->getCompilerPassConfig()->setRemovingPasses(array());
+        }
         $container->compile();
 
         return self::$containerCache[$cacheKey] = $container;

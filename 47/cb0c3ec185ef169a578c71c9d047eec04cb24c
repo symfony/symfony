@@ -1,0 +1,411 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-05T10:29:54Z
+
+Thank you, I didn't understand the issue correctly.
+
+I've changed my fix.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-05T14:53:50Z
+
+Not on these methods for sure.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-05T16:00:06Z
+
+You could perhaps wrap the callable string in a closure inside those `elseif` to prevent the fatal error.
+```php
+elseif (is_string($label) && is_callable($label)) {
+    @trigger_error('createView() - $label - treats callable strings as callable and is deprecated since version 3.0.', E_USER_DEPRECATED);
+
+    $label = function ($choice) use ($label) {
+        return $label($choice);
+    };
+}
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-05T17:47:43Z
+
+I have no errors doing the tests except of one in PasswordEncoder.
+
+Thanks @HeahDude for the help
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-05T22:44:14Z
+
+>I have no errors doing the tests except of one in PasswordEncoder.
+
+What error are you talking about ?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-05T23:14:55Z
+
+Nevermind, no error anymore
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-06T10:36:11Z
+
+@Simperfit What about adding some unit tests?
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-06T22:54:05Z
+
+@fabpot I added one, will add one for each method
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-07T11:34:17Z
+
+Looks like this needs another rebase. It contains some unrelated changes.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-07T18:19:42Z
+
+@xabbuh Sorry for the unrelated changes, I've missed my rebase.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-07T19:21:03Z
+
+@fabpot I've added one test for each method, is it ok like that ? Thank you.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-08T05:10:03Z
+
+>Do we need to do all the stuff beside triggering the deprecation? Shouldn't the following code already handle the callback properly?
+
+@xabbuh not when it is a callable string, see #17993.
+
+Actually that's fine for `$value` (aka [`choice_value`](https://github.com/Simperfit/symfony/blob/master/src/Symfony/Component/Form/ChoiceList/ArrayChoiceList.php#L204)) as it gets the choice as only argument.
+
+But all the others handled in `createView()` method ([`choice_name`](https://github.com/Simperfit/symfony/blob/master/src/Symfony/Component/Form/ChoiceList/Factory/DefaultChoiceListFactory.php#L121), [`choice_label`](https://github.com/Simperfit/symfony/blob/master/src/Symfony/Component/Form/ChoiceList/Factory/DefaultChoiceListFactory.php#L130), [`choice_attr`](https://github.com/Simperfit/symfony/blob/master/src/Symfony/Component/Form/ChoiceList/Factory/DefaultChoiceListFactory.php#L140), [`preferred_choices`](https://github.com/Simperfit/symfony/blob/master/src/Symfony/Component/Form/ChoiceList/Factory/DefaultChoiceListFactory.php#L144), [`group_by`](https://github.com/Simperfit/symfony/blob/master/src/Symfony/Component/Form/ChoiceList/Factory/DefaultChoiceListFactory.php#L203)) would throw a fatal error because they get passed three arguments instead of one.
+
+Consider @webmozart example:
+```php
+$builder->add('deadline', ChoiceType::class, [
+    'choices' => $dateRanges, // DateRange objects
+    'choice_label' => 'end',
+    // One would expect $choice->getEnd() to be called
+    // but this will never happen
+    // because PropertyAccessDecorator treats it as a callable
+    // and not as a string so it does not transform it to a closure.
+]);
+```
+Instead `end($choice)` is called, fine for value but fatal for the others.
+
+So I suggest to say "Treating callable strings as callable is deprecated since version 3.1 and PropertyAccessDecorator will treat them as strings in 4.0. You should use a "\Closure" instead.".
+
+To avoid the fatal error for now, we should wrap the callable string in a closure:
+```php
+$label = function ($choice) use ($label) {
+    return $label($choice);
+}
+```
+So we get `call_user_func($label, $choice, $key, $value)` working until we can refactor in 4.0:
+```php
+if (is_string($value) && !is_callable($value)) {
+    $value = new PropertyPath($value);
+} elseif (is_string($value) && is_callable($value)) {
+   // Trigger, handle...
+}
+
+// To simply
+
+if (is_string($value)) {
+    $value = new PropertyPath($value);
+}
+```
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-08T08:14:58Z
+
+Thanks for working on this @Simperfit! :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-08T09:01:44Z
+
+@HeahDude But if we solve it this way it means that we make a feature working while deprecating it at the same moment. If we think that we should wrap strings that are callables in a closure for safety, we should fix that issue in all affected branches (I guess `2.7` is the lowest affected branch, right?).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-08T09:07:12Z
+
+@xabbuh yes and no. The new feature would be:
+```php
+if (is_string($value) && !is_callable($value)) {
+    $value = new PropertyPath($value);
+} elseif (is_string($value) && is_callable($value)) {
+    // Trigger
+    $value = new PropertyPath($value);
+}
+```
+
+But your right my actual patch should go on 2.7, so I send a PR and this one will need a rebase though.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-08T23:06:57Z
+
+@webmozart thanks to you for helping me :)
+
+@HeahDude I was looking into the PR you made but I can't make the test working, using both closure or PropertyPath, do you know what I'm missing ? Thank you for helping me from the start.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-09T05:18:43Z
+
+@Simperfit You don't need to worry about that anymore.
+
+If validated, once #18057 is merged in master, you will have to rebase, then your commit will only need to add deprecation notices by triggering errors and marking tests in legacy group.
+
+You should mark this PR as "WIP" for now and add a todo to watch #18057, so someone could check it and ping you when the rebase is needed.
+
+Cheers
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-09T09:50:51Z
+
+@xabbuh I don't think we should add any extra support for string callables. It was never intended to support this functionality.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-09T18:01:19Z
+
+@HeahDude Thank you :).
+
+I will changed this PR when the PR from @HeahDude gets merged.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-10T08:28:31Z
+
+@webmozart If it never was intended to work that way, why should we then bother to make it work now (I mean the places where we do not only trigger the deprecations but add extra code)?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-11T09:04:53Z
+
+@xabbuh We shouldn't :) Triggering deprecations only is enough for me.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-11T16:29:59Z
+
+@Simperfit it turns out I explored a dead end. Can you please remove the closures and update your tests ?
+Thank you and sorry for that.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-12T01:11:50Z
+
+NP @HeahDude, i've modified the PR with that
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-12T10:21:43Z
+
+@webmozart Is it ok like this ?
+@xabbuh
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-13T19:00:44Z
+
+:+1: LGTM
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-13T19:30:33Z
+
+@xabbuh we should maybe wait for advice from @webmozart concerning:
+
+>I would like to stick with a deprecation error here (which can be added into the default factory, yes).
+
+ref https://github.com/symfony/symfony/pull/18057#issuecomment-194214677.
+
+This one only targets the `PropertyAccessDecorator` for now.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-15T18:38:20Z
+
+@webmozart I've modified the PR with your help, thanks for that, does it looks good to you ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-25T10:25:50Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-26T02:03:47Z
+
+As I said in #17993 IMO we do not need to deprecate that behavior but could also just change it as a bugfix because we are going back to how it originally was.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-26T02:06:48Z
+
+And ChoiceListFactoryInterface should be clarified that only array and Closure callables are supported. But not strings.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-27T09:12:16Z
+
+@Tobion Should i modify anything ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T10:11:23Z
+
+@Tobion Can you check this PR before merging? Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T10:34:52Z
+
+The other option is to revert @Tobion 's PR which was merged about a year ago in 2.7 (#15561).
+
+I would vote for the revert. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T10:44:20Z
+
+I would say this is ambiguous both ways:
+
+ - If we revert Tobias' patch, the `PropertyAccessor` might fail if the string is a callable (original issue).
+
+ - if we merge this PR, a string `'range'` might not be transformed to property path if it's a callable, but we can pass `new PropertyPath('range')`, so `$choice->getRange()` is called
+
+On second thought, I'm :+1: for deprecations and better document property path as choice option. (ref https://github.com/symfony/symfony-docs/pull/6393)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T10:55:35Z
+
+If this one should be merged, I think it misses notes in changelogs and "update to 4.0".
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-31T11:03:05Z
+
+@HeahDude should I modify the to guide to update with this PR ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T11:04:58Z
+
+Probably let's just wait for a symfony decider to make that call :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T11:10:33Z
+
+If I'm not wrong, as I've just learned with another PR, you should modify the `CHANGELOG` file of the Form component to just note the deprecation in 3.1 section:
+```rst
+  * Using callable strings as choice options in `ChoiceType` has been deprecated and
+    will be used as `PropertyPath` instead of callable in Symfony 4.0.
+```
+And a note in the root `UPGRADE 4.0` to explain:
+```rst
+  * Using callable strings as choice options in ChoiceType has been deprecated
+     in favor of `PropertyPath`. Use a "\Closure" instead.
+
+      Before:
+
+      'choice_value' => new PropertyPath('range'),
+      'choice_label' => 'strtoupper',
+
+      After:
+
+      'choice_value' => 'range',
+      'choice_label' => function ($choice) {
+          return strtoupper($choice);
+      },
+```
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-03-31T11:11:30Z
+
+Got it, thank you will do that @HeahDude  :+1:
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T02:57:53Z
+
+@Simperfit I've edited my comment, please use this new version instead. Thanks :)
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-04-01T17:50:43Z
+
+@HeahDude I've added them
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T18:11:14Z
+
+Minor comments, then you'll need to rebase on current master because there is now some conflicts.
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-04-01T18:56:26Z
+
+I've rebased and added/removed the space :p
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-02T09:28:56Z
+
+Looks perfect now :) Thanks @Simperfit!
+
+This one is ready to merge now.
+
+Deprecate or revert 470b1400d631ff167bf82851a7975e2299da0856 ? ping __@symfony/decoders__
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-04-02T09:34:45Z
+
+ping @Tobion @fabpot @dunglas
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-04-15T05:56:52Z
+
+i've rebased with master.
+ping @fabpot @webmozart @Tobion
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-15T08:52:51Z
+
+IIRC, we were waiting for @Tobion's opinion about merging or reverting instead.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-04-15T09:13:02Z
+
+I would revert but I'm ok with both ways.

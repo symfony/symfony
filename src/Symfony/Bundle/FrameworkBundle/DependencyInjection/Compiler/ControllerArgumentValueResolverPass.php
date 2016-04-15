@@ -29,7 +29,7 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('argument_resolver');
-        $argumentResolvers = $this->findAndSortTaggedServices('controller_argument.value_resolver', $container);
+        $argumentResolvers = $this->findAndSortTaggedServices('controller.argument_value_resolver', $container);
         $definition->replaceArgument(1, $argumentResolvers);
     }
 

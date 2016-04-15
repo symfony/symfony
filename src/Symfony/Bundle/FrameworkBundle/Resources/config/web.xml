@@ -25,19 +25,19 @@
         </service>
 
         <service id="argument_resolver.request_attribute" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver" public="false">
-            <tag name="controller_argument.value_resolver" priority="100" />
+            <tag name="controller.argument_value_resolver" priority="100" />
         </service>
 
         <service id="argument_resolver.request" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver" public="false">
-            <tag name="controller_argument.value_resolver" priority="50" />
+            <tag name="controller.argument_value_resolver" priority="50" />
         </service>
 
         <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver" public="false">
-            <tag name="controller_argument.value_resolver" priority="-100" />
+            <tag name="controller.argument_value_resolver" priority="-100" />
         </service>
 
         <service id="argument_resolver.variadic" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver" public="false">
-            <tag name="controller_argument.value_resolver" priority="-150" />
+            <tag name="controller.argument_value_resolver" priority="-150" />
         </service>
 
         <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">

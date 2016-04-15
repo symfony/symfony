@@ -27,6 +27,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
 {
     protected function listBundles($output)
     {
+        $title = 'Available registered bundles with their extension alias if available';
         $headers = array('Bundle name', 'Extension alias');
         $rows = array();
 
@@ -41,9 +42,10 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         }
 
         if ($output instanceof StyleInterface) {
+            $output->title($title);
             $output->table($headers, $rows);
         } else {
-            $output->writeln('Available registered bundles with their extension alias if available:');
+            $output->writeln($title);
             $table = new Table($output);
             $table->setHeaders($headers)->setRows($rows)->render($output);
         }

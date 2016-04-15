@@ -343,24 +343,17 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     public function dumpCatalogue($locale, ConfigCacheInterface $cache)
     {
         $this->initializeCatalogue($locale);
-        $fallbackContent = $this->getFallbackContent($this->catalogues[$locale]);
 
-        $content = sprintf(<<<EOF
+        $content = <<<EOF
 <?php
 
 use Symfony\Component\Translation\MessageCatalogue;
 
-\$catalogue = new MessageCatalogue('%s', %s);
-
-%s
+{$this->getCataloguePhp($locale, $this->catalogues[$locale]->all(), '')}
+{$this->getFallbackContent($this->catalogues[$locale])}
 return \$catalogue;
 
-EOF
-            ,
-            $locale,
-            var_export($this->catalogues[$locale]->all(), true),
-            $fallbackContent
-        );
+EOF;
 
         $cache->write($content, $this->catalogues[$locale]->getResources());
     }
@@ -376,23 +369,36 @@ EOF
             $fallbackSuffix = ucfirst(preg_replace($replacementPattern, '_', $fallback));
             $currentSuffix = ucfirst(preg_replace($replacementPattern, '_', $current));
 
-            $fallbackContent .= sprintf(<<<EOF
-\$catalogue%s = new MessageCatalogue('%s', %s);
-\$catalogue%s->addFallbackCatalogue(\$catalogue%s);
+            $fallbackContent .= $this->getCataloguePhp($fallback, $fallbackCatalogue->all(), $fallbackSuffix);
+            $fallbackContent .= sprintf("\$catalogue%s->addFallbackCatalogue(\$catalogue%s);\n", $currentSuffix, $fallbackSuffix);
 
-EOF
-                ,
-                $fallbackSuffix,
-                $fallback,
-                var_export($fallbackCatalogue->all(), true),
-                $currentSuffix,
-                $fallbackSuffix
-            );
             $current = $fallbackCatalogue->getLocale();
             $fallbackCatalogue = $fallbackCatalogue->getFallbackCatalogue();
         }
 
         return $fallbackContent;
+    }
+
+    private function getCataloguePhp($locale, array $messages, $suffix)
+    {
+        $static = 'static ';
+        foreach ($messages as $msgs) {
+            if (count($msgs) > 32767) {
+                $static = '';
+                break;
+            }
+        }
+
+        $messages = str_replace("' . \"\\0\" . '", "\0", var_export($messages, true));
+
+        return <<<EOF
+
+$static\$messages$suffix = $messages;
+\$catalogue$suffix =& \$messages$suffix;
+unset(\$messages$suffix);
+\$catalogue$suffix = new MessageCatalogue('$locale', \$catalogue$suffix);
+
+EOF;
     }
 
     private function getCatalogueCachePath($locale)

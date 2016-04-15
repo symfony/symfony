@@ -1,0 +1,102 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-04-13T10:10:18Z
+
+if this does not require any change in the testsuite, it looks like we are missing some tests...
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-13T10:13:17Z
+
+@stof this is functionally tested only (implicitly), I can add a compiler pass unit-test though.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-13T10:24:39Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-13T11:23:18Z
+
+Added a test and named the compiler pass properly, it was still having "Controller" which is not part of the tag anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-13T13:03:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-13T14:04:14Z
+
+👎 I'm all for having shorter names, but they need to be self-descriptive as well. Here, we're not talking about any argument, but only controller arguments.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-13T14:07:02Z
+
+Other alternatives considered:
+
+* `controller.value_resolver`
+* `controller.argument_value_resolver`
+* `controller.argument_value`
+* `controller.argument_resolver`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-13T18:18:02Z
+
+If we were to change this, I would vote for `controller.argument_value_resolver`.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-13T18:34:11Z
+
+@xabbuh That's actually the same length as before:
+ - `controller_argument.value_resolver`
+ - `controller.argument_value_resolver`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-13T18:39:32Z
+
+@iltar That's true. But it still conveys the proper meaning while making the namespace more clear imo. To me all other suggestions lose too much information.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-13T18:48:22Z
+
+That's true, in that case I will also name the class the same as before again.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-14T06:17:56Z
+
+Rebased to a clean commit, if everyone agrees on the name, I will update my other PRs
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-14T10:58:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-14T11:30:08Z
+
+Why do you mock the DI related classes in the test? Imo you should rather use the real classes and check that the definitions are modified as expected.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-14T12:02:02Z
+
+@xabbuh I can do that, this was simply copied from the other tests
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-15T07:59:30Z
+
+@xabbuh, no more mocking ;)

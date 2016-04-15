@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-03-23T17:48:54Z
+
+I hope this does not break the i18n routing bundle tests contrary to before (see #6814 and https://travis-ci.org/schmittjoh/JMSI18nRoutingBundle/jobs/3229075).
+This time only query params are added that are not equal to the default value. I think this is consistent with the optional path placeholders which are also only added if different from default.

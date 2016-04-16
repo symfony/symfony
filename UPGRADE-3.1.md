@@ -83,6 +83,11 @@ FrameworkBundle
     - `"form.type.submit"`
     - `"form.type.reset"`
 
+ * The service `serializer.mapping.cache.apc`  has been deprecated in favor of
+   `serializer.mapping.cache.doctrine.apc` to be consistent with the validator
+   cache service. If you are using `serializer.mapping.cache.apc`, use
+   `serializer.mapping.cache.doctrine.apc` instead.
+
 HttpKernel
 ----------
 

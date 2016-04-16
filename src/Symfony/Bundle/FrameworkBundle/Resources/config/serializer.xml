@@ -38,10 +38,14 @@
         </service>
 
         <!-- Cache -->
-        <service id="serializer.mapping.cache.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
+        <service id="serializer.mapping.cache.doctrine.apc" class="Doctrine\Common\Cache\ApcCache" public="false">
             <call method="setNamespace">
                 <argument>%serializer.mapping.cache.prefix%</argument>
             </call>
+        </service>
+
+        <service id="serializer.mapping.cache.apc" parent="serializer.mapping.cache.doctrine.apc">
+            <deprecated>The "%service_id%" service is deprecated since Symfony 3.1 and will be removed in 4.0. Use "serializer.mapping.cache.doctrine.apc" instead</deprecated>
         </service>
 
         <!-- Encoders -->

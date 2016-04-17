@@ -73,7 +73,7 @@ final class CacheItem implements CacheItemInterface
         if (null === $expiration) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($expiration instanceof \DateTimeInterface) {
-            $this->expiry = $expiration->format('U');
+            $this->expiry = (int) $expiration->format('U');
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given', is_object($expiration) ? get_class($expiration) : gettype($expiration)));
         }
@@ -89,7 +89,7 @@ final class CacheItem implements CacheItemInterface
         if (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
-            $this->expiry = \DateTime::createFromFormat('U', time())->add($time)->format('U');
+            $this->expiry = (int) \DateTime::createFromFormat('U', time())->add($time)->format('U');
         } elseif (is_int($time)) {
             $this->expiry = $time + time();
         } else {

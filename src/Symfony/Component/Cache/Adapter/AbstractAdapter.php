@@ -46,15 +46,18 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             CacheItem::class
         );
         $this->mergeByLifetime = \Closure::bind(
-            function ($deferred, $namespace) {
+            function ($deferred, $namespace, &$expiredIds) {
                 $byLifetime = array();
                 $now = time();
+                $expiredIds = array();
 
                 foreach ($deferred as $key => $item) {
                     if (null === $item->expiry) {
                         $byLifetime[0][$namespace.$key] = $item->value;
                     } elseif ($item->expiry > $now) {
                         $byLifetime[$item->expiry - $now][$namespace.$key] = $item->value;
+                    } else {
+                        $expiredIds[] = $namespace.$key;
                     }
                 }
 
@@ -277,9 +280,12 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     {
         $ok = true;
         $byLifetime = $this->mergeByLifetime;
-        $byLifetime = $byLifetime($this->deferred, $this->namespace);
+        $byLifetime = $byLifetime($this->deferred, $this->namespace, $expiredIds);
         $retry = $this->deferred = array();
 
+        if ($expiredIds) {
+            $this->doDelete($expiredIds);
+        }
         foreach ($byLifetime as $lifetime => $values) {
             try {
                 $e = $this->doSave($values, $lifetime);

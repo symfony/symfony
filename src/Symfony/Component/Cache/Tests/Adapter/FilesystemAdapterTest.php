@@ -42,8 +42,8 @@ class FilesystemAdapterTest extends CachePoolTest
             new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
-        foreach($children as $child) {
-            if ($child->isDir()){
+        foreach ($children as $child) {
+            if ($child->isDir()) {
                 rmdir($child);
             } else {
                 unlink($child);

@@ -36,7 +36,7 @@ class ApcuAdapterTest extends CachePoolTest
         $pool = $this->createCachePool();
 
         $item = $pool->getItem('foo');
-        $item->set(function() {});
+        $item->set(function () {});
 
         $this->assertFalse($pool->save($item));
 

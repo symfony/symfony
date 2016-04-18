@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-04T09:17:09Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-25T21:31:16Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-26T09:19:48Z
+
+You have update the minimum version required for the PropertyAccess component in the `require-dev` section to be `~3.1`.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-27T13:47:33Z
+
+@xabbuh it should work with any supported PropertyAccess version as #18210 has been merged in 2.3. Maybe should I add a `conflict` section however.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-27T16:24:21Z
+
+Travis and AppVeyor not related.
+
+Ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-17T15:06:45Z
+
+:+1: for 3.1. The composer.json update is fine to me.

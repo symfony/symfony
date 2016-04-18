@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-14T15:25:21Z
+
+@iltar (and @symfony/deciders ) would be better to vote using real comments IMHO, so the other deciders can get a notification about it, WDYT?
+:+1: even for 3.1 on my side also
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-14T15:34:40Z
+
+@nicolas-grekas agreed about deciders (otherwise GH won't take votes into account either btw). This is even required for veto votes btw, as we must explain them (and we cannot with reactions), and it also allows to see the history of votes of the core team (for vote changes for instance). However, @iltar is not a decider, so it is fine to show support through reactions IMO (avoids spamming the discussion and shows a total of votes)
+
+:+1: for this
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-14T15:36:05Z
+
+Oups, I thought @iltar you were a decider sorry :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-14T16:04:13Z
+
+@stof explains pretty much why I use that button instead ^.^
+
+I was a bit in a hurry to write a proper reply. I think the sentence is a bit hard to read, what about something like:
+```
+The "repository.user" service is defined as factory but is missing the service
+reference, did you forget to define the factory service id?
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-14T16:08:08Z
+
+@nicolas-grekas I think we should even validate this earlier, in the XML and Yaml loader, as they can give more detailed feedback. What do you think about that ?
+This does not prevent having a check here for the case where the service definition is configured elsewhere
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-14T16:38:46Z
+
+Actually, I was wondering why the example XML did pass the XSD check at all. Turns out the `callable` type allows to define an `id` attribute. Does anyone know why this was added initially?
+
+---------------------------------------------------------------------------
+
+by dbu at 2016-04-14T20:17:55Z
+
+> Actually, I was wondering why the example XML did pass the XSD check at
+> all. Turns out the |callable| type allows to define an |id| attribute.
+> Does anyone know why this was added initially?
+
+i was surprised by that as well but am not deep enough into the code to
+know where to look for that or what to do. i guess removing it could
+annoy people that have a meaningless id lying around, maybe just
+deprecate and remove it in symfony 4 only.
+
+also surprised that it looks like "something" comes up with an empty
+string for class instead of noticing that its neither specified
+explicitly nor can be pulled from a service reference. if you find a
+place to discover the incomplete specification, all the better (though
+it might be possible for a compiler pass to fill in missing things, so
+not allowing a factory with neither class nor service in xml / yml could
+break things)
+
+i am happy to improve the message if you agree iltar's proposal is the
+way we should formulate it. should i do that or does somebody want to
+dig deeper into the code?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-15T06:30:10Z
+
+I agree this comes late in the process. Until someone fixes that, let's enhance the message here, I like @iltar suggestion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-17T14:46:50Z
+
+@dbu tests need some love :)
+
+---------------------------------------------------------------------------
+
+by dbu at 2016-04-18T11:40:16Z
+
+@nicolas-grekas fixed travis-ci. now only appveyor has a complaint left. can you help me here? it feels like this is not related to my change, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-18T11:42:43Z
+
+right!
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-18T11:54:10Z
+
+@nicolas-grekas that error pops up more often; https://ci.appveyor.com/project/fabpot/symfony/build/1.0.8342#L1331
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-18T11:58:00Z
+
+See #18576
+
+---------------------------------------------------------------------------
+
+by dbu at 2016-04-18T12:49:16Z
+
+anything left to do in this PR? or do i wait for #18576 to be merged and
+then rebase?

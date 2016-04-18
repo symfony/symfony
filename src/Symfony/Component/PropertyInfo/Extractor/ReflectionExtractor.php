@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
-use Symfony\Component\PropertyAccess\StringUtil;
+use Symfony\Component\Inflector\Inflector;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -317,15 +317,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private function getMutatorMethod($class, $property)
     {
         $ucProperty = ucfirst($property);
-        $singulars = $this->getSingulars($ucProperty);
+        $names = $this->getSingulars($ucProperty);
 
         foreach (self::$mutatorPrefixes as $prefix) {
-
-            if (null !== $singulars && in_array($prefix, self::$arrayMutatorPrefixes)) {
-                $names = $singulars;
-                $names[] = $ucProperty;
-            } else {
-                $names = array($ucProperty);
+            if (in_array($prefix, self::$arrayMutatorPrefixes)) {
+                array_unshift($names, $ucProperty);
             }
 
             foreach ($names as $name) {
@@ -377,15 +373,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      *
      * @param string $plural
      *
-     * @return array|null Returns null if cannot guess.
+     * @return array
      */
     private function getSingulars($plural)
     {
-        if (!class_exists('Symfony\Component\PropertyAccess\StringUtil')) {
-            return;
-        }
-
-        $singulars = StringUtil::singularify($plural);
+        $singulars = Inflector::singularize($plural);
         if (is_string($singulars)) {
             $singulars = array($singulars);
         }

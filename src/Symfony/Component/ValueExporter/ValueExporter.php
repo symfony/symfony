@@ -15,6 +15,7 @@ use Symfony\Component\ValueExporter\Exporter\ValueExporterInterface;
 use Symfony\Component\ValueExporter\Exporter\ValueToStringExporter;
 use Symfony\Component\ValueExporter\Formatter\CallableToStringFormatter;
 use Symfony\Component\ValueExporter\Formatter\DateTimeToStringFormatter;
+use Symfony\Component\ValueExporter\Formatter\EntityToStringFormatter;
 use Symfony\Component\ValueExporter\Formatter\FormatterInterface;
 use Symfony\Component\ValueExporter\Formatter\PhpIncompleteClassToStringFormatter;
 
@@ -38,6 +39,7 @@ class ValueExporter
             $exporter = self::$exporter ?: new ValueToStringExporter(
                 new CallableToStringFormatter(),
                 new DateTimeToStringFormatter(),
+                new EntityToStringFormatter(),
                 new PhpIncompleteClassToStringFormatter()
             );
             $exporter->addFormatters(self::$appends, self::$prepends);

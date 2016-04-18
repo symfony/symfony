@@ -12,6 +12,8 @@
 namespace Symfony\Component\ValueExporter\Tests;
 
 use Symfony\Component\ValueExporter\Formatter\TraversableToStringFormatter;
+use Symfony\Component\ValueExporter\Tests\Fixtures\Entity;
+use Symfony\Component\ValueExporter\Tests\Fixtures\PublicEntity;
 use Symfony\Component\ValueExporter\Tests\Fixtures\TraversableInstance;
 use Symfony\Component\ValueExporter\ValueExporter;
 
@@ -101,6 +103,8 @@ EOT;
                 'object(DateTimeImmutable) - 2014-06-10T07:35:40+0000',
             ),
             'php incomplete class' => array($foo, '__PHP_Incomplete_Class(AppBundle/Foo)'),
+            'entity' => array(new Entity(23), 'entity:23(Symfony\Component\ValueExporter\Tests\Fixtures\Entity)'),
+            'public entity' => array(new PublicEntity(23), 'entity:23(Symfony\Component\ValueExporter\Tests\Fixtures\PublicEntity)'),
         );
     }
 

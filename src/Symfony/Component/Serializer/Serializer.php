@@ -58,7 +58,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @var array
      *
      * @deprecated since 3.1 will be removed in 4.0
-     * @see https://github.com/symfony/symfony/pull/17140
      */
     protected $normalizerCache = array();
 
@@ -66,7 +65,6 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @var array
      *
      * @deprecated since 3.1 will be removed in 4.0
-     * @see https://github.com/symfony/symfony/pull/17140
      */
     protected $denormalizerCache = array();
 

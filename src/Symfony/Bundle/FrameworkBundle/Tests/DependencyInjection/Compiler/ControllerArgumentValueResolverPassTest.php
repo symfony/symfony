@@ -60,5 +60,7 @@ class ControllerArgumentValueResolverPassTest extends \PHPUnit_Framework_TestCas
         $container = new ContainerBuilder();
 
         (new ControllerArgumentValueResolverPass())->process($container);
+
+        $this->assertFalse($container->hasDefinition('argument_resolver'));
     }
 }

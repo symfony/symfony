@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-16T14:10:14Z
+
+@dunglas: do you know what happened after your comment: https://github.com/symfony/symfony/pull/16795#issuecomment-162663251 ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-17T14:41:24Z
+
+ping @WouterJ
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-04-17T15:49:31Z
+
+The validator service was renamed because the Validator component switched from using their own `ApcCache` class to Doctrine Cache library in Symfony 2.5. To be able to provide a clean upgrade path, the new service was added in 2.8 (refs https://github.com/symfony/symfony/pull/14429).
+
+The serializer service was added in Symfony 2.7 (refs #13107). As it directly used doctrine cache, I think it should have been named `serializer.mapping.cache.doctrine.apc` for consistency. However, this was not done.
+
+I think it makes sense to do this renaming now. Just like all other renamings, the old service should be deprecated in favor of the new service and it should be merged into master (probably 3.1). The old service should then be removed in Symfony 4.
+
+Meanwhile, a PR should be submitted to the 2.8 branch of the Standard Edition to revert https://github.com/symfony/symfony-standard/commit/008055659c18182be62fc7d27166010630f2d0b0 This was a mistake (and it shows the need for consistency btw).
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-18T16:11:28Z
+
+I update this PR to have the behavior @WouterJ recomanded. I'm going to create the 2.8 PR.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-18T18:04:13Z
+
+I think this is ready, targeting 3.1.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-18T18:54:40Z
+
+:+1: for 3.1
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-04-18T19:10:55Z
+
+Status: reviewed
+
+Looks good. Can you please also update the `CHANGELOG.md` file in the FrameworkBundle and `UPGRADE-3.1.md` and `UPGRADE-4.0.md` to explain that this service is renamed?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-18T20:39:54Z
+
+I'll do that tomorrow. Thanks for your review!
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-19T06:26:27Z
+
+I did the change.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-19T06:59:09Z
+
+I'm not sure what the PR in  2.8 should look like. Shouldn't we apply the same PR as this one on 2.8? The validator cache service was renamed in 2.8, we could rename the serializer in 2.8 too couldn't we?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-19T07:19:24Z
+
+@tgalopin It's about updating the commented config in the Symfony Standard Edition where we use the wrong service id: https://github.com/symfony/symfony-standard/blob/2.8/app/config/config_prod.yml#L8
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-19T07:33:53Z
+
+What do you think about deprecating the class itself and recommending the PSR-6 backend instead?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-19T07:45:01Z
+
+@dunglas IMHO it's too early to deprecate for 3.1, but for sure we should *consider* deprecating once we're used to PSR-6 caching and we're sure this wouldn't prevent any valid use case (which needs some time to me to be confirmed).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-19T07:56:04Z
+
+So 👍 for this change.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-19T07:57:53Z
+
+The failure is unrelated.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-19T09:32:03Z
+
+:+1:

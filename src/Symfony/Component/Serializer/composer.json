@@ -24,6 +24,7 @@
         "symfony/property-access": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/cache": "~3.1",
+        "symfony/property-info": "~2.8|~3.0",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0"
     },
@@ -32,6 +33,7 @@
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",
+        "symfony/property-info": "To deserialize relations.",
         "symfony/yaml": "For using the default YAML mapping loader.",
         "symfony/config": "For using the XML mapping loader.",
         "symfony/property-access": "For using the ObjectNormalizer.",

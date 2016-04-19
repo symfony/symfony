@@ -16,6 +16,7 @@ CHANGELOG
  * added support for serializing objects that implement `DateTimeInterface`
  * added `AbstractObjectNormalizer` as a base class for normalizers that deal
    with objects
+ * added support to relation deserialization
 
 2.7.0
 -----

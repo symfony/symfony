@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-19T13:33:20Z
+
+Ah that's a good check to have :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-19T13:43:07Z
+
+Well, I am actually not happy with this particular assertion, but every other assertion that came to my mind made even less sense.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-19T13:46:52Z
+
+Previously the only assertion was that nothing failed, so this is a better assertion than just that. At least you now check if it didn't get added anyway, despite not existing in the first place.

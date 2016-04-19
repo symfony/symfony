@@ -75,6 +75,9 @@ FrameworkBundle
     - `"form.type.submit"`
     - `"form.type.reset"`
 
+ * The service `serializer.mapping.cache.apc` has been removed; use
+   `serializer.mapping.cache.doctrine.apc` instead.
+
 HttpKernel
 ----------
 

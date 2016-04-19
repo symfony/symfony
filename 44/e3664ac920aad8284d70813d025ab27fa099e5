@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-04-18T22:13:59Z
+
+Ref. #17201
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-19T06:15:59Z
+
+Edit: Did we follow that rule everywhere stricly even if the `return` statement technically wasn't necessary?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-19T08:48:07Z
+
+Removing useless code is IMO always a good idea.

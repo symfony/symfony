@@ -268,6 +268,21 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot autowire argument 2 for Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument because the type-hinted class does not exist (Class Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass does not exist).
+     */
+    public function testParentClassNotFoundThrowsException()
+    {
+        $container = new ContainerBuilder();
+
+        $aDefinition = $container->register('a', __NAMESPACE__.'\BadParentTypeHintedArgument');
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
     public function testDontUseAbstractServices()
     {
         $container = new ContainerBuilder();
@@ -521,6 +536,12 @@ class OptionalParameter
 class BadTypeHintedArgument
 {
     public function __construct(Dunglas $k, NotARealClass $r)
+    {
+    }
+}
+class BadParentTypeHintedArgument
+{
+    public function __construct(Dunglas $k, OptionalServiceClass $r)
     {
     }
 }

@@ -337,7 +337,9 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
     private function getId($key)
     {
-        return $this->namespace.CacheItem::validateKey($key);
+        CacheItem::validateKey($key);
+
+        return $this->namespace.$key;
     }
 
     private function generateItems($items, &$keys)

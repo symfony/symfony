@@ -92,9 +92,11 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()
     {
-        $array = array('child' => array('index' => array()));
+        $object = new \ArrayObject();
+        $array = array('child' => array('index' => $object));
 
-        $this->assertNull($this->propertyAccessor->getValue($array, '[child][index][firstName]'));
+        $this->assertNull($this->propertyAccessor->getValue($array, '[child][index][foo][bar]'));
+        $this->assertSame(array(), $object->getArrayCopy());
     }
 
     public function testGetValueReadsProperty()

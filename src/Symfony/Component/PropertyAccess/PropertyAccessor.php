@@ -275,10 +275,11 @@ class PropertyAccessor implements PropertyAccessorInterface
                     (is_array($zval[self::VALUE]) && !isset($zval[self::VALUE][$property]) && !array_key_exists($property, $zval[self::VALUE]))
                 ) {
                     if ($i + 1 < $propertyPath->getLength()) {
-                        $zval[self::VALUE][$property] = array();
-
                         if (isset($zval[self::REF])) {
+                            $zval[self::VALUE][$property] = array();
                             $zval[self::REF] = $zval[self::VALUE];
+                        } else {
+                            $zval[self::VALUE] = array($property => array());
                         }
                     }
                 }

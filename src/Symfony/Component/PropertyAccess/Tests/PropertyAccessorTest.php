@@ -126,6 +126,15 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Bernhard', $this->propertyAccessor->getValue(new TestClassMagicGet('Bernhard'), 'magicProperty'));
     }
 
+    public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()
+    {
+        $object = new \ArrayObject();
+        $array = array('child' => array('index' => $object));
+
+        $this->assertNull($this->propertyAccessor->getValue($array, '[child][index][foo][bar]'));
+        $this->assertSame(array(), $object->getArrayCopy());
+    }
+
     // https://github.com/symfony/symfony/pull/4450
     public function testGetValueReadsMagicGetThatReturnsConstant()
     {

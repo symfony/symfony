@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Util\ReflectionHelper;
 
 /**
  * Guesses constructor arguments of services definitions and try to instantiate services if necessary.
@@ -29,6 +30,12 @@ class AutowirePass implements CompilerPassInterface
     private $definedTypes = array();
     private $types;
     private $ambiguousServiceTypes = array();
+    private $reflectionHelper;
+
+    public function __construct(ReflectionHelper $reflectionHelper = null)
+    {
+        $this->reflectionHelper = $reflectionHelper ?: new ReflectionHelper();
+    }
 
     /**
      * {@inheritdoc}
@@ -293,11 +300,7 @@ class AutowirePass implements CompilerPassInterface
 
         $class = $this->container->getParameterBag()->resolveValue($class);
 
-        try {
-            return $this->reflectionClasses[$id] = new \ReflectionClass($class);
-        } catch (\ReflectionException $reflectionException) {
-            // return null
-        }
+        return $this->reflectionClasses[$id] = $this->reflectionHelper->getReflectionClass($class);
     }
 
     private function addServiceToAmbiguousType($id, $type)

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Util\ReflectionHelper;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -445,6 +446,24 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
             ['IdenticalClassResource', true],
             ['ClassChangedConstructorArgs', false],
         );
+    }
+
+    public function testIgnoreServiceWithClassNotExisting()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('class_not_exist', __NAMESPACE__.'\OptionalServiceClass');
+
+        $barDefinition = $container->register('bar', __NAMESPACE__.'\Bar');
+        $barDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $oldSetup = ReflectionHelper::preferStaticReflection(true);
+
+        $pass->process($container);
+        ReflectionHelper::preferStaticReflection($oldSetup);
+
+        $this->assertTrue($container->hasDefinition('bar'));
     }
 }
 

@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "symfony/polyfill-mbstring": "~1.0",
         "symfony/translation": "~2.8|~3.0"
     },
     "require-dev": {

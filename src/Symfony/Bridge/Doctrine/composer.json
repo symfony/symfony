@@ -17,12 +17,13 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "doctrine/common": "~2.4"
+        "doctrine/common": "~2.4",
+        "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
-        "symfony/form": "~3.0,>3.0-BETA1",
+        "symfony/form": "~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/property-access": "~2.8|~3.0",
         "symfony/property-info": "~2.8|3.0",

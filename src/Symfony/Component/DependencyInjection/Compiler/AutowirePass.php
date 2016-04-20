@@ -228,7 +228,7 @@ class AutowirePass implements CompilerPassInterface
      * @param string     $id
      * @param Definition $definition
      *
-     * @return \ReflectionClass|null
+     * @return \ReflectionClass|false
      */
     private function getReflectionClass($id, Definition $definition)
     {
@@ -238,15 +238,17 @@ class AutowirePass implements CompilerPassInterface
 
         // Cannot use reflection if the class isn't set
         if (!$class = $definition->getClass()) {
-            return;
+            return false;
         }
 
         $class = $this->container->getParameterBag()->resolveValue($class);
 
         try {
-            return $this->reflectionClasses[$id] = new \ReflectionClass($class);
+            $reflector = new \ReflectionClass($class);
         } catch (\ReflectionException $reflectionException) {
-            // return null
+            $reflector = false;
         }
+
+        return $this->reflectionClasses[$id] = $reflector;
     }
 }

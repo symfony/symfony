@@ -470,6 +470,7 @@ class Route implements \Serializable
     public function addRequirements(array $requirements)
     {
         foreach ($requirements as $key => $regex) {
+            $regex = $this->convertUuidRegex($regex);
             $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
         }
         $this->compiled = null;
@@ -511,6 +512,7 @@ class Route implements \Serializable
      */
     public function setRequirement($key, $regex)
     {
+        $regex = $this->convertUuidRegex($regex);
         $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
         $this->compiled = null;
 
@@ -581,6 +583,22 @@ class Route implements \Serializable
 
         if ('' === $regex) {
             throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
+        }
+
+        return $regex;
+    }
+
+    /**
+     * Convert uuid placeholders to regular expressions.
+     *
+     * @param string $regex
+     *
+     * @return string
+     */
+    private function convertUuidRegex($regex)
+    {
+        if ($regex === '\uuid') {
+            $regex = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
         }
 
         return $regex;

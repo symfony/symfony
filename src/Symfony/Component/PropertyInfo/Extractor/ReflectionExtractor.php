@@ -294,8 +294,6 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 // Return null if the property doesn't exist
             }
         }
-
-        return;
     }
 
     /**

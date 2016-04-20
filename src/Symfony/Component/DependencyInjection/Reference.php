@@ -22,8 +22,6 @@ class Reference
     private $invalidBehavior;
 
     /**
-     * Constructor.
-     *
      * @param string $id              The service identifier
      * @param int    $invalidBehavior The behavior when the service does not exist
      *
@@ -36,8 +34,6 @@ class Reference
     }
 
     /**
-     * __toString.
-     *
      * @return string The service identifier
      */
     public function __toString()

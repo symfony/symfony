@@ -14,7 +14,6 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -31,7 +30,7 @@ class ProxyAdapter implements AdapterInterface
     public function __construct(CacheItemPoolInterface $pool, $namespace = '', $defaultLifetime = 0)
     {
         $this->pool = $pool;
-        $this->namespace = $this->getId($namespace, true);
+        $this->namespace = '' === $namespace ? '' : $this->getId($namespace);
         $this->namespaceLen = strlen($namespace);
         $this->createCacheItem = \Closure::bind(
             function ($key, $value, $isHit) use ($defaultLifetime) {
@@ -192,18 +191,8 @@ class ProxyAdapter implements AdapterInterface
         return $this->misses;
     }
 
-    private function getId($key, $ns = false)
+    private function getId($key)
     {
-        if (!is_string($key)) {
-            throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', is_object($key) ? get_class($key) : gettype($key)));
-        }
-        if (!isset($key[0]) && !$ns) {
-            throw new InvalidArgumentException('Cache key length must be greater than zero');
-        }
-        if (isset($key[strcspn($key, '{}()/\@:')])) {
-            throw new InvalidArgumentException('Cache key contains reserved characters {}()/\@:');
-        }
-
-        return $this->namespace.$key;
+        return $this->namespace.CacheItem::validateKey($key);
     }
 }

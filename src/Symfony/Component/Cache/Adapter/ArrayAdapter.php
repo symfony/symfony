@@ -84,7 +84,9 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
      */
     public function hasItem($key)
     {
-        return isset($this->expiries[CacheItem::validateKey($key)]) && ($this->expiries[$key] >= time() || !$this->deleteItem($key));
+        CacheItem::validateKey($key);
+
+        return isset($this->expiries[$key]) && ($this->expiries[$key] >= time() || !$this->deleteItem($key));
     }
 
     /**
@@ -102,7 +104,9 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
      */
     public function deleteItem($key)
     {
-        unset($this->values[CacheItem::validateKey($key)], $this->expiries[$key]);
+        CacheItem::validateKey($key);
+
+        unset($this->values[$key], $this->expiries[$key]);
 
         return true;
     }

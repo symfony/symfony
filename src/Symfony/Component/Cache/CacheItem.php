@@ -104,8 +104,6 @@ final class CacheItem implements CacheItemInterface
      *
      * @param string $key The key to validate.
      *
-     * @return string $key if it is valid.
-     *
      * @throws InvalidArgumentException When $key is not valid.
      */
     public static function validateKey($key)
@@ -119,8 +117,6 @@ final class CacheItem implements CacheItemInterface
         if (isset($key[strcspn($key, '{}()/\@:')])) {
             throw new InvalidArgumentException('Cache key contains reserved characters {}()/\@:');
         }
-
-        return $key;
     }
 
     /**

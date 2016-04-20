@@ -193,6 +193,8 @@ class ProxyAdapter implements AdapterInterface
 
     private function getId($key)
     {
-        return $this->namespace.CacheItem::validateKey($key);
+        CacheItem::validateKey($key);
+
+        return $this->namespace.$key;
     }
 }

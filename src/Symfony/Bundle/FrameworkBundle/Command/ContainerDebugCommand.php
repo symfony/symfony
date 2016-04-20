@@ -121,8 +121,14 @@ EOF
         $options['output'] = $io;
         $helper->describe($output, $object, $options);
 
-        if (!$input->getArgument('name') && $input->isInteractive()) {
-            $io->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
+        if (!$input->getArgument('name') && !$input->getOption('tag') && !$input->getOption('parameter') && $input->isInteractive()) {
+            if ($input->getOption('tags')) {
+                $io->comment('To search for a specific tag, re-run this command with a search term. (e.g. <comment>debug:container --tag=form.type</comment>)');
+            } elseif ($input->getOption('parameters')) {
+                $io->comment('To search for a specific parameter, re-run this command with a search term. (e.g. <comment>debug:container --parameter=kernel.debug</comment>)');
+            } else {
+                $io->comment('To search for a specific service, re-run this command with a search term. (e.g. <comment>debug:container log</comment>)');
+            }
         }
     }
 

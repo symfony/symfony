@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by hason at 2016-04-20T12:50:37Z
+
+@nicolas-grekas You are a PHP hacker. Great!
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-20T12:58:45Z
+
+``$typeHint = $parameter->getClass()`` on line 79 could also trigger the loading of a class without a parent class. Could we apply a similar trick there (we will need to set a meaningful exception message though, saying that the class does not exist) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-20T13:00:35Z
+
+@stof I wondered the same, but someone needs to give me a test case that would trigger the fatal error first :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-20T13:45:40Z
+
+@nicolas-grekas register an autowired service for a class which has a constructor argument typehinted with a class which extend a missing class
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-20T14:13:31Z
+
+@stof done: https://github.com/symfony/symfony/pull/18600/files?w=1
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-20T14:33:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-21T10:39:13Z
+
+👍

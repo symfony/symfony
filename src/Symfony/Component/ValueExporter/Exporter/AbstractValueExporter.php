@@ -39,18 +39,25 @@ abstract class AbstractValueExporter implements ValueExporterInterface
     protected $formatterInterface = FormatterInterface::class;
 
     /**
-     * An array of arrays of formatters by priority.
+     * An array of priorities by formatter class.
      *
      * @var array[]
      */
     private $formatters = array();
 
     /**
-     * A sorted array of formatters.
+     * An array of formatters instances sorted by priority or null.
+     *
+     * @var FormatterInterface[]|null
+     */
+    private $sortedFormatters;
+
+    /**
+     * An array of cached formatters instances by class.
      *
      * @var FormatterInterface[]
      */
-    private $sortedFormatters;
+    private $cachedFormatters = array();
 
     /**
      * Takes {@link FormatterInterface} as arguments.
@@ -72,23 +79,19 @@ abstract class AbstractValueExporter implements ValueExporterInterface
         foreach ($formatters as $formatter) {
             if (is_array($formatter)) {
                 $priority = (int) $formatter[1];
-                $formatter = $formatter[0];
+                $formatterClass = $formatter[0];
             } else {
                 $priority = 0;
+                $formatterClass = $formatter;
             }
 
-            $formatterClass = get_class($formatter);
-
-            if (!$formatter instanceof $this->formatterInterface) {
+            if (!in_array($this->formatterInterface, class_implements($formatterClass), true)) {
                 throw new InvalidFormatterException($formatterClass, static::class, $this->formatterInterface);
             }
 
-            if (in_array(ExpandedFormatterTrait::class, class_uses($formatterClass), true)) {
-                $formatter->setExporter($this);
-            }
-
-            // Using the class as key prevents duplicate
-            $this->formatters[$priority][$formatterClass] = $formatter;
+            // Using the class as key prevents duplicate and allows to
+            // dynamically change the priority
+            $this->formatters[$formatterClass] = $priority;
         }
     }
 
@@ -98,8 +101,24 @@ abstract class AbstractValueExporter implements ValueExporterInterface
     final protected function formatters()
     {
         if (null === $this->sortedFormatters) {
-            krsort($this->formatters);
-            $this->sortedFormatters = call_user_func_array('array_merge', $this->formatters);
+            arsort($this->formatters);
+
+            foreach (array_keys($this->formatters) as $formatterClass) {
+                if (isset($this->cachedFormatters[$formatterClass])) {
+                    $this->sortedFormatters[] = $this->cachedFormatters[$formatterClass];
+
+                    continue;
+                }
+
+                $formatter = new $formatterClass();
+
+                if (in_array(ExpandedFormatterTrait::class, class_uses($formatterClass), true)) {
+                    /* @var ExpandedFormatterTrait $formatter */
+                    $formatter->setExporter($this);
+                }
+
+                $this->sortedFormatters[] = $this->cachedFormatters[$formatterClass] = $formatter;
+            }
         }
 
         return $this->sortedFormatters;

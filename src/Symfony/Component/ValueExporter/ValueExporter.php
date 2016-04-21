@@ -36,10 +36,10 @@ class ValueExporter
     {
         if (null === self::$handler) {
             $exporter = self::$exporter ?: new ValueToStringExporter(
-                new CallableToStringFormatter(),
-                new DateTimeToStringFormatter(),
-                new EntityToStringFormatter(),
-                new PhpIncompleteClassToStringFormatter()
+                CallableToStringFormatter::class,
+                DateTimeToStringFormatter::class,
+                EntityToStringFormatter::class,
+                PhpIncompleteClassToStringFormatter::class
             );
             $exporter->addFormatters(self::$formatters);
             // Clear formatters

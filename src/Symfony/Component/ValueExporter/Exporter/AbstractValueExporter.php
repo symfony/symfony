@@ -80,7 +80,7 @@ abstract class AbstractValueExporter implements ValueExporterInterface
             $formatterClass = get_class($formatter);
 
             if (!$formatter instanceof $this->formatterInterface) {
-                throw new InvalidFormatterException($formatterClass, self::class, $this->formatterInterface);
+                throw new InvalidFormatterException($formatterClass, static::class, $this->formatterInterface);
             }
 
             if (in_array(ExpandedFormatterTrait::class, class_uses($formatterClass), true)) {

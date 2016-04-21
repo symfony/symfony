@@ -12,7 +12,7 @@
 namespace Symfony\Component\ValueExporter\Exporter;
 
 use Symfony\Component\ValueExporter\Exception\InvalidFormatterException;
-use Symfony\Component\ValueExporter\Formatter\ExpandedFormatter;
+use Symfony\Component\ValueExporter\Formatter\ExpandedFormatterTrait;
 use Symfony\Component\ValueExporter\Formatter\FormatterInterface;
 
 /**
@@ -22,6 +22,15 @@ use Symfony\Component\ValueExporter\Formatter\FormatterInterface;
  */
 abstract class AbstractValueExporter implements ValueExporterInterface
 {
+    /**
+     * @var int
+     */
+    protected $depth;
+    /**
+     * @var bool
+     */
+    protected $expand;
+
     /**
      * The supported formatter interface.
      *
@@ -67,15 +76,19 @@ abstract class AbstractValueExporter implements ValueExporterInterface
             } else {
                 $priority = 0;
             }
+
+            $formatterClass = get_class($formatter);
+
             if (!$formatter instanceof $this->formatterInterface) {
-                throw new InvalidFormatterException(get_class($formatter), self::class, $this->formatterInterface);
+                throw new InvalidFormatterException($formatterClass, self::class, $this->formatterInterface);
             }
-            if ($formatter instanceof ExpandedFormatter) {
+
+            if (in_array(ExpandedFormatterTrait::class, class_uses($formatterClass), true)) {
                 $formatter->setExporter($this);
             }
 
             // Using the class as key prevents duplicate
-            $this->formatters[$priority][get_class($formatter)] = $formatter;
+            $this->formatters[$priority][$formatterClass] = $formatter;
         }
     }
 

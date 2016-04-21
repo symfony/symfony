@@ -39,7 +39,7 @@ interface ValueExporterInterface
      * @param int   $depth  The level of indentation
      * @param bool  $expand Whether to inline or expand nested values
      */
-    public function exportValue($value, $depth, $expand);
+    public function exportValue($value, $depth = 1, $expand = false);
 
     /**
      * Adds {@link FormatterInterface} that will be called by priority.

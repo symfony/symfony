@@ -16,11 +16,11 @@ use Symfony\Component\ValueExporter\Exporter\ValueExporterInterface;
 /**
  * ExpandedFormatter.
  *
- * An abstract class holding the {@link ValueExporterInterface} to export nested values.
+ * A trait holding the {@link ValueExporterInterface} to export nested values.
  *
  * @author Jules Pietri <jules@heahprod.com>
  */
-abstract class ExpandedFormatter
+trait ExpandedFormatterTrait
 {
     /**
      * @var ValueExporterInterface
@@ -37,8 +37,13 @@ abstract class ExpandedFormatter
         $this->exporter = $exporter;
     }
 
+    /**
+     * @param mixed $value The nested value to export
+     *
+     * @return mixed The exported nested value
+     */
     final protected function export($value)
     {
-        return $this->exporter->exportValue($value, 1, false);
+        return $this->exporter->exportValue($value);
     }
 }

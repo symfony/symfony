@@ -25,6 +25,9 @@ class ValueToStringExporter extends AbstractValueExporter
 
     public function exportValue($value, $depth = 1, $expand = false)
     {
+        // Use set properties for recursive calls
+        $depth = null === $this->depth ? $depth : $this->depth;
+        $expand = null === $this->expand ? $expand : $this->expand;
         // Arrays have to be handled first to deal with nested level and depth,
         // this implementation intentionally ignores \Traversable values.
         // Therefor, \Traversable instances might be treated as objects unless
@@ -39,9 +42,12 @@ class ValueToStringExporter extends AbstractValueExporter
             $a = array();
             foreach ($value as $k => $v) {
                 if (is_array($v) && !empty($v)) {
-                    $expand = true;
+                    $this->expand = true;
+                    $this->depth = $depth + 1;
                 }
-                $a[] = sprintf('%s => %s', is_string($k) ? sprintf("'%s'", $k) : $k, $this->exportValue($v, $depth + 1, $expand));
+                $a[] = sprintf('%s => %s', is_string($k) ? sprintf("'%s'", $k) : $k, $this->exportValue($v));
+                $this->depth = null;
+                $this->expand = null;
             }
             if ($expand) {
                 return sprintf("array(\n%s%s\n%s)", $indent, implode(sprintf(", \n%s", $indent), $a), str_repeat('  ', $depth - 1));

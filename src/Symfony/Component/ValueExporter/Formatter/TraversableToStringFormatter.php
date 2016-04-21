@@ -16,8 +16,10 @@ namespace Symfony\Component\ValueExporter\Formatter;
  *
  * @author Jules Pietri <jules@heahprod.com>
  */
-class TraversableToStringFormatter extends ExpandedFormatter implements StringFormatterInterface
+class TraversableToStringFormatter implements StringFormatterInterface
 {
+    use ExpandedFormatterTrait;
+
     /**
      * {@inheritdoc}
      */

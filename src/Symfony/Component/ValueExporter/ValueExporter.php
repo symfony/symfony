@@ -30,8 +30,7 @@ class ValueExporter
 {
     private static $handler;
     private static $exporter;
-    private static $appends = array();
-    private static $prepends = array();
+    private static $formatters = array();
 
     public static function export($value, $depth = 1, $expand = false)
     {
@@ -42,9 +41,9 @@ class ValueExporter
                 new EntityToStringFormatter(),
                 new PhpIncompleteClassToStringFormatter()
             );
-            $exporter->addFormatters(self::$appends, self::$prepends);
-            // Clear extra formatters
-            self::$appends = self::$prepends = array();
+            $exporter->addFormatters(self::$formatters);
+            // Clear formatters
+            self::$formatters = array();
             self::$handler = function ($value, $depth = 1, $expand = false) use ($exporter) {
                 return $exporter->exportValue($value, $depth, $expand);
             };
@@ -70,28 +69,29 @@ class ValueExporter
     {
         self::$handler = null;
         self::$exporter = $exporter;
-        self::$appends = self:: $prepends = array();
+        self::$formatters = array();
     }
 
     /**
-     * Appends a {@link FormatterInterface} to the {@link ValueExporterInterface}.
+     * Adds {@link FormatterInterface} to the {@link ValueExporterInterface}.
      *
-     * @param FormatterInterface $formatter
+     * You can simple pass an instance or an array with the instance and the priority:
+     *
+     * <code>
+     * ValueExporter::addFormatters(array(
+     *     new AcmeFormatter,
+     *     array(new AcmeOtherFormatter(), 10)
+     * );
+     * </code>
+     *
+     * @param mixed $formatters An array of FormatterInterface instances and/or
+     *                          arrays holding an instance and its priority
      */
-    public static function appendFormatter(FormatterInterface $formatter)
+    public static function addFormatters($formatters)
     {
         self::$handler = null;
-        self::$appends[] = $formatter;
-    }
-
-    /**
-     * Prepends a {@link FormatterInterface} to the {@link ValueExporterInterface}.
-     *
-     * @param FormatterInterface $formatter
-     */
-    public static function prependFormatter(FormatterInterface $formatter)
-    {
-        self::$handler = null;
-        self::$prepends[] = $formatter;
+        foreach ($formatters as $formatter) {
+            self::$formatters[] = $formatter;
+        }
     }
 }

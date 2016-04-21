@@ -52,7 +52,7 @@ EOT;
 
     public function testExportTraversable()
     {
-        ValueExporter::appendFormatter(new TraversableToStringFormatter());
+        ValueExporter::addFormatters(array(new TraversableToStringFormatter()));
 
         $value = new TraversableInstance();
         $exportedValue = <<<EOT

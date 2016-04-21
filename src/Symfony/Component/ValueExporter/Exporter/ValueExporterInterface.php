@@ -42,12 +42,11 @@ interface ValueExporterInterface
     public function exportValue($value, $depth, $expand);
 
     /**
-     * Adds {@link FormatterInterface} that will be called in the given order.
+     * Adds {@link FormatterInterface} that will be called by priority.
      *
-     * @param FormatterInterface[] $appends  The formatters to execute at last
-     * @param FormatterInterface[] $prepends The formatters to execute first
+     * @param (FormatterInterface|array)[] $formatters
      *
      * @throws InvalidFormatterException If the exporter does not support a given formatter
      */
-    public function addFormatters(array $appends, array $prepends);
+    public function addFormatters(array $formatters);
 }

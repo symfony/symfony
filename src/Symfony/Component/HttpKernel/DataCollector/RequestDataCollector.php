@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -128,20 +129,23 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             unset($this->controllers[$request]);
         }
 
-        if ($request->hasSession() && $request->getSession()->has('sf_redirect')) {
-            $this->data['redirect'] = $request->getSession()->get('sf_redirect');
-            $request->getSession()->remove('sf_redirect');
-        }
+        if (isset($session)) {
+            if ($session->has('sf_redirected')) {
+                $this->data['redirect'] = $session->get('sf_redirect');
+                $session->remove('sf_redirect');
+                $session->remove('sf_redirected');
+            }
 
-        if ($request->hasSession() && $response->isRedirect()) {
-            $request->getSession()->set('sf_redirect', array(
-                'token' => $response->headers->get('x-debug-token'),
-                'route' => $request->attributes->get('_route', 'n/a'),
-                'method' => $request->getMethod(),
-                'controller' => $this->parseController($request->attributes->get('_controller')),
-                'status_code' => $statusCode,
-                'status_text' => Response::$statusTexts[(int) $statusCode],
-            ));
+            if ($response->isRedirect()) {
+                $session->set('sf_redirect', array(
+                    'token' => $response->headers->get('x-debug-token'),
+                    'route' => $request->attributes->get('_route', 'n/a'),
+                    'method' => $request->getMethod(),
+                    'controller' => $this->parseController($request->attributes->get('_controller')),
+                    'status_code' => $statusCode,
+                    'status_text' => Response::$statusTexts[(int) $statusCode],
+                ));
+            }
         }
     }
 
@@ -286,9 +290,23 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         $this->controllers[$event->getRequest()] = $event->getController();
     }
 
+    public function onKernelResponse(FilterResponseEvent $event)
+    {
+        if (!$event->isMasterRequest() || !$event->getRequest()->hasSession()) {
+            return;
+        }
+
+        if ($event->getRequest()->getSession()->has('sf_redirect')) {
+            $event->getRequest()->getSession()->set('sf_redirected', true);
+        }
+    }
+
     public static function getSubscribedEvents()
     {
-        return array(KernelEvents::CONTROLLER => 'onKernelController');
+        return array(
+            KernelEvents::CONTROLLER => 'onKernelController',
+            KernelEvents::RESPONSE => 'onKernelResponse',
+        );
     }
 
     /**

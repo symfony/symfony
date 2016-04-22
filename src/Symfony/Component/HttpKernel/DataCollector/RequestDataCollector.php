@@ -143,18 +143,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 'status_text' => Response::$statusTexts[(int) $statusCode],
             ));
         }
-
-        if ($parentRequestAttributes = $request->attributes->get('_forwarded')) {
-            if ($parentRequestAttributes instanceof ParameterBag) {
-                $parentRequestAttributes->set('_forward_token', $response->headers->get('x-debug-token'));
-            }
-        }
-        if ($request->attributes->has('_forward_controller')) {
-            $this->data['forward'] = array(
-                'token' => $request->attributes->get('_forward_token'),
-                'controller' => $this->parseController($request->attributes->get('_forward_controller')),
-            );
-        }
     }
 
     public function getMethod()

@@ -130,10 +130,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         if (isset($session)) {
-            if ($session->has('sf_redirected')) {
-                $this->data['redirect'] = $session->get('sf_redirect');
-                $session->remove('sf_redirect');
-                $session->remove('sf_redirected');
+            if ($request->attributes->has('_redirected')) {
+                $this->data['redirect'] = $session->remove('sf_redirect');
             }
 
             if ($response->isRedirect()) {
@@ -297,7 +295,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         if ($event->getRequest()->getSession()->has('sf_redirect')) {
-            $event->getRequest()->getSession()->set('sf_redirected', true);
+            $event->getRequest()->attributes->set('_redirected', true);
         }
     }
 

@@ -1,5 +1,13 @@
 framework:
     cache:
+        adapters:
+            foo:
+                parent: cache.adapter.filesystem
+                default_lifetime: 30
+            app_redis:
+                parent: cache.adapter.redis
+                provider: app.redis_connection
+                default_lifetime: 30
         pools:
             foo:
                 adapter: cache.adapter.apcu
@@ -7,13 +15,11 @@ framework:
             bar:
                 adapter: cache.adapter.doctrine
                 default_lifetime: 5
-                provider: app.doctrine_cache_provider
             baz:
                 adapter: cache.adapter.filesystem
                 default_lifetime: 7
             foobar:
                 adapter: cache.adapter.psr6
                 default_lifetime: 10
-                provider: app.cache_pool
             def:
                 default_lifetime: 11

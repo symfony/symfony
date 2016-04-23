@@ -615,6 +615,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertTrue($container->has('property_info'));
     }
 
+    public function testCacheAdapterServices()
+    {
+        $container = $this->createContainerFromFile('cache');
+
+        $this->assertCacheAdaptersServiceDefinitionIsCreated($container, 'foo', 'cache.adapter.foo', null, 30);
+        $this->assertCacheAdaptersServiceDefinitionIsCreated($container, 'app_redis', 'cache.adapter.redis', 'app.redis_connection', 30);
+    }
+
     public function testCachePoolServices()
     {
         $container = $this->createContainerFromFile('cache');
@@ -697,6 +705,46 @@ abstract class FrameworkExtensionTest extends TestCase
         }
     }
 
+    private function assertCacheAdaptersServiceDefinitionIsCreated(ContainerBuilder $container, $name, $parent, $provider, $defaultLifetime)
+    {
+        $id = 'cache.adapter.'.$name;
+
+        $this->assertTrue($container->has($id), sprintf('Service definition "%s" for cache adapter "%s" is registered', $id, $name));
+
+        $adapterDefinition = $container->getDefinition($id);
+
+        $this->assertTrue($adapterDefinition->hasTag('cache.pool'), sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $id));
+        $this->assertTrue($adapterDefinition->isAbstract(), sprintf('Service definition "%s" is abstract.', $id));
+
+        $tag = $adapterDefinition->getTag('cache.pool');
+        $this->assertTrue(isset($tag[0]['default_lifetime']), 'The default lifetime is stored as an attribute of the "cache.pool" tag.');
+        $this->assertSame($defaultLifetime, $tag[0]['default_lifetime'], 'The default lifetime is stored as an attribute of the "cache.pool" tag.');
+
+        if ($provider) {
+            $this->assertTrue(isset($tag[0]['provider']), 'The provider is stored as an attribute of the "cache.pool" tag.');
+            $this->assertSame($provider, $tag[0]['provider'], 'The provider is stored as an attribute of the "cache.pool" tag.');
+        } else {
+            $this->assertFalse(isset($tag[0]['provider']), 'No provider is stored as an attribute of the "cache.pool" tag.');
+        }
+
+        $this->assertInstanceOf(DefinitionDecorator::class, $adapterDefinition, sprintf('Cache adapter "%s" is based on a parent.', $name));
+
+        $adapterId = $adapterDefinition->getParent();
+        $adapterDefinition = $container->findDefinition($adapterId);
+
+        switch ($parent) {
+            case 'cache.adapter.apcu':
+                $this->assertSame(ApcuAdapter::class, $adapterDefinition->getClass());
+                break;
+            case 'cache.adapter.doctrine':
+                $this->assertSame(DoctrineAdapter::class, $adapterDefinition->getClass());
+                break;
+            case 'cache.adapter.filesystem':
+                $this->assertSame(FilesystemAdapter::class, $adapterDefinition->getClass());
+                break;
+        }
+    }
+
     private function assertCachePoolServiceDefinitionIsCreated(ContainerBuilder $container, $name, $adapter, $defaultLifetime)
     {
         $id = 'cache.pool.'.$name;
@@ -728,7 +776,5 @@ abstract class FrameworkExtensionTest extends TestCase
                 $this->assertSame(FilesystemAdapter::class, $adapterDefinition->getClass());
                 break;
         }
-
-        $this->assertTrue($adapterDefinition->isAbstract(), sprintf('Service definition "%s" is abstract.', $adapterId));
     }
 }

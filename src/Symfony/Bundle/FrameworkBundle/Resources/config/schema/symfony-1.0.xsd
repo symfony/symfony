@@ -206,8 +206,17 @@
 
     <xsd:complexType name="cache">
         <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="adapter" type="cache_adapter" />
             <xsd:element name="pool" type="cache_pool" />
         </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="cache_adapter">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="parent" type="xsd:string" />
+        <xsd:attribute name="default-lifetime" type="xsd:integer" />
+        <xsd:attribute name="provider" type="xsd:string" />
+        <xsd:attribute name="clearer" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="cache_pool">
@@ -215,7 +224,5 @@
         <xsd:attribute name="adapter" type="xsd:string" />
         <xsd:attribute name="public" type="xsd:boolean" />
         <xsd:attribute name="default-lifetime" type="xsd:integer" />
-        <xsd:attribute name="provider" type="xsd:string" />
-        <xsd:attribute name="clearer" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

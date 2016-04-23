@@ -44,12 +44,14 @@ class CachePoolPass implements CompilerPassInterface
             if ($pool->isAbstract()) {
                 continue;
             }
-            $tags[0]['namespace'] = $this->getNamespace($namespaceSuffix, isset($tags[0]['namespace']) ? $tags[0]['namespace'] : $id);
             while ($adapter instanceof DefinitionDecorator) {
                 $adapter = $container->findDefinition($adapter->getParent());
                 if ($t = $adapter->getTag('cache.pool')) {
                     $tags[0] += $t[0];
                 }
+            }
+            if (!isset($tags[0]['namespace'])) {
+                $tags[0]['namespace'] = $this->getNamespace($namespaceSuffix, $id);
             }
             if (isset($tags[0]['clearer'])) {
                 $clearer = $container->getDefinition($tags[0]['clearer']);

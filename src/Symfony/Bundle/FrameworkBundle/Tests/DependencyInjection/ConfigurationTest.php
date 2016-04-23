@@ -267,6 +267,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'packages' => array(),
             ),
             'cache' => array(
+                'adapters' => array(),
                 'pools' => array(),
             ),
         );

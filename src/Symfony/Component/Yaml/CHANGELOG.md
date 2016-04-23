@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * Added support for parsing PHP constants:
+
+   ```php
+   Yaml::parse('!php/const:PHP_INT_MAX', Yaml::PARSE_CONSTANT);
+   ```
+
 3.1.0
 -----
 

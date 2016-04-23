@@ -36,6 +36,44 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getTestsForParsePhpConstants
+     */
+    public function testParsePhpConstants($yaml, $value)
+    {
+        $actual = Inline::parse($yaml, Yaml::PARSE_CONSTANT);
+
+        $this->assertSame($value, $actual);
+    }
+
+    public function getTestsForParsePhpConstants()
+    {
+        return array(
+            array('!php/const:Symfony\Component\Yaml\Yaml::PARSE_CONSTANT', Yaml::PARSE_CONSTANT),
+            array('!php/const:PHP_INT_MAX', PHP_INT_MAX),
+            array('[!php/const:PHP_INT_MAX]', array(PHP_INT_MAX)),
+            array('{ foo: !php/const:PHP_INT_MAX }', array('foo' => PHP_INT_MAX)),
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage The constant "WRONG_CONSTANT" is not defined
+     */
+    public function testParsePhpConstantThrowsExceptionWhenUndefined()
+    {
+        Inline::parse('!php/const:WRONG_CONSTANT', Yaml::PARSE_CONSTANT);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessageRegExp #The string "!php/const:PHP_INT_MAX" could not be parsed as a constant.*#
+     */
+    public function testParsePhpConstantThrowsExceptionOnInvalidType()
+    {
+        Inline::parse('!php/const:PHP_INT_MAX', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+    }
+
+    /**
      * @group legacy
      * @dataProvider getTestsForParseWithMapObjects
      */

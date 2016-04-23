@@ -1022,6 +1022,15 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        foreach ($config['adapters'] as $name => $adapterConfig) {
+            $adapterDefinition = !empty($adapterConfig['parent']) ? new DefinitionDecorator($adapterConfig['parent']) : $container->getDefinition('cache.adapter.'.$name);
+            $adapterDefinition->setAbstract(true);
+            unset($adapterConfig['parent']);
+
+            $adapterDefinition->addTag('cache.pool', $adapterConfig);
+            $container->setDefinition('cache.adapter.'.$name, $adapterDefinition);
+        }
+
         foreach ($config['pools'] as $name => $poolConfig) {
             $poolDefinition = new DefinitionDecorator($poolConfig['adapter']);
             $poolDefinition->setPublic($poolConfig['public']);

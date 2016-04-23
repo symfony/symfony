@@ -2,6 +2,16 @@
 
 $container->loadFromExtension('framework', array(
     'cache' => array(
+        'adapters' => array(
+            'foo' => array(
+                'parent' => 'cache.adapter.filesystem',
+                'default_lifetime' => 30,
+            ),
+            'doctrine' => array(
+                'provider' => 'app.doctrine_cache_provider',
+                'default_lifetime' => 30,
+            ),
+        ),
         'pools' => array(
             'foo' => array(
                 'adapter' => 'cache.adapter.apcu',

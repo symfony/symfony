@@ -2,6 +2,17 @@
 
 $container->loadFromExtension('framework', array(
     'cache' => array(
+        'adapters' => array(
+            'foo' => array(
+                'parent' => 'cache.adapter.filesystem',
+                'default_lifetime' => 30,
+            ),
+            'app_redis' => array(
+                'parent' => 'cache.adapter.redis',
+                'provider' => 'app.redis_connection',
+                'default_lifetime' => 30,
+            ),
+        ),
         'pools' => array(
             'foo' => array(
                 'adapter' => 'cache.adapter.apcu',
@@ -10,7 +21,6 @@ $container->loadFromExtension('framework', array(
             'bar' => array(
                 'adapter' => 'cache.adapter.doctrine',
                 'default_lifetime' => 5,
-                'provider' => 'app.doctrine_cache_provider',
             ),
             'baz' => array(
                 'adapter' => 'cache.adapter.filesystem',
@@ -19,7 +29,6 @@ $container->loadFromExtension('framework', array(
             'foobar' => array(
                 'adapter' => 'cache.adapter.psr6',
                 'default_lifetime' => 10,
-                'provider' => 'app.cache_pool',
             ),
             'def' => array(
                 'default_lifetime' => 11,

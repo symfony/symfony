@@ -39,9 +39,9 @@ abstract class AbstractValueExporter implements ValueExporterInterface
     protected $formatterInterface = FormatterInterface::class;
 
     /**
-     * An array of priorities by formatter class.
+     * An array indexed by formatter FQCN with a corresponding priority as value.
      *
-     * @var array[]
+     * @var int[]
      */
     private $formatters = array();
 
@@ -53,16 +53,18 @@ abstract class AbstractValueExporter implements ValueExporterInterface
     private $sortedFormatters;
 
     /**
-     * An array of cached formatters instances by class.
+     * An array of cached formatters instances by their FQCN.
      *
      * @var FormatterInterface[]
      */
     private $cachedFormatters = array();
 
     /**
-     * Takes {@link FormatterInterface} as arguments.
+     * Takes {@link FormatterInterface} FQCN as arguments.
      *
      * They will be called in the given order.
+     * Alternatively, instead of a class, you can pass an array with
+     * a class and its priority {@see self::addFormatters}.
      */
     final public function __construct()
     {

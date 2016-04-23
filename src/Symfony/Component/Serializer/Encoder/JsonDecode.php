@@ -61,7 +61,7 @@ class JsonDecode implements DecoderInterface
      */
     public function getLastError()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.5 and will be removed in 3.0. Catch the exception raised by the decode() method instead to get the last JSON decoding error.', E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s method is deprecated since version 2.5 and will be removed in 3.0. Catch the exception raised by the decode() method instead to get the last JSON decoding error.', __METHOD__),  E_USER_DEPRECATED);
 
         return $this->lastError;
     }

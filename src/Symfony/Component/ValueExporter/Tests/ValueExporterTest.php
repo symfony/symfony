@@ -45,7 +45,7 @@ class ValueExporterTest extends \PHPUnit_Framework_TestCase
 
         $exportedValue = <<<EOT
 array(
-  0 => (callable) "Symfony\Component\ValueExporter\ValueExporter::export"
+  0 => (static) "Symfony\Component\ValueExporter\ValueExporter::export"
 )
 EOT;
 
@@ -100,6 +100,7 @@ EOT;
                 '(callable) "Symfony\Component\ValueExporter\Tests\ValueExporterTest::testExportValue"',
             ),
             'invokable object' => array($this, '(invokable) "Symfony\Component\ValueExporter\Tests\ValueExporterTest"'),
+            'invokable object as array' => array(array($this, '__invoke'), '(invokable) "Symfony\Component\ValueExporter\Tests\ValueExporterTest"'),
             'datetime' => array(
                 new \DateTime('2014-06-10 07:35:40', new \DateTimeZone('UTC')),
                 'object(DateTime) - 2014-06-10T07:35:40+0000',

@@ -36,13 +36,17 @@ class CallableToStringFormatter implements StringFormatterInterface
         }
 
         $caller = is_object($value) ? get_class($value) : (is_object($value[0]) ? get_class($value[0]) : $value[0]);
-        if (is_object($value)) {
+        if (is_object($value) || (is_object($value[0]) && isset($value[1]) && '__invoke' === $value[1])) {
             return sprintf('(invokable) "%s"', $caller);
         }
 
         $method = $value[1];
         if (false !== $cut = strpos($method, $caller)) {
             $method = substr($method, $cut);
+        }
+
+        if ((new \ReflectionMethod($caller, $method))->isStatic()) {
+            return sprintf('(static) "%s::%s"', $caller, $method);
         }
 
         return sprintf('(callable) "%s::%s"', $caller, $method);

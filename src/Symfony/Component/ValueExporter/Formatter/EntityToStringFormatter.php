@@ -39,6 +39,10 @@ class EntityToStringFormatter implements StringFormatterInterface
     {
         $id = isset($value->id) ? $value->id : (is_callable(array($value, 'id')) ? $value->id() : $value->getId());
 
+        if (method_exists($value, '__toString')) {
+            return sprintf('entity:%s(%s) "%s"', $id, get_class($value), $value);
+        }
+
         return sprintf('entity:%s(%s)', $id, get_class($value));
     }
 }

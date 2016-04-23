@@ -70,6 +70,10 @@ class ValueToStringExporter extends AbstractValueExporter
         }
         // Fallback on default
         if (is_object($value)) {
+            if (method_exists($value, '__toString')) {
+                return sprintf('object(%s) "%s"', get_class($value), $value);
+            }
+
             return sprintf('object(%s)', get_class($value));
         }
         if (is_resource($value)) {

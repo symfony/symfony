@@ -13,6 +13,8 @@ namespace Symfony\Component\ValueExporter\Tests;
 
 use Symfony\Component\ValueExporter\Formatter\TraversableToStringFormatter;
 use Symfony\Component\ValueExporter\Tests\Fixtures\Entity;
+use Symfony\Component\ValueExporter\Tests\Fixtures\EntityImplementingToString;
+use Symfony\Component\ValueExporter\Tests\Fixtures\ObjectImplementingToString;
 use Symfony\Component\ValueExporter\Tests\Fixtures\PublicEntity;
 use Symfony\Component\ValueExporter\Tests\Fixtures\TraversableInstance;
 use Symfony\Component\ValueExporter\ValueExporter;
@@ -87,6 +89,10 @@ EOT;
                 array(0 => 0, '1' => 'un', 'key' => 4.5),
                 'array(0 => (int) 0, 1 => "un", \'key\' => (float) 4.5)',
             ),
+            'object implementing to string' => array(
+                new ObjectImplementingToString('test'),
+                'object(Symfony\Component\ValueExporter\Tests\Fixtures\ObjectImplementingToString) "test"',
+            ),
             'closure' => array(function() {}, 'object(Closure)'),
             'callable string' => array('strlen', '(function) "strlen"'),
             'callable array' => array(
@@ -105,6 +111,10 @@ EOT;
             'php incomplete class' => array($foo, '__PHP_Incomplete_Class(AppBundle/Foo)'),
             'entity' => array(new Entity(23), 'entity:23(Symfony\Component\ValueExporter\Tests\Fixtures\Entity)'),
             'public entity' => array(new PublicEntity(23), 'entity:23(Symfony\Component\ValueExporter\Tests\Fixtures\PublicEntity)'),
+            'entity implementing to string' => array(
+                new EntityImplementingToString(23, 'test'),
+                'entity:23(Symfony\Component\ValueExporter\Tests\Fixtures\EntityImplementingToString) "test"',
+            ),
         );
     }
 

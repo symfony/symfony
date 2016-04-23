@@ -88,7 +88,7 @@ abstract class FileLoader extends Loader
                 // @deprecated should be removed in 3.0
                 $locator = $loader->getLocator();
                 if (null === $locator) {
-                    @trigger_error('Not calling the parent constructor in '.get_class($loader).' which extends '.__CLASS__.' is deprecated since version 2.7 and will not be supported anymore in 3.0.', E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Not calling the parent constructor in %s which extends %s is deprecated since version 2.7 and will not be supported anymore in 3.0.', get_class($loader), __CLASS__), E_USER_DEPRECATED);
                     $locator = $this->locator;
                 }
 

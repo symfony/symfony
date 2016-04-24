@@ -137,6 +137,8 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
         $expiry = $item[CacheItem::CAST_PREFIX.'expiry'];
 
         if (null !== $expiry && $expiry <= time()) {
+            $this->deleteItem($key);
+
             return true;
         }
         if ($this->storeSerialized) {

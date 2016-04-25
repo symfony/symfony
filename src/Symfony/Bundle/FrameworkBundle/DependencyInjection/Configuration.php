@@ -513,7 +513,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeEnabled()
                     ->children()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
-                        ->scalarNode('cache')->defaultValue('serializer.mapping.cache.symfony')->end()
+                        ->scalarNode('cache')->end()
                         ->scalarNode('name_converter')->end()
                     ->end()
                 ->end()

@@ -24,6 +24,7 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
@@ -983,6 +984,8 @@ class FrameworkExtension extends Extension
         $chainLoader->replaceArgument(0, $serializerLoaders);
 
         if (isset($config['cache']) && $config['cache']) {
+            @trigger_error('The "framework.serializer.cache" option is deprecated since Symfony 3.1 and will be removed in 4.0. You can configure a cache pool called "serializer" under "framework.cache.pools" instead.', E_USER_DEPRECATED);
+
             $container->setParameter(
                 'serializer.mapping.cache.prefix',
                 'serializer_'.$this->getKernelRootHash($container)
@@ -991,6 +994,18 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
+        } elseif (!$container->getParameter('kernel.debug')) {
+            $cacheMetadataFactory = new Definition(
+                CacheClassMetadataFactory::class,
+                array(
+                    new Reference('serializer.mapping.class_metadata_factory.inner'),
+                    new Reference('cache.pool.serializer'),
+                )
+            );
+            $cacheMetadataFactory->setPublic(false);
+            $cacheMetadataFactory->setDecoratedService('serializer.mapping.class_metadata_factory');
+
+            $container->setDefinition('serializer.mapping.cache_class_metadata_factory', $cacheMetadataFactory);
         }
 
         if (isset($config['name_converter']) && $config['name_converter']) {

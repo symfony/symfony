@@ -16,26 +16,26 @@ Form
 
  * Support for data objects that implements both `Traversable` and
    `ArrayAccess` in `ResizeFormListener::preSubmit` method has been removed.
-   
- * Using callable strings as choice options in ChoiceType is not supported 
+
+ * Using callable strings as choice options in ChoiceType is not supported
    anymore in favor of passing PropertyPath instances.
-    
+
    Before:
-   
+
    ```php
    'choice_value' => new PropertyPath('range'),
    'choice_label' => 'strtoupper',
    ```
- 
+
    After:
-   
+
    ```php
    'choice_value' => 'range',
    'choice_label' => function ($choice) {
        return strtoupper($choice);
    },
    ```
-   
+
 
 FrameworkBundle
 ---------------
@@ -77,6 +77,28 @@ FrameworkBundle
 
  * The service `serializer.mapping.cache.apc` has been removed; use
    `serializer.mapping.cache.doctrine.apc` instead.
+
+ * The `framework.serializer.cache` option has been removed. Configure a cache pool
+   called `serializer` under `framework.cache.pools` instead.
+
+   Before:
+
+   ```yaml
+   framework:
+       serializer:
+           cache: serializer.mapping.cache.apc
+   ```
+
+   After:
+
+   ```yaml
+   framework:
+       serializer: ~
+           cache:
+               pools:
+                   serializer:
+                       adapter: cache.adapter.apcu
+   ```
 
 HttpKernel
 ----------

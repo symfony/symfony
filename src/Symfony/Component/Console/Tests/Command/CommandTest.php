@@ -173,6 +173,16 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->getHelper() returns the correct helper');
     }
 
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage Cannot retrieve helper "formatter" because there is no HelperSet defined.
+     */
+    public function testGetHelperWithoutHelperSet()
+    {
+        $command = new \TestCommand();
+        $command->getHelper('formatter');
+    }
+
     public function testMergeApplicationDefinition()
     {
         $application1 = new Application();

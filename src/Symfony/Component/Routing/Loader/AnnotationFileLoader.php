@@ -96,6 +96,8 @@ class AnnotationFileLoader extends FileLoader
             $token = $tokens[$i];
 
             if (!isset($token[1])) {
+                $class = false;
+
                 continue;
             }
 

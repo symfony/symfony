@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class FilesystemAdapter extends AbstractAdapter
+class FilesystemAdapter extends AbstractAdapter implements HierarchicalAdapterInterface
 {
     private $directory;
 
@@ -100,9 +100,31 @@ class FilesystemAdapter extends AbstractAdapter
     protected function doClear($namespace)
     {
         $ok = true;
+        $now = time();
+        $namespace = rawurlencode($namespace);
 
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            $ok = ($file->isDir() || @unlink($file) || !file_exists($file)) && $ok;
+            if ($file->isDir()) {
+                continue;
+            }
+            $file = $file->getPathname();
+
+            if ('' !== $namespace) {
+                $h = fopen($file, 'rb');
+
+                if (!flock($h, LOCK_SH, $wouldBlock) || $wouldBlock) {
+                    continue;
+                }
+
+                $id = $now >= (int) fgets($h) ? $namespace : fgets($h);
+                flock($h, LOCK_UN);
+                fclose($h);
+
+                if (0 !== strpos($id, $namespace)) {
+                    continue;
+                }
+            }
+            $ok = (@unlink($file) || !file_exists($file)) && $ok;
         }
 
         return $ok;

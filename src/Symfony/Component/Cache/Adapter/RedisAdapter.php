@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @author Aurimas Niekis <aurimas@niekis.lt>
  */
-class RedisAdapter extends AbstractAdapter
+class RedisAdapter extends AbstractAdapter implements HierarchicalAdapterInterface
 {
     private $redis;
 

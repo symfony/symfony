@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Exception\CacheException;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ApcuAdapter extends AbstractAdapter
+class ApcuAdapter extends AbstractAdapter implements HierarchicalAdapterInterface
 {
     public function __construct($namespace = '', $defaultLifetime = 0)
     {

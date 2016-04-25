@@ -185,12 +185,28 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear($prefix = '')
     {
-        $this->deferred = array();
+        if ('' !== $prefix) {
+            $namespace = $this->getId($prefix);
+
+            if (!$this instanceof HierarchicalAdapterInterface) {
+                CacheItem::log($this->logger, 'Cache adapter "{type}" does not implement HierarchicalAdapterInterface: clearing all items while only the one starting with "{prefix}" should have been', array('type' => get_class($this), 'prefix' => $prefix));
+                $namespace = $this->namespace;
+            }
+
+            foreach ($this->deferred as $key => $item) {
+                if (0 === strpos($key, $prefix)) {
+                    unset($this->deferred[$key]);
+                }
+            }
+        } else {
+            $namespace = $this->namespace;
+            $this->deferred = array();
+        }
 
         try {
-            return $this->doClear($this->namespace);
+            return $this->doClear($namespace);
         } catch (\Exception $e) {
             CacheItem::log($this->logger, 'Failed to clear the cache', array('exception' => $e));
 
@@ -326,6 +342,18 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         $this->deferred = array();
 
         return $ok;
+    }
+
+    /**
+     * Returns the current separator that is used in cache keys to identify hierarchical levels.
+     *
+     * To be used for adapters that implement HierarchicalAdapterInterface.
+     *
+     * @return string
+     */
+    public function getHierarchicalSeparator()
+    {
+        return '.';
     }
 
     public function __destruct()

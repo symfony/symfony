@@ -50,7 +50,7 @@ install:
     - IF %PHP%==1 echo extension=php_ldap.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_curl.dll >> php.ini-max
     - IF %PHP%==1 echo curl.cainfo=c:\php\cacert.pem >> php.ini-max
-    - appveyor DownloadFile https://getcomposer.org/composer.phar
+    - IF %PHP%==1 appveyor DownloadFile https://getcomposer.org/download/1.0.2/composer.phar
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
     - mkdir %APPDATA%\Composer

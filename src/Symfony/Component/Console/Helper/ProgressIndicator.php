@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -164,7 +165,7 @@ class ProgressIndicator
     public function finish($message)
     {
         if (!$this->started) {
-            throw new \LogicException('Progress indicator has not yet been started.');
+            throw new LogicException('Progress indicator has not yet been started.');
         }
 
         $this->message = $message;

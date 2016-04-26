@@ -16,12 +16,16 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Process\Process;
 
 /**
- * Disable version for all assets.
+ * Save git commit hash to parameter and then use it as assets version.
  *
  * @author Evgenii Sokolov <ewgraf@gmail.com>
  */
 class GitCommitHashCompilerPass implements CompilerPassInterface
 {
+    /**
+     * @param ContainerBuilder $container
+     * @throws \Exception
+     */
     public function process(ContainerBuilder $container)
     {
         $process = new Process('git log -1');

@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
  * @group time-sensitive
  */
-class FilesystemAdapterTest extends CachePoolTest
+class FilesystemAdapterTest extends TagsInvalidatingAdapterTestCase
 {
     public function createCachePool()
     {

@@ -14,13 +14,14 @@ namespace Symfony\Component\Cache\Adapter;
 use Predis\Connection\Factory;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\RedisCluster;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Aurimas Niekis <aurimas@niekis.lt>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class RedisAdapter extends AbstractAdapter
+class RedisAdapter extends AbstractTagsInvalidatingAdapter
 {
     private static $defaultConnectionOptions = array(
         'class' => null,
@@ -30,6 +31,8 @@ class RedisAdapter extends AbstractAdapter
         'retry_interval' => 0,
     );
     private $redis;
+    private $namespace;
+    private $namespaceLen;
 
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
@@ -45,6 +48,8 @@ class RedisAdapter extends AbstractAdapter
             throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, is_object($redisClient) ? get_class($redisClient) : gettype($redisClient)));
         }
         $this->redis = $redisClient;
+        $this->namespace = $namespace;
+        $this->namespaceLen = strlen($namespace);
     }
 
     /**
@@ -127,6 +132,20 @@ class RedisAdapter extends AbstractAdapter
         }
 
         return $redis;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function invalidateTags($tags)
+    {
+        $tags = CacheItem::normalizeTags($tags);
+
+        foreach ($tags as $tag) {
+            $this->doInvalidateTag($this->namespace.$tag);
+        }
+
+        return true;
     }
 
     /**
@@ -217,14 +236,26 @@ class RedisAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, $lifetime)
+    protected function doSaveWithTags(array $values, $lifetime, array $tags)
     {
         $serialized = array();
         $failed = array();
+        $oldTagsById = $oldKeysByTag = $newKeys = array();
 
         foreach ($values as $id => $value) {
             try {
                 $serialized[$id] = serialize($value);
+
+                $key = substr($id, $this->namespaceLen);
+                foreach ($this->redis->sMembers($id.':tag') as $tag) {
+                    if (!isset($tags[$id][$tag])) {
+                        $oldTagsById[$id][] = $tag;
+                        $oldKeysByTag[$tag][] = $key;
+                    }
+                }
+                foreach ($tags[$id] as $tag) {
+                    $newKeys[$tag][] = $key;
+                }
             } catch (\Exception $e) {
                 $failed[] = $id;
             }
@@ -234,19 +265,94 @@ class RedisAdapter extends AbstractAdapter
             return $failed;
         }
 
-        if (0 >= $lifetime) {
+        if (0 >= $lifetime && !$newKeys && !$oldTagsById) {
             $this->redis->mSet($serialized);
 
             return $failed;
         }
 
-        $this->pipeline(function ($pipe) use (&$serialized, $lifetime) {
+        $this->pipeline(function ($pipe) use (&$serialized, $lifetime, &$oldTagsById, &$oldKeysByTag, &$tags, &$newKeys) {
+            foreach ($oldKeysByTag as $tag => $keys) {
+                $pipe('sRem', $this->namespace.$tag, $keys);
+            }
+            foreach ($oldTagsById as $id => $keys) {
+                $pipe('sRem', $id.':tag', $keys);
+            }
+
             foreach ($serialized as $id => $value) {
-                $pipe('setEx', $id, array($lifetime, $value));
+                if (0 < $lifetime) {
+                    $pipe('setEx', $id, array($lifetime, $value));
+                } else {
+                    $pipe('set', $id, array($value));
+                }
+                if ($tags[$id]) {
+                    $pipe('sAdd', $id.':tag', $tags[$id]);
+                }
+            }
+
+            foreach ($newKeys as $tag => $keys) {
+                $pipe('sAdd', $this->namespace.$tag, $keys);
+
+                while (0 < $r = strrpos($tag, '/')) {
+                    $parent = substr($tag, 0, $r);
+                    $pipe('sAdd', $this->namespace.$parent.':child', array($tag));
+                    $tag = $parent;
+                }
             }
         });
 
         return $failed;
+    }
+
+    private function doInvalidateTag($tag)
+    {
+        foreach ($this->sScan($tag.':child') as $children) {
+            $this->execute('sRem', $tag.':child', $children);
+            foreach ($children as $child) {
+                $this->doInvalidateTag($this->namespace.$child);
+            }
+        }
+
+        $count = 0;
+
+        foreach ($this->sScan($tag) as $ids) {
+            $count += count($ids);
+            $this->execute('sRem', $tag, $ids);
+            foreach ($ids as $k => $id) {
+                $ids[$k] = $this->namespace.$id;
+            }
+            $this->redis->del($ids);
+        }
+
+        CacheItem::log($this->logger, 'Invalidating {count} items tagged as "{tag}"', array('tag' => $tag, 'count' => $count));
+    }
+
+    private function sScan($id)
+    {
+        $redis = $this->redis instanceof \RedisArray ? $this->redis->_instance($this->redis->_target($id)) : $this->redis;
+
+        if (method_exists($redis, 'sScan')) {
+            try {
+                $cursor = null;
+                do {
+                    $ids = $redis->sScan($id, $cursor);
+
+                    if (isset($ids[1]) && is_array($ids[1])) {
+                        $cursor = $ids[0];
+                        $ids = $ids[1];
+                    }
+                    if ($ids) {
+                        yield $ids;
+                    }
+                } while ($cursor);
+
+                return;
+            } catch (\Exception $e) {
+            }
+        }
+        if ($ids = $redis->sMembers($id)) {
+            yield $ids;
+        }
     }
 
     private function execute($command, $id, array $args, $redis = null)

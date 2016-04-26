@@ -47,17 +47,22 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         );
         $this->mergeByLifetime = \Closure::bind(
             function ($deferred, $namespace, &$expiredIds) {
-                $byLifetime = array();
+                $byLifetime = array('value' => array(), 'tags' => array());
                 $now = time();
                 $expiredIds = array();
 
                 foreach ($deferred as $key => $item) {
+                    $id = $namespace.$key;
+
                     if (null === $item->expiry) {
-                        $byLifetime[0][$namespace.$key] = $item->value;
+                        $byLifetime['value'][0][$id] = $item->value;
+                        $byLifetime['tags'][0][$id] = $item->tags;
                     } elseif ($item->expiry > $now) {
-                        $byLifetime[$item->expiry - $now][$namespace.$key] = $item->value;
+                        $byLifetime['value'][$item->expiry - $now][$id] = $item->value;
+                        $byLifetime['tags'][$item->expiry - $now][$id] = $item->tags;
                     } else {
-                        $expiredIds[] = $namespace.$key;
+                        $expiredIds[] = $id;
+                        continue;
                     }
                 }
 
@@ -313,9 +318,13 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         if ($expiredIds) {
             $this->doDelete($expiredIds);
         }
-        foreach ($byLifetime as $lifetime => $values) {
+        foreach ($byLifetime['value'] as $lifetime => $values) {
             try {
-                $e = $this->doSave($values, $lifetime);
+                if ($this instanceof AbstractTagsInvalidatingAdapter) {
+                    $e = $this->doSaveWithTags($values, $lifetime, $byLifetime['tags'][$lifetime]);
+                } else {
+                    $e = $this->doSave($values, $lifetime);
+                }
             } catch (\Exception $e) {
             }
             if (true === $e || array() === $e) {
@@ -339,8 +348,12 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         foreach ($retry as $lifetime => $ids) {
             foreach ($ids as $id) {
                 try {
-                    $v = $byLifetime[$lifetime][$id];
-                    $e = $this->doSave(array($id => $v), $lifetime);
+                    $v = $byLifetime['value'][$lifetime][$id];
+                    if ($this instanceof AbstractTagsInvalidatingAdapter) {
+                        $e = $this->doSaveWithTags(array($id => $v), $lifetime, array($id => $byLifetime['tags'][$lifetime][$id]));
+                    } else {
+                        $e = $this->doSave(array($id => $v), $lifetime);
+                    }
                 } catch (\Exception $e) {
                 }
                 if (true === $e || array() === $e) {

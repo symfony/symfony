@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
-abstract class AbstractRedisAdapterTest extends CachePoolTest
+abstract class AbstractRedisAdapterTest extends TagsInvalidatingAdapterTestCase
 {
     protected static $redis;
 

@@ -31,7 +31,7 @@ class GitCommitHashCompilerPass implements CompilerPassInterface
         $process = new Process('git log -1');
 
         if (0 !== $process->run()) {
-            throw new \Exception("Git command return wrong exit code");
+            throw new \Exception('Git command return wrong exit code');
         }
 
         $container->setParameter('git_commit_hash_version_strategy', sha1($process->getOutput()));

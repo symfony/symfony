@@ -449,7 +449,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertCount(1, $argument);
         $this->assertEquals('Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader', $argument[0]->getClass());
-        $this->assertEquals(new Reference('serializer.mapping.cache.doctrine.apc'), $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
+        $this->assertNull($container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
         $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.normalizer.object')->getArgument(1));
     }
 
@@ -519,6 +519,44 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $this->assertEquals('Symfony\Component\Serializer\Normalizer\ObjectNormalizer', $definition->getClass());
         $this->assertEquals(-1000, $tag[0]['priority']);
+    }
+
+    public function testSerializerCacheActivated()
+    {
+        $container = $this->createContainerFromFile('serializer_enabled');
+        $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+    }
+
+    public function testSerializerCacheDisabled()
+    {
+        $container = $this->createContainerFromFile('serializer_enabled', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
+        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDeprecatedSerializerCacheOption()
+    {
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED !== $type) {
+                restore_error_handler();
+
+                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+            }
+
+            $deprecations[] = $msg;
+        });
+
+        $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
+
+        restore_error_handler();
+
+        $this->assertCount(1, $deprecations);
+        $this->assertContains('The "framework.serializer.cache" option is deprecated', $deprecations[0]);
+        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+        $this->assertEquals(new Reference('foo'), $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
     }
 
     public function testAssetHelperWhenAssetsAreEnabled()

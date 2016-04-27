@@ -30,20 +30,32 @@
         </service>
 
         <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
+            <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
         </service>
 
         <service id="cache.adapter.doctrine" class="Symfony\Component\Cache\Adapter\DoctrineAdapter" abstract="true">
+            <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Doctrine provider service -->
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
         </service>
 
         <service id="cache.adapter.filesystem" class="Symfony\Component\Cache\Adapter\FilesystemAdapter" abstract="true">
+            <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
             <argument>%kernel.cache_dir%/pools</argument>
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
         </service>
 
         <service id="cache.adapter.psr6" class="Symfony\Component\Cache\Adapter\ProxyAdapter" abstract="true">
@@ -53,9 +65,13 @@
         </service>
 
         <service id="cache.adapter.redis" class="Symfony\Component\Cache\Adapter\RedisAdapter" abstract="true">
+            <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Redis connection object -->
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
+            <call method="setLogger">
+                <argument type="service" id="logger" on-invalid="ignore" />
+            </call>
         </service>
 
     </services>

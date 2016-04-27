@@ -103,11 +103,10 @@ FrameworkBundle
 
    ```yaml
    framework:
-       serializer: ~
-           cache:
-               pools:
-                   serializer:
-                       adapter: cache.adapter.apcu
+       cache:
+           pools:
+               serializer:
+                   adapter: cache.adapter.apcu
 
 HttpKernel
 ----------

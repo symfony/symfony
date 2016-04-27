@@ -323,7 +323,6 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
                 CacheItem::log($this->logger, 'Failed to save key "{key}" ({type})', array('key' => substr($id, strlen($this->namespace)), 'type' => $type, 'exception' => $e instanceof \Exception ? $e : null));
             }
         }
-        $this->deferred = array();
 
         return $ok;
     }

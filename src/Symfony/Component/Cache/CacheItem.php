@@ -115,7 +115,7 @@ final class CacheItem implements CacheItemInterface
             throw new InvalidArgumentException('Cache key length must be greater than zero');
         }
         if (isset($key[strcspn($key, '{}()/\@:')])) {
-            throw new InvalidArgumentException('Cache key contains reserved characters {}()/\@:');
+            throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters {}()/\@:', $key));
         }
     }
 

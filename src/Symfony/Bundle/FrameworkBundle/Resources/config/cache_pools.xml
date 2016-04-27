@@ -10,25 +10,6 @@
             <tag name="kernel.cache_clearer" />
         </service>
 
-        <service id="cache.adapter.shared" alias="cache.adapter.filesystem" />
-        <service id="cache.adapter.local" alias="cache.adapter.filesystem" />
-
-        <service id="cache.pool.shared" parent="cache.adapter.shared">
-            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
-        </service>
-
-        <service id="cache.pool.local" parent="cache.adapter.local">
-            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
-        </service>
-
-        <service id="cache.pool.validator" parent="cache.adapter.local" public="false">
-            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
-        </service>
-
-        <service id="cache.pool.serializer" parent="cache.adapter.local" public="false">
-            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
-        </service>
-
         <service id="cache.adapter.apcu" class="Symfony\Component\Cache\Adapter\ApcuAdapter" abstract="true">
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
@@ -72,6 +53,21 @@
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
+        </service>
+
+        <service id="cache.adapter.shared" alias="cache.adapter.filesystem" />
+        <service id="cache.adapter.local" alias="cache.adapter.filesystem" />
+
+        <service id="cache.pool.app" parent="cache.adapter.shared">
+            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
+        </service>
+
+        <service id="cache.pool.validator" parent="cache.adapter.local" public="false">
+            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
+        </service>
+
+        <service id="cache.pool.serializer" parent="cache.adapter.local" public="false">
+            <tag name="cache.pool" clearer="cache.default_pools_clearer" />
         </service>
 
     </services>

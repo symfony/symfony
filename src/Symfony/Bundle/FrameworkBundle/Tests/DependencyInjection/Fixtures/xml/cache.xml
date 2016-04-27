@@ -7,6 +7,8 @@
 
     <framework:config>
         <framework:cache>
+            <framework:adapter name="foo" parent="cache.adapter.filesystem" default-lifetime="30" />
+            <framework:adapter name="doctrine" provider="app.doctrine_cache_provider" default-lifetime="30" />
             <framework:pool name="foo" adapter="cache.adapter.apcu" default-lifetime="30" />
             <framework:pool name="bar" adapter="cache.adapter.doctrine" default-lifetime="5" provider="app.doctrine_cache_provider" />
             <framework:pool name="baz" adapter="cache.adapter.filesystem" default-lifetime="7" />

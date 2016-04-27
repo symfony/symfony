@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-24T15:28:00Z
+
+The tests failure seems unrelated.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-25T06:20:45Z
+
+@Ener-Getick please, don't remove any of the rows of the PR table. In your table we miss the `Branch` row, which is were you propose where to merge this. If you are not sure, it's OK to say so. Thanks!
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-25T06:26:34Z
+
+@javiereguiluz I thought it was enough to target the right branch, added ☺
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-25T07:31:02Z
+
+Can't we always use the `CacheClassMetadataFactory` when the cache is configured and optionally wrap a Doctrine cache instance in a `DoctrineAdapter`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-25T08:02:14Z
+
+Understood, this is for 3.1 :)
+Then I have a few suggestions:
+- change the deprecation message to add the version: ...constructor is deprecated **since version 3.1**....
+- replace the compiler pass by a deprecation of the cache configuration key and a few wiring in the DI extension.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-25T08:42:49Z
+
+If we don't want to deprecate the cache configuration key, then I'd suggest doing what @xabbuh suggests, and do it at runtime using a static method as factory added to `CacheClassMetadataFactory`, tagged `@internal`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-25T09:35:08Z
+
+I agree with @nicolas-grekas. Now that we have the `cache.pool.serializer` pool we do not need the `cache` config option for the serializer anymore. People can now configure the cache through the semantic config of the cache subsystem.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-25T16:17:20Z
+
+@nicolas-grekas @xabbuh then the default value introduced in https://github.com/symfony/symfony/pull/18561 should be removed right ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-25T16:29:42Z
+
+Yep, can you do that in this PR, as a first commit?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-25T16:34:01Z
+
+@nicolas-grekas yes, I'm gonna split my commit
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-25T17:52:00Z
+
+Rebased and updated.
+
+I also added notes in the upgrading files to inform about this new deprecation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-25T19:13:35Z
+
+:+1: with only one wonder: should the UPGRADE files tell about the serializer pool, and/or tell about `cache.pool.local`, which is the centralized way of configuring e.g. APCu for all internal adapters at once?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-25T19:20:09Z
+
+I didn't think about ``cache.pool.local``, this is indeed probably better to use it.
+And in case the user wants something more specific, we can add a link to the documentation (which doesn't exist yet).

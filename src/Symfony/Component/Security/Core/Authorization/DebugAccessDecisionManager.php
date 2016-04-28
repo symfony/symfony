@@ -61,6 +61,7 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
     public function setVoters(array $voters)
     {
         $this->voters = $voters;
+        $this->manager->setVoters($voters);
     }
 
     /**

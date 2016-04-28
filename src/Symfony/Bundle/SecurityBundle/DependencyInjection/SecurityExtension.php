@@ -66,6 +66,10 @@ class SecurityExtension extends Extension
         $loader->load('collectors.xml');
         $loader->load('guard.xml');
 
+        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+            $loader->load('security_debug.xml');
+        }
+
         if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
@@ -95,13 +99,6 @@ class SecurityExtension extends Extension
         // load ACL
         if (isset($config['acl'])) {
             $this->aclLoad($config['acl'], $container);
-        }
-
-        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
-            $loader->load('security_debug.xml');
-
-            $definition = $container->findDefinition('security.authorization_checker');
-            $definition->replaceArgument(2, new Reference('debug.security.access.decision_manager'));
         }
 
         // add some required classes for compilation

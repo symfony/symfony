@@ -18,8 +18,43 @@ namespace Symfony\Component\Security\Core\Exception;
  */
 class AccessDeniedException extends \RuntimeException
 {
+    private $attributes = array();
+    private $object;
+
     public function __construct($message = 'Access Denied.', \Exception $previous = null)
     {
         parent::__construct($message, 403, $previous);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @param array $attributes
+     */
+    public function setAttributes(array $attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    /**
+     * @param mixed $object
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
     }
 }

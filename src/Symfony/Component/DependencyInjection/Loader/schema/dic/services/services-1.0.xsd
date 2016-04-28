@@ -24,13 +24,27 @@
       ]]></xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
-      <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
-      <xsd:element name="imports" type="imports" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="parameters" type="parameters" minOccurs="0" maxOccurs="1" />
-      <xsd:element name="services" type="services" minOccurs="0" maxOccurs="1" />
-      <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:group ref="foreign" />
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="imports" type="imports" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="parameters" type="parameters" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
+      <xsd:sequence minOccurs="0">
+        <xsd:element name="services" type="services" />
+        <xsd:group ref="foreign" />
+      </xsd:sequence>
     </xsd:sequence>
   </xsd:complexType>
+
+  <xsd:group name="foreign">
+    <xsd:sequence>
+      <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:group>
 
   <xsd:complexType name="services">
     <xsd:annotation>

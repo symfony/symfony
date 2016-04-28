@@ -9,9 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Asset\CompilerPass;
+namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Process\Process;
 
@@ -20,7 +19,7 @@ use Symfony\Component\Process\Process;
  *
  * @author Evgenii Sokolov <ewgraf@gmail.com>
  */
-class GitCommitHashCompilerPass implements CompilerPassInterface
+class GitCommitHashPass implements CompilerPassInterface
 {
     /**
      * @param ContainerBuilder $container
@@ -29,12 +28,8 @@ class GitCommitHashCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $process = new Process('git log -1');
-
-        if (0 !== $process->run()) {
-            throw new \Exception('Git command return wrong exit code');
-        }
-
-        $container->setParameter('git_commit_hash_version_strategy', sha1($process->getOutput()));
+        $process = new Process('git log -1', $container->getParameter('kernel.root_dir'));
+        $process->mustRun();
+        $container->setParameter('git_commit_hash', sha1($process->getOutput()));
     }
 }

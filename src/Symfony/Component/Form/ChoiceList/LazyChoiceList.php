@@ -46,7 +46,7 @@ class LazyChoiceList implements ChoiceListInterface
     /**
      * @var ChoiceListInterface|null
      *
-     * @deprecated Since 3.1, to be remove in 4.0. Cache the choice list in the {@link ChoiceLoaderInterface} instead.
+     * @deprecated Since 3.1, to be removed in 4.0. Cache the choice list in the {@link ChoiceLoaderInterface} instead.
      */
     private $loadedList;
 

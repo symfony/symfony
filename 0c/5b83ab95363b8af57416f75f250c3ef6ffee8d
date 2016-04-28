@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T14:41:38Z
+
+Comments addressed.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T14:49:41Z
+
+Actually the more relevant of all the profile is cached app and form types loading [profile 3](https://blackfire.io/profiles/compare/293b27b6-aa58-42ae-bafb-655513201505/graph?settings%5Bdimension%5D=wt&settings%5Bdisplay%5D=landscape&settings%5BtabPane%5D=nodes&selected=&callname=main()):
+
+![load_types-cached](https://cloud.githubusercontent.com/assets/10107633/14146290/64669980-f697-11e5-8088-74c5e5d4e950.jpg)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T14:50:55Z
+
+It should also be the most used (just on display) with a warmup cache
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T18:35:54Z
+
+This might be a first step to do better but can be improved even more IMHO, so let's do this for 3.2.
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T06:53:40Z
+
+Should it be done for 3.1 ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T07:19:35Z
+
+Comments addressed.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T12:33:45Z
+
+Should I deprecate the caching of `LazyChoiceList` in that PR too ? (ref https://github.com/symfony/symfony/pull/18332#issuecomment-203779109)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T12:34:43Z
+
+@javiereguiluz I guess this one could have a "Enhancement" label :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T17:08:08Z
+
+I pushed the `LazyChoiceList` optimization, with both it's even better, here some profiles from previous optimization of the loader to both loader and LazyChoiceList with this new [commit](:
+
+ - [no cache](https://blackfire.io/profiles/compare/2b99d194-8808-4b85-81cb-2e677b807709/graph)
+ - [with cache](https://blackfire.io/profiles/compare/5366b0a0-dbb0-412e-a2e5-267fe71457e8/graph)
+ - [on submit](https://blackfire.io/profiles/compare/faadae3e-f987-442d-8192-5447f882ecad/graph)
+
+So with both optimizations from current to 4.0 (without BC layer):
+
+ - [no cache](https://blackfire.io/profiles/compare/9dfdf55a-8b3a-40f8-982e-b5436d630064/graph)
+
+    ![full_optimized-no_cache](https://cloud.githubusercontent.com/assets/10107633/14228484/5f3f69a6-f916-11e5-8a53-c13f812f7054.jpg)
+
+ - [with cache](https://blackfire.io/profiles/compare/abeb8d8c-64de-4efe-9ef2-4a15377b094a/graph)
+
+    ![full_optimized-cached](https://cloud.githubusercontent.com/assets/10107633/14228524/e2f214ec-f916-11e5-8a54-077176e4f5eb.jpg)
+
+ - [on submit 3 fields with one choice of 50 for each](https://blackfire.io/profiles/compare/8548d855-5631-493d-acfe-342dfad7d7f6/graph)
+
+    ![full_optimized-on_submit](https://cloud.githubusercontent.com/assets/10107633/14228537/5ce2a118-f917-11e5-88e9-a2be78154369.jpg)
+
+Finally profiles with deprecation layer (the final look after that PR):
+
+- 3 entity fields with 50 entities each:
+
+  - [no cache](https://blackfire.io/profiles/compare/85334c69-1dc2-4dfd-8bef-af1327149cd7/graph)
+
+  - [cache](https://blackfire.io/profiles/compare/b7f1e75e-40ce-40cc-9d8e-979b77236c5c/graph)
+
+  - [submit](https://blackfire.io/profiles/compare/871ebdd4-4e56-465d-9283-9ed5dcca744e/graph)
+
+- 1 entity field with 150 entities:
+
+  - [display](https://blackfire.io/profiles/compare/e089a246-7cd7-4ce7-bc3c-69cc72c8fbea/graph)
+
+  - [submit](https://blackfire.io/profiles/compare/34013bc6-a3ee-477b-bfcf-031d068e61e3/graph)
+
+And that will be even better in 4.0!
+
+Don't forget to look at the real values, they are more impacted than the percentages :)
+
+Note that actually the code as it works by default has not triggered any deprecations for my tests, it should only happen for custom implementations and that's good.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T17:14:08Z
+
+Failures are unrelated.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-03T17:17:22Z
+
+@HeahDude nice comparisons :clap: And thanks for using realistic benchmarks (it's "easy" to improve performance when doing a benchmark with 1 million entities ... but that's no real)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T17:20:26Z
+
+Thanks @javiereguiluz, still I guess it would be nice if someone could test it in a real app too to confirm it does not mess with anything...
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-25T13:41:46Z
+
+What's the status of this PR? is this still to be in 3.1?
+
+Allied to #18332 we can get a great performance improvement.
+
+I tested it with `symfony-demo` by quickly adding some `EntityType` fields in some forms, and it worked like a charm :)
+
+Anyone for a final review?

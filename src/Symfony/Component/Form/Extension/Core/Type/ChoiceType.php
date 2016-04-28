@@ -61,9 +61,7 @@ class ChoiceType extends AbstractType
         $builder->setAttribute('choice_list', $choiceList);
 
         if ($options['expanded']) {
-            $builder->setDataMapper($options['multiple']
-                ? new CheckboxListMapper($choiceList)
-                : new RadioListMapper($choiceList));
+            $builder->setDataMapper($options['multiple'] ? new CheckboxListMapper() : new RadioListMapper());
 
             // Initialize all choices before doing the index check below.
             // This helps in cases where index checks are optimized for non
@@ -134,30 +132,13 @@ class ChoiceType extends AbstractType
 
                 $event->setData($data);
             });
+        }
 
-            if (!$options['multiple']) {
-                // For radio lists, transform empty arrays to null
-                // This is kind of a hack necessary because the RadioListMapper
-                // is not invoked for forms without choices
-                $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-                    if (array() === $event->getData()) {
-                        $event->setData(null);
-                    }
-                });
-                // For radio lists, pre selection of the choice needs to pre set data
-                // with the string value so it can be matched in
-                // {@link \Symfony\Component\Form\Extension\Core\DataMapper\RadioListMapper::mapDataToForms()}
-                $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-                    $choiceList = $event->getForm()->getConfig()->getAttribute('choice_list');
-                    $value = current($choiceList->getValuesForChoices(array($event->getData())));
-                    $event->setData((string) $value);
-                });
-            }
-        } elseif ($options['multiple']) {
-            // <select> tag with "multiple" option
+        if ($options['multiple']) {
+            // <select> tag with "multiple" option or list of checkbox inputs
             $builder->addViewTransformer(new ChoicesToValuesTransformer($choiceList));
         } else {
-            // <select> tag without "multiple" option
+            // <select> tag without "multiple" option or list of radio inputs
             $builder->addViewTransformer(new ChoiceToValueTransformer($choiceList));
         }
 
@@ -252,7 +233,11 @@ class ChoiceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $emptyData = function (Options $options) {
-            if ($options['multiple'] || $options['expanded']) {
+            if ($options['expanded'] && !$options['multiple']) {
+                return;
+            }
+
+            if ($options['multiple']) {
                 return array();
             }
 

@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-22T17:57:50Z
+
+@javiereguiluz it happens because of this line https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/EventListener/ProfilerListener.php#L81.
+
+But the scope of `RequestDataCollector::collect()` does not allow to know it the request is the sub request.
+So I had to register the `RequestDataCollector` on `KernelEvents::RESPONSE` to get it from the event.
+
+I also refactored a bit since `$session` was already defined in `RequestDataCollector::collect()`.
+
+Please tell me if the fix works for you too, and thanks again for reporting it :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-23T06:56:26Z
+
+I reverted the redirect controller thing as I got the wrong result while testing it with `symfony-demo`.
+Also I've pushed df19c14 to store the redirected flag in the request attributes instead of the session and used the returned value of `Session::remove`. If you agree with this commit I'll squash it.
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-26T12:08:38Z
+
+ping @javiereguiluz

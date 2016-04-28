@@ -998,7 +998,7 @@ class FrameworkExtension extends Extension
             $cacheMetadataFactory = new Definition(
                 CacheClassMetadataFactory::class,
                 array(
-                    new Reference('serializer.mapping.class_metadata_factory.inner'),
+                    new Reference('serializer.mapping.cache_class_metadata_factory.inner'),
                     new Reference('cache.pool.serializer'),
                 )
             );

@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\Form\Extension\Core\DataMapper;
 
-use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
 use Symfony\Component\Form\DataMapperInterface;
-use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * Maps choices to/from checkbox forms.
@@ -27,16 +26,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class CheckboxListMapper implements DataMapperInterface
 {
     /**
-     * @var ChoiceListInterface
-     */
-    private $choiceList;
-
-    public function __construct(ChoiceListInterface $choiceList)
-    {
-        $this->choiceList = $choiceList;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function mapDataToForms($choices, $checkboxes)
@@ -46,22 +35,12 @@ class CheckboxListMapper implements DataMapperInterface
         }
 
         if (!is_array($choices)) {
-            throw new TransformationFailedException('Expected an array.');
-        }
-
-        try {
-            $valueMap = array_flip($this->choiceList->getValuesForChoices($choices));
-        } catch (\Exception $e) {
-            throw new TransformationFailedException(
-                'Can not read the choices from the choice list.',
-                $e->getCode(),
-                $e
-            );
+            throw new UnexpectedTypeException($choices, 'array');
         }
 
         foreach ($checkboxes as $checkbox) {
             $value = $checkbox->getConfig()->getOption('value');
-            $checkbox->setData(isset($valueMap[$value]) ? true : false);
+            $checkbox->setData(in_array($value, $choices, true));
         }
     }
 
@@ -70,6 +49,10 @@ class CheckboxListMapper implements DataMapperInterface
      */
     public function mapFormsToData($checkboxes, &$choices)
     {
+        if (!is_array($choices)) {
+            throw new UnexpectedTypeException($choices, 'array');
+        }
+
         $values = array();
 
         foreach ($checkboxes as $checkbox) {
@@ -79,14 +62,6 @@ class CheckboxListMapper implements DataMapperInterface
             }
         }
 
-        try {
-            $choices = $this->choiceList->getChoicesForValues($values);
-        } catch (\Exception $e) {
-            throw new TransformationFailedException(
-                'Can not read the values from the choice list.',
-                $e->getCode(),
-                $e
-            );
-        }
+        $choices = $values;
     }
 }

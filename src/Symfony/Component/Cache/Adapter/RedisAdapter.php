@@ -22,11 +22,10 @@ class RedisAdapter extends AbstractAdapter
 
     public function __construct(\Redis $redisConnection, $namespace = '', $defaultLifetime = 0)
     {
-        $this->redis = $redisConnection;
-
         if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(sprintf('RedisAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
         }
+        $this->redis = $redisConnection;
 
         parent::__construct($namespace, $defaultLifetime);
     }
@@ -36,13 +35,15 @@ class RedisAdapter extends AbstractAdapter
      */
     protected function doFetch(array $ids)
     {
-        $values = $this->redis->mget($ids);
-        $index = 0;
-        $result = [];
+        $result = array();
 
-        foreach ($ids as $id) {
-            if (false !== $value = $values[$index++]) {
-                $result[$id] = unserialize($value);
+        if ($ids) {
+            $values = $this->redis->mget($ids);
+            $index = 0;
+            foreach ($ids as $id) {
+                if (false !== $value = $values[$index++]) {
+                    $result[$id] = unserialize($value);
+                }
             }
         }
 
@@ -80,7 +81,9 @@ class RedisAdapter extends AbstractAdapter
      */
     protected function doDelete(array $ids)
     {
-        $this->redis->del($ids);
+        if ($ids) {
+            $this->redis->del($ids);
+        }
 
         return true;
     }
@@ -101,6 +104,9 @@ class RedisAdapter extends AbstractAdapter
             }
         }
 
+        if (!$serialized) {
+            return $failed;
+        }
         if ($lifetime > 0) {
             $pipe = $this->redis->multi(\Redis::PIPELINE);
             foreach ($serialized as $id => $value) {

@@ -227,7 +227,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
         $ok = true;
 
-        // When bulk-save failed, retry each item individually
+        // When bulk-delete failed, retry each item individually
         foreach ($ids as $key => $id) {
             try {
                 $e = null;

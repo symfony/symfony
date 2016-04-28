@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by dosten at 2016-03-09T14:02:30Z
+
+But this is a BC break, isn't it? The listener will not execute the `onBind` method anymore if someone extends the listener, ex:
+
+```php
+<?php
+
+class MyMergeDoctrineCollectionListener extends MergeDoctrineCollectionListener
+{
+    public function onBind()
+    {
+        // my own implementation
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-09T14:57:47Z
+
+@dosten Indeed. Have to keep the old method in the `getSubscribedEvents()` call though.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-10T12:46:12Z
+
+Ok now 37cdb80 fixes the BC break and adds some tests.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-09T13:12:04Z
+
+What's the status of this one ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-12T14:39:13Z
+
+@stof Fixed, thanks.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-25T14:25:09Z
+
+ping :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-28T09:37:26Z
+
+Apart from the typo, 👍
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-28T10:29:13Z
+
+Fixed! Thanks.

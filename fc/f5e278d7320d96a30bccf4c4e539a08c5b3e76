@@ -1,0 +1,77 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-01T08:20:02Z
+
+This issue seems very important. Could anyone who uses XML config verify it? Thanks! After all, people use XML because it validates the config ... so we must ensure that the validation is correct.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-05T11:43:03Z
+
+Best imo would be to have additional tests that ensure that an XML file that wasn't valid before now is parsed properly.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T15:41:56Z
+
+@backbone87 can you add such a test ?
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2016-04-09T14:07:05Z
+
+if the XmlFileLoader is validating the loaded xml, then the schema should be covered by its test cases already?
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2016-04-09T14:19:19Z
+
+actually all the XmlFileLoader tests should fail without this ticket resolved, because the schema is invalid and therefore the xml cant be validated. i am not that familar with the validation behavior of libxml
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2016-04-10T05:05:31Z
+
+ok i have played around with the test cases of the XmlFileLoader and it seems like libxml doesnt care about unique particle attribution and therefore "succeeds" validating the services.xml files with the old (invalid) schema.
+in general i have noticed some wacky applications of the whole validation, but i will open another issue for it.
+
+in general the existing testcases cover that this PR is working as intented.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-10T07:11:49Z
+
+@backbone87 The thing is, if we cannot find an example that would fail without this change, there is no need to do it. So what I meant is that we need to find a failing example and have to add it on top of the already existing ones.
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2016-04-12T10:11:48Z
+
+@xabbuh it cant fail, because libxml doesnt seem to care about the problem in the XSD, but every other standards conforming tool reports this XSD as invalid without the fix
+
+the "benefit" from this PR is that you can now have your extension config between parameter and service config, which was invalid before:
+```xml
+<parameters>...</parameter>
+<project:config>...</project:config>
+<services>...</services>
+```
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2016-04-12T10:23:25Z
+
+i mean we could add a XSD linting test to the test suite, but that needs to use another XML tool than the ones bundled with PHP. every decent XSD editor lints automatically, so idk if its worth the hassle.
+
+---------------------------------------------------------------------------
+
+by backbone87 at 2016-04-21T15:47:20Z
+
+whats missing here? any opinions on the latest comments?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-21T15:50:28Z
+
+The change itself looks good to me. :+1:
+
+But yeah I think we should use some external validation tool if that doesn't work properly with PHP.

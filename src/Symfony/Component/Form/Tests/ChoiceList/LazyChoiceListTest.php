@@ -167,7 +167,9 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('RESULT', $this->list->getChoicesForValues(array('a', 'b')));
     }
 
-    // To be removed in 4.0
+    /**
+     * @group legacy
+     */
     public function testGetValuesForChoicesForwardsCallIfListNotLoaded()
     {
         $this->loader->expects($this->exactly(2))

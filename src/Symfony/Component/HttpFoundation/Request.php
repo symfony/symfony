@@ -275,6 +275,12 @@ class Request
         $this->basePath = null;
         $this->method = null;
         $this->format = null;
+
+        // if the request doesn't contain a unique ID, generate a random one
+        if (!$this->headers->has('X_REQUEST_ID')) {
+            $uuid = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0x0fff) | 0x4000,  mt_rand(0, 0x3fff) | 0x8000, mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
+            $this->headers->set('X_REQUEST_ID', $uuid);
+        }
     }
 
     /**

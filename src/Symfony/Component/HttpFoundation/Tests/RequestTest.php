@@ -1824,6 +1824,20 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array(str_repeat(':', 101)),
         );
     }
+
+    public function testExistingRequestId()
+    {
+        $request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_X_REQUEST_ID' => 'custom-request-id-value'));
+
+        $this->assertEquals('custom-request-id-value', $request->headers->get('X-Request-Id'));
+    }
+
+    public function testGeneratedRequestId()
+    {
+        $request = Request::create('/');
+
+        $this->assertRegexp('/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/', $request->headers->get('X-Request-Id'));
+    }
 }
 
 class RequestContentProxy extends Request

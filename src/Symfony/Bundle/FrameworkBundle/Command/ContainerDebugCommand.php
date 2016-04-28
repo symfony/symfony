@@ -100,25 +100,21 @@ EOF
         }
 
         $this->validateInput($input);
+        $object = $this->getContainerBuilder();
 
         if ($input->getOption('parameters')) {
-            $object = $this->getContainerBuilder()->getParameterBag();
+            $object = $object->getParameterBag();
             $options = array();
         } elseif ($parameter = $input->getOption('parameter')) {
-            $object = $this->getContainerBuilder();
             $options = array('parameter' => $parameter);
         } elseif ($input->getOption('tags')) {
-            $object = $this->getContainerBuilder();
             $options = array('group_by' => 'tags', 'show_private' => $input->getOption('show-private'));
         } elseif ($tag = $input->getOption('tag')) {
-            $object = $this->getContainerBuilder();
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
-            $object = $this->getContainerBuilder();
             $name = $this->findProperServiceName($input, $io, $object, $name);
             $options = array('id' => $name);
         } else {
-            $object = $this->getContainerBuilder();
             $options = array('show_private' => $input->getOption('show-private'));
         }
 

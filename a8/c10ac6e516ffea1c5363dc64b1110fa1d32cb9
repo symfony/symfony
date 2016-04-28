@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-03-15T17:01:47Z
+
+@HeahDude thanks for this fix (and for everything you do for the Form component).
+
+Just a minor comment: it seems that the `| Bug fix?      | yes/no` row disappeared from the PR description table (it is usually displayed after the `Branch?` row). This information is important for mergers. Could you please include it? Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-15T17:02:43Z
+
+@javiereguiluz done :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-16T10:31:02Z
+
+Failures seem unrelated.
+
+---------------------------------------------------------------------------
+
+by nakashu at 2016-03-17T11:49:20Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-17T13:36:48Z
+
+Comments addressed.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-17T16:15:21Z
+
+`TwigBridge` dependency to `EventDispatcher` seems to be broken with php 7 build in travis.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-19T09:23:38Z
+
+@HeahDude Can you check if rebasing fixes the tests?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-19T12:31:25Z
+
+@xabbuh It did. Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T08:58:39Z
+
+Ok there was a reason why I use `assertEmpty`, it's because `$extraData` in as empty array while `$viewData` is an empty string.
+
+I fixed the assertions accordingly.
+
+Rebased and squashed! Needs a final review here. Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T09:24:03Z
+
+There is a little failure in Doctrine bridge because it needs that PR to be merged first.
+
+I've updated the dependency to `2.7.12` but travis does not seem to be aware of it yet.
+
+Is it OK ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T11:16:56Z
+
+@xabbuh Done, let's wait & see :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T11:21:48Z
+
+Nope :(
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T11:26:05Z
+
+@xabbuh Can this be related to the last releases messed tags ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-01T11:44:43Z
+
+@HeahDude This looks good now (the `deps=low` job is passing).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T11:46:48Z
+
+Great!
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-04-08T16:47:50Z
+
+Any news here? Waiting for this fix so I can upgrade to Symfony 2.8.* :)

@@ -192,7 +192,11 @@ abstract class Controller implements ContainerAwareInterface
     protected function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
     {
         if (!$this->isGranted($attributes, $object)) {
-            throw $this->createAccessDeniedException($message);
+            $exception = $this->createAccessDeniedException($message);
+            $exception->setAttributes($attributes);
+            $exception->setObject($object);
+
+            throw $exception;
         }
     }
 

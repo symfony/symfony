@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * added `attributes` and `object` with getters/setters to `Symfony\Component\Security\Core\Exception\AccessDeniedException`
+
 3.0.0
 -----
 

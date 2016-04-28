@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by Koc at 2016-04-18T07:56:50Z
+
+Heh, you answered on my question here https://github.com/symfony/symfony/pull/18308#discussion_r57436761
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-18T08:02:12Z
+
+@Koc correct, back when I answered it, the sequences weren't that robust. Now that the `ArgumentResolver` creates the objects when not passed along, it's guaranteed that the default sequence will not cause this issue. Previously only with the `FrameworkBundle` this could be guaranteed.
+
+So your comment was indeed correct, but ahead of time :+1:

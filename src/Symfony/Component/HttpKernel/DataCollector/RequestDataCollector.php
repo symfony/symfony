@@ -76,6 +76,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         $sessionMetadata = array();
         $sessionAttributes = array();
+        $session = null;
         $flashes = array();
         if ($request->hasSession()) {
             $session = $request->getSession();
@@ -129,7 +130,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             unset($this->controllers[$request]);
         }
 
-        if (isset($session)) {
+        if (null !== $session) {
             if ($request->attributes->has('_redirected')) {
                 $this->data['redirect'] = $session->remove('sf_redirect');
             }

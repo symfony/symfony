@@ -153,7 +153,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
             'choices' => $this->booleanChoicesWithNull,
-            'choices_as_values' => true,
             'expanded' => true,
         ))->createView();
 
@@ -179,7 +178,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
     {
         $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', false, array(
             'choices' => $this->booleanChoicesWithNull,
-            'choices_as_values' => true,
             'expanded' => true,
         ))->createView();
 

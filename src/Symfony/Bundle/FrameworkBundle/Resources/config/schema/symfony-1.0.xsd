@@ -205,18 +205,15 @@
     </xsd:complexType>
 
     <xsd:complexType name="cache">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="adapter" type="cache_adapter" />
-            <xsd:element name="pool" type="cache_pool" />
-        </xsd:choice>
-    </xsd:complexType>
-
-    <xsd:complexType name="cache_adapter">
-        <xsd:attribute name="name" type="xsd:string" use="required" />
-        <xsd:attribute name="parent" type="xsd:string" />
-        <xsd:attribute name="default-lifetime" type="xsd:integer" />
-        <xsd:attribute name="provider" type="xsd:string" />
-        <xsd:attribute name="clearer" type="xsd:string" />
+        <xsd:sequence>
+            <xsd:element name="app" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="system" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="directory" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="default-doctrine-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="default-psr6-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="default-redis-provider" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="pool" type="cache_pool" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="cache_pool">
@@ -224,5 +221,7 @@
         <xsd:attribute name="adapter" type="xsd:string" />
         <xsd:attribute name="public" type="xsd:boolean" />
         <xsd:attribute name="default-lifetime" type="xsd:integer" />
+        <xsd:attribute name="provider" type="xsd:string" />
+        <xsd:attribute name="clearer" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

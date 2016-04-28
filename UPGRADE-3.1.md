@@ -93,8 +93,8 @@ FrameworkBundle
    cache service. If you are using `serializer.mapping.cache.apc`, use
    `serializer.mapping.cache.doctrine.apc` instead.
 
- * The `framework.serializer.cache` option has been deprecated. Configure a cache pool
-   called `serializer` under `framework.cache.pools` instead.
+ * The `framework.serializer.cache` option has been deprecated. Configure the
+   `cache.serializer` service under `framework.cache.pools` instead.
 
    Before:
 
@@ -110,7 +110,7 @@ FrameworkBundle
    framework:
        cache:
            pools:
-               serializer:
+               cache.serializer:
                    adapter: cache.adapter.apcu
 
 HttpKernel

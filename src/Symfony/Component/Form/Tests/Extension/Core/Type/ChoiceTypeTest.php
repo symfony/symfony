@@ -202,7 +202,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testExpandedChoiceListWithBooleanAndNullValues()
     {
-        $view = $this->factory->create('choice', null, array(
+        $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
             'choices' => $this->booleanChoicesWithNull,
             'choices_as_values' => true,
             'expanded' => true,
@@ -229,7 +229,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testExpandedChoiceListWithBooleanAndNullValuesAndFalseAsPreSetData()
     {
-        $view = $this->factory->create('choice', false, array(
+        $view = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', false, array(
             'choices' => $this->booleanChoicesWithNull,
             'choices_as_values' => true,
             'expanded' => true,

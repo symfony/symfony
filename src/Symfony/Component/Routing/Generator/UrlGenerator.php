@@ -187,15 +187,15 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
         if ('' === $url) {
             $url = '/';
-        } elseif (preg_match($this->urlEncodingSkipRegexp, $url)) {
-            // the context base URL is already encoded (see Symfony\Component\HttpFoundation\Request)
+        } else if (preg_match($this->urlEncodingSkipRegexp, $url)) {
+            // the contexts base URL is already encoded (see Symfony\Component\HttpFoundation\Request)
             $url = strtr(rawurlencode($url), $this->decodedChars);
         }
 
         // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
         // so we need to encode them as they are not used for this purpose here
         // otherwise we would generate a URI that, when followed by a user agent (e.g. browser), does not match this route
-        if (false !== strpos($url, '/.')) {
+        if(false !== strpos($url, '/.')) {
             $url = strtr($url, array('/../' => '/%2E%2E/', '/./' => '/%2E/'));
             if ('/..' === substr($url, -3)) {
                 $url = substr($url, 0, -2).'%2E%2E';

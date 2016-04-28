@@ -7,6 +7,8 @@ CHANGELOG
  * added "{{ value }}" message placeholder to UniqueEntityValidator
  * deprecated `MergeDoctrineCollectionListener::onBind` in favor of
    `MergeDoctrineCollectionListener::onSubmit`
+ * deprecated passing `ChoiceListFactoryInterface` as first argument of
+   `DoctrineChoiceLoader`'s constructor
 
 3.0.0
 -----

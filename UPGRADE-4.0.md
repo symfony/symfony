@@ -36,6 +36,8 @@ Form
    },
    ```
 
+ * Caching of the loaded `ChoiceListInterface` in the `LazyChoiceList` has been removed,
+   it must be cached in the `ChoiceLoaderInterface` implementation instead.
 
 FrameworkBundle
 ---------------

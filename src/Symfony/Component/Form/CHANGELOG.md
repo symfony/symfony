@@ -10,6 +10,7 @@ CHANGELOG
  * Using callable strings as choice options in `ChoiceType` has been deprecated
    and will be used as `PropertyPath` instead of callable in Symfony 4.0.
  * implemented `DataTransformerInterface` in `TextType`
+ * deprecated caching loaded choice list in `LazyChoiceList::$loadedList`
 
 3.0.0
 -----

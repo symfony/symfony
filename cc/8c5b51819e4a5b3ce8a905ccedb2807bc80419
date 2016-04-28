@@ -1,0 +1,154 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-16T14:08:24Z
+
+This is not the way you're supposed to define the decorator. In fact, I would expect this to inject itself and cause a recursive dependency. Maybe there's another bug at hand causing this or is this intended behavior?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-16T14:17:10Z
+
+@iltar, I'm not an expert of the DI component but this seems logical if we consider that the decoration is also "hardcoded", see [here](https://github.com/symfony/symfony/pull/17887/files#diff-2f3abc925cd55adf4e005287488c369dR51) and [here](https://github.com/symfony/symfony/pull/17887/files#diff-2be909961a57bf75fbb600c1f5fc46e3R104).
+
+If I understand correctly, if the container handles the debug adm as a decorator it is automatically injected and those lines should not be needed, am I missing something ?
+
+This is also how the decorated choice list factories are defined (without using the `decorates` parameter).
+
+---------------------------------------------------------------------------
+
+by gharlan at 2016-04-18T17:44:57Z
+
+@HeahDude thanks for working on this.
+
+I can confirm that it fixes the issue. (But I don't know if it is the "correct" way to fix it.)
+
+---------------------------------------------------------------------------
+
+by JHGitty at 2016-04-20T14:57:20Z
+
+This fix works fine here. Please merge it. :+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-20T16:02:01Z
+
+The fix does not work fine. It simply means that the debug service will never be used, as it does not replace the original service with the decorated version, making it useless.
+
+so this PR does not fix a bug. It breaks the feature entirely.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-20T16:09:58Z
+
+@stof please see the links of my comment above. This fix does not break the feature as tested with the fork linked in #18554.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-20T16:17:08Z
+
+@HeahDude but do you still get the votes in the profiler ? This is what the debug decorator is about.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-20T16:18:16Z
+
+Yes it works perfectly fine :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-20T16:19:38Z
+
+Can anyone else (re-)confirm? ping @JHGitty @gharlan
+
+---------------------------------------------------------------------------
+
+by gharlan at 2016-04-20T16:30:39Z
+
+Yes I can confirm it. It fixes the bug, and the new access decision log in profiler is still there.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-20T16:32:11Z
+
+Thank you @gharlan
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-21T07:18:43Z
+
+@stof This works for the core as the injected access decision manager is changed manually in the extension class: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/SecurityBundle/DependencyInjection/SecurityExtension.php#L100-L105
+
+However, this will not work if someone injected the default access decision manager somewhere else as those places would now not use the decorated one anymore.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-21T07:39:53Z
+
+One solution could be the following delegator class in dev:
+```php
+@Internal
+final class VoterProxy implements VoterInterface
+{
+    private $voterId;
+    private $container;
+
+    public function __construct($voterId, ContainerInterface $container)
+    {
+        $this->voterId = $voterId;
+        $this->container = $container;
+    }
+
+    public function vote(TokenInterface $token, $subject, array $attributes)
+    {
+        return $this->container->get($this->voterId)->vote($token, $subject, $attributes);
+    }
+}
+```
+
+Imo this is the only "clean" solution will will keep working in the future, possible even in prod (though you might want to cache the container get call then)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-24T11:02:01Z
+
+Ok I've reverted the first fix in a6fce2d and pushed 8e4f98b to fix it while keeping the debug adm injected properly, considering the good point of @xabbuh.
+
+I've tested it was passed to the `SecurityDataCollector` when removing `debug` from its argument name in `SecurityBundle/Resources/config/collectors.xml` using the fork provided in #18554.
+
+If some one could test it again, we should be good now :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-24T11:15:25Z
+
+Actually, the test with the collector is extra safety, since the feature works without overriding `security.authorization_checker` argument in the config thanks to the last fix.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-25T09:11:06Z
+
+There was a major update on this PR wich actually fixes a BC break on 3.1. Anyone for a review?
+
+ping @gharlan @JHGitty @iltar Could you please (re-)confirm it works for you?
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-25T09:15:25Z
+
+Isn't the "critical" label needed when a BC break prevents the application from running?
+
+---------------------------------------------------------------------------
+
+by gharlan at 2016-04-25T09:20:34Z
+
+> ping @gharlan @JHGitty @iltar Could you please (re-)confirm it works for you?
+
+It works!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-25T09:41:33Z
+
+Thank you @gharlan, again :)

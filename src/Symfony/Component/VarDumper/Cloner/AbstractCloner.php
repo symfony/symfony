@@ -100,6 +100,9 @@ abstract class AbstractCloner implements ClonerInterface
 
         'MongoCursorInterface' => 'Symfony\Component\VarDumper\Caster\MongoCaster::castCursor',
 
+        'Redis' => 'Symfony\Component\VarDumper\Caster\RedisCaster::castRedis',
+        'RedisArray' => 'Symfony\Component\VarDumper\Caster\RedisCaster::castRedisArray',
+
         ':curl' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castCurl',
         ':dba' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',
         ':dba persistent' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',

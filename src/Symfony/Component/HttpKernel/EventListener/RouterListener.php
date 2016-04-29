@@ -108,6 +108,7 @@ class RouterListener implements EventSubscriberInterface
                     'route' => isset($parameters['_route']) ? $parameters['_route'] : 'n/a',
                     'route_parameters' => $parameters,
                     'request_uri' => $request->getUri(),
+                    'method' => $request->getMethod(),
                 ));
             }
 

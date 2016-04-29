@@ -18,6 +18,13 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 class RedisAdapter extends AbstractAdapter
 {
+    private static $defaultConnectionOptions = array(
+        'class' => \Redis::class,
+        'persistent' => 0,
+        'timeout' => 0,
+        'read_timeout' => 0,
+        'retry_interval' => 0,
+    );
     private $redis;
 
     public function __construct(\Redis $redisConnection, $namespace = '', $defaultLifetime = 0)
@@ -28,6 +35,80 @@ class RedisAdapter extends AbstractAdapter
         $this->redis = $redisConnection;
 
         parent::__construct($namespace, $defaultLifetime);
+    }
+
+    /**
+     * Creates a Redis connection using a DSN configuration.
+     *
+     * Example DSN:
+     *   - redis://localhost
+     *   - redis://example.com:1234
+     *   - redis://secret@example.com/13
+     *   - redis:///var/run/redis.sock
+     *   - redis://secret@/var/run/redis.sock/13
+     *
+     * @param string $dsn
+     * @param array  $options See self::$defaultConnectionOptions
+     *
+     * @throws InvalidArgumentException When the DSN is invalid.
+     *
+     * @return \Redis
+     */
+    public static function createConnection($dsn, array $options = array())
+    {
+        if (0 !== strpos($dsn, 'redis://')) {
+            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s does not start with "redis://"', $dsn));
+        }
+        $params = preg_replace_callback('#^redis://(?:([^@]*)@)?#', function ($m) use (&$auth) {
+            if (isset($m[1])) {
+                $auth = $m[1];
+            }
+
+            return 'file://';
+        }, $dsn);
+        if (false === $params = parse_url($params)) {
+            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s', $dsn));
+        }
+        if (!isset($params['host']) && !isset($params['path'])) {
+            throw new InvalidArgumentException(sprintf('Invalid Redis DSN: %s', $dsn));
+        }
+        if (isset($params['path']) && preg_match('#/(\d+)$#', $params['path'], $m)) {
+            $params['dbindex'] = $m[1];
+            $params['path'] = substr($params['path'], 0, -strlen($m[0]));
+        }
+        $params += array(
+            'host' => isset($params['host']) ? $params['host'] : $params['path'],
+            'port' => isset($params['host']) ? 6379 : null,
+            'dbindex' => 0,
+        );
+        if (isset($params['query'])) {
+            parse_str($params['query'], $query);
+            $params += $query;
+        }
+        $params += $options + self::$defaultConnectionOptions;
+
+        if (\Redis::class !== $params['class'] && !is_subclass_of($params['class'], \Redis::class)) {
+            throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Redis"', $params['class']));
+        }
+        $connect = empty($params['persistent']) ? 'connect' : 'pconnect';
+        $redis = new $params['class']();
+        @$redis->{$connect}($params['host'], $params['port'], $params['timeout'], null, $params['retry_interval']);
+
+        if (@!$redis->isConnected()) {
+            $e = ($e = error_get_last()) && preg_match('/^Redis::p?connect\(\): (.*)/', $e['message'], $e) ? sprintf(' (%s)', $e[1]) : '';
+            throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s', $e, $dsn));
+        }
+
+        if ((null !== $auth && !$redis->auth($auth))
+            || ($params['dbindex'] && !$redis->select($params['dbindex']))
+            || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
+        ) {
+            $e = preg_replace('/^ERR /', '', $redis->getLastError());
+            $redis->close();
+            throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e, $dsn));
+        }
+
+        return $redis;
     }
 
     /**

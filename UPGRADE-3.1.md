@@ -39,7 +39,10 @@ Form
    'choice_label' => function ($choice) {
        return strtoupper($choice);
    },
-   ```   
+   ```
+
+ * Caching of the loaded `ChoiceListInterface` in the `LazyChoiceList` has been deprecated,
+   it must be cached in the `ChoiceLoaderInterface` implementation instead.
 
 FrameworkBundle
 ---------------

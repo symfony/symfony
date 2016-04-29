@@ -25,11 +25,6 @@ use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 class DoctrineChoiceLoader implements ChoiceLoaderInterface
 {
     /**
-     * @var ChoiceListFactoryInterface
-     */
-    private $factory;
-
-    /**
      * @var ObjectManager
      */
     private $manager;
@@ -78,7 +73,6 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
 
             // Provide a BC layer since $factory has changed
             // form first to last argument as of 3.1
-            $this->factory = $manager;
             $manager = $class;
             $class = $idReader;
             $objectLoader = $factory;

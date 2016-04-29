@@ -7,6 +7,35 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.40 (2016-04-29)
+
+ * bug #18246 [DependencyInjection] fix ambiguous services schema (backbone87)
+ * bug #18603 [PropertyAccess] ->getValue() should be read-only (nicolas-grekas)
+ * bug #18280 [Routing] add query param if value is different from default (Tobion)
+ * bug #18515 [Filesystem] Better error handling in remove() (nicolas-grekas)
+ * bug #18449 [PropertyAccess] Fix regression (nicolas-grekas)
+ * bug #18467 [DependencyInjection] Resolve aliases before removing abstract services + add tests (nicolas-grekas)
+ * bug #18460 [DomCrawler] Fix select option with empty value (Matt Wells)
+ * bug #18425 [Security] Fixed SwitchUserListener when exiting an impersonation with AnonymousToken (lyrixx)
+ * bug #18317 [Form] fix "prototype" not required when parent form is not required (HeahDude)
+ * bug #18439 [Logging] Add support for Firefox (43+) in ChromePhpHandler (arjenm)
+ * bug #18385 Detect CLI color support for Windows 10 build 10586 (mlocati)
+ * bug #18426 [EventDispatcher] Try first if the event is Stopped (lyrixx)
+ * bug #18265 Optimize ReplaceAliasByActualDefinitionPass (ajb-in)
+ * bug #18358 [Form] NumberToLocalizedStringTransformer should return floats when possible (nicolas-grekas)
+ * bug #17926 [DependencyInjection] Enable alias for service_container (hason)
+ * bug #18336 [Debug] Fix handling of php7 throwables (nicolas-grekas)
+ * bug #18312 [ClassLoader] Fix storing not-found classes in APC cache (nicolas-grekas)
+ * bug #18255 [HttpFoundation] Fix support of custom mime types with parameters (Ener-Getick)
+ * bug #18259 [PropertyAccess] Backport fixes from 2.7 (nicolas-grekas)
+ * bug #18224 [PropertyAccess] Remove most ref mismatches to improve perf (nicolas-grekas)
+ * bug #18210 [PropertyAccess] Throw an UnexpectedTypeException when the type do not match (dunglas, nicolas-grekas)
+ * bug #18216 [Intl] Fix invalid numeric literal on PHP 7 (nicolas-grekas)
+ * bug #18147 [Validator] EmailValidator cannot extract hostname if email contains multiple @ symbols (natechicago)
+ * bug #18175 [Translation] Add support for fuzzy tags in PoFileLoader (nud)
+ * bug #18179 [Form] Fix NumberToLocalizedStringTransformer::reverseTransform with big integers (ovrflo, nicolas-grekas)
+ * bug #18164 [HttpKernel] set s-maxage only if all responses are cacheable (xabbuh)
+
 * 2.3.39 (2016-03-13)
 
  * bug #18080 [HttpFoundation] Set the Content-Range header if the requested Range is unsatisfied (jakzal)

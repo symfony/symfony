@@ -218,7 +218,7 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * bug #17094 [Process] More robustness and deterministic tests (nicolas-grekas)
  * bug #17112 [PropertyAccess] Reorder elements array after PropertyPathBuilder::replace (alekitto)
  * bug #17109 Improved the design of the web debug toolbar (javiereguiluz)
- * bug #16797 [Filesystem] Recursivly widen non-executable directories (Slamdunk)
+ * bug #16797 [Filesystem] Recursively widen non-executable directories (Slamdunk)
  * bug #16926 [DependencyInjection] fixed definition loosing property shared when decorated by a parent definition (wahler)
  * bug #17040 [Console] Avoid extra blank lines when rendering exceptions (ogizanagi)
  * bug #17044 [Form] fix BC break introduced with prototype_data option (memphys)

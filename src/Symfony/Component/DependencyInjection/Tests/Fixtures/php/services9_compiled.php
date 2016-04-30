@@ -128,7 +128,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['configured_service_simple'] = $instance = new \stdClass();
 
-        call_user_func(array(new \ConfClass('bar'), 'configureStdClass'), $instance);
+        (new \ConfClass('bar'))->configureStdClass($instance);
 
         return $instance;
     }
@@ -199,7 +199,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceSimpleService()
     {
-        return $this->services['factory_service_simple'] = call_user_func(array(new \SimpleFactoryClass('foo'), 'getInstance'));
+        return $this->services['factory_service_simple'] = (new \SimpleFactoryClass('foo'))->getInstance();
     }
 
     /**

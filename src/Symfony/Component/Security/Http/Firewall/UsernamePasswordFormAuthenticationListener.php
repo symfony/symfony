@@ -20,6 +20,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -81,6 +82,10 @@ class UsernamePasswordFormAuthenticationListener extends AbstractAuthenticationL
         } else {
             $username = trim($request->get($this->options['username_parameter'], null, true));
             $password = $request->get($this->options['password_parameter'], null, true);
+        }
+
+        if (strlen($username) > SecurityContextInterface::MAX_USERNAME_LENGTH) {
+            throw new BadCredentialsException('Invalid username.');
         }
 
         $request->getSession()->set(SecurityContextInterface::LAST_USERNAME, $username);

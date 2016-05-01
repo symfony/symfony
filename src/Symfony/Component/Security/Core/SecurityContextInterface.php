@@ -26,4 +26,5 @@ interface SecurityContextInterface extends TokenStorageInterface, AuthorizationC
     const ACCESS_DENIED_ERROR = Security::ACCESS_DENIED_ERROR;
     const AUTHENTICATION_ERROR = Security::AUTHENTICATION_ERROR;
     const LAST_USERNAME = Security::LAST_USERNAME;
+    const MAX_USERNAME_LENGTH = Security::MAX_USERNAME_LENGTH;
 }

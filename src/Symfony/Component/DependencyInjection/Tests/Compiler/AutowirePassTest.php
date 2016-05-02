@@ -103,7 +103,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a".
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Several services implementing this type have been declared: "c1", "c2".
      */
     public function testTypeCollision()
     {
@@ -120,7 +120,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" for the service "a".
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" for the service "a". Several services implementing this type have been declared: "a1", "a2".
      */
     public function testTypeNotGuessable()
     {
@@ -137,7 +137,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\A" for the service "a".
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\A" for the service "a". Several services implementing this type have been declared: "a1", "a2".
      */
     public function testTypeNotGuessableWithSubclass()
     {
@@ -205,6 +205,21 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
         $lilleDefinition = $container->getDefinition('autowired.symfony\component\dependencyinjection\tests\compiler\lille');
         $this->assertEquals(__NAMESPACE__.'\Lille', $lilleDefinition->getClass());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". This type cannot be instantiated automatically and no service implementing this type is declared.
+     */
+    public function testCreateNonInstanciable()
+    {
+        $container = new ContainerBuilder();
+
+        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
     }
 
     public function testResolveParameter()

@@ -108,6 +108,10 @@ final class KernelEvents
      *
      * This event allows you to reset the global and environmental state of
      * the application, when it was changed during the request.
+     * The event listener method receives a
+     * Symfony\Component\HttpKernel\Event\FinishRequestEvent instance.
+     *
+     * @Event
      *
      * @var string
      */

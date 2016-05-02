@@ -17,6 +17,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\LoggingTranslator;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Translator;
 
@@ -157,7 +159,7 @@ EOF
         // Load the fallback catalogues
         $fallbackCatalogues = array();
         $translator = $this->getContainer()->get('translator');
-        if ($translator instanceof Translator) {
+        if ($translator instanceof Translator || $translator instanceof DataCollectorTranslator || $translator instanceof LoggingTranslator) {
             foreach ($translator->getFallbackLocales() as $fallbackLocale) {
                 if ($fallbackLocale === $locale) {
                     continue;

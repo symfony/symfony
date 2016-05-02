@@ -27,7 +27,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * @internal
      *
-     * @var string[]
+     * @var array[]
      */
     public static $mutatorPrefixes = array('add', 'remove', 'set');
 
@@ -317,11 +317,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private function getMutatorMethod($class, $property)
     {
         $ucProperty = ucfirst($property);
-        $names = $this->getSingulars($ucProperty);
+        $ucSingulars = (array) Inflector::singularize($ucProperty);
 
         foreach (self::$mutatorPrefixes as $prefix) {
+            $names = array($ucProperty);
             if (in_array($prefix, self::$arrayMutatorPrefixes)) {
-                array_unshift($names, $ucProperty);
+                $names = array_merge($names, $ucSingulars);
             }
 
             foreach ($names as $name) {
@@ -357,7 +358,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
 
             foreach ($reflectionProperties as $reflectionProperty) {
-                foreach ($this->getSingulars($reflectionProperty->name) as $name) {
+                foreach ((array) Inflector::singularize($reflectionProperty->name) as $name) {
                     if ($name === lcfirst($matches[2])) {
                         return $reflectionProperty->name;
                     }
@@ -366,22 +367,5 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
             return $matches[2];
         }
-    }
-
-    /**
-     * Gets singulars of a word.
-     *
-     * @param string $plural
-     *
-     * @return array
-     */
-    private function getSingulars($plural)
-    {
-        $singulars = Inflector::singularize($plural);
-        if (is_string($singulars)) {
-            $singulars = array($singulars);
-        }
-
-        return $singulars;
     }
 }

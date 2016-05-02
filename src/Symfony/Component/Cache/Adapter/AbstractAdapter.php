@@ -149,7 +149,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         $ids = array();
 
         foreach ($keys as $key) {
-            $ids[$key] = $this->getId($key);
+            $ids[] = $this->getId($key);
         }
         try {
             $items = $this->doFetch($ids);
@@ -157,7 +157,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             CacheItem::log($this->logger, 'Failed to fetch requested items', array('keys' => $keys, 'exception' => $e));
             $items = array();
         }
-        $ids = array_flip($ids);
+        $ids = array_combine($ids, $keys);
 
         return $this->generateItems($items, $ids);
     }

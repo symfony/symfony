@@ -48,6 +48,7 @@ class RedisAdapterTest extends CachePoolTest
     public function testCreateConnection()
     {
         $redis = RedisAdapter::createConnection('redis://localhost');
+        $this->assertInstanceOf(\Redis::class, $redis);
         $this->assertTrue($redis->isConnected());
         $this->assertSame(0, $redis->getDbNum());
 

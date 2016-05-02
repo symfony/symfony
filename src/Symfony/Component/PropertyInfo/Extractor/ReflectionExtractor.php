@@ -40,7 +40,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     /**
      * @internal
      *
-     * @var array[]
+     * @var string[]
      */
     public static $arrayMutatorPrefixes = array('add', 'remove');
 

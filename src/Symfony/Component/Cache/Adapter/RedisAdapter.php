@@ -27,14 +27,14 @@ class RedisAdapter extends AbstractAdapter
     );
     private $redis;
 
-    public function __construct(\Redis $redisConnection, $namespace = '', $defaultLifetime = 0)
+    public function __construct(\Redis $redisClient, $namespace = '', $defaultLifetime = 0)
     {
+        parent::__construct($namespace, $defaultLifetime);
+
         if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(sprintf('RedisAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
         }
-        $this->redis = $redisConnection;
-
-        parent::__construct($namespace, $defaultLifetime);
+        $this->redis = $redisClient;
     }
 
     /**
@@ -86,26 +86,29 @@ class RedisAdapter extends AbstractAdapter
             $params += $query;
         }
         $params += $options + self::$defaultConnectionOptions;
+        $class = $params['class'];
 
-        if (\Redis::class !== $params['class'] && !is_subclass_of($params['class'], \Redis::class)) {
-            throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Redis"', $params['class']));
-        }
-        $connect = empty($params['persistent']) ? 'connect' : 'pconnect';
-        $redis = new $params['class']();
-        @$redis->{$connect}($params['host'], $params['port'], $params['timeout'], null, $params['retry_interval']);
+        if (is_a($class, \Redis::class, true)) {
+            $connect = empty($params['persistent']) ? 'connect' : 'pconnect';
+            $redis = new $class();
+            @$redis->{$connect}($params['host'], $params['port'], $params['timeout'], null, $params['retry_interval']);
 
-        if (@!$redis->isConnected()) {
-            $e = ($e = error_get_last()) && preg_match('/^Redis::p?connect\(\): (.*)/', $e['message'], $e) ? sprintf(' (%s)', $e[1]) : '';
-            throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s', $e, $dsn));
-        }
+            if (@!$redis->isConnected()) {
+                $e = ($e = error_get_last()) && preg_match('/^Redis::p?connect\(\): (.*)/', $e['message'], $e) ? sprintf(' (%s)', $e[1]) : '';
+                throw new InvalidArgumentException(sprintf('Redis connection failed%s: %s', $e, $dsn));
+            }
 
-        if ((null !== $auth && !$redis->auth($auth))
-            || ($params['dbindex'] && !$redis->select($params['dbindex']))
-            || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
-        ) {
-            $e = preg_replace('/^ERR /', '', $redis->getLastError());
-            $redis->close();
-            throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e, $dsn));
+            if ((null !== $auth && !$redis->auth($auth))
+                || ($params['dbindex'] && !$redis->select($params['dbindex']))
+                || ($params['read_timeout'] && !$redis->setOption(\Redis::OPT_READ_TIMEOUT, $params['read_timeout']))
+            ) {
+                $e = preg_replace('/^ERR /', '', $redis->getLastError());
+                throw new InvalidArgumentException(sprintf('Redis connection failed (%s): %s', $e, $dsn));
+            }
+        } elseif (class_exists($class, false)) {
+            throw new InvalidArgumentException(sprintf('"%s" is not a subclass of "Redis"', $class));
+        } else {
+            throw new InvalidArgumentException(sprintf('Class "%s" does not exist', $class));
         }
 
         return $redis;
@@ -119,10 +122,10 @@ class RedisAdapter extends AbstractAdapter
         $result = array();
 
         if ($ids) {
-            $values = $this->redis->mget($ids);
+            $values = $this->redis->mGet($ids);
             $index = 0;
             foreach ($ids as $id) {
-                if (false !== $value = $values[$index++]) {
+                if ($value = $values[$index++]) {
                     $result[$id] = unserialize($value);
                 }
             }
@@ -144,14 +147,16 @@ class RedisAdapter extends AbstractAdapter
      */
     protected function doClear($namespace)
     {
+        // As documented in Redis documentation (http://redis.io/commands/keys) using KEYS
+        // can hang your server when it is executed against large databases (millions of items).
+        // Whenever you hit this scale, it is advised to deploy one Redis database per cache pool
+        // instead of using namespaces, so that FLUSHDB is used instead.
+        $lua = "local keys=redis.call('KEYS',ARGV[1]..'*') for i=1,#keys,5000 do redis.call('DEL',unpack(keys,i,math.min(i+4999,#keys))) end";
+
         if (!isset($namespace[0])) {
-            $this->redis->flushDB();
+            $this->redis->flushDb();
         } else {
-            // As documented in Redis documentation (http://redis.io/commands/keys) using KEYS
-            // can hang your server when it is executed against large databases (millions of items).
-            // Whenever you hit this scale, it is advised to deploy one Redis database per cache pool
-            // instead of using namespaces, so that the above FLUSHDB is used instead.
-            $this->redis->eval(sprintf("local keys=redis.call('KEYS','%s*') for i=1,#keys,5000 do redis.call('DEL',unpack(keys,i,math.min(i+4999,#keys))) end", $namespace));
+            $this->redis->eval($lua, array($namespace), 0);
         }
 
         return true;
@@ -189,11 +194,11 @@ class RedisAdapter extends AbstractAdapter
             return $failed;
         }
         if ($lifetime > 0) {
-            $pipe = $this->redis->multi(\Redis::PIPELINE);
+            $this->redis->multi(\Redis::PIPELINE);
             foreach ($serialized as $id => $value) {
-                $pipe->setEx($id, $lifetime, $value);
+                $this->redis->setEx($id, $lifetime, $value);
             }
-            if (!$pipe->exec()) {
+            if (!$this->redis->exec()) {
                 return false;
             }
         } elseif (!$this->redis->mSet($serialized)) {

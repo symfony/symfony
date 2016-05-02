@@ -145,12 +145,10 @@ abstract class Controller implements ContainerAwareInterface
             throw new \InvalidArgumentException('Only File object and string can be passed to file helper.');
         }
 
-        // Test if path to file is given
         if (is_string($file) && file_exists($file)) {
             $file = new File($file);
         }
 
-        // Test if content in string is given
         if (is_string($file)) {
             if ('' === $file) {
                 throw new \InvalidArgumentException('File content can\'t be empty.');

@@ -141,6 +141,10 @@ abstract class Controller implements ContainerAwareInterface
     {
         $deleteFileAfterSend = false;
 
+        if (!is_string($file) && false === ($file instanceof File)) {
+            throw new \InvalidArgumentException('Only File object and string can be passed to file helper.');
+        }
+        
         // Test if path to file is given
         if (is_string($file) && file_exists($file)) {
             $file = new File($file);
@@ -162,28 +166,21 @@ abstract class Controller implements ContainerAwareInterface
             try {
                 file_put_contents($tmpPath, $file);
             } catch (\Exception $e) {
-                throw new \RuntimeException($e);
+                throw new \RuntimeException(sprintf('Temporary file "%s" couldn\'t be created.', $tmpPath), 0, $e);
             }
 
             $deleteFileAfterSend = true;
             $file = new File($tmpPath);
         }
 
-        if ($file instanceof File && $file->isReadable()) {
+        if ($file->isReadable()) {
             $response = new BinaryFileResponse($file);
             $mimeType = $file->getMimeType();
             if (true === $deleteFileAfterSend) {
                 $response->deleteFileAfterSend($deleteFileAfterSend);
             }
         } else {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    '"%s" can\'t be passed as parameter to "%s" method of "%s" class.',
-                    is_object($file) ? 'Instance of '.get_class($file) : gettype($file),
-                    __CLASS__,
-                    __METHOD__
-                )
-            );
+            throw new \RuntimeException(sprintf('"%s" is not readable.', $file->getPath()));
         }
 
         if (null === $disposition) {

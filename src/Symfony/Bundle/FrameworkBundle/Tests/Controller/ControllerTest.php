@@ -226,8 +226,8 @@ class ControllerTest extends TestCase
         $response = $controller->file(new File(__FILE__));
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/x-php', $response->headers->get('content-type'));
         $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
         $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
     }
@@ -242,8 +242,8 @@ class ControllerTest extends TestCase
         $response = $controller->file(new File(__FILE__), null, ResponseHeaderBag::DISPOSITION_INLINE);
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/x-php', $response->headers->get('content-type'));
         $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
         $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
     }
@@ -259,8 +259,8 @@ class ControllerTest extends TestCase
         $response = $controller->file(new File(__FILE__), $fileName);
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/x-php', $response->headers->get('content-type'));
         $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
         $this->assertContains($fileName, $response->headers->get('content-disposition'));
     }
@@ -276,8 +276,8 @@ class ControllerTest extends TestCase
         $response = $controller->file(new File(__FILE__), $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/x-php', $response->headers->get('content-type'));
         $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
         $this->assertContains($fileName, $response->headers->get('content-disposition'));
     }
@@ -301,8 +301,8 @@ class ControllerTest extends TestCase
         $response->sendContent();
 
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('text/plain', $response->headers->get('content-type'));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/plain', $response->headers->get('content-type'));
         $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
         $this->assertContains($fileName, $response->headers->get('content-disposition'));
         $this->assertFileNotExists(sys_get_temp_dir().DIRECTORY_SEPARATOR.md5($fileName));
@@ -342,8 +342,8 @@ class ControllerTest extends TestCase
         $response = $controller->file(__FILE__);
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/x-php', $response->headers->get('content-type'));
         $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
         $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
     }
@@ -356,8 +356,8 @@ class ControllerTest extends TestCase
         $response = $controller->file(__FILE__, 'test.php');
 
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('text/x-php', $response->headers->get('content-type'));
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('text/x-php', $response->headers->get('content-type'));
         $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
         $this->assertContains('test.php', $response->headers->get('content-disposition'));
     }

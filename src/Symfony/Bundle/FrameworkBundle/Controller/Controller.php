@@ -131,7 +131,7 @@ abstract class Controller implements ContainerAwareInterface
      *
      * @param File|string $file        File object, path to file or string with content to be sent as response
      * @param string|null $fileName    File name to be sent to response or null (will use original file name)
-     * @param string      $disposition Disposition of response (attachment is default, other type is inline)
+     * @param string      $disposition Disposition of response ("attachment" is default, other type is "inline")
      *
      * @return BinaryFileResponse
      *
@@ -141,8 +141,8 @@ abstract class Controller implements ContainerAwareInterface
     {
         $deleteFileAfterSend = false;
 
-        if (!is_string($file) && false === ($file instanceof File)) {
-            throw new \InvalidArgumentException('Only File object and string can be passed to file helper.');
+        if (!is_string($file) && !$file instanceof File) {
+            throw new \InvalidArgumentException(sprint('The "%s" method expects first argument to be a string or an instance of "%s"', __METHOD__, File::class));
         }
 
         if (is_string($file) && file_exists($file)) {
@@ -171,14 +171,15 @@ abstract class Controller implements ContainerAwareInterface
             $file = new File($tmpPath);
         }
 
-        if ($file->isReadable()) {
-            $response = new BinaryFileResponse($file);
-            $mimeType = $file->getMimeType();
-            if (true === $deleteFileAfterSend) {
-                $response->deleteFileAfterSend($deleteFileAfterSend);
-            }
-        } else {
+        if (!$file->isReadable()) {
             throw new \RuntimeException(sprintf('"%s" is not readable.', $file->getPath()));
+        }
+
+        $response = new BinaryFileResponse($file);
+        $mimeType = $file->getMimeType();
+
+        if (true === $deleteFileAfterSend) {
+            $response->deleteFileAfterSend($deleteFileAfterSend);
         }
 
         if (null === $disposition) {

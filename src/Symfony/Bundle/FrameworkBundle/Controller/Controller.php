@@ -130,12 +130,12 @@ abstract class Controller implements ContainerAwareInterface
      * Returns a BinaryFileResponse object with original or customized file name and disposition header.
      *
      * @param File|string $file        File object, path to file or string with content to be sent as response
-     * @param null        $fileName    File name to be sent to response or null (will use original file name)
+     * @param string|null $fileName    File name to be sent to response or null (will use original file name)
      * @param string      $disposition Disposition of response (attachment is default, other type is inline)
      *
      * @return BinaryFileResponse
      *
-     * @throws \LogicException|\InvalidArgumentException|\Exception
+     * @throws \LogicException|\InvalidArgumentException|\RuntimeException
      */
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
@@ -148,7 +148,7 @@ abstract class Controller implements ContainerAwareInterface
 
         // Test if content in string is given
         if (is_string($file)) {
-            if (empty($file)) {
+            if ('' === $file) {
                 throw new \InvalidArgumentException('File content can\'t be empty.');
             }
 
@@ -162,7 +162,7 @@ abstract class Controller implements ContainerAwareInterface
             try {
                 file_put_contents($tmpPath, $file);
             } catch (\Exception $e) {
-                throw $e;
+                throw new \RuntimeException($e);
             }
 
             $deleteFileAfterSend = true;
@@ -172,25 +172,25 @@ abstract class Controller implements ContainerAwareInterface
         if ($file instanceof File && $file->isReadable()) {
             $response = new BinaryFileResponse($file);
             $mimeType = $file->getMimeType();
-            if ($deleteFileAfterSend === true) {
+            if (true === $deleteFileAfterSend) {
                 $response->deleteFileAfterSend($deleteFileAfterSend);
             }
         } else {
             throw new \InvalidArgumentException(
                 sprintf(
                     '"%s" can\'t be passed as parameter to "%s" method of "%s" class.',
-                    is_object($file) ? 'Instance of '.get_class($file) : $file,
+                    is_object($file) ? 'Instance of '.get_class($file) : gettype($file),
                     __CLASS__,
                     __METHOD__
                 )
             );
         }
 
-        if ($disposition === null) {
+        if (null === $disposition) {
             $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT;
         }
 
-        if (!in_array($disposition, [ResponseHeaderBag::DISPOSITION_INLINE, ResponseHeaderBag::DISPOSITION_ATTACHMENT])) {
+        if(!in_array($disposition, array(ResponseHeaderBag::DISPOSITION_INLINE, ResponseHeaderBag::DISPOSITION_ATTACHMENT), true)) {
             throw new \LogicException(
                 sprintf('You can\'t use disposition "%s". Use "attachment" or "inline".', $disposition)
             );
@@ -202,7 +202,7 @@ abstract class Controller implements ContainerAwareInterface
             $fileName === null ? $file->getFileName() : $fileName
         );
         $response->headers->set('Content-Disposition', $disposition);
-
+        
         return $response;
     }
 

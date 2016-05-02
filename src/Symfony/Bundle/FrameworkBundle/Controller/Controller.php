@@ -202,7 +202,7 @@ abstract class Controller implements ContainerAwareInterface
             $fileName === null ? $file->getFileName() : $fileName
         );
         $response->headers->set('Content-Disposition', $disposition);
-        
+
         return $response;
     }
 

@@ -805,11 +805,18 @@ class Request
             return array($ip);
         }
 
-        if (self::$trustedHeaders[self::HEADER_FORWARDED] && $this->headers->has(self::$trustedHeaders[self::HEADER_FORWARDED])) {
+        $hasTrustedForwardedHeader = self::$trustedHeaders[self::HEADER_FORWARDED] && $this->headers->has(self::$trustedHeaders[self::HEADER_FORWARDED]);
+        $hasTrustedClientIpHeader = self::$trustedHeaders[self::HEADER_CLIENT_IP] && $this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP]);
+
+        if ($hasTrustedForwardedHeader && $hasTrustedClientIpHeader) {
+            trigger_error("The request has both a trusted Forwarded header and a trusted Client IP header. This is likely a misconfiguration. You should either configure your proxy only to send one of these headers, or configure Symfony to distrust one of them. When both headers are set and trusted, this method returns only IPs from the Forwarded header.", E_USER_WARNING);
+        }
+
+        if ($hasTrustedForwardedHeader) {
             $forwardedHeader = $this->headers->get(self::$trustedHeaders[self::HEADER_FORWARDED]);
             preg_match_all('{(for)=("?\[?)([a-z0-9\.:_\-/]*)}', $forwardedHeader, $matches);
             $clientIps = $matches[3];
-        } elseif (self::$trustedHeaders[self::HEADER_CLIENT_IP] && $this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
+        } elseif ($hasTrustedClientIpHeader) {
             $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
         }
 

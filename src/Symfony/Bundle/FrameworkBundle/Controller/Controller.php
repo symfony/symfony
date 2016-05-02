@@ -144,7 +144,7 @@ abstract class Controller implements ContainerAwareInterface
         if (!is_string($file) && false === ($file instanceof File)) {
             throw new \InvalidArgumentException('Only File object and string can be passed to file helper.');
         }
-        
+
         // Test if path to file is given
         if (is_string($file) && file_exists($file)) {
             $file = new File($file);

@@ -253,10 +253,12 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $container->register('parent', 'stdClass');
 
         $container->setDefinition('child1', new DefinitionDecorator('parent'))
-            ->setDecoratedService('foo', 'foo_inner')
+            ->setDecoratedService('foo', 'foo_inner', 5)
         ;
 
-        $this->assertEquals(array('foo', 'foo_inner', 0), $container->getDefinition('child1')->getDecoratedService());
+        $this->process($container);
+
+        $this->assertEquals(array('foo', 'foo_inner', 5), $container->getDefinition('child1')->getDecoratedService());
     }
 
     public function testDecoratedServiceCopiesDeprecatedStatusFromParent()

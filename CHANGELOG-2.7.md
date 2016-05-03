@@ -7,6 +7,37 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.12 (2016-04-29)
+
+ * bug #18180 [Form] fixed BC break with pre selection of choices with `ChoiceType` and its children (HeahDude)
+ * bug #18562 [WebProfilerBunde] Give an absolute url in case the request occured from another domain (romainneutron)
+ * bug #18603 [PropertyAccess] ->getValue() should be read-only (nicolas-grekas)
+ * bug #18593 [VarDumper] Fix dumping type hints for non-existing parent classes (nicolas-grekas)
+ * bug #18581 [Console] [TableHelper] make it work with SymfonyStyle. (aitboudad)
+ * bug #18280 [Routing] add query param if value is different from default (Tobion)
+ * bug #18496 [Console] use ANSI escape sequences in ProgressBar overwrite method (alekitto)
+ * bug #18491 [DependencyInjection] anonymous services are always private (xabbuh)
+ * bug #18515 [Filesystem] Better error handling in remove() (nicolas-grekas)
+ * bug #18449 [PropertyAccess] Fix regression (nicolas-grekas)
+ * bug #18429 [Console] Correct time formatting. (camporter)
+ * bug #18467 [DependencyInjection] Resolve aliases before removing abstract services + add tests (nicolas-grekas)
+ * bug #18460 [DomCrawler] Fix select option with empty value (Matt Wells)
+ * bug #18425 [Security] Fixed SwitchUserListener when exiting an impersonation with AnonymousToken (lyrixx)
+ * bug #18317 [Form] fix "prototype" not required when parent form is not required (HeahDude)
+ * bug #18439 [Logging] Add support for Firefox (43+) in ChromePhpHandler (arjenm)
+ * bug #18385 Detect CLI color support for Windows 10 build 10586 (mlocati)
+ * bug #18426 [EventDispatcher] Try first if the event is Stopped (lyrixx)
+ * bug #18394 [FrameworkBundle] Return the invokable service if its name is the class name (dunglas)
+ * bug #18265 Optimize ReplaceAliasByActualDefinitionPass (ajb-in)
+ * bug #18349 [Process] Fix stream_select priority when writing to stdin (nicolas-grekas)
+ * bug #18358 [Form] NumberToLocalizedStringTransformer should return floats when possible (nicolas-grekas)
+ * bug #17926 [DependencyInjection] Enable alias for service_container (hason)
+ * bug #18352 [Debug] Fix case sensitivity checks (nicolas-grekas)
+ * bug #18336 [Debug] Fix handling of php7 throwables (nicolas-grekas)
+ * bug #18354 [FrameworkBundle][TwigBridge] fix high deps tests (xabbuh)
+ * bug #18312 [ClassLoader] Fix storing not-found classes in APC cache (nicolas-grekas)
+ * bug #18298 [Validator] do not treat payload as callback (xabbuh)
+
 * 2.7.11 (2016-03-25)
 
  * bug #18255 [HttpFoundation] Fix support of custom mime types with parameters (Ener-Getick)

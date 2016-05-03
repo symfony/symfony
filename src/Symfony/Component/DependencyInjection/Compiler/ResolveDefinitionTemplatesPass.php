@@ -174,7 +174,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             if (null === $decoratedService) {
                 $def->setDecoratedService($decoratedService);
             } else {
-                $def->setDecoratedService($decoratedService[0], $decoratedService[1]);
+                $def->setDecoratedService($decoratedService[0], $decoratedService[1], $decoratedService[2]);
             }
         }
 

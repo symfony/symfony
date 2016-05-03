@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-31T17:28:52Z
+
+Actually, this could be seen as breaking the contract given by the parent class which strictly seen doesn't allow to throw an exception here. An alternative fix would be to keep records about the listener priorities in the `TraceableEventDispatcher` (which on the other hand would not work when the listener was registered on the wrapped dispatcher directly, thus bypassing the outer dispatcher).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-28T10:45:18Z
+
+@xabbuh Any feedback regarding @stof comment?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-03T18:41:21Z
+
+Updated here to treat 0 as the default listener priority.

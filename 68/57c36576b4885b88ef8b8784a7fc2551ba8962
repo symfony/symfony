@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-05-01T19:45:10Z
+
+This would make a very nice addition to the plugin!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-02T08:42:45Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-03T12:13:40Z
+
+3.0 is probably not the right target. It should be 2.3 or master/3.1. What do you think? It's not really a new feature, but might cause problem is people are relying on the simple `@Event` tag. So, I'd say that we need to merge this one in master/3.1. Is that ok?
+
+---------------------------------------------------------------------------
+
+by Haehnchen at 2016-05-03T16:35:52Z
+
+i did a rebase on latest changes in 3.0 branch. `master/3.1` sounds good for more.

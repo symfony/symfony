@@ -22,47 +22,47 @@ class Route implements \Serializable
     /**
      * @var string
      */
-    private $path = '/';
+    protected $path = '/';
 
     /**
      * @var string
      */
-    private $host = '';
+    protected $host = '';
 
     /**
      * @var array
      */
-    private $schemes = array();
+    protected $schemes = array();
 
     /**
      * @var array
      */
-    private $methods = array();
+    protected $methods = array();
 
     /**
      * @var array
      */
-    private $defaults = array();
+    protected $defaults = array();
 
     /**
      * @var array
      */
-    private $requirements = array();
+    protected $requirements = array();
 
     /**
      * @var array
      */
-    private $options = array();
+    protected $options = array();
 
     /**
      * @var null|CompiledRoute
      */
-    private $compiled;
+    protected $compiled;
 
     /**
      * @var string
      */
-    private $condition = '';
+    protected $condition = '';
 
     /**
      * Constructor.

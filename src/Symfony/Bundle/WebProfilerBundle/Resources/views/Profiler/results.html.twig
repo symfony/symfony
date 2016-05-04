@@ -48,7 +48,11 @@
                             {% endif %}
                         </td>
                         <td class="break-long-words">
-                            {{ result.url }}
+                            {% if result.method|upper in ['GET', 'HEAD'] %}
+                                <a href="{{ result.url }}">{{ result.url }}</a>
+                            {% else %}
+                                {{ result.url }}
+                            {% endif %}
                             {% if request.session is not null %}
                                 <a href="{{ path('_profiler_search_results', request.query.all|merge({'url': result.url, 'token': result.token})) }}" title="Search">
                                     <span title="Search" class="sf-icon sf-search">{{ include('@WebProfiler/Icon/search.svg') }}</span>

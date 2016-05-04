@@ -11,38 +11,15 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
-/**
- * @requires extension redis
- */
-class RedisAdapterTest extends CachePoolTest
+class RedisAdapterTest extends AbstractRedisAdapterTest
 {
-    private static $redis;
-
-    public function createCachePool()
-    {
-        if (defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
-        }
-
-        return new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__));
-    }
-
     public static function setupBeforeClass()
     {
+        parent::setupBeforeClass();
         self::$redis = new \Redis();
-        if (!@self::$redis->connect('127.0.0.1')) {
-            $e = error_get_last();
-            self::markTestSkipped($e['message']);
-        }
-    }
-
-    public static function tearDownAfterClass()
-    {
-        self::$redis->flushDB();
-        self::$redis->close();
+        self::$redis->connect('127.0.0.1');
     }
 
     public function testCreateConnection()

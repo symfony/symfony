@@ -80,8 +80,8 @@ FrameworkBundle
  * The service `serializer.mapping.cache.apc` has been removed; use
    `serializer.mapping.cache.doctrine.apc` instead.
 
- * The `framework.serializer.cache` option has been removed. Configure a cache pool
-   called `serializer` under `framework.cache.pools` instead.
+ * The `framework.serializer.cache` option has been removed. Configure the
+   `cache.serializer` service under `framework.cache.pools` instead.
 
    Before:
 
@@ -97,7 +97,7 @@ FrameworkBundle
    framework:
        cache:
            pools:
-               serializer:
+               cache.serializer:
                    adapter: cache.adapter.apcu
    ```
 

@@ -73,7 +73,7 @@ class FrameworkExtension extends Extension
         $loader->load('property_access.xml');
 
         // Load Cache configuration first as it is used by other components
-        $loader->load('cache_pools.xml');
+        $loader->load('cache.xml');
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -984,7 +984,7 @@ class FrameworkExtension extends Extension
         $chainLoader->replaceArgument(0, $serializerLoaders);
 
         if (isset($config['cache']) && $config['cache']) {
-            @trigger_error('The "framework.serializer.cache" option is deprecated since Symfony 3.1 and will be removed in 4.0. You can configure a cache pool called "serializer" under "framework.cache.pools" instead.', E_USER_DEPRECATED);
+            @trigger_error('The "framework.serializer.cache" option is deprecated since Symfony 3.1 and will be removed in 4.0. Configure the "cache.serializer" service under "framework.cache.pools" instead.', E_USER_DEPRECATED);
 
             $container->setParameter(
                 'serializer.mapping.cache.prefix',
@@ -999,7 +999,7 @@ class FrameworkExtension extends Extension
                 CacheClassMetadataFactory::class,
                 array(
                     new Reference('serializer.mapping.cache_class_metadata_factory.inner'),
-                    new Reference('cache.pool.serializer'),
+                    new Reference('cache.serializer'),
                 )
             );
             $cacheMetadataFactory->setPublic(false);
@@ -1037,13 +1037,26 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        foreach ($config['pools'] as $name => $poolConfig) {
-            $poolDefinition = new DefinitionDecorator($poolConfig['adapter']);
-            $poolDefinition->setPublic($poolConfig['public']);
-            unset($poolConfig['adapter'], $poolConfig['public']);
+        $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
 
-            $poolDefinition->addTag('cache.pool', $poolConfig);
-            $container->setDefinition('cache.pool.'.$name, $poolDefinition);
+        foreach (array('doctrine', 'psr6', 'redis') as $name) {
+            if (isset($config[$name = 'default_'.$name.'_provider'])) {
+                $container->setAlias('cache.'.$name, Compiler\CachePoolPass::getServiceProvider($container, $config[$name]));
+            }
+        }
+        foreach (array('app', 'system') as $name) {
+            $config['pools']['cache.'.$name] = array(
+                'adapter' => $config[$name],
+                'public' => true,
+            );
+        }
+        foreach ($config['pools'] as $name => $pool) {
+            $definition = new DefinitionDecorator($pool['adapter']);
+            $definition->setPublic($pool['public']);
+            unset($pool['adapter'], $pool['public']);
+
+            $definition->addTag('cache.pool', $pool);
+            $container->setDefinition($name, $definition);
         }
 
         $this->addClassesToCompile(array(

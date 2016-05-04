@@ -36,12 +36,27 @@ class CachePoolsTest extends WebTestCase
         }
     }
 
+    /**
+     * @requires extension redis
+     */
+    public function testRedisCustomCachePools()
+    {
+        try {
+            $this->doTestCachePools(array('root_config' => 'redis_custom_config.yml', 'environment' => 'custom_redis_cache'), RedisAdapter::class);
+        } catch (\PHPUnit_Framework_Error_Warning $e) {
+            if (0 !== strpos($e->getMessage(), 'unable to connect to 127.0.0.1')) {
+                throw $e;
+            }
+            $this->markTestSkipped($e->getMessage());
+        }
+    }
+
     public function doTestCachePools($options, $adapterClass)
     {
         static::bootKernel($options);
         $container = static::$kernel->getContainer();
 
-        $pool = $container->get('cache.pool.test');
+        $pool = $container->get('cache.test');
         $this->assertInstanceOf($adapterClass, $pool);
 
         $key = 'foobar';

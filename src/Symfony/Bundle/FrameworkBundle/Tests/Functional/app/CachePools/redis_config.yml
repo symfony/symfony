@@ -1,22 +1,9 @@
 imports:
     - { resource: ../config/default.yml }
 
-services:
-    cache.adapter.redis.connection:
-        public: false
-        class: Redis
-        calls:
-            - [connect, [127.0.0.1]]
-
-    cache.adapter.shared:
-        abstract: true
-        parent: cache.adapter.redis
-        tags:
-            - name: cache.pool
-              provider: cache.adapter.redis.connection
-
 framework:
     cache:
+        app: cache.adapter.redis
         pools:
-            test:
+            cache.test:
                 public: true

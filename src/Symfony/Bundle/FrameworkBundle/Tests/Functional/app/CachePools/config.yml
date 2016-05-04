@@ -4,5 +4,5 @@ imports:
 framework:
     cache:
         pools:
-            test:
+            cache.test:
                 public: true

@@ -359,7 +359,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
             foreach ($reflectionProperties as $reflectionProperty) {
                 foreach ((array) Inflector::singularize($reflectionProperty->name) as $name) {
-                    if ($name === lcfirst($matches[2])) {
+                    if (strtolower($name) === strtolower($matches[2])) {
                         return $reflectionProperty->name;
                     }
                 }

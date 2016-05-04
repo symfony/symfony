@@ -1,0 +1,133 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-28T19:19:12Z
+
+I'd happily accept some help to fix the XSD please, that should be the only remaining thing left.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-29T15:26:06Z
+
+Hold on, I'm going to change a few things after some discussions with @javiereguiluz
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-29T19:28:46Z
+
+Following suggestions from @javiereguiluz and @fabpot, configuration is now the following:
+
+Pre-configured cache pool services are now: `cache.app`, `cache.system`, `cache.serializer` and `cache.validator`. Cache adapters (abstract pools) are prefixed by `cache.adapter.*`. ~~`cache.adapter.local`~~ is replaced by `cache.system`. ~~`cache.adapter.shared`~~ is replaced by `cache.app`. They both can be reused as a parent to define new "app" or "system" pools reusing the same base adapter. They both default to `cache.adapter.filesystem`.
+
+Configuration is made easy for those two, using full service names to define which adapter should be used for each of them.
+
+E.g. to use APCu for all system caches:
+```yaml
+framework:
+  cache:
+    system: cache.adapter.apcu
+```
+
+To use Redis for all app related caches:
+```yaml
+framework:
+  cache:
+    app: cache.adapter.redis
+    default_redis_provider: redis://1.2.3.4:5678
+```
+As you can see, this PR also adds a factory for creating Redis connection based on a DSN.
+
+Then of course you can go to more advanced configurations to redefine either custom adapters or regular pools (pre-defined or not).
+
+Adapter and pool configurations are merged in a single `framework.cache.pools ` option. Note that pool names should be given as full service names.
+
+E.g. to define a new system cache pool accessible with `$container->get('my_local_cache_pool')`:
+```yaml
+framework:
+  cache:
+    pools:
+      my_local_cache_pool:
+        adapter: cache.system # overwrite the default which is "cache.app"
+        public: true # new cache pools are private by default
+```
+
+E.g. to use Redis for all system pools and use https://github.com/snc/SncRedisBundle to configure the connection:
+```yaml
+framework:
+  cache:
+    system: cache.adapter.redis
+    default_redis_provider: snc_redis_connection_service
+```
+a verbose variant of this could be:
+```yaml
+framework:
+  cache:
+    system: app.redis_cache
+    pools:
+      app.redis_cache:
+        adapter: cache.adapter.redis
+        provider: snc_redis_connection_service
+```
+
+Or to use a Doctrine Cache provider for all app related caches:
+```yaml
+framework:
+  cache:
+    app: cache.adapter.doctrine
+    default_doctrine_provider: doctrine_cache_provider_service
+```
+or verbose variant:
+```yaml
+framework:
+  cache:
+    app: app.doctrine_cache
+    pools:
+      app.doctrine_cache:
+        adapter: cache.adapter.doctrine
+        provider: doctrine_cache_provider_service
+```
+The same would go for configuring a pool on top of a PSR-6 cache adapter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-29T22:03:29Z
+
+Last tweaks pushed, green, ready for review+merge:
+- `cache.system` is now a public pool by default (alongside with `cache.app`)
+- those two special pools are reserved names in the `pools` config section: they must be configured through their dedicated options under `cache` (see examples above)
+- new pools are private by default to allow easily changing the adapter of predefined pools (`cache.serializer` & `cache.validation` today). IMHO creating custom pools is an even more advanced use case that won't suffer from having this requirement of adding `public: true` when needed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-30T09:37:49Z
+
+@nicolas-grekas I'd be happy to split the PR in two (one for the Redis related changes and one for the semantic config). That would make reviewing a bit easier.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-30T12:09:04Z
+
+To be rebased on top of #18681 (which is included for now)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-01T11:01:04Z
+
+#18681 merged now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-01T12:04:20Z
+
+rebased
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-02T07:51:10Z
+
+Apart from how cache pool names are now treated I am 👍 for the changes.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-02T20:53:10Z
+
+👍

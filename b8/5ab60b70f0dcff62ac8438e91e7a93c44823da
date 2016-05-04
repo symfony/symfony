@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-02T13:52:47Z
+
+This needs some fix for `RedisArray` not being available on HHVM it seems (see facebook/hhvm#1992).

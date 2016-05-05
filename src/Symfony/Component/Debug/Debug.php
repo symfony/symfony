@@ -28,10 +28,11 @@ class Debug
      * If the Symfony ClassLoader component is available, a special
      * class loader is also registered.
      *
-     * @param int  $errorReportingLevel The level of error reporting you want
-     * @param bool $displayErrors       Whether to display errors (for development) or just log them (for production)
+     * @param int       $errorReportingLevel The level of error reporting you want
+     * @param bool      $displayErrors       Whether to display errors (for development) or just log them (for production)
+     * @param bool|null $html                Whether to display errors as HTML or plain text.
      */
-    public static function enable($errorReportingLevel = E_ALL, $displayErrors = true)
+    public static function enable($errorReportingLevel = E_ALL, $displayErrors = true, $html = null)
     {
         if (static::$enabled) {
             return;
@@ -47,7 +48,16 @@ class Debug
 
         if ('cli' !== PHP_SAPI) {
             ini_set('display_errors', 0);
-            ExceptionHandler::register();
+
+            // Default to HTML, unless requested with a text-only browser or with XMLHttpRequest.
+            if ($html === null) {
+                $html = !(
+                    isset($_SERVER['HTTP_ACCEPT']) && !preg_match('@(^|,\s*)text/html\s*(,|;|$)@', $_SERVER['HTTP_ACCEPT'])
+                    || isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest'
+                );
+            }
+
+            ExceptionHandler::register(true, null, null, $html);
         } elseif ($displayErrors && (!ini_get('log_errors') || ini_get('error_log'))) {
             // CLI - display errors only if they're not already logged to STDERR
             ini_set('display_errors', 1);

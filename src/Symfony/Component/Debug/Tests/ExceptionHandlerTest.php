@@ -84,6 +84,48 @@ class ExceptionHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame($expectedHeaders, testHeader());
+
+        $handler = new ExceptionHandler(false, 'iso8859-1', null, false);
+
+        ob_start();
+        $handler->sendPhpResponse(new MethodNotAllowedHttpException(array('POST')));
+        $response = ob_get_clean();
+
+        $expectedHeaders = array(
+            array('HTTP/1.0 405', true, null),
+            array('Allow: POST', false, null),
+            array('Content-Type: text/plain; charset=iso8859-1', true, null),
+        );
+
+        $this->assertSame($expectedHeaders, testHeader());
+    }
+
+    private function getException($a1, $a2, $a3, $a4, $a5, $a6, $a7)
+    {
+        return new \Exception('foo');
+    }
+
+    public function testTrace()
+    {
+        $handler = new ExceptionHandler(true);
+
+        $line = __LINE__ + 1;
+        $exception = $this->getException(null, 1, 1.0, true, 'foo', array(1, 'b' => 2), new \stdClass());
+
+        $content = $handler->getHtml($exception);
+
+        $this->assertContains('<li>at <abbr title="Symfony\Component\Debug\Tests\ExceptionHandlerTest">ExceptionHandlerTest</abbr>->getException(', $content);
+        $this->assertContains("(<em>null</em>, '1', '1', <em>true</em>, 'foo', <em>array</em>('1', 'b' => '2'), <em>object</em>(<abbr title=\"stdClass\">stdClass</abbr>))", $content);
+        $this->assertRegExp('@ in <a[^>]+>ExceptionHandlerTest.php line '.$line.'</a></li>\n@', $content);
+
+        $content = $handler->getText($exception);
+
+        $this->assertContains("\n    at ExceptionHandlerTest->getException(", $content);
+        $this->assertContains("ExceptionHandlerTest->getException(null, '1', '1', true, 'foo', array('1', 'b' => '2'), object(stdClass))", $content);
+        $this->assertContains('in '.__FILE__.':'.$line."\n", $content);
+
+        $this->assertNotRegExp('@^\s*(?<!^|^    )[^\s]@m', $content, 'Lines are indented with 0 or 4 spaces');
+        $this->assertNotRegExp('@ $@m', $content, 'Lines have no trailing white-space');
     }
 
     public function testNestedExceptions()

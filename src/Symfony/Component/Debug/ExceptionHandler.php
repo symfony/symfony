@@ -20,9 +20,6 @@ use Symfony\Component\Debug\Exception\OutOfMemoryException;
  * It is mostly useful in debug mode to replace the default PHP/XDebug
  * output with something prettier and more useful.
  *
- * As this class is mainly used during Kernel boot, where nothing is yet
- * available, the Response content is always HTML.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -34,12 +31,14 @@ class ExceptionHandler
     private $caughtBuffer;
     private $caughtLength;
     private $fileLinkFormat;
+    private $html;
 
-    public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
+    public function __construct($debug = true, $charset = null, $fileLinkFormat = null, $html = true)
     {
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->html = $html;
     }
 
     /**
@@ -48,12 +47,13 @@ class ExceptionHandler
      * @param bool        $debug          Enable/disable debug mode, where the stack trace is displayed
      * @param string|null $charset        The charset used by exception messages
      * @param string|null $fileLinkFormat The IDE link template
+     * @param bool        $html           Whether to display errors as HTML or plain text.
      *
      * @return ExceptionHandler The registered exception handler
      */
-    public static function register($debug = true, $charset = null, $fileLinkFormat = null)
+    public static function register($debug = true, $charset = null, $fileLinkFormat = null, $html = true)
     {
-        $handler = new static($debug, $charset, $fileLinkFormat);
+        $handler = new static($debug, $charset, $fileLinkFormat, $html);
 
         $prev = set_exception_handler(array($handler, 'handle'));
         if (is_array($prev) && $prev[0] instanceof ErrorHandler) {
@@ -90,6 +90,21 @@ class ExceptionHandler
     {
         $old = $this->fileLinkFormat;
         $this->fileLinkFormat = $format;
+
+        return $old;
+    }
+
+    /**
+     * Sets the output format to HTML or plain text.
+     *
+     * @param bool $html TRUE if HTML should be returned.
+     *
+     * @return bool The previous output format.
+     */
+    public function setHtml($html)
+    {
+        $old = $this->html;
+        $this->html = $html;
 
         return $old;
     }
@@ -170,18 +185,27 @@ class ExceptionHandler
             foreach ($exception->getHeaders() as $name => $value) {
                 header($name.': '.$value, false);
             }
-            header('Content-Type: text/html; charset='.$this->charset);
+
+            if ($this->html) {
+                header('Content-Type: text/html; charset='.$this->charset);
+            } else {
+                header('Content-Type: text/plain; charset='.$this->charset);
+            }
         }
 
-        echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
+        if ($this->html) {
+            echo $this->getHtml($exception);
+        } else {
+            echo $this->getText($exception);
+        }
     }
 
     /**
-     * Gets the full HTML content associated with the given exception.
+     * Gets the full HTML debug output for the given exception.
      *
      * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
      *
-     * @return string The HTML content as a string
+     * @return string The HTML content
      */
     public function getHtml($exception)
     {
@@ -189,17 +213,34 @@ class ExceptionHandler
             $exception = FlattenException::create($exception);
         }
 
-        return $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
+        return $this->decorate($this->getContent($exception, true), $this->getStylesheet($exception));
     }
 
     /**
-     * Gets the HTML content associated with the given exception.
+     * Gets the full plain-text debug output for the given exception.
+     *
+     * @param \Exception|FlattenException $exception An \Exception or FlattenException instance
+     *
+     * @return string The plain-text content
+     */
+    public function getText($exception)
+    {
+        if (!$exception instanceof FlattenException) {
+            $exception = FlattenException::create($exception);
+        }
+
+        return $this->getContent($exception, false);
+    }
+
+    /**
+     * Gets the full debug output for the given exception.
      *
      * @param FlattenException $exception A FlattenException instance
+     * @param bool             $html      Whether to return HTML or plain text.
      *
-     * @return string The content as a string
+     * @return string The content as an HTML or plain-text string
      */
-    public function getContent(FlattenException $exception)
+    public function getContent(FlattenException $exception, $html = true)
     {
         switch ($exception->getStatusCode()) {
             case 404:
@@ -216,31 +257,24 @@ class ExceptionHandler
                 $total = $count + 1;
                 foreach ($exception->toArray() as $position => $e) {
                     $ind = $count - $position + 1;
-                    $class = $this->formatClass($e['class']);
-                    $message = nl2br($this->escapeHtml($e['message']));
-                    $content .= sprintf(<<<'EOF'
-                        <h2 class="block_exception clear_fix">
-                            <span class="exception_counter">%d/%d</span>
-                            <span class="exception_title">%s%s:</span>
-                            <span class="exception_message">%s</span>
-                        </h2>
-                        <div class="block">
-                            <ol class="traces list_exception">
-
-EOF
-                        , $ind, $total, $class, $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line']), $message);
-                    foreach ($e['trace'] as $trace) {
-                        $content .= '       <li>';
-                        if ($trace['function']) {
-                            $content .= sprintf('at %s%s%s(%s)', $this->formatClass($trace['class']), $trace['type'], $trace['function'], $this->formatArgs($trace['args']));
-                        }
-                        if (isset($trace['file']) && isset($trace['line'])) {
-                            $content .= $this->formatPath($trace['file'], $trace['line']);
-                        }
-                        $content .= "</li>\n";
+                    $class = $this->formatClass($e['class'], $html);
+                    $message = $html ? nl2br($this->escapeHtml($e['message'])) : $e['message'];
+                    $trace = $this->formatTrace($e['trace'], $html);
+                    if ($html) {
+                        $formattedPath = $this->formatPath($e['trace'][0]['file'], $e['trace'][0]['line'], $html);
+                        $content .= <<<EOF
+                            <h2 class="block_exception clear_fix">
+                                <span class="exception_counter">$ind/$total</span>
+                                <span class="exception_title">$class $formattedPath:</span>
+                                <span class="exception_message">$message</span>
+                            </h2>
+                            <div class="block">
+                                $trace
+                            </div>
+EOF;
+                    } else {
+                        $content .= "$ind/$total $class\n    $message\n\n$trace";
                     }
-
-                    $content .= "    </ol>\n</div>\n";
                 }
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
@@ -252,12 +286,40 @@ EOF
             }
         }
 
-        return <<<EOF
-            <div id="sf-resetcontent" class="sf-reset">
-                <h1>$title</h1>
-                $content
-            </div>
+        if ($html) {
+            return <<<EOF
+                <div id="sf-resetcontent" class="sf-reset">
+                    <h1>$title</h1>
+                    $content
+                </div>
 EOF;
+        } else {
+            return "$title\n\n$content\n";
+        }
+    }
+
+    private function formatTrace(array $trace, $html)
+    {
+        $content = '';
+        foreach ($trace as $trace) {
+            $line = '';
+            if ($trace['function']) {
+                $line .= sprintf('at %s%s%s(%s)', $this->formatClass($trace['class'], $html), $trace['type'], $trace['function'], $this->formatArgs($trace['args'], $html));
+            }
+            if (isset($trace['file']) && isset($trace['line'])) {
+                if ($line) {
+                    $line .= ' ';
+                }
+                $line .= $this->formatPath($trace['file'], $trace['line'], $html);
+            }
+            $content .= $html ? "    <li>$line</li>\n" : "    $line\n";
+        }
+
+        if ($html) {
+            return "<ol class=\"traces list_exception\">\n$content</ol>";
+        } else {
+            return $content;
+        }
     }
 
     /**
@@ -350,25 +412,33 @@ EOF;
 EOF;
     }
 
-    private function formatClass($class)
+    private function formatClass($class, $html)
     {
         $parts = explode('\\', $class);
 
-        return sprintf('<abbr title="%s">%s</abbr>', $class, array_pop($parts));
+        if ($html) {
+            return sprintf('<abbr title="%s">%s</abbr>', $class, array_pop($parts));
+        } else {
+            return array_pop($parts);
+        }
     }
 
-    private function formatPath($path, $line)
+    private function formatPath($path, $line, $html)
     {
-        $path = $this->escapeHtml($path);
-        $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
+        if ($html) {
+            $path = $this->escapeHtml($path);
+            $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
 
-        if ($linkFormat = $this->fileLinkFormat) {
-            $link = strtr($this->escapeHtml($linkFormat), array('%f' => $path, '%l' => (int) $line));
+            if ($linkFormat = $this->fileLinkFormat) {
+                $link = strtr($this->escapeHtml($linkFormat), array('%f' => $path, '%l' => (int) $line));
 
-            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
+                return sprintf('in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
+            }
+
+            return sprintf('in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
+        } else {
+            return sprintf('in %s:%s', $path, $line);
         }
-
-        return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
     }
 
     /**
@@ -378,24 +448,28 @@ EOF;
      *
      * @return string
      */
-    private function formatArgs(array $args)
+    private function formatArgs(array $args, $html)
     {
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
-                $formattedValue = sprintf('<em>object</em>(%s)', $this->formatClass($item[1]));
+                $pattern = $html ? '<em>object</em>(%s)' : 'object(%s)';
+                $formattedValue = sprintf($pattern, $this->formatClass($item[1], $html));
             } elseif ('array' === $item[0]) {
-                $formattedValue = sprintf('<em>array</em>(%s)', is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
+                $pattern = $html ? '<em>array</em>(%s)' : 'array(%s)';
+                $formattedValue = sprintf($pattern, is_array($item[1]) ? $this->formatArgs($item[1], $html) : $item[1]);
             } elseif ('string' === $item[0]) {
-                $formattedValue = sprintf("'%s'", $this->escapeHtml($item[1]));
+                $formattedValue = sprintf("'%s'", $html ? $this->escapeHtml($item[1]) : $item[1]);
             } elseif ('null' === $item[0]) {
-                $formattedValue = '<em>null</em>';
+                $formattedValue = $html ? '<em>null</em>' : 'null';
             } elseif ('boolean' === $item[0]) {
-                $formattedValue = '<em>'.strtolower(var_export($item[1], true)).'</em>';
+                $pattern = $html ? '<em>%s</em>' : '%s';
+                $formattedValue = sprintf($pattern, strtolower(var_export($item[1], true)));
             } elseif ('resource' === $item[0]) {
-                $formattedValue = '<em>resource</em>';
+                $formattedValue = $html ? '<em>resource</em>' : 'resource';
             } else {
-                $formattedValue = str_replace("\n", '', var_export($this->escapeHtml((string) $item[1]), true));
+                $s = $html ? $this->escapeHtml((string) $item[1]) : $item[1];
+                $formattedValue = str_replace("\n", '', var_export($s, true));
             }
 
             $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);

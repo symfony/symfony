@@ -65,6 +65,11 @@ class Route implements \Serializable
     private $condition = '';
 
     /**
+     * @var bool
+     */
+    private $enforceRequirementAsString = TRUE;
+
+    /**
      * Constructor.
      *
      * Available options:
@@ -282,6 +287,11 @@ class Route implements \Serializable
         $this->options = array(
             'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
         );
+
+        if (!empty($options['__allow_requirement_non_string'])) {
+            $this->enforceRequirementAsString = FALSE;
+            unset($options['__allow_requirement_non_string']);
+        }
 
         return $this->addOptions($options);
     }
@@ -567,7 +577,7 @@ class Route implements \Serializable
 
     private function sanitizeRequirement($key, $regex)
     {
-        if (!is_string($regex)) {
+        if (!is_string($regex) && $this->enforceRequirementAsString) {
             throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
         }
 

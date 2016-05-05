@@ -144,7 +144,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testNonStringRequirement()
     {
-        $route = new Route('/{foo}', array(), array(), array('__allow_requirement_non_string' => TRUE));
+        $route = new Route('/{foo}', array(), array(), array(Route::REQUIREMENT_NON_STRING => TRUE));
         $route->setRequirement('example', TRUE);
         $this->assertSame(TRUE, $route->getRequirement('example'));
     }

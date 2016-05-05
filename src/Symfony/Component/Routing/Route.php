@@ -20,6 +20,11 @@ namespace Symfony\Component\Routing;
 class Route implements \Serializable
 {
     /**
+     * Use this as option flag to allow non string requirements.
+     */
+    const REQUIREMENT_NON_STRING = '__allow_requirement_non_string';
+
+    /**
      * @var string
      */
     private $path = '/';
@@ -288,9 +293,9 @@ class Route implements \Serializable
             'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
         );
 
-        if (!empty($options['__allow_requirement_non_string'])) {
+        if (!empty($options[self::REQUIREMENT_NON_STRING])) {
             $this->enforceRequirementAsString = FALSE;
-            unset($options['__allow_requirement_non_string']);
+            unset($options[self::REQUIREMENT_NON_STRING]);
         }
 
         return $this->addOptions($options);

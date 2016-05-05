@@ -334,7 +334,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                         return array($reflectionMethod, $prefix);
                     }
                 } catch (\ReflectionException $reflectionException) {
-                    // Try the next prefix if the method doesn't exist
+                    // Try the next one if method does not exist
                 }
             }
         }

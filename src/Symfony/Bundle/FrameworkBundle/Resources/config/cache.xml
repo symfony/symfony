@@ -27,6 +27,7 @@
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
+            <argument /> <!-- nonce -->
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>

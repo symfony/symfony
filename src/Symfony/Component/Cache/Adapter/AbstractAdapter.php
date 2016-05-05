@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\CacheItem;
 
 /**
@@ -65,6 +66,24 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             $this,
             CacheItem::class
         );
+    }
+
+    public static function createSystemCache($namespace, $defaultLifetime, $nonce, $directory, LoggerInterface $logger = null)
+    {
+        $fs = new FilesystemAdapter($namespace, $defaultLifetime, $directory);
+        if (null !== $logger) {
+            $fs->setLogger($logger);
+        }
+        if (!ApcuAdapter::isSupported()) {
+            return $fs;
+        }
+
+        $apcu = new ApcuAdapter($namespace, $defaultLifetime / 5, $nonce);
+        if (null !== $logger) {
+            $apcu->setLogger($logger);
+        }
+
+        return new ChainAdapter(array($apcu, $fs));
     }
 
     /**

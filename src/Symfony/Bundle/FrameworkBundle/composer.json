@@ -58,6 +58,7 @@
         "phpdocumentor/reflection-docblock": "<3.0"
     },
     "suggest": {
+        "ext-apcu": "For best performance of the system caches",
         "symfony/console": "For using the console commands",
         "symfony/form": "For using forms",
         "symfony/serializer": "For using the serializer service",

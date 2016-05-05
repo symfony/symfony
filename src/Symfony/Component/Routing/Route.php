@@ -94,8 +94,8 @@ class Route implements \Serializable
     {
         $this->setPath($path);
         $this->setDefaults($defaults);
-        $this->setRequirements($requirements);
         $this->setOptions($options);
+        $this->setRequirements($requirements);
         $this->setHost($host);
         $this->setSchemes($schemes);
         $this->setMethods($methods);
@@ -580,24 +580,24 @@ class Route implements \Serializable
         return $this->compiled = $class::compile($this);
     }
 
-    private function sanitizeRequirement($key, $regex)
+    private function sanitizeRequirement($key, $regex_or_mixed)
     {
-        if (!is_string($regex) && $this->enforceRequirementAsString) {
+        if (!is_string($regex_or_mixed) && $this->enforceRequirementAsString) {
             throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
         }
 
-        if ('' !== $regex && '^' === $regex[0]) {
-            $regex = (string) substr($regex, 1); // returns false for a single character
+        if ('' !== $regex_or_mixed && '^' === $regex_or_mixed[0]) {
+            $regex_or_mixed = (string) substr($regex_or_mixed, 1); // returns false for a single character
         }
 
-        if ('$' === substr($regex, -1)) {
-            $regex = substr($regex, 0, -1);
+        if ('$' === substr($regex_or_mixed, -1)) {
+            $regex_or_mixed = substr($regex_or_mixed, 0, -1);
         }
 
-        if ('' === $regex) {
+        if ('' === $regex_or_mixed) {
             throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
         }
 
-        return $regex;
+        return $regex_or_mixed;
     }
 }

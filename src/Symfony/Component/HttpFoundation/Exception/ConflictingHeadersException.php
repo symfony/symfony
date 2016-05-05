@@ -20,5 +20,4 @@ namespace Symfony\Component\HttpFoundation\Exception;
  */
 class ConflictingHeadersException extends \RuntimeException
 {
-
 }

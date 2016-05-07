@@ -63,9 +63,7 @@ class FilesystemAdapter extends AbstractAdapter
             if (!$h = @fopen($file, 'rb')) {
                 continue;
             }
-            flock($h, LOCK_SH);
             if ($now >= (int) $expiresAt = fgets($h)) {
-                flock($h, LOCK_UN);
                 fclose($h);
                 if (isset($expiresAt[0])) {
                     @unlink($file);
@@ -73,7 +71,6 @@ class FilesystemAdapter extends AbstractAdapter
             } else {
                 $i = rawurldecode(rtrim(fgets($h)));
                 $value = stream_get_contents($h);
-                flock($h, LOCK_UN);
                 fclose($h);
                 if ($i === $id) {
                     $values[$id] = unserialize($value);
@@ -130,6 +127,7 @@ class FilesystemAdapter extends AbstractAdapter
     {
         $ok = true;
         $expiresAt = $lifetime ? time() + $lifetime : PHP_INT_MAX;
+        $tmp = $this->directory.uniqid('', true);
 
         foreach ($values as $id => $value) {
             $file = $this->getFile($id);
@@ -138,8 +136,9 @@ class FilesystemAdapter extends AbstractAdapter
                 @mkdir($dir, 0777, true);
             }
             $value = $expiresAt."\n".rawurlencode($id)."\n".serialize($value);
-            if (false !== @file_put_contents($file, $value, LOCK_EX)) {
-                @touch($file, $expiresAt);
+            if (false !== @file_put_contents($tmp, $value)) {
+                @touch($tmp, $expiresAt);
+                $ok = @rename($tmp, $file) && $ok;
             } else {
                 $ok = false;
             }

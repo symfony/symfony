@@ -35,7 +35,7 @@ class Query extends AbstractQuery
         $con = $this->connection->getResource();
         $this->connection = null;
 
-        if (null === $this->search) {
+        if (null === $this->search || false === $this->search) {
             return;
         }
 
@@ -60,7 +60,7 @@ class Query extends AbstractQuery
 
             $con = $this->connection->getResource();
 
-            $this->search = ldap_search(
+            $this->search = @ldap_search(
                 $con,
                 $this->dn,
                 $this->query,

@@ -9,9 +9,6 @@
  * file that was distributed with this source code.
  */
 
-/**
- * @author Charles Sarrazin <charles@sarraz.in>
- */
 namespace Symfony\Component\Ldap\Adapter;
 
 use Symfony\Component\Ldap\Entry;
@@ -21,10 +18,10 @@ use Symfony\Component\Ldap\Entry;
  */
 interface QueryInterface
 {
-    const DEREF_NEVER = 0;
-    const DEREF_SEARCHING = 1;
-    const DEREF_FINDING = 2;
-    const DEREF_ALWAYS = 3;
+    const DEREF_NEVER = 0x00;
+    const DEREF_SEARCHING = 0x01;
+    const DEREF_FINDING = 0x02;
+    const DEREF_ALWAYS = 0x03;
 
     /**
      * Executes a query and returns the list of Ldap entries.

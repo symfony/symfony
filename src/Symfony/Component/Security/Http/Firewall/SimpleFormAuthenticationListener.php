@@ -21,6 +21,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Http\Authentication\SimpleFormAuthenticatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
@@ -105,6 +106,10 @@ class SimpleFormAuthenticationListener extends AbstractAuthenticationListener
         } else {
             $username = trim(ParameterBagUtils::getRequestParameterValue($request, $this->options['username_parameter']));
             $password = ParameterBagUtils::getRequestParameterValue($request, $this->options['password_parameter']);
+        }
+
+        if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
+            throw new BadCredentialsException('Invalid username.');
         }
 
         $request->getSession()->set(Security::LAST_USERNAME, $username);

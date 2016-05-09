@@ -99,9 +99,9 @@ class WebProfilerExtensionTest extends TestCase
         $extension = new WebProfilerExtension();
         $extension->load(array(array('toolbar' => $enabled)), $this->container);
 
-        $this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
-
         $this->assertSaneContainer($this->getDumpedContainer());
+
+        $this->assertSame($enabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
     }
 
     public function getDebugModes()

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-09T08:07:51Z
+
+Can you also update the description to describe how the user must be built (like it is done [here](https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/Security/Core/Authentication/Token/AbstractToken.php#L88-L89) too).
+
+---------------------------------------------------------------------------
+
+by eriwin at 2016-05-09T09:07:25Z
+
+@xabbuh Done. Do you also want me to update this description: https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/Security/Core/Authentication/Token/PreAuthenticatedToken.php#L29 and if so in this PR or in a different one?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-09T12:34:53Z
+
+@eriwin You can do that in this PR too.

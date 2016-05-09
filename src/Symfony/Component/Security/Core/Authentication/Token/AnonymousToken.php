@@ -26,7 +26,7 @@ class AnonymousToken extends AbstractToken
      * Constructor.
      *
      * @param string          $secret A secret used to make sure the token is created by the app and not by a malicious client
-     * @param string          $user   The user
+     * @param string|object   $user   The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string.
      * @param RoleInterface[] $roles  An array of roles
      */
     public function __construct($secret, $user, array $roles = array())

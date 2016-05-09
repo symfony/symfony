@@ -29,6 +29,7 @@
     "suggest": {
         "symfony/yaml": "",
         "symfony/config": "",
+        "symfony/expression-language": "For using expressions in service container configuration",
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "autoload": {

@@ -7,6 +7,18 @@ in 3.0 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.0.0...v3.0.1
 
+* 3.0.6 (2016-05-10)
+
+ * security #18736 Fixed issue with blank password with Ldap (csarrazi)
+ * security #18733 limited the maximum length of a submitted username (fabpot)
+ * bug #18730 [FrameworkBundle] prevent calling get() for service_container service (xabbuh)
+ * bug #18705 added a conflict between Monolog bridge 2.8 and HTTP Kernel 3.0+ (fabpot)
+ * bug #18709 [DependencyInjection] top-level anonymous services must be public (xabbuh)
+ * bug #18388 [EventDispatcher] check for method to exist (xabbuh)
+ * bug #18699 [DependencyInjection] Use the priority of service decoration on service with parent (hason)
+ * bug #18692 add @Event annotation for KernelEvents (Haehnchen)
+ * bug #18246 [DependencyInjection] fix ambiguous services schema (backbone87)
+
 * 3.0.5 (2016-05-03)
 
  * bug #18180 [Form] fixed BC break with pre selection of choices with `ChoiceType` and its children (HeahDude)

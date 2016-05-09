@@ -194,4 +194,15 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
 
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
     }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
+     * expectedExceptionMessageRegExp /The property "axes" in class "Mock_PropertyAccessorCollectionTest_Car[^"]*" can be defined with the methods "addAxis()", "removeAxis()" but the new value must be an array or an instance of \Traversable, "string" given./
+     */
+    public function testSetValueFailsIfAdderAndRemoverExistButValueIsNotTraversable()
+    {
+        $car = $this->getMock(__CLASS__.'_Car');
+
+        $this->propertyAccessor->setValue($car, 'axes', 'Not an array or Traversable');
+    }
 }

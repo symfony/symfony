@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-03T12:29:57Z
+
+Out of curiosity, are you using the suggest section of Composer in your day to day activities?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-03T14:51:24Z
+
+@fabpot To be honest, no, especially when the tool(s) used is part of my "everyday" ones (as Symfony is). But when I use a new tool, yes, I look at the composer suggestions.
+To give you an explanation about the motivation of opening this PR:
+
+I worked on a project (LexikJWTAuthenticationBundle) that requires the FrameworkBundle as dependency. I was looking for a way to inject a service as argument of another one, with a dynamic value (a defined parameter between to possible values) used as the last part of the identifier of the injected service.
+I tried to use `<argument type="expression">service('service_namespace' ~ parameter('dynamic_value'))</argument>`.
+This leaded to an error due to (of course) the unknown ExpressionLanguage required by the XmlFileLoader.
+
+So, I looked at how dependencies are managed for components that use other (symfony) component(s), especially if the used components are required or not.
+I quickly realized that most of them don't require the other components they use (out of dev dependencies).
+Then, I started a project with the dependency-injection component as the only required dependency to see if the ExpressionLanguage will be here, or (at least) if composer tell me to install it, as it is used by several classes of the DI component.
+
+Finally, I assumed that developers who have to work with the component should be informed of the packages that are mandatory to make it work properly.
+
+Am I wrong? Is it the responsibility of the developer to take a look at the component by himself to see what he can use and what he can't?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-03T15:23:45Z
+
+I was curious because I think that the way suggest are displayed (only during composer install or update) is not that useful. But of course, being able to have a look at the suggest section from your IDE makes total sense to me.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-03T15:35:43Z
+
+@fabpot As we (developers) are always looking for a faster install/update of project dependencies, I really don't think that people take care of these suggestions during the composer processes execution itself.
+Personally, it's something that I see only after that (from my IDE, or directly on packagist).
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-03T15:55:15Z
+
+> I was curious because I think that the way suggest are displayed (only during composer install or update) is not that useful
+
+@fabpot  that's not true anymore. Composer has a command allowing you to see suggestions from installed packages at any time: ``composer suggests`` (more useful in verbose mode)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-03T16:00:53Z
+
+@stof Thank's!! And 👍  for the verbose mode.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-05T16:12:38Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-06T07:32:48Z
+
+👍

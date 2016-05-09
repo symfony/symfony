@@ -26,7 +26,7 @@ class PreAuthenticatedToken extends AbstractToken
     /**
      * Constructor.
      *
-     * @param string|object            $user        The user
+     * @param string|object            $user        The user can be a UserInterface instance, or an object implementing a __toString method or the username as a regular string.
      * @param mixed                    $credentials The user credentials
      * @param string                   $providerKey The provider key
      * @param RoleInterface[]|string[] $roles       An array of roles

@@ -23,6 +23,23 @@ class LdapBindAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedExceptionMessage The presented password must not be empty.
+     */
+    public function testEmptyPasswordShouldThrowAnException()
+    {
+        $userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
+
+        $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap);
+        $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
+        $reflection->setAccessible(true);
+
+        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', '', 'key'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
      * @expectedExceptionMessage The presented password is invalid.
      */
     public function testBindFailureShouldThrowAnException()
@@ -40,7 +57,7 @@ class LdapBindAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
         $reflection->setAccessible(true);
 
-        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', '', 'key'));
+        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo', 'bar', 'key'));
     }
 
     public function testRetrieveUser()

@@ -4,30 +4,30 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e02685ff7d2409d34fa87e306fc86ec5",
-    "content-hash": "2854c05c76a78113c693dbbdd3f9c518",
+    "hash": "14a4e0fba857b6e49c635e8ca5dc4934",
+    "content-hash": "58da15f65f6995cdf09941de0ded1d6e",
     "packages": [
         {
             "name": "hirak/prestissimo",
-            "version": "0.1.18",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hirak/prestissimo.git",
-                "reference": "84e9fb79ec18a4428c5a0c032eacac640d89be5d"
+                "reference": "dd5cdcdc4369ca0ca57d077d3df89e403586d21a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://codeload.github.com/hirak/prestissimo/legacy.zip/84e9fb79ec18a4428c5a0c032eacac640d89be5d",
-                "reference": "84e9fb79ec18a4428c5a0c032eacac640d89be5d",
+                "url": "https://api.github.com/repos/hirak/prestissimo/zipball/dd5cdcdc4369ca0ca57d077d3df89e403586d21a",
+                "reference": "dd5cdcdc4369ca0ca57d077d3df89e403586d21a",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "~1.0.0-alpha10",
+                "composer-plugin-api": "^1.0.0",
                 "ext-curl": "*",
                 "php": ">=5.3.2"
             },
             "require-dev": {
-                "composer/composer": "1.0.0-alpha10",
+                "composer/composer": "1.0.0",
                 "phpunit/phpunit": "^4.8",
                 "squizlabs/php_codesniffer": "^2.5"
             },
@@ -56,13 +56,15 @@
                 "parallel",
                 "speedup"
             ],
-            "time": "2016-03-17 13:53:53"
+            "time": "2016-05-10 05:55:04"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "hirak/prestissimo": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

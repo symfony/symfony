@@ -1,5 +1,5 @@
 {
     "require": {
-        "hirak/prestissimo": "^0.1.18"
+        "hirak/prestissimo": "dev-master@dev"
     }
 }

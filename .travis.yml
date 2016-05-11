@@ -51,9 +51,8 @@ before_install:
     - if [[ ! $skip && $PHP != hhvm ]]; then echo extension = ldap.so >> $INI_FILE; fi
     - if [[ ! $skip && $PHP != hhvm ]]; then phpenv config-rm xdebug.ini; fi
     - if [[ ! $skip ]]; then composer self-update --stable; fi
-    - if [[ ! $skip ]]; then cp .composer/* ~/.composer/; composer global install; fi
+    - if [[ ! $skip ]]; then cp .composer/* ~/.composer/; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
-    - if [[ ! $skip && $deps ]]; then composer global remove hirak/prestissimo; fi
     - if [[ ! $skip ]]; then export PHPUNIT=$(readlink -f ./phpunit); fi
 
 install:

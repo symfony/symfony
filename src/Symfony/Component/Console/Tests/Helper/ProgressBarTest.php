@@ -677,7 +677,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' 1/4 [=======>--------------------] Text with a space at the beginning  25%').
             $this->generateOutput(' 2/4 [==============>-------------]  Text with two spaces at the beginning  50%').
             $this->generateOutput(' 3/4 [=====================>------]  75%').
-            $this->generateOutput(' 4/4 [============================] Finish 100%')
+            $this->generateOutput(' 4/4 [============================] Finish 100%'),
         );
 
         $data[] = array(
@@ -686,7 +686,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' 1 [=======>--------------------] Text with a space at the beginning').
             $this->generateOutput(' 2 [==============>-------------]  Text with two spaces at the beginning').
             $this->generateOutput(' 3 [=====================>------]').
-            $this->generateOutput(' 4 [============================] Finish')
+            $this->generateOutput(' 4 [============================] Finish'),
         );
 
         // As this test is very lightweight, it should be executed less than 1 second
@@ -697,7 +697,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' 1/4 [=======>--------------------] Text with a space at the beginning  25% < 1 sec').
             $this->generateOutput(' 2/4 [==============>-------------]  Text with two spaces at the beginning  50% < 1 sec').
             $this->generateOutput(' 3/4 [=====================>------]  75% < 1 sec').
-            $this->generateOutput(' 4/4 [============================] Finish 100% < 1 sec')
+            $this->generateOutput(' 4/4 [============================] Finish 100% < 1 sec'),
         );
 
         $data[] = array(
@@ -706,7 +706,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' 1 [=======>--------------------] Text with a space at the beginning < 1 sec').
             $this->generateOutput(' 2 [==============>-------------]  Text with two spaces at the beginning < 1 sec').
             $this->generateOutput(' 3 [=====================>------] < 1 sec').
-            $this->generateOutput(' 4 [============================] Finish < 1 sec')
+            $this->generateOutput(' 4 [============================] Finish < 1 sec'),
         );
 
         $data[] = array(
@@ -715,7 +715,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' 1/4 [=======>--------------------] Text with a space at the beginning  25% < 1 sec/< 1 sec').
             $this->generateOutput(' 2/4 [==============>-------------]  Text with two spaces at the beginning  50% < 1 sec/< 1 sec').
             $this->generateOutput(' 3/4 [=====================>------]  75% < 1 sec/< 1 sec').
-            $this->generateOutput(' 4/4 [============================] Finish 100% < 1 sec/< 1 sec')
+            $this->generateOutput(' 4/4 [============================] Finish 100% < 1 sec/< 1 sec'),
         );
 
         $data[] = array(
@@ -724,7 +724,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             $this->generateOutput(' 1 [=======>--------------------] Text with a space at the beginning < 1 sec').
             $this->generateOutput(' 2 [==============>-------------]  Text with two spaces at the beginning < 1 sec').
             $this->generateOutput(' 3 [=====================>------] < 1 sec').
-            $this->generateOutput(' 4 [============================] Finish < 1 sec')
+            $this->generateOutput(' 4 [============================] Finish < 1 sec'),
         );
 
         // `debug` and `debug_nomax` are not tested because memory usage can be different on different systems and versions

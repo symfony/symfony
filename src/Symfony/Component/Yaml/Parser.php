@@ -816,7 +816,7 @@ class Parser
     /**
      * Returns true if the current line is a collection item.
      *
-     * @return bool Returns true if the current line is a collection item line, false otherwise.
+     * @return bool
      */
     private function isCurrentLineCollectionItem()
     {
@@ -834,7 +834,7 @@ class Parser
     {
         $isCollectionItem = false;
         $moves = 0;
-        while($this->moveToPreviousLine()) {
+        while ($this->moveToPreviousLine()) {
             ++$moves;
             // If previous line is a comment, move back again.
             if ($this->isCurrentLineComment()) {
@@ -845,7 +845,7 @@ class Parser
         }
 
         // Move parser back to previous line.
-        while($moves > 0) {
+        while ($moves > 0) {
             $this->moveToNextLine();
             --$moves;
         }

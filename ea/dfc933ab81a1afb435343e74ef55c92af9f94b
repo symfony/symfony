@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by ymc-dabe at 2016-05-11T08:34:04Z
+
+Note that I'm actually not sure if it is right to prevent installing symfony/monolog-bridge v3.0.6 together with symfony/http-kernel v2.8.6, since PR #18705 only mentions a problem the other way around (monolog-bridge v2.8.x conflicts with http-kernel v3.0+).
+If it is okay to install a 3.0.x monolog-bridge with an older 2.8.x http-kernel, the conflict in composer.json should be removed at all in branch 3.0. In that case, please let me know, so I can update this PR accordingly.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-11T08:37:22Z
+
+yeah, the conflict rule should be removed entirely in the 3.0 branch, which was forgotten when merging 2.8 into 3.0
+
+---------------------------------------------------------------------------
+
+by ymc-dabe at 2016-05-11T08:50:24Z
+
+Thanks for the feedback @stof. I updated this PR to remove the conflict with symfony/http-kernel in src/Symfony/Bridge/Monolog/composer.json.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-05-11T09:52:01Z
+
+:+1:
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-11T10:33:52Z
+
+👍

@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-30T05:59:18Z
+
+I've got that weird feeling after https://github.com/symfony/symfony/pull/18069 got merged, it's now clear:
+
+while addressing @xabbuh's comment about someone calling `parent::onBind()`, I added the condition `__CLASS__ === get_class($this)` to fix the triggering of the deprecation, but I guess that also breaks the call because the logic now in `onSubmit()` is not excecuted.
+
+This PR adds another flag to fix this BC break.
+
+Sorry for this confusion.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-05-03T13:00:31Z
+
+Any thought on this BC break ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-03T20:29:04Z
+
+I think a test for this would be good.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-05-03T23:02:22Z
+
+Thanks @xabbuh I've added a failing test which revealed another issue, we have to keep the event in `onBind()` definition or it ends with a PHP error...
+I also added the missing `Listener` suffix to the test class name.
+
+Note that the patch works as expected, tests are green now :)

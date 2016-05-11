@@ -139,14 +139,37 @@ class ProgressBar
         return isset(self::$formats[$name]) ? self::$formats[$name] : null;
     }
 
+    /**
+     * Set message.
+     *
+     * @param string $message Message
+     * @param string $name    Name for a message which is used as placeholder
+     */
     public function setMessage($message, $name = 'message')
     {
         $this->messages[$name] = $message;
     }
 
+    /**
+     * Get message.
+     *
+     * @param string $name Name for a message which is used as placeholder
+     *
+     * @return mixed
+     */
     public function getMessage($name = 'message')
     {
         return $this->messages[$name];
+    }
+
+    /**
+     * Get messages.
+     *
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
     }
 
     /**
@@ -601,7 +624,7 @@ class ProgressBar
             'message' => function (ProgressBar $bar) {
                 $message = '';
 
-                if (array_key_exists('message', $bar->messages)) {
+                if (array_key_exists('message', $bar->getMessages())) {
                     $message = $bar->getMessage();
 
                     if (0 !== strlen($message) && ' ' !== substr($message, 0, 1)) {

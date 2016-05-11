@@ -44,13 +44,13 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
         // the DateTime constructor:
         // http://php.net/manual/en/datetime.formats.php
         if (is_string($comparedValue)) {
-            if ($value instanceof \DatetimeImmutable) {
+            if ($value instanceof \DateTimeImmutable) {
                 // If $value is immutable, convert the compared value to a
                 // DateTimeImmutable too
-                $comparedValue = new \DatetimeImmutable($comparedValue);
+                $comparedValue = new \DateTimeImmutable($comparedValue);
             } elseif ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
                 // Otherwise use DateTime
-                $comparedValue = new \DateTime($comparedValue);
+                $comparedValue = date_create($comparedValue);
             }
         }
 

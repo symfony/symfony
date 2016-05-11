@@ -41,7 +41,7 @@ class ProgressBar
     private $stepWidth;
     private $percent = 0.0;
     private $formatLineCount;
-    private $messages = [];
+    private $messages = array();
     private $overwrite = true;
 
     private static $formatters;

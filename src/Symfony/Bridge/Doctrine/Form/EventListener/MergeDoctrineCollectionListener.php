@@ -27,8 +27,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class MergeDoctrineCollectionListener implements EventSubscriberInterface
 {
-    // Keeps BC. To be removed in 4.0
+    // Keep BC. To be removed in 4.0
     private $bc = true;
+    private $bcLayer = false;
 
     public static function getSubscribedEvents()
     {
@@ -36,8 +37,7 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
         // is called before
         return array(
             FormEvents::SUBMIT => array(
-                // BC
-                array('onBind', 10),
+                array('onBind', 10), // deprecated
                 array('onSubmit', 5),
             ),
         );
@@ -45,11 +45,14 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
 
     public function onSubmit(FormEvent $event)
     {
-        // If onBind() is overridden then logic has been executed
         if ($this->bc) {
+            // onBind() has been overridden from a child class
             @trigger_error('The onBind() method is deprecated since version 3.1 and will be removed in 4.0. Use the onSubmit() method instead.', E_USER_DEPRECATED);
 
-            return;
+            if (!$this->bcLayer) {
+                // If parent::onBind() has not been called, then logic has been executed
+                return;
+            }
         }
 
         $collection = $event->getForm()->getData();
@@ -68,10 +71,13 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
      * @deprecated since version 3.1, to be removed in 4.0.
      *             Use {@link onSubmit()} instead.
      */
-    public function onBind()
+    public function onBind(FormEvent $event)
     {
         if (__CLASS__ === get_class($this)) {
             $this->bc = false;
+        } else {
+            // parent::onBind() has been called
+            $this->bcLayer = true;
         }
     }
 }

@@ -41,7 +41,7 @@ class ProgressBar
     private $stepWidth;
     private $percent = 0.0;
     private $formatLineCount;
-    private $messages;
+    private $messages = [];
     private $overwrite = true;
 
     private static $formatters;
@@ -598,23 +598,38 @@ class ProgressBar
             'percent' => function (ProgressBar $bar) {
                 return floor($bar->getProgressPercent() * 100);
             },
+            'message' => function (ProgressBar $bar) {
+                $message = '';
+
+                if (array_key_exists('message', $bar->messages)) {
+                    $message = $bar->getMessage();
+
+                    if (0 !== strlen($message) && ' ' !== substr($message, 0, 1)) {
+                        // If message does not start with the space, then add 1 space at the beginning of the message
+                        // to separate the message from the [%bar%] placeholder
+                        $message = ' '.$message;
+                    }
+                }
+
+                return $message;
+            },
         );
     }
 
     private static function initFormats()
     {
         return array(
-            'normal' => ' %current%/%max% [%bar%] %percent:3s%%',
-            'normal_nomax' => ' %current% [%bar%]',
+            'normal' => ' %current%/%max% [%bar%]%message% %percent:3s%%',
+            'normal_nomax' => ' %current% [%bar%]%message%',
 
-            'verbose' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%',
-            'verbose_nomax' => ' %current% [%bar%] %elapsed:6s%',
+            'verbose' => ' %current%/%max% [%bar%]%message% %percent:3s%% %elapsed:6s%',
+            'verbose_nomax' => ' %current% [%bar%]%message% %elapsed:6s%',
 
-            'very_verbose' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%',
-            'very_verbose_nomax' => ' %current% [%bar%] %elapsed:6s%',
+            'very_verbose' => ' %current%/%max% [%bar%]%message% %percent:3s%% %elapsed:6s%/%estimated:-6s%',
+            'very_verbose_nomax' => ' %current% [%bar%]%message% %elapsed:6s%',
 
-            'debug' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
-            'debug_nomax' => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
+            'debug' => ' %current%/%max% [%bar%]%message% %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
+            'debug_nomax' => ' %current% [%bar%]%message% %elapsed:6s% %memory:6s%',
         );
     }
 }

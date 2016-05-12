@@ -43,6 +43,16 @@ class DateValidatorTest extends AbstractConstraintValidatorTest
     }
 
     /**
+     * @requires PHP 5.5.0
+     */
+    public function testDateTimeImmutableClassIsValid()
+    {
+        $this->validator->validate(new \DateTimeImmutable(), new Date());
+
+        $this->assertNoViolation();
+    }
+
+    /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
     public function testExpectsStringCompatibleType()

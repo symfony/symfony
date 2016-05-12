@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -193,8 +194,8 @@ class ProfilerController
         $url = null;
         try {
             $url = $this->generator->generate('_profiler', array('token' => $token));
-        } catch (\Exception $e) {
-            // the profiler is not enabled
+        } catch (RouteNotFoundException $e) {
+            // the named route doesn't exist => the profiler is not enabled
         }
 
         return new Response($this->twig->render('@WebProfiler/Profiler/toolbar.html.twig', array(

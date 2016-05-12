@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-06T09:51:16Z
+
+Having the nonce as a container parameter makes the APCu cache barely unusable in the `dev` environment where the container may be rebuilt quite often, doesn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-06T09:57:13Z
+
+Except that our system caches (serializer & validation for now) are not enabled in debug mode.
+Also, caches are registered with a clearer which means they are already cleared quite often in dev.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-06T20:06:06Z
+
+I simplified the implementation to the very minimum so that no overhead is added anymore to each apcu_fetch/store. I also replaced the container parameter by an inline value for the nonce.
+
+It has the drawback that @xabbuh outlined: the cache **in dev** is going to be cleared more often than strictly required. Yet I think this does not matter compared to the main benefit (we even already disable most caches in dev):
+
+As you know, there is currently no way to invalidate an FPM/Apache apcu cache from the CLI, other than restarting FPM/Apache on deployment. Even if it's a best practice, not everyone is able to do it.
+Nonce-based invalidation fixes this. Thus, it makes apcu usable again **in prod** for everyone, by default.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-10T16:42:02Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-12T16:58:25Z
+
+ping @symfony/deciders votes pendind for 3.1-beta which should/may be released tomorrow

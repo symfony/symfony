@@ -132,11 +132,8 @@ class FilesystemAdapter extends AbstractAdapter
         $expiresAt = $lifetime ? time() + $lifetime : PHP_INT_MAX;
 
         foreach ($values as $id => $value) {
-            $file = $this->getFile($id);
-            $dir = dirname($file);
-            if (!file_exists($dir)) {
-                @mkdir($dir, 0777, true);
-            }
+            $file = $this->getFile($id, true);
+
             $value = $expiresAt."\n".rawurlencode($id)."\n".serialize($value);
             if (false !== @file_put_contents($file, $value, LOCK_EX)) {
                 @touch($file, $expiresAt);
@@ -148,10 +145,15 @@ class FilesystemAdapter extends AbstractAdapter
         return $ok;
     }
 
-    private function getFile($id)
+    private function getFile($id, $mkdir = false)
     {
         $hash = str_replace('/', '-', base64_encode(md5($id, true)));
+        $dir = $this->directory.$hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR;
 
-        return $this->directory.$hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR.substr($hash, 2, -2);
+        if ($mkdir && !file_exists($dir)) {
+            @mkdir($dir, 0777, true);
+        }
+
+        return $dir.substr($hash, 2, -2);
     }
 }

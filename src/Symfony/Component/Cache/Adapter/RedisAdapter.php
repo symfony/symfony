@@ -233,51 +233,62 @@ class RedisAdapter extends AbstractAdapter
         if (!$serialized) {
             return $failed;
         }
-        if ($lifetime > 0) {
-            if ($this->redis instanceof \RedisArray) {
-                $redis = array();
-                foreach ($serialized as $id => $value) {
-                    if (!isset($redis[$h = $this->redis->_target($id)])) {
-                        $redis[$h] = $this->redis->_instance($h);
-                        $redis[$h]->multi(\Redis::PIPELINE);
-                    }
-                    $redis[$h]->setEx($id, $lifetime, $value);
-                }
-                foreach ($redis as $h) {
-                    if (!$h->exec()) {
-                        $failed = false;
-                    }
-                }
-            } else {
-                $this->pipeline(function ($pipe) use ($serialized, $lifetime) {
-                    foreach ($serialized as $id => $value) {
-                        $pipe->setEx($id, $lifetime, $value);
-                    }
-                });
-            }
-        } elseif (!$this->redis->mSet($serialized)) {
-            return false;
+
+        if (0 >= $lifetime) {
+            $this->redis->mSet($serialized);
+
+            return $failed;
         }
+
+        $this->pipeline(function ($pipe) use (&$serialized, $lifetime) {
+            foreach ($serialized as $id => $value) {
+                $pipe('setEx', $id, array($lifetime, $value));
+            }
+        });
 
         return $failed;
     }
 
+    private function execute($command, $id, array $args, $redis = null)
+    {
+        array_unshift($args, $id);
+        call_user_func_array(array($redis ?: $this->redis, $command), $args);
+    }
+
     private function pipeline(\Closure $callback)
     {
-        if ($this->redis instanceof \Predis\Client) {
-            return $this->redis->pipeline($callback);
-        }
-        $pipe = $this->redis instanceof \Redis && $this->redis->multi(\Redis::PIPELINE);
+        $redis = $this->redis;
+
         try {
-            $e = null;
-            $callback($this->redis);
-        } catch (\Exception $e) {
-        }
-        if ($pipe) {
-            $this->redis->exec();
-        }
-        if (null !== $e) {
-            throw $e;
+            if ($redis instanceof \Predis\Client) {
+                $redis->pipeline(function ($pipe) use ($callback) {
+                    $this->redis = $pipe;
+                    $callback(array($this, 'execute'));
+                });
+            } elseif ($redis instanceof \RedisArray) {
+                $connections = array();
+                $callback(function ($command, $id, $args) use (&$connections) {
+                    if (!isset($connections[$h = $this->redis->_target($id)])) {
+                        $connections[$h] = $this->redis->_instance($h);
+                        $connections[$h]->multi(\Redis::PIPELINE);
+                    }
+                    $this->execute($command, $id, $args, $connections[$h]);
+                });
+                foreach ($connections as $c) {
+                    $c->exec();
+                }
+            } else {
+                $pipe = $redis->multi(\Redis::PIPELINE);
+                try {
+                    $callback(array($this, 'execute'));
+                } finally {
+                    if ($pipe) {
+                        $redis->exec();
+                    }
+                }
+            }
+        } finally {
+            $this->redis = $redis;
         }
     }
 }

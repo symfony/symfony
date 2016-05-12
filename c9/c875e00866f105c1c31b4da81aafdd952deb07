@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-11T06:36:05Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-11T08:44:14Z
+
+shouldn't the update of `hirak/prestissimo` be done in a separate PR applied in 2.3 instead ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-11T21:42:17Z
+
+@stof hirak/prestissimo removed, I just needed it to check if `finally` worked on hhvm also (answer is yes here)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-12T16:58:53Z
+
+ping @symfony/deciders votes pending for 3.1-beta which should/may be released tomorrow

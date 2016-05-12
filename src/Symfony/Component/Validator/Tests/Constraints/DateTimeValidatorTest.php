@@ -41,7 +41,7 @@ class DateTimeValidatorTest extends AbstractConstraintValidatorTest
 
         $this->assertNoViolation();
     }
-    
+
     public function testDateTimeImmutableClassIsValid()
     {
         $this->validator->validate(new \DateTimeImmutable(), new DateTime());

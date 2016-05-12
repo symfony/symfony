@@ -44,8 +44,8 @@ class AutowirePass implements CompilerPassInterface
                     $this->completeDefinition($id, $definition);
                 }
             }
-        } catch (\Error $e) {
         } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
 
         spl_autoload_unregister($throwingAutoloader);

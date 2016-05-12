@@ -198,6 +198,11 @@ class TextDescriptor extends Descriptor
             }
 
             // add commands by namespace
+            $commandNames = [];
+            foreach($description->getCommands() as $name => $command) {
+                $commandNames[] = $name;
+            }
+
             foreach ($description->getNamespaces() as $namespace) {
                 if (!$describedNamespace && ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {
                     $this->writeText("\n");
@@ -205,9 +210,13 @@ class TextDescriptor extends Descriptor
                 }
 
                 foreach ($namespace['commands'] as $name) {
-                    $this->writeText("\n");
-                    $spacingWidth = $width - strlen($name);
-                    $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $description->getCommand($name)->getDescription()), $options);
+                    if(in_array($name, $commandNames)) {
+                        $this->writeText("\n");
+                        $spacingWidth = $width - strlen($name);
+                        $command = $description->getCommand($name);
+                        $commandAliases = $this->getCommandAliasesText($command);
+                        $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $commandAliases.$command->getDescription()), $options);
+                    }
                 }
             }
 
@@ -225,6 +234,26 @@ class TextDescriptor extends Descriptor
             isset($options['raw_output']) ? !$options['raw_output'] : true
         );
     }
+
+    /**
+     * Formats command aliases to show them in the command description.
+     * 
+     * @param Command $command
+     * 
+     * @return string
+     */
+    private function getCommandAliasesText($command)
+    {
+        $text = '';
+        $aliases = $command->getAliases();
+
+        if(count($aliases) > 0) {
+            $text = '['.implode('|',$aliases).'] ';
+        }
+
+        return $text;
+    }
+
 
     /**
      * Formats input option/argument default value.

@@ -7,6 +7,11 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.41 (2016-05-09)
+
+ * security #18733 limited the maximum length of a submitted username (fabpot)
+ * bug #18709 [DependencyInjection] top-level anonymous services must be public (xabbuh)
+
 * 2.3.40 (2016-04-29)
 
  * bug #18246 [DependencyInjection] fix ambiguous services schema (backbone87)

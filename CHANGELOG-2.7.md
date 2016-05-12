@@ -7,6 +7,14 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.13 (2016-05-09)
+
+ * security #18733 limited the maximum length of a submitted username (fabpot)
+ * bug #18730 [FrameworkBundle] prevent calling get() for service_container service (xabbuh)
+ * bug #18709 [DependencyInjection] top-level anonymous services must be public (xabbuh)
+ * bug #18692 add @Event annotation for KernelEvents (Haehnchen)
+ * bug #18246 [DependencyInjection] fix ambiguous services schema (backbone87)
+
 * 2.7.12 (2016-04-29)
 
  * bug #18180 [Form] fixed BC break with pre selection of choices with `ChoiceType` and its children (HeahDude)

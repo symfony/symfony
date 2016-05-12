@@ -484,6 +484,24 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @requires PHP 7
+     */
+    public function testHandleErrorException()
+    {
+        $exception = new \Error("Class 'Foo' not found");
+
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler(function () use (&$args) {
+            $args = func_get_args();
+        });
+
+        $handler->handleException($exception);
+
+        $this->assertInstanceOf('Symfony\Component\Debug\Exception\ClassNotFoundException', $args[0]);
+        $this->assertSame("Attempted to load class \"Foo\" from the global namespace.\nDid you forget a \"use\" statement?", $args[0]->getMessage());
+    }
+
     public function testHandleFatalErrorOnHHVM()
     {
         try {

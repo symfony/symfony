@@ -18,7 +18,7 @@ init:
 install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
     - cd c:\php
-    - IF %PHP%==1 appveyor DownloadFile https://curl.haxx.se/ca/cacert.pem
+    - IF %PHP%==1 appveyor DownloadFile https://raw.githubusercontent.com/symfony/binary-utils/master/cacert.pem
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.3.11-nts-Win32-VC9-x86.zip
     - IF %PHP%==1 7z x php-5.3.11-nts-Win32-VC9-x86.zip -y >nul
     - IF %PHP%==1 appveyor DownloadFile https://raw.githubusercontent.com/symfony/binary-utils/master/ICU-51.2-dlls.zip
@@ -50,12 +50,11 @@ install:
     - IF %PHP%==1 echo extension=php_ldap.dll >> php.ini-max
     - IF %PHP%==1 echo extension=php_curl.dll >> php.ini-max
     - IF %PHP%==1 echo curl.cainfo=c:\php\cacert.pem >> php.ini-max
-    - IF %PHP%==1 appveyor DownloadFile https://getcomposer.org/download/1.0.2/composer.phar
+    - IF %PHP%==1 appveyor DownloadFile https://getcomposer.org/download/1.0.3/composer.phar
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
     - mkdir %APPDATA%\Composer
     - copy /Y .composer\* %APPDATA%\Composer\
-    - composer global install --no-progress --ansi
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
     - composer update --no-progress --ansi

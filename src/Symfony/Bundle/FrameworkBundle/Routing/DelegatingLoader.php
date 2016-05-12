@@ -77,6 +77,9 @@ class DelegatingLoader extends BaseDelegatingLoader
         } catch (\Exception $e) {
             $this->loading = false;
             throw $e;
+        } catch (\Throwable $e) {
+            $this->loading = false;
+            throw $e;
         }
 
         $this->loading = false;

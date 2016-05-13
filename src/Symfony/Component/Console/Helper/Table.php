@@ -521,6 +521,18 @@ class Table
                 continue;
             }
 
+            foreach ($row as $i => $cell) {
+                if ($cell instanceof TableCell) {
+                    $textLength = strlen($cell);
+                    if ($textLength > 0) {
+                        $contentColumns = str_split($cell, ceil($textLength / $cell->getColspan()));
+                        foreach ($contentColumns as $position => $content) {
+                            $row[$i + $position] = $content;
+                        }
+                    }
+                }
+            }
+
             $lengths[] = $this->getCellWidth($row, $column);
         }
 
@@ -550,10 +562,6 @@ class Table
         if (isset($row[$column])) {
             $cell = $row[$column];
             $cellWidth = Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
-            if ($cell instanceof TableCell && $cell->getColspan() > 1) {
-                // we assume that cell value will be across more than one column.
-                $cellWidth = $cellWidth / $cell->getColspan();
-            }
 
             return $cellWidth;
         }

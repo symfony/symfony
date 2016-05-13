@@ -33,7 +33,7 @@ class RangeValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_numeric($value) && !$value instanceof \DateTime && !$value instanceof \DateTimeInterface) {
+        if (!is_numeric($value) && !$value instanceof \DateTimeInterface) {
             $this->context->buildViolation($constraint->invalidMessage)
                 ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
                 ->setCode(Range::INVALID_CHARACTERS_ERROR)
@@ -49,7 +49,7 @@ class RangeValidator extends ConstraintValidator
         // This allows to compare with any date/time value supported by
         // the DateTime constructor:
         // http://php.net/manual/en/datetime.formats.php
-        if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+        if ($value instanceof \DateTimeInterface) {
             if (is_string($min)) {
                 $min = new \DateTime($min);
             }

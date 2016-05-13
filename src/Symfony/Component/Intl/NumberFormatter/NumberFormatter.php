@@ -328,7 +328,7 @@ class NumberFormatter
      * @return string The formatted currency value
      *
      * @see http://www.php.net/manual/en/numberformatter.formatcurrency.php
-     * @see http://www.iso.org/iso/support/faqs/faqs_widely_used_standards/widely_used_standards_other/currency_codes/currency_codes_list-1.htm
+     * @see https://en.wikipedia.org/wiki/ISO_4217#Active_codes
      */
     public function formatCurrency($value, $currency)
     {

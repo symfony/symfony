@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-04-27T08:54:05Z
+
+LGTM 👍 , but i think the merge should be applied to older maintained branches too
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-27T10:36:48Z
+
+The `421` status code is part of HTTP2 standard. Should we include it?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-04-27T10:45:05Z
+
+If we support HTTP2, then yes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-27T13:31:48Z
+
+:+1: for 2.3
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-27T13:35:43Z
+
+@nicolas-grekas is it OK to add HTTP2 status codes even if we don't support the HTTP2 protocol?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-27T13:38:53Z
+
+But Symfony can already be put behind an HTTP2 server and thus many of us already use it in this context, and we should support it. Maybe a new feature, I don't know what others think. Always hard to know where the limit is :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-27T13:48:09Z
+
+@javiereguiluz as far as Symfony is concerned, there is no new protocol here. PHP-FPM talks the FastCGI protocol anyway, not the HTTP one.
+
+So I'm also :+1: for adding this (in 3.1)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-27T13:51:32Z
+
+@stof OK then. Thanks!  I agree with Nico for merging this in 2.3.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-27T14:38:51Z
+
+Other changes to the HTTP status list have always been merged in 2.3, so I think we should do the same here.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-27T14:48:14Z
+
+then OK for 2.3
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-28T07:17:22Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-29T08:26:11Z
+
+👍

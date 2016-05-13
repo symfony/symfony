@@ -103,7 +103,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Several services implementing this type have been declared: "c1", "c2".
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". Multiple services exist for this interface (c1, c2, c3).
      */
     public function testTypeCollision()
     {
@@ -111,6 +111,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('c1', __NAMESPACE__.'\CollisionA');
         $container->register('c2', __NAMESPACE__.'\CollisionB');
+        $container->register('c3', __NAMESPACE__.'\CollisionB');
         $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
         $aDefinition->setAutowired(true);
 
@@ -120,7 +121,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" for the service "a". Several services implementing this type have been declared: "a1", "a2".
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\Foo" for the service "a". Multiple services exist for this class (a1, a2).
      */
     public function testTypeNotGuessable()
     {
@@ -137,7 +138,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\A" for the service "a". Several services implementing this type have been declared: "a1", "a2".
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\A" for the service "a". Multiple services exist for this class (a1, a2).
      */
     public function testTypeNotGuessableWithSubclass()
     {
@@ -146,6 +147,21 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $container->register('a1', __NAMESPACE__.'\B');
         $container->register('a2', __NAMESPACE__.'\B');
         $aDefinition = $container->register('a', __NAMESPACE__.'\NotGuessableArgumentForSubclass');
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". No services were found matching this interface and it cannot be auto-registered.
+     */
+    public function testTypeNotGuessableNoServicesFound()
+    {
+        $container = new ContainerBuilder();
+
+        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -205,21 +221,6 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
         $lilleDefinition = $container->getDefinition('autowired.symfony\component\dependencyinjection\tests\compiler\lille');
         $this->assertEquals(__NAMESPACE__.'\Lille', $lilleDefinition->getClass());
-    }
-
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "a". This type cannot be instantiated automatically and no service implementing this type is declared.
-     */
-    public function testCreateNonInstanciable()
-    {
-        $container = new ContainerBuilder();
-
-        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
-        $aDefinition->setAutowired(true);
-
-        $pass = new AutowirePass();
-        $pass->process($container);
     }
 
     public function testResolveParameter()

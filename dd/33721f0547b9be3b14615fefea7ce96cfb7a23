@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-14T05:21:23Z
+
+I do not think that we can merge this as someone might already rely on the class being present in their own code.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-28T10:58:18Z
+
+Do we really need to keep BC here? This is a Bootstrap theme and the class does not exist.
+
+---------------------------------------------------------------------------
+
+by Toelath at 2016-05-01T10:36:02Z
+
+This class does not exist in Bootstrap 3. More, this causes problems to display because this is not the default use of framework. The answers are either the deletion of the class in HTML or add CSS to correct buttons display.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-01T10:39:15Z
+
+👍 for merge

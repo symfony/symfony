@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by issei-m at 2016-05-12T07:18:19Z
+
+ping @alekitto @webmozart
+
+---------------------------------------------------------------------------
+
+by alekitto at 2016-05-12T08:52:09Z
+
+Yes, you're right, elements are overwritten in the `$children` array, but it was used to avoid to evaluate forms that surely are not a match, removing it will affect performances on complex forms.
+Passing `$use_keys = false` to `iterator_to_array` should be sufficient.
+
+However, the fix was originally submitted to the 2.3 branch, probably that branch is affected from this bug too...
+
+---------------------------------------------------------------------------
+
+by issei-m at 2016-05-12T10:17:15Z
+
+@alekitto
+> $use_keys = false to iterator_to_array
+
+Great! It's exactly what I want. I will fix soon.
+
+> 2.3 branch
+
+Indeed. I'm also gonna fix target branch.
+
+---------------------------------------------------------------------------
+
+by issei-m at 2016-05-12T10:46:31Z
+
+@alekitto Updated. But cf520b5 cannot be merged into 2.3 as it is because it's using `iterator_to_array` for Form::getErrors().
+So I'm gonna open the another PR for 2.3.
+
+---------------------------------------------------------------------------
+
+by issei-m at 2016-05-12T10:48:47Z
+
+For 2.3: https://github.com/symfony/symfony/pull/18761

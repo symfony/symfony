@@ -32,6 +32,30 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class YamlFileLoader extends FileLoader
 {
+    private static $keywords = array(
+        'alias' => 'alias',
+        'parent' => 'parent',
+        'class' => 'class',
+        'shared' => 'shared',
+        'synthetic' => 'synthetic',
+        'lazy' => 'lazy',
+        'public' => 'public',
+        'abstract' => 'abstract',
+        'deprecated' => 'deprecated',
+        'factory' => 'factory',
+        'file' => 'file',
+        'arguments' => 'arguments',
+        'properties' => 'properties',
+        'configurator' => 'configurator',
+        'calls' => 'calls',
+        'tags' => 'tags',
+        'decorates' => 'decorates',
+        'decoration_inner_name' => 'decoration_inner_name',
+        'decoration_priority' => 'decoration_priority',
+        'autowire' => 'autowire',
+        'autowiring_types' => 'autowiring_types',
+    );
+
     private $yamlParser;
 
     /**
@@ -148,9 +172,17 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('A service definition must be an array or a string starting with "@" but %s found for service "%s" in %s. Check your YAML syntax.', gettype($service), $id, $file));
         }
 
+        static::checkDefinition($id, $service, $file);
+
         if (isset($service['alias'])) {
             $public = !array_key_exists('public', $service) || (bool) $service['public'];
             $this->container->setAlias($id, new Alias($service['alias'], $public));
+
+            foreach ($service as $key => $value) {
+                if (!in_array($key, array('alias', 'public'))) {
+                    @trigger_error(sprintf('The configuration key "%s" is unsupported for alias definition "%s" in "%s". Allowed configuration keys are "alias" and "public". The YamlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $key, $id, $file), E_USER_DEPRECATED);
+                }
+            }
 
             return;
         }
@@ -165,17 +197,12 @@ class YamlFileLoader extends FileLoader
             $definition->setClass($service['class']);
         }
 
-        if (isset($service['scope'])) {
-            $definition->setScope($service['scope']);
+        if (isset($service['shared'])) {
+            $definition->setShared($service['shared']);
         }
 
         if (isset($service['synthetic'])) {
             $definition->setSynthetic($service['synthetic']);
-        }
-
-        if (isset($service['synchronized'])) {
-            @trigger_error(sprintf('The "synchronized" key of service "%s" in file "%s" is deprecated since version 2.7 and will be removed in 3.0.', $id, $file), E_USER_DEPRECATED);
-            $definition->setSynchronized($service['synchronized'], 'request' !== $id);
         }
 
         if (isset($service['lazy'])) {
@@ -190,6 +217,10 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
+        if (array_key_exists('deprecated', $service)) {
+            $definition->setDeprecated(true, $service['deprecated']);
+        }
+
         if (isset($service['factory'])) {
             if (is_string($service['factory'])) {
                 if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {
@@ -201,21 +232,6 @@ class YamlFileLoader extends FileLoader
             } else {
                 $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
             }
-        }
-
-        if (isset($service['factory_class'])) {
-            @trigger_error(sprintf('The "factory_class" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryClass($service['factory_class']);
-        }
-
-        if (isset($service['factory_method'])) {
-            @trigger_error(sprintf('The "factory_method" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryMethod($service['factory_method']);
-        }
-
-        if (isset($service['factory_service'])) {
-            @trigger_error(sprintf('The "factory_service" key of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use "factory" instead.', $id, $file), E_USER_DEPRECATED);
-            $definition->setFactoryService($service['factory_service']);
         }
 
         if (isset($service['file'])) {
@@ -293,7 +309,30 @@ class YamlFileLoader extends FileLoader
             }
 
             $renameId = isset($service['decoration_inner_name']) ? $service['decoration_inner_name'] : null;
-            $definition->setDecoratedService($service['decorates'], $renameId);
+            $priority = isset($service['decoration_priority']) ? $service['decoration_priority'] : 0;
+            $definition->setDecoratedService($service['decorates'], $renameId, $priority);
+        }
+
+        if (isset($service['autowire'])) {
+            $definition->setAutowired($service['autowire']);
+        }
+
+        if (isset($service['autowiring_types'])) {
+            if (is_string($service['autowiring_types'])) {
+                $definition->addAutowiringType($service['autowiring_types']);
+            } else {
+                if (!is_array($service['autowiring_types'])) {
+                    throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be a string or an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                }
+
+                foreach ($service['autowiring_types'] as $autowiringType) {
+                    if (!is_string($autowiringType)) {
+                        throw new InvalidArgumentException(sprintf('A "autowiring_types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                    }
+
+                    $definition->addAutowiringType($autowiringType);
+                }
+            }
         }
 
         $this->container->setDefinition($id, $definition);
@@ -432,6 +471,26 @@ class YamlFileLoader extends FileLoader
             }
 
             $this->container->loadFromExtension($namespace, $values);
+        }
+    }
+
+    /**
+     * Checks the keywords used to define a service.
+     *
+     * @param string $id         The service name
+     * @param array  $definition The service definition to check
+     * @param string $file       The loaded YAML file
+     */
+    private static function checkDefinition($id, array $definition, $file)
+    {
+        foreach ($definition as $key => $value) {
+            if (!isset(static::$keywords[$key])) {
+                @trigger_error(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s". The YamlFileLoader object will raise an exception instead in Symfony 4.0 when detecting an unsupported service configuration key.', $key, $id, $file, implode('", "', static::$keywords)), E_USER_DEPRECATED);
+                // @deprecated Uncomment the following statement in Symfony 4.0
+                // and also update the corresponding unit test to make it expect
+                // an InvalidArgumentException exception.
+                //throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', static::$keywords)));
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ class Cookie
     protected $path;
     protected $secure;
     protected $httpOnly;
+    private $raw;
 
     /**
      * Constructor.
@@ -36,10 +37,11 @@ class Cookie
      * @param string                                  $domain   The domain that the cookie is available to
      * @param bool                                    $secure   Whether the cookie should only be transmitted over a secure HTTPS connection from the client
      * @param bool                                    $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
+     * @param bool                                    $raw      Whether the cookie value should be sent with no url encoding
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true)
+    public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true, $raw = false)
     {
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
@@ -51,7 +53,7 @@ class Cookie
         }
 
         // convert expiration time to a Unix timestamp
-        if ($expire instanceof \DateTime || $expire instanceof \DateTimeInterface) {
+        if ($expire instanceof \DateTimeInterface) {
             $expire = $expire->format('U');
         } elseif (!is_numeric($expire)) {
             $expire = strtotime($expire);
@@ -68,6 +70,7 @@ class Cookie
         $this->path = empty($path) ? '/' : $path;
         $this->secure = (bool) $secure;
         $this->httpOnly = (bool) $httpOnly;
+        $this->raw = (bool) $raw;
     }
 
     /**
@@ -186,5 +189,15 @@ class Cookie
     public function isCleared()
     {
         return $this->expire < time();
+    }
+
+    /**
+     * Checks if the cookie value should be sent with no url encoding.
+     *
+     * @return bool
+     */
+    public function isRaw()
+    {
+        return $this->raw;
     }
 }

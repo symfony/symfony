@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper;
 
+use ProxyManager\ProxyGenerator\LazyLoading\MethodGenerator\StaticProxyConstructor;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -49,8 +50,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
      */
     public function testDumpContainerWithProxyServiceWillShareProxies()
     {
-        // detecting ProxyManager v2
-        if (class_exists('ProxyManager\ProxyGenerator\LazyLoading\MethodGenerator\StaticProxyConstructor')) {
+        if (class_exists(StaticProxyConstructor::class)) { // detecting ProxyManager v2
             require_once __DIR__.'/../Fixtures/php/lazy_service_with_hints.php';
         } else {
             require_once __DIR__.'/../Fixtures/php/lazy_service.php';

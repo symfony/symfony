@@ -29,6 +29,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $addIfNotSet = false;
     protected $performDeepMerging = true;
     protected $ignoreExtraKeys = false;
+    protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
 
     public function setNormalizeKeys($normalizeKeys)
@@ -143,10 +144,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      * Whether extra keys should just be ignore without an exception.
      *
      * @param bool $boolean To allow extra keys
+     * @param bool $remove  To remove extra keys
      */
-    public function setIgnoreExtraKeys($boolean)
+    public function setIgnoreExtraKeys($boolean, $remove = true)
     {
         $this->ignoreExtraKeys = (bool) $boolean;
+        $this->removeExtraKeys = $this->ignoreExtraKeys && $remove;
     }
 
     /**
@@ -303,6 +306,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             if (isset($this->children[$name])) {
                 $normalized[$name] = $this->children[$name]->normalize($val);
                 unset($value[$name]);
+            } elseif (!$this->removeExtraKeys) {
+                $normalized[$name] = $val;
             }
         }
 
@@ -327,9 +332,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function remapXml($value)
     {
-        foreach ($this->xmlRemappings as $transformation) {
-            list($singular, $plural) = $transformation;
-
+        foreach ($this->xmlRemappings as list($singular, $plural)) {
             if (!isset($value[$singular])) {
                 continue;
             }

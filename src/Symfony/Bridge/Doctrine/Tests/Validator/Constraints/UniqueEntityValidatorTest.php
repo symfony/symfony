@@ -22,7 +22,6 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
-use Symfony\Component\Validator\Validation;
 use Doctrine\ORM\Tools\SchemaTool;
 
 /**
@@ -46,11 +45,6 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
      * @var ObjectRepository
      */
     protected $repository;
-
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
 
     protected function setUp()
     {
@@ -166,6 +160,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
+            ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
             ->assertRaised();
     }
@@ -189,6 +184,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.bar')
+            ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
             ->assertRaised();
     }
@@ -240,6 +236,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
+            ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
             ->assertRaised();
     }
@@ -271,6 +268,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.name2')
+            ->setParameter('{{ value }}', 'Bar')
             ->setInvalidValue('Bar')
             ->assertRaised();
     }
@@ -403,6 +401,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
+            ->setParameter('{{ value }}', $entity1)
             ->setInvalidValue($entity1)
             ->assertRaised();
     }

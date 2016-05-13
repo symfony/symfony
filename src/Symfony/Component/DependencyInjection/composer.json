@@ -16,15 +16,12 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.1",
-        "symfony/config": "~2.2",
-        "symfony/expression-language": "~2.6"
-    },
-    "conflict": {
-        "symfony/expression-language": "<2.6"
+        "symfony/yaml": "~2.8|~3.0",
+        "symfony/config": "~2.8|~3.0",
+        "symfony/expression-language": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/yaml": "",
@@ -41,7 +38,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.2-dev"
         }
     }
 }

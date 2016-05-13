@@ -11,14 +11,17 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use Symfony\Component\VarDumper\Test\VarDumperTestCase;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo;
 use Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ReflectionCasterTest extends VarDumperTestCase
+class ReflectionCasterTest extends \PHPUnit_Framework_TestCase
 {
+    use VarDumperTestTrait;
+
     public function testReflectionCaster()
     {
         $var = new \ReflectionClass('ReflectionClass');
@@ -40,7 +43,6 @@ ReflectionClass {
 %A    +name: "name"
       +class: "ReflectionClass"
 %A    modifiers: "public"
-      extra: null
     }
 %A]
   methods: array:%d [
@@ -48,14 +50,33 @@ ReflectionClass {
     "export" => ReflectionMethod {
       +name: "export"
       +class: "ReflectionClass"
-%A    parameters: array:2 [
-        "$%s" => ReflectionParameter {
+%A    parameters: {
+        $%s: ReflectionParameter {
 %A         position: 0
-%A      }
-      ]
-      modifiers: "public static"
-    }
 %A
+}
+EOTXT
+            , $var
+        );
+    }
+
+    public function testClosureCaster()
+    {
+        $a = $b = 123;
+        $var = function ($x) use ($a, &$b) {};
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+Closure {
+%Aparameters: {
+    \$x: {}
+  }
+  use: {
+    \$a: 123
+    \$b: & 123
+  }
+  file: "%sReflectionCasterTest.php"
+  line: "66 to 66"
 }
 EOTXT
             , $var
@@ -119,6 +140,87 @@ Closure {
 EOTXT
             , $f
         );
+    }
+
+    /**
+     * @requires PHP 7.0
+     */
+    public function testGenerator()
+    {
+        $g = new GeneratorDemo();
+        $g = $g->baz();
+        $r = new \ReflectionGenerator($g);
+
+        $xDump = <<<'EODUMP'
+Generator {
+  this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
+  executing: {
+    Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz(): {
+      %sGeneratorDemo.php:14: """
+        {\n
+            yield from bar();\n
+        }\n
+        """
+    }
+  }
+}
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, $g);
+
+        foreach ($g as $v) {
+            break;
+        }
+
+        $xDump = <<<'EODUMP'
+array:2 [
+  0 => ReflectionGenerator {
+    this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
+    trace: {
+      3. Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo() ==> yield(): {
+        src: {
+          %sGeneratorDemo.php:9: """
+            {\n
+                yield 1;\n
+            }\n
+            """
+        }
+      }
+      2. Symfony\Component\VarDumper\Tests\Fixtures\bar() ==> Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo(): {
+        src: {
+          %sGeneratorDemo.php:20: """
+            {\n
+                yield from GeneratorDemo::foo();\n
+            }\n
+            """
+        }
+      }
+      1. Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() ==> Symfony\Component\VarDumper\Tests\Fixtures\bar(): {
+        src: {
+          %sGeneratorDemo.php:14: """
+            {\n
+                yield from bar();\n
+            }\n
+            """
+        }
+      }
+    }
+  }
+  1 => Generator {
+    executing: {
+      Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo(): {
+        %sGeneratorDemo.php:10: """
+                  yield 1;\n
+              }\n
+          \n
+          """
+      }
+    }
+  }
+]
+EODUMP;
+
+        $this->assertDumpMatchesFormat($xDump, array($r, $r->getExecutingGenerator()));
     }
 }
 

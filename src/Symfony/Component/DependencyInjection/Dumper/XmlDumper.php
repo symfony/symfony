@@ -117,17 +117,8 @@ class XmlDumper extends Dumper
 
             $service->setAttribute('class', $class);
         }
-        if ($definition->getFactoryMethod(false)) {
-            $service->setAttribute('factory-method', $definition->getFactoryMethod(false));
-        }
-        if ($definition->getFactoryClass(false)) {
-            $service->setAttribute('factory-class', $definition->getFactoryClass(false));
-        }
-        if ($definition->getFactoryService(false)) {
-            $service->setAttribute('factory-service', $definition->getFactoryService(false));
-        }
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $service->setAttribute('scope', $scope);
+        if (!$definition->isShared()) {
+            $service->setAttribute('shared', 'false');
         }
         if (!$definition->isPublic()) {
             $service->setAttribute('public', 'false');
@@ -135,17 +126,17 @@ class XmlDumper extends Dumper
         if ($definition->isSynthetic()) {
             $service->setAttribute('synthetic', 'true');
         }
-        if ($definition->isSynchronized(false)) {
-            $service->setAttribute('synchronized', 'true');
-        }
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');
         }
         if (null !== $decorated = $definition->getDecoratedService()) {
-            list($decorated, $renamedId) = $decorated;
+            list($decorated, $renamedId, $priority) = $decorated;
             $service->setAttribute('decorates', $decorated);
             if (null !== $renamedId) {
                 $service->setAttribute('decoration-inner-name', $renamedId);
+            }
+            if (0 !== $priority) {
+                $service->setAttribute('decoration-priority', $priority);
             }
         }
 
@@ -189,6 +180,24 @@ class XmlDumper extends Dumper
                 $factory->setAttribute('function', $callable);
             }
             $service->appendChild($factory);
+        }
+
+        if ($definition->isDeprecated()) {
+            $deprecated = $this->document->createElement('deprecated');
+            $deprecated->appendChild($this->document->createTextNode($definition->getDeprecationMessage('%service_id%')));
+
+            $service->appendChild($deprecated);
+        }
+
+        if ($definition->isAutowired()) {
+            $service->setAttribute('autowire', 'true');
+        }
+
+        foreach ($definition->getAutowiringTypes() as $autowiringTypeValue) {
+            $autowiringType = $this->document->createElement('autowiring-type');
+            $autowiringType->appendChild($this->document->createTextNode($autowiringTypeValue));
+
+            $service->appendChild($autowiringType);
         }
 
         if ($callable = $definition->getConfigurator()) {
@@ -282,9 +291,6 @@ class XmlDumper extends Dumper
                     $element->setAttribute('on-invalid', 'null');
                 } elseif ($behaviour == ContainerInterface::IGNORE_ON_INVALID_REFERENCE) {
                     $element->setAttribute('on-invalid', 'ignore');
-                }
-                if (!$value->isStrict()) {
-                    $element->setAttribute('strict', 'false');
                 }
             } elseif ($value instanceof Definition) {
                 $element->setAttribute('type', 'service');

@@ -24,20 +24,12 @@ class TimezoneType extends AbstractType
     private static $timezones;
 
     /**
-     * Stores the available timezone choices.
-     *
-     * @var array
-     */
-    private static $flippedTimezones;
-
-    /**
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'choices' => self::getFlippedTimezones(),
-            'choices_as_values' => true,
+            'choices' => self::getTimezones(),
             'choice_translation_domain' => false,
         ));
     }
@@ -47,13 +39,13 @@ class TimezoneType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return __NAMESPACE__.'\ChoiceType';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'timezone';
     }
@@ -68,43 +60,7 @@ class TimezoneType extends AbstractType
      *
      * @return array The timezone choices
      */
-    public static function getTimezones()
-    {
-        if (null === static::$timezones) {
-            static::$timezones = array();
-
-            foreach (\DateTimeZone::listIdentifiers() as $timezone) {
-                $parts = explode('/', $timezone);
-
-                if (count($parts) > 2) {
-                    $region = $parts[0];
-                    $name = $parts[1].' - '.$parts[2];
-                } elseif (count($parts) > 1) {
-                    $region = $parts[0];
-                    $name = $parts[1];
-                } else {
-                    $region = 'Other';
-                    $name = $parts[0];
-                }
-
-                static::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
-            }
-        }
-
-        return static::$timezones;
-    }
-
-    /**
-     * Returns the timezone choices.
-     *
-     * The choices are generated from the ICU function
-     * \DateTimeZone::listIdentifiers(). They are cached during a single request,
-     * so multiple timezone fields on the same page don't lead to unnecessary
-     * overhead.
-     *
-     * @return array The timezone choices
-     */
-    private static function getFlippedTimezones()
+    private static function getTimezones()
     {
         if (null === self::$timezones) {
             self::$timezones = array();

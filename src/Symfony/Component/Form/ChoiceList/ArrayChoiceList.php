@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form\ChoiceList;
 
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
 /**
  * A list of choices with arbitrary data types.
  *
@@ -64,12 +62,8 @@ class ArrayChoiceList implements ChoiceListInterface
      *                                    incrementing integers are used as
      *                                    values
      */
-    public function __construct($choices, $value = null)
+    public function __construct($choices, callable $value = null)
     {
-        if (null !== $value && !is_callable($value)) {
-            throw new UnexpectedTypeException($value, 'null or callable');
-        }
-
         if ($choices instanceof \Traversable) {
             $choices = iterator_to_array($choices);
         }

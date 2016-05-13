@@ -26,7 +26,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\DependencyInjection\Scope;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -57,6 +56,32 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         } catch (ServiceNotFoundException $e) {
             $this->assertEquals('You have requested a non-existent service "baz".', $e->getMessage(), '->getDefinition() throws a ServiceNotFoundException if the service definition does not exist');
         }
+    }
+
+    public function testCreateDeprecatedService()
+    {
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED !== $type) {
+                restore_error_handler();
+
+                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+            }
+
+            $deprecations[] = $msg;
+        });
+
+        $definition = new Definition('stdClass');
+        $definition->setDeprecated(true);
+
+        $builder = new ContainerBuilder();
+        $builder->setDefinition('deprecated_foo', $definition);
+        $builder->get('deprecated_foo');
+
+        restore_error_handler();
+
+        $this->assertCount(1, $deprecations);
+        $this->assertContains('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', $deprecations[0]);
     }
 
     public function testRegister()
@@ -104,8 +129,15 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('Circular reference detected for service "baz", path: "baz".', $e->getMessage(), '->get() throws a LogicException if the service has a circular reference to itself');
         }
 
-        $builder->register('foobar', 'stdClass')->setScope('container');
         $this->assertTrue($builder->get('bar') === $builder->get('bar'), '->get() always returns the same instance if the service is shared');
+    }
+
+    public function testNonSharedServicesReturnsDifferentInstances()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass')->setShared(false);
+
+        $this->assertNotSame($builder->get('bar'), $builder->get('bar'));
     }
 
     /**
@@ -125,21 +157,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         // we must also have the same RuntimeException here
         $builder->get('foo');
-    }
-
-    public function testGetReturnsNullOnInactiveScope()
-    {
-        $builder = new ContainerBuilder();
-        $builder->register('foo', 'stdClass')->setScope('request');
-
-        $this->assertNull($builder->get('foo', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-    }
-
-    public function testGetReturnsNullOnInactiveScopeWhenServiceIsCreatedByAMethod()
-    {
-        $builder = new ProjectContainer();
-
-        $this->assertNull($builder->get('foobaz', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 
     public function testGetServiceIds()
@@ -294,35 +311,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($builder->get('baz')->called, '->createService() uses another service as factory');
     }
 
-    public function testLegacyCreateServiceFactory()
-    {
-        $builder = new ContainerBuilder();
-        $builder->register('bar', 'Bar\FooClass');
-        $builder
-            ->register('foo1', 'Bar\FooClass')
-            ->setFactoryClass('%foo_class%')
-            ->setFactoryMethod('getInstance')
-            ->addArgument(array('foo' => '%value%', '%value%' => 'foo', new Reference('bar')))
-        ;
-        $builder->setParameter('value', 'bar');
-        $builder->setParameter('foo_class', 'Bar\FooClass');
-        $this->assertTrue($builder->get('foo1')->called, '->createService() calls the factory method to create the service instance');
-        $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the factory method');
-    }
-
-    public function testLegacyCreateServiceFactoryService()
-    {
-        $builder = new ContainerBuilder();
-        $builder->register('foo_service', 'Bar\FooClass');
-        $builder
-            ->register('foo', 'Bar\FooClass')
-            ->setFactoryService('%foo_service%')
-            ->setFactoryMethod('getInstance')
-        ;
-        $builder->setParameter('foo_service', 'foo_service');
-        $this->assertTrue($builder->get('foo')->called, '->createService() calls the factory method to create the service instance');
-    }
-
     public function testCreateServiceMethodCalls()
     {
         $builder = new ContainerBuilder();
@@ -475,6 +463,18 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             ),
         ), '->findTaggedServiceIds() returns an array of service ids and its tag attributes');
         $this->assertEquals(array(), $builder->findTaggedServiceIds('foobar'), '->findTaggedServiceIds() returns an empty array if there is annotated services');
+    }
+
+    public function testFindUnusedTags()
+    {
+        $builder = new ContainerBuilder();
+        $builder
+            ->register('foo', 'Bar\FooClass')
+            ->addTag('kernel.event_listener', array('foo' => 'foo'))
+            ->addTag('kenrel.event_listener', array('bar' => 'bar'))
+        ;
+        $builder->findTaggedServiceIds('kernel.event_listener');
+        $this->assertEquals(array('kenrel.event_listener'), $builder->findUnusedTags(), '->findUnusedTags() returns an array with unused tags');
     }
 
     public function testFindDefinition()
@@ -659,58 +659,6 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group legacy
-     */
-    public function testLegacySetOnSynchronizedService()
-    {
-        $container = new ContainerBuilder();
-        $container->register('baz', 'BazClass')
-            ->setSynchronized(true)
-        ;
-        $container->register('bar', 'BarClass')
-            ->addMethodCall('setBaz', array(new Reference('baz')))
-        ;
-
-        $container->set('baz', $baz = new \BazClass());
-        $this->assertSame($baz, $container->get('bar')->getBaz());
-
-        $container->set('baz', $baz = new \BazClass());
-        $this->assertSame($baz, $container->get('bar')->getBaz());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySynchronizedServiceWithScopes()
-    {
-        $container = new ContainerBuilder();
-        $container->addScope(new Scope('foo'));
-        $container->register('baz', 'BazClass')
-            ->setSynthetic(true)
-            ->setSynchronized(true)
-            ->setScope('foo')
-        ;
-        $container->register('bar', 'BarClass')
-            ->addMethodCall('setBaz', array(new Reference('baz', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)))
-        ;
-        $container->compile();
-
-        $container->enterScope('foo');
-        $container->set('baz', $outerBaz = new \BazClass(), 'foo');
-        $this->assertSame($outerBaz, $container->get('bar')->getBaz());
-
-        $container->enterScope('foo');
-        $container->set('baz', $innerBaz = new \BazClass(), 'foo');
-        $this->assertSame($innerBaz, $container->get('bar')->getBaz());
-        $container->leaveScope('foo');
-
-        $this->assertNotSame($innerBaz, $container->get('bar')->getBaz());
-        $this->assertSame($outerBaz, $container->get('bar')->getBaz());
-
-        $container->leaveScope('foo');
-    }
-
-    /**
      * @expectedException \BadMethodCallException
      */
     public function testThrowsExceptionWhenSetDefinitionOnAFrozenContainer()
@@ -786,16 +734,32 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($classInList);
     }
+
+    public function testAutowiring()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', __NAMESPACE__.'\A');
+        $bDefinition = $container->register('b', __NAMESPACE__.'\B');
+        $bDefinition->setAutowired(true);
+
+        $container->compile();
+
+        $this->assertEquals('a', (string) $container->getDefinition('b')->getArgument(0));
+    }
 }
 
 class FooClass
 {
 }
 
-class ProjectContainer extends ContainerBuilder
+class A
 {
-    public function getFoobazService()
+}
+
+class B
+{
+    public function __construct(A $a)
     {
-        throw new InactiveScopeException('foo', 'request');
     }
 }

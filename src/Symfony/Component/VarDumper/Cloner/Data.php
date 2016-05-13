@@ -83,29 +83,6 @@ class Data
     }
 
     /**
-     * Returns a depth limited clone of $this.
-     *
-     * @param int  $maxDepth         The max dumped depth level.
-     * @param int  $maxItemsPerDepth The max number of items dumped per depth level.
-     * @param bool $useRefHandles    False to hide ref. handles.
-     *
-     * @return self A depth limited clone of $this.
-     *
-     * @deprecated since Symfony 2.7, to be removed in 3.0. Use withMaxDepth, withMaxItemsPerDepth or withRefHandles instead.
-     */
-    public function getLimitedClone($maxDepth, $maxItemsPerDepth, $useRefHandles = true)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0. Use withMaxDepth, withMaxItemsPerDepth or withRefHandles methods instead.', E_USER_DEPRECATED);
-
-        $data = clone $this;
-        $data->maxDepth = (int) $maxDepth;
-        $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
-        $data->useRefHandles = $useRefHandles ? -1 : 0;
-
-        return $data;
-    }
-
-    /**
      * Dumps data with a DumperInterface dumper.
      */
     public function dump(DumperInterface $dumper)

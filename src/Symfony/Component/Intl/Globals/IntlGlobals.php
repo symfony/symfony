@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\Globals;
  * Provides fake static versions of the global functions in the intl extension.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 abstract class IntlGlobals
 {

@@ -13,18 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\IsbnValidator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @see https://en.wikipedia.org/wiki/Isbn
  */
 class IsbnValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new IsbnValidator();

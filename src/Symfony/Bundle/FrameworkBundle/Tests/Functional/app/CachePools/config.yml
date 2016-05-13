@@ -1,0 +1,8 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    cache:
+        pools:
+            cache.test:
+                public: true

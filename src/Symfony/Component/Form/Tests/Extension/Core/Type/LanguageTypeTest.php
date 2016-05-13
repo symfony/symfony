@@ -26,7 +26,7 @@ class LanguageTypeTest extends TestCase
 
     public function testCountriesAreSelectable()
     {
-        $form = $this->factory->create('language');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\LanguageType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 
@@ -39,7 +39,7 @@ class LanguageTypeTest extends TestCase
 
     public function testMultipleLanguagesIsNotIncluded()
     {
-        $form = $this->factory->create('language', 'language');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\LanguageType', 'Symfony\Component\Form\Extension\Core\Type\LanguageType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

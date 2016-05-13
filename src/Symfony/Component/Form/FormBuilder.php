@@ -99,7 +99,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (null === $type && null === $this->getDataClass()) {
-            $type = 'text';
+            $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
         }
 
         if (null !== $type) {

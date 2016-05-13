@@ -48,9 +48,9 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function __construct($output = null, $charset = null)
+    public function __construct($output = null, $charset = null, $flags = 0)
     {
-        AbstractDumper::__construct($output, $charset);
+        AbstractDumper::__construct($output, $charset, $flags);
         $this->dumpId = 'sf-dump-'.mt_rand();
     }
 
@@ -442,30 +442,7 @@ EOHTML;
         }
         $this->lastDepth = $depth;
 
-        // Replaces non-ASCII UTF-8 chars by numeric HTML entities
-        $this->line = preg_replace_callback(
-            '/[\x80-\xFF]+/',
-            function ($m) {
-                $m = unpack('C*', $m[0]);
-                $i = 1;
-                $entities = '';
-
-                while (isset($m[$i])) {
-                    if (0xF0 <= $m[$i]) {
-                        $c = (($m[$i++] - 0xF0) << 18) + (($m[$i++] - 0x80) << 12) + (($m[$i++] - 0x80) << 6) + $m[$i++] - 0x80;
-                    } elseif (0xE0 <= $m[$i]) {
-                        $c = (($m[$i++] - 0xE0) << 12) + (($m[$i++] - 0x80) << 6) + $m[$i++]  - 0x80;
-                    } else {
-                        $c = (($m[$i++] - 0xC0) << 6) + $m[$i++] - 0x80;
-                    }
-
-                    $entities .= '&#'.$c.';';
-                }
-
-                return $entities;
-            },
-            $this->line
-        );
+        $this->line = mb_convert_encoding($this->line, 'HTML-ENTITIES', 'UTF-8');
 
         if (-1 === $depth) {
             AbstractDumper::dumpLine(0);

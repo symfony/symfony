@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Formatter;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
@@ -62,7 +64,7 @@ class OutputFormatterStyleStack
      *
      * @return OutputFormatterStyleInterface
      *
-     * @throws \InvalidArgumentException When style tags incorrectly nested
+     * @throws InvalidArgumentException When style tags incorrectly nested
      */
     public function pop(OutputFormatterStyleInterface $style = null)
     {
@@ -82,7 +84,7 @@ class OutputFormatterStyleStack
             }
         }
 
-        throw new \InvalidArgumentException('Incorrectly nested style tag found.');
+        throw new InvalidArgumentException('Incorrectly nested style tag found.');
     }
 
     /**

@@ -12,15 +12,10 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderAdapter;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfTokenManagerAdapter;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -55,14 +50,8 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     private $translationDomain;
 
-    public function __construct($defaultTokenManager, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
+    public function __construct(CsrfTokenManagerInterface $defaultTokenManager, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
     {
-        if ($defaultTokenManager instanceof CsrfProviderInterface) {
-            $defaultTokenManager = new CsrfProviderAdapter($defaultTokenManager);
-        } elseif (!$defaultTokenManager instanceof CsrfTokenManagerInterface) {
-            throw new UnexpectedTypeException($defaultTokenManager, 'CsrfProviderInterface or CsrfTokenManagerInterface');
-        }
-
         $this->defaultTokenManager = $defaultTokenManager;
         $this->defaultEnabled = $defaultEnabled;
         $this->defaultFieldName = $defaultFieldName;
@@ -108,7 +97,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: get_class($form->getConfig()->getType()->getInnerType()));
             $data = (string) $options['csrf_token_manager']->getToken($tokenId);
 
-            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'hidden', $data, array(
+            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'Symfony\Component\Form\Extension\Core\Type\HiddenType', $data, array(
                 'mapped' => false,
             ));
 
@@ -121,30 +110,12 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        // BC clause for the "intention" option
-        $csrfTokenId = function (Options $options) {
-            return $options['intention'];
-        };
-
-        // BC clause for the "csrf_provider" option
-        $csrfTokenManager = function (Options $options) {
-            if ($options['csrf_provider'] instanceof CsrfTokenManagerInterface) {
-                return $options['csrf_provider'];
-            }
-
-            return $options['csrf_provider'] instanceof CsrfTokenManagerAdapter
-                ? $options['csrf_provider']->getTokenManager(false)
-                : new CsrfProviderAdapter($options['csrf_provider']);
-        };
-
         $resolver->setDefaults(array(
             'csrf_protection' => $this->defaultEnabled,
             'csrf_field_name' => $this->defaultFieldName,
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
-            'csrf_token_manager' => $csrfTokenManager,
-            'csrf_token_id' => $csrfTokenId,
-            'csrf_provider' => $this->defaultTokenManager,
-            'intention' => null,
+            'csrf_token_manager' => $this->defaultTokenManager,
+            'csrf_token_id' => null,
         ));
     }
 
@@ -153,6 +124,6 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'form';
+        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
     }
 }

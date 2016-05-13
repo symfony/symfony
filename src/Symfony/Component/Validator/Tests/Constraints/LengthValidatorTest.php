@@ -13,15 +13,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LengthValidator;
-use Symfony\Component\Validator\Validation;
 
 class LengthValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new LengthValidator();
@@ -87,9 +81,6 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function getOneCharset()
     {
         return array(
@@ -240,6 +231,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
                 ->setParameter('{{ value }}', '"'.$value.'"')
                 ->setParameter('{{ charset }}', $charset)
                 ->setInvalidValue($value)
+                ->setCode(Length::INVALID_CHARACTERS_ERROR)
                 ->assertRaised();
         }
     }

@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Input;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\InvalidOptionException;
+
 /**
  * ArrayInput represents an input provided as an array.
  *
@@ -59,17 +62,22 @@ class ArrayInput extends Input
      * This method is to be used to introspect the input parameters
      * before they have been validated. It must be used carefully.
      *
-     * @param string|array $values The values to look for in the raw parameters (can be an array)
+     * @param string|array $values     The values to look for in the raw parameters (can be an array)
+     * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
      * @return bool true if the value is contained in the raw parameters
      */
-    public function hasParameterOption($values)
+    public function hasParameterOption($values, $onlyParams = false)
     {
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
             if (!is_int($k)) {
                 $v = $k;
+            }
+
+            if ($onlyParams && $v === '--') {
+                return false;
             }
 
             if (in_array($v, $values)) {
@@ -86,16 +94,21 @@ class ArrayInput extends Input
      * This method is to be used to introspect the input parameters
      * before they have been validated. It must be used carefully.
      *
-     * @param string|array $values  The value(s) to look for in the raw parameters (can be an array)
-     * @param mixed        $default The default value to return if no result is found
+     * @param string|array $values     The value(s) to look for in the raw parameters (can be an array)
+     * @param mixed        $default    The default value to return if no result is found
+     * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
      * @return mixed The option value
      */
-    public function getParameterOption($values, $default = false)
+    public function getParameterOption($values, $default = false, $onlyParams = false)
     {
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
+            if ($onlyParams && ($k === '--' || (is_int($k) && $v === '--'))) {
+                return false;
+            }
+
             if (is_int($k)) {
                 if (in_array($v, $values)) {
                     return true;
@@ -133,6 +146,9 @@ class ArrayInput extends Input
     protected function parse()
     {
         foreach ($this->parameters as $key => $value) {
+            if ($key === '--') {
+                return;
+            }
             if (0 === strpos($key, '--')) {
                 $this->addLongOption(substr($key, 2), $value);
             } elseif ('-' === $key[0]) {
@@ -149,12 +165,12 @@ class ArrayInput extends Input
      * @param string $shortcut The short option key
      * @param mixed  $value    The value for the option
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
+     * @throws InvalidOptionException When option given doesn't exist
      */
     private function addShortOption($shortcut, $value)
     {
         if (!$this->definition->hasShortcut($shortcut)) {
-            throw new \InvalidArgumentException(sprintf('The "-%s" option does not exist.', $shortcut));
+            throw new InvalidOptionException(sprintf('The "-%s" option does not exist.', $shortcut));
         }
 
         $this->addLongOption($this->definition->getOptionForShortcut($shortcut)->getName(), $value);
@@ -166,20 +182,20 @@ class ArrayInput extends Input
      * @param string $name  The long option key
      * @param mixed  $value The value for the option
      *
-     * @throws \InvalidArgumentException When option given doesn't exist
-     * @throws \InvalidArgumentException When a required value is missing
+     * @throws InvalidOptionException When option given doesn't exist
+     * @throws InvalidOptionException When a required value is missing
      */
     private function addLongOption($name, $value)
     {
         if (!$this->definition->hasOption($name)) {
-            throw new \InvalidArgumentException(sprintf('The "--%s" option does not exist.', $name));
+            throw new InvalidOptionException(sprintf('The "--%s" option does not exist.', $name));
         }
 
         $option = $this->definition->getOption($name);
 
         if (null === $value) {
             if ($option->isValueRequired()) {
-                throw new \InvalidArgumentException(sprintf('The "--%s" option requires a value.', $name));
+                throw new InvalidOptionException(sprintf('The "--%s" option requires a value.', $name));
             }
 
             $value = $option->isValueOptional() ? $option->getDefault() : true;
@@ -194,12 +210,12 @@ class ArrayInput extends Input
      * @param string $name  The argument name
      * @param mixed  $value The value for the argument
      *
-     * @throws \InvalidArgumentException When argument given doesn't exist
+     * @throws InvalidArgumentException When argument given doesn't exist
      */
     private function addArgument($name, $value)
     {
         if (!$this->definition->hasArgument($name)) {
-            throw new \InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
+            throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
         }
 
         $this->arguments[$name] = $value;

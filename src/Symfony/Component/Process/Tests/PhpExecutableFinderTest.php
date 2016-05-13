@@ -19,31 +19,25 @@ use Symfony\Component\Process\PhpExecutableFinder;
 class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * tests find() with the env var PHP_PATH.
+     * tests find() with the constant PHP_BINARY.
      */
-    public function testFindWithPhpPath()
+    public function testFind()
     {
-        if (defined('PHP_BINARY')) {
-            $this->markTestSkipped('The PHP binary is easily available as of PHP 5.4');
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('Should not be executed in HHVM context.');
         }
 
         $f = new PhpExecutableFinder();
 
-        $current = $f->find();
+        $current = PHP_BINARY;
+        $args = 'phpdbg' === PHP_SAPI ? ' -qrr' : '';
 
-        //not executable PHP_PATH
-        putenv('PHP_PATH=/not/executable/php');
-        $this->assertFalse($f->find(), '::find() returns false for not executable PHP');
-        $this->assertFalse($f->find(false), '::find() returns false for not executable PHP');
-
-        //executable PHP_PATH
-        putenv('PHP_PATH='.$current);
-        $this->assertEquals($f->find(), $current, '::find() returns the executable PHP');
-        $this->assertEquals($f->find(false), $current, '::find() returns the executable PHP');
+        $this->assertEquals($current.$args, $f->find(), '::find() returns the executable PHP');
+        $this->assertEquals($current, $f->find(false), '::find() returns the executable PHP');
     }
 
     /**
-     * tests find() with the env var PHP_PATH.
+     * tests find() with the env var / constant PHP_BINARY with HHVM.
      */
     public function testFindWithHHVM()
     {
@@ -72,28 +66,6 @@ class PhpExecutableFinderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($f->findArguments(), array('-qrr'), '::findArguments() returns phpdbg arguments');
         } else {
             $this->assertEquals($f->findArguments(), array(), '::findArguments() returns no arguments');
-        }
-    }
-
-    /**
-     * tests find() with default executable.
-     */
-    public function testFindWithSuffix()
-    {
-        if (defined('PHP_BINARY')) {
-            $this->markTestSkipped('The PHP binary is easily available as of PHP 5.4');
-        }
-
-        putenv('PHP_PATH=');
-        putenv('PHP_PEAR_PHP_BIN=');
-        $f = new PhpExecutableFinder();
-
-        $current = $f->find();
-
-        //TODO maybe php executable is custom or even Windows
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertTrue(is_executable($current));
-            $this->assertTrue((bool) preg_match('/'.addslashes(DIRECTORY_SEPARATOR).'php\.(exe|bat|cmd|com)$/i', $current), '::find() returns the executable PHP with suffixes');
         }
     }
 }

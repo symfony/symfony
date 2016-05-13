@@ -102,12 +102,12 @@ class VarCloner extends AbstractCloner
                             } else {
                                 $stub->value = $v;
                             }
-                        } elseif (0 <= $maxString && isset($v[1 + ($maxString >> 2)]) && 0 < $cut = iconv_strlen($v, 'UTF-8') - $maxString) {
+                        } elseif (0 <= $maxString && isset($v[1 + ($maxString >> 2)]) && 0 < $cut = mb_strlen($v, 'UTF-8') - $maxString) {
                             $stub = new Stub();
                             $stub->type = Stub::TYPE_STRING;
                             $stub->class = Stub::STRING_UTF8;
                             $stub->cut = $cut;
-                            $stub->value = iconv_substr($v, 0, $maxString, 'UTF-8');
+                            $stub->value = mb_substr($v, 0, $maxString, 'UTF-8');
                         }
                         break;
 
@@ -149,7 +149,7 @@ class VarCloner extends AbstractCloner
                             $stub->handle = $h;
                             $a = $this->castObject($stub, 0 < $i);
                             if ($v !== $stub->value) {
-                                if (Stub::TYPE_OBJECT !== $stub->type) {
+                                if (Stub::TYPE_OBJECT !== $stub->type || null === $stub->value) {
                                     break;
                                 }
                                 if ($useExt) {
@@ -282,7 +282,7 @@ class VarCloner extends AbstractCloner
         } else {
             // check if we are nested in an output buffering handler to prevent a fatal error with ob_start() below
             $obFuncs = array('ob_clean', 'ob_end_clean', 'ob_flush', 'ob_end_flush', 'ob_get_contents', 'ob_get_flush');
-            foreach (debug_backtrace(PHP_VERSION_ID >= 50400 ? DEBUG_BACKTRACE_IGNORE_ARGS : false) as $frame) {
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
                 if (isset($frame['function'][0]) && !isset($frame['class']) && 'o' === $frame['function'][0] && in_array($frame['function'], $obFuncs)) {
                     $frame['line'] = 0;
                     break;

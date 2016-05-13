@@ -84,8 +84,8 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
-            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
+        if (!$dateTime instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTimeInterface.');
         }
 
         $value = $this->getIntlDateFormatter()->format($dateTime->getTimestamp());

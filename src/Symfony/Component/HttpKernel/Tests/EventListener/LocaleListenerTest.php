@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\EventListener\LocaleListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -28,7 +27,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultLocaleWithoutSession()
     {
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request = Request::create('/'));
 
         $listener->onKernelRequest($event);
@@ -42,7 +41,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request->cookies->set('foo', 'value');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);
@@ -61,7 +60,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request = Request::create('/');
 
         $request->attributes->set('_locale', 'es');
-        $listener = new LocaleListener('fr', $router, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr', $router);
         $listener->onKernelRequest($this->getEvent($request));
     }
 
@@ -81,7 +80,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->getMock('Symfony\Component\HttpKernel\Event\FinishRequestEvent', array(), array(), '', false);
 
-        $listener = new LocaleListener('fr', $router, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr', $router);
         $listener->onKernelFinishRequest($event);
     }
 
@@ -89,7 +88,7 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = Request::create('/');
         $request->setLocale('de');
-        $listener = new LocaleListener('fr', null, $this->requestStack);
+        $listener = new LocaleListener($this->requestStack, 'fr');
         $event = $this->getEvent($request);
 
         $listener->onKernelRequest($event);

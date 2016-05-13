@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass;
 
-use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -175,8 +174,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @return string The name of the chain driver service
      *
-     * @throws ParameterNotFoundException if non of the managerParameters has a
-     *                                    non-empty value.
+     * @throws InvalidArgumentException if non of the managerParameters has a
+     *                                  non-empty value.
      */
     protected function getChainDriverServiceName(ContainerBuilder $container)
     {
@@ -203,8 +202,8 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @return string a service definition name
      *
-     * @throws ParameterNotFoundException if none of the managerParameters has a
-     *                                    non-empty value.
+     * @throws InvalidArgumentException if none of the managerParameters has a
+     *                                  non-empty value.
      */
     private function getConfigurationServiceName(ContainerBuilder $container)
     {
@@ -221,7 +220,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @return string The name of the active manager.
      *
-     * @throws ParameterNotFoundException If none of the managerParameters is found in the container.
+     * @throws InvalidArgumentException If none of the managerParameters is found in the container.
      */
     private function getManagerName(ContainerBuilder $container)
     {
@@ -234,7 +233,10 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
             }
         }
 
-        throw new ParameterNotFoundException('Could not determine the Doctrine manager. Either Doctrine is not configured or a bundle is misconfigured.');
+        throw new \InvalidArgumentException(sprintf(
+            'Could not find the manager name parameter in the container. Tried the following parameter names: "%s"',
+            implode('", "', $this->managerParameters)
+        ));
     }
 
     /**

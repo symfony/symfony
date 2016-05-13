@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * Added `Controller::json` to simplify creating JSON responses when using the Serializer component
+ * Deprecated absolute template paths support in the template name parser
+ * Deprecated using core form types without dependencies as services
+ * Added `Symfony\Component\HttpHernel\DataCollector\RequestDataCollector::onKernelResponse()`
+ * Added `Symfony\Bundle\FrameworkBundle\DataCollector\RequestDataCollector`
+ * Deprecated service `serializer.mapping.cache.apc` (use `serializer.mapping.cache.doctrine.apc` instead)
+
+3.0.0
+-----
+
+ * removed `validator.api` parameter
+ * removed `alias` option of the `form.type` tag
+
+2.8.0
+-----
+
+ * Deprecated the `alias` option of the `form.type_extension` tag in favor of the
+   `extended_type`/`extended-type` option
+ * Deprecated the `alias` option of the `form.type` tag
+ * Deprecated the Shell
+
 2.7.0
 -----
 

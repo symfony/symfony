@@ -26,6 +26,8 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class StringHandler implements HandlerInterface
 {

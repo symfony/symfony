@@ -107,10 +107,6 @@ class ExceptionListener implements EventSubscriberInterface
             '_controller' => $this->controller,
             'exception' => FlattenException::create($exception),
             'logger' => $this->logger instanceof DebugLoggerInterface ? $this->logger : null,
-            // keep for BC -- as $format can be an argument of the controller callable
-            // see src/Symfony/Bundle/TwigBundle/Controller/ExceptionController.php
-            // @deprecated since version 2.4, to be removed in 3.0
-            'format' => $request->getRequestFormat(),
         );
         $request = $request->duplicate(null, null, $attributes);
         $request->setMethod('GET');

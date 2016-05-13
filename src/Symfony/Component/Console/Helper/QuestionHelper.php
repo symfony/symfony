@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -38,7 +40,7 @@ class QuestionHelper extends Helper
      *
      * @return string The user answer
      *
-     * @throws \RuntimeException If there is no data to read in the input stream
+     * @throws RuntimeException If there is no data to read in the input stream
      */
     public function ask(InputInterface $input, OutputInterface $output, Question $question)
     {
@@ -54,10 +56,8 @@ class QuestionHelper extends Helper
             return $this->doAsk($output, $question);
         }
 
-        $that = $this;
-
-        $interviewer = function () use ($output, $question, $that) {
-            return $that->doAsk($output, $question);
+        $interviewer = function () use ($output, $question) {
+            return $this->doAsk($output, $question);
         };
 
         return $this->validateAttempts($interviewer, $output, $question);
@@ -70,12 +70,12 @@ class QuestionHelper extends Helper
      *
      * @param resource $stream The input stream
      *
-     * @throws \InvalidArgumentException In case the stream is not a resource
+     * @throws InvalidArgumentException In case the stream is not a resource
      */
     public function setInputStream($stream)
     {
         if (!is_resource($stream)) {
-            throw new \InvalidArgumentException('Input stream must be a valid resource.');
+            throw new InvalidArgumentException('Input stream must be a valid resource.');
         }
 
         $this->inputStream = $stream;
@@ -102,8 +102,6 @@ class QuestionHelper extends Helper
     /**
      * Asks the question to the user.
      *
-     * This method is public for PHP 5.3 compatibility, it should be private.
-     *
      * @param OutputInterface $output
      * @param Question        $question
      *
@@ -112,7 +110,7 @@ class QuestionHelper extends Helper
      * @throws \Exception
      * @throws \RuntimeException
      */
-    public function doAsk(OutputInterface $output, Question $question)
+    private function doAsk(OutputInterface $output, Question $question)
     {
         $this->writePrompt($output, $question);
 
@@ -320,7 +318,7 @@ class QuestionHelper extends Helper
      *
      * @return string The answer
      *
-     * @throws \RuntimeException In case the fallback is deactivated and the response cannot be hidden
+     * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
      */
     private function getHiddenResponse(OutputInterface $output, $inputStream)
     {
@@ -352,7 +350,7 @@ class QuestionHelper extends Helper
             shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {
-                throw new \RuntimeException('Aborted');
+                throw new RuntimeException('Aborted');
             }
 
             $value = trim($value);
@@ -370,7 +368,7 @@ class QuestionHelper extends Helper
             return $value;
         }
 
-        throw new \RuntimeException('Unable to hide the response.');
+        throw new RuntimeException('Unable to hide the response.');
     }
 
     /**
@@ -384,7 +382,7 @@ class QuestionHelper extends Helper
      *
      * @throws \Exception In case the max number of attempts has been reached and no valid response has been given
      */
-    private function validateAttempts($interviewer, OutputInterface $output, Question $question)
+    private function validateAttempts(callable $interviewer, OutputInterface $output, Question $question)
     {
         $error = null;
         $attempts = $question->getMaxAttempts();

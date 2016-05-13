@@ -47,6 +47,7 @@ class PassConfig
             new CheckDefinitionValidityPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),
+            new AutowirePass(),
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),

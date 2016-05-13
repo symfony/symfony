@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\RuntimeException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -47,22 +47,17 @@ class ImageValidator extends FileValidator
         if (null === $constraint->minWidth && null === $constraint->maxWidth
             && null === $constraint->minHeight && null === $constraint->maxHeight
             && null === $constraint->minRatio && null === $constraint->maxRatio
-            && $constraint->allowSquare && $constraint->allowLandscape && $constraint->allowPortrait) {
+            && $constraint->allowSquare && $constraint->allowLandscape && $constraint->allowPortrait
+            && !$constraint->detectCorrupted) {
             return;
         }
 
         $size = @getimagesize($value);
 
         if (empty($size) || ($size[0] === 0) || ($size[1] === 0)) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->sizeNotDetectedMessage)
-                    ->setCode(Image::SIZE_NOT_DETECTED_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->sizeNotDetectedMessage)
-                    ->setCode(Image::SIZE_NOT_DETECTED_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->sizeNotDetectedMessage)
+                ->setCode(Image::SIZE_NOT_DETECTED_ERROR)
+                ->addViolation();
 
             return;
         }
@@ -76,19 +71,11 @@ class ImageValidator extends FileValidator
             }
 
             if ($width < $constraint->minWidth) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->minWidthMessage)
-                        ->setParameter('{{ width }}', $width)
-                        ->setParameter('{{ min_width }}', $constraint->minWidth)
-                        ->setCode(Image::TOO_NARROW_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->minWidthMessage)
-                        ->setParameter('{{ width }}', $width)
-                        ->setParameter('{{ min_width }}', $constraint->minWidth)
-                        ->setCode(Image::TOO_NARROW_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->minWidthMessage)
+                    ->setParameter('{{ width }}', $width)
+                    ->setParameter('{{ min_width }}', $constraint->minWidth)
+                    ->setCode(Image::TOO_NARROW_ERROR)
+                    ->addViolation();
 
                 return;
             }
@@ -100,19 +87,11 @@ class ImageValidator extends FileValidator
             }
 
             if ($width > $constraint->maxWidth) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->maxWidthMessage)
-                        ->setParameter('{{ width }}', $width)
-                        ->setParameter('{{ max_width }}', $constraint->maxWidth)
-                        ->setCode(Image::TOO_WIDE_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->maxWidthMessage)
-                        ->setParameter('{{ width }}', $width)
-                        ->setParameter('{{ max_width }}', $constraint->maxWidth)
-                        ->setCode(Image::TOO_WIDE_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->maxWidthMessage)
+                    ->setParameter('{{ width }}', $width)
+                    ->setParameter('{{ max_width }}', $constraint->maxWidth)
+                    ->setCode(Image::TOO_WIDE_ERROR)
+                    ->addViolation();
 
                 return;
             }
@@ -124,19 +103,11 @@ class ImageValidator extends FileValidator
             }
 
             if ($height < $constraint->minHeight) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->minHeightMessage)
-                        ->setParameter('{{ height }}', $height)
-                        ->setParameter('{{ min_height }}', $constraint->minHeight)
-                        ->setCode(Image::TOO_LOW_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->minHeightMessage)
-                        ->setParameter('{{ height }}', $height)
-                        ->setParameter('{{ min_height }}', $constraint->minHeight)
-                        ->setCode(Image::TOO_LOW_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->minHeightMessage)
+                    ->setParameter('{{ height }}', $height)
+                    ->setParameter('{{ min_height }}', $constraint->minHeight)
+                    ->setCode(Image::TOO_LOW_ERROR)
+                    ->addViolation();
 
                 return;
             }
@@ -148,19 +119,11 @@ class ImageValidator extends FileValidator
             }
 
             if ($height > $constraint->maxHeight) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->maxHeightMessage)
-                        ->setParameter('{{ height }}', $height)
-                        ->setParameter('{{ max_height }}', $constraint->maxHeight)
-                        ->setCode(Image::TOO_HIGH_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->maxHeightMessage)
-                        ->setParameter('{{ height }}', $height)
-                        ->setParameter('{{ max_height }}', $constraint->maxHeight)
-                        ->setCode(Image::TOO_HIGH_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->maxHeightMessage)
+                    ->setParameter('{{ height }}', $height)
+                    ->setParameter('{{ max_height }}', $constraint->maxHeight)
+                    ->setCode(Image::TOO_HIGH_ERROR)
+                    ->addViolation();
             }
         }
 
@@ -172,19 +135,11 @@ class ImageValidator extends FileValidator
             }
 
             if ($ratio < $constraint->minRatio) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->minRatioMessage)
-                        ->setParameter('{{ ratio }}', $ratio)
-                        ->setParameter('{{ min_ratio }}', $constraint->minRatio)
-                        ->setCode(Image::RATIO_TOO_SMALL_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->minRatioMessage)
-                        ->setParameter('{{ ratio }}', $ratio)
-                        ->setParameter('{{ min_ratio }}', $constraint->minRatio)
-                        ->setCode(Image::RATIO_TOO_SMALL_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->minRatioMessage)
+                    ->setParameter('{{ ratio }}', $ratio)
+                    ->setParameter('{{ min_ratio }}', $constraint->minRatio)
+                    ->setCode(Image::RATIO_TOO_SMALL_ERROR)
+                    ->addViolation();
             }
         }
 
@@ -194,68 +149,54 @@ class ImageValidator extends FileValidator
             }
 
             if ($ratio > $constraint->maxRatio) {
-                if ($this->context instanceof ExecutionContextInterface) {
-                    $this->context->buildViolation($constraint->maxRatioMessage)
-                        ->setParameter('{{ ratio }}', $ratio)
-                        ->setParameter('{{ max_ratio }}', $constraint->maxRatio)
-                        ->setCode(Image::RATIO_TOO_BIG_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolation($constraint->maxRatioMessage)
-                        ->setParameter('{{ ratio }}', $ratio)
-                        ->setParameter('{{ max_ratio }}', $constraint->maxRatio)
-                        ->setCode(Image::RATIO_TOO_BIG_ERROR)
-                        ->addViolation();
-                }
+                $this->context->buildViolation($constraint->maxRatioMessage)
+                    ->setParameter('{{ ratio }}', $ratio)
+                    ->setParameter('{{ max_ratio }}', $constraint->maxRatio)
+                    ->setCode(Image::RATIO_TOO_BIG_ERROR)
+                    ->addViolation();
             }
         }
 
         if (!$constraint->allowSquare && $width == $height) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->allowSquareMessage)
-                    ->setParameter('{{ width }}', $width)
-                    ->setParameter('{{ height }}', $height)
-                    ->setCode(Image::SQUARE_NOT_ALLOWED_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->allowSquareMessage)
-                    ->setParameter('{{ width }}', $width)
-                    ->setParameter('{{ height }}', $height)
-                    ->setCode(Image::SQUARE_NOT_ALLOWED_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->allowSquareMessage)
+                ->setParameter('{{ width }}', $width)
+                ->setParameter('{{ height }}', $height)
+                ->setCode(Image::SQUARE_NOT_ALLOWED_ERROR)
+                ->addViolation();
         }
 
         if (!$constraint->allowLandscape && $width > $height) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->allowLandscapeMessage)
-                    ->setParameter('{{ width }}', $width)
-                    ->setParameter('{{ height }}', $height)
-                    ->setCode(Image::LANDSCAPE_NOT_ALLOWED_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->allowLandscapeMessage)
-                    ->setParameter('{{ width }}', $width)
-                    ->setParameter('{{ height }}', $height)
-                    ->setCode(Image::LANDSCAPE_NOT_ALLOWED_ERROR)
-                    ->addViolation();
-            }
+            $this->context->buildViolation($constraint->allowLandscapeMessage)
+                ->setParameter('{{ width }}', $width)
+                ->setParameter('{{ height }}', $height)
+                ->setCode(Image::LANDSCAPE_NOT_ALLOWED_ERROR)
+                ->addViolation();
         }
 
         if (!$constraint->allowPortrait && $width < $height) {
-            if ($this->context instanceof ExecutionContextInterface) {
-                $this->context->buildViolation($constraint->allowPortraitMessage)
-                    ->setParameter('{{ width }}', $width)
-                    ->setParameter('{{ height }}', $height)
-                    ->setCode(Image::PORTRAIT_NOT_ALLOWED_ERROR)
-                    ->addViolation();
-            } else {
-                $this->buildViolation($constraint->allowPortraitMessage)
-                    ->setParameter('{{ width }}', $width)
-                    ->setParameter('{{ height }}', $height)
-                    ->setCode(Image::PORTRAIT_NOT_ALLOWED_ERROR)
-                    ->addViolation();
+            $this->context->buildViolation($constraint->allowPortraitMessage)
+                ->setParameter('{{ width }}', $width)
+                ->setParameter('{{ height }}', $height)
+                ->setCode(Image::PORTRAIT_NOT_ALLOWED_ERROR)
+                ->addViolation();
+        }
+
+        if ($constraint->detectCorrupted) {
+            if (!function_exists('imagecreatefromstring')) {
+                throw new RuntimeException('Corrupted images detection requires installed and enabled GD extension');
             }
+
+            $resource = @imagecreatefromstring(file_get_contents($value));
+
+            if (false === $resource) {
+                $this->context->buildViolation($constraint->corruptedMessage)
+                    ->setCode(Image::CORRUPTED_IMAGE_ERROR)
+                    ->addViolation();
+
+                return;
+            }
+
+            imagedestroy($resource);
         }
     }
 }

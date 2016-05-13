@@ -15,6 +15,8 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  * Parser and formatter for day of week format.
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @internal
  */
 class DayOfWeekTransformer extends Transformer
 {

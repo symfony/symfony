@@ -132,9 +132,6 @@ class DbalLoggerTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testLogUTF8LongString()
     {
         $logger = $this->getMock('Psr\\Log\\LoggerInterface');

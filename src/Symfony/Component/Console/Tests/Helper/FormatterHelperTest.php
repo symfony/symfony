@@ -52,9 +52,6 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testFormatBlockWithDiacriticLetters()
     {
         $formatter = new FormatterHelper();
@@ -68,9 +65,6 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testFormatBlockWithDoubleWidthDiacriticLetters()
     {
         $formatter = new FormatterHelper();
@@ -94,5 +88,41 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
             $formatter->formatBlock('<info>some info</info>', 'error', true),
             '::formatBlock() escapes \'<\' chars'
         );
+    }
+
+    public function testTruncatingWithShorterLengthThanMessageWithSuffix()
+    {
+        $formatter = new FormatterHelper();
+        $message = 'testing truncate';
+
+        $this->assertSame('test...', $formatter->truncate($message, 4));
+        $this->assertSame('testing truncat...', $formatter->truncate($message, 15));
+        $this->assertSame('testing truncate...', $formatter->truncate($message, 16));
+        $this->assertSame('zażółć gęślą...', $formatter->truncate('zażółć gęślą jaźń', 12));
+    }
+
+    public function testTruncatingMessageWithCustomSuffix()
+    {
+        $formatter = new FormatterHelper();
+        $message = 'testing truncate';
+
+        $this->assertSame('test!', $formatter->truncate($message, 4, '!'));
+    }
+
+    public function testTruncatingWithLongerLengthThanMessageWithSuffix()
+    {
+        $formatter = new FormatterHelper();
+        $message = 'test';
+
+        $this->assertSame($message, $formatter->truncate($message, 10));
+    }
+
+    public function testTruncatingWithNegativeLength()
+    {
+        $formatter = new FormatterHelper();
+        $message = 'testing truncate';
+
+        $this->assertSame('testing tru...', $formatter->truncate($message, -5));
+        $this->assertSame('...', $formatter->truncate($message, -100));
     }
 }

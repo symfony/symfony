@@ -8,6 +8,8 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
+        <env name="DUMP_LIGHT_ARRAY" value="" />
+        <env name="DUMP_STRING_LENGTH" value="" />
     </php>
 
     <testsuites>

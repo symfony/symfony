@@ -4,15 +4,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <parameters>
-        <parameter key="web_profiler.controller.profiler.class">Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController</parameter>
-        <parameter key="web_profiler.controller.router.class">Symfony\Bundle\WebProfilerBundle\Controller\RouterController</parameter>
-        <parameter key="web_profiler.controller.exception.class">Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController</parameter>
-        <parameter key="twig.extension.webprofiler.class">Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension</parameter>
-    </parameters>
-
     <services>
-        <service id="web_profiler.controller.profiler" class="%web_profiler.controller.profiler.class%">
+        <service id="web_profiler.controller.profiler" class="Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController">
             <argument type="service" id="router" on-invalid="null" />
             <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
@@ -20,19 +13,19 @@
             <argument>%web_profiler.debug_toolbar.position%</argument>
         </service>
 
-        <service id="web_profiler.controller.router" class="%web_profiler.controller.router.class%">
+        <service id="web_profiler.controller.router" class="Symfony\Bundle\WebProfilerBundle\Controller\RouterController">
             <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument type="service" id="router" on-invalid="null" />
         </service>
 
-        <service id="web_profiler.controller.exception" class="%web_profiler.controller.exception.class%">
+        <service id="web_profiler.controller.exception" class="Symfony\Bundle\WebProfilerBundle\Controller\ExceptionController">
             <argument type="service" id="profiler" on-invalid="null" />
             <argument type="service" id="twig" />
             <argument>%kernel.debug%</argument>
         </service>
 
-        <service id="twig.extension.webprofiler" class="%twig.extension.webprofiler.class%" public="false">
+        <service id="twig.extension.webprofiler" class="Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension" public="false">
             <tag name="twig.extension" />
         </service>
     </services>

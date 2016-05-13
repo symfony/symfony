@@ -32,13 +32,13 @@ foreach ($dirs as $dir) {
     file_put_contents($dir.'/composer.json', $json);
     passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
 
-    $package->version = $branch.'.x-dev';
+    $package->version = 'master' !== $branch ? $branch.'.x-dev' : 'dev-master';
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.__DIR__."/$dir/package.tar";
 
     $packages[$package->name][$package->version] = $package;
 
-    $versions = file_get_contents('https://packagist.org/packages/'.$package->name.'.json');
+    $versions = @file_get_contents('https://packagist.org/packages/'.$package->name.'.json') ?: '{"package":{"versions":[]}}';
     $versions = json_decode($versions);
 
     foreach ($versions->package->versions as $version => $package) {

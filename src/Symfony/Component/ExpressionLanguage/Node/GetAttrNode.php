@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class GetAttrNode extends Node
 {
     const PROPERTY_CALL = 1;

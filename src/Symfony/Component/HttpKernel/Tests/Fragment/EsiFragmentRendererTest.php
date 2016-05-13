@@ -25,6 +25,36 @@ class EsiFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $strategy->render('/', Request::create('/'));
     }
 
+    /**
+     * @group legacy
+     */
+    public function testRenderFallbackWithObjectAttributesIsDeprecated()
+    {
+        $deprecations = array();
+        set_error_handler(function ($type, $message) use (&$deprecations) {
+            if (E_USER_DEPRECATED !== $type) {
+                restore_error_handler();
+
+                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+            }
+
+            $deprecations[] = $message;
+        });
+
+        $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true), new UriSigner('foo'));
+
+        $request = Request::create('/');
+
+        $reference = new ControllerReference('main_controller', array('foo' => array('a' => array(), 'b' => new \stdClass())), array());
+
+        $strategy->render($reference, $request);
+
+        restore_error_handler();
+
+        $this->assertCount(1, $deprecations);
+        $this->assertContains('Passing objects as part of URI attributes to the ESI and SSI rendering strategies is deprecated', $deprecations[0]);
+    }
+
     public function testRender()
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());

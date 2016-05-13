@@ -133,6 +133,8 @@ class XmlFileLoader extends FileLoader
     private function parseDefinition(\DOMElement $service, $file)
     {
         if ($alias = $service->getAttribute('alias')) {
+            $this->validateAlias($service, $file);
+
             $public = true;
             if ($publicAttr = $service->getAttribute('public')) {
                 $public = XmlUtils::phpize($publicAttr);
@@ -148,28 +150,23 @@ class XmlFileLoader extends FileLoader
             $definition = new Definition();
         }
 
-        foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'lazy', 'abstract') as $key) {
+        foreach (array('class', 'shared', 'public', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
-                if (in_array($key, array('factory-class', 'factory-method', 'factory-service'))) {
-                    @trigger_error(sprintf('The "%s" attribute of service "%s" in file "%s" is deprecated since version 2.6 and will be removed in 3.0. Use the "factory" element instead.', $key, (string) $service->getAttribute('id'), $file), E_USER_DEPRECATED);
-                }
                 $method = 'set'.str_replace('-', '', $key);
                 $definition->$method(XmlUtils::phpize($value));
             }
         }
 
-        if ($value = $service->getAttribute('synchronized')) {
-            $triggerDeprecation = 'request' !== (string) $service->getAttribute('id');
-
-            if ($triggerDeprecation) {
-                @trigger_error(sprintf('The "synchronized" attribute of service "%s" in file "%s" is deprecated since version 2.7 and will be removed in 3.0.', (string) $service->getAttribute('id'), $file), E_USER_DEPRECATED);
-            }
-
-            $definition->setSynchronized(XmlUtils::phpize($value), $triggerDeprecation);
+        if ($value = $service->getAttribute('autowire')) {
+            $definition->setAutowired(XmlUtils::phpize($value));
         }
 
         if ($files = $this->getChildren($service, 'file')) {
             $definition->setFile($files[0]->nodeValue);
+        }
+
+        if ($deprecated = $this->getChildren($service, 'deprecated')) {
+            $definition->setDeprecated(true, $deprecated[0]->nodeValue);
         }
 
         $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
@@ -227,7 +224,7 @@ class XmlFileLoader extends FileLoader
                 if (false !== strpos($name, '-') && false === strpos($name, '_') && !array_key_exists($normalizedName = str_replace('-', '_', $name), $parameters)) {
                     $parameters[$normalizedName] = XmlUtils::phpize($node->nodeValue);
                 }
-                // keep not normalized key for BC too
+                // keep not normalized key
                 $parameters[$name] = XmlUtils::phpize($node->nodeValue);
             }
 
@@ -238,9 +235,14 @@ class XmlFileLoader extends FileLoader
             $definition->addTag($tag->getAttribute('name'), $parameters);
         }
 
+        foreach ($this->getChildren($service, 'autowiring-type') as $type) {
+            $definition->addAutowiringType($type->textContent);
+        }
+
         if ($value = $service->getAttribute('decorates')) {
             $renameId = $service->hasAttribute('decoration-inner-name') ? $service->getAttribute('decoration-inner-name') : null;
-            $definition->setDecoratedService($value, $renameId);
+            $priority = $service->hasAttribute('decoration-priority') ? $service->getAttribute('decoration-priority') : 0;
+            $definition->setDecoratedService($value, $renameId, $priority);
         }
 
         return $definition;
@@ -312,10 +314,7 @@ class XmlFileLoader extends FileLoader
 
         // resolve definitions
         krsort($definitions);
-        foreach ($definitions as $id => $def) {
-            list($domElement, $file, $wild) = $def;
-
-
+        foreach ($definitions as $id => list($domElement, $file, $wild)) {
             if (null !== $definition = $this->parseDefinition($domElement, $file)) {
                 $this->container->setDefinition($id, $definition);
             }
@@ -492,6 +491,27 @@ EOF
         }
 
         return $valid;
+    }
+
+    /**
+     * Validates an alias.
+     *
+     * @param \DOMElement $alias
+     * @param string      $file
+     */
+    private function validateAlias(\DOMElement $alias, $file)
+    {
+        foreach ($alias->attributes as $name => $node) {
+            if (!in_array($name, array('alias', 'id', 'public'))) {
+                @trigger_error(sprintf('Using the attribute "%s" is deprecated for alias definition "%s" in "%s". Allowed attributes are "alias", "id" and "public". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $name, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+            }
+        }
+
+        foreach ($alias->childNodes as $child) {
+            if ($child instanceof \DOMElement && $child->namespaceURI === self::NS) {
+                @trigger_error(sprintf('Using the element "%s" is deprecated for alias definition "%s" in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+            }
+        }
     }
 
     /**

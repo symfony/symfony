@@ -163,16 +163,6 @@ class ProgressBar
     }
 
     /**
-     * Get messages.
-     *
-     * @return array
-     */
-    public function getMessages()
-    {
-        return $this->messages;
-    }
-
-    /**
      * Gets the progress bar start time.
      *
      * @return int The progress bar start time
@@ -624,7 +614,7 @@ class ProgressBar
             'message' => function (ProgressBar $bar) {
                 $message = '';
 
-                if (array_key_exists('message', $bar->getMessages())) {
+                if (isset($bar->messages['message'])) {
                     $message = $bar->getMessage();
 
                     if (0 !== strlen($message) && ' ' !== substr($message, 0, 1)) {

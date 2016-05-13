@@ -271,7 +271,7 @@ class AutowirePass implements CompilerPassInterface
 
         if (!$typeHint->isInstantiable()) {
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
-            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s.', $typeHint->name, $id, $classOrInterface));
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $id, $classOrInterface));
         }
 
         $argumentId = sprintf('autowired.%s', $typeHint->name);
@@ -280,7 +280,14 @@ class AutowirePass implements CompilerPassInterface
         $argumentDefinition->setPublic(false);
 
         $this->populateAvailableType($argumentId, $argumentDefinition);
-        $this->completeDefinition($argumentId, $argumentDefinition);
+
+        try {
+            $this->completeDefinition($argumentId, $argumentDefinition);
+        } catch (\RuntimeException $e) {
+            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
+            $message = sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $id, $classOrInterface);
+            throw new RuntimeException($message, 0, $e);
+        }
 
         return new Reference($argumentId);
     }

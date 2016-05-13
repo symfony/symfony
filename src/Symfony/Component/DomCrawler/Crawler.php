@@ -71,6 +71,16 @@ class Crawler implements \Countable, \IteratorAggregate
     }
 
     /**
+     * Returns the current URI.
+     *
+     * @return string
+     */
+    public function getUri()
+    {
+        return $this->uri;
+    }
+
+    /**
      * Returns base href.
      *
      * @return string

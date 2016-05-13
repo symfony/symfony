@@ -27,6 +27,13 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
     }
 
+    public function testGetUri()
+    {
+        $uri = 'http://symfony.com';
+        $crawler = new Crawler(null,  $uri);
+        $this->assertEquals($uri, $crawler->getUri());
+    }
+
     public function testGetBaseHref()
     {
         $baseHref = 'http://symfony.com';

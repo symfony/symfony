@@ -162,9 +162,7 @@ class ViolationMapper implements ViolationMapperInterface
             }
         }
 
-        $children = iterator_to_array(new \RecursiveIteratorIterator(
-            new InheritDataAwareIterator($form)
-        ));
+        $children = iterator_to_array(new \RecursiveIteratorIterator(new InheritDataAwareIterator($form)), false);
 
         while ($it->valid()) {
             if ($it->isIndex()) {
@@ -189,7 +187,7 @@ class ViolationMapper implements ViolationMapperInterface
             }
 
             /** @var FormInterface $child */
-            foreach ($children as $key => $child) {
+            foreach ($children as $i => $child) {
                 $childPath = (string) $child->getPropertyPath();
                 if ($childPath === $chunk) {
                     $target = $child;
@@ -198,7 +196,7 @@ class ViolationMapper implements ViolationMapperInterface
                     continue;
                 }
 
-                unset($children[$key]);
+                unset($children[$i]);
             }
 
             $it->next();

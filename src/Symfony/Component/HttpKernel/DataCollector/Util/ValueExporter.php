@@ -28,7 +28,7 @@ class ValueExporter
     public function exportValue($value, $depth = 1, $deep = false)
     {
         if (is_object($value)) {
-            if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+            if ($value instanceof \DateTimeInterface) {
                 return sprintf('Object(%s) - %s', get_class($value), $value->format(\DateTime::ISO8601));
             }
 

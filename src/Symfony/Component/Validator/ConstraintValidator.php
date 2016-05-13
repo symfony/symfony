@@ -72,7 +72,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * (i.e. "false" for false, "1" for 1 etc.). Strings are always wrapped
      * in double quotes ("). Objects, arrays and resources are formatted as
      * "object", "array" and "resource". If the $format bitmask contains
-     * the PRETTY_DATE bit, then {@link \DateTime} objects will be formatted 
+     * the PRETTY_DATE bit, then {@link \DateTime} objects will be formatted
      * as RFC-3339 dates ("Y-m-d H:i:s").
      *
      * Be careful when passing message parameters to a constraint violation
@@ -89,7 +89,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function formatValue($value, $format = 0)
     {
-        $isDateTime = $value instanceof \DateTime || $value instanceof \DateTimeInterface;
+        $isDateTime = $value instanceof \DateTimeInterface;
 
         if (($format & self::PRETTY_DATE) && $isDateTime) {
             if (class_exists('IntlDateFormatter')) {

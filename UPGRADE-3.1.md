@@ -93,25 +93,8 @@ FrameworkBundle
    cache service. If you are using `serializer.mapping.cache.apc`, use
    `serializer.mapping.cache.doctrine.apc` instead.
 
- * The `framework.serializer.cache` option has been deprecated. Configure the
-   `cache.serializer` service under `framework.cache.pools` instead.
-
-   Before:
-
-   ```yaml
-   framework:
-       serializer:
-           cache: serializer.mapping.cache.apc
-   ```
-
-   After:
-
-   ```yaml
-   framework:
-       cache:
-           pools:
-               cache.serializer:
-                   adapter: cache.adapter.apcu
+ * The `framework.serializer.cache` option has been deprecated. APCu should now
+   be automatically used when available so you can remove this configuration key.
 
 HttpKernel
 ----------

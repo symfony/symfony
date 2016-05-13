@@ -564,7 +564,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('system')
                             ->info('System related cache pools configuration')
-                            ->defaultValue('cache.adapter.filesystem')
+                            ->defaultValue('cache.adapter.system')
                         ->end()
                         ->scalarNode('directory')->defaultValue('%kernel.cache_dir%/pools')->end()
                         ->scalarNode('default_doctrine_provider')->end()

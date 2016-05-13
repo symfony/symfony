@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-12T18:46:21Z
+
+Thanks!
+It would be great if you could make the exception messages the same in 3.0 and 3.1 (when applicable).
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-05-12T18:53:34Z
+
+No problem, which messages are better? Would you prefer me to update the ones in 2.8/3.0 to Ryan's messages or to change this PR to re-use the ones I defined in my previous PR?
+
+IMHO, I think the ones in this PR are better than the one from my first PR, so I'd think updating 2.8/3.0 would be better...

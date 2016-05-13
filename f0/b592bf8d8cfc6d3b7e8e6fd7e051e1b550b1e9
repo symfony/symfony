@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-27T11:29:06Z
+
+@dantleech we prefer doing this kind of changes on master because of the potential BC break you spotted...
+
+---------------------------------------------------------------------------
+
+by dantleech at 2016-04-27T11:47:36Z
+
+Looks like I already based it on master by accident.

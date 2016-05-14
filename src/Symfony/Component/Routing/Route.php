@@ -20,11 +20,6 @@ namespace Symfony\Component\Routing;
 class Route implements \Serializable
 {
     /**
-     * Use this as option flag to allow non string requirements.
-     */
-    const REQUIREMENT_NON_STRING = '__allow_requirement_non_string';
-
-    /**
      * @var string
      */
     private $path = '/';
@@ -70,11 +65,6 @@ class Route implements \Serializable
     private $condition = '';
 
     /**
-     * @var bool
-     */
-    private $enforceRequirementAsString = TRUE;
-
-    /**
      * Constructor.
      *
      * Available options:
@@ -94,8 +84,8 @@ class Route implements \Serializable
     {
         $this->setPath($path);
         $this->setDefaults($defaults);
-        $this->setOptions($options);
         $this->setRequirements($requirements);
+        $this->setOptions($options);
         $this->setHost($host);
         $this->setSchemes($schemes);
         $this->setMethods($methods);
@@ -293,11 +283,6 @@ class Route implements \Serializable
             'compiler_class' => 'Symfony\\Component\\Routing\\RouteCompiler',
         );
 
-        if (!empty($options[self::REQUIREMENT_NON_STRING])) {
-            $this->enforceRequirementAsString = FALSE;
-            unset($options[self::REQUIREMENT_NON_STRING]);
-        }
-
         return $this->addOptions($options);
     }
 
@@ -485,7 +470,10 @@ class Route implements \Serializable
     public function addRequirements(array $requirements)
     {
         foreach ($requirements as $key => $regex) {
-            $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+            if (is_string($regex)) {
+                $regex = $this->sanitizeRequirement($key, $regex);
+            }
+            $this->requirements[$key] = $regex;
         }
         $this->compiled = null;
 
@@ -526,7 +514,10 @@ class Route implements \Serializable
      */
     public function setRequirement($key, $regex)
     {
-        $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+        if (is_string($regex)) {
+            $regex = $this->sanitizeRequirement($key, $regex);
+        }
+        $this->requirements[$key] = $regex;
         $this->compiled = null;
 
         return $this;
@@ -580,24 +571,20 @@ class Route implements \Serializable
         return $this->compiled = $class::compile($this);
     }
 
-    private function sanitizeRequirement($key, $regex_or_mixed)
+    private function sanitizeRequirement($key, $regex)
     {
-        if (!is_string($regex_or_mixed) && $this->enforceRequirementAsString) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
+        if ('' !== $regex && '^' === $regex[0]) {
+            $regex = (string) substr($regex, 1); // returns false for a single character
         }
 
-        if ('' !== $regex_or_mixed && '^' === $regex_or_mixed[0]) {
-            $regex_or_mixed = (string) substr($regex_or_mixed, 1); // returns false for a single character
+        if ('$' === substr($regex, -1)) {
+            $regex = substr($regex, 0, -1);
         }
 
-        if ('$' === substr($regex_or_mixed, -1)) {
-            $regex_or_mixed = substr($regex_or_mixed, 0, -1);
-        }
-
-        if ('' === $regex_or_mixed) {
+        if ('' === $regex) {
             throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be empty.', $key));
         }
 
-        return $regex_or_mixed;
+        return $regex;
     }
 }

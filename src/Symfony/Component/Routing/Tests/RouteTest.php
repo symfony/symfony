@@ -135,18 +135,30 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         return array(
            array(''),
-           array(array()),
            array('^$'),
            array('^'),
            array('$'),
         );
     }
 
-    public function testNonStringRequirement()
+    /**
+     * @dataProvider getValidRequirements
+     */
+    public function testSetValid($req)
     {
-        $route = new Route('/{foo}', array(), array(), array(Route::REQUIREMENT_NON_STRING => TRUE));
-        $route->setRequirement('example', TRUE);
-        $this->assertTrue($route->getRequirement('example'));
+        $route = new Route('/{foo}');
+        $route->setRequirement('foo', $req);
+        $this->assertEquals($req, $route->getRequirement('foo'));
+    }
+
+    public function getValidRequirements()
+    {
+        return array(
+            array(TRUE),
+            array(FALSE),
+            array(314),
+            array(array('key' => 'value')),
+        );
     }
 
     public function testHost()

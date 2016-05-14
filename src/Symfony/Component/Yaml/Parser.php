@@ -25,6 +25,7 @@ class Parser
     const FOLDED_SCALAR_PATTERN = self::BLOCK_SCALAR_HEADER_PATTERN;
 
     private $offset = 0;
+    private $totalNumberOfLines;
     private $lines = array();
     private $currentLineNb = -1;
     private $currentLine = '';
@@ -33,11 +34,13 @@ class Parser
     /**
      * Constructor.
      *
-     * @param int $offset The offset of YAML document (used for line numbers in error messages)
+     * @param int      $offset             The offset of YAML document (used for line numbers in error messages)
+     * @param int|null $totalNumberOfLines The overall number of lines being parsed
      */
-    public function __construct($offset = 0)
+    public function __construct($offset = 0, $totalNumberOfLines = null)
     {
         $this->offset = $offset;
+        $this->totalNumberOfLines = $totalNumberOfLines;
     }
 
     /**
@@ -60,6 +63,10 @@ class Parser
         $this->currentLine = '';
         $value = $this->cleanup($value);
         $this->lines = explode("\n", $value);
+
+        if (null === $this->totalNumberOfLines) {
+            $this->totalNumberOfLines = count($this->lines);
+        }
 
         if (function_exists('mb_internal_encoding') && ((int) ini_get('mbstring.func_overload')) & 2) {
             $mbEncoding = mb_internal_encoding();
@@ -93,7 +100,7 @@ class Parser
                 // array
                 if (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     $c = $this->getRealCurrentLineNb() + 1;
-                    $parser = new self($c);
+                    $parser = new self($c, $this->totalNumberOfLines);
                     $parser->refs = &$this->refs;
                     $data[] = $parser->parse($this->getNextEmbedBlock(null, true), $exceptionOnInvalidType, $objectSupport);
                 } else {
@@ -102,7 +109,7 @@ class Parser
                     ) {
                         // this is a compact notation element, add to next block and parse
                         $c = $this->getRealCurrentLineNb();
-                        $parser = new self($c);
+                        $parser = new self($c, $this->totalNumberOfLines);
                         $parser->refs = &$this->refs;
 
                         $block = $values['value'];
@@ -153,7 +160,7 @@ class Parser
                             $value = $this->getNextEmbedBlock();
                         }
                         $c = $this->getRealCurrentLineNb() + 1;
-                        $parser = new self($c);
+                        $parser = new self($c, $this->totalNumberOfLines);
                         $parser->refs = &$this->refs;
                         $parsed = $parser->parse($value, $exceptionOnInvalidType, $objectSupport);
 
@@ -190,7 +197,7 @@ class Parser
                         $data[$key] = null;
                     } else {
                         $c = $this->getRealCurrentLineNb() + 1;
-                        $parser = new self($c);
+                        $parser = new self($c, $this->totalNumberOfLines);
                         $parser->refs = &$this->refs;
                         $data[$key] = $parser->parse($this->getNextEmbedBlock(), $exceptionOnInvalidType, $objectSupport);
                     }
@@ -528,6 +535,8 @@ class Parser
         if ($notEOF) {
             $blockLines[] = '';
             $this->moveToPreviousLine();
+        } elseif (!$notEOF && !$this->isCurrentLineLastLineInDocument()) {
+            $blockLines[] = '';
         }
 
         // folded style
@@ -632,6 +641,11 @@ class Parser
         $ltrimmedLine = ltrim($this->currentLine, ' ');
 
         return '' !== $ltrimmedLine && $ltrimmedLine[0] === '#';
+    }
+
+    private function isCurrentLineLastLineInDocument()
+    {
+        return ($this->offset + $this->currentLineNb) >= ($this->totalNumberOfLines - 1);
     }
 
     /**

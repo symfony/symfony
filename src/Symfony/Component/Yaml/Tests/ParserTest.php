@@ -826,6 +826,7 @@ EOT
 foo
 # bar
 baz
+
 EOT
                     ,
                 ),
@@ -854,7 +855,7 @@ EOT;
         $expected = array(
             'foo' => array(
                 'bar' => array(
-                    'scalar-block' => 'line1 line2>',
+                    'scalar-block' => "line1 line2>\n",
                 ),
                 'baz' => array(
                     'foobar' => null,

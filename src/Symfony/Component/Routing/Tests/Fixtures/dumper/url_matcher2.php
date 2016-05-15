@@ -39,7 +39,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             }
 
         }
-    
+
         if (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {

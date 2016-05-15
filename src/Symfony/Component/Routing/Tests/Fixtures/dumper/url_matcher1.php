@@ -39,7 +39,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             }
 
         }
-        
+
         if (0 === strpos($pathinfo, '/bar')) {
             // bar
             if (preg_match('#^/bar/(?P<foo>[^/]++)$#s', $pathinfo, $matches)) {

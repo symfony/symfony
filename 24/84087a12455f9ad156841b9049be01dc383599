@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2016-05-14T12:09:42Z
+
+👍 This is acceptable because removed methods are flagged as [`@internal`](http://symfony.com/doc/current/contributing/code/bc.html#using-our-classes).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-05-14T14:11:22Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-15T09:22:52Z
+
+👍

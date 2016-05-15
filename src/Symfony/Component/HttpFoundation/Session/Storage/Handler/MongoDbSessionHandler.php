@@ -67,28 +67,28 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      * @throws \InvalidArgumentException When MongoClient or Mongo instance not provided
      * @throws \InvalidArgumentException When "database" or "collection" not provided
      */
-     public function __construct($mongo, array $options)
-     {
-         if (!($mongo instanceof \MongoClient || $mongo instanceof \Mongo || $mongo instanceof \MongoDB\Client)) {
-             throw new \InvalidArgumentException('MongoClient, Mongo or MongoDB instance required');
-         }elseif($mongo instanceof \MongoDB\Client && !class_exists('\MongoDB\Collection')){
-             throw new \InvalidArgumentException('\MongoDB\Collection instance not loaded');
+    public function __construct($mongo, array $options)
+    {
+        if (!($mongo instanceof \MongoClient || $mongo instanceof \Mongo || $mongo instanceof \MongoDB\Client)) {
+           throw new \InvalidArgumentException('MongoClient, Mongo or MongoDB instance required');
+        }elseif($mongo instanceof \MongoDB\Client && !class_exists('\MongoDB\Collection')){
+           throw new \InvalidArgumentException('\MongoDB\Collection instance not loaded');
 
-         }
+        }
 
-         if (!isset($options['database']) || !isset($options['collection'])) {
-             throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
-         }
+        if (!isset($options['database']) || !isset($options['collection'])) {
+           throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
+        }
 
-         $this->mongo = $mongo;
+        $this->mongo = $mongo;
 
-         $this->options = array_merge(array(
-             'id_field' => '_id',
-             'data_field' => 'data',
-             'time_field' => 'time',
-             'expiry_field' => 'expires_at',
-         ), $options);
-     }
+        $this->options = array_merge(array(
+           'id_field' => '_id',
+           'data_field' => 'data',
+           'time_field' => 'time',
+           'expiry_field' => 'expires_at',
+        ), $options);
+    }
 
     /**
      * {@inheritdoc}

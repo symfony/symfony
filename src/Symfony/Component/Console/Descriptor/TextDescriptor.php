@@ -254,7 +254,6 @@ class TextDescriptor extends Descriptor
         return $text;
     }
 
-
     /**
      * Formats input option/argument default value.
      *

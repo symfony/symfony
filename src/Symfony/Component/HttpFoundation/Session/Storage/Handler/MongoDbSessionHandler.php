@@ -133,7 +133,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
         if($this->getCollection() instanceof \MongoDB\Collection)
         {
             $this->getCollection()->deleteMany(array(
-                $this->options['id_field'] => $sessionId,
+                $this->options['expiry_field'] => array('$lt' => new \MongoDate()),
             ));
         }else{
             $this->getCollection()->remove(array(

@@ -67,25 +67,28 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      * @throws \InvalidArgumentException When MongoClient or Mongo instance not provided
      * @throws \InvalidArgumentException When "database" or "collection" not provided
      */
-    public function __construct($mongo, array $options)
-    {
-        if (!($mongo instanceof \MongoClient || $mongo instanceof \Mongo)) {
-            throw new \InvalidArgumentException('MongoClient or Mongo instance required');
-        }
+     public function __construct($mongo, array $options)
+     {
+         if (!($mongo instanceof \MongoClient || $mongo instanceof \Mongo || $mongo instanceof \MongoDB\Client)) {
+             throw new \InvalidArgumentException('MongoClient, Mongo or MongoDB instance required');
+         }elseif($mongo instanceof \MongoDB\Client && !class_exists('\MongoDB\Collection')){
+             throw new \InvalidArgumentException('\MongoDB\Collection instance not loaded');
 
-        if (!isset($options['database']) || !isset($options['collection'])) {
-            throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
-        }
+         }
 
-        $this->mongo = $mongo;
+         if (!isset($options['database']) || !isset($options['collection'])) {
+             throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
+         }
 
-        $this->options = array_merge(array(
-            'id_field' => '_id',
-            'data_field' => 'data',
-            'time_field' => 'time',
-            'expiry_field' => 'expires_at',
-        ), $options);
-    }
+         $this->mongo = $mongo;
+
+         $this->options = array_merge(array(
+             'id_field' => '_id',
+             'data_field' => 'data',
+             'time_field' => 'time',
+             'expiry_field' => 'expires_at',
+         ), $options);
+     }
 
     /**
      * {@inheritdoc}
@@ -108,9 +111,16 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        $this->getCollection()->remove(array(
-            $this->options['id_field'] => $sessionId,
-        ));
+        if($this->getCollection() instanceof \MongoDB\Collection)
+        {
+            $this->getCollection()->deleteOne(array(
+                $this->options['id_field'] => $sessionId,
+            ));
+        }else{
+            $this->getCollection()->remove(array(
+                $this->options['id_field'] => $sessionId,
+            ));
+        }
 
         return true;
     }
@@ -120,9 +130,16 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function gc($maxlifetime)
     {
-        $this->getCollection()->remove(array(
-            $this->options['expiry_field'] => array('$lt' => new \MongoDate()),
-        ));
+        if($this->getCollection() instanceof \MongoDB\Collection)
+        {
+            $this->getCollection()->deleteMany(array(
+                $this->options['id_field'] => $sessionId,
+            ));
+        }else{
+            $this->getCollection()->remove(array(
+                $this->options['expiry_field'] => array('$lt' => new \MongoDate()),
+            ));
+        }
 
         return true;
     }
@@ -140,11 +157,20 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
             $this->options['expiry_field'] => $expiry,
         );
 
-        $this->getCollection()->update(
-            array($this->options['id_field'] => $sessionId),
-            array('$set' => $fields),
-            array('upsert' => true, 'multiple' => false)
-        );
+        if($this->getCollection() instanceof \MongoDB\Collection)
+        {
+            $this->getCollection()->updateOne(
+                array($this->options['id_field'] => $sessionId),
+                array('$set' => $fields),
+                array('upsert' => true, 'multiple' => false)
+            );
+        }else{
+            $this->getCollection()->update(
+                array($this->options['id_field'] => $sessionId),
+                array('$set' => $fields),
+                array('upsert' => true, 'multiple' => false)
+            );
+        }
 
         return true;
     }

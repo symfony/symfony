@@ -24,7 +24,7 @@ class ApcuAdapter extends AbstractAdapter
         return function_exists('apcu_fetch') && ini_get('apc.enabled') && !('cli' === PHP_SAPI && !ini_get('apc.enable_cli'));
     }
 
-    public function __construct($namespace = '', $defaultLifetime = 0, $nonce = null)
+    public function __construct($namespace = '', $defaultLifetime = 0, $version = null)
     {
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled');
@@ -34,12 +34,12 @@ class ApcuAdapter extends AbstractAdapter
         }
         parent::__construct($namespace, $defaultLifetime);
 
-        if (null !== $nonce) {
-            CacheItem::validateKey($nonce);
+        if (null !== $version) {
+            CacheItem::validateKey($version);
 
-            if (!apcu_exists($nonce.':nonce'.$namespace)) {
+            if (!apcu_exists($version.':'.$namespace)) {
                 $this->clear($namespace);
-                apcu_add($nonce.':nonce'.$namespace, null);
+                apcu_add($version.':'.$namespace, null);
             }
         }
     }

@@ -154,8 +154,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function getValidRequirements()
     {
         return array(
-            array(TRUE),
-            array(FALSE),
+            array(true),
+            array(false),
             array(314),
             array(array('key' => 'value')),
         );

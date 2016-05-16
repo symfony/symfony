@@ -489,12 +489,16 @@ class Crawler implements \Countable, \IteratorAggregate
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        $node = $this->getNode(0);
+        $nodeCount = $this->count();
         $nodes = array();
 
-        while ($node = $node->parentNode) {
-            if (XML_ELEMENT_NODE === $node->nodeType) {
-                $nodes[] = $node;
+        for ($i = 0; $i < $nodeCount; ++$i) {
+            $node = $this->getNode($i);
+
+            while ($node = $node->parentNode) {
+                if (XML_ELEMENT_NODE === $node->nodeType) {
+                    $nodes[] = $node;
+                }
             }
         }
 

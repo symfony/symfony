@@ -22,4 +22,11 @@ final class Security
     const AUTHENTICATION_ERROR = '_security.last_error';
     const LAST_USERNAME = '_security.last_username';
     const MAX_USERNAME_LENGTH = 4096;
+
+    /**
+     * This class should not be instantiated.
+     */
+    private function __construct()
+    {
+    }
 }

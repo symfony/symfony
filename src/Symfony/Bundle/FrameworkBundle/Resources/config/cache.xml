@@ -28,7 +28,7 @@
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
-            <argument /> <!-- nonce -->
+            <argument /> <!-- version -->
             <argument>%kernel.cache_dir%/pools</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
@@ -38,7 +38,7 @@
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
             <argument /> <!-- default lifetime -->
-            <argument /> <!-- nonce -->
+            <argument /> <!-- version -->
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>

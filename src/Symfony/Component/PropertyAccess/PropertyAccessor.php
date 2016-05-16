@@ -722,7 +722,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                         '"%s" given.',
                         $property,
                         $reflClass->name,
-                        implode(' and ', array_map(function($method){
+                        implode(' and ', array_map(function ($method) {
                             return '"'.$method.'()"';
                         }, $this->findAdderAndRemover($reflClass, $singulars))),
                         is_object($value) ? get_class($value) : gettype($value)

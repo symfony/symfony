@@ -44,7 +44,7 @@ class ApcuAdapterTest extends CachePoolTest
         $this->assertFalse($item->isHit());
     }
 
-    public function testNonce()
+    public function testVersion()
     {
         $namespace = str_replace('\\', '.', __CLASS__);
 

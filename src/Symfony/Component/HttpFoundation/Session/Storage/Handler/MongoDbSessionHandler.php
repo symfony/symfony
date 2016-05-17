@@ -70,14 +70,14 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     public function __construct($mongo, array $options)
     {
         if (!($mongo instanceof \MongoClient || $mongo instanceof \Mongo || $mongo instanceof \MongoDB\Client)) {
-           throw new \InvalidArgumentException('MongoClient, Mongo or MongoDB instance required');
-        }elseif($mongo instanceof \MongoDB\Client && !class_exists('\MongoDB\Collection')){
-           throw new \InvalidArgumentException('\MongoDB\Collection instance not loaded');
-
+            throw new \InvalidArgumentException('MongoClient, Mongo or MongoDB instance required');
+        }
+        if ($mongo instanceof \MongoDB\Client && !class_exists('\MongoDB\Collection')) {
+            throw new \InvalidArgumentException('\MongoDB\Collection instance not loaded');
         }
 
         if (!isset($options['database']) || !isset($options['collection'])) {
-           throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
+            throw new \InvalidArgumentException('You must provide the "database" and "collection" option for MongoDBSessionHandler');
         }
 
         $this->mongo = $mongo;
@@ -111,12 +111,11 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        if($this->getCollection() instanceof \MongoDB\Collection)
-        {
+        if ($this->getCollection() instanceof \MongoDB\Collection) {
             $this->getCollection()->deleteOne(array(
                 $this->options['id_field'] => $sessionId,
             ));
-        }else{
+        } else {
             $this->getCollection()->remove(array(
                 $this->options['id_field'] => $sessionId,
             ));
@@ -130,12 +129,11 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function gc($maxlifetime)
     {
-        if($this->getCollection() instanceof \MongoDB\Collection)
-        {
+        if ($this->getCollection() instanceof \MongoDB\Collection) {
             $this->getCollection()->deleteMany(array(
                 $this->options['expiry_field'] => array('$lt' => new \MongoDate()),
             ));
-        }else{
+        } else {
             $this->getCollection()->remove(array(
                 $this->options['expiry_field'] => array('$lt' => new \MongoDate()),
             ));
@@ -157,14 +155,13 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
             $this->options['expiry_field'] => $expiry,
         );
 
-        if($this->getCollection() instanceof \MongoDB\Collection)
-        {
+        if ($this->getCollection() instanceof \MongoDB\Collection) {
             $this->getCollection()->updateOne(
                 array($this->options['id_field'] => $sessionId),
                 array('$set' => $fields),
                 array('upsert' => true, 'multiple' => false)
             );
-        }else{
+        } else {
             $this->getCollection()->update(
                 array($this->options['id_field'] => $sessionId),
                 array('$set' => $fields),

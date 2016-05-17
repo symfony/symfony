@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-04-02T23:34:07Z
+
+PR updated, comments addressed
+
+---------------------------------------------------------------------------
+
+by kroshp at 2016-04-06T11:58:49Z
+
+Same issue in 2.8
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-06T18:57:10Z
+
+@kroshp All fixes will be merged up to all maintained branches after being merged into the lowest affected branch.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T15:10:02Z
+
+is there a way in JS to check whether a header can be accessed according to the CORS rules, to be able to fallback ? It would be great to avoid this configuration setting entirely, and just remove it from the display (or display it in a special way) when the token cannot be retrieved due to CORS restrictions
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T15:10:53Z
+
+btw, a try/catch around the statement reading the header might be an acceptable way to implement the fallback if there is no better one.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-04-14T08:58:49Z
+
+I just tried to detect if we had access to these headers in CORS using `Access-Control-Expose-Headers`, but a security warning is still issued when accessing this header.
+
+Please note that these are not exception but Browser security warnings. You can try/catch these warnings but they still appear in the console.
+
+I'm not in favor of adding a new configuration, so this PR is stalled while we found something better :/
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-04-16T11:00:52Z
+
+I'm a bit stuck with this here...
+If anybody's got an idea on how to solve this problem without a config option, help is welcome :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-20T10:19:27Z
+
+@romainneutron have to tried to ask on SO to get some help from the JS community ?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-05-05T19:18:24Z
+
+Could why just avoid checking the headers entirely (and therefore showing the profiler link) when the AJAX request is for another domain? As nice as it is to show a profiler link that's coming from another Symfony app on some other domain, I'm not sure it's necessary - I'd expect the profiler link only for AJAX requests that are coming from *this* application.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-05-12T12:18:03Z
+
+I like @weaverryan 's idea, WDYT?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-13T07:26:43Z
+
+@weaverryan But that would mean that AJAX requests to the same application but with another domain also wouldn't be displayed, right? If so this is a BC break to me as someone might already rely on it (you could serve your internal API with a different domain for whatever reason for example).
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-13T13:59:53Z
+
+@weaverryan this would not be very convenient if you have an app hitting your API hosted on a different domain.
+This is why we should first try to get input from the community of JS devs/browsers to know whether there is a way to know that we are allowed (or not allowed) to read a header. But @romainneutron has not replied to my question above
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-13T14:14:00Z
+
+@romainneutron can you try using ``getAllResponseHeaders()`` which will give you all headers ? AFAIU, this should always be allowed by CORS (but giving you only the headers you are allowed to see). You could then check in this object whether there is the profiler header
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-13T14:37:54Z
+
+@romainneutron I confirm you that ``xhr.getAllResponseHeaders()`` does not trigger a security warning in chromium
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-13T14:39:18Z
+
+though it returns a string representation of HTTP headers, so you will need to extract the header from it.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-13T14:41:36Z
+
+or simpler: use the regex only to know whether the Symfony headers are exposed, and then use ``getResponseHeader`` to get their value when exposed (avoiding to parse headers manually)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-05-14T12:30:23Z
+
+@stof thanks for the hint! I'll try this asap
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-05-16T14:53:33Z
+
+PR has been updated, ready for review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-17T12:45:34Z
+
+:+1:

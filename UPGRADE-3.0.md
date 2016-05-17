@@ -636,6 +636,11 @@ UPGRADE FROM 2.x to 3.0
    be removed in Symfony 3.0. Use the `debug:config`, `debug:container`,
    `debug:router`, `debug:translation` and `lint:yaml` commands instead.
 
+ * The base `Controller`class is now abstract.
+
+ * The visibility of all methods of the base `Controller` class has been changed from
+   `public` to `protected`.
+
  * The `getRequest` method of the base `Controller` class has been deprecated
    since Symfony 2.4 and must be therefore removed in 3.0. The only reliable
    way to get the `Request` object is to inject it in the action method.

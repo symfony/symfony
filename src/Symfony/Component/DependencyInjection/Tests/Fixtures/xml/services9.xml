@@ -84,6 +84,12 @@
     <service id="configured_service" class="stdClass">
       <configurator service="configurator_service" method="configureStdClass"/>
     </service>
+    <service id="configurator_service_simple" class="ConfClass" public="false">
+      <argument>bar</argument>
+    </service>
+    <service id="configured_service_simple" class="stdClass">
+      <configurator service="configurator_service_simple" method="configureStdClass"/>
+    </service>
     <service id="decorated" class="stdClass"/>
     <service id="decorator_service" class="stdClass" decorates="decorated"/>
     <service id="decorator_service_with_name" class="stdClass" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
@@ -102,6 +108,12 @@
     </service>
     <service id="service_from_static_method" class="Bar\FooClass">
       <factory class="Bar\FooClass" method="getInstance"/>
+    </service>
+    <service id="factory_simple" class="SimpleFactoryClass" public="false">
+      <argument>foo</argument>
+    </service>
+    <service id="factory_service_simple" class="Bar">
+      <factory service="factory_simple" method="getInstance"/>
     </service>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>

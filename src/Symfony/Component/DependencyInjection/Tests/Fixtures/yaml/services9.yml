@@ -67,6 +67,13 @@ services:
     configured_service:
         class: stdClass
         configurator: ['@configurator_service', configureStdClass]
+    configurator_service_simple:
+        class: ConfClass
+        public: false
+        arguments: ['bar']
+    configured_service_simple:
+        class: stdClass
+        configurator: ['@configurator_service_simple', configureStdClass]
     decorated:
         class: stdClass
     decorator_service:
@@ -93,5 +100,12 @@ services:
     service_from_static_method:
         class: Bar\FooClass
         factory: [Bar\FooClass, getInstance]
+    factory_simple:
+        class: SimpleFactoryClass
+        public: false
+        arguments: ['foo']
+    factory_service_simple:
+        class: Bar
+        factory: ['@factory_simple', getInstance]
     alias_for_foo: '@foo'
     alias_for_alias: '@foo'

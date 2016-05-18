@@ -30,10 +30,12 @@ class ProjectServiceContainer extends Container
             'bar' => 'getBarService',
             'baz' => 'getBazService',
             'configured_service' => 'getConfiguredServiceService',
+            'configured_service_simple' => 'getConfiguredServiceSimpleService',
             'decorator_service' => 'getDecoratorServiceService',
             'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
             'deprecated_service' => 'getDeprecatedServiceService',
             'factory_service' => 'getFactoryServiceService',
+            'factory_service_simple' => 'getFactoryServiceSimpleService',
             'foo' => 'getFooService',
             'foo.baz' => 'getFoo_BazService',
             'foo_bar' => 'getFooBarService',
@@ -115,6 +117,23 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'configured_service_simple' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance.
+     */
+    protected function getConfiguredServiceSimpleService()
+    {
+        $this->services['configured_service_simple'] = $instance = new \stdClass();
+
+        (new \ConfClass('bar'))->configureStdClass($instance);
+
+        return $instance;
+    }
+
+    /**
      * Gets the 'decorator_service' service.
      *
      * This service is shared.
@@ -168,6 +187,19 @@ class ProjectServiceContainer extends Container
     protected function getFactoryServiceService()
     {
         return $this->services['factory_service'] = $this->get('foo.baz')->getInstance();
+    }
+
+    /**
+     * Gets the 'factory_service_simple' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Bar A Bar instance.
+     */
+    protected function getFactoryServiceSimpleService()
+    {
+        return $this->services['factory_service_simple'] = (new \SimpleFactoryClass('foo'))->getInstance();
     }
 
     /**

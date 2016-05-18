@@ -202,7 +202,7 @@ Yaml
    After:
 
    ```php
-   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, Yaml::DUMP_OBJECT);
+   Yaml::dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_OBJECT);
    ```
 
  * The `!!php/object` tag to indicate dumped PHP objects has been deprecated

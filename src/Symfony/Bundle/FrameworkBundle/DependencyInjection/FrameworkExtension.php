@@ -989,7 +989,11 @@ class FrameworkExtension extends Extension
     }
 
     /**
-     * Gets the path of a given bundle using Bundle#getPath() when available.
+     * Gets the path of a given bundle using Bundle::getPath() when usable.
+     *
+     * WARNING:
+     * Calling this may cause a fatal error if the getPath method contains call(s)
+     * of constructor argument's methods, e.g. Bundle::$foo->bar() called in Bundle::getPath()
      *
      * @param string $fqcn The bundle FQCN
      *

@@ -31,8 +31,8 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->atLeastOnce())
-            ->method('isPublic')
-            ->will($this->returnValue(true));
+            ->method('setPublic')
+            ->with(true);
         $definition->expects($this->atLeastOnce())
             ->method('getClass')
             ->will($this->returnValue('stdClass'));
@@ -66,8 +66,8 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
 
         $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
         $definition->expects($this->atLeastOnce())
-            ->method('isPublic')
-            ->will($this->returnValue(true));
+            ->method('setPublic')
+            ->with(true);
         $definition->expects($this->atLeastOnce())
             ->method('getClass')
             ->will($this->returnValue('Symfony\Component\EventDispatcher\Tests\DependencyInjection\SubscriberService'));
@@ -98,31 +98,34 @@ class RegisterListenersPassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The service "foo" must be public as event listeners are lazy-loaded.
+     * @dataProvider privateTaggedServicesProvider
      */
-    public function testPrivateEventListener()
+    public function testPrivateEventListenerAndSubscriber($tag, array $tagAttributes, array $methodCalls)
     {
         $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')->setPublic(false)->addTag('kernel.event_listener', array());
-        $container->register('event_dispatcher', 'stdClass');
+        $listener = $container
+            ->register('foo', SubscriberService::class)
+            ->setPublic(false)
+            ->addTag($tag, $tagAttributes);
+        $eventDispatcher = $container->register('event_dispatcher', 'stdClass');
 
         $registerListenersPass = new RegisterListenersPass();
         $registerListenersPass->process($container);
+
+        $this->assertSame($methodCalls, $eventDispatcher->getMethodCalls());
+        $this->assertTrue($listener->isPublic());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The service "foo" must be public as event subscribers are lazy-loaded.
-     */
-    public function testPrivateEventSubscriber()
+    public function privateTaggedServicesProvider()
     {
-        $container = new ContainerBuilder();
-        $container->register('foo', 'stdClass')->setPublic(false)->addTag('kernel.event_subscriber', array());
-        $container->register('event_dispatcher', 'stdClass');
-
-        $registerListenersPass = new RegisterListenersPass();
-        $registerListenersPass->process($container);
+        return array(
+            array('kernel.event_subscriber', array(), array(
+                array('addSubscriberService', array('foo', SubscriberService::class)),
+            )),
+            array('kernel.event_listener', array('event' => 'foo_bar'), array(
+                array('addListenerService', array('foo_bar', array('foo', 'onFoobar'), 0)),
+            )),
+        );
     }
 
     /**

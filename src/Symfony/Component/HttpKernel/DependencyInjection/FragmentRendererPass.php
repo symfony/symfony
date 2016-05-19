@@ -43,9 +43,7 @@ class FragmentRendererPass implements CompilerPassInterface
         $definition = $container->getDefinition($this->handlerService);
         foreach ($container->findTaggedServiceIds($this->rendererTag) as $id => $tags) {
             $def = $container->getDefinition($id);
-            if (!$def->isPublic()) {
-                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as fragment renderer are lazy-loaded.', $id));
-            }
+            $def->setPublic(true);
 
             if ($def->isAbstract()) {
                 throw new \InvalidArgumentException(sprintf('The service "%s" must not be abstract as fragment renderer are lazy-loaded.', $id));

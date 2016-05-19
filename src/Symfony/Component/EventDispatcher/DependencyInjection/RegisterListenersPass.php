@@ -58,9 +58,7 @@ class RegisterListenersPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($this->listenerTag) as $id => $events) {
             $def = $container->getDefinition($id);
-            if (!$def->isPublic()) {
-                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event listeners are lazy-loaded.', $id));
-            }
+            $def->setPublic(true);
 
             if ($def->isAbstract()) {
                 throw new \InvalidArgumentException(sprintf('The service "%s" must not be abstract as event listeners are lazy-loaded.', $id));
@@ -87,9 +85,7 @@ class RegisterListenersPass implements CompilerPassInterface
 
         foreach ($container->findTaggedServiceIds($this->subscriberTag) as $id => $attributes) {
             $def = $container->getDefinition($id);
-            if (!$def->isPublic()) {
-                throw new \InvalidArgumentException(sprintf('The service "%s" must be public as event subscribers are lazy-loaded.', $id));
-            }
+            $def->setPublic(true);
 
             if ($def->isAbstract()) {
                 throw new \InvalidArgumentException(sprintf('The service "%s" must not be abstract as event subscribers are lazy-loaded.', $id));

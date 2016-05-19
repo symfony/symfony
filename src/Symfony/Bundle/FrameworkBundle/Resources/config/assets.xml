@@ -38,5 +38,10 @@
 
         <service id="assets.empty_version_strategy" class="Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy" public="false" />
 
+        <service id="assets.git_version_strategy" class="Symfony\Component\Asset\VersionStrategy\GitVersionStrategy" public="false">
+            <argument /> <!-- version -->
+            <argument /> <!-- format -->
+        </service>
+
     </services>
 </container>

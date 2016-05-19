@@ -34,6 +34,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass;
 use Symfony\Component\Debug\ErrorHandler;
+use Symfony\Component\DependencyInjection\Compiler\GitCommitHashPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
@@ -91,6 +92,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new PropertyInfoPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new CachePoolPass());
+        $container->addCompilerPass(new GitCommitHashPass());
 
         if ($container->getParameter('kernel.debug')) {
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);

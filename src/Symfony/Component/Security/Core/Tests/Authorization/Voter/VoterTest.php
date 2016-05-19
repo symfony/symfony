@@ -58,7 +58,7 @@ class VoterTest extends \PHPUnit_Framework_TestCase
 
 class VoterTest_Voter extends Voter
 {
-    protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+    protected function isGranted($attribute, $object, TokenInterface $token)
     {
         return 'EDIT' === $attribute;
     }

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -31,6 +32,7 @@ class ServerStatusCommand extends ServerCommand
         $this
             ->setDefinition(array(
                 new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
+                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
             ))
             ->setName('server:status')
             ->setDescription('Outputs the status of the built-in web server for the given address')
@@ -43,6 +45,10 @@ class ServerStatusCommand extends ServerCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $address = $input->getArgument('address');
+
+        if (false === strpos($address, ':')) {
+            $address = $address.':'.$input->getOption('port');
+        }
 
         // remove an orphaned lock file
         if (file_exists($this->getLockFile($address)) && !$this->isServerRunning($address)) {

@@ -596,7 +596,7 @@ class FrameworkExtension extends Extension
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
 
-                if ($package['version_strategy'] == "assets.git_version_strategy") {
+                if ($package['version_strategy'] == 'assets.git_version_strategy') {
                     $removeGitStrategy = false;
                 }
             } elseif (!array_key_exists('version', $package)) {

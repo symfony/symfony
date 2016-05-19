@@ -26,8 +26,8 @@ class GitCommitHashPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $process = new Process('git log -1', $container->getParameter('kernel.root_dir'));
+        $process = new Process('git rev-parse HEAD', $container->getParameter('kernel.root_dir'));
         $process->mustRun();
-        $container->setParameter('git_commit_hash', sha1($process->getOutput()));
+        $container->setParameter('git_commit_hash', trim($process->getOutput()));
     }
 }

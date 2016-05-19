@@ -168,7 +168,11 @@ class Application
         if (true === $input->hasParameterOption(array('--help', '-h'), true)) {
             if (!$name) {
                 $name = 'help';
-                $input = new ArrayInput(array('command' => 'help'));
+                if ('list' !== $this->defaultCommand) {
+                    $input = new ArrayInput(array('command_name' => $this->defaultCommand));
+                } else {
+                    $input = new ArrayInput(array('command_name' => 'help'));
+                }
             } else {
                 $this->wantHelps = true;
             }
@@ -1044,6 +1048,8 @@ class Application
     public function setDefaultCommand($commandName)
     {
         $this->defaultCommand = $commandName;
+
+        return $this;
     }
 
     private function stringWidth($string)

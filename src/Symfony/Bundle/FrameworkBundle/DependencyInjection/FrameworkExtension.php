@@ -574,10 +574,16 @@ class FrameworkExtension extends Extension
     {
         $loader->load('assets.xml');
 
+        $removeGitStrategy = true;
+
         $defaultVersion = null;
 
         if ($config['version_strategy']) {
             $defaultVersion = new Reference($config['version_strategy']);
+
+            if ($config['version_strategy'] == 'assets.git_version_strategy') {
+                $removeGitStrategy = false;
+            }
         } else {
             $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
         }
@@ -589,6 +595,10 @@ class FrameworkExtension extends Extension
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
+
+                if ($package['version_strategy'] == "assets.git_version_strategy") {
+                    $removeGitStrategy = false;
+                }
             } elseif (!array_key_exists('version', $package)) {
                 $version = $defaultVersion;
             } else {
@@ -604,6 +614,10 @@ class FrameworkExtension extends Extension
             ->replaceArgument(0, new Reference('assets._default_package'))
             ->replaceArgument(1, $namedPackages)
         ;
+
+        if ($removeGitStrategy) {
+            $container->removeDefinition('assets.git_version_strategy');
+        }
     }
 
     /**

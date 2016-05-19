@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\EventDispatcher\Debug;
 
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -52,7 +52,7 @@ class WrappedListener
         return $this->stoppedPropagation;
     }
 
-    public function __invoke(Event $event, $eventName, EventDispatcherInterface $dispatcher)
+    public function __invoke(EventInterface $event, $eventName, EventDispatcherInterface $dispatcher)
     {
         $this->called = true;
 

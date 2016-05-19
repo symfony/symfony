@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * [BC BREAK] added EventInterface
+ 
 3.0.0
 -----
 

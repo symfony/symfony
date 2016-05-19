@@ -24,8 +24,9 @@ namespace Symfony\Component\EventDispatcher;
  * @author Jonathan Wage <jonwage@gmail.com>
  * @author Roman Borschel <roman@code-factory.org>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Tomasz Świacko-Świackiewicz <tomasz.swiacko.swiackiewicz@gmail.com>
  */
-class Event
+class Event implements EventInterface
 {
     /**
      * @var bool Whether no further event listeners should be triggered
@@ -33,11 +34,7 @@ class Event
     private $propagationStopped = false;
 
     /**
-     * Returns whether further event listeners should be triggered.
-     *
-     * @see Event::stopPropagation()
-     *
-     * @return bool Whether propagation was already stopped for this event.
+     * {@inheritdoc}
      */
     public function isPropagationStopped()
     {
@@ -45,11 +42,7 @@ class Event
     }
 
     /**
-     * Stops the propagation of the event to further event listeners.
-     *
-     * If multiple event listeners are connected to the same event, no
-     * further event listener will be triggered once any trigger calls
-     * stopPropagation().
+     * {@inheritdoc}
      */
     public function stopPropagation()
     {

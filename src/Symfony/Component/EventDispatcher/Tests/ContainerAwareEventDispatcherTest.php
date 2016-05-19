@@ -14,6 +14,7 @@ namespace Symfony\Component\EventDispatcher\Tests;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
@@ -177,7 +178,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
 
 class Service
 {
-    public function onEvent(Event $e)
+    public function onEvent(EventInterface $e)
     {
     }
 }
@@ -193,15 +194,15 @@ class SubscriberService implements EventSubscriberInterface
         );
     }
 
-    public function onEvent(Event $e)
+    public function onEvent(EventInterface $e)
     {
     }
 
-    public function onEventWithPriority(Event $e)
+    public function onEventWithPriority(EventInterface $e)
     {
     }
 
-    public function onEventNested(Event $e)
+    public function onEventNested(EventInterface $e)
     {
     }
 }

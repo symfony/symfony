@@ -12,6 +12,7 @@
 namespace Symfony\Component\EventDispatcher\Debug;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -118,7 +119,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     /**
      * {@inheritdoc}
      */
-    public function dispatch($eventName, Event $event = null)
+    public function dispatch($eventName, EventInterface $event = null)
     {
         if (null === $event) {
             $event = new Event();

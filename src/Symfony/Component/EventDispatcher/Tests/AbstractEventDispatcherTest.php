@@ -13,6 +13,7 @@ namespace Symfony\Component\EventDispatcher\Tests;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class AbstractEventDispatcherTest extends \PHPUnit_Framework_TestCase
@@ -317,12 +318,12 @@ class TestEventListener
 
     /* Listener methods */
 
-    public function preFoo(Event $e)
+    public function preFoo(EventInterface $e)
     {
         $this->preFooInvoked = true;
     }
 
-    public function postFoo(Event $e)
+    public function postFoo(EventInterface $e)
     {
         $this->postFooInvoked = true;
 
@@ -335,7 +336,7 @@ class TestWithDispatcher
     public $name;
     public $dispatcher;
 
-    public function foo(Event $e, $name, $dispatcher)
+    public function foo(EventInterface $e, $name, $dispatcher)
     {
         $this->name = $name;
         $this->dispatcher = $dispatcher;

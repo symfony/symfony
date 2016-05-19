@@ -46,6 +46,7 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         return array_merge(parent::getExtensions(), array(
             new TemplatingExtension($this->engine, $this->csrfTokenManager, array(
                 'FrameworkBundle:Form',
+                'TestBundle:Javascript',
             )),
         ));
     }
@@ -79,6 +80,29 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
         $html = $this->renderStart($form->createView());
 
         $this->assertSame('<form name="form" method="get" action="0">', $html);
+    }
+
+    public function testFormJavascript()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType');
+
+        $this->assertEmpty($this->renderJavascript($form->createView()));
+    }
+
+    public function testButtonJavascript()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ButtonType');
+
+        $this->assertEmpty($this->renderJavascript($form->createView()));
+    }
+
+    public function testCustomJavascript()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TextType');
+
+        $html = $this->renderJavascript($form->createView());
+
+        $this->assertSame('<script type="text/javascript">text</script>', $html);
     }
 
     protected function renderForm(FormView $view, array $vars = array())
@@ -119,6 +143,11 @@ class FormHelperDivLayoutTest extends AbstractDivLayoutTest
     protected function renderEnd(FormView $view, array $vars = array())
     {
         return (string) $this->engine->get('form')->end($view, $vars);
+    }
+
+    protected function renderJavascript(FormView $view, array $vars = array())
+    {
+        return (string) $this->engine->get('form')->javascript($view, $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)

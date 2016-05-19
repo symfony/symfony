@@ -20,7 +20,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  * @author Aurimas Niekis <aurimas@niekis.lt>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class RedisAdapter extends AbstractAdapter
+class RedisAdapter extends AbstractAdapter implements HierarchicalAdapterInterface
 {
     private static $defaultConnectionOptions = array(
         'class' => null,

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by realityking at 2016-04-30T13:58:29Z
+
+Not sure what do with the fabbot.io failures as the offending code is in the dumped containers.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-02T19:11:41Z
+
+:+1: after @xabbuh's comment is fixed (fabbot failures should be ignored for failures).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-05T16:13:04Z
+
+ping @realityking
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-18T11:30:36Z
+
+@realityking will you have some time to finish this nice pull request adding the minor changes asked by @nicolas-grekas? If not, we can make those minor changes ourselves. Thank you!
+
+---------------------------------------------------------------------------
+
+by realityking at 2016-05-18T14:15:29Z
+
+Sorry, I was distracted and then forgot all about this. Comments addressed, hope Travis runs succeeds this time.
+
+---------------------------------------------------------------------------
+
+by realityking at 2016-05-18T18:36:19Z
+
+Remaning failures are in the generated code.

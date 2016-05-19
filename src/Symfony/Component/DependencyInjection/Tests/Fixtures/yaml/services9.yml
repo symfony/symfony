@@ -75,7 +75,7 @@ services:
     decorator_service_with_name:
         class: stdClass
         decorates: decorated
-        decoration_inner_name: decorated.pif-pouf
+        decoration_inner_name: decorated.pif_pouf
     deprecated_service:
         class: stdClass
         deprecated: The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.

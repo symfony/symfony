@@ -31,13 +31,14 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
         $definition = new Definition('%my-command.class%');
         $definition->setPublic($public);
         $definition->addTag('console.command');
-        $container->setDefinition('my-command', $definition);
+        $container->setDefinition('app.command', $definition);
 
         $container->compile();
 
         $alias = 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
+
         if ($container->hasAlias($alias)) {
-            $this->assertSame('my-command', (string) $container->getAlias($alias));
+            $this->assertSame('app.command', (string) $container->getAlias($alias));
         } else {
             // The alias is replaced by a Definition by the ReplaceAliasByActualDefinitionPass
             // in case the original service is private
@@ -59,7 +60,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The service "my-command" tagged "console.command" must not be abstract.
+     * @expectedExceptionMessage The service "app.command" tagged "console.command" must not be abstract.
      */
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
@@ -69,14 +70,14 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
         $definition = new Definition('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
         $definition->addTag('console.command');
         $definition->setAbstract(true);
-        $container->setDefinition('my-command', $definition);
+        $container->setDefinition('app.command', $definition);
 
         $container->compile();
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The service "my-command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".
+     * @expectedExceptionMessage The service "app.command" tagged "console.command" must be a subclass of "Symfony\Component\Console\Command\Command".
      */
     public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()
     {
@@ -85,7 +86,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
 
         $definition = new Definition('SplObjectStorage');
         $definition->addTag('console.command');
-        $container->setDefinition('my-command', $definition);
+        $container->setDefinition('app.command', $definition);
 
         $container->compile();
     }
@@ -96,7 +97,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
         $container->addCompilerPass(new AddConsoleCommandPass());
         $definition = new Definition('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
         $definition->addTag('console.command');
-        $container->setDefinition('my-command', $definition);
+        $container->setDefinition('app.command', $definition);
         $container->compile();
 
         $application = $this->getMock('Symfony\Component\Console\Application');

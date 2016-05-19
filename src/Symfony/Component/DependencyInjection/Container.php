@@ -59,6 +59,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 class Container implements ResettableContainerInterface
 {
     /**
+     * @internal
+     */
+    const INVALID_SERVICE_ID_REGEX = '/[\s\x00-\x1F\x7F!?"\'`@-]/';
+
+    /**
      * @var ParameterBagInterface
      */
     protected $parameterBag;
@@ -161,6 +166,10 @@ class Container implements ResettableContainerInterface
      */
     public function set($id, $service)
     {
+        if (preg_match(self::INVALID_SERVICE_ID_REGEX, $id)) {
+            @trigger_error(sprintf('Using whitespaces, control sequences, quotes, or the characters "!", "?", "@", "`" and "-" in service ids ("%s" given) is deprecated since Symfony 3.1 and will throw an exception in 4.0.', $id), E_USER_DEPRECATED);
+        }
+
         $id = strtolower($id);
 
         if ('service_container' === $id) {

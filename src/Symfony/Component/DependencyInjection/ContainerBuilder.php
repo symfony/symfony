@@ -613,6 +613,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new InvalidArgumentException(sprintf('An alias can not reference itself, got a circular reference on "%s".', $alias));
         }
 
+        if (preg_match(self::INVALID_SERVICE_ID_REGEX, $alias)) {
+            @trigger_error(sprintf('Using whitespaces, control sequences, quotes, or the characters "!", "?", "@", "`" and "-" in service ids ("%s" given) is deprecated since Symfony 3.1 and will throw an exception in 4.0.', $alias), E_USER_DEPRECATED);
+        }
+
         unset($this->definitions[$alias]);
 
         $this->aliasDefinitions[$alias] = $id;
@@ -731,6 +735,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setDefinition($id, Definition $definition)
     {
+        if (preg_match(self::INVALID_SERVICE_ID_REGEX, $id)) {
+            @trigger_error(sprintf('Using whitespaces, control sequences, quotes, or the characters "!", "?", "@", "`" and "-" in service ids ("%s" given) is deprecated since Symfony 3.1 and will throw an exception in 4.0.', $id), E_USER_DEPRECATED);
+        }
+
         if ($this->isFrozen()) {
             throw new BadMethodCallException('Adding definition to a frozen container is not allowed');
         }

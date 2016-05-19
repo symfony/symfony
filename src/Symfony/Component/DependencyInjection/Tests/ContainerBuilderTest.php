@@ -20,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -746,6 +745,109 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->compile();
 
         $this->assertEquals('a', (string) $container->getDefinition('b')->getArgument(0));
+    }
+
+    /**
+     * @dataProvider getSpecialCharServiceIds
+     */
+    public function testSpecialCharInServiceIdTriggersDeprecationInSet($id)
+    {
+        $container = new ContainerBuilder();
+
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED === $type) {
+                $deprecations[] = $msg;
+            }
+        });
+
+        $container->set($id, new \stdClass());
+
+        restore_error_handler();
+
+        $this->assertCount(1, $deprecations);
+        $this->assertSame(sprintf('Using whitespaces, control sequences, quotes, or the characters "!", "?", "@", "`" and "-" in service ids ("%s" given) is deprecated since Symfony 3.1 and will throw an exception in 4.0.', $id), $deprecations[0]);
+    }
+
+    /**
+     * @dataProvider getSpecialCharServiceIds
+     */
+    public function testSpecialCharInServiceIdTriggersDeprecationInRegister($id)
+    {
+        $container = new ContainerBuilder();
+
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED === $type) {
+                $deprecations[] = $msg;
+            }
+        });
+
+        $container->register($id, 'Foo');
+
+        restore_error_handler();
+
+        $this->assertCount(1, $deprecations);
+        $this->assertSame(sprintf('Using whitespaces, control sequences, quotes, or the characters "!", "?", "@", "`" and "-" in service ids ("%s" given) is deprecated since Symfony 3.1 and will throw an exception in 4.0.', $id), $deprecations[0]);
+    }
+
+    /**
+     * @dataProvider getSpecialCharServiceIds
+     */
+    public function testSpecialCharInServiceIdTriggersDeprecationInSetDefinition($id)
+    {
+        $container = new ContainerBuilder();
+
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED === $type) {
+                $deprecations[] = $msg;
+            }
+        });
+
+        $container->setDefinition($id, new Definition('Foo'));
+
+        restore_error_handler();
+
+        $this->assertCount(1, $deprecations);
+        $this->assertSame(sprintf('Using whitespaces, control sequences, quotes, or the characters "!", "?", "@", "`" and "-" in service ids ("%s" given) is deprecated since Symfony 3.1 and will throw an exception in 4.0.', $id), $deprecations[0]);
+    }
+
+    /**
+     * @dataProvider getSpecialCharServiceIds
+     */
+    public function testSpecialCharInServiceIdTriggersDeprecationInSetAlias($id)
+    {
+        $container = new ContainerBuilder();
+
+        $deprecations = array();
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED === $type) {
+                $deprecations[] = $msg;
+            }
+        });
+
+        $container->setAlias($id, 'foo');
+
+        restore_error_handler();
+
+        $this->assertCount(1, $deprecations);
+        $this->assertSame(sprintf('Using whitespaces, control sequences, quotes, or the characters "!", "?", "@", "`" and "-" in service ids ("%s" given) is deprecated since Symfony 3.1 and will throw an exception in 4.0.', $id), $deprecations[0]);
+    }
+
+    public function getSpecialCharServiceIds()
+    {
+        return array(
+            'contains whitespace' => array('service id'),
+            'contains ASCII control sequence' => array("service\x07id"),
+            'contains exclamation mark' => array('service!'),
+            'contains question mark' => array('service?'),
+            'contains @' => array('@service_id'),
+            'contains double quote' => array('"my_service"'),
+            'contains single quote' => array("'my_service'"),
+            'contains backtick' => array('`my_service`'),
+            'contains dash' => array('my-service'),
+        );
     }
 }
 

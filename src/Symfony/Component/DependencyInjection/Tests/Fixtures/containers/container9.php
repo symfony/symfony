@@ -87,7 +87,7 @@ $container
 ;
 $container
     ->register('decorator_service_with_name', 'stdClass')
-    ->setDecoratedService('decorated', 'decorated.pif-pouf')
+    ->setDecoratedService('decorated', 'decorated.pif_pouf')
 ;
 $container
     ->register('deprecated_service', 'stdClass')

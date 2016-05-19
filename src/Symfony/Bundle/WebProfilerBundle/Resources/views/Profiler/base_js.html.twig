@@ -50,7 +50,7 @@
                         setTimeout(function(){
                             options.maxTries--;
                             request(url, onSuccess, onError, payload, options);
-                        }, 500);
+                        }, {{ options['tries_interval'] is defined ? options['tries_interval'] : 500}});
 
                         return null;
                     }

@@ -40,8 +40,9 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $mode;
     protected $position;
     protected $excludedAjaxPaths;
+    protected $options;
 
-    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', UrlGeneratorInterface $urlGenerator = null, $excludedAjaxPaths = '^/bundles|^/_wdt')
+    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', UrlGeneratorInterface $urlGenerator = null, $excludedAjaxPaths = '^/bundles|^/_wdt', $options = [])
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
@@ -49,6 +50,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->mode = (int) $mode;
         $this->position = $position;
         $this->excludedAjaxPaths = $excludedAjaxPaths;
+        $this->options = $options;
     }
 
     public function isEnabled()
@@ -123,6 +125,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'excluded_ajax_paths' => $this->excludedAjaxPaths,
                     'token' => $response->headers->get('X-Debug-Token'),
                     'request' => $request,
+                    'options' => $this->options,
                 )
             ))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);

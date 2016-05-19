@@ -198,10 +198,7 @@ class TextDescriptor extends Descriptor
             }
 
             // add commands by namespace
-            $commandNames = [];
-            foreach($description->getCommands() as $name => $command) {
-                $commandNames[] = $name;
-            }
+            $commands = $description->getCommands();
 
             foreach ($description->getNamespaces() as $namespace) {
                 if (!$describedNamespace && ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {
@@ -210,10 +207,10 @@ class TextDescriptor extends Descriptor
                 }
 
                 foreach ($namespace['commands'] as $name) {
-                    if(in_array($name, $commandNames)) {
+                    if (isset($commands[$name])) {
                         $this->writeText("\n");
                         $spacingWidth = $width - strlen($name);
-                        $command = $description->getCommand($name);
+                        $command = $commands[$name];
                         $commandAliases = $this->getCommandAliasesText($command);
                         $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $commandAliases.$command->getDescription()), $options);
                     }
@@ -247,8 +244,8 @@ class TextDescriptor extends Descriptor
         $text = '';
         $aliases = $command->getAliases();
 
-        if(count($aliases) > 0) {
-            $text = '['.implode('|',$aliases).'] ';
+        if ($aliases) {
+            $text = '['.implode('|', $aliases).'] ';
         }
 
         return $text;

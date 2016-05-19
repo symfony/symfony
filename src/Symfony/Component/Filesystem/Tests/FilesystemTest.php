@@ -1101,13 +1101,19 @@ class FilesystemTest extends FilesystemTestCase
     {
         $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
 
+        // skip mode check on Windows
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $oldMask = umask(0002);
+        }
+
         $this->filesystem->dumpFile($filename, 'bar');
         $this->assertFileExists($filename);
         $this->assertSame('bar', file_get_contents($filename));
 
         // skip mode check on Windows
         if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->assertFilePermissions(666, $filename);
+            $this->assertFilePermissions(664, $filename);
+            umask($oldMask);
         }
     }
 

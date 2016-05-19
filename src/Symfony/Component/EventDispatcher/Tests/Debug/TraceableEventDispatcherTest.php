@@ -205,6 +205,34 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }
+
+    public function testGetCalledListenersWithEventName()
+    {
+        $dispatcher = new EventDispatcher();
+        $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
+        $tdispatcher->addListener('foo', $listener = function () {});
+        $tdispatcher->addListener('bar', $listener = function () {});
+
+        $this->assertEquals(array(), $tdispatcher->getCalledListeners());
+        $this->assertEquals(array('foo.closure' => array('event' => 'foo', 'type' => 'Closure', 'pretty' => 'closure', 'priority' => 0)), $tdispatcher->getNotCalledListeners('foo'));
+
+        $tdispatcher->dispatch('foo');
+
+        $this->assertEquals(array('foo.closure' => array('event' => 'foo', 'type' => 'Closure', 'pretty' => 'closure', 'priority' => null)), $tdispatcher->getCalledListeners('foo'));
+        $this->assertEquals(array('bar.closure' => array('event' => 'bar', 'type' => 'Closure', 'pretty' => 'closure', 'priority' => null)), $tdispatcher->getNotCalledListeners('bar'));
+        $this->assertEquals(array('bar.closure' => array('event' => 'bar', 'type' => 'Closure', 'pretty' => 'closure', 'priority' => null)), $tdispatcher->getNotCalledListeners());
+
+        $tdispatcher->dispatch('bar');
+
+        $this->assertEquals(
+            array(
+                'foo.closure' => array('event' => 'foo', 'type' => 'Closure', 'pretty' => 'closure', 'priority' => 0),
+                'bar.closure' => array('event' => 'bar', 'type' => 'Closure', 'pretty' => 'closure', 'priority' => 0),
+            ),
+            $tdispatcher->getCalledListeners()
+        );
+        $this->assertEquals(array(), $tdispatcher->getNotCalledListeners());
+    }
 }
 
 class EventSubscriber implements EventSubscriberInterface

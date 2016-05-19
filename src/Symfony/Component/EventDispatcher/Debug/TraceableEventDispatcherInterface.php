@@ -21,14 +21,18 @@ interface TraceableEventDispatcherInterface extends EventDispatcherInterface
     /**
      * Gets the called listeners.
      *
+     * @param string $eventName The name of the event
+     *
      * @return array An array of called listeners
      */
-    public function getCalledListeners();
+    public function getCalledListeners($eventName = null);
 
     /**
      * Gets the not called listeners.
      *
+     * @param string $eventName The name of the event
+     *
      * @return array An array of not called listeners
      */
-    public function getNotCalledListeners();
+    public function getNotCalledListeners($eventName = null);
 }

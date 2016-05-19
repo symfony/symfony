@@ -30,7 +30,7 @@ class DateTimeValidator extends DateValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\DateTime');
         }
 
-        if (null === $value || '' === $value || $value instanceof \DateTime) {
+        if (null === $value || '' === $value || $value instanceof \DateTimeInterface) {
             return;
         }
 

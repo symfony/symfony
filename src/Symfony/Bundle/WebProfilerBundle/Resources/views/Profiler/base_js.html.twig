@@ -110,6 +110,19 @@
                             methodCell.textContent = request.method;
                             row.appendChild(methodCell);
 
+                            var statusCodeCell = document.createElement('td');
+                            var statusCode = document.createElement('span');
+                            if (request.statusCode < 300) {
+                                statusCode.setAttribute('class', 'sf-toolbar-status');
+                            } else if (request.statusCode < 400) {
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
+                            } else {
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+                            }
+                            statusCode.textContent = request.statusCode || '-';
+                            statusCodeCell.appendChild(statusCode);
+                            row.appendChild(statusCodeCell);
+
                             var pathCell = document.createElement('td');
                             pathCell.className = 'sf-ajax-request-url';
                             if ('GET' === request.method) {
@@ -241,6 +254,7 @@
                                 stackElement.duration = new Date() - stackElement.start;
                                 stackElement.loading = false;
                                 stackElement.error = self.status < 200 || self.status >= 400;
+                                stackElement.statusCode = self.status;
                                 stackElement.profile = self.getResponseHeader("X-Debug-Token");
                                 stackElement.profilerUrl = self.getResponseHeader("X-Debug-Token-Link");
 

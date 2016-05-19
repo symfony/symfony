@@ -45,6 +45,8 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      */
     private $output;
 
+    private $stdoutput;
+
     /**
      * @var array
      */
@@ -122,7 +124,8 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
     {
         $output = $event->getOutput();
         if ($output instanceof ConsoleOutputInterface) {
-            $output = $output->getErrorOutput();
+            $this->stdoutput = $output->getStdOutput();
+            $output          = $output->getErrorOutput();
         }
 
         $this->setOutput($output);
@@ -154,7 +157,13 @@ class ConsoleHandler extends AbstractProcessingHandler implements EventSubscribe
      */
     protected function write(array $record)
     {
-        $this->output->write((string) $record['formatted']);
+        if (Logger::ERROR > $record['level']) {
+            $this->stdoutput->write((string)$record['formatted']);
+
+            return;
+        }
+
+        $this->output->write((string)$record['formatted']);
     }
 
     /**

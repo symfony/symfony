@@ -33,6 +33,8 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      * @var StreamOutput
      */
     private $stderr;
+    private $stdout;
+
 
     /**
      * Constructor.
@@ -44,6 +46,7 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     public function __construct($verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         parent::__construct($this->openOutputStream(), $verbosity, $decorated, $formatter);
+        $this->stdout= new StreamOutput($this->openOutputStream(), $verbosity, $decorated, $formatter);
 
         $actualDecorated = $this->isDecorated();
         $this->stderr = new StreamOutput($this->openErrorStream(), $verbosity, $decorated, $this->getFormatter());
@@ -153,5 +156,13 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
     private function openErrorStream()
     {
         return fopen($this->hasStderrSupport() ? 'php://stderr' : 'php://output', 'w');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStdOutput()
+    {
+        return $this->stdout;
     }
 }

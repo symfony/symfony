@@ -60,7 +60,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
         //  (integration test for the issue #18767 fix)
         $levelName = Logger::getLevelName($level);
 
-        $realOutput = $this->getMock('Symfony\Component\Console\Output\Output', ['doWrite']);
+        $realOutput = $this->getMock('Symfony\Component\Console\Output\Output', array('doWrite'));
         $realOutput->setVerbosity($verbosity);
         $realOutput
             ->expects($isHandling ? $this->once() : $this->never())

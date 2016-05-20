@@ -62,8 +62,12 @@ class FileFormField extends FormField
             $name = basename($value);
 
             // copy to a tmp location
-            $tmp = tempnam(sys_get_temp_dir(), 'upload');
-            unlink($tmp);
+            $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'symfony' . DIRECTORY_SEPARATOR . uniqid();
+            mkdir($path, 0777, true);
+            $tmp = $path . DIRECTORY_SEPARATOR . $name;
+            if (is_file($tmp)) {
+                unlink($tmp);
+            }
             copy($value, $tmp);
             $value = $tmp;
         } else {

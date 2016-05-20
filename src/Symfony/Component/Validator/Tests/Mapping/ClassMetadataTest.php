@@ -277,4 +277,71 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertCount(0, $this->metadata->getPropertyMetadata('foo'), '->getPropertyMetadata() returns an empty collection if no metadata is configured for the given property');
     }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testAddConstraintFailsIfClassNameGroupIsSet()
+    {
+        $metadata = new ClassMetadata(self::CLASSNAME);
+        $constraint = new ConstraintA(array('groups' => array('Entity')));
+        $metadata->addConstraint($constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testAddPropertyConstraintFailsIfClassNameGroupIsSet()
+    {
+        $metadata = new ClassMetadata(self::CLASSNAME);
+        $constraint = new ConstraintA(array('groups' => array('Entity')));
+        $metadata->addPropertyConstraint('firstName', $constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testAddGetterConstraintFailsIfClassNameGroupIsSet()
+    {
+        $metadata = new ClassMetadata(self::CLASSNAME);
+        $constraint = new ConstraintA(array('groups' => array('Entity')));
+        $metadata->addGetterConstraint('lastName', $constraint);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testMergeConstraintsFailsIfClassNameGroupIsSetInClassConstraint()
+    {
+        $metadata = new ClassMetadata(self::CLASSNAME);
+        $parent = new ClassMetadata(self::PARENTCLASS);
+        $constraint = new ConstraintA(array('groups' => array('Entity')));
+        $parent->addConstraint($constraint);
+        $metadata->mergeConstraints($parent);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testMergeConstraintsFailsIfClassNameGroupIsSetInPropertyConstraint()
+    {
+        $metadata = new ClassMetadata(self::CLASSNAME);
+        $parent = new ClassMetadata(self::PARENTCLASS);
+        $constraint = new ConstraintA(array('groups' => array('Entity')));
+        $parent->addPropertyConstraint('firstName', $constraint);
+        $metadata->mergeConstraints($parent);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\GroupDefinitionException
+     */
+    public function testMergeConstraintsFailsIfClassNameGroupIsSetInGetterConstraint()
+    {
+        $metadata = new ClassMetadata(self::CLASSNAME);
+        $parent = new ClassMetadata(self::PARENTCLASS);
+        $constraint = new ConstraintA(array('groups' => array('Entity')));
+        $parent->addGetterConstraint('data', $constraint);
+        $metadata->mergeConstraints($parent);
+    }
+
 }

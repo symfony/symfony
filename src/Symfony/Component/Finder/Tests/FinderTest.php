@@ -112,6 +112,13 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(array('test.php')), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testSizeWithDirectory()
+    {
+        $finder = new Finder();
+        $this->assertSame($finder, $finder->directories()->size('< 100'));
+        $this->assertIterator($this->toAbsolute(array('toto')), $finder->in(self::$tmpDir)->getIterator());
+    }
+
     public function testDate()
     {
         $finder = new Finder();

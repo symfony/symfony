@@ -13,6 +13,7 @@ namespace Symfony\Tests\Component\Security\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Doctrine\Common\Util\ClassUtils;
 
 class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,7 +51,7 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($account))
         ;
 
-        return array(
+        $data = array(
             array(new UserSecurityIdentity('foo', 'Foo'), new UserSecurityIdentity('foo', 'Foo'), true),
             array(new UserSecurityIdentity('foo', 'Bar'), new UserSecurityIdentity('foo', 'Foo'), false),
             array(new UserSecurityIdentity('foo', 'Foo'), new UserSecurityIdentity('bar', 'Foo'), false),
@@ -60,5 +61,12 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             array(new UserSecurityIdentity('foo', 'Foo'), UserSecurityIdentity::fromToken($token), false),
             array(new UserSecurityIdentity('foo', 'USI_AccountImpl'), UserSecurityIdentity::fromToken($token), true),
         );
+
+        if (class_exists('Doctrine\Common\Util\ClassUtils')) {
+            $proxyClass = ClassUtils::generateProxyClassName('Foo', 'Acme\\DemoBundle\\Proxy\\');
+            $data[] = array(new UserSecurityIdentity('foo', $proxyClass), new UserSecurityIdentity('foo', 'Foo'), true);
+        }
+
+        return $data;
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Debug;
 
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Debug\Stopwatch;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
@@ -56,18 +57,18 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
     public function dispatch($eventName, Event $event = null)
     {
         switch ($eventName) {
-            case 'kernel.request':
+            case KernelEvents::REQUEST:
                 $this->stopwatch->openSection();
                 break;
-            case 'kernel.view':
-            case 'kernel.response':
+            case KernelEvents::VIEW:
+            case KernelEvents::RESPONSE:
                 // stop only if a controller has been executed
                 try {
                     $this->stopwatch->stop('controller');
                 } catch (\LogicException $e) {
                 }
                 break;
-            case 'kernel.terminate':
+            case KernelEvents::TERMINATE:
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
                 $this->stopwatch->openSection($token);
                 break;
@@ -80,22 +81,22 @@ class ContainerAwareTraceableEventDispatcher extends ContainerAwareEventDispatch
         $e1->stop();
 
         switch ($eventName) {
-            case 'kernel.controller':
+            case KernelEvents::CONTROLLER:
                 $this->stopwatch->start('controller', 'section');
                 break;
-            case 'kernel.response':
+            case KernelEvents::RESPONSE:
                 $token = $event->getResponse()->headers->get('X-Debug-Token');
                 $this->stopwatch->stopSection($token);
                 if (HttpKernelInterface::MASTER_REQUEST === $event->getRequestType()) {
                     // The profiles can only be updated once they have been created
-                    // that is after the 'kernel.response' event of the main request
+                    // that is after the KernelEvents::RESPONSE event of the main request
                     $this->updateProfiles($token, true);
                 }
                 break;
-            case 'kernel.terminate':
+            case KernelEvents::TERMINATE:
                 $this->stopwatch->stopSection($token);
-                // The children profiles have been updated by the previous 'kernel.response'
-                // event. Only the root profile need to be updated with the 'kernel.terminate'
+                // The children profiles have been updated by the previous KernelEvents::RESPONSE
+                // event. Only the root profile need to be updated with the KernelEvents::TERMINATE
                 // timing informations.
                 $this->updateProfiles($token, false);
                 break;

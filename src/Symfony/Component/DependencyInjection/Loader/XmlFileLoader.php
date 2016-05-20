@@ -116,25 +116,28 @@ class XmlFileLoader extends FileLoader
         }
 
         foreach ($services as $service) {
-            $this->parseDefinition((string) $service->getAttribute('id'), $service, $file);
+            if (null !== $definition = $this->parseDefinition($service, $file)) {
+                $this->container->setDefinition((string) $service->getAttribute('id'), $definition);
+            }
         }
     }
 
     /**
      * Parses an individual Definition.
      *
-     * @param string      $id
      * @param \DOMElement $service
      * @param string      $file
+     *
+     * @return Definition
      */
-    private function parseDefinition($id, \DOMElement $service, $file)
+    private function parseDefinition(\DOMElement $service, $file)
     {
         if ($alias = $service->getAttribute('alias')) {
             $public = true;
             if ($publicAttr = $service->getAttribute('public')) {
                 $public = XmlUtils::phpize($publicAttr);
             }
-            $this->container->setAlias($id, new Alias($alias, $public));
+            $this->container->setAlias((string) $service->getAttribute('id'), new Alias($alias, $public));
 
             return;
         }
@@ -174,6 +177,13 @@ class XmlFileLoader extends FileLoader
             }
         }
 
+        $configuratorService = $this->getChildren($service, 'configurator-service');
+
+        if (count($configuratorService) === 1) {
+            $serviceNode = $this->getChildren($configuratorService[0], 'service');
+            $definition->setConfigurator($this->parseDefinition($serviceNode[0], $file));
+        }
+
         foreach ($this->getChildren($service, 'call') as $call) {
             $definition->addMethodCall($call->getAttribute('method'), $this->getArgumentsAsPhp($call, 'argument'));
         }
@@ -200,7 +210,7 @@ class XmlFileLoader extends FileLoader
             $definition->setDecoratedService($value, $renameId);
         }
 
-        $this->container->setDefinition($id, $definition);
+        return $definition;
     }
 
     /**
@@ -276,7 +286,9 @@ class XmlFileLoader extends FileLoader
             // we could not use the constant false here, because of XML parsing
             $domElement->setAttribute('public', 'false');
 
-            $this->parseDefinition($id, $domElement, $file);
+            if (null !== $definition = $this->parseDefinition($domElement, $file)) {
+                $this->container->setDefinition($id, $definition);
+            }
 
             if (true === $wild) {
                 $tmpDomElement = new \DOMElement('_services', null, self::NS);

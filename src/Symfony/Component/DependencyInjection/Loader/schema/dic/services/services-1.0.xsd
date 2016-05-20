@@ -72,11 +72,18 @@
     <xsd:attribute name="function" type="xsd:string" />
   </xsd:complexType>
 
+  <xsd:complexType name="configurator-service" mixed="true">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="service" type="service" />
+    </xsd:choice>
+  </xsd:complexType>
+
   <xsd:complexType name="service">
     <xsd:choice maxOccurs="unbounded">
       <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
       <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="configurator" type="configurator" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="configurator-service" type="configurator-service" minOccurs="0" maxOccurs="1" />
       <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
       <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />

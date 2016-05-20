@@ -490,8 +490,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if (!isset($this->extensionConfigs[$name])) {
                 $this->extensionConfigs[$name] = array();
             }
-
-            $this->extensionConfigs[$name] = array_merge($this->extensionConfigs[$name], $container->getExtensionConfig($name));
         }
     }
 

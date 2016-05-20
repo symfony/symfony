@@ -68,7 +68,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
             array(
                 'Route with several variables that have default values',
                 array('/foo/{bar}/{foobar}', array('bar' => 'bar', 'foobar' => '')),
-                '/foo', '#^/foo(?:/(?P<bar>[^/]+?)(?:/(?P<foobar>[^/]+?))?)?$#s', array('bar', 'foobar'), array(
+                '/foo', '#^/foo(?:/(?P<bar>[^/]+?))?(?:/(?P<foobar>[^/]+?))?$#s', array('bar', 'foobar'), array(
                     array('variable', '/', '[^/]+?', 'foobar'),
                     array('variable', '/', '[^/]+?', 'bar'),
                     array('text', '/foo'),
@@ -95,6 +95,23 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 array('/{bar}', array('bar' => 'bar'), array('bar' => '(foo|bar)')),
                 '', '#^/(?P<bar>(foo|bar))?$#s', array('bar'), array(
                     array('variable', '/', '(foo|bar)', 'bar'),
+                )),
+            array(
+                'Route with optional variable and suffix',
+                array('/foo-{bar}.html', array('bar' => 'bar'), array('bar' => '(foo|bar)')),
+                '/foo', '#^/foo(?:\-(?P<bar>(foo|bar)))?\.html$#s', array('bar'), array(
+                    array('text', '.html'),
+                    array('variable', '-', '(foo|bar)', 'bar'),
+                    array('text', '/foo'),
+                )),
+            array(
+                'Route with several optional variables and suffix',
+                array('/foo-{bar}-{baz}.html', array('bar' => 'bar', 'baz' => 'baz'), array('bar' => '(foo|bar)', 'baz' => '(baz|zab)')),
+                '/foo', '#^/foo(?:\-(?P<bar>(foo|bar)))?(?:\-(?P<baz>(baz|zab)))?\.html$#s', array('bar', 'baz'), array(
+                    array('text', '.html'),
+                    array('variable', '-', '(baz|zab)', 'baz'),
+                    array('variable', '-', '(foo|bar)', 'bar'),
+                    array('text', '/foo'),
                 )),
         );
     }

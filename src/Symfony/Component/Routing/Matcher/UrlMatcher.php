@@ -141,7 +141,8 @@ class UrlMatcher implements UrlMatcherInterface
     {
         $parameters = $defaults;
         foreach ($params as $key => $value) {
-            if (!is_int($key)) {
+            // empty value in matches ($params) means not-matched optional parameter
+            if (!is_int($key) && !empty($value)) {
                 $parameters[$key] = rawurldecode($value);
             }
         }

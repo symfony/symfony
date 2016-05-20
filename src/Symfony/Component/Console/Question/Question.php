@@ -28,6 +28,7 @@ class Question
     private $autocompleterValues;
     private $validator;
     private $default;
+    private $showDefault = false;
     private $normalizer;
 
     /**
@@ -49,6 +50,10 @@ class Question
      */
     public function getQuestion()
     {
+        if ($this->showDefault) {
+            return sprintf('%s [%s]', $this->question, $this->default);
+        }
+
         return $this->question;
     }
 
@@ -60,6 +65,20 @@ class Question
     public function getDefault()
     {
         return $this->default;
+    }
+
+    /**
+     * Sets whether the default answer should be shown to the user in the question
+     *
+     * @param bool $showDefault
+     *
+     * @return Question The current instance
+     */
+    public function setShowDefault($showDefault)
+    {
+        $this->showDefault = (bool) $showDefault;
+
+        return $this;
     }
 
     /**

@@ -290,15 +290,17 @@ class Process
             $w = $writePipes;
             $e = null;
 
-            $n = @stream_select($r, $w, $e, 0, ceil(static::TIMEOUT_PRECISION * 1E6));
-
-            if (false === $n) {
+            if (false === $n = @stream_select($r, $w, $e, 0, ceil(static::TIMEOUT_PRECISION * 1E6))) {
+                // if a system call has been interrupted, forget about it, let's try again
+                if ($this->hasSystemCallBeenInterrupted()) {
+                    continue;
+                }
                 break;
             }
-            if ($n === 0) {
-                proc_terminate($this->process);
 
-                throw new \RuntimeException('The process timed out.');
+            // nothing has changed, let's wait until the process is ready
+            if (0 === $n) {
+                continue;
             }
 
             if ($w) {
@@ -361,10 +363,9 @@ class Process
 
                 // let's have a look if something changed in streams
                 if (false === $n = @stream_select($r, $w, $e, 0, ceil(static::TIMEOUT_PRECISION * 1E6))) {
-                    $lastError = error_get_last();
-
-                    // stream_select returns false when the `select` system call is interrupted by an incoming signal
-                    if (isset($lastError['message']) && false === stripos($lastError['message'], 'interrupted system call')) {
+                    // if a system call has been interrupted, forget about it, let's try again
+                    // otherwise, an error occured, let's reset pipes
+                    if (!$this->hasSystemCallBeenInterrupted()) {
                         $this->pipes = array();
                     }
 
@@ -976,5 +977,18 @@ class Process
                 unset($this->fileHandles[$type]);
             }
         }
+    }
+
+    /**
+     * Returns true if a system call has been interrupted.
+     *
+     * @return Boolean
+     */
+    private function hasSystemCallBeenInterrupted()
+    {
+        $lastError = error_get_last();
+
+        // stream_select returns false when the `select` system call is interrupted by an incoming signal
+        return isset($lastError['message']) && false !== stripos($lastError['message'], 'interrupted system call');
     }
 }

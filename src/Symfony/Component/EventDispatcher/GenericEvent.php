@@ -49,11 +49,25 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     /**
      * Getter for subject property.
      *
-     * @return mixed $subject The observer subject.
+     * @return mixed $subject The observed subject.
      */
     public function getSubject()
     {
         return $this->subject;
+    }
+
+    /**
+     * Setter for subject property.
+     *
+     * @param mixed $subject The observed subject.
+     *
+     * @return GenericEvent
+     */
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+
+        return $this;
     }
 
     /**

@@ -28,6 +28,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\HelpCommand;
 use Symfony\Component\Console\Command\ListCommand;
+use Symfony\Component\Console\Command\ClearCommand;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
@@ -949,7 +950,7 @@ class Application
      */
     protected function getDefaultCommands()
     {
-        return array(new HelpCommand(), new ListCommand());
+        return array(new HelpCommand(), new ListCommand(), new ClearCommand());
     }
 
     /**

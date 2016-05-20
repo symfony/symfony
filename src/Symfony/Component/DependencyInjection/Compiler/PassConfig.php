@@ -40,7 +40,7 @@ class PassConfig
      */
     public function __construct()
     {
-        $this->mergePass = new MergeExtensionConfigurationPass();
+        $this->mergePass = new MergeExtensionConfigurationPass(array());
 
         $this->afterRemovingPasses = array();
         $this->beforeOptimizationPasses = array();

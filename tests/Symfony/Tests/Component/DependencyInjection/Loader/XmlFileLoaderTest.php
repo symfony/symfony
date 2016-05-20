@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -204,6 +205,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         // extension without an XSD
         $loader->load('extensions/services1.xml');
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($container->getParameterBag()->all()));
         $container->compile();
         $services = $container->getDefinitions();
         $parameters = $container->getParameterBag()->all();
@@ -220,6 +222,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $container->registerExtension(new \ProjectWithXsdExtension());
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('extensions/services2.xml');
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($container->getParameterBag()->all()));
         $container->compile();
         $services = $container->getDefinitions();
         $parameters = $container->getParameterBag()->all();

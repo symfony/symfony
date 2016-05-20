@@ -20,12 +20,24 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class MergeExtensionConfigurationPass implements CompilerPassInterface
 {
+    private $configParams;
+
+    /**
+     * To make sure that the main configuration's parameters are not overridable by extensions
+     * you should pass them to the constructor.
+     *
+     * @param array $configParams Configuration parameters that will take precedence over extensions
+     */
+    public function __construct(array $configParams)
+    {
+        $this->configParams = $configParams;
+    }
+
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $parameters = $container->getParameterBag()->all();
         $definitions = $container->getDefinitions();
         $aliases = $container->getAliases();
 
@@ -46,6 +58,6 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
         $container->addDefinitions($definitions);
         $container->addAliases($aliases);
-        $container->getParameterBag()->add($parameters);
+        $container->getParameterBag()->add($this->configParams);
     }
 }

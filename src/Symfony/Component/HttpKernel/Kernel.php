@@ -626,7 +626,11 @@ abstract class Kernel implements KernelInterface
             }
         }
 
-        $container = new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
+        $kernelParams = $this->getKernelParameters();
+        $container = new ContainerBuilder(new ParameterBag($kernelParams));
+        $container->addObjectResource($this);
+
+        // ensure these extensions are implicitly loaded
         $extensions = array();
         foreach ($this->bundles as $bundle) {
             $bundle->build($container);
@@ -640,14 +644,20 @@ abstract class Kernel implements KernelInterface
                 $container->addObjectResource($bundle);
             }
         }
-        $container->addObjectResource($this);
-
-        // ensure these extensions are implicitly loaded
-        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($extensions));
 
         if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
             $container->merge($cont);
         }
+
+        // ensure kernel parameters are overridable by extensions
+        $params = $container->getParameterBag()->all();
+        foreach ($params as $key => $val) {
+            if (isset($kernelParams[$key]) && $kernelParams[$key] === $val) {
+                unset($params[$key]);
+            }
+        }
+
+        $container->getCompilerPassConfig()->setMergePass(new MergeExtensionConfigurationPass($params, $extensions));
 
         $container->addCompilerPass(new AddClassesToCachePass($this));
         $container->compile();

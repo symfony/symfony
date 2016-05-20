@@ -23,12 +23,15 @@ class Processor
      *
      * @param NodeInterface $configTree The node tree describing the configuration
      * @param array         $configs    An array of configuration items to process
+     * @param bool          $normalizeKeys Flag indicating if config key normalization is needed. True by default.
      *
      * @return array The processed configuration
      */
-    public function process(NodeInterface $configTree, array $configs)
+    public function process(NodeInterface $configTree, array $configs, $normalizeKeys = true)
     {
-        $configs = self::normalizeKeys($configs);
+        if ($normalizeKeys) {
+            $configs = self::normalizeKeys($configs);
+        }
 
         $currentConfig = array();
         foreach ($configs as $config) {
@@ -44,12 +47,13 @@ class Processor
      *
      * @param ConfigurationInterface $configuration The configuration class
      * @param array                  $configs       An array of configuration items to process
+     * @param bool                   $normalizeKeys Flag indicating if config key normalization is needed. True by default.
      *
      * @return array The processed configuration
      */
-    public function processConfiguration(ConfigurationInterface $configuration, array $configs)
+    public function processConfiguration(ConfigurationInterface $configuration, array $configs, $normalizeKeys = true)
     {
-        return $this->process($configuration->getConfigTreeBuilder()->buildTree(), $configs);
+        return $this->process($configuration->getConfigTreeBuilder()->buildTree(), $configs, $normalizeKeys);
     }
 
     /**

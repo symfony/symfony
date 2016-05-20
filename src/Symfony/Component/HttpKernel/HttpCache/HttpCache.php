@@ -29,10 +29,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpCache implements HttpKernelInterface, TerminableInterface
 {
+    protected $esi;
     private $kernel;
     private $store;
     private $request;
-    private $esi;
     private $esiCacheStrategy;
     private $traces;
 
@@ -599,7 +599,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @return Response A Response instance
      */
-    private function restoreResponseBody(Request $request, Response $response)
+    protected function restoreResponseBody(Request $request, Response $response)
     {
         if ('HEAD' === $request->getMethod() || 304 === $response->getStatusCode()) {
             $response->setContent(null);

@@ -89,17 +89,21 @@ class Crawler extends \SplObjectStorage
             $type = 'text/html';
         }
 
-        // DOM only for HTML/XML content
-        if (!preg_match('/(x|ht)ml/i', $type, $matches)) {
-            return null;
-        }
-
         $charset = 'ISO-8859-1';
         if (false !== $pos = strpos($type, 'charset=')) {
             $charset = substr($type, $pos + 8);
             if (false !== $pos = strpos($charset, ';')) {
                 $charset = substr($charset, 0, $pos);
             }
+
+            if (strlen($charset) === strlen($type) - 8) {
+                $type = 'text/html';
+            }
+        }
+
+        // DOM only for HTML/XML content
+        if (!preg_match('/(x|ht)ml/i', $type, $matches)) {
+            return null;
         }
 
         if ('x' === $matches[1]) {

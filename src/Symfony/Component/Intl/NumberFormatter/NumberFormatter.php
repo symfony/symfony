@@ -693,7 +693,7 @@ class NumberFormatter
      * @see http://en.wikipedia.org/wiki/Swedish_rounding
      * @see http://www.docjar.com/html/api/com/ibm/icu/util/Currency.java.html#1007
      */
-    private function roundCurrency($value, $currency)
+    public function roundCurrency($value, $currency)
     {
         $fractionDigits = Intl::getCurrencyBundle()->getFractionDigits($currency);
         $roundingIncrement = Intl::getCurrencyBundle()->getRoundingIncrement($currency);

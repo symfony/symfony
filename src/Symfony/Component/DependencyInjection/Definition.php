@@ -71,7 +71,7 @@ class Definition
      */
     public function setFactoryClass($factoryClass)
     {
-        $this->factoryClass = $factoryClass;
+        $this->factoryClass = trim($factoryClass);
 
         return $this;
     }
@@ -99,7 +99,7 @@ class Definition
      */
     public function setFactoryMethod($factoryMethod)
     {
-        $this->factoryMethod = $factoryMethod;
+        $this->factoryMethod = trim($factoryMethod);
 
         return $this;
     }
@@ -155,7 +155,7 @@ class Definition
      */
     public function setClass($class)
     {
-        $this->class = $class;
+        $this->class = trim($class);
 
         return $this;
     }
@@ -320,6 +320,7 @@ class Definition
      */
     public function addMethodCall($method, array $arguments = array())
     {
+        $method = trim($method);
         if (empty($method)) {
             throw new InvalidArgumentException(sprintf('Method name cannot be empty.'));
         }
@@ -339,6 +340,7 @@ class Definition
      */
     public function removeMethodCall($method)
     {
+        $method = trim($method);
         foreach ($this->calls as $i => $call) {
             if ($call[0] === $method) {
                 unset($this->calls[$i]);
@@ -360,6 +362,7 @@ class Definition
      */
     public function hasMethodCall($method)
     {
+        $method = trim($method);
         foreach ($this->calls as $call) {
             if ($call[0] === $method) {
                 return true;

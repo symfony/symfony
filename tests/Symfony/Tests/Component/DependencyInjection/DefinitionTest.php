@@ -33,6 +33,8 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($def->getFactoryClass());
         $this->assertSame($def, $def->setFactoryClass('stdClass2'), "->setFactoryClass() implements a fluent interface.");
         $this->assertEquals('stdClass2', $def->getFactoryClass(), "->getFactoryClass() returns current class to construct this service.");
+        $def->setFactoryClass("   stdClass3  \t\n");
+        $this->assertEquals('stdClass3', $def->getFactoryClass(), "->getFactoryClass() returns a trimmed class name");
     }
 
     public function testSetGetFactoryMethod()
@@ -60,6 +62,8 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setClass('foo'), '->setClass() implements a fluent interface');
         $this->assertEquals('foo', $def->getClass(), '->getClass() returns the class name');
+        $def->setClass("\t\n  bar ");
+        $this->assertEquals('bar', $def->getClass(), '->getClass() returns the trimmed class name');
     }
 
     /**

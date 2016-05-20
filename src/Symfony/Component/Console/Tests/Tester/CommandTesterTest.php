@@ -59,4 +59,9 @@ class CommandTesterTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('foo'.PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
     }
+
+    public function testGetStatusCode()
+    {
+        $this->assertSame(0, $this->tester->getStatusCode(), '->getStatusCode() returns the status code');
+    }
 }

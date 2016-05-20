@@ -126,7 +126,7 @@ class Link
         }
 
         // relative path
-        return substr($this->currentUri, 0, strrpos($this->currentUri, '/') + 1).$uri;
+        return $this->resolveRelativeUri($uri);
     }
 
     /**
@@ -153,5 +153,39 @@ class Link
         }
 
         $this->node = $node;
+    }
+
+    /**
+     * Resolves a relative URI, removing all '.' and '..' references.
+     *
+     * @param string $uri The relative URI to resolve
+     *
+     * @return string
+     */
+    protected function resolveRelativeUri($uri)
+    {
+        preg_match('#^(\w+://[^/]+)/(.*)$#', $this->currentUri, $matches);
+        $currentBaseUri = $matches[1];
+        $currentPath = preg_replace('#(^|/)([^/]*)$#', '', $matches[2]);
+
+        $currentSegments = ('' !== $currentPath) ? explode('/', $currentPath) : array();
+        $targetSegments = $currentSegments;
+
+        $segments = explode('/', $uri);
+
+        foreach ($segments as $segment) {
+            if ('.' === $segment) {
+                continue;
+            }
+
+            if ('..' === $segment) {
+                array_pop($targetSegments);
+                continue;
+            }
+
+            array_push($targetSegments, $segment);
+        }
+
+        return $currentBaseUri.'/'.implode('/', $targetSegments);
     }
 }

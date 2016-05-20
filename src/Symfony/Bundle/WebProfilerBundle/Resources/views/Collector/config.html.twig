@@ -60,24 +60,33 @@
         <img width="21" height="28" alt="Environment" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAcCAMAAAC5xgRsAAAAZlBMVEX///////////////////////////////////////////////////////////////////////////////////////////+ZmZmZmZlISEhJSUmdnZ1HR0fR0dFZWVlpaWlfX18/Pz+puygPAAAAIXRSTlMACwwlJygpLzIzNjs8QEtMUmd6e32AucDBw8fIydTm6u5l8MjvAAAAo0lEQVR42r2P2Q6CMBBFL6XsZRGRfZv//0nbDBNEE19MnJeTc5ILKf58ahiUwzy/AJpIWwREwQnEXRdbGCLjrO+djWRvVMiJcigxB7viGogxDdJpSmHEmCVPS7YczJvgUu+CS30IvtbNYZMvsGVo2mVpG/kbm4auiCpdcC3YPCAhSpAdUzaAn6qPKZtUT6ZSzb4bi2hdo9MQ1nX4ASjfV+/4/Z40pyCHrNTbIgAAAABJRU5ErkJggg=="/>
         <span class="sf-toolbar-info-piece-additional-detail {{ debug_status_class }}"> </span>
         <span class="sf-toolbar-info-piece-additional sf-toolbar-status">{{ token }}</span>
-        <span class="sf-toolbar-info-piece-additional-detail">
-            <span class="sf-toolbar-info-with-delimiter">{{ collector.appname }}</span><span>{{ collector.env }}</span>
-        </span>
+        {% if 'n/a' != collector.appname or 'n/a' != collector.env %}
+            <span class="sf-toolbar-info-piece-additional-detail">
+                <span class="sf-toolbar-info-with-delimiter">{{ collector.appname }}</span>
+                <span>{{ collector.env }}</span>
+            </span>
+        {% endif %}
     {% endset %}
     {% set text %}
         {% spaceless %}
-            <div class="sf-toolbar-info-piece">
-                <b>Name</b>
-                <span>{{ collector.appname }}</span>
-            </div>
-            <div class="sf-toolbar-info-piece">
-                <b>Environment</b>
-                <span>{{ collector.env }}</span>
-            </div>
-            <div class="sf-toolbar-info-piece">
-                <b>Debug</b>
-                <span class="{{ debug_status_class }}">{{ collector.debug ? 'en' : 'dis' }}abled</span>
-            </div>
+            {% if 'n/a' != collector.appname %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Name</b>
+                    <span>{{ collector.appname }}</span>
+                </div>
+            {% endif %}
+            {% if 'n/a' != collector.env %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Environment</b>
+                    <span>{{ collector.env }}</span>
+                </div>
+            {% endif %}
+            {% if 'n/a' != collector.debug %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Debug</b>
+                    <span class="{{ debug_status_class }}">{{ collector.debug ? 'en' : 'dis' }}abled</span>
+                </div>
+            {% endif %}
             <div class="sf-toolbar-info-piece">
                 <b>Token</b>
                 <span>
@@ -116,18 +125,24 @@
                 <td>{{ collector.symfonyversion }}</td>
             {% endif %}
         </tr>
-        <tr>
-            <th>Application name</th>
-            <td>{{ collector.appname }}</td>
-        </tr>
-        <tr>
-            <th>Environment</th>
-            <td>{{ collector.env }}</td>
-        </tr>
-        <tr>
-            <th>Debug</th>
-            <td>{{ collector.debug ? 'enabled' : 'disabled' }}</td>
-        </tr>
+        {% if 'n/a' != collector.appname %}
+            <tr>
+                <th>Application name</th>
+                <td>{{ collector.appname }}</td>
+            </tr>
+        {% endif %}
+        {% if 'n/a' != collector.env %}
+            <tr>
+                <th>Environment</th>
+                <td>{{ collector.env }}</td>
+            </tr>
+        {% endif %}
+        {% if 'n/a' != collector.debug %}
+            <tr>
+                <th>Debug</th>
+                <td>{{ collector.debug ? 'enabled' : 'disabled' }}</td>
+            </tr>
+        {% endif %}
     </table>
 
     <h2>PHP configuration</h2>

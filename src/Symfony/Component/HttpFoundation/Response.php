@@ -135,7 +135,7 @@ class Response
      *
      * @api
      */
-    public function __construct($content = '', $status = 200, $headers = array())
+    public function __construct($content = '', $status = 200, array $headers = array())
     {
         $this->headers = new ResponseHeaderBag($headers);
         $this->setContent($content);

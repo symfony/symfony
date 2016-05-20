@@ -28,7 +28,7 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
             ->end()
             ->append($child);
 
-        $this->assertEquals(count($this->getField($parent, 'children')), 3);
+        $this->assertCount(3, $this->getField($parent, 'children'));
         $this->assertTrue(in_array($child, $this->getField($parent, 'children')));
     }
 

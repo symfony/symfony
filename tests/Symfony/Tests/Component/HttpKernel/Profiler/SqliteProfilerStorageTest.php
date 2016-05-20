@@ -49,7 +49,7 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
             $profile->setUrl('http://foo.bar');
             self::$storage->write($profile);
         }
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar', 20)), 10, '->write() stores data in the database');
+        $this->assertCount(10, self::$storage->find('127.0.0.1', 'http://foo.bar', 20), '->write() stores data in the database');
     }
 
     public function testStoreSpecialCharsInUrl()
@@ -95,9 +95,9 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
         self::$storage->write($profile);
 
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', '', 10)), 1, '->find() retrieve a record by IP');
-        $this->assertEquals(count(self::$storage->find('127.0.%.1', '', 10)), 0, '->find() does not interpret a "%" as a wildcard in the IP');
-        $this->assertEquals(count(self::$storage->find('127.0._.1', '', 10)), 0, '->find() does not interpret a "_" as a wildcard in the IP');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', '', 10), '->find() retrieve a record by IP');
+        $this->assertCount(0, self::$storage->find('127.0.%.1', '', 10), '->find() does not interpret a "%" as a wildcard in the IP');
+        $this->assertCount(0, self::$storage->find('127.0._.1', '', 10), '->find() does not interpret a "_" as a wildcard in the IP');
     }
 
     public function testRetrieveByUrl()
@@ -127,10 +127,10 @@ class SqliteProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $profile->setUrl('http://foo.bar/_');
         self::$storage->write($profile);
 
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/\'', 10)), 1, '->find() accepts single quotes in URLs');
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/"', 10)), 1, '->find() accepts double quotes in URLs');
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo\\bar/', 10)), 1, '->find() accepts backslash in URLs');
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/%', 10)), 1, '->find() does not interpret a "%" as a wildcard in the URL');
-        $this->assertEquals(count(self::$storage->find('127.0.0.1', 'http://foo.bar/_', 10)), 1, '->find() does not interpret a "_" as a wildcard in the URL');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo.bar/\'', 10), '->find() accepts single quotes in URLs');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo.bar/"', 10), '->find() accepts double quotes in URLs');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo\\bar/', 10), '->find() accepts backslash in URLs');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo.bar/%', 10), '->find() does not interpret a "%" as a wildcard in the URL');
+        $this->assertCount(1, self::$storage->find('127.0.0.1', 'http://foo.bar/_', 10), '->find() does not interpret a "_" as a wildcard in the URL');
     }
 }

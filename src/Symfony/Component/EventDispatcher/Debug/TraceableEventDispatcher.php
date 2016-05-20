@@ -315,9 +315,9 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         $listenerHash = '';
 
         if (is_string($listener)) {
-            $listenerHash = md5($listener);
-            if (isset($this->listenerInfoCache[$listenerHash][$eventName])) {
-                return $this->listenerInfoCache[$listenerHash][$eventName];
+            $listenerHash = md5($listener.$eventName);
+            if (isset($this->listenerInfoCache[$listenerHash])) {
+                return $this->listenerInfoCache[$listenerHash];
             }
 
             try {
@@ -342,9 +342,9 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             }
             $class = is_object($listener[0]) ? get_class($listener[0]) : $listener[0];
 
-            $listenerHash = md5($class);
-            if (isset($this->listenerInfoCache[$listenerHash][$eventName])) {
-                return $this->listenerInfoCache[$listenerHash][$eventName];
+            $listenerHash = md5($class.$listener[1].$eventName);
+            if (isset($this->listenerInfoCache[$listenerHash])) {
+                return $this->listenerInfoCache[$listenerHash];
             }
 
             try {

@@ -63,7 +63,7 @@ class FirePHPHandler extends BaseFirePHPHandler
      */
     protected function sendHeader($header, $content)
     {
-        if (!$this->sendHeaders) {
+        if (!isset($this->sendHeaders)) {
             return;
         }
 

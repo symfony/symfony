@@ -356,7 +356,7 @@ class Store implements StoreInterface
             return false;
         }
 
-        if (false === @rename($tmpFile, $path)) {
+        if (false === @copy($tmpFile, $path) || false === @unlink(@$tmpFile)) {
             return false;
         }
 

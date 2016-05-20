@@ -54,15 +54,13 @@ class RoleVoter implements VoterInterface
     public function vote(TokenInterface $token, $object, array $attributes)
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
-        $roles = $this->extractRoles($token);
-
         foreach ($attributes as $attribute) {
             if (!$this->supportsAttribute($attribute)) {
                 continue;
             }
 
             $result = VoterInterface::ACCESS_DENIED;
-            foreach ($roles as $role) {
+            foreach ($this->extractRoles($token) as $role) {
                 if ($attribute === $role->getRole()) {
                     return VoterInterface::ACCESS_GRANTED;
                 }

@@ -17,6 +17,7 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  * Wraps errors in forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Chris BECKER <goabonga@gmail.com>
  */
 class FormError implements \Serializable
 {
@@ -186,5 +187,21 @@ class FormError implements \Serializable
     public function unserialize($serialized)
     {
         list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized);
+    }
+
+    /**
+     * Map error as associative array.
+     *
+     * @return array
+     */
+    public function getAsArray()
+    {
+        return array(
+            'message'=>$this->message,
+            'messageTemplate'=>$this->messageTemplate,
+            'messageParameters'=>$this->messageParameters,
+            'messagePluralization'=>$this->messagePluralization,
+            'cause'=>$this->cause
+        );
     }
 }

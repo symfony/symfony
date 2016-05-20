@@ -1042,6 +1042,23 @@ class SimpleFormTest extends AbstractFormTest
         $child->initialize();
     }
 
+    public function testErrorsAsArray()
+    {
+        $this->form->addError(new FormError('Error!'));
+        $errors = $this->form->getErrors()->getAsArray();
+
+        $this->assertEquals(array('message'=>'Error!','messageTemplate'=>'Error!','messageParameters'=>array(),'messagePluralization'=>null,'cause'=>null), array_pop($errors));
+
+    }
+
+    public function testErrorsAsArrayToJson()
+    {
+        $this->form->addError(new FormError('Error!'));
+        $errors = $this->form->getErrors()->getAsArray();
+
+        $this->assertEquals('[{"message":"Error!","messageTemplate":"Error!","messageParameters":[],"messagePluralization":null,"cause":null}]',json_encode($errors));
+    }
+
     protected function createForm()
     {
         return $this->getBuilder()->getForm();

@@ -27,6 +27,7 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  * flatten the recursive structure into a flat list of errors.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @author Chris BECKER <goabonga@gmail.com>
  *
  * @since 2.5
  */
@@ -277,5 +278,21 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     private static function indent($string)
     {
         return rtrim(self::INDENTATION.str_replace("\n", "\n".self::INDENTATION, $string), ' ');
+    }
+
+    /**
+     * Get errors as associative array
+     *
+     * @return array the errors as associative array
+     */
+    public function getAsArray()
+    {
+        $errors = array();
+
+        foreach ($this->errors as $error) {
+            $errors[] = $error->getAsArray();
+        }
+
+        return $errors;
     }
 }

@@ -32,7 +32,7 @@ class CheckboxType extends AbstractType
         // We cannot solve this case via overriding the "data" option, because
         // doing so also calls setDataLocked(true).
         $builder->setData(isset($options['data']) ? $options['data'] : false);
-        $builder->addViewTransformer(new BooleanToStringTransformer($options['value']));
+        $builder->addViewTransformer(new BooleanToStringTransformer($options['value'], !$options['accept_any_value']));
     }
 
     /**
@@ -57,6 +57,7 @@ class CheckboxType extends AbstractType
 
         $resolver->setDefaults(array(
             'value' => '1',
+            'accept_any_value' => true,
             'empty_data' => $emptyData,
             'compound' => false,
         ));

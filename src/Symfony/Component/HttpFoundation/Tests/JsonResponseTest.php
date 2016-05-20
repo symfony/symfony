@@ -225,6 +225,26 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
 
         JsonResponse::create($serializable);
     }
+
+    public function testDataAfterSettingEncodingOptions()
+    {
+        $response = new JsonResponse();
+        $response->setData(array(array(1, 2, 3)));
+
+        $this->assertEquals('[[1,2,3]]', $response->getContent());
+        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+
+        $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
+    }
+
+    public function testContentAfterSettingEncodingOptionsToBeEmpty()
+    {
+        $response = new JsonResponse();
+        $response->setContent('{"different":{"key":"value"}}');
+        $response->setEncodingOptions(JSON_FORCE_OBJECT);
+
+        $this->assertEquals($response->getContent(), '{"different":{"key":"value"}}');
+    }
 }
 
 if (interface_exists('JsonSerializable')) {

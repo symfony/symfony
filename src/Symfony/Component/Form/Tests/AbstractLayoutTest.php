@@ -1741,7 +1741,7 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
     public function testCollectionPrototype()
     {
         $form = $this->factory->createNamedBuilder('name', 'form', array('items' => array('one', 'two', 'three')))
-            ->add('items', 'collection', array('allow_add' => true))
+            ->add('items', 'collection', array('allow_add' => true, 'prototype_name' => '__item__'))
             ->getForm()
             ->createView();
 
@@ -1751,6 +1751,14 @@ abstract class AbstractLayoutTest extends FormIntegrationTestCase
             '//div[@id="name_items"][@data-prototype]
             |
              //table[@id="name_items"][@data-prototype]
+
+'
+        );
+
+        $this->assertMatchesXpath($html,
+            '//div[@id="name_items"][@data-prototype-name="__item__"]
+            |
+             //table[@id="name_items"][@data-prototype-name="__item__"]
 
 '
         );

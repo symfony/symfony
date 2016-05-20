@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\SimpleXMLElement;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -25,9 +24,12 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * XmlFileLoader loads XML files service definitions.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Martin Hasoň <martin.hason@gmail.com>
  */
 class XmlFileLoader extends FileLoader
 {
+    const NAMESPACE_URI = 'http://symfony.com/schema/dic/services';
+
     /**
      * Loads an XML file.
      *
@@ -38,25 +40,29 @@ class XmlFileLoader extends FileLoader
     {
         $path = $this->locator->locate($file);
 
-        $xml = $this->parseFile($path);
-        $xml->registerXPathNamespace('container', 'http://symfony.com/schema/dic/services');
+        $dom = $this->parseFile($path);
+
+        $xpath = new \DOMXPath($dom);
+        $xpath->registerNamespace('container', self::NAMESPACE_URI);
+
+        $element = $dom->documentElement;
 
         $this->container->addResource(new FileResource($path));
 
         // anonymous services
-        $this->processAnonymousServices($xml, $path);
+        $this->processAnonymousServices($element, $xpath, $path);
 
         // imports
-        $this->parseImports($xml, $path);
+        $this->parseImports($element, $xpath, $path);
 
         // parameters
-        $this->parseParameters($xml, $path);
+        $this->parseParameters($element, $xpath, $path);
 
         // extensions
-        $this->loadFromExtensions($xml);
+        $this->loadFromExtensions($element, $xpath);
 
         // services
-        $this->parseDefinitions($xml, $path);
+        $this->parseDefinitions($element, $xpath, $path);
     }
 
     /**
@@ -73,123 +79,304 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
+     * Converts a \DomElement object to a PHP array.
+     *
+     * The following rules applies during the conversion:
+     *
+     *  * Each tag is converted to a key value or an array
+     *    if there is more than one "value"
+     *
+     *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
+     *    if the tag also has some nested tags
+     *
+     *  * The attributes are converted to keys (<foo foo="bar"/>)
+     *
+     *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
+     *
+     * @param \DomElement $element A \DomElement instance
+     *
+     * @return array A PHP array
+     */
+    public static function convertDomElementToArray(\DomElement $element)
+    {
+        $empty = true;
+        $config = array();
+        foreach ($element->attributes as $name => $node) {
+            $config[$name] = static::phpize($node->value);
+            $empty = false;
+        }
+
+        $nodeValue = false;
+        foreach ($element->childNodes as $node) {
+            if ($node instanceof \DOMText) {
+                if (trim($node->nodeValue)) {
+                    $nodeValue = trim($node->nodeValue);
+                    $empty = false;
+                }
+            } elseif (!$node instanceof \DOMComment) {
+                if ($node instanceof \DOMElement && '_services' === $node->nodeName) {
+                    $value = new Reference($node->getAttribute('id'));
+                } else {
+                    $value = static::convertDomElementToArray($node);
+                }
+
+                $key = $node->localName;
+                if (isset($config[$key])) {
+                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
+                        $config[$key] = array($config[$key]);
+                    }
+                    $config[$key][] = $value;
+                } else {
+                    $config[$key] = $value;
+                }
+
+                $empty = false;
+            }
+        }
+
+        if (false !== $nodeValue) {
+            $value = static::phpize($nodeValue);
+            if (count($config)) {
+                $config['value'] = $value;
+            } else {
+                $config = $value;
+            }
+        }
+
+        return !$empty ? $config : null;
+    }
+
+    /**
+     * Returns arguments as valid php types.
+     *
+     * @param string  $name
+     * @param Boolean $lowercase
+     *
+     * @return mixed
+     */
+    public static function getArgumentsAsPhp(\DOMElement $element, $name, $lowercase = true)
+    {
+        $arguments = array();
+
+        foreach ($element->childNodes as $arg) {
+            if (!$arg instanceof \DOMElement || $arg->namespaceURI !== self::NAMESPACE_URI || $arg->localName !== $name) {
+                continue;
+            }
+
+            if ($arg->hasAttribute('name')) {
+                $arg->setAttribute('key', $arg->getAttribute('name'));
+            }
+            $key = $arg->hasAttribute('key') ? $arg->getAttribute('key') : (!$arguments ? 0 : max(array_keys($arguments)) + 1);
+
+            // parameter keys are case insensitive
+            if ('parameter' == $name && $lowercase) {
+                $key = strtolower($key);
+            }
+
+            // this is used by DefinitionDecorator to overwrite a specific
+            // argument of the parent definition
+            if ($arg->hasAttribute('index')) {
+                $key = 'index_'.$arg->getAttribute('index');
+            }
+
+            switch ($arg->getAttribute('type')) {
+                case 'service':
+                    $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+                    if ($arg->hasAttribute('on-invalid') && 'ignore' == $arg->getAttribute('on-invalid')) {
+                        $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+                    } elseif ($arg->hasAttribute('on-invalid') && 'null' == $arg->getAttribute('on-invalid')) {
+                        $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+                    }
+
+                    if ($arg->hasAttribute('strict')) {
+                        $strict = self::phpize($arg->getAttribute('strict'));
+                    } else {
+                        $strict = true;
+                    }
+
+                    $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior, $strict);
+                    break;
+                case 'collection':
+                    $arguments[$key] = static::getArgumentsAsPhp($arg, $name, false);
+                    break;
+                case 'string':
+                    $arguments[$key] = $arg->nodeValue;
+                    break;
+                case 'constant':
+                    $arguments[$key] = constant($arg->nodeValue);
+                    break;
+                default:
+                    $arguments[$key] = self::phpize($arg->nodeValue);
+            }
+        }
+
+        return $arguments;
+    }
+
+    /**
+     * Converts an xml value to a php type.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public static function phpize($value)
+    {
+        $value = (string) $value;
+        $lowercaseValue = strtolower($value);
+
+        switch (true) {
+            case 'null' === $lowercaseValue:
+                return null;
+            case ctype_digit($value):
+                $raw = $value;
+                $cast = intval($value);
+
+                return '0' == $value[0] ? octdec($value) : (((string) $raw == (string) $cast) ? $cast : $raw);
+            case 'true' === $lowercaseValue:
+                return true;
+            case 'false' === $lowercaseValue:
+                return false;
+            case is_numeric($value):
+                return '0x' == $value[0].$value[1] ? hexdec($value) : floatval($value);
+            case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $value):
+                return floatval(str_replace(',', '', $value));
+            default:
+                return $value;
+        }
+    }
+
+    /**
      * Parses parameters
      *
-     * @param SimpleXMLElement $xml
-     * @param string           $file
+     * @param \DOMElement $xml
+     * @param \DOMXPath   $xpath
+     * @param string      $file
      */
-    private function parseParameters(SimpleXMLElement $xml, $file)
+    private function parseParameters(\DOMElement $xml, \DOMXPath $xpath, $file)
     {
-        if (!$xml->parameters) {
+        $parameters = $xpath->query('//container:parameters');
+        if (!$parameters->length) {
             return;
         }
 
-        $this->container->getParameterBag()->add($xml->parameters->getArgumentsAsPhp('parameter'));
+        $this->container->getParameterBag()->add(static::getArgumentsAsPhp($parameters->item(0), 'parameter'));
     }
 
     /**
      * Parses imports
      *
-     * @param SimpleXMLElement $xml
-     * @param string           $file
+     * @param \DOMElement $xml
+     * @param \DOMXPath   $xpath
+     * @param string      $file
      */
-    private function parseImports(SimpleXMLElement $xml, $file)
+    private function parseImports(\DOMElement $xml, \DOMXPath $xpath, $file)
     {
-        if (false === $imports = $xml->xpath('//container:imports/container:import')) {
+        $imports = $xpath->query('//container:imports/container:import');
+        if (!$imports->length) {
             return;
         }
 
         foreach ($imports as $import) {
             $this->setCurrentDir(dirname($file));
-            $this->import((string) $import['resource'], null, (Boolean) $import->getAttributeAsPhp('ignore-errors'), $file);
+            $resource = $import->getAttribute('resource');
+            $this->import($resource, null, (Boolean) $this->getAttributeAsPhp($import, 'ignore-errors', $file));
         }
     }
 
     /**
      * Parses multiple definitions
      *
-     * @param SimpleXMLElement $xml
-     * @param string           $file
+     * @param \DOMElement $xml
+     * @param \DOMXPath   $xpath
+     * @param string      $file
      */
-    private function parseDefinitions(SimpleXMLElement $xml, $file)
+    private function parseDefinitions(\DOMElement $xml, \DOMXPath $xpath, $file)
     {
-        if (false === $services = $xml->xpath('//container:services/container:service')) {
+        $services = $xpath->query('//container:services/container:service');
+        if (!$services->length) {
             return;
         }
 
         foreach ($services as $service) {
-            $this->parseDefinition((string) $service['id'], $service, $file);
+            $this->parseDefinition($service->getAttribute('id'), $service, $file);
         }
     }
 
     /**
      * Parses an individual Definition
      *
-     * @param string           $id
-     * @param SimpleXMLElement $service
-     * @param string           $file
+     * @param string      $id
+     * @param \DOMElement $service
+     * @param string      $file
      */
-    private function parseDefinition($id, $service, $file)
+    private function parseDefinition($id, \DOMElement $service, $file)
     {
-        if ((string) $service['alias']) {
+        if ($service->hasAttribute('alias')) {
             $public = true;
-            if (isset($service['public'])) {
-                $public = $service->getAttributeAsPhp('public');
+            if ($service->hasAttribute('public')) {
+                $public = $this->getAttributeAsPhp($service, 'public');
             }
-            $this->container->setAlias($id, new Alias((string) $service['alias'], $public));
+            $this->container->setAlias($id, new Alias($service->getAttribute('alias'), $public));
 
             return;
         }
 
-        if (isset($service['parent'])) {
-            $definition = new DefinitionDecorator((string) $service['parent']);
+        if ($service->hasAttribute('parent')) {
+            $definition = new DefinitionDecorator($service->getAttribute('parent'));
         } else {
             $definition = new Definition();
         }
 
         foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'abstract') as $key) {
-            if (isset($service[$key])) {
+            if ($service->hasAttribute($key)) {
                 $method = 'set'.str_replace('-', '', $key);
-                $definition->$method((string) $service->getAttributeAsPhp($key));
+                $definition->$method($this->getAttributeAsPhp($service, $key));
             }
         }
 
-        if ($service->file) {
-            $definition->setFile((string) $service->file);
-        }
+        $definition->setArguments(static::getArgumentsAsPhp($service, 'argument'));
+        $definition->setProperties(static::getArgumentsAsPhp($service, 'property'));
 
-        $definition->setArguments($service->getArgumentsAsPhp('argument'));
-        $definition->setProperties($service->getArgumentsAsPhp('property'));
-
-        if (isset($service->configurator)) {
-            if (isset($service->configurator['function'])) {
-                $definition->setConfigurator((string) $service->configurator['function']);
-            } else {
-                if (isset($service->configurator['service'])) {
-                    $class = new Reference((string) $service->configurator['service'], ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
-                } else {
-                    $class = (string) $service->configurator['class'];
-                }
-
-                $definition->setConfigurator(array($class, (string) $service->configurator['method']));
-            }
-        }
-
-        foreach ($service->call as $call) {
-            $definition->addMethodCall((string) $call['method'], $call->getArgumentsAsPhp('argument'));
-        }
-
-        foreach ($service->tag as $tag) {
-            $parameters = array();
-            foreach ($tag->attributes() as $name => $value) {
-                if ('name' === $name) {
-                    continue;
-                }
-
-                $parameters[$name] = SimpleXMLElement::phpize($value);
+        foreach ($service->childNodes as $node) {
+            if (!$node instanceof \DOMElement || $node->namespaceURI !== self::NAMESPACE_URI) {
+                continue;
             }
 
-            $definition->addTag((string) $tag['name'], $parameters);
+            switch ($node->localName) {
+                case 'file':
+                    $definition->setFile($node->nodeValue);
+                    break;
+                case 'configurator':
+                    if ($node->hasAttribute('function')) {
+                        $definition->setConfigurator($node->getAttribute('function'));
+                    } else {
+                        if ($node->hasAttribute('service')) {
+                            $class = new Reference($node->getAttribute('service'), ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
+                        } else {
+                            $class = $node->getAttribute('class');
+                        }
+
+                        $definition->setConfigurator(array($class, $node->getAttribute('method')));
+                    }
+                    break;
+                case 'call':
+                    $definition->addMethodCall($node->getAttribute('method'), static::getArgumentsAsPhp($node, 'argument'));
+                    break;
+                case 'tag':
+                    $parameters = array();
+                    foreach ($node->attributes as $attribute) {
+                        $name = $attribute->name;
+                        if ('name' === $name) {
+                            continue;
+                        }
+
+                        $parameters[$name] = static::phpize($attribute->value);
+                    }
+
+                    $definition->addTag($node->getAttribute('name'), $parameters);
+                    break;
+            }
         }
 
         $this->container->setDefinition($id, $definition);
@@ -200,9 +387,9 @@ class XmlFileLoader extends FileLoader
      *
      * @param string $file Path to a file
      *
-     * @return SimpleXMLElement
+     * @throws InvalidArgumentException When loading of XML file returns error
      *
-     * @throws \InvalidArgumentException When loading of XML file returns error
+     * @return \DOMDocument
      */
     protected function parseFile($file)
     {
@@ -215,7 +402,7 @@ class XmlFileLoader extends FileLoader
         if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
-            throw new \InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
+            throw new InvalidArgumentException(implode("\n", $this->getXmlErrors($internalErrors)));
         }
         $dom->normalizeDocument();
 
@@ -224,45 +411,48 @@ class XmlFileLoader extends FileLoader
 
         foreach ($dom->childNodes as $child) {
             if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
-                throw new \InvalidArgumentException('Document types are not allowed.');
+                throw new InvalidArgumentException('Document types are not allowed.');
             }
         }
 
         $this->validate($dom, $file);
 
-        return simplexml_import_dom($dom, 'Symfony\\Component\\DependencyInjection\\SimpleXMLElement');
+        return $dom;
     }
 
     /**
      * Processes anonymous services
      *
-     * @param SimpleXMLElement $xml
-     * @param string           $file
+     * @param \DOMElement $xml
+     * @param \DOMXpath   $xpath
+     * @param string      $file
      */
-    private function processAnonymousServices(SimpleXMLElement $xml, $file)
+    private function processAnonymousServices(\DOMElement $xml, \DOMXPath $xpath, $file)
     {
         $definitions = array();
         $count = 0;
 
         // anonymous services as arguments/properties
-        if (false !== $nodes = $xml->xpath('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
+        $nodes = $xpath->query('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]');
+        if ($nodes->length) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+                $node->setAttribute('id', sprintf('%s_%d', md5($file), ++$count));
 
-                $definitions[(string) $node['id']] = array($node->service, $file, false);
-                $node->service['id'] = (string) $node['id'];
+                $service = $xpath->query('container:service', $node)->item(0);
+                $definitions[$node->getAttribute('id')] = array($service, $file, false);
+                $service->setAttribute('id', $node->getAttribute('id'));
             }
         }
 
         // anonymous services "in the wild"
-        if (false !== $nodes = $xml->xpath('//container:services/container:service[not(@id)]')) {
+        $nodes = $xpath->query('//container:services/container:service[not(@id)]');
+        if ($nodes->length) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $node['id'] = sprintf('%s_%d', md5($file), ++$count);
+                $node->setAttribute('id', sprintf('%s_%d', md5($file), ++$count));
 
-                $definitions[(string) $node['id']] = array($node, $file, true);
-                $node->service['id'] = (string) $node['id'];
+                $definitions[$node->getAttribute('id')] = array($node, $file, true);
             }
         }
 
@@ -270,11 +460,11 @@ class XmlFileLoader extends FileLoader
         krsort($definitions);
         foreach ($definitions as $id => $def) {
             // anonymous services are always private
-            $def[0]['public'] = false;
+            $def[0]->setAttribute('public', false);
 
             $this->parseDefinition($id, $def[0], $def[1]);
 
-            $oNode = dom_import_simplexml($def[0]);
+            $oNode = $def[0];
             if (true === $def[2]) {
                 $nNode = new \DOMElement('_services');
                 $oNode->parentNode->replaceChild($nNode, $oNode);
@@ -433,12 +623,12 @@ EOF
     /**
      * Loads from an extension.
      *
-     * @param SimpleXMLElement $xml
+     * @param \DOMElement $xml
      */
-    private function loadFromExtensions(SimpleXMLElement $xml)
+    private function loadFromExtensions(\DOMElement $xml)
     {
-        foreach (dom_import_simplexml($xml)->childNodes as $node) {
-            if (!$node instanceof \DOMElement || $node->namespaceURI === 'http://symfony.com/schema/dic/services') {
+        foreach ($xml->childNodes as $node) {
+            if (!$node instanceof \DOMElement || $node->namespaceURI === self::NAMESPACE_URI) {
                 continue;
             }
 
@@ -452,70 +642,14 @@ EOF
     }
 
     /**
-     * Converts a \DomElement object to a PHP array.
+     * Converts an attribute as a php type.
      *
-     * The following rules applies during the conversion:
+     * @param string $name
      *
-     *  * Each tag is converted to a key value or an array
-     *    if there is more than one "value"
-     *
-     *  * The content of a tag is set under a "value" key (<foo>bar</foo>)
-     *    if the tag also has some nested tags
-     *
-     *  * The attributes are converted to keys (<foo foo="bar"/>)
-     *
-     *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
-     *
-     * @param \DomElement $element A \DomElement instance
-     *
-     * @return array A PHP array
+     * @return mixed
      */
-    public static function convertDomElementToArray(\DomElement $element)
+    private function getAttributeAsPhp(\DOMElement $element, $name)
     {
-        $empty = true;
-        $config = array();
-        foreach ($element->attributes as $name => $node) {
-            $config[$name] = SimpleXMLElement::phpize($node->value);
-            $empty = false;
-        }
-
-        $nodeValue = false;
-        foreach ($element->childNodes as $node) {
-            if ($node instanceof \DOMText) {
-                if (trim($node->nodeValue)) {
-                    $nodeValue = trim($node->nodeValue);
-                    $empty = false;
-                }
-            } elseif (!$node instanceof \DOMComment) {
-                if ($node instanceof \DOMElement && '_services' === $node->nodeName) {
-                    $value = new Reference($node->getAttribute('id'));
-                } else {
-                    $value = static::convertDomElementToArray($node);
-                }
-
-                $key = $node->localName;
-                if (isset($config[$key])) {
-                    if (!is_array($config[$key]) || !is_int(key($config[$key]))) {
-                        $config[$key] = array($config[$key]);
-                    }
-                    $config[$key][] = $value;
-                } else {
-                    $config[$key] = $value;
-                }
-
-                $empty = false;
-            }
-        }
-
-        if (false !== $nodeValue) {
-            $value = SimpleXMLElement::phpize($nodeValue);
-            if (count($config)) {
-                $config['value'] = $value;
-            } else {
-                $config = $value;
-            }
-        }
-
-        return !$empty ? $config : null;
+        return static::phpize($element->getAttribute($name));
     }
 }

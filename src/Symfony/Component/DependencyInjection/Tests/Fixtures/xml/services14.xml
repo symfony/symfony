@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://www.example.com/schema/project"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://symfony.com/schema/dic/services"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+  <srv:parameters>
+    <srv:parameter key="foo" type="collection">
+      <srv:parameter key="foo1">bar1</srv:parameter>
+      <srv:parameter key="foo2">bar2</srv:parameter>
+    </srv:parameter>
+  </srv:parameters>
+
+  <srv:services>
+    <srv:service id="foo" class="Foo">
+      <srv:argument>%foo%</srv:argument>
+      <srv:argument type="service">
+        <srv:service>
+          <srv:call method="setFoo">
+            <srv:argument>bar</srv:argument>
+          </srv:call>
+        </srv:service>
+      </srv:argument>
+    </srv:service>
+
+    <srv:service class="Bar">
+      <srv:property>property</srv:property>
+    </srv:service>
+  </srv:services>
+
+</srv:container>

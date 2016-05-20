@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Methwyd � uwchlwytho'r ffeil. </target>
+                <target>Methwyd � uwchlwytho'r ffeil.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>

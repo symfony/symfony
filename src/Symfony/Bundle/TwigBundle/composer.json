@@ -18,6 +18,7 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/twig-bridge": "~2.6",
+        "symfony/debug": "~2.3",
         "symfony/http-foundation": "~2.5",
         "symfony/http-kernel": "~2.3.24|~2.5.9|~2.6,>=2.6.2"
     },

@@ -71,7 +71,13 @@ class Configuration implements ConfigurationInterface
                                 ->prototype('scalar')->end()
                             ->end()
                             ->scalarNode('from_email')->end() // swift_mailer and native_mailer
-                            ->scalarNode('to_email')->end() // swift_mailer and native_mailer
+                            ->arrayNode('to_email') // swift_mailer and native_mailer
+                                ->prototype('scalar')->end()
+                                ->beforeNormalization()
+                                    ->ifString()
+                                    ->then(function($v) { return array('id' => $v); })
+                                ->end()
+                            ->end()
                             ->scalarNode('subject')->end() // swift_mailer and native_mailer
                             ->arrayNode('email_prototype') // swift_mailer
                                 ->canBeUnset()

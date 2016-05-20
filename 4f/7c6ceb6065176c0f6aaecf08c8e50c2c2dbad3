@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-05-13T17:56:11Z
+
+This feature was deprecated in 2.5, so this should be merged into 2.7
+
+---------------------------------------------------------------------------
+
+by bradbyu at 2016-05-13T18:30:34Z
+
+I'm not sure how to change where it should be merged other than to create a new pull request. Is that the only way?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-05-13T19:32:21Z
+
+@bradbyu Yes, that's the only way.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-05-13T19:38:57Z
+
+Except if the merger targets the right branch when merging ;-)
+I don't know what's the policy in this repo.
+
+---------------------------------------------------------------------------
+
+by bradbyu at 2016-05-13T19:40:35Z
+
+Replaced with another pull request here https://github.com/symfony/symfony/pull/18779
+
+---------------------------------------------------------------------------
+
+by bradbyu at 2016-05-14T15:08:23Z
+
+Please merge this with 2.7 as mentioned by @weaverryan . The other pull request went wrong and I was told to reopen this one instead by @xabbuh
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-19T07:32:47Z
+
+This should be merged into 3.0 isn't it?
+We *removed* the attr in 3.0, or?
+
+---------------------------------------------------------------------------
+
+by bradbyu at 2016-05-19T12:42:25Z
+
+@nicolas-grekas
+As per @weaverryan
+"This feature was deprecated in 2.5, so this should be merged into 2.7"
+
+I'm fine with it being merged with either. I can see valid cases for both.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-19T12:49:17Z
+
+If it's been deprecated in 2.5, the message you say deprecated, not removed, that's my point
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-19T13:42:09Z
+
+@nicolas-grekas this is the ``UPGRADE-3.0`` file
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-19T15:19:10Z
+
+👍 for merging into the `2.7` branch

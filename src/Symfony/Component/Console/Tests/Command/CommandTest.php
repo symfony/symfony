@@ -41,7 +41,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \LogicException
-     * @expectedExceptionMessage The command name cannot be empty.
+     * @expectedExceptionMessage The command defined in "Symfony\Component\Console\Command\Command" cannot have an empty name.
      */
     public function testCommandNameCannotBeEmpty()
     {

@@ -34,6 +34,11 @@ class FirePHPHandler extends BaseFirePHPHandler
     private $response;
 
     /**
+     * @var boolean
+     */
+     private $sendHeaders;
+
+    /**
      * Adds the headers to the response once it's created
      */
     public function onKernelResponse(FilterResponseEvent $event)

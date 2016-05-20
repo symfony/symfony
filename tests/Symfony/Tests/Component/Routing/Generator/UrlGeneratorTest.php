@@ -125,6 +125,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('/app.php/testing?foo=bar', $url);
     }
+    
+    public function testUrlWithExtraParametersAndQuestionMarkAlready()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing?foo=bar'));
+        $url = $this->getGenerator($routes)->generate('test', array('extra' => '123'));
+
+        $this->assertSame('/app.php/testing?foo=bar&extra=123', $url);
+    }
 
     public function testUrlWithGlobalParameter()
     {

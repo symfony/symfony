@@ -101,6 +101,9 @@ class SecurityExtension extends Extension
             'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallMap',
             'Symfony\\Bundle\\SecurityBundle\\Security\\FirewallContext',
             'Symfony\\Component\\HttpFoundation\\RequestMatcher',
+            'Symfony\\Bundle\\SecurityBundle\\DataCollector\\SecurityDataCollector',
+            'Symfony\\Bundle\\SecurityBundle\\Templating\\Helper\\LogoutUrlHelper',
+            'Symfony\\Bundle\\SecurityBundle\\Twig\\Extension\\LogoutUrlExtension',
         ));
     }
 

@@ -713,12 +713,12 @@ class Application
                     'args' => array(),
                 ));
 
-                for ($i = 0, $count = count($trace); $i < $count; ++$i) {
-                    $class = isset($trace[$i]['class']) ? $trace[$i]['class'] : '';
-                    $type = isset($trace[$i]['type']) ? $trace[$i]['type'] : '';
-                    $function = $trace[$i]['function'];
-                    $file = isset($trace[$i]['file']) ? $trace[$i]['file'] : 'n/a';
-                    $line = isset($trace[$i]['line']) ? $trace[$i]['line'] : 'n/a';
+                foreach ($trace as $traceEntry) {
+                    $class = isset($traceEntry['class']) ? $traceEntry['class'] : '';
+                    $type = isset($traceEntry['type']) ? $traceEntry['type'] : '';
+                    $function = $traceEntry['function'];
+                    $file = isset($traceEntry['file']) ? $traceEntry['file'] : 'n/a';
+                    $line = isset($traceEntry['line']) ? $traceEntry['line'] : 'n/a';
 
                     $output->writeln(sprintf(' %s%s%s() at <info>%s:%s</info>', $class, $type, $function, $file, $line));
                 }

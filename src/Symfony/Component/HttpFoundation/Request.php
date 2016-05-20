@@ -1619,11 +1619,11 @@ class Request
                         $lang = $codes[1];
                     }
                 } else {
-                    for ($i = 0, $max = count($codes); $i < $max; ++$i) {
-                        if ($i === 0) {
-                            $lang = strtolower($codes[0]);
+                    foreach ($codes as $i => $code) {
+                        if (0 === $i) {
+                            $lang = strtolower($code);
                         } else {
-                            $lang .= '_'.strtoupper($codes[$i]);
+                            $lang .= '_'.strtoupper($code);
                         }
                     }
                 }
@@ -1937,7 +1937,7 @@ class Request
         if (self::$requestFactory) {
             $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
 
-            if (!$request instanceof Request) {
+            if (!$request instanceof self) {
                 throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\Request.');
             }
 

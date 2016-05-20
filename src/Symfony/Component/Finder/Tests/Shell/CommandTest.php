@@ -148,7 +148,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(is_array($result));
         $this->assertNotEmpty($result);
-        $this->assertRegexp('/PHP|HipHop/', $result[0]);
+        $this->assertRegExp('/PHP|HipHop/', $result[0]);
     }
 
     public function testCastToString()

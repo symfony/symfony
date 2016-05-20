@@ -111,7 +111,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
     /**
      * Deletes the security identity from the database.
-     * ACL entries have the CASCADE option on their foreign key so they will also get deleted
+     * ACL entries have the CASCADE option on their foreign key so they will also get deleted.
      *
      * @param SecurityIdentityInterface $sid
      *
@@ -366,7 +366,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
-     * Updates a user security identity when the user's username changes
+     * Updates a user security identity when the user's username changes.
      *
      * @param UserSecurityIdentity $usid
      * @param string               $oldUsername
@@ -701,12 +701,14 @@ QUERY;
      */
     protected function getUpdateUserSecurityIdentitySql(UserSecurityIdentity $usid, $oldUsername)
     {
-        if ($usid->getUsername() == $oldUsername) {
+        $userName = $usid->getUsername();
+        if ($userName == $oldUsername) {
             throw new \InvalidArgumentException('There are no changes.');
         }
 
-        $oldIdentifier = $usid->getClass().'-'.$oldUsername;
-        $newIdentifier = $usid->getClass().'-'.$usid->getUsername();
+        $securityIdentityClass = $usid->getClass();
+        $oldIdentifier = $securityIdentityClass.'-'.$oldUsername;
+        $newIdentifier = $securityIdentityClass.'-'.$userName;
 
         return sprintf(
             'UPDATE %s SET identifier = %s WHERE identifier = %s AND username = %s',
@@ -854,14 +856,14 @@ QUERY;
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
         foreach ($changes[1] as $field => $new) {
-            for ($i = 0, $c = count($new); $i < $c; ++$i) {
-                $ace = $new[$i];
-
+            foreach ($new as $i => $ace) {
                 if (null === $ace->getId()) {
-                    if ($sids->contains($ace->getSecurityIdentity())) {
-                        $sid = $sids->offsetGet($ace->getSecurityIdentity());
+                    $aceSecurityIdentity = $ace->getSecurityIdentity();
+
+                    if ($sids->contains($aceSecurityIdentity)) {
+                        $sid = $sids->offsetGet($aceSecurityIdentity);
                     } else {
-                        $sid = $this->createOrRetrieveSecurityIdentityId($ace->getSecurityIdentity());
+                        $sid = $this->createOrRetrieveSecurityIdentityId($aceSecurityIdentity);
                     }
 
                     $oid = $ace->getAcl()->getObjectIdentity();
@@ -895,22 +897,22 @@ QUERY;
     {
         $currentIds = array();
         foreach ($changes[1] as $field => $new) {
-            for ($i = 0, $c = count($new); $i < $c; ++$i) {
-                $ace = $new[$i];
+            foreach ($new as $ace) {
+                $aceId = $ace->getId();
 
-                if (null !== $ace->getId()) {
-                    $currentIds[$ace->getId()] = true;
+                if (null !== $aceId) {
+                    $currentIds[$aceId] = true;
                 }
             }
         }
 
         foreach ($changes[0] as $old) {
-            for ($i = 0, $c = count($old); $i < $c; ++$i) {
-                $ace = $old[$i];
+            foreach ($old as $ace) {
+                $aceId = $ace->getId();
 
-                if (!isset($currentIds[$ace->getId()])) {
-                    $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($ace->getId()));
-                    unset($this->loadedAces[$ace->getId()]);
+                if (!isset($currentIds[$aceId])) {
+                    $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($aceId));
+                    unset($this->loadedAces[$aceId]);
                 }
             }
         }
@@ -928,14 +930,14 @@ QUERY;
 
         $sids = new \SplObjectStorage();
         $classIds = new \SplObjectStorage();
-        for ($i = 0, $c = count($new); $i < $c; ++$i) {
-            $ace = $new[$i];
-
+        foreach ($new as $i => $ace) {
             if (null === $ace->getId()) {
-                if ($sids->contains($ace->getSecurityIdentity())) {
-                    $sid = $sids->offsetGet($ace->getSecurityIdentity());
+                $aceSecurityIdentity = $ace->getSecurityIdentity();
+
+                if ($sids->contains($aceSecurityIdentity)) {
+                    $sid = $sids->offsetGet($aceSecurityIdentity);
                 } else {
-                    $sid = $this->createOrRetrieveSecurityIdentityId($ace->getSecurityIdentity());
+                    $sid = $this->createOrRetrieveSecurityIdentityId($aceSecurityIdentity);
                 }
 
                 $oid = $ace->getAcl()->getObjectIdentity();
@@ -969,20 +971,20 @@ QUERY;
         list($old, $new) = $changes;
         $currentIds = array();
 
-        for ($i = 0, $c = count($new); $i < $c; ++$i) {
-            $ace = $new[$i];
+        foreach ($new as $ace) {
+            $aceId = $ace->getId();
 
-            if (null !== $ace->getId()) {
-                $currentIds[$ace->getId()] = true;
+            if (null !== $aceId) {
+                $currentIds[$aceId] = true;
             }
         }
 
-        for ($i = 0, $c = count($old); $i < $c; ++$i) {
-            $ace = $old[$i];
+        foreach ($old as $ace) {
+            $aceId = $ace->getId();
 
-            if (!isset($currentIds[$ace->getId()])) {
-                $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($ace->getId()));
-                unset($this->loadedAces[$ace->getId()]);
+            if (!isset($currentIds[$aceId])) {
+                $this->connection->executeQuery($this->getDeleteAccessControlEntrySql($aceId));
+                unset($this->loadedAces[$aceId]);
             }
         }
     }

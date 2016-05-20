@@ -55,7 +55,11 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new ConstraintDefinitionException('At least one field has to be specified.');
         }
 
-        $em = $this->registry->getEntityManager($constraint->em);
+        if ($constraint->em) {
+            $em = $this->registry->getEntityManager($constraint->em);
+        } else {
+            $em = $this->registry->getEntityManagerForClass(get_class($entity));
+        }
 
         $className = $this->context->getCurrentClass();
         $class = $em->getClassMetadata($className);

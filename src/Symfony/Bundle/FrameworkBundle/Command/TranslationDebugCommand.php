@@ -41,12 +41,12 @@ class TranslationDebugCommand extends ContainerAwareCommand
             ->setName('translation:debug')
             ->setDefinition(array(
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
-                new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle name'),
+                new InputArgument('bundle', InputArgument::REQUIRED, 'The bundle name or directory'),
                 new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Displays only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Displays only unused messages'),
             ))
-            ->setDescription('Displays translation messages informations')
+            ->setDescription('Displays translation messages information')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the
@@ -80,17 +80,29 @@ EOF
     {
         $locale = $input->getArgument('locale');
         $domain = $input->getOption('domain');
-        $bundle = $this->getContainer()->get('kernel')->getBundle($input->getArgument('bundle'));
+        $kernel = $this->getContainer()->get('kernel');
+
+        try {
+            $bundlePath = $kernel->getBundle($input->getArgument('bundle'))->getPath();
+        } catch (\InvalidArgumentException $e) {
+            // such a bundle does not exist, so treat the argument as path
+            $bundlePath = $input->getArgument('bundle');
+
+            if (!is_dir($bundlePath)) {
+                throw new \InvalidArgumentException(sprintf('<error>"%s" is neither an enabled bundle nor a directory.</error>', $bundlePath));
+            }
+        }
+
         $loader = $this->getContainer()->get('translation.loader');
 
         // Extract used messages
         $extractedCatalogue = new MessageCatalogue($locale);
-        $this->getContainer()->get('translation.extractor')->extract($bundle->getPath().'/Resources/views', $extractedCatalogue);
+        $this->getContainer()->get('translation.extractor')->extract($bundlePath.'/Resources/views', $extractedCatalogue);
 
         // Load defined messages
         $currentCatalogue = new MessageCatalogue($locale);
-        if (is_dir($bundle->getPath().'/Resources/translations')) {
-            $loader->loadMessages($bundle->getPath().'/Resources/translations', $currentCatalogue);
+        if (is_dir($bundlePath.'/Resources/translations')) {
+            $loader->loadMessages($bundlePath.'/Resources/translations', $currentCatalogue);
         }
 
         // Merge defined and extracted messages to get all message ids
@@ -123,7 +135,7 @@ EOF
                 }
 
                 $fallbackCatalogue = new MessageCatalogue($fallbackLocale);
-                $loader->loadMessages($bundle->getPath().'/Resources/translations', $fallbackCatalogue);
+                $loader->loadMessages($bundlePath.'/Resources/translations', $fallbackCatalogue);
                 $fallbackCatalogues[] = $fallbackCatalogue;
             }
         }

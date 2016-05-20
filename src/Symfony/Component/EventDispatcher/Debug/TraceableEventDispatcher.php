@@ -315,7 +315,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         $listenerHash = '';
 
         if (is_string($listener)) {
-            $listenerHash = md5($listenerHash);
+            $listenerHash = md5($listener);
             if (isset($this->listenerInfoCache[$listenerHash][$eventName])) {
                 return $this->listenerInfoCache[$listenerHash][$eventName];
             }

@@ -90,7 +90,7 @@ class ResizeFormListener implements EventSubscriberInterface
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
-            $form->add($this->factory->createNamed($this->type, $name, null, array_replace(array(
+            $form->add($this->factory->createNamed($this->type, $name, $value, array_replace(array(
                 'property_path' => '['.$name.']',
             ), $this->options)));
         }
@@ -122,7 +122,7 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 if (!$form->has($name)) {
-                    $form->add($this->factory->createNamed($this->type, $name, null, array_replace(array(
+                    $form->add($this->factory->createNamed($this->type, $name, $value, array_replace(array(
                         'property_path' => '['.$name.']',
                     ), $this->options)));
                 }

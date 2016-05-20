@@ -30,6 +30,8 @@ class ProcessBuilder
     private $inheritEnv = true;
     private $prefix = array();
     private $outputDisabled = false;
+    /** @var ProcessBuilder[] */
+    private $pipeProcess = array();
 
     /**
      * Constructor.
@@ -262,10 +264,12 @@ class ProcessBuilder
             throw new LogicException('You must add() command arguments before calling getProcess().');
         }
 
-        $options = $this->options;
-
         $arguments = array_merge($this->prefix, $this->arguments);
         $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
+
+        foreach ($this->pipeProcess as $processBuilder) {
+            $script .= ' | '.$processBuilder->getProcess()->getCommandLine();
+        }
 
         if ($this->inheritEnv) {
             $env = array_replace($_ENV, $_SERVER, $this->env);
@@ -273,12 +277,19 @@ class ProcessBuilder
             $env = $this->env;
         }
 
-        $process = new Process($script, $this->cwd, $env, $this->input, $this->timeout, $options);
+        $process = new Process($script, $this->cwd, $env, $this->input, $this->timeout, $this->options);
 
         if ($this->outputDisabled) {
             $process->disableOutput();
         }
 
         return $process;
+    }
+
+    public function pipe(ProcessBuilder $processBuilder)
+    {
+        $this->pipeProcess[] = $processBuilder;
+
+        return $this;
     }
 }

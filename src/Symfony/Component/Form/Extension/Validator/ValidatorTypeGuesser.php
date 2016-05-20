@@ -48,7 +48,9 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
 
         return $this->guess($class, $property, function (Constraint $constraint) use ($guesser) {
             return $guesser->guessRequiredForConstraint($constraint);
-        });
+        // If we don't find any constraint telling otherwise, we can assume
+        // that a field is not required (with LOW_CONFIDENCE)
+        }, false);
     }
 
     /**
@@ -244,11 +246,6 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                     true,
                     Guess::HIGH_CONFIDENCE
                 );
-            default:
-                return new ValueGuess(
-                    false,
-                    Guess::LOW_CONFIDENCE
-                );
         }
     }
 
@@ -308,7 +305,7 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
      *                            for a given constraint
      * @return Guess  The guessed value with the highest confidence
      */
-    protected function guess($class, $property, \Closure $guessForConstraint)
+    protected function guess($class, $property, \Closure $closure, $defaultValue = null)
     {
         $guesses = array();
         $classMetadata = $this->metadataFactory->getClassMetadata($class);
@@ -320,10 +317,14 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
                 $constraints = $memberMetadata->getConstraints();
 
                 foreach ($constraints as $constraint) {
-                    if ($guess = $guessForConstraint($constraint)) {
+                    if ($guess = $closure($constraint)) {
                         $guesses[] = $guess;
                     }
                 }
+            }
+            
+            if (null !== $defaultValue) {
+                $guesses[] = new ValueGuess($defaultValue, Guess::LOW_CONFIDENCE);
             }
         }
 

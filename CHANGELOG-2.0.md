@@ -147,6 +147,9 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * 5d88255: Authorization header should only be rebuild when Basic Auth scheme is used
  * 789fc14: Accept calling setLenient(false)
  * b631073: [Yaml] Fixed double quotes escaping in Dumper.
+ * added new events: 'security.authentication.success' and 'security.authentication.failure'
+   fired on authentication success/failure, regardless of authentication method,
+   events are defined in new event class: 'Symfony\Component\Security\Core\AuthenticationEvents'.
 
 * 2.0.15 (2012-05-30)
 

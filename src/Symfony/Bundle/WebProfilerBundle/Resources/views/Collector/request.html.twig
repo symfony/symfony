@@ -109,6 +109,10 @@
 
     {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.requestserver } only %}
 
+    <h2>Response Status</h2>
+
+    <p><strong>{{ collector.statusCode }}</strong> {{ collector.statusText }}</p>
+
     <h2>Response Headers</h2>
 
     {% include '@WebProfiler/Profiler/bag.html.twig' with { 'bag': collector.responseheaders } only %}

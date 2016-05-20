@@ -268,6 +268,29 @@ class DateTypeTest extends LocalizedTestCase
     }
 
     /**
+     * @dataProvider provideDateFormats
+     */
+    public function testDatePatternWithFormatOption($format, $pattern)
+    {
+        $form = $this->factory->create('date', null, array(
+            'format' => $format,
+        ));
+
+        $view = $form->createView();
+
+        $this->assertEquals($pattern, $view->vars['date_pattern']);
+    }
+
+    public function provideDateFormats()
+    {
+        return array(
+            array('dMy', '{{ day }}{{ month }}{{ year }}'),
+            array('d-M-yyyy', '{{ day }}-{{ month }}-{{ year }}'),
+            array('M d y', '{{ month }} {{ day }} {{ year }}'),
+        );
+    }
+
+    /**
      * This test is to check that the strings '0', '1', '2', '3' are no accepted
      * as valid IntlDateFormatter constants for FULL, LONG, MEDIUM or SHORT respectively.
      *

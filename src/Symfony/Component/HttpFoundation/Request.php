@@ -246,7 +246,19 @@ class Request
      */
     public static function createFromGlobals()
     {
-        $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        $server = $_SERVER;
+        if (function_exists('apache_request_headers') && apache_request_headers() !== false) {
+            $server = array_merge(
+                array_map(
+                    function($header) {
+                        return 'HTTP_' . strtoupper($header);
+                    },
+                    apache_request_headers()
+                ),
+                $server
+            );
+        }
+        $request = new static($_GET, $_POST, array(), $_COOKIE, $_FILES, $server);
 
         if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded')
             && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), array('PUT', 'DELETE', 'PATCH'))

@@ -649,9 +649,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 $container->addObjectResource($bundle);
             }
         }
-        foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
-        }
+        $this->buildBundles($container);
 
         $container->addObjectResource($this);
 
@@ -666,6 +664,18 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $container->compile();
 
         return $container;
+    }
+
+    /**
+     * Builds bundles.
+     *
+     * @param ContainerBuilder $container
+     */
+    protected function buildBundles(ContainerBuilder $container)
+    {
+        foreach ($this->bundles as $bundle) {
+            $bundle->build($container);
+        }
     }
 
     /**

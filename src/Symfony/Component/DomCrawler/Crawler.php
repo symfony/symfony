@@ -487,13 +487,14 @@ class Crawler extends \SplObjectStorage
     /**
      * Filters the list of nodes with an XPath expression.
      *
-     * @param string $xpath An XPath expression
+     * @param string $xpath     An XPath expression
+     * @param array $namespaces An associative array of namespaces that contains (prefix => uri) elements
      *
      * @return Crawler A new instance of Crawler with the filtered list of nodes
      *
      * @api
      */
-    public function filterXPath($xpath)
+    public function filterXPath($xpath, array $namespaces = array())
     {
         $document = new \DOMDocument('1.0', 'UTF-8');
         $root = $document->appendChild($document->createElement('_root'));
@@ -502,6 +503,9 @@ class Crawler extends \SplObjectStorage
         }
 
         $domxpath = new \DOMXPath($document);
+        foreach($namespaces as $prefix => $uri) {
+            $domxpath->registerNamespace($prefix, $uri);
+        }
 
         return new static($domxpath->query($xpath), $this->uri);
     }
@@ -511,7 +515,8 @@ class Crawler extends \SplObjectStorage
      *
      * This method only works if you have installed the CssSelector Symfony Component.
      *
-     * @param string $selector A CSS selector
+     * @param string $selector  A CSS selector
+     * @param array $namespaces An associative array of namespaces that contains (prefix => uri) elements
      *
      * @return Crawler A new instance of Crawler with the filtered list of nodes
      *
@@ -519,7 +524,7 @@ class Crawler extends \SplObjectStorage
      *
      * @api
      */
-    public function filter($selector)
+    public function filter($selector, array $namespaces = array())
     {
         if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
             // @codeCoverageIgnoreStart
@@ -527,7 +532,7 @@ class Crawler extends \SplObjectStorage
             // @codeCoverageIgnoreEnd
         }
 
-        return $this->filterXPath(CssSelector::toXPath($selector));
+        return $this->filterXPath(CssSelector::toXPath($selector), $namespaces);
     }
 
     /**

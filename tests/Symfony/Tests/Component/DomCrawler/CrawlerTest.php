@@ -245,6 +245,29 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers \Symfony\Component\DomCrawler\Crawler::filterXPath
+     */
+    public function testFilterXPathWithNamespaceSupport()
+    {
+        $crawler = $this->createTestCrawlerWithNamespace();
+        $this->assertNotSame($crawler, $crawler->filterXPath('yt|accessControl'), '->filterXPath() returns a new instance of a crawler');
+        $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Crawler', $crawler, '->filterXPath() returns a new instance of a crawler');
+
+        $controls = $crawler->filter('ns1|accessControl', array('ns1' => 'http://namespace.uir.com/schema/'));
+        $this->assertCount(3, $controls , '->filterXPath() filters the node list with the XPath expression');
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_Error_Warning
+     * @covers \Symfony\Component\DomCrawler\Crawler::filterXPath
+     */
+    public function testFilterXPathWithoutNamespacePassed()
+    {
+        $crawler = $this->createTestCrawlerWithNamespace();
+        $crawler->filter('ns1|accessControl');
+    }
+
+    /**
      * @covers Symfony\Component\DomCrawler\Crawler::filter
      */
     public function testFilter()
@@ -491,6 +514,20 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
                     </ul>
                 </body>
             </html>
+        ');
+
+        return new Crawler($dom, $uri);
+    }
+
+    public function createTestCrawlerWithNamespace($uri = null)
+    {
+        $dom = new \DOMDocument();
+        $dom->loadXML('<?xml version="1.0" encoding="UTF-8"?>
+            <entry xmlns="http://www.w3.org/2005/Atom" xmlns:ns1="http://namespace.uir.com/schema/">
+                <ns1:accessControl action="comment" permission="allowed"/>
+                <ns1:accessControl action="comment" permission="allowed"/>
+                <ns1:accessControl action="comment" permission="allowed"/>
+            </entry>
         ');
 
         return new Crawler($dom, $uri);

@@ -27,8 +27,18 @@ if (!is_dir($vendorDir = dirname(__FILE__).'/vendor')) {
 
 // optional transport change
 $transport = false;
-if (isset($argv[1]) && in_array($argv[1], array('--transport=http', '--transport=https', '--transport=git'))) {
-    $transport = preg_replace('/^--transport=(.*)$/', '$1', $argv[1]);
+$options = array();
+
+foreach ($argv as $arg) {
+    if (preg_match('/^--transport=(?P<transport>https|http|git)$/', $arg, $m)) {
+        $transport = $m['transport'];
+    }
+    if (preg_match('/^(?P<depth>--depth=\d+)$/', $arg, $m)) {
+        $options[] = $m['depth'];
+    }
+    if (preg_match('/^-q$/', $arg, $m)) {
+        $options[] = '-q';
+    }
 }
 
 $deps = array(
@@ -42,16 +52,18 @@ $deps = array(
 
 foreach ($deps as $dep) {
     list($name, $url, $rev) = $dep;
-    
-    if ($transport) {
-        $url = preg_replace('/^(http:|https:|git:)(.*)/', $transport . ':$2', $url);
-    }
 
-    echo "> Installing/Updating $name\n";
+    if ($transport) {
+        $url = preg_replace('/^(https|http|git)/', $transport, $url);
+    }
 
     $installDir = $vendorDir.'/'.$name;
     if (!is_dir($installDir)) {
-        system(sprintf('git clone %s %s', escapeshellarg($url), escapeshellarg($installDir)));
+        echo "> Installing $name\n";
+
+        system(sprintf('git clone %s %s %s', implode(' ', $options), escapeshellarg($url), escapeshellarg($installDir)));
+    } else {
+        echo "> Updating $name\n";
     }
 
     system(sprintf('cd %s && git fetch origin && git reset --hard %s', escapeshellarg($installDir), escapeshellarg($rev)));

@@ -10,4 +10,4 @@ matrix:
   allow_failures:
     - php: 5.5
 
-before_script: php vendors.php
+before_script: php vendors.php -q --depth=1 --transport=git

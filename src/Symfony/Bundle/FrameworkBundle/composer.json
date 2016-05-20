@@ -42,6 +42,7 @@
         "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" }
     },
     "target-dir": "Symfony/Bundle/FrameworkBundle",
+    "bin":["Resources/bin/symfony"],
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

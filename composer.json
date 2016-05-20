@@ -71,6 +71,7 @@
             "src/Symfony/Component/Locale/Resources/stubs"
         ]
     },
+    "bin": ["src/Symfony/Bundle/FrameworkBundle/Resources/bin/symfony"],
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

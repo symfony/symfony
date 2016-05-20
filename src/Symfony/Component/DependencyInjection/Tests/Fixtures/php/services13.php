@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer.
+ * ProjectServiceContainer
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
@@ -24,35 +24,18 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        $dir = __DIR__;
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
-        }
         $this->parameters = $this->getDefaultParameters();
 
         $this->services =
         $this->scopedServices =
         $this->scopeStacks = array();
+
+        $this->set('service_container', $this);
+
         $this->scopes = array();
         $this->scopeChildren = array();
-        $this->methodMap = array(
-            'test' => 'getTestService',
-        );
 
         $this->aliases = array();
-    }
-
-    /**
-     * Gets the 'test' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \stdClass A stdClass instance.
-     */
-    protected function getTestService()
-    {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => $this->targetDirs[2]));
     }
 
     /**
@@ -106,12 +89,8 @@ class ProjectServiceContainer extends Container
     protected function getDefaultParameters()
     {
         return array(
-            'foo' => ('wiz'.$this->targetDirs[1]),
-            'bar' => __DIR__,
-            'baz' => (__DIR__.'/PhpDumperTest.php'),
-            'buz' => $this->targetDirs[2],
-            'baz_dir_with_dots' => __DIR__,
-            'baz_file_with_dots' => (__DIR__.'/PhpDumperTest.php'),
+            'baz_dir_with_dots' => '%path%/../Dumper',
+            'baz_file_with_dots' => '%path%/../Dumper/PhpDumperTest.php',
         );
     }
 }

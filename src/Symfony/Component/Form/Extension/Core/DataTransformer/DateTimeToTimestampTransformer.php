@@ -25,7 +25,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a DateTime object into a timestamp in the configured timezone.
      *
-     * @param DateTime $value A DateTime object
+     * @param \DateTime $value A DateTime object
      *
      * @return integer          A timestamp
      *
@@ -35,7 +35,7 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
     public function transform($value)
     {
         if (null === $value) {
-            return null;
+            return '';
         }
 
         if (!$value instanceof \DateTime) {

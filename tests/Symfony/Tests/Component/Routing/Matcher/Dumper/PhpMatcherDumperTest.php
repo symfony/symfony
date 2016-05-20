@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Tests\Component\Routing;
+namespace Symfony\Tests\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Route;
@@ -20,7 +20,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
 {
     public function testDump()
     {
-        $dumper = new PhpMatcherDumper($this->getRouteCollection(), new RequestContext());
+        $dumper = new PhpMatcherDumper($this->getRouteCollection());
 
         $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher1.php', $dumper->dump(), '->dump() dumps basic routes to the correct PHP file.');
 
@@ -40,7 +40,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array('_scheme' => 'http')
         ));
 
-        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+        $dumper = new PhpMatcherDumper($collection);
 
         $this->assertStringEqualsFile(__DIR__.'/../../Fixtures/dumper/url_matcher2.php', $dumper->dump(array('base_class' => 'Symfony\Tests\Component\Routing\Fixtures\RedirectableUrlMatcher')), '->dump() dumps basic routes to the correct PHP file.');
     }
@@ -56,7 +56,7 @@ class PhpMatcherDumperTest extends \PHPUnit_Framework_TestCase
             array(),
             array('_scheme' => 'https')
         ));
-        $dumper = new PhpMatcherDumper($collection, new RequestContext());
+        $dumper = new PhpMatcherDumper($collection);
         $dumper->dump();
     }
 

@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Translation;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 
 /**
  * Translator.
@@ -26,6 +26,7 @@ class Translator extends BaseTranslator
     protected $container;
     protected $options;
     protected $loaderIds;
+    protected $configCacheFactory;
 
     /**
      * Constructor.
@@ -61,6 +62,30 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * Sets the configCacheFactory
+     *
+     * @param ConfigCacheFactoryInterface $configCacheFactory
+     */
+    public function setConfigCacheFactory(ConfigCacheFactoryInterface $configCacheFactory)
+    {
+        $this->configCacheFactory = $configCacheFactory;
+    }
+
+    /**
+     * Returns the configCacheFactory set by setConfigCacheFactory or a BC default implementation
+     *
+     * @return ConfigCacheFactoryInterface $configCacheFactory
+     */
+    private function getConfigCacheFactory()
+    {
+        if (!$this->configCacheFactory) {
+            $this->configCacheFactory = new \Symfony\Component\Config\ConfigCacheFactory($this->options['debug']);
+        }
+
+        return $this->configCacheFactory;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getLocale()
@@ -87,7 +112,7 @@ class Translator extends BaseTranslator
             return parent::loadCatalogue($locale);
         }
 
-        $cache = new ConfigCache($this->options['cache_dir'].'/catalogue.'.$locale.'.php', $this->options['debug']);
+        $cache = $this->getConfigCacheFactory()->create($this->options['cache_dir'].'/catalogue.'.$locale.'.php');
         if (!$cache->isFresh()) {
             $this->initialize();
 

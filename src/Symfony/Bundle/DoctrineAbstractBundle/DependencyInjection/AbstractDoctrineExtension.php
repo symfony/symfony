@@ -46,7 +46,7 @@ abstract class AbstractDoctrineExtension extends Extension
             // automatically register bundle mappings
             foreach (array_keys($container->getParameter('kernel.bundles')) as $bundle) {
                 if (!isset($objectManager['mappings'][$bundle])) {
-                    $objectManager['mappings'][$bundle] = null;
+                    $objectManager['mappings'][$bundle] = array('is_bundle' => true);
                 }
             }
         }

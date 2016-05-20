@@ -179,13 +179,41 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Removes a parameter.
      *
-     * @param string $key The key
+     * @param string|array $keys The key or keys
      *
      * @api
      */
-    public function remove($key)
+    public function remove($keys)
     {
-        unset($this->parameters[$key]);
+        if (is_array($keys)) {
+            $this->parameters = $this->recursiveRemove($keys, $this->parameters);
+        } else {
+            unset($this->parameters[$keys]);
+        }
+    }
+    
+    /**
+     * Recursively removes parameters from a list of keys
+     * 
+     * @param array $keys List of keys
+     * @param array $search The array we remove parameters from the list of keys
+     * @return array The cleaned array
+     */
+    private function recursiveRemove($keys, $search) 
+    {
+        foreach ($keys as $key => $value) {
+            if (is_array($value)) {
+                $search[$key] = $this->recursiveRemove($value, $search[$key]);
+                
+                if (sizeof($search[$key]) == 0) {
+                    unset($search[$key]);
+                }
+            } else {
+                unset($search[$value]);
+            }
+        }
+        
+        return $search;
     }
 
     /**

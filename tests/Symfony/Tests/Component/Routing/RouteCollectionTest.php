@@ -27,6 +27,21 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($collection->get('bar'), '->get() returns null if a route does not exist');
     }
 
+    public function testCloneRouteCollection()
+    {
+        $collection = new RouteCollection();
+        $collection->add('foo', new Route('/foo'));
+
+        $embedded = new RouteCollection();
+        $embedded->add('bar', new Route('/bar'));
+
+        $collection->addCollection($embedded);
+        $copy = clone $collection;
+
+        $this->assertNotSame($copy, $collection);
+        $this->assertCount(2, $copy->all());
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
@@ -114,14 +129,27 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($foo, $foo1), $collection->getResources(), '->addCollection() merges resources');
     }
 
-    public function testAddPrefix()
+    /**
+     * @dataProvider providePrefixes
+     */
+    public function testAddPrefix($prefix)
     {
         $collection = new RouteCollection();
         $collection->add('foo', $foo = new Route('/foo'));
         $collection->add('bar', $bar = new Route('/bar'));
-        $collection->addPrefix('/admin');
+        $collection->addPrefix($prefix);
         $this->assertEquals('/admin/foo', $collection->get('foo')->getPattern(), '->addPrefix() adds a prefix to all routes');
         $this->assertEquals('/admin/bar', $collection->get('bar')->getPattern(), '->addPrefix() adds a prefix to all routes');
+    }
+
+    public function providePrefixes()
+    {
+        return array(
+            array('/admin'),
+            array('admin'),
+            array('/admin/'),
+            array('admin/'),
+        );
     }
 
     public function testResource()

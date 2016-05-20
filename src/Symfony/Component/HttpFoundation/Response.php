@@ -281,6 +281,11 @@ class Response
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
 
+        // Fix status for FastCGI server
+        if ('cgi-fcgi' === php_sapi_name() && false == ini_get('cgi.rfc2616_headers')) {
+            $this->headers->set('Status', sprintf('%s %s', $this->statusCode, $this->statusText));
+        }
+
         // headers
         foreach ($this->headers->all() as $name => $values) {
             foreach ($values as $value) {

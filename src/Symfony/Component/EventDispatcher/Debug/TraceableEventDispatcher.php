@@ -32,6 +32,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     private $called;
     private $dispatcher;
     private $wrappedListeners;
+    private $listenerInfoCache;
 
     /**
      * Constructor.
@@ -47,6 +48,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         $this->logger = $logger;
         $this->called = array();
         $this->wrappedListeners = array();
+        $this->listenerInfoCache = array();
     }
 
     /**
@@ -302,12 +304,22 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             'event' => $eventName,
             'priority' => $this->getListenerPriority($eventName, $listener),
         );
+
         if ($listener instanceof \Closure) {
-            $info += array(
+            return $info += array(
                 'type' => 'Closure',
                 'pretty' => 'closure',
             );
-        } elseif (is_string($listener)) {
+        }
+
+        $listenerHash = '';
+
+        if (is_string($listener)) {
+            $listenerHash = md5($listenerHash);
+            if (isset($this->listenerInfoCache[$listenerHash][$eventName])) {
+                return $this->listenerInfoCache[$listenerHash][$eventName];
+            }
+
             try {
                 $r = new \ReflectionFunction($listener);
                 $file = $r->getFileName();
@@ -316,6 +328,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 $file = null;
                 $line = null;
             }
+
             $info += array(
                 'type' => 'Function',
                 'function' => $listener,
@@ -328,6 +341,12 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 $listener = array($listener, '__invoke');
             }
             $class = is_object($listener[0]) ? get_class($listener[0]) : $listener[0];
+
+            $listenerHash = md5($class);
+            if (isset($this->listenerInfoCache[$listenerHash][$eventName])) {
+                return $this->listenerInfoCache[$listenerHash][$eventName];
+            }
+
             try {
                 $r = new \ReflectionMethod($class, $listener[1]);
                 $file = $r->getFileName();
@@ -336,6 +355,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 $file = null;
                 $line = null;
             }
+
             $info += array(
                 'type' => 'Method',
                 'class' => $class,
@@ -345,6 +365,8 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 'pretty' => $class.'::'.$listener[1],
             );
         }
+
+        $this->listenerInfoCache[$listenerHash][$eventName] = $info;
 
         return $info;
     }

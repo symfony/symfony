@@ -351,6 +351,23 @@ EOF;
             }
         }
     }
+
+    public function testIssue4022()
+    {
+        $yaml = <<<EOF
+
+collection:
+- item1
+- item2
+- item3
+
+EOF;
+
+        $array = array('collection' => array('item1', 'item2', 'item3'));
+
+        $this->assertEquals($array, $this->parser->parse($yaml));
+    }
+
 }
 
 class B

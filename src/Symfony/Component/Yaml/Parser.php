@@ -163,7 +163,7 @@ class Parser
                 // hash
                 } elseif (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     // if next line is less indented or equal, then it means that the current value is null
-                    if ($this->isNextLineIndented()) {
+                    if ($this->isNextLineIndented() && !$this->isNextLineUnIndentedCollection()) {
                         $data[$key] = null;
                     } else {
                         $c = $this->getRealCurrentLineNb() + 1;
@@ -280,7 +280,12 @@ class Parser
         if (null === $indentation) {
             $newIndent = $this->getCurrentLineIndentation();
 
-            if (!$this->isCurrentLineEmpty() && 0 == $newIndent) {
+            $unindentedEmbedBlock = false;
+            if (preg_match('/^- .+/', $this->currentLine)) {
+                $unindentedEmbedBlock = true;
+            }
+
+            if (!$this->isCurrentLineEmpty() && 0 == $newIndent && !$unindentedEmbedBlock) {
                 throw new ParseException('Indentation problem.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
             }
         } else {
@@ -554,4 +559,37 @@ class Parser
 
         return $value;
     }
+
+    /**
+     * Returns true if the next line starts unindented collection
+     *
+     * @return Boolean Returns true if the next line starts unindented collection, false otherwise
+     */
+    private function isNextLineUnIndentedCollection()
+    {
+        $currentIndentation = $this->getCurrentLineIndentation();
+        $notEOF = $this->moveToNextLine();
+
+        while ($notEOF && $this->isCurrentLineEmpty()) {
+            $notEOF = $this->moveToNextLine();
+        }
+
+        if (false === $notEOF) {
+            return false;
+        }
+
+        $ret = false;
+        if (
+            $this->getCurrentLineIndentation() == $currentIndentation
+            &&
+            preg_match('/^- .*/', $this->currentLine)
+        ) {
+            $ret = true;
+        }
+
+        $this->moveToPreviousLine();
+
+        return $ret;
+    }
+
 }

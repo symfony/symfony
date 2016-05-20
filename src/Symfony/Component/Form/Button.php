@@ -317,7 +317,11 @@ class Button implements \IteratorAggregate, FormInterface
      */
     public function isDisabled()
     {
-        return $this->config->getDisabled();
+        if (null === $this->parent || !$this->parent->isDisabled()) {
+            return $this->config->getDisabled();
+        }
+
+        return true;
     }
 
     /**

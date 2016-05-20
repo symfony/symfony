@@ -38,10 +38,10 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
             }))
         ;
 
-        $parsedExpression = $expressionLanguage->parse('1 + 1', array());
+        $parsedExpression = $expressionLanguage->parse('1 + 1');
         $this->assertSame($savedParsedExpression, $parsedExpression);
 
-        $parsedExpression = $expressionLanguage->parse('1 + 1', array());
+        $parsedExpression = $expressionLanguage->parse('1 + 1');
         $this->assertSame($savedParsedExpression, $parsedExpression);
     }
 

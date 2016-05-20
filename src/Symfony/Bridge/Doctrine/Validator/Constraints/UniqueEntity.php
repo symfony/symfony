@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class UniqueEntity extends Constraint
 {
-    public $message = 'This value is already used.';
+    public $message = 'Entity with provided fields already used.';
     public $service = 'doctrine.orm.validator.unique';
     public $em = null;
     public $repositoryMethod = 'findBy';

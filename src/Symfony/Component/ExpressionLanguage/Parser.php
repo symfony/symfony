@@ -314,12 +314,20 @@ class Parser
                 if (
                     $token->type !== Token::NAME_TYPE
                     &&
-                    $token->type !== Token::NUMBER_TYPE
-                    &&
-                    // operators line "not" are valid method or property names
-                    ($token->type !== Token::OPERATOR_TYPE && preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
+                    // Operators like "not" and "matches" are valid method or property names,
+                    //
+                    // In other words, besides NAME_TYPE, OPERATOR_TYPE could also be parsed as a property or method.
+                    // This is because operators are processed by the lexer prior to names. So "not" in "foo.not()" or "matches" in "foo.matches" will be recognized as an operator first.
+                    // But in fact, "not" and "matches" in such expressions shall be parsed as method or property names.
+                    //
+                    // And this ONLY works if the operator consists of valid characters for a property or method name.
+                    //
+                    // Other types, such as STRING_TYPE and NUMBER_TYPE, can't be parsed as property nor method names.
+                    //
+                    // As a result, if $token is NOT an operator OR $token->value is NOT a valid property or method name, an exception shall be thrown.
+                    ($token->type !== Token::OPERATOR_TYPE || !preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A', $token->value))
                 ) {
-                    throw new SyntaxError('Expected name or number', $token->cursor);
+                    throw new SyntaxError('Expected name', $token->cursor);
                 }
 
                 $arg = new Node\ConstantNode($token->value);

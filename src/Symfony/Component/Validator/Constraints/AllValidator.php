@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * @api
@@ -50,7 +51,11 @@ class AllValidator extends ConstraintValidator
 
         foreach ($value as $key => $element) {
             foreach ($constraints as $constr) {
-                $walker->walkConstraint($constr, $element, $group, $propertyPath.'['.$key.']');
+                if ($constr instanceof Valid) {
+                    $walker->walkReference($element, $group, $propertyPath.'['.$key.']', $constr->traverse);
+                } else {
+                    $walker->walkConstraint($constr, $element, $group, $propertyPath.'['.$key.']');
+                }
             }
         }
 

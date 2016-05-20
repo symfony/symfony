@@ -127,6 +127,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             array('111,222,333,444', '111,222,333,444'),
             array('1111,2222,3333,4444,5555', '1111,2222,3333,4444,5555'),
             array('foo', 'foo'),
+            array(6, '0b0110'),
         );
     }
 }

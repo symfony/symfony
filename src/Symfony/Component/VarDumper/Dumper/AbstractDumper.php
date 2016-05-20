@@ -110,6 +110,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      *
      * @param Data                          $data   A Data object.
      * @param callable|resource|string|null $output A line dumper callable, an opened stream or an output path.
+     *
+     * @throws \Exception
+     * @throws null
      */
     public function dump(Data $data, $output = null)
     {

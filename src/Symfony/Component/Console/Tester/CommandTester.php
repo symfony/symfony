@@ -54,6 +54,18 @@ class CommandTester
      */
     public function execute(array $input, array $options = array())
     {
+        // set the command name automatically if the application requires
+        // this argument and no command name was passed
+        if (!isset($input['command'])) {
+            $application = $this->command->getApplication();
+            if (null !== $application) {
+                $definition = $application->getDefinition();
+                if ($definition->hasArgument('command')) {
+                    $input['command'] = $this->command->getName();
+                }
+            }
+        }
+
         $this->input = new ArrayInput($input);
         if (isset($options['interactive'])) {
             $this->input->setInteractive($options['interactive']);

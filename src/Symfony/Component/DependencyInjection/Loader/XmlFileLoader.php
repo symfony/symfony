@@ -146,8 +146,11 @@ class XmlFileLoader extends FileLoader
 
         foreach (array('class', 'scope', 'public', 'factory-class', 'factory-method', 'factory-service', 'synthetic', 'synchronized', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
-                $method = 'set'.str_replace('-', '', $key);
-                $definition->$method(XmlUtils::phpize($value));
+                $name = explode('-', $key);
+                if (isset($name[0])) {
+                    $method = 'set'.$name[0];
+                    $definition->$method(XmlUtils::phpize($value));
+                }
             }
         }
 
@@ -218,7 +221,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a XML file to a \DOMDocument
+     * Parses a XML file to a \DOMDocument.
      *
      * @param string $file Path to a file
      *
@@ -375,7 +378,7 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Get child elements by name
+     * Get child elements by name.
      *
      * @param \DOMNode $node
      * @param mixed    $name

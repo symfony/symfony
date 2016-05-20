@@ -540,6 +540,7 @@ class HttpCache implements HttpKernelInterface
     protected function store(Request $request, Response $response)
     {
         try {
+            $response->setDate(new \DateTime(null, new \DateTimeZone('UTC')));
             $this->store->write($request, $response);
 
             $this->record($request, 'store');

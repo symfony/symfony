@@ -61,6 +61,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container->setParameter('kernel.cache_dir', __DIR__);
         $this->container->setParameter('kernel.debug', false);
         $this->container->setParameter('kernel.root_dir', __DIR__);
+        $this->container->setParameter('profiler.class', array('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'));
         $this->container->register('profiler', $this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\Profiler'))
             ->addArgument(new Definition($this->getMockClass('Symfony\\Component\\HttpKernel\\Profiler\\ProfilerStorageInterface')));
         $this->container->setParameter('data_collector.templates', array());

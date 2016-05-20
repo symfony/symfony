@@ -15,6 +15,7 @@ $container->loadFromExtension('framework', array(
     ),
     'profiler' => array(
         'only_exceptions' => true,
+        'enabled' => false,
     ),
     'router' => array(
         'resource'     => '%kernel.root_dir%/config/routing.xml',

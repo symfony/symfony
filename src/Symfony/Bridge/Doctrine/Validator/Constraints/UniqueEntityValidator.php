@@ -66,6 +66,13 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf("The field '%s' is not mapped by Doctrine, so it cannot be validated for uniqueness.", $fieldName));
             }
 
+            // If the column used is of number type, first check conversion before checking unicity.
+            if (in_array($class->fieldMappings[$fieldName]['type'], array('integer', 'smallint', 'bigint'))) {
+                if (!is_numeric($class->reflFields[$fieldName]->getValue($entity))) {
+                    return true;
+                }
+            }
+
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
 
             if (null === $criteria[$fieldName]) {

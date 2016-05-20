@@ -54,7 +54,7 @@ class ValueExporter
                 return sprintf("[\n%s%s\n%s]", $indent, implode(sprintf(", \n%s", $indent), $a), str_repeat('  ', $depth - 1));
             }
 
-            return sprintf("[%s]", implode(', ', $a));
+            return sprintf('[%s]', implode(', ', $a));
         }
 
         if (is_resource($value)) {

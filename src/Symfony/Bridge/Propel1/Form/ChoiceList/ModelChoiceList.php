@@ -100,7 +100,7 @@ class ModelChoiceList extends ObjectChoiceList
 
         $this->query = $queryObject ?: $query;
         if ($useAsIdentifier) {
-            $this->identifier = array( $this->query->getTableMap()->getColumn($useAsIdentifier) );
+            $this->identifier = array($this->query->getTableMap()->getColumn($useAsIdentifier));
         } else {
             $this->identifier = $this->query->getTableMap()->getPrimaryKeys();
         }

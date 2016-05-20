@@ -29,7 +29,7 @@ class SessionTokenStorage implements TokenStorageInterface
     const SESSION_NAMESPACE = '_csrf';
 
     /**
-     * The user session from which the session ID is returned
+     * The user session from which the session ID is returned.
      * @var SessionInterface
      */
     private $session;

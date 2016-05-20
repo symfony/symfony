@@ -108,7 +108,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * Return a Memcache instance
+     * Return a Memcache instance.
      *
      * @return \Memcache
      */

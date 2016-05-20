@@ -21,7 +21,7 @@ use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 /**
- * Tests SetAclCommand
+ * Tests SetAclCommand.
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
  */

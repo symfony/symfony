@@ -85,7 +85,7 @@ class ItemQuery
     }
 
     /**
-     * Method from the TableMap API
+     * Method from the TableMap API.
      */
     public function getColumnByInsensitiveCase($column)
     {
@@ -97,7 +97,7 @@ class ItemQuery
     }
 
     /**
-     * Method from the TableMap API
+     * Method from the TableMap API.
      */
     public function getRelations()
     {

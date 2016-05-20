@@ -55,13 +55,13 @@ abstract class Constraint
     const PROPERTY_CONSTRAINT = 'property';
 
     /**
-     * Maps error codes to the names of their constants
+     * Maps error codes to the names of their constants.
      * @var array
      */
     protected static $errorNames = array();
 
     /**
-     * Domain-specific data attached to a constraint
+     * Domain-specific data attached to a constraint.
      * @var mixed
      */
     public $payload;

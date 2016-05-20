@@ -257,7 +257,7 @@ class Table
         }
 
         $markup = $this->style->getCrossingChar();
-        for ($column = 0; $column < $count; $column++) {
+        for ($column = 0; $column < $count; ++$column) {
             $markup .= str_repeat($this->style->getHorizontalBorderChar(), $this->getColumnWidth($column)).$this->style->getCrossingChar();
         }
 
@@ -287,7 +287,7 @@ class Table
         }
 
         $this->renderColumnSeparator();
-        for ($column = 0, $count = $this->getNumberOfColumns(); $column < $count; $column++) {
+        for ($column = 0, $count = $this->getNumberOfColumns(); $column < $count; ++$column) {
             $this->renderCell($row, $column, $cellFormat);
             $this->renderColumnSeparator();
         }

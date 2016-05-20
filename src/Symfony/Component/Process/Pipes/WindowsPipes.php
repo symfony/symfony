@@ -173,7 +173,7 @@ class WindowsPipes extends AbstractPipes
     }
 
     /**
-     * Removes temporary files
+     * Removes temporary files.
      */
     private function removeFiles()
     {
@@ -186,7 +186,7 @@ class WindowsPipes extends AbstractPipes
     }
 
     /**
-     * Writes input to stdin
+     * Writes input to stdin.
      *
      * @param bool $blocking
      * @param bool $close

@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\EventListener\DebugHandlersListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * DebugHandlersListenerTest
+ * DebugHandlersListenerTest.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */

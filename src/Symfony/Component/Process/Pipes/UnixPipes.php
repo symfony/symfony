@@ -200,7 +200,7 @@ class UnixPipes extends AbstractPipes
     }
 
     /**
-     * Creates a new UnixPipes instance
+     * Creates a new UnixPipes instance.
      *
      * @param Process         $process
      * @param string|resource $input

@@ -54,7 +54,7 @@ abstract class AbstractPipes implements PipesInterface
     }
 
     /**
-     * Unblocks streams
+     * Unblocks streams.
      */
     protected function unblock()
     {

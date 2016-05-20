@@ -177,7 +177,7 @@ class StopwatchEvent
         $stopped = count($periods);
         $left = count($this->started) - $stopped;
 
-        for ($i = 0; $i < $left; $i++) {
+        for ($i = 0; $i < $left; ++$i) {
             $index = $stopped + $i;
             $periods[] = new StopwatchPeriod($this->started[$index], $this->getNow());
         }

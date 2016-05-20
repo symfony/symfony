@@ -14,7 +14,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Twig;
 use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 
 /**
- * Twig extension for the profiler
+ * Twig extension for the profiler.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 interface SurrogateInterface
 {
     /**
-     * Returns surrogate name
+     * Returns surrogate name.
      *
      * @return string
      */

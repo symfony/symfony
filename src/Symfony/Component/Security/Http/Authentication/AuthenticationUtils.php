@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Extracts Security Errors from Request
+ * Extracts Security Errors from Request.
  *
  * @author Boris Vujicic <boris.vujicic@gmail.com>
  */

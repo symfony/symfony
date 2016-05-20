@@ -72,7 +72,7 @@ class VoterFixture extends AbstractVoter
 
     protected function getSupportedAttributes()
     {
-        return array( 'foo', 'bar', 'baz');
+        return array('foo', 'bar', 'baz');
     }
 
     protected function isGranted($attribute, $object, $user = null)

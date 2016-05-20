@@ -76,7 +76,7 @@ abstract class HttpCache extends BaseHttpCache
     }
 
     /**
-     * Creates new ESI instance
+     * Creates new ESI instance.
      *
      * @return Esi
      *

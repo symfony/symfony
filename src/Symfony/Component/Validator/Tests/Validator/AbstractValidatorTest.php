@@ -855,7 +855,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * https://github.com/symfony/symfony/issues/11604
+     * https://github.com/symfony/symfony/issues/11604.
      */
     public function testValidatePropertyWithoutConstraints()
     {
@@ -988,7 +988,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * https://github.com/symfony/symfony/issues/11604
+     * https://github.com/symfony/symfony/issues/11604.
      */
     public function testValidatePropertyValueWithoutConstraints()
     {

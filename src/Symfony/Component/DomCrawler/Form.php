@@ -355,7 +355,7 @@ class Form extends Link implements \ArrayAccess
     }
 
     /**
-     * Disables validation
+     * Disables validation.
      *
      * @return self
      */

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * CircularReferenceException
+ * CircularReferenceException.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

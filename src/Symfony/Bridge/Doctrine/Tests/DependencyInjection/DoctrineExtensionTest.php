@@ -162,10 +162,10 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
 
         $newEmConfigs = $method->invoke($this->extension, $emConfigs, $bundles);
 
-        $this->assertEquals($newEmConfigs["em1"], array_merge(array(
+        $this->assertEquals($newEmConfigs['em1'], array_merge(array(
             'auto_mapping' => false,
         ), $expectedEm1));
-        $this->assertEquals($newEmConfigs["em2"], array_merge(array(
+        $this->assertEquals($newEmConfigs['em2'], array_merge(array(
             'auto_mapping' => false,
         ), $expectedEm2));
     }

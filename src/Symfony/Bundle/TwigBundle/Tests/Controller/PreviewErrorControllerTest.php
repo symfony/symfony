@@ -24,7 +24,7 @@ class PreviewErrorControllerTest extends TestCase
         $self = $this;
 
         $request = Request::create('whatever');
-        $response = new Response("");
+        $response = new Response('');
         $code = 123;
         $logicalControllerName = 'foo:bar:baz';
 

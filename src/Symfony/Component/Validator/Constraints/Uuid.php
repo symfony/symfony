@@ -45,14 +45,14 @@ class Uuid extends Constraint
     const V5_SHA1 = 5;
 
     /**
-     * Message to display when validation fails
+     * Message to display when validation fails.
      *
      * @var string
      */
     public $message = 'This is not a valid UUID.';
 
     /**
-     * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 4122
+     * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 4122.
      *
      * Set this to `false` to allow legacy formats with different dash positioning or wrapping characters
      *
@@ -61,7 +61,7 @@ class Uuid extends Constraint
     public $strict = true;
 
     /**
-     * Array of allowed versions (see version constants above)
+     * Array of allowed versions (see version constants above).
      *
      * All UUID versions are allowed by default
      *

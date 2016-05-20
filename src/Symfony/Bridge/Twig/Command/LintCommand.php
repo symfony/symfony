@@ -162,7 +162,7 @@ EOF
             if ($info['valid'] && $output->isVerbose()) {
                 $output->writeln('<info>OK</info>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
             } elseif (!$info['valid']) {
-                $errors++;
+                ++$errors;
                 $this->renderException($output, $info['template'], $info['exception'], $info['file']);
             }
         }
@@ -182,7 +182,7 @@ EOF
             if (!$v['valid']) {
                 $v['message'] = $v['exception']->getMessage();
                 unset($v['exception']);
-                $errors++;
+                ++$errors;
             }
         });
 
@@ -193,7 +193,7 @@ EOF
 
     private function renderException(OutputInterface $output, $template, \Twig_Error $exception, $file = null)
     {
-        $line =  $exception->getTemplateLine();
+        $line = $exception->getTemplateLine();
 
         if ($file) {
             $output->writeln(sprintf('<error>KO</error> in %s (line %s)', $file, $line));
@@ -224,7 +224,7 @@ EOF
         $result = array();
         while ($position < $max) {
             $result[$position + 1] = $lines[$position];
-            $position++;
+            ++$position;
         }
 
         return $result;

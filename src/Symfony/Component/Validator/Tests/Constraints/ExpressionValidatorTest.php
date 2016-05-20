@@ -174,7 +174,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
     /**
      * When validatePropertyValue() is called with a class name
-     * https://github.com/symfony/symfony/pull/11498
+     * https://github.com/symfony/symfony/pull/11498.
      */
     public function testSucceedingExpressionAtPropertyLevelWithoutRoot()
     {
@@ -191,7 +191,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
 
     /**
      * When validatePropertyValue() is called with a class name
-     * https://github.com/symfony/symfony/pull/11498
+     * https://github.com/symfony/symfony/pull/11498.
      */
     public function testFailingExpressionAtPropertyLevelWithoutRoot()
     {

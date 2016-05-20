@@ -169,6 +169,12 @@ class Form implements \IteratorAggregate, FormInterface
     private $readOnly = false;
 
     /**
+     * Whether this form is empty or not
+     * @var Boolean
+     */
+    private $isEmpty = false;
+
+    /**
      * The dispatcher for distributing events of this form
      * @var Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
@@ -399,6 +405,9 @@ class Form implements \IteratorAggregate, FormInterface
         $this->clientData = $clientData;
         $this->synchronized = true;
 
+        // Reset status of form data
+        $this->isEmpty = false;
+
         if ($this->dataMapper) {
             // Update child forms from the data
             $this->dataMapper->mapDataToForms($clientData, $this->children);
@@ -547,6 +556,9 @@ class Form implements \IteratorAggregate, FormInterface
         $this->extraData = $extraData;
         $this->synchronized = $synchronized;
 
+        // Reset status of form data
+        $this->isEmpty = false;
+
         $event = new DataEvent($this, $clientData);
         $this->dispatcher->dispatch(FormEvents::POST_BIND, $event);
 
@@ -657,13 +669,17 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function isEmpty()
     {
+        if ($this->isEmpty) {
+            return true;
+        }
+
         foreach ($this->children as $child) {
             if (!$child->isEmpty()) {
                 return false;
             }
         }
 
-        return array() === $this->appData || null === $this->appData || '' === $this->appData;
+        return $this->isEmpty = array() === $this->appData || null === $this->appData || '' === $this->appData;
     }
 
     /**

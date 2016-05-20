@@ -116,7 +116,12 @@ class SwitchUserListener implements ListenerInterface
             throw new AccessDeniedException();
         }
 
-        $username = $request->get($this->usernameParameter);
+        $username = urldecode($request->get($this->usernameParameter));
+        if (function_exists('mb_convert_encoding')) {
+            $username = mb_convert_encoding($username, 'UTF-8');
+        } elseif (function_exists('iconv')) {
+            $username = iconv('ISO-8859-1', 'UTF-8', $username);
+        }
 
         if (null !== $this->logger) {
             $this->logger->info(sprintf('Attempt to switch to user "%s"', $username));

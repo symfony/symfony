@@ -100,7 +100,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
+        $this->assertEquals('', $this->response->headers->get('Content-Type'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
         $this->assertTraceContains('store');
@@ -113,7 +113,7 @@ class HttpCacheTest extends HttpCacheTestCase
 
         $this->assertHttpKernelIsCalled();
         $this->assertEquals(304, $this->response->getStatusCode());
-        $this->assertEquals('text/html; charset=UTF-8', $this->response->headers->get('Content-Type'));
+        $this->assertEquals('', $this->response->headers->get('Content-Type'));
         $this->assertTrue($this->response->headers->has('ETag'));
         $this->assertEmpty($this->response->getContent());
         $this->assertTraceContains('miss');
@@ -800,7 +800,7 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceContains('fresh');
 
         // now POST to same URL
-        $this->request('POST', '/');
+        $this->request('POST', '/helloworld');
         $this->assertHttpKernelIsCalled();
         $this->assertEquals('/', $this->response->headers->get('Location'));
         $this->assertTraceContains('invalidate');

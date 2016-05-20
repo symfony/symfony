@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Security;
 
-use Symfony\Component\Security\Http\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\Firewall\AbstractExceptionListener;
 
 /**
  * This is a wrapper around the actual firewall configuration which allows us
@@ -24,7 +24,7 @@ class FirewallContext
     private $listeners;
     private $exceptionListener;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
+    public function __construct(array $listeners, AbstractExceptionListener $exceptionListener = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;

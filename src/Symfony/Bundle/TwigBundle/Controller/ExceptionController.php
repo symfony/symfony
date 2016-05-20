@@ -27,10 +27,10 @@ class ExceptionController
     protected $twig;
     protected $debug;
 
-    public function __construct(\Twig_Environment $twig, $debug)
+    public function __construct(\Twig_Environment $twig, array $twigOptions)
     {
         $this->twig = $twig;
-        $this->debug = $debug;
+        $this->debug = isset($twigOptions['debug']) ? $twigOptions['debug'] : false;
     }
 
     /**

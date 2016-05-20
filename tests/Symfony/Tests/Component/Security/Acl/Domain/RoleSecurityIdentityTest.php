@@ -17,18 +17,23 @@ use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 
 class RoleSecurityIdentityTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    /**
+     * @dataProvider getConstructorData
+     */
+    public function testConstructor($role, $roleString)
     {
-        $id = new RoleSecurityIdentity('ROLE_FOO');
+        $id = new RoleSecurityIdentity($role);
 
-        $this->assertEquals('ROLE_FOO', $id->getRole());
+        $this->assertEquals($roleString, $id->getRole());
     }
 
-    public function testConstructorWithRoleInstance()
+     public function getConstructorData()
     {
-        $id = new RoleSecurityIdentity(new Role('ROLE_FOO'));
-
-        $this->assertEquals('ROLE_FOO', $id->getRole());
+        return array(
+            array('ROLE_FOO', 'ROLE_FOO'),
+            array(new Role('ROLE_FOO'), 'ROLE_FOO'),
+            array(new CustomRole(), 'CUSTOM_ROLE'),
+        );
     }
 
     /**
@@ -51,5 +56,16 @@ class RoleSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             array(new RoleSecurityIdentity('ROLE_USER'), new RoleSecurityIdentity('ROLE_FOO'), false),
             array(new RoleSecurityIdentity('ROLE_FOO'), new UserSecurityIdentity('ROLE_FOO', 'Foo'), false),
         );
+    }
+}
+
+class CustomRole implements \Symfony\Component\Security\Core\Role\RoleInterface
+{
+    /**
+     * {@inheritDoc}
+     */
+    public function getRole()
+    {
+        return 'CUSTOM_ROLE';
     }
 }

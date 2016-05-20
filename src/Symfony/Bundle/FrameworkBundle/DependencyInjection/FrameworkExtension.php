@@ -575,7 +575,7 @@ class FrameworkExtension extends Extension
             $loaderChain->setArguments($arguments);
         }
 
-        if (isset($config['cache'])) {
+        if (!empty($config['cache'])) {
             $container->getDefinition('validator.mapping.class_metadata_factory')
                 ->replaceArgument(1, new Reference('validator.mapping.cache.'.$config['cache']));
             $container->setParameter(

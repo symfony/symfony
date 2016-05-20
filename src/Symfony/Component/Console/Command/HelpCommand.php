@@ -69,7 +69,7 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (null === $this->command) {
-            $this->command = $this->getApplication()->get($input->getArgument('command_name'));
+            $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
         if ($input->getOption('xml')) {

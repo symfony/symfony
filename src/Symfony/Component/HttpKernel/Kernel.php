@@ -127,10 +127,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         // init container
         $this->initializeContainer();
 
-        foreach ($this->getBundles() as $bundle) {
-            $bundle->setContainer($this->container);
-            $bundle->boot();
-        }
+        // boot bundles
+        $this->bootBundles();
 
         $this->booted = true;
     }
@@ -544,6 +542,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
+        }
+    }
+
+    /**
+     * Boots the registered bundle instances.
+     */
+    protected function bootBundles()
+    {
+        foreach ($this->getBundles() as $bundle) {
+            $bundle->setContainer($this->container);
+            $bundle->boot();
         }
     }
 

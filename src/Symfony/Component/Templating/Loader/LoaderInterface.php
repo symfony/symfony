@@ -27,7 +27,7 @@ interface LoaderInterface
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     * @return \Symfony\Component\Templating\Storage\Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
      *
      * @api
      */

@@ -6,7 +6,7 @@
 
     <parameters>
         <parameter key="validator.class">Symfony\Component\Validator\ValidatorInterface</parameter>
-        <parameter key="validator.builder.class">Symfony\Component\Validator\ValidatorBuilderInterface</parameter>
+        <parameter key="validator.builder.class">Symfony\Component\Validator\ValidatorBuilder</parameter>
         <parameter key="validator.builder.factory.class">Symfony\Component\Validator\Validation</parameter>
         <parameter key="validator.mapping.cache.apc.class">Symfony\Component\Validator\Mapping\Cache\ApcCache</parameter>
         <parameter key="validator.mapping.cache.prefix" />

@@ -98,7 +98,6 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $cache = $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface');
         $factory = new ClassMetadataFactory($loader, $cache);
 
-        $tester = $this;
         $metadata = new ClassMetadata(self::PARENTCLASS);
         $metadata->addConstraint(new ConstraintA());
 

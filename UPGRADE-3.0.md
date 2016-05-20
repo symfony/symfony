@@ -132,7 +132,10 @@ UPGRADE FROM 2.x to 3.0
 
 ### Form
 
- *  The `ChoiceToBooleanArrayTransformer`, `ChoicesToBooleanArrayTransformer`,
+ * The `max_length` option was removed. Use the `attr` option instead by setting it to
+   an `array` with a `maxlength` key.
+
+ * The `ChoiceToBooleanArrayTransformer`, `ChoicesToBooleanArrayTransformer`,
     `FixRadioInputListener`, and `FixCheckboxInputListener` classes were removed.
 
  * The `choice_list` option of `ChoiceType` was removed.

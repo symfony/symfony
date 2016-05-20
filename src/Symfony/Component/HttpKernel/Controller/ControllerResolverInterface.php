@@ -41,6 +41,8 @@ interface ControllerResolverInterface
      * @return mixed|Boolean A PHP callable representing the Controller,
      *                       or false if this resolver is not able to determine the controller
      *
+     * FIXME: Symfony3 return null instead of false
+     *
      * @throws \InvalidArgumentException|\LogicException If the controller can't be found
      *
      * @api

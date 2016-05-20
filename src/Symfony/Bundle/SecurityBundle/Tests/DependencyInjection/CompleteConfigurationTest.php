@@ -117,6 +117,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
             array(
                 '/test',
                 'foo\\.example\\.org',
+                array('GET', 'POST'),
             ),
         ), $matchers);
     }

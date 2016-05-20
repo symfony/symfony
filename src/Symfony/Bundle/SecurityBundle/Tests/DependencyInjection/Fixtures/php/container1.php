@@ -74,6 +74,7 @@ $container->loadFromExtension('security', array(
         'host' => array(
             'pattern' => '/test',
             'host' => 'foo\\.example\\.org',
+            'methods' => array('GET', 'POST'),
             'anonymous' => true,
             'http_basic' => true,
         ),

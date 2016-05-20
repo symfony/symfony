@@ -106,7 +106,14 @@
 
                             var pathCell = document.createElement('td');
                             pathCell.className = 'sf-ajax-request-url';
-                            pathCell.textContent = request.url;
+                            if ('GET' === request.method) {
+                                var pathLink = document.createElement('a');
+                                pathLink.setAttribute('href', request.url);
+                                pathLink.textContent = request.url;
+                                pathCell.appendChild(pathLink);
+                            } else {
+                                pathCell.textContent = request.url;
+                            }
                             pathCell.setAttribute('title', request.url);
                             row.appendChild(pathCell);
 

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Process;
 
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+
 /**
  * Process is a thin wrapper around proc_* functions to ease
  * start independent PHP processes.
@@ -43,21 +45,35 @@ class Process
      * @param array   $options     An array of options for proc_open
      *
      * @throws \RuntimeException When proc_open is not installed
+     * @throws \RuntimeException When working directory is not a directory
      *
      * @api
      */
-    public function __construct($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
-    {
+    public function __construct(
+        $commandline,
+        $cwd = null,
+        array $env = null,
+        $stdin = null,
+        $timeout = 60,
+        array $options = array()
+    ) {
         if (!function_exists('proc_open')) {
-            throw new \RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
+            throw new \RuntimeException(
+                'The Process class relies on proc_open, which is not available on your PHP installation.'
+            );
         }
 
         $this->commandline = $commandline;
-        $this->cwd = $cwd;
         // on windows, if the cwd changed via chdir(), proc_open defaults to the dir where php was started
-        if (null === $this->cwd && defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $this->cwd = getcwd();
+        if (null === $cwd && defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $cwd = getcwd();
         }
+        if (!is_dir($cwd)) {
+            throw new \RuntimeException(
+                sprintf('The working directory %s is not a directory.', var_export($cwd, true))
+            );
+        }
+        $this->cwd = $cwd;
         if (null !== $env) {
             $this->env = array();
             foreach ($env as $key => $value) {
@@ -66,9 +82,12 @@ class Process
         } else {
             $this->env = null;
         }
-        $this->stdin = $stdin;
+        $this->stdin   = $stdin;
         $this->timeout = $timeout;
-        $this->options = array_merge(array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => false), $options);
+        $this->options = array_merge(
+            array('suppress_errors' => true, 'binary_pipes' => true, 'bypass_shell' => false),
+            $options
+        );
     }
 
     /**
@@ -94,76 +113,62 @@ class Process
     {
         $this->stdout = '';
         $this->stderr = '';
-        $that = $this;
-        $callback = function ($type, $data) use ($that, $callback) {
-            if ('out' == $type) {
+        $that         = $this;
+        $callback     = function ($descriptorNumber, $data) use ($that, $callback) {
+
+            if (1 == $descriptorNumber) {
                 $that->addOutput($data);
-            } else {
+            } elseif (2 == $descriptorNumber) {
                 $that->addErrorOutput($data);
             }
 
             if (null !== $callback) {
-                call_user_func($callback, $type, $data);
+                call_user_func($callback, $descriptorNumber == 1 ? 'out' : 'err', $data);
             }
         };
 
-        $descriptors = array(array('pipe', 'r'), array('pipe', 'w'), array('pipe', 'w'));
-
-        $process = proc_open($this->commandline, $descriptors, $pipes, $this->cwd, $this->env, $this->options);
-
-        if (!is_resource($process)) {
-            throw new \RuntimeException('Unable to launch a new process.');
-        }
-
-        foreach ($pipes as $pipe) {
-            stream_set_blocking($pipe, false);
-        }
-
-        if (null === $this->stdin) {
-            fclose($pipes[0]);
-            $writePipes = null;
+        // on windows, pipes do not work, instead use tempfile handles. See Bug #51800
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $streams = ProcessStreams::create('temp');
         } else {
-            $writePipes = array($pipes[0]);
-            $stdinLen = strlen($this->stdin);
-            $stdinOffset = 0;
+            $streams = ProcessStreams::create('pipe');
         }
-        unset($pipes[0]);
 
-        while ($pipes || $writePipes) {
-            $r = $pipes;
-            $w = $writePipes;
-            $e = null;
+        $streams->prepareWrite($streams::STDIN, $this->stdin);
+        $process = $streams->openProcess($this->commandline, $this->cwd, $this->env, $this->options);
 
-            $n = @stream_select($r, $w, $e, $this->timeout);
+        $bytesToRead = 8192;
 
-            if (false === $n) {
+        while ($streams->hasOpenPipes()) {
+            $streams->readFiles($bytesToRead, $callback);
+
+            list($selected, $pipesRead, $pipesWrite) = $streams->selectAll($this->timeout);
+
+            if (false === $selected) {
                 break;
-            } elseif ($n === 0) {
+            } elseif ($selected === 0) {
                 proc_terminate($process);
-
                 throw new \RuntimeException('The process timed out.');
             }
 
-            if ($w) {
-                $written = fwrite($writePipes[0], (binary) substr($this->stdin, $stdinOffset), 8192);
-                if (false !== $written) {
-                    $stdinOffset += $written;
-                }
-                if ($stdinOffset >= $stdinLen) {
-                    fclose($writePipes[0]);
-                    $writePipes = null;
-                }
+            if ($pipesWrite) {
+                $streams->writePreparedString($streams::STDIN);
             }
 
-            foreach ($r as $pipe) {
-                $type = array_search($pipe, $pipes);
-                $data = fread($pipe, 8192);
-                if (strlen($data) > 0) {
-                    call_user_func($callback, $type == 1 ? 'out' : 'err', $data);
-                }
-                if (false === $data || feof($pipe)) {
-                    fclose($pipe);
-                    unset($pipes[$type]);
+            foreach ($pipesRead as $descriptorNumber => $pipe) {
+                $metaData = stream_get_meta_data($pipe);
+                if ($metaData['blocked']) {
+                    if ($metaData['unread_bytes']) {
+                        $data = fread($pipe, min($metaData['unread_bytes'], $bytesToRead));
+                        call_user_func($callback, $descriptorNumber, $data);
+                    } else {
+                        $streams->readPipe($descriptorNumber, $bytesToRead, $callback);
+                    }
+                    if ($metaData['eof']) {
+                        $streams->closePipe($descriptorNumber);
+                    }
+                } else {
+                    $streams->readPipe($descriptorNumber, $bytesToRead, $callback);
                 }
             }
         }
@@ -179,11 +184,40 @@ class Process
 
         $exitcode = proc_close($process);
 
+        while ($streams->hasFiles()) {
+            $streams->readFiles($bytesToRead, $callback, true);
+        }
+
         if ($this->status['signaled']) {
-            throw new \RuntimeException(sprintf('The process stopped because of a "%s" signal.', $this->status['stopsig']));
+            throw new \RuntimeException(
+                sprintf(
+                    'The process stopped because of a "%s" signal.',
+                    $this->status['stopsig']
+                )
+            );
         }
 
         return $this->exitcode = $this->status['running'] ? $exitcode : $this->status['exitcode'];
+    }
+
+    /**
+     * Adds a line to the STDOUT stream.
+     *
+     * @param string $line The line to append
+     */
+    public function addOutput($line)
+    {
+        $this->stdout .= $line;
+    }
+
+    /**
+     * Adds a line to the STDERR stream.
+     *
+     * @param string $line The line to append
+     */
+    public function addErrorOutput($line)
+    {
+        $this->stderr .= $line;
     }
 
     /**
@@ -297,26 +331,6 @@ class Process
     }
 
     /**
-     * Adds a line to the STDOUT stream.
-     *
-     * @param string $line The line to append
-     */
-    public function addOutput($line)
-    {
-        $this->stdout .= $line;
-    }
-
-    /**
-     * Adds a line to the STDERR stream.
-     *
-     * @param string $line The line to append
-     */
-    public function addErrorOutput($line)
-    {
-        $this->stderr .= $line;
-    }
-
-    /**
      * Gets the command line to be executed.
      *
      * @return string The command to execute
@@ -367,7 +381,7 @@ class Process
         if (null === $this->cwd) {
             // getcwd() will return false if any one of the parent directories does not have
             // the readable or search mode set, even if the current directory does
-            return getcwd() ?: null;
+            return getcwd() ? : null;
         }
 
         return $this->cwd;

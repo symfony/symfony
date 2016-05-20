@@ -55,10 +55,6 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessPipes($expected, $code)
     {
-        if (strpos(PHP_OS, "WIN") === 0) {
-            $this->markTestSkipped('Test hangs on Windows & PHP due to https://bugs.php.net/bug.php?id=60120 and https://bugs.php.net/bug.php?id=51800');
-        }
-
         $p = new Process(sprintf('php -r %s', escapeshellarg($code)));
         $p->setStdin($expected);
         $p->run();
@@ -87,7 +83,9 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $baseData = str_repeat('*', 1024);
 
         $codes = array();
-        foreach (array(1, 16, 64, 1024, 4096) as $size) {
+        $sizes = array(1, 16, 64, 1024, 4096);
+        // $sizes = array(1, 16, 64);
+        foreach ($sizes as $size) {
             $data = str_repeat($baseData, $size) . '!';
             foreach ($variations as $code) {
                 $codes[] = array($data, $code);

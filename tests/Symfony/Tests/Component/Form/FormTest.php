@@ -1003,6 +1003,18 @@ class FormTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($parent, $view->getParent());
     }
 
+    public function testEmptyStringData()
+    {
+        $test = $this;
+        $form = $this->getBuilder()
+            ->setEmptyData('')
+            ->getForm();
+
+        $form->bind(null);
+
+        $this->assertTrue('' === $form->getData());
+    }
+
     protected function getBuilder($name = 'name', EventDispatcherInterface $dispatcher = null)
     {
         return new FormBuilder($name, $this->factory, $dispatcher ?: $this->dispatcher);

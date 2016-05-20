@@ -999,7 +999,7 @@ class Form implements \IteratorAggregate, FormInterface
     private function clientToNorm($value)
     {
         if (!$this->clientTransformers) {
-            return '' === $value ? null : $value;
+            return $value;
         }
 
         for ($i = count($this->clientTransformers) - 1; $i >= 0; --$i) {

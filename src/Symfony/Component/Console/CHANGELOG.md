@@ -23,6 +23,7 @@ CHANGELOG
 
  * added a Process helper
  * added a DebugFormatter helper
+ * added formatOutput method to ConsoleLogger
 
 2.5.0
 -----

@@ -190,6 +190,35 @@ EOF
     }
 
     /**
+     * Determine the absolute file path for the router script, using the environment to choose a standard script
+     * if no custom router script is specified.
+     *
+     * @param string|null     $router File path of the custom router script, if set by the user; otherwise null
+     * @param string          $env    The application environment
+     * @param OutputInterface $output An OutputInterface instance
+     *
+     * @return string|bool The absolute file path of the router script, or false on failure
+     */
+    private function determineRouterScript($router, $env, OutputInterface $output)
+    {
+        if (null === $router) {
+            $router = $this
+                ->getContainer()
+                ->get('kernel')
+                ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
+            ;
+        }
+
+        if (false === $path = realpath($router)) {
+            $output->writeln(sprintf('<error>The given router script "%s" does not exist</error>', $router));
+
+            return false;
+        }
+
+        return $path;
+    }
+
+    /**
      * Creates a process to start PHP's built-in web server.
      *
      * @param OutputInterface $output       A OutputInterface instance

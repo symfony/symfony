@@ -46,7 +46,9 @@ class BinaryFileResponse extends Response
     {
         parent::__construct(null, $status, $headers);
 
-        $this->setFile($file, $contentDisposition, $autoEtag, $autoLastModified);
+        if (null !== $file) {
+            $this->setFile($file, $contentDisposition, $autoEtag, $autoLastModified);
+        }
 
         if ($public) {
             $this->setPublic();

@@ -47,6 +47,12 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFalse($response->getContent());
     }
 
+    public function testCreateWithEmptyFile()
+    {
+        $response = BinaryFileResponse::create();
+        $this->assertNull($response->getFile());
+    }
+
     /**
      * @dataProvider provideRanges
      */

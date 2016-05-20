@@ -231,7 +231,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
             }
         }
 
-        throw new ParameterNotFoundException('None of the managerParameters resulted in a valid name');
+        throw new ParameterNotFoundException('Could not determine the doctrine manager. Either Doctrine is not configured or a bundle is misconfigured.');
     }
 
     /**

@@ -232,6 +232,24 @@ namespace $namespace
 
             return \$container;
         }
+
+        protected function buildContainer()
+        {
+            \$container = parent::buildContainer();
+
+            // filter container's resources, removing reference to temp kernel file
+            \$resources = \$container->getResources();
+            \$filteredResources = array();
+            foreach (\$resources as \$resource) {
+                if ((string) \$resource !== __FILE__) {
+                    \$filteredResources[] = \$resource;
+                }
+            }
+
+            \$container->setResources(\$filteredResources);
+
+            return \$container;
+        }
     }
 }
 EOF;

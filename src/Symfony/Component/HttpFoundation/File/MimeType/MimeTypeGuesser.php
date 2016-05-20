@@ -48,31 +48,11 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
     protected $guessers = array();
 
     /**
-     * Returns the singleton instance
-     *
-     * @return MimeTypeGuesser
+     * Defines the current MimeTypeGuesser as the instance returned by getInstance method.
      */
-    public static function getInstance()
+    public function defineAsInstance()
     {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * Registers all natively provided mime type guessers
-     */
-    private function __construct()
-    {
-        if (FileBinaryMimeTypeGuesser::isSupported()) {
-            $this->register(new FileBinaryMimeTypeGuesser());
-        }
-
-        if (FileinfoMimeTypeGuesser::isSupported()) {
-            $this->register(new FileinfoMimeTypeGuesser());
-        }
+        self::$instance = $this;
     }
 
     /**
@@ -120,5 +100,30 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface
                 return $mimeType;
             }
         }
+    }
+
+    /**
+     * Returns the singleton instance.
+     *
+     * If the instance needs to be built, builds it and registers default
+     * mime-type guessers.
+     *
+     * @return MimeTypeGuesser
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+
+            if (FileBinaryMimeTypeGuesser::isSupported()) {
+                self::$instance->register(new FileBinaryMimeTypeGuesser());
+            }
+
+            if (FileinfoMimeTypeGuesser::isSupported()) {
+                self::$instance->register(new FileinfoMimeTypeGuesser());
+            }
+        }
+
+        return self::$instance;
     }
 }

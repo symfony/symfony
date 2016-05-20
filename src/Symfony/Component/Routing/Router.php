@@ -76,6 +76,7 @@ class Router implements RouterInterface
             'matcher_dumper_class'   => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
             'matcher_cache_class'    => 'ProjectUrlMatcher',
             'resource_type'          => null,
+            'matcher_needs_collection' => true,
         );
 
         // check option names and live merge, if errors are encountered Exception will be thrown
@@ -192,7 +193,25 @@ class Router implements RouterInterface
      */
     public function match($url)
     {
-        return $this->getMatcher()->match($url);
+        $matcher = $this->getMatcher();
+
+        if ($this->options['matcher_needs_collection']) {
+            return $matcher->match($url);
+        }
+
+        try {
+            return $matcher->match($url);
+        } catch (\Exception $e) {
+            if (!method_exists($matcher, 'parentMatch')) {
+                throw $e;
+            }
+
+            if (!$matcher->hasDefaultRouteSet()) {
+                $matcher->setDefaultRoute($this->getRouteCollection());
+            }
+
+            return $matcher->parentMatch($url);
+        }
     }
 
     /**
@@ -207,7 +226,11 @@ class Router implements RouterInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->defaults);
+            if ($this->options['matcher_needs_collection']) {
+                return $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->defaults);
+            }
+
+            return $this->matcher = new $this->options['matcher_class'](null, $this->context, $this->defaults);
         }
 
         $class = $this->options['matcher_cache_class'];

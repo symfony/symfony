@@ -17,6 +17,7 @@
         <parameter key="router.options.matcher_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</parameter>
         <parameter key="router.options.matcher_base_class">Symfony\Bundle\FrameworkBundle\Routing\RedirectableUrlMatcher</parameter>
         <parameter key="router.options.matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</parameter>
+        <parameter key="router.options.matcher.needs_collection">true</parameter>
         <parameter key="router.cache_warmer.class">Symfony\Bundle\FrameworkBundle\CacheWarmer\RouterCacheWarmer</parameter>
         <parameter key="router.options.matcher.cache_class">%kernel.name%%kernel.environment%UrlMatcher</parameter>
         <parameter key="router.options.generator.cache_class">%kernel.name%%kernel.environment%UrlGenerator</parameter>
@@ -61,6 +62,7 @@
                 <argument key="matcher_base_class">%router.options.matcher_base_class%</argument>
                 <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
                 <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
+                <argument key="matcher_needs_collection">%router.options.matcher.needs_collection%</argument>
             </argument>
         </service>
         <service id="router" alias="router.default" />

@@ -85,11 +85,36 @@ class RedirectResponse extends Response
 
         $this->targetUrl = $url;
 
+        /*
+         * We're a bit lost here as we don't know the encoding of the URL given
+         * and we also don't know what the target system/app expects.
+         *
+         * RFC 1630 mandates ASCII-only URLs (so use urlencode()), but there's
+         * still a difference in having a (e. g.) latin-1 or utf-8 string
+         * urlencoded.
+         *
+         * For links, browsers will usually use the encoding of the page containing
+         * the link before applying url-encoding. So for cross-site links or
+         * URLs entered directly YMMV.
+         *
+         * Thus, we try our best to keep the encoding that was probably used. Note that we also
+         * don't convert the URL to utf-8 for the redirect page, as that would on an
+         * otherwise latin-1 site lead browsers to request url-encoded multibyte sequences
+         * instead of (urlencoded) single-byte non-ascii chars (umlauts for example).
+         */
+        if (function_exists('mb_detect_encoding')) {
+            $encoding = mb_detect_encoding($url, 'UTF-8, ISO-8859-1, ISO-8859-15, cp866, cp1251, cp1252, KOI8-R');
+        } else {
+            $encoding = 'utf-8'; // as it was previously assumed
+        }
+
+        $urlencodedUrl = implode("/", array_map("rawurlencode", explode("/", $url)));
+
         $this->setContent(
             sprintf('<!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=%2$s" />
         <meta http-equiv="refresh" content="1;url=%1$s" />
 
         <title>Redirecting to %1$s</title>
@@ -97,9 +122,9 @@ class RedirectResponse extends Response
     <body>
         Redirecting to <a href="%1$s">%1$s</a>.
     </body>
-</html>', htmlspecialchars($url, ENT_QUOTES, 'UTF-8')));
+</html>', htmlspecialchars($url, ENT_QUOTES), $encoding));
 
-        $this->headers->set('Location', $url);
+        $this->headers->set('Location', $urlencodedUrl);
 
         return $this;
     }

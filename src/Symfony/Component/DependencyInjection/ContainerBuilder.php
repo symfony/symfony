@@ -744,7 +744,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 throw new \RuntimeException('Cannot create service from factory method without a factory service or factory class.');
             }
 
-            $service = call_user_func_array(array($factory, $definition->getFactoryMethod()), $arguments);
+            $service = call_user_func_array(array($factory, $this->getParameterBag()->resolveValue($definition->getFactoryMethod())), $arguments);
         } else {
             $r = new \ReflectionClass($this->getParameterBag()->resolveValue($definition->getClass()));
 

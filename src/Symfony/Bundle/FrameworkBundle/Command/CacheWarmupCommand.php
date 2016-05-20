@@ -43,7 +43,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Warming up the cache');
+        $kernel = $this->getContainer()->get('kernel');
+        $output->writeln(sprintf('Warming up the cache for the <info>%s</info> environment with debug <info>%s</info>', $kernel->getEnvironment(), var_export($kernel->isDebug(), true)));
 
         $warmer = $this->getContainer()->get('cache_warmer');
         $warmer->enableOptionalWarmers();

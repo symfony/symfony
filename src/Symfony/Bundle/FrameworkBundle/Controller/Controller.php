@@ -74,7 +74,7 @@ class Controller extends ContainerAware
      *
      * @return RedirectResponse
      */
-    public function redirect($url, $status = 302)
+    public function redirect($url, $status = Response::HTTP_FOUND)
     {
         return new RedirectResponse($url, $status);
     }

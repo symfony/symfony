@@ -1164,7 +1164,7 @@ class Request
      */
     public function getMethod()
     {
-        if (null === $this->method) {
+        if (null === $this->method || self::$httpMethodParameterOverride) {
             $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
 
             if ('POST' === $this->method) {

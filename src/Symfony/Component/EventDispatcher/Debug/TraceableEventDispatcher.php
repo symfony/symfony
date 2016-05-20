@@ -366,7 +366,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             );
         }
 
-        $this->listenerInfoCache[$listenerHash][$eventName] = $info;
+        $this->listenerInfoCache[$listenerHash] = $info;
 
         return $info;
     }

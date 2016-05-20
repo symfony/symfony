@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Required;
 
-abstract class CollectionValidatorTest extends AbstractConstraintValidatorTest
+abstract class  CollectionValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function createValidator()
     {

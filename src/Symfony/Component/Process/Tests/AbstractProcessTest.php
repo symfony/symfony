@@ -118,6 +118,8 @@ abstract class AbstractProcessTest extends \PHPUnit_Framework_TestCase
      * tests results from sub processes
      *
      * @dataProvider pipesCodeProvider
+     *
+     * @group noparallel
      */
     public function testProcessPipes($code, $size)
     {

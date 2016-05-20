@@ -88,7 +88,7 @@ class DialogHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @group tty
+     * @group noparallel
      */
     public function testAskHiddenResponse()
     {

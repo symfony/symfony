@@ -35,10 +35,7 @@ class HelpCommand extends Command
 
         $this
             ->setName('help')
-            ->setDefinition(array(
-                new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
-                new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
-            ))
+            ->setDefinition($this->getInputDefinition())
             ->setDescription('Displays help for a command')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command displays help for a given command:
@@ -74,6 +71,10 @@ EOF
             $this->command = $this->getApplication()->find($input->getArgument('command_name'));
         }
 
+        if ($this->command instanceof self) {
+            $this->command->setDefinition($this->getInputDefinition());
+        }
+
         if ($input->getOption('xml')) {
             $output->writeln($this->command->asXml(), OutputInterface::OUTPUT_RAW);
         } else {
@@ -81,5 +82,13 @@ EOF
         }
 
         $this->command = null;
+    }
+
+    private function getInputDefinition()
+    {
+        return array(
+            new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
+            new InputOption('xml', null, InputOption::VALUE_NONE, 'To output help as XML'),
+        );
     }
 }

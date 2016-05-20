@@ -72,6 +72,9 @@
         font-weight: bold;
         color: #313131;
     }
+    .tree a.error {
+        color: #a33;
+    }
     .tree-details {
         border-left: 1px solid #dfdfdf;
         background: white;
@@ -173,7 +176,12 @@
 
 {% macro form_tree_entry(name, data) %}
     <li>
-        <a href="#details_{{ data.id }}">{{ name }}</a>
+        <a href="#details_{{ data.id }}" class="{% if data.errors is defined and data.errors|length > 0 %}error{% endif %}">
+            {{ name }}
+            {% if data.errors is defined and data.errors|length > 0 %}
+                ({{ data.errors|length }})
+            {% endif %}
+        </a>
 
         {% if data.children is not empty %}
             <ul>

@@ -50,7 +50,7 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Sets the parent node
+     * Sets the parent node.
      *
      * @param NodeParentInterface $parent The parent
      *
@@ -197,20 +197,6 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Gets the builder for normalization rules.
-     *
-     * @return NormalizationBuilder
-     */
-    protected function normalization()
-    {
-        if (null === $this->normalization) {
-            $this->normalization = new NormalizationBuilder($this);
-        }
-
-        return $this->normalization;
-    }
-
-    /**
      * Sets an expression to run before the normalization.
      *
      * @return ExprBuilder
@@ -233,20 +219,6 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Gets the builder for validation rules.
-     *
-     * @return ValidationBuilder
-     */
-    protected function validation()
-    {
-        if (null === $this->validation) {
-            $this->validation = new ValidationBuilder($this);
-        }
-
-        return $this->validation;
-    }
-
-    /**
      * Sets an expression to run for the validation.
      *
      * The expression receives the value of the node and must return it. It can
@@ -258,6 +230,34 @@ abstract class NodeDefinition implements NodeParentInterface
     public function validate()
     {
         return $this->validation()->rule();
+    }
+
+    /**
+     * Sets whether the node can be overwritten.
+     *
+     * @param Boolean $deny Whether the overwriting is forbidden or not
+     *
+     * @return NodeDefinition
+     */
+    public function cannotBeOverwritten($deny = true)
+    {
+        $this->merge()->denyOverwrite($deny);
+
+        return $this;
+    }
+
+    /**
+     * Gets the builder for validation rules.
+     *
+     * @return ValidationBuilder
+     */
+    protected function validation()
+    {
+        if (null === $this->validation) {
+            $this->validation = new ValidationBuilder($this);
+        }
+
+        return $this->validation;
     }
 
     /**
@@ -275,17 +275,17 @@ abstract class NodeDefinition implements NodeParentInterface
     }
 
     /**
-     * Sets whether the node can be overwritten.
+     * Gets the builder for normalization rules.
      *
-     * @param Boolean $deny Whether the overwriting is forbidden or not
-     *
-     * @return NodeDefinition
+     * @return NormalizationBuilder
      */
-    public function cannotBeOverwritten($deny = true)
+    protected function normalization()
     {
-        $this->merge()->denyOverwrite($deny);
+        if (null === $this->normalization) {
+            $this->normalization = new NormalizationBuilder($this);
+        }
 
-        return $this;
+        return $this->normalization;
     }
 
     /**

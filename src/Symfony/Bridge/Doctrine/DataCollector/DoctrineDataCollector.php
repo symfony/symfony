@@ -30,6 +30,11 @@ class DoctrineDataCollector extends DataCollector
     private $managers;
     private $loggers = array();
 
+    /**
+     * Constructor.
+     * 
+     * @param ManagerRegistry $registry A ManagerRegistry instance
+     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
@@ -75,6 +80,11 @@ class DoctrineDataCollector extends DataCollector
         return $this->data['connections'];
     }
 
+    /**
+     * Returns number of array elements.
+     * 
+     * @return integer
+     */
     public function getQueryCount()
     {
         return array_sum(array_map('count', $this->data['queries']));

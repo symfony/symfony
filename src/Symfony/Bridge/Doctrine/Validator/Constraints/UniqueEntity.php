@@ -31,6 +31,11 @@ class UniqueEntity extends Constraint
     public $errorPath = null;
     public $ignoreNull = true;
 
+    /**
+     * Returns an array with required options.
+     * 
+     * @return array
+     */
     public function getRequiredOptions()
     {
         return array('fields');
@@ -54,6 +59,11 @@ class UniqueEntity extends Constraint
         return self::CLASS_CONSTRAINT;
     }
 
+    /**
+     * Returns a string with default option.
+     * 
+     * @return string
+     */
     public function getDefaultOption()
     {
         return 'fields';

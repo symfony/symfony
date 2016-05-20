@@ -30,6 +30,11 @@ class FirewallContext
         $this->exceptionListener = $exceptionListener;
     }
 
+    /**
+     * Returns an array with context.
+     * 
+     * @return array
+     */
     public function getContext()
     {
         return array($this->listeners, $this->exceptionListener);

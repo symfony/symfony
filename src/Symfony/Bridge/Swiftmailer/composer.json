@@ -25,5 +25,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Bridge\\Swiftmailer": "" }
     },
-    "target-dir": "Symfony/Bridge/Swiftmailer"
+    "target-dir": "Symfony/Bridge/Swiftmailer",
+    "minimum-stability": "dev"
 }

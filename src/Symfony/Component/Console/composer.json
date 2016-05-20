@@ -21,5 +21,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Console": "" }
     },
-    "target-dir": "Symfony/Component/Console"
+    "target-dir": "Symfony/Component/Console",
+    "minimum-stability": "dev"
 }

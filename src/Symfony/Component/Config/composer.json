@@ -21,5 +21,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Config": "" }
     },
-    "target-dir": "Symfony/Component/Config"
+    "target-dir": "Symfony/Component/Config",
+    "minimum-stability": "dev"
 }

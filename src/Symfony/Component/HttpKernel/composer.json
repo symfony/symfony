@@ -31,5 +31,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\HttpKernel": "" }
     },
-    "target-dir": "Symfony/Component/HttpKernel"
+    "target-dir": "Symfony/Component/HttpKernel",
+    "minimum-stability": "dev"
 }

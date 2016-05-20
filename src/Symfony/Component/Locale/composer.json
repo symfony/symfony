@@ -22,7 +22,8 @@
         "ext-intl": ">=5.3.2"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Locale": "" }
+        "psr-0": { "Symfony\\Component\\Locale": "" },
+        "classmap": ["Resources/stubs"]
     },
     "target-dir": "Symfony/Component/Locale"
 }

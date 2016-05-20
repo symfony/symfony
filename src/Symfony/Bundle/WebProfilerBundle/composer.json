@@ -22,5 +22,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\WebProfilerBundle": "" }
     },
-    "target-dir": "Symfony/Bundle/WebProfilerBundle"
+    "target-dir": "Symfony/Bundle/WebProfilerBundle",
+    "minimum-stability": "dev"
 }

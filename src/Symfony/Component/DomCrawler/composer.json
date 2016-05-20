@@ -24,5 +24,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\DomCrawler": "" }
     },
-    "target-dir": "Symfony/Component/DomCrawler"
+    "target-dir": "Symfony/Component/DomCrawler",
+    "minimum-stability": "dev"
 }

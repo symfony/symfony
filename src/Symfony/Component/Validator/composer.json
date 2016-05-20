@@ -26,5 +26,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Validator": "" }
     },
-    "target-dir": "Symfony/Component/Validator"
+    "target-dir": "Symfony/Component/Validator",
+    "minimum-stability": "dev"
 }

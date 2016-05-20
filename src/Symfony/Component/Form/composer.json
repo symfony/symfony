@@ -27,5 +27,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\Form": "" }
     },
-    "target-dir": "Symfony/Component/Form"
+    "target-dir": "Symfony/Component/Form",
+    "minimum-stability": "dev"
 }

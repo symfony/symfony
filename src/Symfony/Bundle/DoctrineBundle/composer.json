@@ -17,10 +17,12 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "symfony/doctrine-bridge": "self.version"
+        "symfony/doctrine-bridge": "self.version",
+        "symfony/doctrine-abstract-bundle": "self.version"
     },
     "autoload": {
         "psr-0": { "Symfony\\Bundle\\DoctrineBundle": "" }
     },
-    "target-dir": "Symfony/Bundle/DoctrineBundle"
+    "target-dir": "Symfony/Bundle/DoctrineBundle",
+    "minimum-stability": "dev"
 }

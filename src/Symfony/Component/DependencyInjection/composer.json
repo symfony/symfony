@@ -25,5 +25,6 @@
     "autoload": {
         "psr-0": { "Symfony\\Component\\DependencyInjection": "" }
     },
-    "target-dir": "Symfony/Component/DependencyInjection"
+    "target-dir": "Symfony/Component/DependencyInjection",
+    "minimum-stability": "dev"
 }

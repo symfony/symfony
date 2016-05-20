@@ -67,12 +67,12 @@ class StringUtil
         array('seivom', 6, true, true, 'movie'),
 
         // babies (baby)
-        array('sei', 3, false, true, 'y'),
+        array('sei', 3, false, true, array('y', 'ie')),
 
         // accesses (access), addresses (address), kisses (kiss)
         array('sess', 4, true, false, 'ss'),
 
-        // analyses (analysis), ellipses (ellipsis), funguses (fungus),
+        // analyses (analysis), ellipses (ellipsis), fungi (fungus),
         // neuroses (neurosis), theses (thesis), emphases (emphasis),
         // oases (oasis), crises (crisis), houses (house), bases (base),
         // atlases (atlas)

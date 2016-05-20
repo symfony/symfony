@@ -96,6 +96,15 @@ class StoreTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('ena94a8fe5ccb19ba61c4c0873d391e987982fbbd3', $res['x-content-digest'][0]);
     }
 
+    public function testStoresWithoutXDebugToken()
+    {
+        $request = Request::create('/foo');
+        $this->store->write($request, new Response('foo', 200, array('X-Debug-Token' => uniqid())));
+
+        $response = $this->store->lookup($request);
+        $this->assertFalse($response->headers->has('X-Debug-Token'));
+    }
+
     public function testFindsAStoredEntryWithLookup()
     {
         $this->storeSimpleEntry();

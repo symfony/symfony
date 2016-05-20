@@ -403,6 +403,7 @@ class Store implements StoreInterface
      */
     private function persistResponse(Response $response)
     {
+        $response->headers->remove('X-Debug-Token');
         $headers = $response->headers->all();
         $headers['X-Status'] = array($response->getStatusCode());
 

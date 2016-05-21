@@ -17,6 +17,7 @@ use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Response;
 use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\ServerRequest;
 use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Stream;
 use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\UploadedFile;
+use Symfony\Bridge\PsrHttpMessage\Tests\Fixtures\Uri;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -118,6 +119,26 @@ class HttpFoundationFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertCount(0, $this->factory->createRequest($serverRequest)->request);
+    }
+
+    public function testCreateRequestWithUri()
+    {
+        $serverRequest = new ServerRequest(
+            '1.1',
+            array(),
+            new Stream(),
+            '/',
+            'GET',
+            new Uri('http://les-tilleuls.coop/about/kevin'),
+            array(),
+            array(),
+            array(),
+            array(),
+            null,
+            array()
+        );
+
+        $this->assertEquals('/about/kevin', $this->factory->createRequest($serverRequest)->getPathInfo());
     }
 
     public function testCreateUploadedFile()

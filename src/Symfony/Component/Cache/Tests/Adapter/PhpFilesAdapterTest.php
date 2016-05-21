@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 /**
  * @group time-sensitive
  */
-class FilesystemAdapterTest extends AbstractFilesystemAdapterTest
+class PhpFilesAdapterTest extends AbstractFilesystemAdapterTest
 {
     public function createCachePool()
     {
@@ -25,6 +24,6 @@ class FilesystemAdapterTest extends AbstractFilesystemAdapterTest
             $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
         }
 
-        return new FilesystemAdapter('sf-cache');
+        return new PhpFilesAdapter('sf-cache');
     }
 }

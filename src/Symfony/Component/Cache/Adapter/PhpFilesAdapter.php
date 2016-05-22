@@ -38,7 +38,7 @@ class PhpFilesAdapter extends AbstractAdapter
             if (!is_array($valueArray)) {
                 continue;
             }
-            list($value, $expiresAt, ) = $valueArray;
+            list($value, $expiresAt) = $valueArray;
             if (time() < (int) $expiresAt) {
                 $values[$id] = $value;
             }
@@ -64,7 +64,7 @@ class PhpFilesAdapter extends AbstractAdapter
         $directory = $this->filesCacheHelper->getDirectory();
 
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            $ok = ($file->isDir() || $this->removeCacheFile((string)$file)) && $ok;
+            $ok = ($file->isDir() || $this->removeCacheFile((string) $file)) && $ok;
         }
 
         return $ok;
@@ -78,7 +78,7 @@ class PhpFilesAdapter extends AbstractAdapter
         $ok = true;
 
         foreach ($ids as $id) {
-            $file = $this->filesCacheHelper->getFilePath($id);
+            $file = $this->filesCacheHelper->getFilePath($id, true);
             $ok = $this->removeCacheFile($file) && $ok;
         }
 
@@ -115,7 +115,7 @@ class PhpFilesAdapter extends AbstractAdapter
             // workaround for https://github.com/facebook/hhvm/issues/1447 and similar
             // use file modification as a sequence number (cache file versioning)
             @clearstatcache(true, $file);
-            $currentSequenceNumber = 1 + (int)@filemtime($file);
+            $currentSequenceNumber = 1 + (int) @filemtime($file);
             if ($currentSequenceNumber > time()) {
                 $currentSequenceNumber = 1;
             }
@@ -128,6 +128,7 @@ class PhpFilesAdapter extends AbstractAdapter
         if (function_exists('apc_compile_file')) {
             @apc_compile_file($file);
         }
+
         return $ok;
     }
 
@@ -151,6 +152,7 @@ class PhpFilesAdapter extends AbstractAdapter
             @apc_delete_file($file);
         }
         @unlink($file);
+
         return !@file_exists($file);
     }
 
@@ -173,7 +175,7 @@ class PhpFilesAdapter extends AbstractAdapter
             // workaround for https://github.com/facebook/hhvm/issues/1447 and similar
             // use file modification as a sequence number (cache file version)
             @clearstatcache(true, $file);
-            $actualSequenceNumber = (int)@filemtime($file);
+            $actualSequenceNumber = (int) @filemtime($file);
             if ($foundSequenceNumber != $actualSequenceNumber) {
                 return $this->includeCacheFile($file, true);
             }

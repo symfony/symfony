@@ -22,7 +22,7 @@ class FilesystemAdapter extends AbstractAdapter
      * @var FilesCacheHelper
      */
     protected $filesCacheHelper;
-    
+
     public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
     {
         parent::__construct($namespace, $defaultLifetime);

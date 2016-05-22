@@ -76,6 +76,7 @@ class FilesCacheHelper
     public function saveFileForId($id, $fileContent, $modificationTime = null)
     {
         $file = $this->getFilePath($id, true);
+
         return $this->saveFile($file, $fileContent, $modificationTime);
     }
 

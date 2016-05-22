@@ -14,10 +14,8 @@ namespace Symfony\Component\HttpKernel\Exception;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
- * DisableLogDirectoryException.
- *
  * @author Asmir Mustafic <goetas@gmail.com>
  */
-class DisableLogDirectoryException extends RuntimeException
+class MethodNotImplementedException extends RuntimeException
 {
 }

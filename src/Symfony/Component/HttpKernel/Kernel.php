@@ -34,7 +34,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
-use Symfony\Component\HttpKernel\Exception\DisableLogDirectoryException;
+use Symfony\Component\HttpKernel\Exception\MethodNotImplementedException;
 
 /**
  * The Kernel is the heart of the Symfony system.
@@ -539,7 +539,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         try {
             $logDir = realpath($this->getLogDir()) ?: $this->getLogDir();
-        } catch (DisableLogDirectoryException $e) {
+        } catch (MethodNotImplementedException $e) {
             $logDir = false;
         }
 
@@ -589,7 +589,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     {
         try{
             $logDir = $this->getLogDir();
-        } catch (DisableLogDirectoryException $e) {
+        } catch (MethodNotImplementedException $e) {
             $logDir = false;
         }
         foreach (array('cache' => $this->getCacheDir(), 'logs' => $logDir) as $name => $dir) {

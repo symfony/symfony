@@ -711,7 +711,7 @@ class Parser
      */
     private function isStringUnIndentedCollectionItem()
     {
-        return 0 === strpos($this->currentLine, '- ');
+        return '-' === rtrim($this->currentLine) || 0 === strpos($this->currentLine, '- ');
     }
 
     /**

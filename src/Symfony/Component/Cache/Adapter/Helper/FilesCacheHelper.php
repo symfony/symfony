@@ -27,16 +27,17 @@ class FilesCacheHelper
 
     /**
      * @param string $directory  Path where cache items should be stored, defaults to sys_get_temp_dir().'/symfony-cache'
+     * @param string $namespace  Cache namespace
      * @param string $fileSuffix Suffix that will be appended to all file names
      */
-    public function __construct($directory = null, $fileSuffix = '')
+    public function __construct($directory = null, $namespace = null, $fileSuffix = '')
     {
         if (!isset($directory[0])) {
             $directory = sys_get_temp_dir().'/symfony-cache';
         }
         if (isset($namespace[0])) {
             if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
-                throw new InvalidArgumentException(sprintf('FilesystemAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
+                throw new InvalidArgumentException(sprintf('Cache namespace for filesystem cache contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
             }
             $directory .= '/'.$namespace;
         }

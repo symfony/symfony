@@ -31,7 +31,7 @@ class FilesystemAdapter extends AbstractAdapter
     public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
     {
         parent::__construct($namespace, $defaultLifetime);
-        $this->filesCacheHelper = new FilesCacheHelper($directory);
+        $this->filesCacheHelper = new FilesCacheHelper($directory, $namespace);
     }
 
     /**

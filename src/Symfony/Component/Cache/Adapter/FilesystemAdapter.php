@@ -23,6 +23,11 @@ class FilesystemAdapter extends AbstractAdapter
      */
     protected $filesCacheHelper;
 
+    /**
+     * @param string $namespace       Cache namespace
+     * @param int    $defaultLifetime Default lifetime for cache items
+     * @param null   $directory       Path where cache items should be stored, defaults to sys_get_temp_dir().'/symfony-cache'
+     */
     public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
     {
         parent::__construct($namespace, $defaultLifetime);

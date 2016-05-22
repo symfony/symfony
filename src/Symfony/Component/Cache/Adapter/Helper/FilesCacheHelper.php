@@ -25,6 +25,10 @@ class FilesCacheHelper
      */
     private $directory;
 
+    /**
+     * @param string $directory  Path where cache items should be stored, defaults to sys_get_temp_dir().'/symfony-cache'
+     * @param string $fileSuffix Suffix that will be appended to all file names
+     */
     public function __construct($directory = null, $fileSuffix = '')
     {
         if (!isset($directory[0])) {

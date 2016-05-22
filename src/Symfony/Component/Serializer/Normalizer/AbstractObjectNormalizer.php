@@ -182,10 +182,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attribute = $this->nameConverter->denormalize($attribute);
             }
 
-            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
-            $ignored = in_array($attribute, $this->ignoredAttributes);
-
-            if (!$allowed || $ignored) {
+            if (($allowedAttributes !== false && !in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
                 continue;
             }
 

@@ -290,10 +290,6 @@ EOF;
             .sf-reset .exception_message { margin-left: 3em; display: block; }
             .sf-reset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
             .sf-reset .block { background-color:#FFFFFF; padding:10px 28px; margin-bottom:20px;
-                -webkit-border-bottom-right-radius: 16px;
-                -webkit-border-bottom-left-radius: 16px;
-                -moz-border-radius-bottomright: 16px;
-                -moz-border-radius-bottomleft: 16px;
                 border-bottom-right-radius: 16px;
                 border-bottom-left-radius: 16px;
                 border-bottom:1px solid #ccc;
@@ -301,10 +297,6 @@ EOF;
                 border-left:1px solid #ccc;
             }
             .sf-reset .block_exception { background-color:#ddd; color: #333; padding:20px;
-                -webkit-border-top-left-radius: 16px;
-                -webkit-border-top-right-radius: 16px;
-                -moz-border-radius-topleft: 16px;
-                -moz-border-radius-topright: 16px;
                 border-top-left-radius: 16px;
                 border-top-right-radius: 16px;
                 border-top:1px solid #ccc;
@@ -317,8 +309,6 @@ EOF;
             .sf-reset a:hover { background:none; color:#313131; text-decoration:underline; }
             .sf-reset ol { padding: 10px 0; }
             .sf-reset h1 { background-color:#FFFFFF; padding: 15px 28px; margin-bottom: 20px;
-                -webkit-border-radius: 10px;
-                -moz-border-radius: 10px;
                 border-radius: 10px;
                 border: 1px solid #ccc;
             }
@@ -343,7 +333,7 @@ EOF;
             $css
         </style>
     </head>
-    <body>
+    <body ondblclick="var t = event.target; if (t.title && !t.href) { var f = t.innerHTML; t.innerHTML = t.title; t.title = f; }">
         $content
     </body>
 </html>
@@ -368,7 +358,7 @@ EOF;
             return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
         }
 
-        return sprintf(' in <a title="%s line %3$d" ondblclick="var f=this.innerHTML;this.innerHTML=this.title;this.title=f;">%s line %d</a>', $path, $file, $line);
+        return sprintf(' in <a title="%s line %3$d">%s line %d</a>', $path, $file, $line);
     }
 
     /**
@@ -409,6 +399,6 @@ EOF;
      */
     private function escapeHtml($str)
     {
-        return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset);
+        return htmlspecialchars($str, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
     }
 }

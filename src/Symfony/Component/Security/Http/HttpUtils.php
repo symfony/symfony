@@ -129,7 +129,7 @@ class HttpUtils
      *
      * @throws \LogicException
      */
-    public function generateUri($request, $path)
+    public function generateUri(Request $request, $path)
     {
         if (0 === strpos($path, 'http') || !$path) {
             return $path;

@@ -11,14 +11,22 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Symfony\Component\Cache\Adapter\Helper\FilesCacheHelper;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class FilesystemAdapter extends AbstractFilesystemAdapter
+class FilesystemAdapter extends AbstractAdapter
 {
+    /**
+     * @var FilesCacheHelper
+     */
+    protected $filesCacheHelper;
+    
     public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
     {
-        parent::__construct('', $defaultLifetime, $directory);
+        parent::__construct($namespace, $defaultLifetime);
+        $this->filesCacheHelper = new FilesCacheHelper($directory);
     }
 
     /**
@@ -30,7 +38,7 @@ class FilesystemAdapter extends AbstractFilesystemAdapter
         $now = time();
 
         foreach ($ids as $id) {
-            $file = $this->getFile($id);
+            $file = $this->filesCacheHelper->getFilePath($id);
             if (!$h = @fopen($file, 'rb')) {
                 continue;
             }
@@ -57,9 +65,39 @@ class FilesystemAdapter extends AbstractFilesystemAdapter
      */
     protected function doHave($id)
     {
-        $file = $this->getFile($id);
+        $file = $this->filesCacheHelper->getFilePath($id);
 
         return file_exists($file) && (@filemtime($file) > time() || $this->doFetch(array($id)));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doClear($namespace)
+    {
+        $ok = true;
+        $directory = $this->filesCacheHelper->getDirectory();
+
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
+            $ok = ($file->isDir() || @unlink($file) || !file_exists($file)) && $ok;
+        }
+
+        return $ok;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doDelete(array $ids)
+    {
+        $ok = true;
+
+        foreach ($ids as $id) {
+            $file = $this->filesCacheHelper->getFilePath($id);
+            $ok = (!file_exists($file) || @unlink($file) || !file_exists($file)) && $ok;
+        }
+
+        return $ok;
     }
 
     /**
@@ -71,17 +109,21 @@ class FilesystemAdapter extends AbstractFilesystemAdapter
         $expiresAt = $lifetime ? time() + $lifetime : PHP_INT_MAX;
 
         foreach ($values as $id => $value) {
-            $fileContent = $this->getCacheFileContent($id, $value, $expiresAt);
-            $ok = $this->saveFile($id, $fileContent, $expiresAt) && $ok;
+            $fileContent = $this->createCacheFileContent($id, $value, $expiresAt);
+            $ok = $this->filesCacheHelper->saveFileForId($id, $fileContent, $expiresAt) && $ok;
         }
 
         return $ok;
     }
 
     /**
-     * @inheritdoc
+     * @param string $id
+     * @param mixed  $value
+     * @param int    $expiresAt
+     *
+     * @return string
      */
-    protected function getCacheFileContent($id, $value, $expiresAt)
+    protected function createCacheFileContent($id, $value, $expiresAt)
     {
         return $expiresAt."\n".rawurlencode($id)."\n".serialize($value);
     }

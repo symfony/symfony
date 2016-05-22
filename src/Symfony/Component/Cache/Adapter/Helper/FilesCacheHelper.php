@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Adapter\Helper;
 
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
-abstract class AbstractFilesystemAdapter extends AbstractAdapter
+class FilesCacheHelper
 {
     /**
      * @var string
@@ -25,10 +25,8 @@ abstract class AbstractFilesystemAdapter extends AbstractAdapter
      */
     private $directory;
 
-    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null, $fileSuffix = '')
+    public function __construct($directory = null, $fileSuffix = '')
     {
-        parent::__construct('', $defaultLifetime);
-
         if (!isset($directory[0])) {
             $directory = sys_get_temp_dir().'/symfony-cache';
         }
@@ -57,46 +55,42 @@ abstract class AbstractFilesystemAdapter extends AbstractAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * Returns root cache directory.
+     *
+     * @return string
      */
-    protected function doClear($namespace)
+    public function getDirectory()
     {
-        $ok = true;
-
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            $ok = ($file->isDir() || @unlink($file) || !file_exists($file)) && $ok;
-        }
-
-        return $ok;
+        return $this->directory;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function doDelete(array $ids)
-    {
-        $ok = true;
-
-        foreach ($ids as $id) {
-            $file = $this->getFile($id);
-            $ok = (!file_exists($file) || @unlink($file) || !file_exists($file)) && $ok;
-        }
-
-        return $ok;
-    }
-
-    /**
-     * @param string   $id               Id of the cache item (used for obtaining file path to write to)
-     * @param string   $fileContent      Content to write to file
+     * Saves entry in cache.
+     *
+     * @param string   $id               Id of the cache entry (used for obtaining file path to write to).
+     * @param string   $fileContent      Content to write to cache file
      * @param int|null $modificationTime If this is not-null it will be passed to touch()
      *
      * @return bool
      */
-    protected function saveFile($id, $fileContent, $modificationTime = null)
+    public function saveFileForId($id, $fileContent, $modificationTime = null)
+    {
+        $file = $this->getFilePath($id, true);
+        return $this->saveFile($file, $fileContent, $modificationTime);
+    }
+
+    /**
+     * Saves entry in cache.
+     *
+     * @param string   $file             File path to cache entry.
+     * @param string   $fileContent      Content to write to cache file
+     * @param int|null $modificationTime If this is not-null it will be passed to touch()
+     *
+     * @return bool
+     */
+    public function saveFile($file, $fileContent, $modificationTime = null)
     {
         $temporaryFile = $this->directory.uniqid('', true);
-        $file = $this->getFile($id, true);
-
         if (false === @file_put_contents($temporaryFile, $fileContent)) {
             return false;
         }
@@ -108,7 +102,15 @@ abstract class AbstractFilesystemAdapter extends AbstractAdapter
         return @rename($temporaryFile, $file);
     }
 
-    protected function getFile($id, $mkdir = false)
+    /**
+     * Returns file path to cache entry.
+     *
+     * @param string $id    Cache entry id.
+     * @param bool   $mkdir Whether to create necessary directories before returning file path.
+     *
+     * @return string
+     */
+    public function getFilePath($id, $mkdir = false)
     {
         $hash = str_replace('/', '-', base64_encode(md5($id, true)));
         $dir = $this->directory.$hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR;

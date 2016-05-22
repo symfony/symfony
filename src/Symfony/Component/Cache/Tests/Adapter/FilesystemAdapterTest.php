@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**

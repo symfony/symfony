@@ -24,11 +24,12 @@ class PhpFilesAdapter extends AbstractAdapter
      * @param string $namespace       Cache namespace
      * @param int    $defaultLifetime Default lifetime for cache items
      * @param null   $directory       Path where cache items should be stored, defaults to sys_get_temp_dir().'/symfony-cache'
+     * @param string $version         Version (works the same way as namespace)
      */
-    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
+    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null, $version = null)
     {
         parent::__construct($namespace, $defaultLifetime);
-        $this->filesCacheHelper = new FilesCacheHelper($directory, $namespace, '.php');
+        $this->filesCacheHelper = new FilesCacheHelper($directory, $namespace, $version, '.php');
     }
 
     /**
@@ -39,14 +40,11 @@ class PhpFilesAdapter extends AbstractAdapter
         $values = array();
 
         foreach ($ids as $id) {
-            $valueArray = $this->includeCacheFileWithSequenceCheck($this->filesCacheHelper->getFilePath($id));
+            $valueArray = $this->includeCacheFile($this->filesCacheHelper->getFilePath($id));
             if (!is_array($valueArray)) {
                 continue;
             }
-            list($value, $expiresAt) = $valueArray;
-            if (time() < (int) $expiresAt) {
-                $values[$id] = $value;
-            }
+            $values[$id] = $valueArray[0];
         }
 
         return $values;
@@ -65,14 +63,8 @@ class PhpFilesAdapter extends AbstractAdapter
      */
     protected function doClear($namespace)
     {
-        $ok = true;
         $directory = $this->filesCacheHelper->getDirectory();
-
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            $ok = ($file->isDir() || $this->removeCacheFile((string) $file)) && $ok;
-        }
-
-        return $ok;
+        return !(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS))->valid();
     }
 
     /**
@@ -80,14 +72,14 @@ class PhpFilesAdapter extends AbstractAdapter
      */
     protected function doDelete(array $ids)
     {
-        $ok = true;
-
         foreach ($ids as $id) {
-            $file = $this->filesCacheHelper->getFilePath($id, true);
-            $ok = $this->removeCacheFile($file) && $ok;
+            $file = $this->filesCacheHelper->getFilePath($id);
+            if (@file_exists($file)) {
+                return false;
+            }
         }
 
-        return $ok;
+        return true;
     }
 
     /**
@@ -100,7 +92,11 @@ class PhpFilesAdapter extends AbstractAdapter
 
         foreach ($values as $id => $value) {
             $file = $this->filesCacheHelper->getFilePath($id, true);
-            $ok = $this->saveCacheFile($file, $value, $expiresAt) && $ok;
+            if (file_exists($file)) {
+                $ok = false;
+            } else {
+                $ok = $this->saveCacheFile($file, $value, $expiresAt) && $ok;
+            }
         }
 
         return $ok;
@@ -115,113 +111,45 @@ class PhpFilesAdapter extends AbstractAdapter
      */
     private function saveCacheFile($file, $value, $expiresAt)
     {
-        $currentSequenceNumber = 1;
-        if (defined('HHVM_VERSION')) {
-            // workaround for https://github.com/facebook/hhvm/issues/1447 and similar
-            // use file modification as a sequence number (cache file versioning)
-            @clearstatcache(true, $file);
-            $currentSequenceNumber = 1 + (int) @filemtime($file);
-            if ($currentSequenceNumber > time()) {
-                $currentSequenceNumber = 1;
-            }
-        }
-        $fileContent = $this->createCacheFileContent($value, $expiresAt, $currentSequenceNumber);
-        $ok = $this->filesCacheHelper->saveFile($file, $fileContent, $currentSequenceNumber);
-        if (function_exists('opcache_invalidate')) {
-            @opcache_invalidate($file, true);
-        }
-        if (function_exists('apc_compile_file')) {
-            @apc_compile_file($file);
-        }
-
-        return $ok;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return bool
-     */
-    private function removeCacheFile($file)
-    {
-        if (defined('HHVM_VERSION')) {
-            // workaround for https://github.com/facebook/hhvm/issues/1447
-            // save file with empty expired data instead of removing it
-            // so that we can check modification time (where we store version number)
-            return $this->saveCacheFile($file, null, 0);
-        }
-        if (function_exists('opcache_invalidate')) {
-            @opcache_invalidate($file, true);
-        }
-        if (function_exists('apc_delete_file')) {
-            @apc_delete_file($file);
-        }
-        @unlink($file);
-
-        return !@file_exists($file);
+        $fileContent = $this->createCacheFileContent($value, $expiresAt);
+        return $this->filesCacheHelper->saveFile($file, $fileContent);
     }
 
     /**
      * @param string $file File path
      *
-     * @return mixed|null
+     * @return array|null unserialized value wrapped in array or null
      */
-    private function includeCacheFileWithSequenceCheck($file)
+    private function includeCacheFile($file)
     {
-        $valueArray = $this->includeCacheFile($file);
-
-        if (!is_array($valueArray) || 3 !== count($valueArray)) {
+        $valueArray = @include $file;
+        if (!is_array($valueArray) || 2 !== count($valueArray)) {
             return;
         }
 
-        list(, , $foundSequenceNumber) = $valueArray;
-
-        if (defined('HHVM_VERSION')) {
-            // workaround for https://github.com/facebook/hhvm/issues/1447 and similar
-            // use file modification as a sequence number (cache file version)
-            @clearstatcache(true, $file);
-            $actualSequenceNumber = (int) @filemtime($file);
-            if ($foundSequenceNumber != $actualSequenceNumber) {
-                return $this->includeCacheFile($file, true);
-            }
+        list($serializedValue, $expiresAt) = $valueArray;
+        if (time() > (int) $expiresAt) {
+            return;
         }
 
-        return $valueArray;
-    }
-
-    /**
-     * @param string $file    File path
-     * @param bool   $useEval If true, tries to eval file contents instead of including it (forcing omitting opcache).
-     *
-     * @return mixed|null
-     */
-    private function includeCacheFile($file, $useEval = false)
-    {
-        if ($useEval) {
-            $content = @file_get_contents($file);
-            if ($content) {
-                $valueArray = eval('?>'.$content);
-            } else {
-                return;
-            }
-        } else {
-            $valueArray = @include $file;
+        $unserializedValueInArray = unserialize($serializedValue);
+        if (!is_array($unserializedValueInArray)) {
+            return;
         }
 
-        return $valueArray;
+        return $unserializedValueInArray;
     }
 
     /**
      * @param mixed $value
      * @param int   $expiresAt
-     * @param int   $currentSequenceNumber
      *
      * @return string
      */
-    private function createCacheFileContent($value, $expiresAt, $currentSequenceNumber)
+    private function createCacheFileContent($value, $expiresAt)
     {
-        $exportedValue = var_export(serialize(array($value, $expiresAt, $currentSequenceNumber)), true);
+        $exportedValue = var_export(array(serialize([$value]), $expiresAt), true);
 
-        return '<?php return unserialize('.$exportedValue.');';
+        return '<?php return '.$exportedValue.';';
     }
 }

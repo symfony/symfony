@@ -557,6 +557,34 @@ EOF
         );
     }
 
+    public function testSequenceInMappingStartedBySingleDashLine()
+    {
+        $yaml = <<<EOT
+a:
+-
+  b:
+  -
+    bar: baz
+- foo
+d: e
+EOT;
+        $expected = array(
+            'a' => array(
+                array(
+                    'b' => array(
+                        array(
+                            'bar' => 'baz',
+                        ),
+                    ),
+                ),
+                'foo',
+            ),
+            'd' => 'e',
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */

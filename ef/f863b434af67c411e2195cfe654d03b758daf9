@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-05-12T16:17:36Z
+
+some of these changes should actually be done in 2.3 or in 2.7 too. Can you open 3 PRs instead ?
+
+- one for 2.3 changing all affected places relevant for 2.3
+- another one for 2.7 changing the places relevant in 2.7+ (not changing the places already changed in the previous PR)
+- another one for 2.8 for 2.8+ changes (you can update the current PR for that by removing parts of the patch as it already targets the 2.8 branch)
+
+---------------------------------------------------------------------------
+
+by fprochazka at 2016-05-12T16:19:11Z
+
+I wasn't aware the 2.3 is still maintained :) I'll do that then.
+
+---------------------------------------------------------------------------
+
+by fprochazka at 2016-05-12T16:47:25Z
+
+@stof I think it would be more productive to have 90% of the discussion under one PR and I can split it after this is cleaned, so I'm not doing it over 4 branches.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-13T12:40:25Z
+
+I'm mostly :-1: but on a few spots: \Error should not be dealt with as regular exceptions. They are a sign of serious issues and recovering after them is encouraging not fixing the related issues to me.
+Should be thought on a case by case basis.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-13T12:48:19Z
+
+yeah, catching them is fine in places where they are rethrown after some cleanup (use case for ``finally`` in newer versions of PHP), but other places should probably let them bubble most of the time
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-15T14:57:28Z
+
+@fprochazka thanks for this PR. I added a comment everywhere I think catching `Throwable` should be reverted. All the other non-commented places look fine to me.
+
+---------------------------------------------------------------------------
+
+by fprochazka at 2016-05-16T11:14:44Z
+
+@nicolas-grekas I've removed those where I agree, but I would like a better reasoning behind those I left untouched, that you've commented. They seem important to me.
+
+---------------------------------------------------------------------------
+
+by fprochazka at 2016-05-19T12:09:35Z
+
+All the comments are solved, so I'm gonna start spliting this to more branches [as @stof said](https://github.com/symfony/symfony/pull/18765#issuecomment-218808477)
+
+---------------------------------------------------------------------------
+
+by fprochazka at 2016-05-19T14:08:32Z
+
+Should I try to help with PR for 3.0? Or will the mergers solve the possible conflicts and throw away changes that are not relevant in 3.0? As I'm sure there will be some.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-20T15:03:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-23T06:59:05Z
+
+👍

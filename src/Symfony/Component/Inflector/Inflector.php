@@ -126,6 +126,9 @@ final class Inflector
 
         // chateaux (chateau)
         array('xuae', 4, false, true, 'eau'),
+
+        // people (person)
+        array('elpoep', 6, true, true, 'person'),
     );
 
     /**

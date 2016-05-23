@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-22T08:12:58Z
+
+Status: reviewed
+
+👍
+
+Fabbot error is a false positive.
+A PR should also be opened on older version of this class (in the PropertyInfo component).
+
+---------------------------------------------------------------------------
+
+by Keeo at 2016-05-22T09:45:17Z
+
+Will do in few hours
+
+---------------------------------------------------------------------------
+
+by Keeo at 2016-05-22T13:01:00Z
+
+Here it is for v2.8 - [#18839]

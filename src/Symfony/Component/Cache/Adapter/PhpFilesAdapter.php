@@ -64,6 +64,7 @@ class PhpFilesAdapter extends AbstractAdapter
     protected function doClear($namespace)
     {
         $directory = $this->filesCacheHelper->getDirectory();
+
         return !(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS))->valid();
     }
 
@@ -112,6 +113,7 @@ class PhpFilesAdapter extends AbstractAdapter
     private function saveCacheFile($file, $value, $expiresAt)
     {
         $fileContent = $this->createCacheFileContent($value, $expiresAt);
+
         return $this->filesCacheHelper->saveFile($file, $fileContent);
     }
 

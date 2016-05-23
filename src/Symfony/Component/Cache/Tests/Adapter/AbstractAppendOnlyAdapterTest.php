@@ -23,7 +23,7 @@ abstract class AbstractAppendOnlyAdapterTest extends CachePoolTest
     private $cacheVersion;
 
     /**
-     * @type CacheItemPoolInterface
+     * @var CacheItemPoolInterface
      */
     private $cache;
 
@@ -37,6 +37,7 @@ abstract class AbstractAppendOnlyAdapterTest extends CachePoolTest
     public function createCachePool()
     {
         $cacheVersion = $this->createRandomCachePoolVersion();
+
         return $this->createVersionedCachePool($cacheVersion);
     }
 
@@ -135,7 +136,7 @@ abstract class AbstractAppendOnlyAdapterTest extends CachePoolTest
 
         $items = $this->cache->getItems(['foo', 'bar', 'baz']);
 
-        /** @type CacheItemInterface $item */
+        /** @var CacheItemInterface $item */
         foreach ($items as $idx => $item) {
             $item->set($idx);
             $this->cache->save($item);
@@ -249,7 +250,7 @@ abstract class AbstractAppendOnlyAdapterTest extends CachePoolTest
 
     private function prepareDeferredSaveWithoutCommit()
     {
-        $cache       = $this->cache;
+        $cache = $this->cache;
         $this->cache = null;
 
         $item = $cache->getItem('key');

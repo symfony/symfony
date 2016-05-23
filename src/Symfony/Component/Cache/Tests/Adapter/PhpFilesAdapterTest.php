@@ -48,6 +48,7 @@ class PhpFilesAdapterTest extends AbstractAppendOnlyAdapterTest
 
     /**
      * @param string $cacheVersion
+     *
      * @return CacheItemPoolInterface that is used in the tests that need to recreate the same cache pool
      */
     public function createVersionedCachePool($cacheVersion)

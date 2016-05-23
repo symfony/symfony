@@ -107,6 +107,8 @@ class StringUtilTest extends \PHPUnit_Framework_TestCase
             array('objectives', 'objective'),
             array('oxen', 'ox'),
             array('parties', 'party'),
+            array('people', 'person'),
+            array('persons', 'person'),
             array('phenomena', array('phenomenon', 'phenomenum')),
             array('photos', 'photo'),
             array('pianos', 'piano'),

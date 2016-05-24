@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\Exception;
+
 /**
  * Defines the interface of encoders.
  *
@@ -25,6 +27,8 @@ interface EncoderInterface
      * @param string $format  Format name
      * @param array  $context options that normalizers/encoders have access to.
      *
+     * @throws Exception
+     *                                     
      * @return string|bool|int|float|null
      */
     public function encode($data, $format, array $context = array());

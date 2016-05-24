@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
+use Symfony\Component\Serializer\Exception\Exception;
+
 /**
  * Defines the interface of decoders.
  *
@@ -30,6 +32,8 @@ interface DecoderInterface
      * are encouraged to document which formats they support in a non-inherited
      * phpdoc comment.
      *
+     * @throws Exception
+     *                    
      * @return mixed
      */
     public function decode($data, $format, array $context = array());

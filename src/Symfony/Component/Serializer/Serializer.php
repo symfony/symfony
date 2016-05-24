@@ -169,6 +169,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws RuntimeException
      */
     private function getNormalizer($data, $format = null)
     {
@@ -183,6 +185,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws RuntimeException
      */
     private function getDenormalizer($data, $type, $format = null)
     {

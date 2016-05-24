@@ -861,6 +861,9 @@ class OptionsResolver implements Options, OptionsResolverInterface
             } catch (\Exception $e) {
                 unset($this->calling[$option]);
                 throw $e;
+            } catch (\Throwable $e) {
+                unset($this->calling[$option]);
+                throw $e;
             }
             unset($this->calling[$option]);
             // END
@@ -961,6 +964,9 @@ class OptionsResolver implements Options, OptionsResolverInterface
             try {
                 $value = $normalizer($this, $value);
             } catch (\Exception $e) {
+                unset($this->calling[$option]);
+                throw $e;
+            } catch (\Throwable $e) {
                 unset($this->calling[$option]);
                 throw $e;
             }

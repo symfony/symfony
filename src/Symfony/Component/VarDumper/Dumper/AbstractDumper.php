@@ -122,6 +122,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
             $this->dumpLine(-1);
         } catch (\Exception $exception) {
             // Re-thrown below
+        } catch (\Throwable $exception) {
+            // Re-thrown below
         }
         if ($output) {
             $this->setOutput($prevOutput);

@@ -518,6 +518,10 @@ class ErrorHandler
                 $this->isRecursive = false;
 
                 throw $e;
+            } catch (\Throwable $e) {
+                $this->isRecursive = false;
+
+                throw $e;
             }
         }
 
@@ -624,6 +628,8 @@ class ErrorHandler
                 static::unstackErrors();
             }
         } catch (\Exception $exception) {
+            // Handled below
+        } catch (\Throwable $exception) {
             // Handled below
         }
 

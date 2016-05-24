@@ -176,6 +176,10 @@ class DebugClassLoader
             ErrorHandler::unstackErrors();
 
             throw $e;
+        } catch (\Throwable $e) {
+            ErrorHandler::unstackErrors();
+
+            throw $e;
         }
 
         ErrorHandler::unstackErrors();

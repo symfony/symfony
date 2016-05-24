@@ -157,7 +157,7 @@ class Process implements \IteratorAggregate
         // on Gnu/Linux, PHP builds with --enable-maintainer-zts are also affected
         // @see : https://bugs.php.net/bug.php?id=51800
         // @see : https://bugs.php.net/bug.php?id=50524
-        if (null === $this->cwd && (defined('ZEND_THREAD_SAFE') || '\\' === DIRECTORY_SEPARATOR)) {
+        if (null === $this->cwd && (defined('ZEND_THREAD_SAFE') || self::isWindowsPlatform())) {
             $this->cwd = getcwd();
         }
         if (null !== $env) {
@@ -166,10 +166,10 @@ class Process implements \IteratorAggregate
 
         $this->setInput($input);
         $this->setTimeout($timeout);
-        $this->useFileHandles = '\\' === DIRECTORY_SEPARATOR;
+        $this->useFileHandles = self::isWindowsPlatform();
         $this->pty = false;
         $this->enhanceWindowsCompatibility = true;
-        $this->enhanceSigchildCompatibility = '\\' !== DIRECTORY_SEPARATOR && $this->isSigchildEnabled();
+        $this->enhanceSigchildCompatibility = !self::isWindowsPlatform() && $this->isSigchildEnabled();
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }
 
@@ -268,7 +268,7 @@ class Process implements \IteratorAggregate
 
         $commandline = $this->commandline;
 
-        if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
+        if (self::isWindowsPlatform() && $this->enhanceWindowsCompatibility) {
             $commandline = 'cmd /V:ON /E:ON /D /C "('.$commandline.')';
             foreach ($this->processPipes->getFiles() as $offset => $filename) {
                 $commandline .= ' '.$offset.'>'.ProcessUtils::escapeArgument($filename);
@@ -368,7 +368,7 @@ class Process implements \IteratorAggregate
 
         do {
             $this->checkTimeout();
-            $running = '\\' === DIRECTORY_SEPARATOR ? $this->isRunning() : $this->processPipes->areOpen();
+            $running = self::isWindowsPlatform() ? $this->isRunning() : $this->processPipes->areOpen();
             $this->readPipes($running, '\\' !== DIRECTORY_SEPARATOR || !$running);
         } while ($running);
 
@@ -973,7 +973,7 @@ class Process implements \IteratorAggregate
      */
     public function setTty($tty)
     {
-        if ('\\' === DIRECTORY_SEPARATOR && $tty) {
+        if (self::isWindowsPlatform() && $tty) {
             throw new RuntimeException('TTY mode is not supported on Windows platform.');
         }
         if ($tty && (!file_exists('/dev/tty') || !is_readable('/dev/tty'))) {
@@ -1237,11 +1237,28 @@ class Process implements \IteratorAggregate
             return $result;
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (self::isWindowsPlatform()) {
             return $result = false;
         }
 
         return $result = (bool) @proc_open('echo 1', array(array('pty'), array('pty'), array('pty')), $pipes);
+    }
+
+    /**
+     * Returns whether the current process is run on Windows platform (Command Prompt, PowerShell) or not.
+     * 
+     * Keep in mind, that Windows users can use Unix shells (like the git-shell) with TTY/PTY support,
+     * in this case, this function will return 'false'.
+     *
+     * @return bool
+     */
+    public static function isWindowsPlatform()
+    {
+        if ('\\' === DIRECTORY_SEPARATOR && (!file_exists('/dev/tty') || !is_readable('/dev/tty'))) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -1254,7 +1271,7 @@ class Process implements \IteratorAggregate
         if ($this->input instanceof \Iterator) {
             $this->input->rewind();
         }
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (self::isWindowsPlatform()) {
             $this->processPipes = new WindowsPipes($this->input, !$this->outputDisabled || $this->hasCallback);
         } else {
             $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $this->hasCallback);
@@ -1478,7 +1495,7 @@ class Process implements \IteratorAggregate
             return false;
         }
 
-        if ('\\' === DIRECTORY_SEPARATOR) {
+        if (self::isWindowsPlatform()) {
             exec(sprintf('taskkill /F /T /PID %d 2>&1', $pid), $output, $exitCode);
             if ($exitCode && $this->isRunning()) {
                 if ($throwException) {

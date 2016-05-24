@@ -580,6 +580,8 @@ class ErrorHandler
             }
         } catch (\Exception $exception) {
             // Handled below
+        } catch (\Throwable $exception) {
+            // Handled below
         }
 
         if ($error && $error['type'] &= E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR) {

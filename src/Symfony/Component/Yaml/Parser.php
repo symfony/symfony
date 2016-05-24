@@ -24,6 +24,7 @@ class Parser
     const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
 
     private $offset = 0;
+    private $totalNumberOfLines;
     private $lines = array();
     private $currentLineNb = -1;
     private $currentLine = '';
@@ -32,11 +33,13 @@ class Parser
     /**
      * Constructor.
      *
-     * @param int $offset The offset of YAML document (used for line numbers in error messages)
+     * @param int      $offset             The offset of YAML document (used for line numbers in error messages)
+     * @param int|null $totalNumberOfLines The overall number of lines being parsed
      */
-    public function __construct($offset = 0)
+    public function __construct($offset = 0, $totalNumberOfLines = null)
     {
         $this->offset = $offset;
+        $this->totalNumberOfLines = $totalNumberOfLines;
     }
 
     /**
@@ -85,6 +88,10 @@ class Parser
         $value = $this->cleanup($value);
         $this->lines = explode("\n", $value);
 
+        if (null === $this->totalNumberOfLines) {
+            $this->totalNumberOfLines = count($this->lines);
+        }
+
         if (2 /* MB_OVERLOAD_STRING */ & (int) ini_get('mbstring.func_overload')) {
             $mbEncoding = mb_internal_encoding();
             mb_internal_encoding('UTF-8');
@@ -106,7 +113,7 @@ class Parser
             $isRef = $mergeNode = false;
             if (preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+?))?\s*$#u', $this->currentLine, $values)) {
                 if ($context && 'mapping' == $context) {
-                    throw new ParseException('You cannot define a sequence item when in a mapping');
+                    throw new ParseException('You cannot define a sequence item when in a mapping', $this->getRealCurrentLineNb() + 1, $this->currentLine);
                 }
                 $context = 'sequence';
 
@@ -118,7 +125,7 @@ class Parser
                 // array
                 if (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
                     $c = $this->getRealCurrentLineNb() + 1;
-                    $parser = new self($c);
+                    $parser = new self($c, $this->totalNumberOfLines);
                     $parser->refs = &$this->refs;
                     $data[] = $parser->parse($this->getNextEmbedBlock(null, true), $flags);
                 } else {
@@ -127,7 +134,7 @@ class Parser
                     ) {
                         // this is a compact notation element, add to next block and parse
                         $c = $this->getRealCurrentLineNb();
-                        $parser = new self($c);
+                        $parser = new self($c, $this->totalNumberOfLines);
                         $parser->refs = &$this->refs;
 
                         $block = $values['value'];
@@ -145,7 +152,7 @@ class Parser
                 }
             } elseif (preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->currentLine, $values) && (false === strpos($values['key'], ' #') || in_array($values['key'][0], array('"', "'")))) {
                 if ($context && 'sequence' == $context) {
-                    throw new ParseException('You cannot define a mapping item when in a sequence');
+                    throw new ParseException('You cannot define a mapping item when in a sequence', $this->currentLineNb + 1, $this->currentLine);
                 }
                 $context = 'mapping';
 
@@ -192,7 +199,7 @@ class Parser
                             $value = $this->getNextEmbedBlock();
                         }
                         $c = $this->getRealCurrentLineNb() + 1;
-                        $parser = new self($c);
+                        $parser = new self($c, $this->totalNumberOfLines);
                         $parser->refs = &$this->refs;
                         $parsed = $parser->parse($value, $flags);
 
@@ -243,7 +250,7 @@ class Parser
                         }
                     } else {
                         $c = $this->getRealCurrentLineNb() + 1;
-                        $parser = new self($c);
+                        $parser = new self($c, $this->totalNumberOfLines);
                         $parser->refs = &$this->refs;
                         $value = $parser->parse($this->getNextEmbedBlock(), $flags);
                         // Spec: Keys MUST be unique; first one wins.
@@ -266,7 +273,7 @@ class Parser
             } else {
                 // multiple documents are not supported
                 if ('---' === $this->currentLine) {
-                    throw new ParseException('Multiple documents are not supported.');
+                    throw new ParseException('Multiple documents are not supported.', $this->currentLineNb + 1, $this->currentLine);
                 }
 
                 // 1-liner optionally followed by newline(s)
@@ -511,7 +518,7 @@ class Parser
             }
 
             if (!array_key_exists($value, $this->refs)) {
-                throw new ParseException(sprintf('Reference "%s" does not exist.', $value), $this->currentLine);
+                throw new ParseException(sprintf('Reference "%s" does not exist.', $value), $this->currentLineNb + 1, $this->currentLine);
             }
 
             return $this->refs[$value];
@@ -609,6 +616,8 @@ class Parser
         if ($notEOF) {
             $blockLines[] = '';
             $this->moveToPreviousLine();
+        } elseif (!$notEOF && !$this->isCurrentLineLastLineInDocument()) {
+            $blockLines[] = '';
         }
 
         // folded style
@@ -715,6 +724,11 @@ class Parser
         return '' !== $ltrimmedLine && $ltrimmedLine[0] === '#';
     }
 
+    private function isCurrentLineLastLineInDocument()
+    {
+        return ($this->offset + $this->currentLineNb) >= ($this->totalNumberOfLines - 1);
+    }
+
     /**
      * Cleanups a YAML string to be parsed.
      *
@@ -792,7 +806,7 @@ class Parser
      */
     private function isStringUnIndentedCollectionItem()
     {
-        return 0 === strpos($this->currentLine, '- ');
+        return '-' === rtrim($this->currentLine) || 0 === strpos($this->currentLine, '- ');
     }
 
     /**

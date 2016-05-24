@@ -68,14 +68,14 @@ class ObjectNormalizer extends AbstractObjectNormalizer
                 $attributeName = lcfirst(substr($name, 2));
             }
 
-            if (null !== $attributeName && $this->isAllowedAttribute($object, $attributeName)) {
+            if (null !== $attributeName && $this->isAllowedAttribute($object, $attributeName, $format, $context)) {
                 $attributes[$attributeName] = true;
             }
         }
 
         // properties
         foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-            if ($reflProperty->isStatic() || !$this->isAllowedAttribute($object, $reflProperty->name)) {
+            if ($reflProperty->isStatic() || !$this->isAllowedAttribute($object, $reflProperty->name, $format, $context)) {
                 continue;
             }
 

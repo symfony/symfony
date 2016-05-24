@@ -156,12 +156,22 @@ class Inline
      */
     private static function dumpArray($value, $exceptionOnInvalidType, $objectSupport)
     {
+        if ($value) {
+            $expectedKey = 0;
+            $isMapping = false;
+
+            foreach ($value as $key => $val) {
+                if ($key !== $expectedKey++) {
+                    $isMapping = true;
+                    break;
+                }
+            }
+        } else {
+            $isMapping = true;
+        }
+
         // array
-        $keys = array_keys($value);
-        $keysCount = count($keys);
-        if ((1 === $keysCount && '0' == $keys[0])
-            || ($keysCount > 1 && array_reduce($keys, function ($v, $w) { return (int) $v + $w; }, 0) === $keysCount * ($keysCount - 1) / 2)
-        ) {
+        if (!$isMapping) {
             $output = array();
             foreach ($value as $val) {
                 $output[] = self::dump($val, $exceptionOnInvalidType, $objectSupport);

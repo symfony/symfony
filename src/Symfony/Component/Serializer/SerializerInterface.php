@@ -28,7 +28,7 @@ interface SerializerInterface
      * @param array  $context options normalizers/encoders have access to
      *
      * @throws Exception
-     *                        
+     *                    
      * @return string
      */
     public function serialize($data, $format, array $context = array());

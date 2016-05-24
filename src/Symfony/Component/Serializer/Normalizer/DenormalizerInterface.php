@@ -29,7 +29,7 @@ interface DenormalizerInterface
      * @param array  $context options available to the denormalizer
      *
      * @throws Exception
-     *                        
+     *                    
      * @return object
      */
     public function denormalize($data, $class, $format = null, array $context = array());

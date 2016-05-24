@@ -33,7 +33,7 @@ interface DecoderInterface
      * phpdoc comment.
      *
      * @throws Exception
-     *                        
+     *                    
      * @return mixed
      */
     public function decode($data, $format, array $context = array());

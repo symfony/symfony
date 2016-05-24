@@ -28,7 +28,7 @@ interface NormalizerInterface
      * @param array  $context Context options for the normalizer
      *
      * @throws Exception
-     *                        
+     *                                           
      * @return array|string|bool|int|float|null
      */
     public function normalize($object, $format = null, array $context = array());

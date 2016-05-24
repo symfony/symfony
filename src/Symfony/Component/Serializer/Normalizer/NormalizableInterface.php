@@ -36,7 +36,7 @@ interface NormalizableInterface
      * @param array               $context    Options for normalizing this object
      *
      * @throws Exception
-     *                                        
+     *                                           
      * @return array|string|bool|int|float|null
      */
     public function normalize(NormalizerInterface $normalizer, $format = null, array $context = array());

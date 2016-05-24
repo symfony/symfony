@@ -308,6 +308,19 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testIgnoredAttributesDenormalize()
+    {
+        $this->normalizer->setIgnoredAttributes(array('fooBar', 'bar', 'baz'));
+
+        $obj = new ObjectDummy();
+        $obj->setFoo('foo');
+
+        $this->assertEquals(
+            $obj,
+            $this->normalizer->denormalize(array('fooBar' => 'fooBar', 'foo' => 'foo', 'baz' => 'baz'), __NAMESPACE__.'\ObjectDummy')
+        );
+    }
+
     public function provideCallbacks()
     {
         return array(

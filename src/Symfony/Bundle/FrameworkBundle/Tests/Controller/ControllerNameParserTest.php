@@ -59,8 +59,8 @@ class ControllerNameParserTest extends TestCase
     {
         $parser = $this->createParser();
 
-        $this->assertEquals('FooBundle:Default:index', $parser->build('TestBundle\FooBundle\Controller\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
-        $this->assertEquals('FooBundle:Sub\Default:index', $parser->build('TestBundle\FooBundle\Controller\Sub\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
+        $this->assertEquals('FoooooBundle:Default:index', $parser->build('TestBundle\FooBundle\Controller\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
+        $this->assertEquals('FoooooBundle:Sub\Default:index', $parser->build('TestBundle\FooBundle\Controller\Sub\DefaultController::indexAction'), '->parse() converts a class::method string to a short a:b:c notation string');
 
         try {
             $parser->build('TestBundle\FooBundle\Controller\DefaultController::index');
@@ -132,8 +132,9 @@ class ControllerNameParserTest extends TestCase
     public function getInvalidBundleNameTests()
     {
         return array(
-            array('FoodBundle:Default:index', 'FooBundle:Default:index'),
-            array('CrazyBundle:Default:index', false),
+            'Alternative will be found using levenshtein' => array('FoodBundle:Default:index', 'FooBundle:Default:index'),
+            'Alternative will be found using partial match' => array('FabpotFooBund:Default:index', 'FabpotFooBundle:Default:index'),
+            'Bundle does not exist at all' => array('CrazyBundle:Default:index', false),
         );
     }
 
@@ -162,6 +163,7 @@ class ControllerNameParserTest extends TestCase
         $bundles = array(
             'SensioFooBundle' => $this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'),
             'SensioCmsFooBundle' => $this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle'),
+            'FoooooBundle' => $this->getBundle('TestBundle\FooBundle', 'FoooooBundle'),
             'FooBundle' => $this->getBundle('TestBundle\FooBundle', 'FooBundle'),
             'FabpotFooBundle' => $this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'),
         );

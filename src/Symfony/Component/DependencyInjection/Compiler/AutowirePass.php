@@ -44,8 +44,8 @@ class AutowirePass implements CompilerPassInterface
                     $this->completeDefinition($id, $definition);
                 }
             }
-        } catch (\Error $e) {
         } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
 
         spl_autoload_unregister($throwingAutoloader);
@@ -225,13 +225,16 @@ class AutowirePass implements CompilerPassInterface
     private function createAutowiredDefinition(\ReflectionClass $typeHint, $id)
     {
         if (isset($this->notGuessableTypes[$typeHint->name])) {
-            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Several services implementing this type have been declared: "%s".', $typeHint->name, $id, implode('", "', $this->types[$typeHint->name])));
+            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
+            $matchingServices = implode(', ', $this->types[$typeHint->name]);
+
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $typeHint->name, $id, $classOrInterface, $matchingServices));
+
         }
 
-        $noAvailableDefinitionMessage = sprintf('Unable to autowire argument of type "%s" for the service "%s". This type cannot be instantiated automatically and no service implementing this type is declared.', $typeHint->name, $id);
-
         if (!$typeHint->isInstantiable()) {
-            throw new RuntimeException($noAvailableDefinitionMessage);
+            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $id, $classOrInterface));
         }
 
         $argumentId = sprintf('autowired.%s', $typeHint->name);
@@ -244,7 +247,9 @@ class AutowirePass implements CompilerPassInterface
         try {
             $this->completeDefinition($argumentId, $argumentDefinition);
         } catch (RuntimeException $e) {
-            throw new RuntimeException($noAvailableDefinitionMessage, 0, $e);
+            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
+            $message = sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $id, $classOrInterface);
+            throw new RuntimeException($message, 0, $e);
         }
 
         return new Reference($argumentId);

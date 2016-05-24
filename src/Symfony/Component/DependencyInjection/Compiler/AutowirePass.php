@@ -45,8 +45,8 @@ class AutowirePass implements CompilerPassInterface
                     $this->completeDefinition($id, $definition);
                 }
             }
-        } catch (\Error $e) {
         } catch (\Exception $e) {
+        } catch (\Throwable $e) {
         }
 
         spl_autoload_unregister($throwingAutoloader);
@@ -283,7 +283,7 @@ class AutowirePass implements CompilerPassInterface
 
         try {
             $this->completeDefinition($argumentId, $argumentDefinition);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
             $message = sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $id, $classOrInterface);
             throw new RuntimeException($message, 0, $e);

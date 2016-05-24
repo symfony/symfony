@@ -1037,9 +1037,9 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        $nonce = substr(str_replace('/', '-', base64_encode(md5(uniqid(mt_rand(), true), true))), 0, -2);
-        $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $nonce);
-        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $nonce);
+        $version = substr(str_replace('/', '-', base64_encode(md5(uniqid(mt_rand(), true), true))), 0, -2);
+        $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
+        $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
 
         foreach (array('doctrine', 'psr6', 'redis') as $name) {

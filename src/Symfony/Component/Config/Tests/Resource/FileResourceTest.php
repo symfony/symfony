@@ -21,7 +21,7 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->file = realpath(sys_get_temp_dir()).'/tmp.xml';
+        $this->file = sys_get_temp_dir().'/tmp.xml';
         $this->time = time();
         touch($this->file, $this->time);
         $this->resource = new FileResource($this->file);
@@ -39,6 +39,12 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
     public function testGetResource()
     {
         $this->assertSame(realpath($this->file), $this->resource->getResource(), '->getResource() returns the path to the resource');
+    }
+
+    public function testGetResourceWithScheme()
+    {
+        $resource = new FileResource('file://'.$this->file);
+        $this->assertSame('file://'.$this->file, $resource->getResource(), '->getResource() returns the path to the schemed resource');
     }
 
     public function testToString()

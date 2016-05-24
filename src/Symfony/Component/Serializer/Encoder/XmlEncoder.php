@@ -66,8 +66,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * {@inheritdoc}
-     * 
-     * @throws UnexpectedValueException
      */
     public function decode($data, $format, array $context = array())
     {

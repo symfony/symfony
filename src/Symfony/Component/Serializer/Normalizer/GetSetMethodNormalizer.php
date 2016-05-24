@@ -111,8 +111,6 @@ class GetSetMethodNormalizer extends SerializerAwareNormalizer implements Normal
 
     /**
      * {@inheritdoc}
-     * 
-     * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {

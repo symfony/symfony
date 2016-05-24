@@ -66,6 +66,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws UnexpectedValueException
      */
     public function decode($data, $format, array $context = array())
     {
@@ -399,6 +401,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      * @param \DOMNode $node
      * @param mixed    $val
      *
+     * @throws UnexpectedValueException
+     * 
      * @return bool
      */
     private function selectNodeType(\DOMNode $node, $val)

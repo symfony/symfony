@@ -32,6 +32,8 @@ class ChainDecoder implements DecoderInterface
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws RuntimeException If no decoder is found.
      */
     final public function decode($data, $format, array $context = array())
     {
@@ -59,7 +61,7 @@ class ChainDecoder implements DecoderInterface
      *
      * @return DecoderInterface
      *
-     * @throws RuntimeException if no decoder is found
+     * @throws RuntimeException If no decoder is found.
      */
     private function getDecoder($format)
     {

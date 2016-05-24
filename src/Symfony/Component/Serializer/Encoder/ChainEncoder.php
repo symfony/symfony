@@ -32,6 +32,8 @@ class ChainEncoder implements EncoderInterface
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws RuntimeException If no decoder is found.
      */
     final public function encode($data, $format, array $context = array())
     {
@@ -57,6 +59,8 @@ class ChainEncoder implements EncoderInterface
      *
      * @param string $format
      *
+     * @throws RuntimeException if no encoder is found
+     * 
      * @return bool
      */
     public function needsNormalization($format)

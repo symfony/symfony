@@ -71,6 +71,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws UnexpectedValueException
      */
     final public function serialize($data, $format, array $context = array())
     {
@@ -101,6 +103,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws UnexpectedValueException
      */
     public function normalize($data, $format = null, array $context = array())
     {
@@ -133,6 +137,9 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws LogicException
+     * @throws UnexpectedValueException
      */
     public function denormalize($data, $type, $format = null, array $context = array())
     {
@@ -169,6 +176,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws RuntimeException
      */
     private function getNormalizer($data, $format = null)
     {
@@ -183,6 +192,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws RuntimeException
      */
     private function getDenormalizer($data, $type, $format = null)
     {

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\Exception\Exception;
+
 /**
  * Defines the most basic interface a class must implement to be denormalizable.
  *
@@ -33,6 +35,10 @@ interface DenormalizableInterface
      * @param string|null                      $format       The format is optionally given to be able to denormalize differently
      *                                                       based on different input formats.
      * @param array                            $context      options for denormalizing
+     *
+     * @throws Exception
+     * 
+     * @return object
      */
     public function denormalize(DenormalizerInterface $denormalizer, $data, $format = null, array $context = array());
 }

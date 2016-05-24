@@ -31,9 +31,30 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getDataFormSpecifications
      */
-    public function testSpecifications($file, $expected, $yaml, $comment)
+    public function testSpecifications($file, $expected, $yaml, $comment, $deprecated)
     {
+        $deprecations = array();
+
+        if ($deprecated) {
+            set_error_handler(function ($type, $msg) use (&$deprecations) {
+                if (E_USER_DEPRECATED !== $type) {
+                    restore_error_handler();
+
+                    return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+                }
+
+                $deprecations[] = $msg;
+            });
+        }
+
         $this->assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
+
+        if ($deprecated) {
+            restore_error_handler();
+
+            $this->assertCount(1, $deprecations);
+            $this->assertContains('Using the comma as a group separator for floats is deprecated since version 3.2 and will be removed in 4.0.', $deprecations[0]);
+        }
     }
 
     public function getDataFormSpecifications()
@@ -58,7 +79,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 } else {
                     eval('$expected = '.trim($test['php']).';');
 
-                    $tests[] = array($file, var_export($expected, true), $test['yaml'], $test['test']);
+                    $tests[] = array($file, var_export($expected, true), $test['yaml'], $test['test'], isset($test['deprecated']) ? $test['deprecated'] : false);
                 }
             }
         }

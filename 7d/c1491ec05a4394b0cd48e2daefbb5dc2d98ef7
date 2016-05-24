@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-23T08:29:35Z
+
+@dunglas So this is meant to be merged into the `3.1` branch? And can we add a test for this?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-23T08:48:11Z
+
+Yes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-24T10:11:01Z
+
+Merging as I'd like to do RC1 today. A test can/should be added later on.

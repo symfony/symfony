@@ -24,8 +24,6 @@ class ProxyAdapter implements AdapterInterface
     private $namespace;
     private $namespaceLen;
     private $createCacheItem;
-    private $hits = 0;
-    private $misses = 0;
 
     public function __construct(CacheItemPoolInterface $pool, $namespace = '', $defaultLifetime = 0)
     {
@@ -54,13 +52,8 @@ class ProxyAdapter implements AdapterInterface
     {
         $f = $this->createCacheItem;
         $item = $this->pool->getItem($this->getId($key));
-        if ($isHit = $item->isHit()) {
-            ++$this->hits;
-        } else {
-            ++$this->misses;
-        }
 
-        return $f($key, $item->get(), $isHit);
+        return $f($key, $item->get(), $item->isHit());
     }
 
     /**
@@ -158,37 +151,12 @@ class ProxyAdapter implements AdapterInterface
         $f = $this->createCacheItem;
 
         foreach ($items as $key => $item) {
-            if ($isHit = $item->isHit()) {
-                ++$this->hits;
-            } else {
-                ++$this->misses;
-            }
             if ($this->namespaceLen) {
                 $key = substr($key, $this->namespaceLen);
             }
 
-            yield $key => $f($key, $item->get(), $isHit);
+            yield $key => $f($key, $item->get(), $item->isHit());
         }
-    }
-
-    /**
-     * Returns the number of cache read hits.
-     *
-     * @return int
-     */
-    public function getHits()
-    {
-        return $this->hits;
-    }
-
-    /**
-     * Returns the number of cache read misses.
-     *
-     * @return int
-     */
-    public function getMisses()
-    {
-        return $this->misses;
     }
 
     private function getId($key)

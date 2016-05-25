@@ -29,6 +29,7 @@ class EventDispatcher implements EventDispatcherInterface
 {
     private $listeners = array();
     private $sorted = array();
+    private $listenerCaller;
 
     /**
      * {@inheritdoc}
@@ -155,6 +156,11 @@ class EventDispatcher implements EventDispatcherInterface
         }
     }
 
+    public function setListenerCaller(EventListenerCallerInterface $listenerCaller)
+    {
+        $this->listenerCaller = $listenerCaller;
+    }
+
     /**
      * Triggers the listeners of an event.
      *
@@ -167,12 +173,27 @@ class EventDispatcher implements EventDispatcherInterface
      */
     protected function doDispatch($listeners, $eventName, Event $event)
     {
+        $listenerCaller = $this->getListenerCaller();
+
         foreach ($listeners as $listener) {
             if ($event->isPropagationStopped()) {
                 break;
             }
-            call_user_func($listener, $event, $eventName, $this);
+
+            $listenerCaller->call($listener, $event, $eventName, $this);
         }
+    }
+
+    /**
+     * @return EventListenerCallerInterface
+     */
+    private function getListenerCaller()
+    {
+        if (null === $this->listenerCaller) {
+            $this->listenerCaller = new StandardEventListenerCaller();
+        }
+
+        return $this->listenerCaller;
     }
 
     /**

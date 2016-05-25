@@ -292,6 +292,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('"quoted string"', 'quoted string'),
             array("'quoted string'", 'quoted string'),
             array('12.30e+02', 12.30e+02),
+            array('123.45_67', 123.4567),
             array('0x4D2', 0x4D2),
             array('0x_4_D_2_', 0x4D2),
             array('02333', 02333),

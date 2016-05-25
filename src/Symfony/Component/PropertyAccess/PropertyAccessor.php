@@ -714,17 +714,15 @@ class PropertyAccessor implements PropertyAccessorInterface
                     // we call the getter and hope the __call do the job
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_MAGIC;
                     $access[self::ACCESS_NAME] = $setter;
-                } elseif (null !== $this->findAdderAndRemover($reflClass, $singulars)) {
+                } elseif (null !== $methods = $this->findAdderAndRemover($reflClass, $singulars)) {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
                     $access[self::ACCESS_NAME] = sprintf(
-                        'The property "%s" in class "%s" can be defined with the methods %s but '.
+                        'The property "%s" in class "%s" can be defined with the methods "%s()" but '.
                         'the new value must be an array or an instance of \Traversable, '.
                         '"%s" given.',
                         $property,
                         $reflClass->name,
-                        implode(' and ', array_map(function ($method) {
-                            return '"'.$method.'()"';
-                        }, $this->findAdderAndRemover($reflClass, $singulars))),
+                        implode('()", "', $methods),
                         is_object($value) ? get_class($value) : gettype($value)
                     );
                 } else {

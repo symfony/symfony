@@ -46,6 +46,15 @@ class AnnotationFileLoaderTest extends AbstractAnnotationLoaderTest
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Did you forgot to add the "<?php" start tag at the beginning of the file?
+     */
+    public function testLoadFileWithoutStartTag()
+    {
+        $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/NoStartTagClass.php');
+    }
+
+    /**
      * @requires PHP 5.6
      */
     public function testLoadVariadic()

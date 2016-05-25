@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-05-02T10:08:22Z
+
+Can the caster be tested ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-02T16:05:13Z
+
+Tests added, comments addressed.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-04T10:53:08Z
+
+This feature looks great ... but the code sometimes is not very readable because of the single-letter variable names (`$a`, `$c`, etc.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-19T08:10:11Z
+
+ping @symfony/deciders

@@ -47,6 +47,7 @@ before_install:
     - if [[ $PHP != hhvm ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi
     - if [[ ! $skip ]]; then echo memory_limit = -1 >> $INI_FILE; fi
     - if [[ ! $skip ]]; then echo session.gc_probability = 0 >> $INI_FILE; fi
+    - if [[ ! $skip ]]; then echo opcache.enable_cli = 1 >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then echo extension = mongo.so >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then echo extension = memcache.so >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.10 && echo apc.enable_cli = 1 >> $INI_FILE); fi

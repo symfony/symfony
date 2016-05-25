@@ -19,6 +19,15 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
  */
 class FilesystemAdapterTest extends CachePoolTest
 {
+    public function createCachePool()
+    {
+        if (defined('HHVM_VERSION')) {
+            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
+        }
+
+        return new FilesystemAdapter('sf-cache');
+    }
+
     public static function tearDownAfterClass()
     {
         self::rmdir(sys_get_temp_dir().'/symfony-cache');
@@ -44,14 +53,5 @@ class FilesystemAdapterTest extends CachePoolTest
             }
         }
         rmdir($dir);
-    }
-
-    public function createCachePool()
-    {
-        if (defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
-        }
-
-        return new FilesystemAdapter('sf-cache');
     }
 }

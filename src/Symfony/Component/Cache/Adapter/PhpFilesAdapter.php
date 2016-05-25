@@ -11,25 +11,34 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Symfony\Component\Cache\Adapter\Helper\FilesCacheHelper;
+use Symfony\Component\Cache\Exception\CacheException;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
+/**
+ * @author Piotr Stankowski <git@trakos.pl>
+ * @author Nicolas Grekas <p@tchwork.com>
+ */
 class PhpFilesAdapter extends AbstractAdapter
 {
-    /**
-     * @var FilesCacheHelper
-     */
-    protected $filesCacheHelper;
+    use FilesystemAdapterTrait;
 
-    /**
-     * @param string $namespace       Cache namespace
-     * @param int    $defaultLifetime Default lifetime for cache items
-     * @param null   $directory       Path where cache items should be stored, defaults to sys_get_temp_dir().'/symfony-cache'
-     * @param string $version         Version (works the same way as namespace)
-     */
-    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null, $version = null)
+    private $includeHandler;
+
+    public static function isSupported()
     {
-        parent::__construct($namespace, $defaultLifetime);
-        $this->filesCacheHelper = new FilesCacheHelper($directory, $namespace, $version, '.php');
+        return function_exists('opcache_compile_file') && ini_get('opcache.enable');
+    }
+
+    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
+    {
+        if (!static::isSupported()) {
+            throw new CacheException('OPcache is not enabled');
+        }
+        parent::__construct('', $defaultLifetime);
+        $this->init($namespace, $directory);
+
+        $e = new \Exception();
+        $this->includeHandler = function () use ($e) { throw $e; };
     }
 
     /**
@@ -38,13 +47,31 @@ class PhpFilesAdapter extends AbstractAdapter
     protected function doFetch(array $ids)
     {
         $values = array();
+        $now = time();
 
-        foreach ($ids as $id) {
-            $valueArray = $this->includeCacheFile($this->filesCacheHelper->getFilePath($id));
-            if (!is_array($valueArray)) {
-                continue;
+        set_error_handler($this->includeHandler);
+        try {
+            foreach ($ids as $id) {
+                try {
+                    $file = $this->getFile($id);
+                    list($expiresAt, $values[$id]) = include $file;
+                    if ($now >= $expiresAt) {
+                        unset($values[$id]);
+                    }
+                } catch (\Exception $e) {
+                    continue;
+                }
             }
-            $values[$id] = $valueArray[0];
+        } finally {
+            restore_error_handler();
+        }
+
+        foreach ($values as $id => $value) {
+            if ('N;' === $value) {
+                $values[$id] = null;
+            } elseif (is_string($value) && isset($value[2]) && ':' === $value[1]) {
+                $values[$id] = unserialize($value);
+            }
         }
 
         return $values;
@@ -55,32 +82,7 @@ class PhpFilesAdapter extends AbstractAdapter
      */
     protected function doHave($id)
     {
-        return 0 !== count($this->doFetch(array($id)));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function doClear($namespace)
-    {
-        $directory = $this->filesCacheHelper->getDirectory();
-
-        return !(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS))->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function doDelete(array $ids)
-    {
-        foreach ($ids as $id) {
-            $file = $this->filesCacheHelper->getFilePath($id);
-            if (@file_exists($file)) {
-                return false;
-            }
-        }
-
-        return true;
+        return (bool) $this->doFetch(array($id));
     }
 
     /**
@@ -89,69 +91,33 @@ class PhpFilesAdapter extends AbstractAdapter
     protected function doSave(array $values, $lifetime)
     {
         $ok = true;
-        $expiresAt = $lifetime ? time() + $lifetime : PHP_INT_MAX;
+        $data = array($lifetime ? time() + $lifetime : PHP_INT_MAX, '');
 
         foreach ($values as $id => $value) {
-            $file = $this->filesCacheHelper->getFilePath($id, true);
-            if (file_exists($file)) {
-                $ok = false;
-            } else {
-                $ok = $this->saveCacheFile($file, $value, $expiresAt) && $ok;
+            if (null === $value || is_object($value)) {
+                $value = serialize($value);
+            } elseif (is_array($value)) {
+                $serialized = serialize($value);
+                $unserialized = unserialize($serialized);
+                // Store arrays serialized if they contain any objects or references
+                if ($unserialized !== $value || (false !== strpos($serialized, ';R:') && preg_match('/;R:[1-9]/', $serialized))) {
+                    $value = $serialized;
+                }
+            } elseif (is_string($value)) {
+                // Serialize strings if they could be confused with serialized objects or arrays
+                if ('N;' === $value || (isset($value[2]) && ':' === $value[1])) {
+                    $value = serialize($value);
+                }
+            } elseif (!is_scalar($value)) {
+                throw new InvalidArgumentException(sprintf('Value of type "%s" is not serializable', $key, gettype($value)));
             }
+
+            $data[1] = $value;
+            $file = $this->getFile($id, true);
+            $ok = $this->write($file, '<?php return '.var_export($data, true).';') && $ok;
+            @opcache_compile_file($file);
         }
 
         return $ok;
-    }
-
-    /**
-     * @param string $file
-     * @param mixed  $value
-     * @param int    $expiresAt
-     *
-     * @return bool
-     */
-    private function saveCacheFile($file, $value, $expiresAt)
-    {
-        $fileContent = $this->createCacheFileContent($value, $expiresAt);
-
-        return $this->filesCacheHelper->saveFile($file, $fileContent);
-    }
-
-    /**
-     * @param string $file File path
-     *
-     * @return array|null unserialized value wrapped in array or null
-     */
-    private function includeCacheFile($file)
-    {
-        $valueArray = @include $file;
-        if (!is_array($valueArray) || 2 !== count($valueArray)) {
-            return;
-        }
-
-        list($serializedValue, $expiresAt) = $valueArray;
-        if (time() > (int) $expiresAt) {
-            return;
-        }
-
-        $unserializedValueInArray = unserialize($serializedValue);
-        if (!is_array($unserializedValueInArray)) {
-            return;
-        }
-
-        return $unserializedValueInArray;
-    }
-
-    /**
-     * @param mixed $value
-     * @param int   $expiresAt
-     *
-     * @return string
-     */
-    private function createCacheFileContent($value, $expiresAt)
-    {
-        $exportedValue = var_export(array(serialize([$value]), $expiresAt), true);
-
-        return '<?php return '.$exportedValue.';';
     }
 }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-25T21:23:03Z
+
+My first intention was to propose this on 2.8, it's a mistake...
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-26T06:32:33Z
+
+@chalasr thanks for this PR. In my opinion this is a bug fix which should be merged in 2.7. The "new" behavior is the one we expected since the beginning.

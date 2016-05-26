@@ -1173,7 +1173,7 @@ EOF;
                     return true;
                 }
 
-                if ($deep && !isset($visited[(string) $argument])) {
+                if ($deep && !isset($visited[(string) $argument]) && 'service_container' !== (string) $argument) {
                     $visited[(string) $argument] = true;
 
                     $service = $this->container->getDefinition((string) $argument);

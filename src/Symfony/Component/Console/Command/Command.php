@@ -300,13 +300,13 @@ class Command
             return;
         }
 
+        $this->definition->addOptions($this->application->getDefinition()->getOptions());
+
         if ($mergeArgs) {
             $currentArguments = $this->definition->getArguments();
             $this->definition->setArguments($this->application->getDefinition()->getArguments());
             $this->definition->addArguments($currentArguments);
         }
-
-        $this->definition->addOptions($this->application->getDefinition()->getOptions());
 
         $this->applicationDefinitionMerged = true;
         if ($mergeArgs) {

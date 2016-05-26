@@ -81,8 +81,8 @@
             requestStack = [],
 
             extractHeaders = function(xhr, stackElement) {
-                // Here we avoid to call xhr.getResponseHeader in order to
-                // prevent polluting the console with CORS security errors
+                /* Here we avoid to call xhr.getResponseHeader in order to */
+                /* prevent polluting the console with CORS security errors */
                 var allHeaders = xhr.getAllResponseHeaders();
                 var ret;
 

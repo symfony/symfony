@@ -1230,6 +1230,19 @@ EOT
             ),
         );
     }
+
+    public function testParseDateAsMappingValue()
+    {
+        $yaml = <<<EOT
+date: 2002-12-14
+EOT;
+        $expectedDate = new \DateTime();
+        $expectedDate->setTimeZone(new \DateTimeZone('UTC'));
+        $expectedDate->setDate(2002, 12, 14);
+        $expectedDate->setTime(0, 0, 0);
+
+        $this->assertEquals(array('date' => $expectedDate), $this->parser->parse($yaml, Yaml::PARSE_DATETIME));
+    }
 }
 
 class B

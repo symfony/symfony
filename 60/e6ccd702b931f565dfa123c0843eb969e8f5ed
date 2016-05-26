@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-05-25T08:17:55Z
+
+Please add a test covering this to prevent regressions
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-25T08:18:45Z
+
+btw, it may even go into 2.3 (if it is merged in the next few days)
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-05-25T19:52:52Z
+
+@stof Test just has been added.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-25T20:28:01Z
+
+:+1: apart from my minor comment
+
+Status: Reviewed

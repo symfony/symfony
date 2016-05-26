@@ -661,7 +661,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $application
             ->register('foo')
-            ->setAliases(['f'])
+            ->setAliases(array('f'))
             ->setDefinition(array(new InputOption('survey', 'e', InputOption::VALUE_REQUIRED, 'My option with a shortcut.')))
             ->setCode(function (InputInterface $input, OutputInterface $output) {})
         ;

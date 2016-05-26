@@ -57,7 +57,7 @@ class SymfonyStyleTest extends PHPUnit_Framework_TestCase
 
     public function testLongWordsBlockWrapping()
     {
-        $word = 'Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon';
+        $word = 'Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygovgollhjvhvljfezefeqifzeiqgiqzhrsdgihqzridghqridghqirshdghdghieridgheirhsdgehrsdvhqrsidhqshdgihrsidvqhneriqsdvjzergetsrfhgrstsfhsetsfhesrhdgtesfhbzrtfbrztvetbsdfbrsdfbrn';
         $wordLength = strlen($word);
         $maxLineLength = SymfonyStyle::MAX_LINE_LENGTH - 3;
 

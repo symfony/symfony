@@ -11,43 +11,27 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Adapter\Helper\FilesCacheHelper;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class FilesystemAdapter extends AbstractAdapter
 {
-    private $directory;
+    /**
+     * @var FilesCacheHelper
+     */
+    protected $filesCacheHelper;
 
+    /**
+     * @param string $namespace       Cache namespace
+     * @param int    $defaultLifetime Default lifetime for cache items
+     * @param null   $directory       Path where cache items should be stored, defaults to sys_get_temp_dir().'/symfony-cache'
+     */
     public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
     {
-        parent::__construct('', $defaultLifetime);
-
-        if (!isset($directory[0])) {
-            $directory = sys_get_temp_dir().'/symfony-cache';
-        }
-        if (isset($namespace[0])) {
-            if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
-                throw new InvalidArgumentException(sprintf('FilesystemAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
-            }
-            $directory .= '/'.$namespace;
-        }
-        if (!file_exists($dir = $directory.'/.')) {
-            @mkdir($directory, 0777, true);
-        }
-        if (false === $dir = realpath($dir)) {
-            throw new InvalidArgumentException(sprintf('Cache directory does not exist (%s)', $directory));
-        }
-        if (!is_writable($dir .= DIRECTORY_SEPARATOR)) {
-            throw new InvalidArgumentException(sprintf('Cache directory is not writable (%s)', $directory));
-        }
-        // On Windows the whole path is limited to 258 chars
-        if ('\\' === DIRECTORY_SEPARATOR && strlen($dir) > 234) {
-            throw new InvalidArgumentException(sprintf('Cache directory too long (%s)', $directory));
-        }
-
-        $this->directory = $dir;
+        parent::__construct($namespace, $defaultLifetime);
+        $this->filesCacheHelper = new FilesCacheHelper($directory, $namespace);
     }
 
     /**
@@ -59,7 +43,7 @@ class FilesystemAdapter extends AbstractAdapter
         $now = time();
 
         foreach ($ids as $id) {
-            $file = $this->getFile($id);
+            $file = $this->filesCacheHelper->getFilePath($id);
             if (!$h = @fopen($file, 'rb')) {
                 continue;
             }
@@ -86,7 +70,7 @@ class FilesystemAdapter extends AbstractAdapter
      */
     protected function doHave($id)
     {
-        $file = $this->getFile($id);
+        $file = $this->filesCacheHelper->getFilePath($id);
 
         return file_exists($file) && (@filemtime($file) > time() || $this->doFetch(array($id)));
     }
@@ -97,8 +81,9 @@ class FilesystemAdapter extends AbstractAdapter
     protected function doClear($namespace)
     {
         $ok = true;
+        $directory = $this->filesCacheHelper->getDirectory();
 
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
             $ok = ($file->isDir() || @unlink($file) || !file_exists($file)) && $ok;
         }
 
@@ -113,7 +98,7 @@ class FilesystemAdapter extends AbstractAdapter
         $ok = true;
 
         foreach ($ids as $id) {
-            $file = $this->getFile($id);
+            $file = $this->filesCacheHelper->getFilePath($id);
             $ok = (!file_exists($file) || @unlink($file) || !file_exists($file)) && $ok;
         }
 
@@ -127,32 +112,24 @@ class FilesystemAdapter extends AbstractAdapter
     {
         $ok = true;
         $expiresAt = $lifetime ? time() + $lifetime : PHP_INT_MAX;
-        $tmp = $this->directory.uniqid('', true);
 
         foreach ($values as $id => $value) {
-            $file = $this->getFile($id, true);
-
-            $value = $expiresAt."\n".rawurlencode($id)."\n".serialize($value);
-            if (false !== @file_put_contents($tmp, $value)) {
-                @touch($tmp, $expiresAt);
-                $ok = @rename($tmp, $file) && $ok;
-            } else {
-                $ok = false;
-            }
+            $fileContent = $this->createCacheFileContent($id, $value, $expiresAt);
+            $ok = $this->filesCacheHelper->saveFileForId($id, $fileContent, $expiresAt) && $ok;
         }
 
         return $ok;
     }
 
-    private function getFile($id, $mkdir = false)
+    /**
+     * @param string $id
+     * @param mixed  $value
+     * @param int    $expiresAt
+     *
+     * @return string
+     */
+    protected function createCacheFileContent($id, $value, $expiresAt)
     {
-        $hash = str_replace('/', '-', base64_encode(md5($id, true)));
-        $dir = $this->directory.$hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR;
-
-        if ($mkdir && !file_exists($dir)) {
-            @mkdir($dir, 0777, true);
-        }
-
-        return $dir.substr($hash, 2, -2);
+        return $expiresAt."\n".rawurlencode($id)."\n".serialize($value);
     }
 }

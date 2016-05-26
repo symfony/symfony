@@ -7,6 +7,27 @@ in 3.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.1.0...v3.1.1
 
+* 3.1.0-RC1 (2016-05-26)
+
+ * bug #18879 [Console] SymfonyStyle: Align multi-line/very-long-line blocks (chalasr)
+ * bug #18881 [Security][Ldap] Fixed issue with password attribute containing an array of values. (csarrazi)
+ * bug #18864 [Console][DX] Fixed ambiguous error message when using a duplicate option shortcut (peterrehm)
+ * bug #18883 Fix js comment in profiler (linnaea)
+ * feature #18867 [Cache] Drop counting hit/miss in ProxyAdapter (nicolas-grekas)
+ * bug #18837 [Serializer] AbstractObjectNormalizer: be sure that isAllowedAttribute is called (dunglas)
+ * bug #18838 [Serializer] ObjectNormalizer: add missing parameters (dunglas)
+ * bug #18844 [Yaml] fix exception contexts (xabbuh)
+ * bug #18840 [Yaml] properly handle unindented collections (xabbuh)
+ * bug #18765 Catch \Throwable (fprochazka)
+ * bug #18813 Catch \Throwable (fprochazka)
+ * bug #18839 People - person singularization (Keeo)
+ * bug #18820 [Config] Allow schemed paths in FileResource (nicolas-grekas)
+ * bug #18828 [Yaml] chomp newlines only at the end of YAML documents (xabbuh)
+ * bug #18814 Fixed server status command when port has been omitted (peterrehm)
+ * bug #18759 [Validator] Support for DateTimeImmutable (krzysiekpiasecki)
+ * bug #18799 Use levenshtein level for better Bundle matching (j0k3r)
+ * bug #18413 [WebProfilerBundle] Fix CORS ajax security issues (romainneutron)
+
 * 3.1.0-BETA1 (2016-05-13)
 
  * feature #18725 [Ldap] Added the possibility to configure all available Ldap options for connection (csarrazi)

@@ -55,6 +55,24 @@ class SymfonyStyleTest extends PHPUnit_Framework_TestCase
         return array_map(null, glob($baseDir.'/command/command_*.php'), glob($baseDir.'/output/output_*.txt'));
     }
 
+    /**
+     * @dataProvider inputInteractiveCommandToOutputFilesProvider
+     */
+    public function testInteractiveOutputs($inputCommandFilepath, $outputFilepath)
+    {
+        $code = require $inputCommandFilepath;
+        $this->command->setCode($code);
+        $this->tester->execute(array(), array('interactive' => true, 'decorated' => false));
+        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
+    }
+
+    public function inputInteractiveCommandToOutputFilesProvider()
+    {
+        $baseDir = __DIR__.'/../Fixtures/Style/SymfonyStyle';
+
+        return array_map(null, glob($baseDir.'/command/interactive_command_*.php'), glob($baseDir.'/output/interactive_output_*.txt'));
+    }
+
     public function testLongWordsBlockWrapping()
     {
         $word = 'Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygovgollhjvhvljfezefeqifzeiqgiqzhrsdgihqzridghqridghqirshdghdghieridgheirhsdgehrsdvhqrsidhqshdgihrsidvqhneriqsdvjzergetsrfhgrstsfhsetsfhesrhdgtesfhbzrtfbrztvetbsdfbrsdfbrn';
@@ -69,6 +87,28 @@ class SymfonyStyleTest extends PHPUnit_Framework_TestCase
         $this->tester->execute(array(), array('interactive' => false, 'decorated' => false));
         $expectedCount = (int) ceil($wordLength / ($maxLineLength)) + (int) ($wordLength > $maxLineLength - 5);
         $this->assertSame($expectedCount, substr_count($this->tester->getDisplay(true), ' § '));
+    }
+
+    public function testSetInputStream()
+    {
+        $command = $this->command;
+        $inputs = array('Foo', 'Bar', 'Baz');
+        $stream = fopen('php://memory', 'r+', false);
+
+        fputs($stream, implode(PHP_EOL, $inputs));
+        rewind($stream);
+
+        $command->setCode(function ($input, $output) use ($command, $stream) {
+            $sfStyle = new SymfonyStyle($input, $output);
+
+            $sfStyle->setInputStream($stream);
+            $sfStyle->ask('What\'s your name?');
+            $sfStyle->ask('How are you?');
+            $sfStyle->ask('Where do you come from?');
+        });
+
+        $this->tester->execute(array());
+        $this->assertSame(0, $this->tester->getStatusCode());
     }
 }
 

@@ -96,8 +96,6 @@ class AnnotationFileLoader extends FileLoader
             $token = $tokens[$i];
 
             if (!isset($token[1])) {
-                $class = false;
-
                 continue;
             }
 
@@ -114,7 +112,24 @@ class AnnotationFileLoader extends FileLoader
             }
 
             if (T_CLASS === $token[0]) {
-                $class = true;
+                // Skip usage of ::class constant
+                $isClassConstant = false;
+                for ($j = $i - 1; $j > 0; --$j) {
+                    if (!isset($tokens[$j][1])) {
+                        break;
+                    }
+
+                    if (T_DOUBLE_COLON === $tokens[$j][0]) {
+                        $isClassConstant = true;
+                        break;
+                    } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
+                        break;
+                    }
+                }
+
+                if (!$isClassConstant) {
+                    $class = true;
+                }
             }
 
             if (T_NAMESPACE === $token[0]) {

@@ -169,6 +169,24 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         Inline::parse('{ foo: * #foo }');
     }
 
+    /**
+     * @dataProvider getDataForIsHash
+     */
+    public function testIsHash($array, $expected)
+    {
+        $this->assertSame($expected, Inline::isHash($array));
+    }
+
+    public function getDataForIsHash()
+    {
+        return array(
+            array([], false),
+            array([1, 2, 3], false),
+            array([2 => 1, 1 => 2, 0 => 3], true),
+            array(['foo' => 1, 'bar' => 2], true),
+        );
+    }
+
     protected function getTestsForParse()
     {
         return array(

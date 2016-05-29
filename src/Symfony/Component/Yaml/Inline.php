@@ -148,6 +148,8 @@ class Inline
     /**
      * Check if given array is hash or just normal indexed array.
      *
+     * @internal
+     *
      * @param array $value The PHP array to check
      *
      * @return bool true if value is hash array, false otherwise

@@ -311,7 +311,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetValueThrowsExceptionIfGetterIsNotPublic()
     {
-        $this->propertyAccessor->setValue(new Author(), 'privateSetter', 'foobar');
+        $object = new Author();
+
+        $this->propertyAccessor->setValue($object, 'privateSetter', 'foobar');
     }
 
     /**
@@ -414,7 +416,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowTypeError()
     {
-        $this->propertyAccessor->setValue(new TypeHinted(), 'date', 'This is a string, \DateTime expected.');
+        $object = new TypeHinted();
+
+        $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTime expected.');
     }
 
     public function testSetTypeHint()

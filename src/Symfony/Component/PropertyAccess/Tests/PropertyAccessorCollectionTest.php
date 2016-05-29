@@ -173,7 +173,9 @@ abstract class PropertyAccessorCollectionTest extends \PHPUnit_Framework_TestCas
      */
     public function testSetValueThrowsExceptionIfArrayAccessExpected()
     {
-        $this->propertyAccessor->setValue(new \stdClass(), '[firstName]', 'Bernhard');
+        $object = new \stdClass();
+
+        $this->propertyAccessor->setValue($object, '[firstName]', 'Bernhard');
     }
 
     public function testSetValueCallsAdderAndRemoverForCollections()

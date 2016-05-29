@@ -24,7 +24,6 @@ class StringUtil
      * @var array
      *
      * @see http://english-zone.com/spelling/plurals.html
-     * @see http://www.scribd.com/doc/3271143/List-of-100-Irregular-Plural-Nouns-in-English
      */
     private static $pluralMap = array(
         // First entry: plural suffix, reversed
@@ -211,8 +210,13 @@ class StringUtil
             }
         }
 
+        $irregularNouns = array(
+            'committee' => 'committee',
+            'feedback' => 'feedback',
+        );
+
         // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && 'feedback' !== $plural) {
+        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && !isset($irregularNouns[strtolower($plural)])) {
             return substr_replace($plural, 'oo', $pos, 2);
         }
 

@@ -180,10 +180,10 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     public function getDataForIsHash()
     {
         return array(
-            array([], false),
-            array([1, 2, 3], false),
-            array([2 => 1, 1 => 2, 0 => 3], true),
-            array(['foo' => 1, 'bar' => 2], true),
+            array(array(), false),
+            array(array(1, 2, 3), false),
+            array(array(2 => 1, 1 => 2, 0 => 3), true),
+            array(array('foo' => 1, 'bar' => 2), true),
         );
     }
 

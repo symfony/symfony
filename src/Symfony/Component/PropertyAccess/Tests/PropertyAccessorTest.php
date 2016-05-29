@@ -242,7 +242,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetValueThrowsExceptionIfNotArrayAccess()
     {
-        $this->propertyAccessor->setValue(new \stdClass(), '[index]', 'Updated');
+        $object = new \stdClass();
+
+        $this->propertyAccessor->setValue($object, '[index]', 'Updated');
     }
 
     public function testSetValueUpdatesMagicSet()
@@ -259,7 +261,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetValueThrowsExceptionIfThereAreMissingParameters()
     {
-        $this->propertyAccessor->setValue(new TestClass('Bernhard'), 'publicAccessorWithMoreRequiredParameters', 'Updated');
+        $object = new TestClass('Bernhard');
+
+        $this->propertyAccessor->setValue($object, 'publicAccessorWithMoreRequiredParameters', 'Updated');
     }
 
     /**
@@ -527,7 +531,9 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowTypeError()
     {
-        $this->propertyAccessor->setValue(new TypeHinted(), 'date', 'This is a string, \DateTime expected.');
+        $object = new TypeHinted();
+
+        $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTime expected.');
     }
 
     public function testSetTypeHint()

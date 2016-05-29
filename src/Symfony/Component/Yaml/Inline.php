@@ -146,7 +146,7 @@ class Inline
     }
 
     /**
-     * Check if given array is hash or just normal indexed array
+     * Check if given array is hash or just normal indexed array.
      *
      * @param array $value The PHP array to check
      *

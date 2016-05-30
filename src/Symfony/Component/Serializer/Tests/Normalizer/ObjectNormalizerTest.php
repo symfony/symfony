@@ -545,6 +545,28 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $serializer->denormalize(array('date' => 'foo'), ObjectOuter::class);
     }
+
+    public function testExtractAttributesRespectsFormat()
+    {
+        $normalizer = new FormatAndContextAwareNormalizer();
+
+        $data = new ObjectDummy();
+        $data->setFoo('bar');
+        $data->bar = 'foo';
+
+        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $normalizer->normalize($data, 'foo_and_bar_included'));
+    }
+
+    public function testExtractAttributesRespectsContext()
+    {
+        $normalizer = new FormatAndContextAwareNormalizer();
+
+        $data = new ObjectDummy();
+        $data->setFoo('bar');
+        $data->bar = 'foo';
+
+        $this->assertSame(array('foo' => 'bar', 'bar' => 'foo'), $normalizer->normalize($data, null, array('include_foo_and_bar' => true)));
+    }
 }
 
 class ObjectDummy
@@ -743,4 +765,20 @@ class ObjectInner
 {
     public $foo;
     public $bar;
+}
+
+class FormatAndContextAwareNormalizer extends ObjectNormalizer
+{
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
+    {
+        if (in_array($attribute, array('foo', 'bar')) && 'foo_and_bar_included' === $format) {
+            return true;
+        }
+
+        if (in_array($attribute, array('foo', 'bar')) && isset($context['include_foo_and_bar']) && true === $context['include_foo_and_bar']) {
+            return true;
+        }
+
+        return false;
+    }
 }

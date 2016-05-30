@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-30T08:06:25Z
+
+Do we have the same issue in XliffFileLoader.php and XmlUtils.php?

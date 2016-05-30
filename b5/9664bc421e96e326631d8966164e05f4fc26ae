@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-05-09T06:31:44Z
+
+/cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-05-27T08:35:08Z
+
+@nicolas-grekas: Addressed @xabbuh's comment.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-05-27T16:17:51Z
+
+I believe Travis failure is unrelated.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-05-30T03:37:53Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-30T07:15:02Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-30T07:24:28Z
+
+feature on 3.2 isn't it?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-05-30T07:49:45Z
+
+> feature on 3.2 isn't it?
+
+If so, then we need to address this issue in symfony-standard, because it does not work as expected out of the box.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-30T07:51:20Z
+
+there is no deps bewteen the bridge and sfstd, so no need to change, just use the newest bridge to run the tests
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-05-30T07:53:52Z
+
+> just use the newest bridge to run the tests
+
+That means bumping the version of the PhpUnit Bridge in symfony-standard 2.8+?

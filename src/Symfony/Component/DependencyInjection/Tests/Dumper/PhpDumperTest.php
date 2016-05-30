@@ -226,4 +226,15 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container);
         $dumper->dump();
     }
+
+    public function testInlinedDefinitionReferencingServiceContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->addMethodCall('add', array(new Reference('service_container')))->setPublic(false);
+        $container->register('bar', 'stdClass')->addArgument(new Reference('foo'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services13.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
+    }
 }

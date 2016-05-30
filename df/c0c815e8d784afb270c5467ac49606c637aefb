@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-27T20:05:02Z
+
+This is the missing part of the recently merged #18879.
+Travis failure is unrelated.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-29T15:48:21Z
+
+Are you sure that the failed tests are not related to these changes?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-29T16:13:42Z
+
+@fabpot You're right, the problem comes from these changes.
+I can't figure it out for now so I let you know when it's ok.
+If you have any idea...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-29T18:36:16Z
+
+:+1:
+
+Status: Reviewed

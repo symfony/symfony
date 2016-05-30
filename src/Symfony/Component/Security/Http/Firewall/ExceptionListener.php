@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Psr\Log\LoggerInterface;
@@ -98,6 +99,15 @@ class ExceptionListener
     {
         if (null !== $this->logger) {
             $this->logger->info(sprintf('Authentication exception occurred; redirecting to authentication entry point (%s)', $exception->getMessage()));
+        }
+
+        if ($event->getRequest()->hasSession() && !$this->stateless) {
+            $session = $event->getRequest()->getSession();
+            $session->set(SecurityContextInterface::AUTHENTICATION_ERROR, $exception);
+
+            if ($exception instanceof UsernameNotFoundException) {
+                $session->set(SecurityContextInterface::LAST_USERNAME, $exception->getUsername());
+            }
         }
 
         try {

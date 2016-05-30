@@ -144,6 +144,7 @@ class ContextListener implements ListenerInterface
      *
      * @return TokenInterface|null
      *
+     * @throws UsernameNotFoundException
      * @throws \RuntimeException
      */
     private function refreshUser(TokenInterface $token)
@@ -174,7 +175,7 @@ class ContextListener implements ListenerInterface
                     $this->logger->warning(sprintf('Username "%s" could not be found.', $e->getUsername()));
                 }
 
-                return;
+                throw $e;
             }
         }
 

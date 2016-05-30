@@ -1,0 +1,27 @@
+imports:
+    - { resource: ./../config/default.yml }
+
+services:
+    filesystem_user_provider:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Security\User\FilesystemUserProvider
+        arguments:
+            - %kernel.test_case%
+
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    providers:
+        filesystem:
+            id: filesystem_user_provider
+
+    firewalls:
+        login_form:
+            pattern: ^/login$
+            security: false
+
+        default:
+            form_login:
+                check_path: /login_check
+                default_target_path: /profile
+            anonymous: ~

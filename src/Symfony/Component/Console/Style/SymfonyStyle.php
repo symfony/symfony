@@ -170,16 +170,18 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * {@inheritdoc}
+     * Formats a command comment.
+     *
+     * @param string|array $message
      */
     public function comment($message)
     {
-        $this->autoPrependText();
-
         $messages = is_array($message) ? array_values($message) : array($message);
-        foreach ($messages as $message) {
-            $this->writeln(sprintf(' // %s', $message));
+        foreach ($messages as &$message) {
+            $message = $this->getFormatter()->format($message);
         }
+
+        $this->block($messages, null, null, ' // ');
     }
 
     /**

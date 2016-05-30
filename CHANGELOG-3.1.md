@@ -7,6 +7,12 @@ in 3.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.1.0...v3.1.1
 
+* 3.1.0 (2016-05-30)
+
+ * bug #18889 [Console] SymfonyStyle: Fix alignment/prefixing of multi-line comments (chalasr)
+ * bug #18907 [Routing] Fix the annotation loader taking a class constant as a beginning of a class name (jakzal, nicolas-grekas)
+ * bug #18899 [Yaml] search for colons in strings only (xabbuh)
+
 * 3.1.0-RC1 (2016-05-26)
 
  * bug #18879 [Console] SymfonyStyle: Align multi-line/very-long-line blocks (chalasr)

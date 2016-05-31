@@ -773,7 +773,11 @@ class EntityTypeTest extends TypeTestCase
             'em' => 'default',
             'class' => self::ITEM_GROUP_CLASS,
             'choice_label' => 'name',
-            'choice_value' => function (GroupableEntity $entity) {
+            'choice_value' => function (GroupableEntity $entity = null) {
+                if (null === $entity) {
+                    return '';
+                }
+
                 return $entity->groupName.'/'.$entity->name;
             },
         ));

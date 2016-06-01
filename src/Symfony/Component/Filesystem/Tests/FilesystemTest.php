@@ -1163,4 +1163,23 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFilePermissions(767, $targetFilePath);
     }
+
+    public function testGetContents()
+    {
+        $path = $this->workspace.DIRECTORY_SEPARATOR.'contents';
+        $contents = 'Foobar';
+        file_put_contents($path, $contents);
+
+        $this->assertEquals($contents, $this->filesystem->getContents($path));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Filesystem\Exception\IOException
+     * @expectedExceptionMessage Unable to read file
+     */
+    public function testGetContentsThrowExceptionNotExist()
+    {
+        $path = $this->workspace.DIRECTORY_SEPARATOR.'contents';
+        $this->filesystem->getContents($path);
+    }
 }

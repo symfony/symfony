@@ -78,6 +78,22 @@ class Filesystem
     }
 
     /**
+     * Return the contents of the file at the given path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function getContents($path)
+    {
+        if (false === $this->isReadable($path)) {
+            throw new IOException(sprintf('Unable to read file "%s". Either it does not exist or it is not readable.', 0, null, $path));
+        }
+
+        return file_get_contents($path);
+    }
+
+    /**
      * Creates a directory recursively.
      *
      * @param string|array|\Traversable $dirs The directory path

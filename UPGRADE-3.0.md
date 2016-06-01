@@ -1040,6 +1040,39 @@ UPGRADE FROM 2.x to 3.0
    }
    ```
 
+ * The `AbstractVoter::isGranted()` method has been replaced by `Voter::voteOnAttribute()`.
+
+   Before:
+
+   ```php
+   class MyVoter extends AbstractVoter
+   {
+       protected function isGranted($attribute, $object, $user = null)
+       {
+           return 'EDIT' === $attribute && $user === $object->getAuthor();
+       }
+
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   class MyVoter extends Voter
+   {
+       protected function voteOnAttribute($attribute, $object, TokenInterface $token)
+       {
+           return 'EDIT' === $attribute && $token->getUser() === $object->getAuthor();
+       }
+
+       // ...
+   }
+   ```
+
+ * The `supportsAttribute()` and `supportsClass()` methods of the `AuthenticatedVoter`, `ExpressionVoter`,
+   and `RoleVoter` classes have been removed.
+
  * The `intention` option was renamed to `csrf_token_id` for all the authentication listeners.
 
  * The `csrf_provider` option was renamed to `csrf_token_generator` for all the authentication listeners.

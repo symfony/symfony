@@ -177,4 +177,70 @@ class LdapClientTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals($expected, $this->client->find('dc=foo,dc=com', 'bar', 'baz'));
     }
+
+    /**
+     * @dataProvider provideConfig
+     */
+    public function testLdapClientConfig($args, $expected)
+    {
+        $reflObj = new \ReflectionObject($this->client);
+        $reflMethod = $reflObj->getMethod('normalizeConfig');
+        $reflMethod->setAccessible(true);
+        array_unshift($args, $this->client);
+        $this->assertEquals($expected, call_user_func_array(array($reflMethod, 'invoke'), $args));
+    }
+
+    public function provideConfig()
+    {
+        return array(
+            array(
+                array('localhost', 389, 3, true, false, false),
+                array(
+                    'host' => 'localhost',
+                    'port' => 389,
+                    'encryption' => 'ssl',
+                    'options' => array(
+                        'protocol_version' => 3,
+                        'referrals' => false,
+                    ),
+                ),
+            ),
+            array(
+                array('localhost', 389, 3, false, true, false),
+                array(
+                    'host' => 'localhost',
+                    'port' => 389,
+                    'encryption' => 'tls',
+                    'options' => array(
+                        'protocol_version' => 3,
+                        'referrals' => false,
+                    ),
+                ),
+            ),
+            array(
+                array('localhost', 389, 3, false, false, false),
+                array(
+                    'host' => 'localhost',
+                    'port' => 389,
+                    'encryption' => 'none',
+                    'options' => array(
+                        'protocol_version' => 3,
+                        'referrals' => false,
+                    ),
+                ),
+            ),
+            array(
+                array('localhost', 389, 3, false, false, false),
+                array(
+                    'host' => 'localhost',
+                    'port' => 389,
+                    'encryption' => 'none',
+                    'options' => array(
+                        'protocol_version' => 3,
+                        'referrals' => false,
+                    ),
+                ),
+            ),
+        );
+    }
 }

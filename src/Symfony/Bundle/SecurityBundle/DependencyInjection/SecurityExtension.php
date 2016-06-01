@@ -66,7 +66,7 @@ class SecurityExtension extends Extension
         $loader->load('collectors.xml');
         $loader->load('guard.xml');
 
-        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
+        if ($container->has('profiler')) {
             $loader->load('security_debug.xml');
         }
 

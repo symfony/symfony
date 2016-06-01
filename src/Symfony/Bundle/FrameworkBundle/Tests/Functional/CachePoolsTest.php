@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class CachePoolsTest extends WebTestCase
 {
@@ -30,6 +31,11 @@ class CachePoolsTest extends WebTestCase
             $this->doTestCachePools(array('root_config' => 'redis_config.yml', 'environment' => 'redis_cache'), RedisAdapter::class);
         } catch (\PHPUnit_Framework_Error_Warning $e) {
             if (0 !== strpos($e->getMessage(), 'unable to connect to 127.0.0.1')) {
+                throw $e;
+            }
+            $this->markTestSkipped($e->getMessage());
+        } catch (InvalidArgumentException $e) {
+            if (0 !== strpos($e->getMessage(), 'Redis connection failed')) {
                 throw $e;
             }
             $this->markTestSkipped($e->getMessage());

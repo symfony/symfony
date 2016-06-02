@@ -31,6 +31,10 @@ class MemcachedSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('PHPUnit_MockObject cannot mock the Memcached class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
+        }
+
         parent::setUp();
 
         if (version_compare(phpversion('memcached'), '2.2.0', '>=')) {

@@ -86,7 +86,7 @@ class DiactorosFactory implements HttpMessageFactoryInterface
         $files = array();
 
         foreach ($uploadedFiles as $key => $value) {
-            if ($value === null) {
+            if (null === $value) {
                 $files[$key] = new DiactorosUploadedFile(null, 0, UPLOAD_ERR_NO_FILE, null, null);
                 continue;
             }

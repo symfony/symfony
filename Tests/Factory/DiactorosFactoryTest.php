@@ -164,18 +164,13 @@ class DiactorosFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testUploadErrNoFile()
     {
-        $file = new UploadedFile(null, null, null, 0, UPLOAD_ERR_NO_FILE, true);
-        $this->assertEquals(0,$file->getSize());
-        $this->assertEquals(UPLOAD_ERR_NO_FILE,$file->getError());
-
-        // SplFile returns false on error
-        $this->assertEquals('boolean',gettype(($file->getSize())));
+        $file = new UploadedFile('', '', null, 0, UPLOAD_ERR_NO_FILE, true);
+        $this->assertEquals(0, $file->getSize());
+        $this->assertEquals(UPLOAD_ERR_NO_FILE, $file->getError());
         $this->assertFalse($file->getSize());
+        $this->assertInternalType('integer', $file->getClientSize());
 
-        // This is an integer, oddly enough internally size is declared as a string
-        $this->assertTrue(is_int($file->getClientSize()));
-
-        $request = new Request(array(),array(),array(),array(),
+        $request = new Request(array(), array(), array(), array(),
           array(
             'f1' => $file,
             'f2' => array('name' => null, 'type' => null, 'tmp_name' => null, 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0),

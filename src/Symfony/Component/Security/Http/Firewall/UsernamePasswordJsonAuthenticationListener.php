@@ -14,61 +14,141 @@ namespace Symfony\Component\Security\Http\Firewall;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
-use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\SecurityEvents;
 
 /**
- * UsernamePasswordJsonAuthenticationListener is an implementation of
+ * UsernamePasswordJsonAuthenticationListener is a stateless implementation of
  * an authentication via a JSON document composed of a username and a password.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class UsernamePasswordJsonAuthenticationListener extends AbstractAuthenticationListener
+class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
 {
-    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, SessionAuthenticationStrategyInterface $sessionStrategy, HttpUtils $httpUtils, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    private $tokenStorage;
+    private $authenticationManager;
+    private $providerKey;
+    private $successHandler;
+    private $failureHandler;
+    private $options;
+    private $logger;
+    private $eventDispatcher;
+    private $propertyAccessor;
+
+    public function __construct(TokenStorageInterface $tokenStorage, AuthenticationManagerInterface $authenticationManager, $providerKey, AuthenticationSuccessHandlerInterface $successHandler, AuthenticationFailureHandlerInterface $failureHandler, array $options = array(), LoggerInterface $logger = null, EventDispatcherInterface $eventDispatcher = null, PropertyAccessorInterface $propertyAccessor = null)
     {
-        parent::__construct($tokenStorage, $authenticationManager, $sessionStrategy, $httpUtils, $providerKey, $successHandler, $failureHandler, array_merge(array(
-            'username_parameter' => '_username',
-            'password_parameter' => '_password',
-        ), $options), $logger, $dispatcher);
+        $this->tokenStorage = $tokenStorage;
+        $this->authenticationManager = $authenticationManager;
+        $this->providerKey = $providerKey;
+        $this->successHandler = $successHandler;
+        $this->failureHandler = $failureHandler;
+        $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->options = array_merge(array('username_path' => 'username', 'password_path' => 'password'), $options);
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function attemptAuthentication(Request $request)
+    public function handle(GetResponseEvent $event)
     {
-        $data = json_decode($request->getContent(), true);
+        $request = $event->getRequest();
+        $data = json_decode($request->getContent());
 
-        if (!isset($data[$this->options['username_parameter']])) {
-            throw new BadCredentialsException(sprintf('Missing key "%s".', $this->options['username_parameter']));
+        if (!$data instanceof \stdClass) {
+            throw new BadCredentialsException('Invalid JSON.');
         }
 
-        if (!isset($data[$this->options['password_parameter']])) {
-            throw new BadCredentialsException(sprintf('Missing key "%s".', $this->options['password_parameter']));
+        try {
+            $username = $this->propertyAccessor->getValue($data, $this->options['username_path']);
+        } catch (AccessException $e) {
+            throw new BadCredentialsException(sprintf('Missing key "%s".', $this->options['username_path']));
         }
 
-        $username = $data[$this->options['username_parameter']];
+        try {
+            $password = $this->propertyAccessor->getValue($data, $this->options['password_path']);
+        } catch (AccessException $e) {
+            throw new BadCredentialsException(sprintf('Missing key "%s".', $this->options['password_path']));
+        }
+
         if (!is_string($username)) {
-            throw new BadCredentialsException(sprintf('The key "%s" must contain a string.', $this->options['username_parameter']));
+            throw new BadCredentialsException(sprintf('The key "%s" must contain a string.', $this->options['username_path']));
         }
 
         if (strlen($username) > Security::MAX_USERNAME_LENGTH) {
             throw new BadCredentialsException('Invalid username.');
         }
 
-        $password = $data[$this->options['password_parameter']];
         if (!is_string($password)) {
-            throw new BadCredentialsException(sprintf('The key "%s" must contain a string.', $this->options['password_parameter']));
+            throw new BadCredentialsException(sprintf('The key "%s" must contain a string.', $this->options['password_path']));
         }
 
-        return $this->authenticationManager->authenticate(new UsernamePasswordToken($username, $password, $this->providerKey));
+        try {
+            $token = new UsernamePasswordToken($username, $password, $this->providerKey);
+
+            $this->authenticationManager->authenticate($token);
+            $response = $this->onSuccess($request, $token);
+        } catch (AuthenticationException $e) {
+            $response = $this->onFailure($request, $e);
+        }
+
+        $event->setResponse($response);
+    }
+
+    private function onSuccess(Request $request, TokenInterface $token)
+    {
+        if (null !== $this->logger) {
+            $this->logger->info('User has been authenticated successfully.', array('username' => $token->getUsername()));
+        }
+
+        $this->tokenStorage->setToken($token);
+
+        if (null !== $this->eventDispatcher) {
+            $loginEvent = new InteractiveLoginEvent($request, $token);
+            $this->eventDispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+        }
+
+        $response = $this->successHandler->onAuthenticationSuccess($request, $token);
+
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('Authentication Success Handler did not return a Response.');
+        }
+
+        return $response;
+    }
+
+    private function onFailure(Request $request, AuthenticationException $failed)
+    {
+        if (null !== $this->logger) {
+            $this->logger->info('Authentication request failed.', array('exception' => $failed));
+        }
+
+        $token = $this->tokenStorage->getToken();
+        if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {
+            $this->tokenStorage->setToken(null);
+        }
+
+        $response = $this->failureHandler->onAuthenticationFailure($request, $failed);
+
+        if (!$response instanceof Response) {
+            throw new \RuntimeException('Authentication Failure Handler did not return a Response.');
+        }
+
+        return $response;
     }
 }

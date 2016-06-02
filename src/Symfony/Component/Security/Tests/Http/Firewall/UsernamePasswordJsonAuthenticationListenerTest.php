@@ -12,14 +12,16 @@
 namespace Symfony\Component\Security\Tests\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Firewall\UsernamePasswordJsonAuthenticationListener;
-use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -31,31 +33,53 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
      */
     private $listener;
 
-    /**
-     * @var \ReflectionMethod
-     */
-    private $attemptAuthenticationMethod;
-
-    protected function setUp() {
+    private function createListener(array $options = array(), $success = true)
+    {
         $tokenStorage = $this->getMock(TokenStorageInterface::class);
         $authenticationManager = $this->getMock(AuthenticationManagerInterface::class);
-        $authenticationManager->method('authenticate')->willReturn(true);
-        $sessionAuthenticationStrategyInterface = $this->getMock(SessionAuthenticationStrategyInterface::class);
-        $httpUtils = $this->getMock(HttpUtils::class);
-        $authenticationSuccessHandler = $this->getMock(AuthenticationSuccessHandlerInterface::class);
-        $authenticationFailureHandler = $this->getMock(AuthenticationFailureHandlerInterface::class);
 
-        $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, $sessionAuthenticationStrategyInterface, $httpUtils, 'providerKey',  $authenticationSuccessHandler, $authenticationFailureHandler);
-        $this->attemptAuthenticationMethod = new \ReflectionMethod($this->listener, 'attemptAuthentication');
-        $this->attemptAuthenticationMethod->setAccessible(true);
+        if ($success) {
+            $authenticationManager->method('authenticate')->willReturn(true);
+        } else {
+            $authenticationManager->method('authenticate')->willThrowException(new AuthenticationException());
+        }
+
+        $authenticationSuccessHandler = $this->getMock(AuthenticationSuccessHandlerInterface::class);
+        $authenticationSuccessHandler->method('onAuthenticationSuccess')->willReturn(new Response('ok'));
+        $authenticationFailureHandler = $this->getMock(AuthenticationFailureHandlerInterface::class);
+        $authenticationFailureHandler->method('onAuthenticationFailure')->willReturn(new Response('ko'));
+
+        $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, 'providerKey',  $authenticationSuccessHandler, $authenticationFailureHandler, $options);
     }
 
-    public function testAttemptAuthentication()
+    public function testHandleSuccess()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array(), '{"_username": "dunglas", "_password": "foo"}');
+        $this->createListener();
+        $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": "foo"}');
+        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
 
-        $result = $this->attemptAuthenticationMethod->invokeArgs($this->listener, array($request));
-        $this->assertTrue($result);
+        $this->listener->handle($event);
+        $this->assertEquals('ok', $event->getResponse()->getContent());
+    }
+
+    public function testHandleFailure()
+    {
+        $this->createListener(array(), false);
+        $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": "foo"}');
+        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
+        $this->assertEquals('ko', $event->getResponse()->getContent());
+    }
+
+    public function testUsePath()
+    {
+        $this->createListener(array('username_path' => 'user.login', 'password_path' => 'user.pwd'));
+        $request = new Request(array(), array(), array(), array(), array(), array(), '{"user": {"login": "dunglas", "pwd": "foo"}}');
+        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
+        $this->assertEquals('ok', $event->getResponse()->getContent());
     }
 
     /**
@@ -63,8 +87,11 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
      */
     public function testAttemptAuthenticationNoUsername()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array(), '{"usr": "dunglas", "_password": "foo"}');
-        $this->attemptAuthenticationMethod->invokeArgs($this->listener, array($request));
+        $this->createListener();
+        $request = new Request(array(), array(), array(), array(), array(), array(), '{"usr": "dunglas", "password": "foo"}');
+        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
     }
 
     /**
@@ -72,8 +99,11 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
      */
     public function testAttemptAuthenticationNoPassword()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array(), '{"_username": "dunglas", "pass": "foo"}');
-        $this->attemptAuthenticationMethod->invokeArgs($this->listener, array($request));
+        $this->createListener();
+        $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "pass": "foo"}');
+        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
     }
 
     /**
@@ -81,8 +111,11 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
      */
     public function testAttemptAuthenticationUsernameNotAString()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array(), '{"_username": 1, "_password": "foo"}');
-        $this->attemptAuthenticationMethod->invokeArgs($this->listener, array($request));
+        $this->createListener();
+        $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": 1, "password": "foo"}');
+        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
     }
 
     /**
@@ -90,8 +123,11 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
      */
     public function testAttemptAuthenticationPasswordNotAString()
     {
-        $request = new Request(array(), array(), array(), array(), array(), array(), '{"_username": "dunglas", "_password": 1}');
-        $this->attemptAuthenticationMethod->invokeArgs($this->listener, array($request));
+        $this->createListener();
+        $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": 1}');
+        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+
+        $this->listener->handle($event);
     }
 
     /**
@@ -99,9 +135,11 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
      */
     public function testAttemptAuthenticationUsernameTooLong()
     {
+        $this->createListener();
         $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
-        $request = new Request(array(), array(), array(), array(), array(), array(), sprintf('{"_username": "%s", "_password": 1}', $username));
+        $request = new Request(array(), array(), array(), array(), array(), array(), sprintf('{"username": "%s", "password": 1}', $username));
+        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
 
-        $this->attemptAuthenticationMethod->invokeArgs($this->listener, array($request));
+        $this->listener->handle($event);
     }
 }

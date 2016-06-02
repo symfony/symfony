@@ -33,10 +33,12 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
     {
         $this->manager = $manager;
 
-        // The strategy is stored in a private property of the decorated service
-        $reflection = new \ReflectionProperty($manager, 'strategy');
-        $reflection->setAccessible(true);
-        $this->strategy = $reflection->getValue($manager);
+        if ($this->manager instanceof AccessDecisionManager) {
+            // The strategy is stored in a private property of the decorated service
+            $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'strategy');
+            $reflection->setAccessible(true);
+            $this->strategy = $reflection->getValue($manager);
+        }
     }
 
     /**
@@ -60,6 +62,10 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function setVoters(array $voters)
     {
+        if (!$this->manager instanceof AccessDecisionManager) {
+            return;
+        }
+
         $this->voters = $voters;
         $this->manager->setVoters($voters);
     }
@@ -72,7 +78,7 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
         // The $strategy property is misleading because it stores the name of its
         // method (e.g. 'decideAffirmative') instead of the original strategy name
         // (e.g. 'affirmative')
-        return strtolower(substr($this->strategy, 6));
+        return null === $this->strategy ? '-' : strtolower(substr($this->strategy, 6));
     }
 
     /**

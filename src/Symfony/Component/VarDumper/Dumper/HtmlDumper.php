@@ -25,7 +25,7 @@ class HtmlDumper extends CliDumper
 
     protected $dumpHeader;
     protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s">';
-    protected $dumpSuffix = '</pre><script>Sfdump("%s"%s)</script>';
+    protected $dumpSuffix = '</pre><script>Sfdump(%s)</script>';
     protected $dumpId = 'sf-dump';
     protected $colors = true;
     protected $headerIsDumped = false;
@@ -43,16 +43,13 @@ class HtmlDumper extends CliDumper
         'meta' => 'color:#B729D9',
         'key' => 'color:#56DB3A',
         'index' => 'color:#1299DA',
-        'str .max-string-length b' => 'color:#A0A0A0',
     );
 
-    protected $displayOptions = array(
-        'initDepth' => 1,
+    private $displayOptions = array(
         'maxDepth' => 1,
         'maxStringLength' => 160,
     );
-
-    protected $displayOptionsIsUpdated = false;
+    private $extraDisplayOptions = array();
 
     /**
      * {@inheritdoc}
@@ -87,15 +84,12 @@ class HtmlDumper extends CliDumper
     /**
      * Configures display options.
      *
-     * @param array $displayOptions A map of displayOptions names to customize the behavior.
+     * @param array $displayOptions A map of display options to customize the behavior.
      */
     public function setDisplayOptions(array $displayOptions)
     {
-        if ($displayOptions)
-        {
-            $this->displayOptionsIsUpdated = true;
-            $this->displayOptions = $displayOptions + $this->displayOptions;
-        }
+        $this->headerIsDumped = false;
+        $this->displayOptions = $displayOptions + $this->displayOptions;
     }
 
     /**
@@ -123,9 +117,9 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function dump(Data $data, $output = null, array $displayOptions = [])
+    public function dump(Data $data, $output = null, array $extraDisplayOptions = array())
     {
-        $this->setDisplayOptions($displayOptions);
+        $this->extraDisplayOptions = $extraDisplayOptions;
         parent::dump($data, $output);
         $this->dumpId = 'sf-dump-'.mt_rand();
     }
@@ -141,7 +135,7 @@ class HtmlDumper extends CliDumper
             return $this->dumpHeader;
         }
 
-        $line = <<<'EOHTML'
+        $line = str_replace('{$options}', json_encode($this->displayOptions, JSON_FORCE_OBJECT), <<<'EOHTML'
 <script>
 Sfdump = window.Sfdump || (function (doc) {
 
@@ -165,8 +159,8 @@ if (!doc.addEventListener) {
     };
 }
 
-function toggle(a, depth) {
-    var s = a.nextSibling || {}, oldClass = s.className, arrow, newClass, i;
+function toggle(a, recursive) {
+    var s = a.nextSibling || {}, oldClass = s.className, arrow, newClass;
 
     if ('sf-dump-compact' == oldClass) {
         arrow = '▼';
@@ -181,21 +175,13 @@ function toggle(a, depth) {
     a.lastChild.innerHTML = arrow;
     s.className = newClass;
 
-    if (depth) {
-
+    if (recursive) {
         try {
             a = s.querySelectorAll('.'+oldClass);
-
-            for (i = 0; i < a.length; ++i) {
-                if (depth != 'ALL' && isNaN(depth) == false) {
-                    if (getLevelNodeForParent(s, a[i]) >= depth) {
-                        continue;
-                    }
-                }
-
-                if (a[i].className !== newClass) {
-                    a[i].className = newClass;
-                    a[i].previousSibling.lastChild.innerHTML = arrow;
+            for (s = 0; s < a.length; ++s) {
+                if (a[s].className !== newClass) {
+                    a[s].className = newClass;
+                    a[s].previousSibling.lastChild.innerHTML = arrow;
                 }
             }
         } catch (e) {
@@ -205,26 +191,9 @@ function toggle(a, depth) {
     return true;
 };
 
-function getLevelNodeForParent(parentNode, currentNode, level) {
-    level = level || 0;
-    level++;
-
-    if (parentNode.isSameNode(currentNode)) {
-        return level-1;
-    }
-
-    currentNode = currentNode.parentNode;
-
-    return getLevelNodeForParent(parentNode, currentNode, level);
-}
-
-return function (root, options) {
+return function (root, x) {
     root = doc.getElementById(root);
-EOHTML;
 
-    $line .= 'options = options || '.json_encode($this->displayOptions).';';
-
-    $line .= <<<'EOHTML'
     function a(e, f) {
         addEventListener(root, e, function (e) {
             if ('A' == e.target.tagName) {
@@ -253,8 +222,7 @@ EOHTML;
     a('click', function (a, e) {
         if (/\bsf-dump-toggle\b/.test(a.className)) {
             e.preventDefault();
-            var maxDepth = isCtrlKey(e) ? 'ALL' : options.maxDepth ;
-            if (!toggle(a, maxDepth)) {
+            if (!toggle(a, isCtrlKey(e))) {
                 var r = doc.getElementById(a.getAttribute('href').substr(1)),
                     s = r.previousSibling,
                     f = r.parentNode,
@@ -268,7 +236,7 @@ EOHTML;
                     r.innerHTML = r.innerHTML.replace(new RegExp('^'+f[0].replace(rxEsc, '\\$1'), 'mg'), t[0]);
                 }
                 if ('sf-dump-compact' == r.className) {
-                    toggle(s, maxDepth);
+                    toggle(s, isCtrlKey(e));
                 }
             }
 
@@ -281,31 +249,37 @@ EOHTML;
             } else {
                 doc.selection.empty();
             }
+        } else if (/\bsf-dump-str-toggle\b/.test(a.className)) {
+            e.preventDefault();
+            e = a.parentNode.parentNode;
+            e.className = e.className.replace(/sf-dump-str-(expand|collapse)/, a.parentNode.className);
         }
     });
 
     var indentRx = new RegExp('^('+(root.getAttribute('data-indent-pad') || '  ').replace(rxEsc, '\\$1')+')+', 'm'),
+        options = {$options},
         elt = root.getElementsByTagName('A'),
         len = elt.length,
-        i = 0,
-        t = [],
-        temp;
+        i = 0, s, h,
+        t = [];
 
     while (i < len) t.push(elt[i++]);
+
+    for (i in x) {
+        options[i] = x[i];
+    }
 
     elt = root.getElementsByTagName('SAMP');
     len = elt.length;
     i = 0;
 
     while (i < len) t.push(elt[i++]);
-
     len = t.length;
-    i = 0;
 
-    while (i < len) {
+    for (i = 0; i < len; ++i) {
         elt = t[i];
-        if ("SAMP" == elt.tagName) {
-            elt.className = "sf-dump-expanded";
+        if ('SAMP' == elt.tagName) {
+            elt.className = 'sf-dump-expanded';
             a = elt.previousSibling || {};
             if ('A' != a.tagName) {
                 a = doc.createElement('A');
@@ -317,19 +291,24 @@ EOHTML;
             a.title = (a.title ? a.title+'\n[' : '[')+keyHint+'+click] Expand all children';
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
-            if (getLevelNodeForParent(root, a) > options.initDepth) {
-                toggle(a);
+            x = 1;
+            if ('sf-dump' != elt.parentNode.className) {
+                x += elt.parentNode.getAttribute('data-depth')/1;
+                if (x > options.maxDepth) {
+                    toggle(a);
+                }
             }
-        } else if ("sf-dump-ref" == elt.className && (a = elt.getAttribute('href'))) {
+            elt.setAttribute('data-depth', x);
+        } else if ('sf-dump-ref' == elt.className && (a = elt.getAttribute('href'))) {
             a = a.substr(1);
             elt.className += ' '+a;
 
             if (/[\[{]$/.test(elt.previousSibling.nodeValue)) {
                 a = a != elt.nextSibling.id && doc.getElementById(a);
                 try {
-                    t = a.nextSibling;
+                    s = a.nextSibling;
                     elt.appendChild(a);
-                    t.parentNode.insertBefore(a, t);
+                    s.parentNode.insertBefore(a, s);
                     if (/^[@#]/.test(elt.innerHTML)) {
                         elt.innerHTML += ' <span>▶</span>';
                     } else {
@@ -345,43 +324,33 @@ EOHTML;
                 }
             }
         }
-        ++i;
     }
 
-    if (options.maxStringLength) {
-        configureMaxStringCollapse();
+    if (0 >= options.maxStringLength) {
+        return;
     }
+    try {
+        elt = root.querySelectorAll('.sf-dump-str');
+        len = elt.length;
+        i = 0;
+        t = [];
 
-    function configureMaxStringCollapse()
-    {
-        var t = root.querySelectorAll('.sf-dump-str'), i = 0;
+        while (i < len) t.push(elt[i++]);
+        len = t.length;
 
-        for (i = 0; i < t.length; ++i) {
+        for (i = 0; i < len; ++i) {
             elt = t[i];
-            if (elt.innerText.length > options.maxStringLength) {
-                elt.innerHTML = '<span class="max-string-length collapsed">' +
-                    '<span class="collapsed">' + elt.innerText.substring(0, options.maxStringLength)+'...' +' <b>[+]</b></span>'+
-                    '<span class="expanded">' + elt.innerHTML +' <b>[-]</b></span>' +
-                    '</span>';
+            s = elt.innerText || elt.textContent;
+            x = s.length - options.maxStringLength;
+            if (0 < x) {
+                h = elt.innerHTML;
+                elt[elt.innerText ? 'innerText' : 'textContent'] = s.substring(0, options.maxStringLength);
+                elt.className += ' sf-dump-str-collapse';
+                elt.innerHTML = '<span class=sf-dump-str-collapse>'+h+'<a class="sf-dump-ref sf-dump-str-toggle" title="Collapse"> ◀</a></span>'+
+                    '<span class=sf-dump-str-expand>'+elt.innerHTML+'<a class="sf-dump-ref sf-dump-str-toggle" title="'+x+' remaining characters"> ▶</a></span>';
             }
         }
-
-        t = root.querySelectorAll('.max-string-length span b');
-
-        for (i = 0; i < t.length; ++i) {
-            t[i].addEventListener("click", function(e) {
-                toggleMaxStringLength(e.target.parentNode.parentNode);
-            });
-        }
-
-        function toggleMaxStringLength(elt) {
-
-            if (elt.className == 'max-string-length expanded') {
-                elt.className = 'max-string-length collapsed';
-            }else{
-                elt.className = 'max-string-length expanded';
-            }
-        }
+    } catch (e) {
     }
 };
 
@@ -410,16 +379,14 @@ pre.sf-dump a {
     border: 0;
     outline: none;
 }
-pre.sf-dump .max-string-length.expanded .collapsed {
-    display:none;
+.sf-dump-str-collapse .sf-dump-str-collapse {
+    display: none;
 }
-pre.sf-dump .max-string-length.collapsed .expanded {
-    display:none
+.sf-dump-str-expand .sf-dump-str-expand {
+    display: none;
 }
-pre.sf-dump .max-string-length b {
-    cursor: pointer;
-}
-EOHTML;
+EOHTML
+        );
 
         foreach ($this->styles as $class => $style) {
             $line .= 'pre.sf-dump'.('default' !== $class ? ' .sf-dump-'.$class : '').'{'.$style.'}';
@@ -533,11 +500,12 @@ EOHTML;
         }
 
         if (-1 === $depth) {
-            $this->line .= sprintf(
-                $this->dumpSuffix,
-                $this->dumpId,
-                $this->displayOptionsIsUpdated ? ','.json_encode($this->displayOptions) : ''
-            );
+            $args = array('"'.$this->dumpId.'"');
+            if ($this->extraDisplayOptions) {
+                $args[] = json_encode($this->extraDisplayOptions, JSON_FORCE_OBJECT);
+            }
+            // Replace is for BC
+            $this->line .= sprintf(str_replace('"%s"', '%s', $this->dumpSuffix), implode(', ', $args));
         }
         $this->lastDepth = $depth;
 

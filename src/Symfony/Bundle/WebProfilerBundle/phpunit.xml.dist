@@ -6,6 +6,9 @@
          colors="true"
          bootstrap="vendor/autoload.php"
 >
+    <php>
+        <ini name="error_reporting" value="-1" />
+    </php>
 
     <testsuites>
         <testsuite name="Symfony WebProfilerBundle Test Suite">
@@ -17,8 +20,8 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./Tests</directory>
                 <directory>./Resources</directory>
+                <directory>./Tests</directory>
                 <directory>./vendor</directory>
             </exclude>
         </whitelist>

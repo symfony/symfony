@@ -65,6 +65,18 @@ class AppKernel extends Kernel
         parent::__construct($environment, $debug);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        if (null === $this->name) {
+            $this->name = parent::getName().md5($this->rootConfig);
+        }
+
+        return $this->name;
+    }
+
     public function registerBundles()
     {
         if (!is_file($filename = $this->getRootDir().'/'.$this->testCase.'/bundles.php')) {
@@ -101,7 +113,8 @@ class AppKernel extends Kernel
 
     public function unserialize($str)
     {
-        call_user_func_array(array($this, '__construct'), unserialize($str));
+        $a = unserialize($str);
+        $this->__construct($a[0], $a[1], $a[2], $a[3]);
     }
 
     protected function getKernelParameters()

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -35,8 +36,12 @@ class ProcessHelper extends Helper
      *
      * @return Process The process that ran
      */
-    public function run(OutputInterface $output, $cmd, $error = null, $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
+    public function run(OutputInterface $output, $cmd, $error = null, callable $callback = null, $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
         if (is_array($cmd)) {
@@ -87,7 +92,7 @@ class ProcessHelper extends Helper
      *
      * @see run()
      */
-    public function mustRun(OutputInterface $output, $cmd, $error = null, $callback = null)
+    public function mustRun(OutputInterface $output, $cmd, $error = null, callable $callback = null)
     {
         $process = $this->run($output, $cmd, $error, $callback);
 
@@ -107,14 +112,16 @@ class ProcessHelper extends Helper
      *
      * @return callable
      */
-    public function wrapCallback(OutputInterface $output, Process $process, $callback = null)
+    public function wrapCallback(OutputInterface $output, Process $process, callable $callback = null)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $formatter = $this->getHelperSet()->get('debug_formatter');
 
-        $that = $this;
-
-        return function ($type, $buffer) use ($output, $process, $callback, $formatter, $that) {
-            $output->write($formatter->progress(spl_object_hash($process), $that->escapeString($buffer), Process::ERR === $type));
+        return function ($type, $buffer) use ($output, $process, $callback, $formatter) {
+            $output->write($formatter->progress(spl_object_hash($process), $this->escapeString($buffer), Process::ERR === $type));
 
             if (null !== $callback) {
                 call_user_func($callback, $type, $buffer);
@@ -122,12 +129,7 @@ class ProcessHelper extends Helper
         };
     }
 
-    /**
-     * This method is public for PHP 5.3 compatibility, it should be private.
-     *
-     * @internal
-     */
-    public function escapeString($str)
+    private function escapeString($str)
     {
         return str_replace('<', '\\<', $str);
     }

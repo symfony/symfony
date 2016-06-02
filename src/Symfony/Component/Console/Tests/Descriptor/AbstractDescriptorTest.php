@@ -83,6 +83,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
     }
 
     abstract protected function getDescriptor();
+
     abstract protected function getFormat();
 
     private function getDescriptionTestData(array $objects)
@@ -96,7 +97,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $data;
     }
 
-    private function assertDescription($expectedDescription, $describedObject)
+    protected function assertDescription($expectedDescription, $describedObject)
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
         $this->getDescriptor()->describe($output, $describedObject, array('raw_output' => true));

@@ -22,7 +22,7 @@ class ListCommandTest extends \PHPUnit_Framework_TestCase
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(array('command' => $command->getName()), array('decorated' => false));
 
-        $this->assertRegExp('/help   Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
+        $this->assertRegExp('/help\s{2,}Displays help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
     }
 
     public function testExecuteListsCommandsWithXmlOption()
@@ -38,7 +38,7 @@ class ListCommandTest extends \PHPUnit_Framework_TestCase
         $application = new Application();
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(array('command' => $command->getName(), '--raw' => true));
-        $output = <<<EOF
+        $output = <<<'EOF'
 help   Displays help for a command
 list   Lists commands
 
@@ -54,11 +54,59 @@ EOF;
         $application->add(new \FooCommand());
         $commandTester = new CommandTester($command = $application->get('list'));
         $commandTester->execute(array('command' => $command->getName(), 'namespace' => 'foo', '--raw' => true));
-        $output = <<<EOF
+        $output = <<<'EOF'
 foo:bar   The foo:bar command
 
 EOF;
 
         $this->assertEquals($output, $commandTester->getDisplay(true));
+    }
+
+    public function testExecuteListsCommandsOrder()
+    {
+        require_once realpath(__DIR__.'/../Fixtures/Foo6Command.php');
+        $application = new Application();
+        $application->add(new \Foo6Command());
+        $commandTester = new CommandTester($command = $application->get('list'));
+        $commandTester->execute(array('command' => $command->getName()), array('decorated' => false));
+        $output = <<<'EOF'
+Console Tool
+
+Usage:
+  command [options] [arguments]
+
+Options:
+  -h, --help            Display this help message
+  -q, --quiet           Do not output any message
+  -V, --version         Display this application version
+      --ansi            Force ANSI output
+      --no-ansi         Disable ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+Available commands:
+  help      Displays help for a command
+  list      Lists commands
+ 0foo
+  0foo:bar  0foo:bar command
+EOF;
+
+        $this->assertEquals($output, trim($commandTester->getDisplay(true)));
+    }
+
+    public function testExecuteListsCommandsOrderRaw()
+    {
+        require_once realpath(__DIR__.'/../Fixtures/Foo6Command.php');
+        $application = new Application();
+        $application->add(new \Foo6Command());
+        $commandTester = new CommandTester($command = $application->get('list'));
+        $commandTester->execute(array('command' => $command->getName(), '--raw' => true));
+        $output = <<<'EOF'
+help       Displays help for a command
+list       Lists commands
+0foo:bar   0foo:bar command
+EOF;
+
+        $this->assertEquals($output, trim($commandTester->getDisplay(true)));
     }
 }

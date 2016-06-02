@@ -54,7 +54,7 @@ class PrototypedArrayNodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests that when a key attribute is mapped, that key is removed from the array:
+     * Tests that when a key attribute is mapped, that key is removed from the array.
      *
      *     <things>
      *         <option id="option1" value="foo">

@@ -142,14 +142,6 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * {@inheritdoc}
      */
-    public function getMessageParameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * Alias of {@link getMessageParameters()}.
-     */
     public function getParameters()
     {
         return $this->parameters;
@@ -157,14 +149,6 @@ class ConstraintViolation implements ConstraintViolationInterface
 
     /**
      * {@inheritdoc}
-     */
-    public function getMessagePluralization()
-    {
-        return $this->plural;
-    }
-
-    /**
-     * Alias of {@link getMessagePluralization()}.
      */
     public function getPlural()
     {

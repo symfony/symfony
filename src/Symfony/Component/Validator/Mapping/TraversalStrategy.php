@@ -24,6 +24,7 @@ namespace Symfony\Component\Validator\Mapping;
  * The traversal strategy is ignored for arrays. Arrays are always iterated.
  *
  * @since  2.1
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see CascadingStrategy
@@ -46,15 +47,6 @@ class TraversalStrategy
      * not an instance of {@link \Traversable}, an exception should be thrown.
      */
     const TRAVERSE = 4;
-
-    /**
-     * Specifies that nested instances of {@link \Traversable} should never be
-     * iterated. Can be combined with {@link IMPLICIT} or {@link TRAVERSE}.
-     *
-     * @deprecated This constant was added for backwards compatibility only.
-     *             It will be removed in Symfony 3.0.
-     */
-    const STOP_RECURSION = 8;
 
     /**
      * Not instantiable.

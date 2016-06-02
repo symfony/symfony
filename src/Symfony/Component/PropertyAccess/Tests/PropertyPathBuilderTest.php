@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is new3 of the Symfony package.
+ * This file is part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
@@ -250,6 +250,17 @@ class PropertyPathBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->replace(0, 1, $path);
 
         $this->assertEquals($path, $builder->getPropertyPath());
+    }
+
+    public function testReplaceWithLongerPathKeepsOrder()
+    {
+        $path = new PropertyPath('new1.new2.new3');
+        $expected = new PropertyPath('new1.new2.new3.old2');
+
+        $builder = new PropertyPathBuilder(new PropertyPath('old1.old2'));
+        $builder->replace(0, 1, $path);
+
+        $this->assertEquals($expected, $builder->getPropertyPath());
     }
 
     public function testRemove()

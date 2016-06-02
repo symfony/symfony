@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>An authentication exception occurred.</source>
-                <target>Ocorreu um excepção durante a autenticação.</target>
+                <target>Ocorreu uma excepção durante a autenticação.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>Authentication credentials could not be found.</source>
@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>Cookie has already been used by someone else.</source>
-                <target>Este cookie já esta em uso.</target>
+                <target>Este cookie já está em uso.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>Not privileged to request the resource.</source>
@@ -64,7 +64,7 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>Account is locked.</source>
-                <target>A conta esta trancada.</target>
+                <target>A conta está trancada.</target>
             </trans-unit>
         </body>
     </file>

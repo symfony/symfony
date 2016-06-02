@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Transforms between a date string and a DateTime object
+ * Transforms between a date string and a DateTime object.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Florian Eckerstorfer <florian@eckerstorfer.org>
@@ -23,13 +23,14 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class DateTimeToStringTransformer extends BaseDateTimeTransformer
 {
     /**
-     * Format used for generating strings
+     * Format used for generating strings.
+     *
      * @var string
      */
     private $generateFormat;
 
     /**
-     * Format used for parsing strings
+     * Format used for parsing strings.
      *
      * Different than the {@link $generateFormat} because formats for parsing
      * support additional characters in PHP that are not supported for
@@ -49,28 +50,23 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
     private $parseUsingPipe;
 
     /**
-     * Transforms a \DateTime instance to a string
+     * Transforms a \DateTime instance to a string.
      *
      * @see \DateTime::format() for supported formats
      *
-     * @param string  $inputTimezone  The name of the input timezone
-     * @param string  $outputTimezone The name of the output timezone
-     * @param string  $format         The date format
-     * @param bool    $parseUsingPipe Whether to parse by appending a pipe "|" to the parse format
+     * @param string $inputTimezone  The name of the input timezone
+     * @param string $outputTimezone The name of the output timezone
+     * @param string $format         The date format
+     * @param bool   $parseUsingPipe Whether to parse by appending a pipe "|" to the parse format
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s', $parseUsingPipe = null)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s', $parseUsingPipe = true)
     {
         parent::__construct($inputTimezone, $outputTimezone);
 
         $this->generateFormat = $this->parseFormat = $format;
-
-        // The pipe in the parser pattern only works as of PHP 5.3.7
-        // See http://bugs.php.net/54316
-        $this->parseUsingPipe = null === $parseUsingPipe
-            ? PHP_VERSION_ID >= 50307
-            : $parseUsingPipe;
+        $this->parseUsingPipe = $parseUsingPipe || null === $parseUsingPipe;
 
         // See http://php.net/manual/en/datetime.createfromformat.php
         // The character "|" in the format makes sure that the parts of a date
@@ -87,9 +83,9 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
 
     /**
      * Transforms a DateTime object into a date string with the configured format
-     * and timezone
+     * and timezone.
      *
-     * @param \DateTime $value A DateTime object
+     * @param \DateTime|\DateTimeInterface $value A DateTime object
      *
      * @return string A value as produced by PHP's date() function
      *
@@ -103,13 +99,16 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             return '';
         }
 
-        if (!$value instanceof \DateTime) {
-            throw new TransformationFailedException('Expected a \DateTime.');
+        if (!$value instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTimeInterface.');
         }
 
-        $value = clone $value;
+        if (!$value instanceof \DateTimeImmutable) {
+            $value = clone $value;
+        }
+
         try {
-            $value->setTimezone(new \DateTimeZone($this->outputTimezone));
+            $value = $value->setTimezone(new \DateTimeZone($this->outputTimezone));
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
@@ -138,21 +137,21 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('Expected a string.');
         }
 
+        $outputTz = new \DateTimeZone($this->outputTimezone);
+        $dateTime = \DateTime::createFromFormat($this->parseFormat, $value, $outputTz);
+
+        $lastErrors = \DateTime::getLastErrors();
+
+        if (0 < $lastErrors['warning_count'] || 0 < $lastErrors['error_count']) {
+            throw new TransformationFailedException(
+                implode(', ', array_merge(
+                    array_values($lastErrors['warnings']),
+                    array_values($lastErrors['errors'])
+                ))
+            );
+        }
+
         try {
-            $outputTz = new \DateTimeZone($this->outputTimezone);
-            $dateTime = \DateTime::createFromFormat($this->parseFormat, $value, $outputTz);
-
-            $lastErrors = \DateTime::getLastErrors();
-
-            if (0 < $lastErrors['warning_count'] || 0 < $lastErrors['error_count']) {
-                throw new TransformationFailedException(
-                    implode(', ', array_merge(
-                        array_values($lastErrors['warnings']),
-                        array_values($lastErrors['errors'])
-                    ))
-                );
-            }
-
             // On PHP versions < 5.3.7 we need to emulate the pipe operator
             // and reset parts not given in the format to their equivalent
             // of the UNIX base timestamp.
@@ -218,10 +217,8 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             }
 
             if ($this->inputTimezone !== $this->outputTimezone) {
-                $dateTime->setTimeZone(new \DateTimeZone($this->inputTimezone));
+                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
             }
-        } catch (TransformationFailedException $e) {
-            throw $e;
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }

@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -43,36 +44,25 @@ class ExpressionVoter implements VoterInterface
         $this->roleHierarchy = $roleHierarchy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
     {
-        return $attribute instanceof Expression;
+        $this->expressionLanguage->registerProvider($provider);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $subject, array $attributes)
     {
         $result = VoterInterface::ACCESS_ABSTAIN;
         $variables = null;
         foreach ($attributes as $attribute) {
-            if (!$this->supportsAttribute($attribute)) {
+            if (!$attribute instanceof Expression) {
                 continue;
             }
 
             if (null === $variables) {
-                $variables = $this->getVariables($token, $object);
+                $variables = $this->getVariables($token, $subject);
             }
 
             $result = VoterInterface::ACCESS_DENIED;
@@ -84,7 +74,7 @@ class ExpressionVoter implements VoterInterface
         return $result;
     }
 
-    private function getVariables(TokenInterface $token, $object)
+    private function getVariables(TokenInterface $token, $subject)
     {
         if (null !== $this->roleHierarchy) {
             $roles = $this->roleHierarchy->getReachableRoles($token->getRoles());
@@ -95,7 +85,8 @@ class ExpressionVoter implements VoterInterface
         $variables = array(
             'token' => $token,
             'user' => $token->getUser(),
-            'object' => $object,
+            'object' => $subject,
+            'subject' => $subject,
             'roles' => array_map(function ($role) { return $role->getRole(); }, $roles),
             'trust_resolver' => $this->trustResolver,
         );
@@ -103,8 +94,8 @@ class ExpressionVoter implements VoterInterface
         // this is mainly to propose a better experience when the expression is used
         // in an access control rule, as the developer does not know that it's going
         // to be handled by this voter
-        if ($object instanceof Request) {
-            $variables['request'] = $object;
+        if ($subject instanceof Request) {
+            $variables['request'] = $subject;
         }
 
         return $variables;

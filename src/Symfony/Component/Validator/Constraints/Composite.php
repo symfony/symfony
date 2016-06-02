@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * contains the nested constraints.
  *
  * @since  2.6
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class Composite extends Constraint
@@ -58,7 +59,7 @@ abstract class Composite extends Constraint
 
         $this->initializeNestedConstraints();
 
-        /** @var Constraint[] $nestedConstraints */
+        /* @var Constraint[] $nestedConstraints */
         $compositeOption = $this->getCompositeOption();
         $nestedConstraints = $this->$compositeOption;
 

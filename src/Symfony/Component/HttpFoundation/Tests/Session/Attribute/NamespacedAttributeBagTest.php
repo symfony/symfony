@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Attribute;
 use Symfony\Component\HttpFoundation\Session\Attribute\NamespacedAttributeBag;
 
 /**
- * Tests NamespacedAttributeBag
+ * Tests NamespacedAttributeBag.
  *
  * @author Drak <drak@zikula.org>
  */
@@ -43,8 +43,9 @@ class NamespacedAttributeBagTest extends \PHPUnit_Framework_TestCase
             'category' => array(
                 'fishing' => array(
                     'first' => 'cod',
-                    'second' => 'sole',),
+                    'second' => 'sole',
                 ),
+            ),
         );
         $this->bag = new NamespacedAttributeBag('_sf2', '/');
         $this->bag->initialize($this->array);

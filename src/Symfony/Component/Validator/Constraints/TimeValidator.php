@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class TimeValidator extends ConstraintValidator
 {
@@ -60,7 +58,7 @@ class TimeValidator extends ConstraintValidator
         $value = (string) $value;
 
         if (!preg_match(static::PATTERN, $value, $matches)) {
-            $this->buildViolation($constraint->message)
+            $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Time::INVALID_FORMAT_ERROR)
                 ->addViolation();
@@ -69,7 +67,7 @@ class TimeValidator extends ConstraintValidator
         }
 
         if (!self::checkTime($matches[1], $matches[2], $matches[3])) {
-            $this->buildViolation($constraint->message)
+            $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
                 ->setCode(Time::INVALID_TIME_ERROR)
                 ->addViolation();

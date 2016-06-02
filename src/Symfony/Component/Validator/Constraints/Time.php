@@ -18,13 +18,11 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Time extends Constraint
 {
-    const INVALID_FORMAT_ERROR = 1;
-    const INVALID_TIME_ERROR = 2;
+    const INVALID_FORMAT_ERROR = '9d27b2bb-f755-4fbf-b725-39b1edbdebdf';
+    const INVALID_TIME_ERROR = '8532f9e1-84b2-4d67-8989-0818bc38533b';
 
     protected static $errorNames = array(
         self::INVALID_FORMAT_ERROR => 'INVALID_FORMAT_ERROR',

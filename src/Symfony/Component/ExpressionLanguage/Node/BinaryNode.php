@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class BinaryNode extends Node
 {
     private static $operators = array(
@@ -87,11 +92,12 @@ class BinaryNode extends Node
         if (isset(self::$functions[$operator])) {
             $right = $this->nodes['right']->evaluate($functions, $values);
 
-            if ('not in' == $operator) {
-                return !call_user_func('in_array', $left, $right);
+            if ('not in' === $operator) {
+                return !in_array($left, $right);
             }
+            $f = self::$functions[$operator];
 
-            return call_user_func(self::$functions[$operator], $left, $right);
+            return $f($left, $right);
         }
 
         switch ($operator) {

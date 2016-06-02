@@ -17,17 +17,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    private $httpKernel = null;
-
-    private $httpUtils = null;
-
-    private $logger = null;
-
-    private $request = null;
-
-    private $session = null;
-
-    private $exception = null;
+    private $httpKernel;
+    private $httpUtils;
+    private $logger;
+    private $request;
+    private $session;
+    private $exception;
 
     protected function setUp()
     {
@@ -38,7 +33,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
         $this->session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $this->request->expects($this->any())->method('getSession')->will($this->returnValue($this->session));
-        $this->exception = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        $this->exception = $this->getMock('Symfony\Component\Security\Core\Exception\AuthenticationException', array('getMessage'));
     }
 
     public function testForward()
@@ -105,7 +100,10 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
 
     public function testRedirectIsLogged()
     {
-        $this->logger->expects($this->once())->method('debug')->with('Redirecting to /login');
+        $this->logger
+            ->expects($this->once())
+            ->method('debug')
+            ->with('Authentication failure, redirect triggered.', array('failure_path' => '/login'));
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, array(), $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -119,7 +117,10 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
             ->method('createRequest')->with($this->request, '/login')
             ->will($this->returnValue($this->getRequest()));
 
-        $this->logger->expects($this->once())->method('debug')->with('Forwarding to /login');
+        $this->logger
+            ->expects($this->once())
+            ->method('debug')
+            ->with('Authentication failure, forward triggered.', array('failure_path' => '/login'));
 
         $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, $options, $this->logger);
         $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -139,7 +140,7 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
     public function testFailurePathCanBeOverwrittenWithRequest()
     {
         $this->request->expects($this->once())
-            ->method('get')->with('_failure_path', null, true)
+            ->method('get')->with('_failure_path')
             ->will($this->returnValue('/auth/login'));
 
         $this->httpUtils->expects($this->once())
@@ -149,12 +150,25 @@ class DefaultAuthenticationFailureHandlerTest extends \PHPUnit_Framework_TestCas
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
+    public function testFailurePathCanBeOverwrittenWithNestedAttributeInRequest()
+    {
+        $this->request->expects($this->once())
+            ->method('get')->with('_failure_path')
+            ->will($this->returnValue(array('value' => '/auth/login')));
+
+        $this->httpUtils->expects($this->once())
+            ->method('createRedirectResponse')->with($this->request, '/auth/login');
+
+        $handler = new DefaultAuthenticationFailureHandler($this->httpKernel, $this->httpUtils, array('failure_path_parameter' => '_failure_path[value]'), $this->logger);
+        $handler->onAuthenticationFailure($this->request, $this->exception);
+    }
+
     public function testFailurePathParameterCanBeOverwritten()
     {
         $options = array('failure_path_parameter' => '_my_failure_path');
 
         $this->request->expects($this->once())
-            ->method('get')->with('_my_failure_path', null, true)
+            ->method('get')->with('_my_failure_path')
             ->will($this->returnValue('/auth/login'));
 
         $this->httpUtils->expects($this->once())

@@ -24,11 +24,11 @@
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
-                <target>Dir sollt mindestens {{ limit }} Méiglechkeete wielen.</target>
+                <target>Et muss mindestens {{ limit }} Méiglechkeet ausgewielt ginn.|Et musse mindestens {{ limit }} Méiglechkeeten ausgewielt ginn.</target>
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>Dir sollt héchstens {{ limit }} Méiglechkeete wielen.</target>
+                <target>Et dierf héchstens {{ limit }} Méiglechkeet ausgewielt ginn.|Et dierfen héchstens {{ limit }} Méiglechkeeten ausgewielt ginn.</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -297,6 +297,22 @@
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
                 <target>D'Bild ass am Héichformat ({{ width }}x{{ height }}px). Biller am Héichformat sinn net erlaabt.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>En eidele Fichier ass net erlaabt.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Den Domain-Numm konnt net opgeléist ginn.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Dëse Wäert entsprécht net dem erwaarten Zeechesaz {{ charset }}.</target>
+            </trans-unit>
+            <trans-unit id="81">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>Dëst ass kee gëltege "Business Identifier Code" (BIC).</target>
             </trans-unit>
         </body>
     </file>

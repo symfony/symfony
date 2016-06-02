@@ -39,16 +39,23 @@ class LengthValidator extends ConstraintValidator
 
         $stringValue = (string) $value;
 
-        if (function_exists('grapheme_strlen') && 'UTF-8' === $constraint->charset) {
-            $length = grapheme_strlen($stringValue);
-        } elseif (function_exists('mb_strlen')) {
+        if (!$invalidCharset = !@mb_check_encoding($stringValue, $constraint->charset)) {
             $length = mb_strlen($stringValue, $constraint->charset);
-        } else {
-            $length = strlen($stringValue);
+        }
+
+        if ($invalidCharset) {
+            $this->context->buildViolation($constraint->charsetMessage)
+                ->setParameter('{{ value }}', $this->formatValue($stringValue))
+                ->setParameter('{{ charset }}', $constraint->charset)
+                ->setInvalidValue($value)
+                ->setCode(Length::INVALID_CHARACTERS_ERROR)
+                ->addViolation();
+
+            return;
         }
 
         if (null !== $constraint->max && $length > $constraint->max) {
-            $this->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
+            $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
                 ->setParameter('{{ value }}', $this->formatValue($stringValue))
                 ->setParameter('{{ limit }}', $constraint->max)
                 ->setInvalidValue($value)
@@ -60,7 +67,7 @@ class LengthValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->min && $length < $constraint->min) {
-            $this->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
+            $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
                 ->setParameter('{{ value }}', $this->formatValue($stringValue))
                 ->setParameter('{{ limit }}', $constraint->min)
                 ->setInvalidValue($value)

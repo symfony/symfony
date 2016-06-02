@@ -20,19 +20,10 @@ class GlobalVariablesTest extends TestCase
     private $container;
     private $globals;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->container = new Container();
         $this->globals = new GlobalVariables($this->container);
-    }
-
-    public function testGetSecurity()
-    {
-        $securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-
-        $this->assertNull($this->globals->getSecurity());
-        $this->container->set('security.context', $securityContext);
-        $this->assertSame($securityContext, $this->globals->getSecurity());
     }
 
     public function testGetUserNoTokenStorage()

@@ -14,7 +14,7 @@ namespace Symfony\Component\Security\Core\Authentication\Token\Storage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * TokenStorage contains a TokenInterface
+ * TokenStorage contains a TokenInterface.
  *
  * It gives access to the token representing the current user authentication.
  *

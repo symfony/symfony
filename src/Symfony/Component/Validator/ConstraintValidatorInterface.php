@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 interface ConstraintValidatorInterface
 {
@@ -30,8 +30,6 @@ interface ConstraintValidatorInterface
      *
      * @param mixed      $value      The value that should be validated
      * @param Constraint $constraint The constraint for the validation
-     *
-     * @api
      */
     public function validate($value, Constraint $constraint);
 }

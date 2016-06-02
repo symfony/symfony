@@ -13,13 +13,10 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class CollectionValidator extends ConstraintValidator
 {
@@ -58,18 +55,13 @@ class CollectionValidator extends ConstraintValidator
 
             if ($existsInArray || $existsInArrayAccess) {
                 if (count($fieldConstraint->constraints) > 0) {
-                    if ($context instanceof ExecutionContextInterface) {
-                        $context->getValidator()
-                            ->inContext($context)
-                            ->atPath('['.$field.']')
-                            ->validate($value[$field], $fieldConstraint->constraints);
-                    } else {
-                        // 2.4 API
-                        $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']');
-                    }
+                    $context->getValidator()
+                        ->inContext($context)
+                        ->atPath('['.$field.']')
+                        ->validate($value[$field], $fieldConstraint->constraints);
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                $this->buildViolationInContext($context, $constraint->missingFieldsMessage)
+                $context->buildViolation($constraint->missingFieldsMessage)
                     ->atPath('['.$field.']')
                     ->setParameter('{{ field }}', $this->formatValue($field))
                     ->setInvalidValue(null)
@@ -81,7 +73,7 @@ class CollectionValidator extends ConstraintValidator
         if (!$constraint->allowExtraFields) {
             foreach ($value as $field => $fieldValue) {
                 if (!isset($constraint->fields[$field])) {
-                    $this->buildViolationInContext($context, $constraint->extraFieldsMessage)
+                    $context->buildViolation($constraint->extraFieldsMessage)
                         ->atPath('['.$field.']')
                         ->setParameter('{{ field }}', $this->formatValue($field))
                         ->setInvalidValue($fieldValue)

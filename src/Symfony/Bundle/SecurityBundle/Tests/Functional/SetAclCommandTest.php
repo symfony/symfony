@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 /*
@@ -21,14 +30,29 @@ use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
 use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 
 /**
- * Tests SetAclCommand
+ * Tests SetAclCommand.
  *
  * @author Kévin Dunglas <kevin@les-tilleuls.coop>
+ * @requires extension pdo_sqlite
  */
 class SetAclCommandTest extends WebTestCase
 {
     const OBJECT_CLASS = 'Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AclBundle\Entity\Car';
     const SECURITY_CLASS = 'Symfony\Component\Security\Core\User\User';
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->deleteTmpDir('Acl');
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->deleteTmpDir('Acl');
+    }
 
     public function testSetAclUser()
     {
@@ -89,7 +113,7 @@ class SetAclCommandTest extends WebTestCase
         $setAclCommandTester = new CommandTester($setAclCommand);
         $setAclCommandTester->execute(array(
             'command' => 'acl:set',
-            'arguments' => array($grantedPermission, sprintf('%s:%s', strtr(self::OBJECT_CLASS, '\\', '/'), $objectId)),
+            'arguments' => array($grantedPermission, sprintf('%s:%s', str_replace('\\', '/', self::OBJECT_CLASS), $objectId)),
             '--role' => array($role),
         ));
 

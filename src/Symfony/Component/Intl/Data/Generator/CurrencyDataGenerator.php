@@ -73,7 +73,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     );
 
     /**
-     * Collects all available currency codes
+     * Collects all available currency codes.
      *
      * @var string[]
      */
@@ -121,8 +121,6 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
             return $data;
         }
-
-        return;
     }
 
     /**
@@ -164,7 +162,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
     }
 
     /**
-     * @param $rootBundle
+     * @param ArrayAccessibleResourceBundle $rootBundle
      *
      * @return array
      */

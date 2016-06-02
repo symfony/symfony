@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
  * Validates PHP values against constraints.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ValidatorInterface extends MetadataFactoryInterface

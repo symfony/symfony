@@ -11,7 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -19,15 +20,17 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TemplateController extends ContainerAware
+class TemplateController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * Renders a template.
      *
-     * @param string       $template  The template name
-     * @param int|null     $maxAge    Max age for client caching
-     * @param int|null     $sharedAge Max age for shared (proxy) caching
-     * @param bool|null    $private   Whether or not caching should apply for client caches only
+     * @param string    $template  The template name
+     * @param int|null  $maxAge    Max age for client caching
+     * @param int|null  $sharedAge Max age for shared (proxy) caching
+     * @param bool|null $private   Whether or not caching should apply for client caches only
      *
      * @return Response A Response instance
      */
@@ -47,7 +50,7 @@ class TemplateController extends ContainerAware
         if ($private) {
             $response->setPrivate();
         } elseif ($private === false || (null === $private && ($maxAge || $sharedAge))) {
-            $response->setPublic($private);
+            $response->setPublic();
         }
 
         return $response;

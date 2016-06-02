@@ -16,10 +16,10 @@ use Psr\Log\LoggerInterface;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class LoggingTranslator implements TranslatorInterface
+class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var TranslatorInterface|TranslatorBagInterface
      */
     private $translator;
 
@@ -29,13 +29,13 @@ class LoggingTranslator implements TranslatorInterface
     private $logger;
 
     /**
-     * @param Translator      $translator
-     * @param LoggerInterface $logger
+     * @param TranslatorInterface $translator The translator must implement TranslatorBagInterface
+     * @param LoggerInterface     $logger
      */
-    public function __construct($translator, LoggerInterface $logger)
+    public function __construct(TranslatorInterface $translator, LoggerInterface $logger)
     {
-        if (!($translator instanceof TranslatorInterface && $translator instanceof TranslatorBagInterface)) {
-            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implements TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
+        if (!$translator instanceof TranslatorBagInterface) {
+            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
         }
 
         $this->translator = $translator;
@@ -47,7 +47,7 @@ class LoggingTranslator implements TranslatorInterface
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
-        $trans = $this->translator->trans($id, $parameters , $domain , $locale);
+        $trans = $this->translator->trans($id, $parameters, $domain, $locale);
         $this->log($id, $domain, $locale);
 
         return $trans;
@@ -66,8 +66,6 @@ class LoggingTranslator implements TranslatorInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setLocale($locale)
     {
@@ -76,12 +74,18 @@ class LoggingTranslator implements TranslatorInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function getLocale()
     {
         return $this->translator->getLocale();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCatalogue($locale = null)
+    {
+        return $this->translator->getCatalogue($locale);
     }
 
     /**
@@ -101,10 +105,6 @@ class LoggingTranslator implements TranslatorInterface
      */
     private function log($id, $domain, $locale)
     {
-        if (null === $locale) {
-            $locale = $this->getLocale();
-        }
-
         if (null === $domain) {
             $domain = 'messages';
         }

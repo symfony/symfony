@@ -75,16 +75,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testAcceptOptionalConstraintAsOneElementArray()
     {
         $collection1 = new Collection(array(
-            "fields" => array(
-                "alternate_email" => array(
+            'fields' => array(
+                'alternate_email' => array(
                     new Optional(new Email()),
                 ),
             ),
         ));
 
         $collection2 = new Collection(array(
-            "fields" => array(
-                "alternate_email" => new Optional(new Email()),
+            'fields' => array(
+                'alternate_email' => new Optional(new Email()),
             ),
         ));
 
@@ -94,16 +94,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testAcceptRequiredConstraintAsOneElementArray()
     {
         $collection1 = new Collection(array(
-            "fields" => array(
-                "alternate_email" => array(
+            'fields' => array(
+                'alternate_email' => array(
                     new Required(new Email()),
                 ),
             ),
         ));
 
         $collection2 = new Collection(array(
-            "fields" => array(
-                "alternate_email" => new Required(new Email()),
+            'fields' => array(
+                'alternate_email' => new Required(new Email()),
             ),
         ));
 

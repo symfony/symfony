@@ -44,9 +44,6 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
         return array(
             array('class', 'class'),
             array('factory', 'factory'),
-            array('factoryClass', 'factory_class'),
-            array('factoryMethod', 'factory_method'),
-            array('factoryService', 'factory_service'),
             array('configurator', 'configurator'),
             array('file', 'file'),
         );

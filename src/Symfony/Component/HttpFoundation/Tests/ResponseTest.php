@@ -14,6 +14,9 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group time-sensitive
+ */
 class ResponseTest extends ResponseTestCase
 {
     public function testCreate()
@@ -29,8 +32,8 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response();
         $response = explode("\r\n", $response);
-        $this->assertEquals("HTTP/1.0 200 OK", $response[0]);
-        $this->assertEquals("Cache-Control: no-cache", $response[1]);
+        $this->assertEquals('HTTP/1.0 200 OK', $response[0]);
+        $this->assertEquals('Cache-Control: no-cache', $response[1]);
     }
 
     public function testClone()
@@ -103,6 +106,22 @@ class ResponseTest extends ResponseTestCase
     {
         $response = new Response();
         $this->assertFalse($response->mustRevalidate());
+    }
+
+    public function testMustRevalidateWithMustRevalidateCacheControlHeader()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'must-revalidate');
+
+        $this->assertTrue($response->mustRevalidate());
+    }
+
+    public function testMustRevalidateWithProxyRevalidateCacheControlHeader()
+    {
+        $response = new Response();
+        $response->headers->set('cache-control', 'proxy-revalidate');
+
+        $this->assertTrue($response->mustRevalidate());
     }
 
     public function testSetNotModified()
@@ -243,16 +262,18 @@ class ResponseTest extends ResponseTestCase
     {
         $oneHourAgo = $this->createDateTimeOneHourAgo();
         $response = new Response('', 200, array('Date' => $oneHourAgo->format(DATE_RFC2822)));
-        $this->assertEquals(0, $oneHourAgo->diff($response->getDate())->format('%s'), '->getDate() returns the Date header if present');
+        $date = $response->getDate();
+        $this->assertEquals($oneHourAgo->getTimestamp(), $date->getTimestamp(), '->getDate() returns the Date header if present');
 
         $response = new Response();
         $date = $response->getDate();
-        $this->assertLessThan(1, $date->diff(new \DateTime(), true)->format('%s'), '->getDate() returns the current Date if no Date header present');
+        $this->assertEquals(time(), $date->getTimestamp(), '->getDate() returns the current Date if no Date header present');
 
         $response = new Response('', 200, array('Date' => $this->createDateTimeOneHourAgo()->format(DATE_RFC2822)));
         $now = $this->createDateTimeNow();
         $response->headers->set('Date', $now->format(DATE_RFC2822));
-        $this->assertLessThanOrEqual(1, $now->diff($response->getDate())->format('%s'), '->getDate() returns the date when the header has been modified');
+        $date = $response->getDate();
+        $this->assertEquals($now->getTimestamp(), $date->getTimestamp(), '->getDate() returns the date when the header has been modified');
 
         $response = new Response('', 200);
         $response->headers->remove('Date');
@@ -272,7 +293,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Expires', $this->createDateTimeOneHourLater()->format(DATE_RFC2822));
-        $this->assertLessThanOrEqual(1, $response->getMaxAge() - 3600, '->getMaxAge() falls back to Expires when no max-age or s-maxage directive present');
+        $this->assertEquals(3600, $response->getMaxAge(), '->getMaxAge() falls back to Expires when no max-age or s-maxage directive present');
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'must-revalidate');
@@ -343,7 +364,7 @@ class ResponseTest extends ResponseTestCase
 
         $response = new Response();
         $response->headers->set('Expires', $this->createDateTimeOneHourLater()->format(DATE_RFC2822));
-        $this->assertLessThanOrEqual(1, 3600 - $response->getTtl(), '->getTtl() uses the Expires header when no max-age is present');
+        $this->assertEquals(3600, $response->getTtl(), '->getTtl() uses the Expires header when no max-age is present');
 
         $response = new Response();
         $response->headers->set('Expires', $this->createDateTimeOneHourAgo()->format(DATE_RFC2822));
@@ -356,7 +377,7 @@ class ResponseTest extends ResponseTestCase
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'max-age=60');
-        $this->assertLessThan(1, 60 - $response->getTtl(), '->getTtl() uses Cache-Control max-age when present');
+        $this->assertEquals(60, $response->getTtl(), '->getTtl() uses Cache-Control max-age when present');
     }
 
     public function testSetClientTtl()
@@ -545,7 +566,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         //array('etag', 'last_modified', 'max_age', 's_maxage', 'private', 'public')
         try {
-            $response->setCache(array("wrong option" => "value"));
+            $response->setCache(array('wrong option' => 'value'));
             $this->fail('->setCache() throws an InvalidArgumentException if an option is not supported');
         } catch (\Exception $e) {
             $this->assertInstanceOf('InvalidArgumentException', $e, '->setCache() throws an InvalidArgumentException if an option is not supported');
@@ -556,7 +577,7 @@ class ResponseTest extends ResponseTestCase
         $response->setCache($options);
         $this->assertEquals($response->getEtag(), '"whatever"');
 
-        $now = new \DateTime();
+        $now = $this->createDateTimeNow();
         $options = array('last_modified' => $now);
         $response->setCache($options);
         $this->assertEquals($response->getLastModified()->getTimestamp(), $now->getTimestamp());
@@ -615,7 +636,7 @@ class ResponseTest extends ResponseTestCase
 
         $this->assertNull($response->getExpires(), '->setExpires() remove the header when passed null');
 
-        $now = new \DateTime();
+        $now = $this->createDateTimeNow();
         $response->setExpires($now);
 
         $this->assertEquals($response->getExpires()->getTimestamp(), $now->getTimestamp());
@@ -624,7 +645,7 @@ class ResponseTest extends ResponseTestCase
     public function testSetLastModified()
     {
         $response = new Response();
-        $response->setLastModified(new \DateTime());
+        $response->setLastModified($this->createDateTimeNow());
         $this->assertNotNull($response->getLastModified());
 
         $response->setLastModified(null);
@@ -674,7 +695,7 @@ class ResponseTest extends ResponseTestCase
             array('200', null, 'OK'),
             array('200', false, ''),
             array('200', 'foo', 'foo'),
-            array('199', null, ''),
+            array('199', null, 'unknown status'),
             array('199', false, ''),
             array('199', 'foo', 'foo'),
         );
@@ -809,7 +830,7 @@ class ResponseTest extends ResponseTestCase
             'setCharset' => 'UTF-8',
             'setPublic' => null,
             'setPrivate' => null,
-            'setDate' => new \DateTime(),
+            'setDate' => $this->createDateTimeNow(),
             'expire' => null,
             'setMaxAge' => 1,
             'setSharedMaxAge' => 1,
@@ -842,21 +863,19 @@ class ResponseTest extends ResponseTestCase
 
     protected function createDateTimeOneHourAgo()
     {
-        $date = new \DateTime();
-
-        return $date->sub(new \DateInterval('PT1H'));
+        return $this->createDateTimeNow()->sub(new \DateInterval('PT1H'));
     }
 
     protected function createDateTimeOneHourLater()
     {
-        $date = new \DateTime();
-
-        return $date->add(new \DateInterval('PT1H'));
+        return $this->createDateTimeNow()->add(new \DateInterval('PT1H'));
     }
 
     protected function createDateTimeNow()
     {
-        return new \DateTime();
+        $date = new \DateTime();
+
+        return $date->setTimestamp(time());
     }
 
     protected function provideResponse()

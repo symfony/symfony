@@ -23,7 +23,7 @@ class MergeBuilder
     public $allowOverwrite = true;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param NodeDefinition $node The related node
      */
@@ -35,7 +35,7 @@ class MergeBuilder
     /**
      * Sets whether the node can be unset.
      *
-     * @param bool    $allow
+     * @param bool $allow
      *
      * @return MergeBuilder
      */
@@ -49,7 +49,7 @@ class MergeBuilder
     /**
      * Sets whether the node can be overwritten.
      *
-     * @param bool    $deny Whether the overwriting is forbidden or not
+     * @param bool $deny Whether the overwriting is forbidden or not
      *
      * @return MergeBuilder
      */

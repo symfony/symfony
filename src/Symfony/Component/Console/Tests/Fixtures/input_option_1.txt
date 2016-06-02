@@ -1,1 +1,1 @@
- <info>--option_name</info> (-o)
+  <info>-o, --option_name</info>

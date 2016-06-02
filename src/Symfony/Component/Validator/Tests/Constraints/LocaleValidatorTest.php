@@ -11,28 +11,14 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Locale;
 use Symfony\Component\Validator\Constraints\LocaleValidator;
-use Symfony\Component\Validator\Validation;
 
 class LocaleValidatorTest extends AbstractConstraintValidatorTest
 {
-    protected function getApiVersion()
-    {
-        return Validation::API_VERSION_2_5;
-    }
-
     protected function createValidator()
     {
         return new LocaleValidator();
-    }
-
-    protected function setUp()
-    {
-        IntlTestHelper::requireIntl($this);
-
-        parent::setUp();
     }
 
     public function testNullIsValid()
@@ -75,6 +61,7 @@ class LocaleValidatorTest extends AbstractConstraintValidatorTest
             array('pt'),
             array('pt_PT'),
             array('zh_Hans'),
+            array('fil_PH'),
         );
     }
 
@@ -91,6 +78,7 @@ class LocaleValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$locale.'"')
+            ->setCode(Locale::NO_SUCH_LOCALE_ERROR)
             ->assertRaised();
     }
 

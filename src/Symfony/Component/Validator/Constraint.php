@@ -19,46 +19,49 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 /**
  * Contains the properties of a constraint definition.
  *
- * A constraint can be defined on a class, an option or a getter method.
+ * A constraint can be defined on a class, a property or a getter method.
  * The Constraint class encapsulates all the configuration required for
- * validating this class, option or getter result successfully.
+ * validating this class, property or getter result successfully.
  *
  * Constraint instances are immutable and serializable.
  *
  * @property array $groups The groups that the constraint belongs to
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 abstract class Constraint
 {
     /**
-     * The name of the group given to all constraints with no explicit group
+     * The name of the group given to all constraints with no explicit group.
+     *
      * @var string
      */
     const DEFAULT_GROUP = 'Default';
 
     /**
-     * Marks a constraint that can be put onto classes
+     * Marks a constraint that can be put onto classes.
+     *
      * @var string
      */
     const CLASS_CONSTRAINT = 'class';
 
     /**
-     * Marks a constraint that can be put onto properties
+     * Marks a constraint that can be put onto properties.
+     *
      * @var string
      */
     const PROPERTY_CONSTRAINT = 'property';
 
     /**
-     * Maps error codes to the names of their constants
+     * Maps error codes to the names of their constants.
+     *
      * @var array
      */
     protected static $errorNames = array();
 
     /**
-     * Domain-specific data attached to a constraint
+     * Domain-specific data attached to a constraint.
+     *
      * @var mixed
      */
     public $payload;
@@ -66,7 +69,7 @@ abstract class Constraint
     /**
      * Returns the name of the given error code.
      *
-     * @param int $errorCode The error code
+     * @param string $errorCode The error code
      *
      * @return string The name of the error code
      *
@@ -111,8 +114,6 @@ abstract class Constraint
      * @throws ConstraintDefinitionException When you don't pass an associative
      *                                       array, but getDefaultOption() returns
      *                                       null
-     *
-     * @api
      */
     public function __construct($options = null)
     {
@@ -221,42 +222,38 @@ abstract class Constraint
     }
 
     /**
-     * Adds the given group if this constraint is in the Default group
+     * Adds the given group if this constraint is in the Default group.
      *
      * @param string $group
-     *
-     * @api
      */
     public function addImplicitGroupName($group)
     {
-        if (in_array(Constraint::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
+        if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
             $this->groups[] = $group;
         }
     }
 
     /**
-     * Returns the name of the default option
+     * Returns the name of the default option.
      *
      * Override this method to define a default option.
      *
      * @return string
-     * @see __construct()
      *
-     * @api
+     * @see __construct()
      */
     public function getDefaultOption()
     {
     }
 
     /**
-     * Returns the name of the required options
+     * Returns the name of the required options.
      *
      * Override this method if you want to define required options.
      *
      * @return array
-     * @see __construct()
      *
-     * @api
+     * @see __construct()
      */
     public function getRequiredOptions()
     {
@@ -264,15 +261,13 @@ abstract class Constraint
     }
 
     /**
-     * Returns the name of the class that validates this constraint
+     * Returns the name of the class that validates this constraint.
      *
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
      * behaviour.
      *
      * @return string
-     *
-     * @api
      */
     public function validatedBy()
     {
@@ -281,14 +276,12 @@ abstract class Constraint
 
     /**
      * Returns whether the constraint can be put onto classes, properties or
-     * both
+     * both.
      *
      * This method should return one or more of the constants
      * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
      *
-     * @return string|array  One or more constant values
-     *
-     * @api
+     * @return string|array One or more constant values
      */
     public function getTargets()
     {

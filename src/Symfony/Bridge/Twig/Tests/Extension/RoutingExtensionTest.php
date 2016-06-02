@@ -20,7 +20,7 @@ class RoutingExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testEscaping($template, $mustBeEscaped)
     {
-        $twig = new \Twig_Environment(null, array('debug' => true, 'cache' => false, 'autoescape' => true, 'optimizations' => 0));
+        $twig = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array('debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0));
         $twig->addExtension(new RoutingExtension($this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface')));
 
         $nodes = $twig->parse($twig->tokenize($template));

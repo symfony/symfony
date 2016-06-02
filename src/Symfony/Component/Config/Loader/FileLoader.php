@@ -82,18 +82,14 @@ abstract class FileLoader extends Loader
         try {
             $loader = $this->resolve($resource, $type);
 
-            if ($loader instanceof FileLoader && null !== $this->currentDir) {
-                // we fallback to the current locator to keep BC
-                // as some some loaders do not call the parent __construct()
-                // @deprecated should be removed in 3.0
-                $locator = $loader->getLocator() ?: $this->locator;
-                $resource = $locator->locate($resource, $this->currentDir, false);
+            if ($loader instanceof self && null !== $this->currentDir) {
+                $resource = $loader->getLocator()->locate($resource, $this->currentDir, false);
             }
 
             $resources = is_array($resource) ? $resource : array($resource);
-            for ($i = 0; $i < $resourcesCount = count($resources); $i++ ) {
+            for ($i = 0; $i < $resourcesCount = count($resources); ++$i) {
                 if (isset(self::$loading[$resources[$i]])) {
-                    if ($i == $resourcesCount-1) {
+                    if ($i == $resourcesCount - 1) {
                         throw new FileLoaderImportCircularReferenceException(array_keys(self::$loading));
                     }
                 } else {
@@ -103,9 +99,11 @@ abstract class FileLoader extends Loader
             }
             self::$loading[$resource] = true;
 
-            $ret = $loader->load($resource, $type);
-
-            unset(self::$loading[$resource]);
+            try {
+                $ret = $loader->load($resource, $type);
+            } finally {
+                unset(self::$loading[$resource]);
+            }
 
             return $ret;
         } catch (FileLoaderImportCircularReferenceException $e) {

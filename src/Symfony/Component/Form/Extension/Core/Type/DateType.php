@@ -21,7 +21,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateType extends AbstractType
@@ -35,6 +35,11 @@ class DateType extends AbstractType
         \IntlDateFormatter::LONG,
         \IntlDateFormatter::MEDIUM,
         \IntlDateFormatter::SHORT,
+    );
+
+    private static $widgets = array(
+        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
     );
 
     /**
@@ -57,8 +62,8 @@ class DateType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
-                'UTC',
-                'UTC',
+                $options['model_timezone'],
+                $options['view_timezone'],
                 $dateFormat,
                 $timeFormat,
                 $calendar,
@@ -73,12 +78,12 @@ class DateType extends AbstractType
                 \Locale::getDefault(),
                 $dateFormat,
                 $timeFormat,
-                'UTC',
+                null,
                 $calendar,
                 $pattern
             );
 
-            // new \intlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/bug.php?id=66323
+            // new \IntlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/bug.php?id=66323
             if (!$formatter) {
                 throw new InvalidOptionsException(intl_get_error_message(), intl_get_error_code());
             }
@@ -89,10 +94,13 @@ class DateType extends AbstractType
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
                 $yearOptions['placeholder'] = $options['placeholder']['year'];
+                $yearOptions['choice_translation_domain'] = $options['choice_translation_domain']['year'];
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
                 $monthOptions['placeholder'] = $options['placeholder']['month'];
+                $monthOptions['choice_translation_domain'] = $options['choice_translation_domain']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
                 $dayOptions['placeholder'] = $options['placeholder']['day'];
+                $dayOptions['choice_translation_domain'] = $options['choice_translation_domain']['day'];
             }
 
             // Append generic carry-along options
@@ -101,11 +109,11 @@ class DateType extends AbstractType
             }
 
             $builder
-                ->add('year', $options['widget'], $yearOptions)
-                ->add('month', $options['widget'], $monthOptions)
-                ->add('day', $options['widget'], $dayOptions)
+                ->add('year', self::$widgets[$options['widget']], $yearOptions)
+                ->add('month', self::$widgets[$options['widget']], $monthOptions)
+                ->add('day', self::$widgets[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
-                    'UTC', 'UTC', array('year', 'month', 'day')
+                    $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
                 ->setAttribute('formatter', $formatter)
             ;
@@ -113,15 +121,15 @@ class DateType extends AbstractType
 
         if ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToStringTransformer('UTC', 'UTC', 'Y-m-d')
+                new DateTimeToStringTransformer($options['model_timezone'], $options['model_timezone'], 'Y-m-d')
             ));
         } elseif ('timestamp' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToTimestampTransformer('UTC', 'UTC')
+                new DateTimeToTimestampTransformer($options['model_timezone'], $options['model_timezone'])
             ));
         } elseif ('array' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
-                new DateTimeToArrayTransformer('UTC', 'UTC', array('year', 'month', 'day'))
+                new DateTimeToArrayTransformer($options['model_timezone'], $options['model_timezone'], array('year', 'month', 'day'))
             ));
         }
     }
@@ -146,6 +154,10 @@ class DateType extends AbstractType
 
             // remove special characters unless the format was explicitly specified
             if (!is_string($options['format'])) {
+                // remove quoted strings first
+                $pattern = preg_replace('/\'[^\']+\'/', '', $pattern);
+
+                // remove remaining special chars
                 $pattern = preg_replace('/[^yMd]+/', '', $pattern);
             }
 
@@ -165,18 +177,14 @@ class DateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
-            return $options['widget'] !== 'single_text';
+            return 'single_text' !== $options['widget'];
         };
 
-        $emptyValue = $placeholderDefault = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
-        };
-
-        $placeholder = function (Options $options) {
-            return $options['empty_value'];
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
@@ -196,8 +204,25 @@ class DateType extends AbstractType
             );
         };
 
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (is_array($choiceTranslationDomain)) {
+                $default = false;
+
+                return array_replace(
+                    array('year' => $default, 'month' => $default, 'day' => $default),
+                    $choiceTranslationDomain
+                );
+            };
+
+            return array(
+                'year' => $choiceTranslationDomain,
+                'month' => $choiceTranslationDomain,
+                'day' => $choiceTranslationDomain,
+            );
+        };
+
         $format = function (Options $options) {
-            return $options['widget'] === 'single_text' ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
+            return 'single_text' === $options['widget'] ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
         };
 
         $resolver->setDefaults(array(
@@ -209,8 +234,7 @@ class DateType extends AbstractType
             'format' => $format,
             'model_timezone' => null,
             'view_timezone' => null,
-            'empty_value' => $emptyValue, // deprecated
-            'placeholder' => $placeholder,
+            'placeholder' => $placeholderDefault,
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -222,39 +246,34 @@ class DateType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'choice_translation_domain' => false,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $placeholderNormalizer,
-            'placeholder' => $placeholderNormalizer,
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
+
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('widget', array(
+            'single_text',
+            'text',
+            'choice',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input' => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'widget' => array(
-                'single_text',
-                'text',
-                'choice',
-            ),
-        ));
-
-        $resolver->setAllowedTypes(array(
-            'format' => array('int', 'string'),
-            'years' => 'array',
-            'months' => 'array',
-            'days' => 'array',
-        ));
+        $resolver->setAllowedTypes('format', array('int', 'string'));
+        $resolver->setAllowedTypes('years', 'array');
+        $resolver->setAllowedTypes('months', 'array');
+        $resolver->setAllowedTypes('days', 'array');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'date';
     }
@@ -263,18 +282,15 @@ class DateType extends AbstractType
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
+        $formattedTimestamps = array();
 
-        if ($setTimeZone = method_exists($formatter, 'setTimeZone')) {
-            $formatter->setTimeZone('UTC');
-        } else {
-            $formatter->setTimeZoneId('UTC');
-        }
+        $formatter->setTimeZone('UTC');
 
         if (preg_match($regex, $pattern, $matches)) {
             $formatter->setPattern($matches[0]);
 
-            foreach ($timestamps as $key => $timestamp) {
-                $timestamps[$key] = $formatter->format($timestamp);
+            foreach ($timestamps as $timestamp => $choice) {
+                $formattedTimestamps[$formatter->format($timestamp)] = $choice;
             }
 
             // I'd like to clone the formatter above, but then we get a
@@ -282,13 +298,9 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        if ($setTimeZone) {
-            $formatter->setTimeZone($timezone);
-        } else {
-            $formatter->setTimeZoneId($timezone);
-        }
+        $formatter->setTimeZone($timezone);
 
-        return $timestamps;
+        return $formattedTimestamps;
     }
 
     private function listYears(array $years)
@@ -297,7 +309,7 @@ class DateType extends AbstractType
 
         foreach ($years as $year) {
             if (false !== $y = gmmktime(0, 0, 0, 6, 15, $year)) {
-                $result[$year] = $y;
+                $result[$y] = $year;
             }
         }
 
@@ -309,7 +321,7 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($months as $month) {
-            $result[$month] = gmmktime(0, 0, 0, $month, 15);
+            $result[gmmktime(0, 0, 0, $month, 15)] = $month;
         }
 
         return $result;
@@ -320,7 +332,7 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($days as $day) {
-            $result[$day] = gmmktime(0, 0, 0, 5, $day);
+            $result[gmmktime(0, 0, 0, 5, $day)] = $day;
         }
 
         return $result;

@@ -21,13 +21,13 @@ class BirthdayTypeTest extends BaseTypeTest
      */
     public function testSetInvalidYearsOption()
     {
-        $this->factory->create('birthday', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\BirthdayType', null, array(
             'years' => 'bad value',
         ));
     }
 
     protected function getTestedType()
     {
-        return 'birthday';
+        return 'Symfony\Component\Form\Extension\Core\Type\BirthdayType';
     }
 }

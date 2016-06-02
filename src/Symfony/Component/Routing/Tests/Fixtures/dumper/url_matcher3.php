@@ -5,7 +5,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * ProjectUrlMatcher
+ * ProjectUrlMatcher.
  *
  * This class has been auto-generated
  * by the Symfony Routing Component.

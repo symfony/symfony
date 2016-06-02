@@ -22,6 +22,24 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  */
 class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
+    private $errorNames = array(
+        E_DEPRECATED => 'E_DEPRECATED',
+        E_USER_DEPRECATED => 'E_USER_DEPRECATED',
+        E_NOTICE => 'E_NOTICE',
+        E_USER_NOTICE => 'E_USER_NOTICE',
+        E_STRICT => 'E_STRICT',
+        E_WARNING => 'E_WARNING',
+        E_USER_WARNING => 'E_USER_WARNING',
+        E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+        E_CORE_WARNING => 'E_CORE_WARNING',
+        E_USER_ERROR => 'E_USER_ERROR',
+        E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+        E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+        E_PARSE => 'E_PARSE',
+        E_ERROR => 'E_ERROR',
+        E_CORE_ERROR => 'E_CORE_ERROR',
+    );
+
     private $logger;
 
     public function __construct($logger = null)
@@ -97,15 +115,49 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
     private function sanitizeLogs($logs)
     {
-        foreach ($logs as $i => $log) {
+        $errorContextById = array();
+        $sanitizedLogs = array();
+
+        foreach ($logs as $log) {
             $context = $this->sanitizeContext($log['context']);
-            if (isset($context['type'], $context['level']) && !($context['type'] & $context['level'])) {
-                $context['scream'] = true;
+
+            if (isset($context['type'], $context['file'], $context['line'], $context['level'])) {
+                $errorId = md5("{$context['type']}/{$context['line']}/{$context['file']}\x00{$log['message']}", true);
+                $silenced = !($context['type'] & $context['level']);
+                if (isset($this->errorNames[$context['type']])) {
+                    $context = array_merge(array('name' => $this->errorNames[$context['type']]), $context);
+                }
+
+                if (isset($errorContextById[$errorId])) {
+                    if (isset($errorContextById[$errorId]['errorCount'])) {
+                        ++$errorContextById[$errorId]['errorCount'];
+                    } else {
+                        $errorContextById[$errorId]['errorCount'] = 2;
+                    }
+
+                    if (!$silenced && isset($errorContextById[$errorId]['scream'])) {
+                        unset($errorContextById[$errorId]['scream']);
+                        $errorContextById[$errorId]['level'] = $context['level'];
+                    }
+
+                    continue;
+                }
+
+                $errorContextById[$errorId] = &$context;
+                if ($silenced) {
+                    $context['scream'] = true;
+                }
+
+                $log['context'] = &$context;
+                unset($context);
+            } else {
+                $log['context'] = $context;
             }
-            $logs[$i]['context'] = $context;
+
+            $sanitizedLogs[] = $log;
         }
 
-        return $logs;
+        return $sanitizedLogs;
     }
 
     private function sanitizeContext($context)

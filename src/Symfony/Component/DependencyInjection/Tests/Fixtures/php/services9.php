@@ -2,42 +2,42 @@
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
- * ProjectServiceContainer
+ * ProjectServiceContainer.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
  */
 class ProjectServiceContainer extends Container
 {
-    private static $parameters = array(
-            'baz_class' => 'BazClass',
-            'foo_class' => 'Bar\\FooClass',
-            'foo' => 'bar',
-        );
+    private $parameters;
+    private $targetDirs = array();
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        parent::__construct(new ParameterBag(self::$parameters));
+        parent::__construct(new ParameterBag($this->getDefaultParameters()));
         $this->methodMap = array(
             'bar' => 'getBarService',
             'baz' => 'getBazService',
             'configurator_service' => 'getConfiguratorServiceService',
+            'configurator_service_simple' => 'getConfiguratorServiceSimpleService',
             'configured_service' => 'getConfiguredServiceService',
+            'configured_service_simple' => 'getConfiguredServiceSimpleService',
             'decorated' => 'getDecoratedService',
             'decorator_service' => 'getDecoratorServiceService',
             'decorator_service_with_name' => 'getDecoratorServiceWithNameService',
-            'depends_on_request' => 'getDependsOnRequestService',
+            'deprecated_service' => 'getDeprecatedServiceService',
             'factory_service' => 'getFactoryServiceService',
+            'factory_service_simple' => 'getFactoryServiceSimpleService',
+            'factory_simple' => 'getFactorySimpleService',
             'foo' => 'getFooService',
             'foo.baz' => 'getFoo_BazService',
             'foo_bar' => 'getFooBarService',
@@ -109,6 +109,23 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'configured_service_simple' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance.
+     */
+    protected function getConfiguredServiceSimpleService()
+    {
+        $this->services['configured_service_simple'] = $instance = new \stdClass();
+
+        $this->get('configurator_service_simple')->configureStdClass($instance);
+
+        return $instance;
+    }
+
+    /**
      * Gets the 'decorated' service.
      *
      * This service is shared.
@@ -148,20 +165,20 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Gets the 'depends_on_request' service.
+     * Gets the 'deprecated_service' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
      *
      * @return \stdClass A stdClass instance.
+     *
+     * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.
      */
-    protected function getDependsOnRequestService()
+    protected function getDeprecatedServiceService()
     {
-        $this->services['depends_on_request'] = $instance = new \stdClass();
+        @trigger_error('The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.', E_USER_DEPRECATED);
 
-        $instance->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-
-        return $instance;
+        return $this->services['deprecated_service'] = new \stdClass();
     }
 
     /**
@@ -175,6 +192,19 @@ class ProjectServiceContainer extends Container
     protected function getFactoryServiceService()
     {
         return $this->services['factory_service'] = $this->get('foo.baz')->getInstance();
+    }
+
+    /**
+     * Gets the 'factory_service_simple' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Bar A Bar instance.
+     */
+    protected function getFactoryServiceSimpleService()
+    {
+        return $this->services['factory_service_simple'] = $this->get('factory_simple')->getInstance();
     }
 
     /**
@@ -318,16 +348,6 @@ class ProjectServiceContainer extends Container
     }
 
     /**
-     * Updates the 'request' service.
-     */
-    protected function synchronizeRequestService()
-    {
-        if ($this->initialized('depends_on_request')) {
-            $this->get('depends_on_request')->setRequest($this->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
-        }
-    }
-
-    /**
      * Gets the 'configurator_service' service.
      *
      * This service is shared.
@@ -346,6 +366,40 @@ class ProjectServiceContainer extends Container
         $instance->setFoo($this->get('baz'));
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'configurator_service_simple' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return \ConfClass A ConfClass instance.
+     */
+    protected function getConfiguratorServiceSimpleService()
+    {
+        return $this->services['configurator_service_simple'] = new \ConfClass('bar');
+    }
+
+    /**
+     * Gets the 'factory_simple' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return \SimpleFactoryClass A SimpleFactoryClass instance.
+     */
+    protected function getFactorySimpleService()
+    {
+        return $this->services['factory_simple'] = new \SimpleFactoryClass('foo');
     }
 
     /**
@@ -389,5 +443,19 @@ class ProjectServiceContainer extends Container
         $instance->foo = 'bar';
 
         return $instance;
+    }
+
+    /**
+     * Gets the default parameters.
+     *
+     * @return array An array of the default parameters
+     */
+    protected function getDefaultParameters()
+    {
+        return array(
+            'baz_class' => 'BazClass',
+            'foo_class' => 'Bar\\FooClass',
+            'foo' => 'bar',
+        );
     }
 }

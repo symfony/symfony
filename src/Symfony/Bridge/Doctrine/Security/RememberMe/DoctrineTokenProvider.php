@@ -39,16 +39,16 @@ class DoctrineTokenProvider implements TokenProviderInterface
 {
     /**
      * Doctrine DBAL database connection
-     * F.ex. service id: doctrine.dbal.default_connection
+     * F.ex. service id: doctrine.dbal.default_connection.
      *
-     * @var \Doctrine\DBAL\Connection
+     * @var Connection
      */
     private $conn;
 
     /**
-     * new DoctrineTokenProvider for the RememberMe authentication service
+     * new DoctrineTokenProvider for the RememberMe authentication service.
      *
-     * @param \Doctrine\DBAL\Connection $conn
+     * @param Connection $conn
      */
     public function __construct(Connection $conn)
     {
@@ -65,14 +65,10 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $paramValues = array('series' => $series);
         $paramTypes = array('series' => \PDO::PARAM_STR);
         $stmt = $this->conn->executeQuery($sql, $paramValues, $paramTypes);
-        $row =  $stmt->fetch(\PDO::FETCH_ASSOC);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
         if ($row) {
-            return new PersistentToken($row['class'],
-                                       $row['username'],
-                                       $series,
-                                       $row['value'],
-                                       new \DateTime($row['lastUsed'])
-                                       );
+            return new PersistentToken($row['class'], $row['username'], $series, $row['value'], new \DateTime($row['lastUsed']));
         }
 
         throw new TokenNotFoundException('No token found.');
@@ -96,12 +92,16 @@ class DoctrineTokenProvider implements TokenProviderInterface
     {
         $sql = 'UPDATE rememberme_token SET value=:value, lastUsed=:lastUsed'
             .' WHERE series=:series';
-        $paramValues = array('value' => $tokenValue,
-                             'lastUsed' => $lastUsed,
-                             'series' => $series,);
-        $paramTypes =  array('value' => \PDO::PARAM_STR,
-                             'lastUsed' => DoctrineType::DATETIME,
-                             'series' => \PDO::PARAM_STR,);
+        $paramValues = array(
+            'value' => $tokenValue,
+            'lastUsed' => $lastUsed,
+            'series' => $series,
+        );
+        $paramTypes = array(
+            'value' => \PDO::PARAM_STR,
+            'lastUsed' => DoctrineType::DATETIME,
+            'series' => \PDO::PARAM_STR,
+        );
         $updated = $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
         if ($updated < 1) {
             throw new TokenNotFoundException('No token found.');
@@ -116,16 +116,20 @@ class DoctrineTokenProvider implements TokenProviderInterface
         $sql = 'INSERT INTO rememberme_token'
             .' (class, username, series, value, lastUsed)'
             .' VALUES (:class, :username, :series, :value, :lastUsed)';
-        $paramValues = array('class' => $token->getClass(),
-                             'username' => $token->getUsername(),
-                             'series' => $token->getSeries(),
-                             'value' => $token->getTokenValue(),
-                             'lastUsed' => $token->getLastUsed(),);
-        $paramTypes = array('class' => \PDO::PARAM_STR,
-                             'username' => \PDO::PARAM_STR,
-                             'series' => \PDO::PARAM_STR,
-                             'value' => \PDO::PARAM_STR,
-                             'lastUsed' => DoctrineType::DATETIME,);
+        $paramValues = array(
+            'class' => $token->getClass(),
+            'username' => $token->getUsername(),
+            'series' => $token->getSeries(),
+            'value' => $token->getTokenValue(),
+            'lastUsed' => $token->getLastUsed(),
+        );
+        $paramTypes = array(
+            'class' => \PDO::PARAM_STR,
+            'username' => \PDO::PARAM_STR,
+            'series' => \PDO::PARAM_STR,
+            'value' => \PDO::PARAM_STR,
+            'lastUsed' => DoctrineType::DATETIME,
+        );
         $this->conn->executeUpdate($sql, $paramValues, $paramTypes);
     }
 }

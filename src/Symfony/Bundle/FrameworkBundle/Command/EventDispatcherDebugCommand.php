@@ -16,10 +16,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * A console command for retrieving information about event dispatcher
+ * A console command for retrieving information about event dispatcher.
  *
  * @author Matthieu Auger <mail@matthieuauger.com>
  */
@@ -33,8 +34,8 @@ class EventDispatcherDebugCommand extends ContainerAwareCommand
         $this
             ->setName('debug:event-dispatcher')
             ->setDefinition(array(
-                new InputArgument('event', InputArgument::OPTIONAL, 'An event name (foo)'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'To output description in other formats', 'txt'),
+                new InputArgument('event', InputArgument::OPTIONAL, 'An event name'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format  (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ))
             ->setDescription('Displays configured listeners for an application')
@@ -58,22 +59,29 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($event = $input->getArgument('event')) {
-            $options = array('event' => $event);
-        } else {
-            $options = array();
-        }
-
+        $io = new SymfonyStyle($input, $output);
         $dispatcher = $this->getEventDispatcher();
+
+        $options = array();
+        if ($event = $input->getArgument('event')) {
+            if (!$dispatcher->hasListeners($event)) {
+                $io->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
+
+                return;
+            }
+
+            $options = array('event' => $event);
+        }
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
         $options['raw_text'] = $input->getOption('raw');
-        $helper->describe($output, $dispatcher, $options);
+        $options['output'] = $io;
+        $helper->describe($io, $dispatcher, $options);
     }
 
     /**
-     * Loads the Event Dispatcher from the container
+     * Loads the Event Dispatcher from the container.
      *
      * @return EventDispatcherInterface
      */

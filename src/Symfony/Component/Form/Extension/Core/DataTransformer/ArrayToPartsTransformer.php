@@ -32,7 +32,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
             $array = array();
         }
 
-        if (!is_array($array) ) {
+        if (!is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 
@@ -51,7 +51,7 @@ class ArrayToPartsTransformer implements DataTransformerInterface
 
     public function reverseTransform($array)
     {
-        if (!is_array($array) ) {
+        if (!is_array($array)) {
             throw new TransformationFailedException('Expected an array.');
         }
 

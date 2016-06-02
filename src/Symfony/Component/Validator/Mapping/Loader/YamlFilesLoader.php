@@ -12,11 +12,12 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 /**
- * Loads multiple yaml mapping files
+ * Loads validation metadata from a list of YAML files.
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
+ * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see    Symfony\Component\Validator\Mapping\Loader\FilesLoader
+ * @see FilesLoader
  */
 class YamlFilesLoader extends FilesLoader
 {

@@ -12,7 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionLoadedBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ExtensionLoadedExtension extends Extension
 {

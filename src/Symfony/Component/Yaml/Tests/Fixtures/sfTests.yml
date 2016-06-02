@@ -51,9 +51,9 @@ php: |
       '~',
     )
 ---
-test: Empty lines in folded blocks
+test: Empty lines in literal blocks
 brief: >
-  Empty lines in folded blocks
+  Empty lines in literal blocks
 yaml: |
   foo:
     bar: |
@@ -64,6 +64,20 @@ yaml: |
       bar
 php: |
   array('foo' => array('bar' => "foo\n\n\n  \nbar\n"))
+---
+test: Empty lines in folded blocks
+brief: >
+  Empty lines in folded blocks
+yaml: |
+  foo:
+    bar: >
+
+      foo
+
+      
+      bar
+php: |
+  array('foo' => array('bar' => "\nfoo\n\nbar\n"))
 ---
 test: IP addresses
 brief: >

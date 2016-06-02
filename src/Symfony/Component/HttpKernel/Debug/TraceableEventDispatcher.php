@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Debug;
 
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcher as BaseTraceableEventDispatcher;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -25,21 +24,6 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class TraceableEventDispatcher extends BaseTraceableEventDispatcher
 {
-    /**
-     * Sets the profiler.
-     *
-     * The traceable event dispatcher does not use the profiler anymore.
-     * The job is now done directly by the Profiler listener and the
-     * data collectors themselves.
-     *
-     * @param Profiler|null $profiler A Profiler instance
-     *
-     * @deprecated Deprecated since version 2.4, to be removed in 3.0.
-     */
-    public function setProfiler(Profiler $profiler = null)
-    {
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -77,7 +61,7 @@ class TraceableEventDispatcher extends BaseTraceableEventDispatcher
     protected function postDispatch($eventName, Event $event)
     {
         switch ($eventName) {
-            case KernelEvents::CONTROLLER:
+            case KernelEvents::CONTROLLER_ARGUMENTS:
                 $this->stopwatch->start('controller', 'section');
                 break;
             case KernelEvents::RESPONSE:

@@ -15,11 +15,9 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
 
 /**
- * Tests for {@see \Symfony\Component\DependencyInjection\Instantiator\RealServiceInstantiator}
+ * Tests for {@see \Symfony\Component\DependencyInjection\Instantiator\RealServiceInstantiator}.
  *
  * @author Marco Pivetta <ocramius@gmail.com>
- *
- * @covers \Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator
  */
 class RealServiceInstantiatorTest extends \PHPUnit_Framework_TestCase
 {

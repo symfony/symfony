@@ -1,0 +1,21 @@
+imports:
+    - { resource: ../config/default.yml }
+
+services:
+    cache.test_redis_connection:
+        public: false
+        class: Redis
+        calls:
+            - [connect, [127.0.0.1]]
+
+    cache.app:
+        parent: cache.adapter.redis
+        tags:
+            - name: cache.pool
+              provider: cache.test_redis_connection
+
+framework:
+    cache:
+        pools:
+            cache.test:
+                public: true

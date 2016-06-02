@@ -17,8 +17,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class BlankValidator extends ConstraintValidator
 {
@@ -32,8 +30,9 @@ class BlankValidator extends ConstraintValidator
         }
 
         if ('' !== $value && null !== $value) {
-            $this->buildViolation($constraint->message)
+            $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Blank::NOT_BLANK_ERROR)
                 ->addViolation();
         }
     }

@@ -13,26 +13,28 @@ namespace Symfony\Component\Form\Guess;
 
 /**
  * Contains a guessed class name and a list of options for creating an instance
- * of that class
+ * of that class.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class TypeGuess extends Guess
 {
     /**
-     * The guessed field type
+     * The guessed field type.
+     *
      * @var string
      */
     private $type;
 
     /**
-     * The guessed options for creating an instance of the guessed class
+     * The guessed options for creating an instance of the guessed class.
+     *
      * @var array
      */
     private $options;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $type       The guessed field type
      * @param array  $options    The options for creating instances of the
@@ -49,7 +51,7 @@ class TypeGuess extends Guess
     }
 
     /**
-     * Returns the guessed field type
+     * Returns the guessed field type.
      *
      * @return string
      */
@@ -59,7 +61,7 @@ class TypeGuess extends Guess
     }
 
     /**
-     * Returns the guessed options for creating instances of the guessed type
+     * Returns the guessed options for creating instances of the guessed type.
      *
      * @return array
      */

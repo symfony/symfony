@@ -19,8 +19,6 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
  * LoaderInterface is the interface implemented by all translation loaders.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface LoaderInterface
 {
@@ -32,8 +30,6 @@ interface LoaderInterface
      * @param string $domain   The domain
      *
      * @return MessageCatalogue A MessageCatalogue instance
-     *
-     * @api
      *
      * @throws NotFoundResourceException when the resource cannot be found
      * @throws InvalidResourceException  when the resource cannot be loaded

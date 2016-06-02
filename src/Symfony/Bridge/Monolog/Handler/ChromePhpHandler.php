@@ -33,7 +33,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
     private $response;
 
     /**
-     * Adds the headers to the response once it's created
+     * Adds the headers to the response once it's created.
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
@@ -41,7 +41,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
             return;
         }
 
-        if (!preg_match('{\bChrome/\d+[\.\d+]*\b}', $event->getRequest()->headers->get('User-Agent'))) {
+        if (!preg_match('{\b(?:Chrome/\d+(?:\.\d+)*|Firefox/(?:4[3-9]|[5-9]\d|\d{3,})(?:\.\d)*)\b}', $event->getRequest()->headers->get('User-Agent'))) {
             $this->sendHeaders = false;
             $this->headers = array();
 
@@ -72,7 +72,7 @@ class ChromePhpHandler extends BaseChromePhpHandler
     }
 
     /**
-     * Override default behavior since we check it in onKernelResponse
+     * Override default behavior since we check it in onKernelResponse.
      */
     protected function headersAccepted()
     {

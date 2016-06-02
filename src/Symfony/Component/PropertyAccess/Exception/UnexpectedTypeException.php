@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyAccess\Exception;
 
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
 /**
  * Thrown when a value does not match an expected type.
  *
@@ -18,8 +20,21 @@ namespace Symfony\Component\PropertyAccess\Exception;
  */
 class UnexpectedTypeException extends RuntimeException
 {
-    public function __construct($value, $expectedType)
+    /**
+     * @param mixed                 $value     The unexpected value found while traversing property path
+     * @param PropertyPathInterface $path      The property path
+     * @param int                   $pathIndex The property path index when the unexpected value was found
+     */
+    public function __construct($value, PropertyPathInterface $path, $pathIndex)
     {
-        parent::__construct(sprintf('Expected argument of type "%s", "%s" given', $expectedType, is_object($value) ? get_class($value) : gettype($value)));
+        $message = sprintf(
+            'PropertyAccessor requires a graph of objects or arrays to operate on, '.
+            'but it found type "%s" while trying to traverse path "%s" at property "%s".',
+            gettype($value),
+            (string) $path,
+            $path->getElement($pathIndex)
+        );
+
+        parent::__construct($message);
     }
 }

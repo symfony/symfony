@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\TwigBundle\Command;
 
 use Symfony\Bridge\Twig\Command\LintCommand as BaseLintCommand;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -22,20 +22,9 @@ use Symfony\Component\Finder\Finder;
  * @author Marc Weistroff <marc.weistroff@sensiolabs.com>
  * @author Jérôme Tamarelle <jerome@tamarelle.net>
  */
-class LintCommand extends BaseLintCommand implements ContainerAwareInterface
+final class LintCommand extends BaseLintCommand implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface|null
-     */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+    use ContainerAwareTrait;
 
     /**
      * {@inheritdoc}
@@ -54,12 +43,12 @@ class LintCommand extends BaseLintCommand implements ContainerAwareInterface
 
         $this
             ->setHelp(
-                $this->getHelp().<<<EOF
-
+                $this->getHelp().<<<'EOF'
 
 Or all template files in a bundle:
 
-<info>php %command.full_name% @AcmeDemoBundle</info>
+  <info>php %command.full_name% @AcmeDemoBundle</info>
+
 EOF
             )
         ;

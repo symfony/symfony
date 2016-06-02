@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -45,14 +44,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
     public function __construct(FormTypeInterface $innerType, array $typeExtensions = array(), ResolvedFormTypeInterface $parent = null)
     {
-        if (!preg_match('/^[a-z0-9_]*$/i', $innerType->getName())) {
-            throw new InvalidArgumentException(sprintf(
-                'The "%s" form type name ("%s") is not valid. Names must only contain letters, numbers, and "_".',
-                get_class($innerType),
-                $innerType->getName()
-            ));
-        }
-
         foreach ($typeExtensions as $extension) {
             if (!$extension instanceof FormTypeExtensionInterface) {
                 throw new UnexpectedTypeException($extension, 'Symfony\Component\Form\FormTypeExtensionInterface');
@@ -67,9 +58,9 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
-        return $this->innerType->getName();
+        return $this->innerType->getBlockPrefix();
     }
 
     /**
@@ -93,11 +84,6 @@ class ResolvedFormType implements ResolvedFormTypeInterface
      */
     public function getTypeExtensions()
     {
-        // BC
-        if ($this->innerType instanceof AbstractType) {
-            return $this->innerType->getExtensions();
-        }
-
         return $this->typeExtensions;
     }
 
@@ -192,7 +178,7 @@ class ResolvedFormType implements ResolvedFormTypeInterface
     /**
      * Returns the configured options resolver used for this type.
      *
-     * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface The options resolver.
+     * @return \Symfony\Component\OptionsResolver\OptionsResolver The options resolver.
      */
     public function getOptionsResolver()
     {
@@ -203,10 +189,10 @@ class ResolvedFormType implements ResolvedFormTypeInterface
                 $this->optionsResolver = new OptionsResolver();
             }
 
-            $this->innerType->setDefaultOptions($this->optionsResolver);
+            $this->innerType->configureOptions($this->optionsResolver);
 
             foreach ($this->typeExtensions as $extension) {
-                $extension->setDefaultOptions($this->optionsResolver);
+                $extension->configureOptions($this->optionsResolver);
             }
         }
 

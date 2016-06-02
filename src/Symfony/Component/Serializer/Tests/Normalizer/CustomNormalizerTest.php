@@ -17,10 +17,22 @@ use Symfony\Component\Serializer\Serializer;
 
 class CustomNormalizerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var CustomNormalizer
+     */
+    private $normalizer;
+
     protected function setUp()
     {
         $this->normalizer = new CustomNormalizer();
         $this->normalizer->setSerializer(new Serializer());
+    }
+
+    public function testInterface()
+    {
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\NormalizerInterface', $this->normalizer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Normalizer\DenormalizerInterface', $this->normalizer);
+        $this->assertInstanceOf('Symfony\Component\Serializer\SerializerAwareInterface', $this->normalizer);
     }
 
     public function testSerialize()

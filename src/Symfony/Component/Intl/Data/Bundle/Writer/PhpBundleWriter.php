@@ -25,7 +25,7 @@ class PhpBundleWriter implements BundleWriterInterface
      */
     public function write($path, $locale, $data)
     {
-        $template = <<<TEMPLATE
+        $template = <<<'TEMPLATE'
 <?php
 
 return %s;

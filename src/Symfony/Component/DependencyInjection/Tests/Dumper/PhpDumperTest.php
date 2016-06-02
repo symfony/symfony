@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Variable;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class PhpDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,21 +39,6 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         new PhpDumper($container);
     }
 
-    public function testDumpFrozenContainerWithNoParameter()
-    {
-        $container = new ContainerBuilder();
-        $container->setResourceTracking(false);
-        $container->register('foo', 'stdClass');
-
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-
-        $dumpedString = $dumper->dump();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services11.php', $dumpedString, '->dump() does not add getDefaultParameters() method call if container have no parameters.');
-        $this->assertNotRegexp("/function getDefaultParameters\(/", $dumpedString, '->dump() does not add getDefaultParameters() method definition.');
-    }
-
     public function testDumpOptimizationString()
     {
         $definition = new Definition();
@@ -63,8 +50,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
             '.' => 'dot as a key',
             '.\'\'.' => 'concatenation as a key',
             '\'\'.' => 'concatenation from the start key',
-            'optimize concatenation' => "string1%some_string%string2",
-            'optimize concatenation with empty string' => "string1%empty_value%string2",
+            'optimize concatenation' => 'string1%some_string%string2',
+            'optimize concatenation with empty string' => 'string1%empty_value%string2',
             'optimize concatenation from the start' => '%empty_value%start',
             'optimize concatenation at the end' => 'end%empty_value%',
         ));
@@ -80,13 +67,43 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services10.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
     }
 
+    public function testDumpRelativeDir()
+    {
+        $definition = new Definition();
+        $definition->setClass('stdClass');
+        $definition->addArgument('%foo%');
+        $definition->addArgument(array('%foo%' => '%buz%/'));
+
+        $container = new ContainerBuilder();
+        $container->setDefinition('test', $definition);
+        $container->setParameter('foo', 'wiz'.dirname(__DIR__));
+        $container->setParameter('bar', __DIR__);
+        $container->setParameter('baz', '%bar%/PhpDumperTest.php');
+        $container->setParameter('buz', dirname(dirname(__DIR__)));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services12.php', $dumper->dump(array('file' => __FILE__)), '->dump() dumps __DIR__ relative strings');
+    }
+
     /**
+     * @dataProvider provideInvalidParameters
      * @expectedException \InvalidArgumentException
      */
-    public function testExportParameters()
+    public function testExportParameters($parameters)
     {
-        $dumper = new PhpDumper(new ContainerBuilder(new ParameterBag(array('foo' => new Reference('foo')))));
+        $dumper = new PhpDumper(new ContainerBuilder(new ParameterBag($parameters)));
         $dumper->dump();
+    }
+
+    public function provideInvalidParameters()
+    {
+        return array(
+            array(array('foo' => new Definition('stdClass'))),
+            array(array('foo' => new Expression('service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")'))),
+            array(array('foo' => new Reference('foo'))),
+            array(array('foo' => new Variable('foo'))),
+        );
     }
 
     public function testAddParameters()
@@ -101,13 +118,13 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         // without compilation
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new PhpDumper($container);
-        $this->assertEquals(str_replace('%path%', str_replace('\\','\\\\',self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9.php')), $dumper->dump(), '->dump() dumps services');
+        $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9.php')), $dumper->dump(), '->dump() dumps services');
 
         // with compilation
         $container = include self::$fixturesPath.'/containers/container9.php';
         $container->compile();
         $dumper = new PhpDumper($container);
-        $this->assertEquals(str_replace('%path%', str_replace('\\','\\\\',self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9_compiled.php')), $dumper->dump(), '->dump() dumps services');
+        $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9_compiled.php')), $dumper->dump(), '->dump() dumps services');
 
         $dumper = new PhpDumper($container = new ContainerBuilder());
         $container->register('foo', 'FooClass')->addArgument(new \stdClass());
@@ -128,16 +145,71 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Service id "bar$" cannot be converted to a valid PHP method name.
-     */
-    public function testAddServiceInvalidServiceId()
+    public function testAddServiceIdWithUnsupportedCharacters()
     {
+        $class = 'Symfony_DI_PhpDumper_Test_Unsupported_Characters';
         $container = new ContainerBuilder();
         $container->register('bar$', 'FooClass');
+        $container->register('bar$!', 'FooClass');
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => $class)));
+
+        $this->assertTrue(method_exists($class, 'getBarService'));
+        $this->assertTrue(method_exists($class, 'getBar2Service'));
+    }
+
+    public function testConflictingServiceIds()
+    {
+        $class = 'Symfony_DI_PhpDumper_Test_Conflicting_Service_Ids';
+        $container = new ContainerBuilder();
+        $container->register('foo_bar', 'FooClass');
+        $container->register('foobar', 'FooClass');
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => $class)));
+
+        $this->assertTrue(method_exists($class, 'getFooBarService'));
+        $this->assertTrue(method_exists($class, 'getFoobar2Service'));
+    }
+
+    public function testConflictingMethodsWithParent()
+    {
+        $class = 'Symfony_DI_PhpDumper_Test_Conflicting_Method_With_Parent';
+        $container = new ContainerBuilder();
+        $container->register('bar', 'FooClass');
+        $container->register('foo_bar', 'FooClass');
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array(
+            'class' => $class,
+            'base_class' => 'Symfony\Component\DependencyInjection\Tests\Fixtures\containers\CustomContainer',
+        )));
+
+        $this->assertTrue(method_exists($class, 'getBar2Service'));
+        $this->assertTrue(method_exists($class, 'getFoobar2Service'));
+    }
+
+    /**
+     * @dataProvider provideInvalidFactories
+     * @expectedException Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot dump definition
+     */
+    public function testInvalidFactories($factory)
+    {
+        $container = new ContainerBuilder();
+        $def = new Definition('stdClass');
+        $def->setFactory($factory);
+        $container->setDefinition('bar', $def);
         $dumper = new PhpDumper($container);
         $dumper->dump();
+    }
+
+    public function provideInvalidFactories()
+    {
+        return array(
+            array(array('', 'method')),
+            array(array('class', '')),
+            array(array('...', 'method')),
+            array(array('class', '...')),
+        );
     }
 
     public function testAliases()
@@ -203,5 +275,13 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper = new PhpDumper($container);
         $dumper->dump();
+    }
+
+    public function testDumpAutowireData()
+    {
+        $container = include self::$fixturesPath.'/containers/container24.php';
+        $dumper = new PhpDumper($container);
+
+        $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services24.php'), $dumper->dump());
     }
 }

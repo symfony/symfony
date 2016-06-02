@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @Symfony\Component\Validator\Tests\Fixtures\ConstraintA
@@ -64,7 +64,7 @@ class Entity extends EntityParent implements EntityInterface
     }
 
     /**
-     * @Assert\True
+     * @Assert\IsTrue
      */
     public function isValid()
     {
@@ -72,7 +72,7 @@ class Entity extends EntityParent implements EntityInterface
     }
 
     /**
-     * @Assert\True
+     * @Assert\IsTrue
      */
     public function hasPermissions()
     {
@@ -85,7 +85,7 @@ class Entity extends EntityParent implements EntityInterface
     }
 
     /**
-     * @Assert\Callback
+     * @Assert\Callback(payload="foo")
      */
     public function validateMe(ExecutionContextInterface $context)
     {

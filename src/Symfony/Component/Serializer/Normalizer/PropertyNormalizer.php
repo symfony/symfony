@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\RuntimeException;
-
 /**
  * Converts between objects and arrays by mapping properties.
  *
@@ -29,144 +26,16 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * property with the corresponding name exists. If found, the property gets the value.
  *
  * @author Matthieu Napoli <matthieu@mnapoli.fr>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PropertyNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
+class PropertyNormalizer extends AbstractObjectNormalizer
 {
-    private $callbacks = array();
-    private $ignoredAttributes = array();
-    private $camelizedAttributes = array();
-
-    /**
-     * Set normalization callbacks
-     *
-     * @param array $callbacks help normalize the result
-     *
-     * @throws InvalidArgumentException if a non-callable callback is set
-     */
-    public function setCallbacks(array $callbacks)
-    {
-        foreach ($callbacks as $attribute => $callback) {
-            if (!is_callable($callback)) {
-                throw new InvalidArgumentException(sprintf(
-                    'The given callback for attribute "%s" is not callable.',
-                    $attribute
-                ));
-            }
-        }
-        $this->callbacks = $callbacks;
-    }
-
-    /**
-     * Set ignored attributes for normalization.
-     *
-     * @param array $ignoredAttributes
-     */
-    public function setIgnoredAttributes(array $ignoredAttributes)
-    {
-        $this->ignoredAttributes = $ignoredAttributes;
-    }
-
-    /**
-     * Set attributes to be camelized on denormalize
-     *
-     * @param array $camelizedAttributes
-     */
-    public function setCamelizedAttributes(array $camelizedAttributes)
-    {
-        $this->camelizedAttributes = $camelizedAttributes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize($object, $format = null, array $context = array())
-    {
-        $reflectionObject = new \ReflectionObject($object);
-        $attributes = array();
-
-        foreach ($reflectionObject->getProperties() as $property) {
-            if (in_array($property->name, $this->ignoredAttributes)) {
-                continue;
-            }
-
-            // Override visibility
-            if (! $property->isPublic()) {
-                $property->setAccessible(true);
-            }
-
-            $attributeValue = $property->getValue($object);
-
-            if (array_key_exists($property->name, $this->callbacks)) {
-                $attributeValue = call_user_func($this->callbacks[$property->name], $attributeValue);
-            }
-            if (null !== $attributeValue && !is_scalar($attributeValue)) {
-                $attributeValue = $this->serializer->normalize($attributeValue, $format);
-            }
-
-            $attributes[$property->name] = $attributeValue;
-        }
-
-        return $attributes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, $class, $format = null, array $context = array())
-    {
-        $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
-
-        if ($constructor) {
-            $constructorParameters = $constructor->getParameters();
-
-            $params = array();
-            foreach ($constructorParameters as $constructorParameter) {
-                $paramName = lcfirst($this->formatAttribute($constructorParameter->name));
-
-                if (isset($data[$paramName])) {
-                    $params[] = $data[$paramName];
-                    // don't run set for a parameter passed to the constructor
-                    unset($data[$paramName]);
-                } elseif (!$constructorParameter->isOptional()) {
-                    throw new RuntimeException(sprintf(
-                        'Cannot create an instance of %s from serialized data because '.
-                        'its constructor requires parameter "%s" to be present.',
-                        $class,
-                        $constructorParameter->name
-                    ));
-                }
-            }
-
-            $object = $reflectionClass->newInstanceArgs($params);
-        } else {
-            $object = new $class();
-        }
-
-        foreach ($data as $propertyName => $value) {
-            $propertyName = lcfirst($this->formatAttribute($propertyName));
-
-            if ($reflectionClass->hasProperty($propertyName)) {
-                $property = $reflectionClass->getProperty($propertyName);
-
-                // Override visibility
-                if (! $property->isPublic()) {
-                    $property->setAccessible(true);
-                }
-
-                $property->setValue($object, $value);
-            }
-        }
-
-        return $object;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && $this->supports(get_class($data));
+        return parent::supportsNormalization($data, $format) && $this->supports(get_class($data));
     }
 
     /**
@@ -174,25 +43,7 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $this->supports($type);
-    }
-
-    /**
-     * Format an attribute name, for example to convert a snake_case name to camelCase.
-     *
-     * @param  string $attributeName
-     *
-     * @return string
-     */
-    protected function formatAttribute($attributeName)
-    {
-        if (in_array($attributeName, $this->camelizedAttributes)) {
-            return preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
-                return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-            }, $attributeName);
-        }
-
-        return $attributeName;
+        return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
 
     /**
@@ -208,11 +59,93 @@ class PropertyNormalizer extends SerializerAwareNormalizer implements Normalizer
 
         // We look for at least one non-static property
         foreach ($class->getProperties() as $property) {
-            if (! $property->isStatic()) {
+            if (!$property->isStatic()) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
+    {
+        if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
+            return false;
+        }
+
+        try {
+            $reflectionProperty = new \ReflectionProperty(is_string($classOrObject) ? $classOrObject : get_class($classOrObject), $attribute);
+            if ($reflectionProperty->isStatic()) {
+                return false;
+            }
+        } catch (\ReflectionException $reflectionException) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function extractAttributes($object, $format = null, array $context = array())
+    {
+        $reflectionObject = new \ReflectionObject($object);
+        $attributes = array();
+
+        foreach ($reflectionObject->getProperties() as $property) {
+            if (!$this->isAllowedAttribute($object, $property->name)) {
+                continue;
+            }
+
+            $attributes[] = $property->name;
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = array())
+    {
+        try {
+            $reflectionProperty = new \ReflectionProperty(get_class($object), $attribute);
+        } catch (\ReflectionException $reflectionException) {
+            return;
+        }
+
+        // Override visibility
+        if (!$reflectionProperty->isPublic()) {
+            $reflectionProperty->setAccessible(true);
+        }
+
+        return $reflectionProperty->getValue($object);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array())
+    {
+        try {
+            $reflectionProperty = new \ReflectionProperty(get_class($object), $attribute);
+        } catch (\ReflectionException $reflectionException) {
+            return;
+        }
+
+        if ($reflectionProperty->isStatic()) {
+            return;
+        }
+
+        // Override visibility
+        if (!$reflectionProperty->isPublic()) {
+            $reflectionProperty->setAccessible(true);
+        }
+
+        $reflectionProperty->setValue($object, $value);
     }
 }

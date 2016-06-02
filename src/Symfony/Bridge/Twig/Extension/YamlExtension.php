@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Yaml\Dumper as YamlDumper;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Provides integration of the Yaml component with Twig.
@@ -31,12 +32,24 @@ class YamlExtension extends \Twig_Extension
         );
     }
 
-    public function encode($input, $inline = 0, $dumpObjects = false)
+    public function encode($input, $inline = 0, $dumpObjects = 0)
     {
         static $dumper;
 
         if (null === $dumper) {
             $dumper = new YamlDumper();
+        }
+
+        if (defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
+            if (is_bool($dumpObjects)) {
+                @trigger_error('Passing a boolean flag to toggle object support is deprecated since version 3.1 and will be removed in 4.0. Use the Yaml::DUMP_OBJECT flag instead.', E_USER_DEPRECATED);
+
+                $flags = $dumpObjects ? Yaml::DUMP_OBJECT : 0;
+            } else {
+                $flags = $dumpObjects;
+            }
+
+            return $dumper->dump($input, $inline, 0, $flags);
         }
 
         return $dumper->dump($input, $inline, 0, false, $dumpObjects);
@@ -56,9 +69,7 @@ class YamlExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {

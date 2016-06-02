@@ -1,4 +1,5 @@
 <?php
+
 namespace {
     trait TFoo
     {

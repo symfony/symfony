@@ -22,13 +22,15 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class MergeCollectionListener implements EventSubscriberInterface
 {
     /**
-     * Whether elements may be added to the collection
+     * Whether elements may be added to the collection.
+     *
      * @var bool
      */
     private $allowAdd;
 
     /**
-     * Whether elements may be removed from the collection
+     * Whether elements may be removed from the collection.
+     *
      * @var bool
      */
     private $allowDelete;
@@ -72,7 +74,7 @@ class MergeCollectionListener implements EventSubscriberInterface
         }
 
         // If we are not allowed to change anything, return immediately
-        if ((!$this->allowAdd && !$this->allowDelete) || $data === $dataToMergeInto) {
+        if ($data === $dataToMergeInto || (!$this->allowAdd && !$this->allowDelete)) {
             $event->setData($dataToMergeInto);
 
             return;
@@ -122,16 +124,5 @@ class MergeCollectionListener implements EventSubscriberInterface
         }
 
         $event->setData($dataToMergeInto);
-    }
-
-    /**
-     * Alias of {@link onSubmit()}.
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link onSubmit()} instead.
-     */
-    public function onBind(FormEvent $event)
-    {
-        $this->onSubmit($event);
     }
 }

@@ -54,7 +54,7 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
      */
     public function setMaxRunningTime($maxRunningTime)
     {
-        if (is_integer($maxRunningTime) && $maxRunningTime >= 0) {
+        if (is_int($maxRunningTime) && $maxRunningTime >= 0) {
             $this->maxRunningTime = $maxRunningTime;
         } else {
             throw new \InvalidArgumentException();

@@ -12,12 +12,13 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimezoneType extends AbstractType
 {
     /**
-     * Stores the available timezone choices
+     * Stores the available timezone choices.
+     *
      * @var array
      */
     private static $timezones;
@@ -25,10 +26,11 @@ class TimezoneType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'choices' => self::getTimezones(),
+            'choice_translation_domain' => false,
         ));
     }
 
@@ -37,13 +39,13 @@ class TimezoneType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return __NAMESPACE__.'\ChoiceType';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'timezone';
     }
@@ -58,10 +60,10 @@ class TimezoneType extends AbstractType
      *
      * @return array The timezone choices
      */
-    public static function getTimezones()
+    private static function getTimezones()
     {
-        if (null === static::$timezones) {
-            static::$timezones = array();
+        if (null === self::$timezones) {
+            self::$timezones = array();
 
             foreach (\DateTimeZone::listIdentifiers() as $timezone) {
                 $parts = explode('/', $timezone);
@@ -77,10 +79,10 @@ class TimezoneType extends AbstractType
                     $name = $parts[0];
                 }
 
-                static::$timezones[$region][$timezone] = str_replace('_', ' ', $name);
+                self::$timezones[$region][str_replace('_', ' ', $name)] = $timezone;
             }
         }
 
-        return static::$timezones;
+        return self::$timezones;
     }
 }

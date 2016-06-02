@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition;
 
 use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends \PHPUnit_Framework_TestCase
@@ -27,7 +28,7 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Unrecognized options "foo" under "root"
+     * @expectedExceptionMessage Unrecognized option "foo" under "root"
      */
     public function testExceptionThrownOnUnrecognizedChild()
     {
@@ -35,19 +36,30 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
         $node->normalize(array('foo' => 'bar'));
     }
 
-    /**
-     * Tests that no exception is thrown for an unrecognized child if the
-     * ignoreExtraKeys option is set to true.
-     *
-     * Related to testExceptionThrownOnUnrecognizedChild
-     */
-    public function testIgnoreExtraKeysNoException()
+    public function ignoreAndRemoveMatrixProvider()
     {
-        $node = new ArrayNode('roo');
-        $node->setIgnoreExtraKeys(true);
+        $unrecognizedOptionException = new InvalidConfigurationException('Unrecognized option "foo" under "root"');
 
-        $node->normalize(array('foo' => 'bar'));
-        $this->assertTrue(true, 'No exception was thrown when setIgnoreExtraKeys is true');
+        return array(
+            array(true, true, array(), 'no exception is thrown for an unrecognized child if the ignoreExtraKeys option is set to true'),
+            array(true, false, array('foo' => 'bar'), 'extra keys are not removed when ignoreExtraKeys second option is set to false'),
+            array(false, true, $unrecognizedOptionException),
+            array(false, false, $unrecognizedOptionException),
+        );
+    }
+
+    /**
+     * @dataProvider ignoreAndRemoveMatrixProvider
+     */
+    public function testIgnoreAndRemoveBehaviors($ignore, $remove, $expected, $message = '')
+    {
+        if ($expected instanceof \Exception) {
+            $this->setExpectedException(get_class($expected), $expected->getMessage());
+        }
+        $node = new ArrayNode('root');
+        $node->setIgnoreExtraKeys($ignore, $remove);
+        $result = $node->normalize(array('foo' => 'bar'));
+        $this->assertSame($expected, $result, $message);
     }
 
     /**
@@ -73,6 +85,10 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
             array(
                 array('foo-bar_moo' => 'foo'),
                 array('foo-bar_moo' => 'foo'),
+            ),
+            array(
+                array('anything-with-dash-and-no-underscore' => 'first', 'no_dash' => 'second'),
+                array('anything_with_dash_and_no_underscore' => 'first', 'no_dash' => 'second'),
             ),
             array(
                 array('foo-bar' => null, 'foo_bar' => 'foo'),
@@ -116,10 +132,10 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
                     'string_key' => 'just value',
                 ),
                 array(
-                    0 => array (
+                    0 => array(
                         'name' => 'something',
                     ),
-                    5 => array (
+                    5 => array(
                         0 => 'this won\'t work too',
                         'new_key' => 'some other value',
                     ),

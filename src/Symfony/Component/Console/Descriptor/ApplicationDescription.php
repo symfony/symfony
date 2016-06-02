@@ -13,9 +13,12 @@ namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class ApplicationDescription
 {
@@ -87,12 +90,12 @@ class ApplicationDescription
      *
      * @return Command
      *
-     * @throws \InvalidArgumentException
+     * @throws CommandNotFoundException
      */
     public function getCommand($name)
     {
         if (!isset($this->commands[$name]) && !isset($this->aliases[$name])) {
-            throw new \InvalidArgumentException(sprintf('Command %s does not exist.', $name));
+            throw new CommandNotFoundException(sprintf('Command %s does not exist.', $name));
         }
 
         return isset($this->commands[$name]) ? $this->commands[$name] : $this->aliases[$name];
@@ -134,19 +137,23 @@ class ApplicationDescription
     private function sortCommands(array $commands)
     {
         $namespacedCommands = array();
+        $globalCommands = array();
         foreach ($commands as $name => $command) {
             $key = $this->application->extractNamespace($name, 1);
             if (!$key) {
-                $key = '_global';
+                $globalCommands['_global'][$name] = $command;
+            } else {
+                $namespacedCommands[$key][$name] = $command;
             }
-
-            $namespacedCommands[$key][$name] = $command;
         }
         ksort($namespacedCommands);
+        $namespacedCommands = array_merge($globalCommands, $namespacedCommands);
 
-        foreach ($namespacedCommands as &$commands) {
-            ksort($commands);
+        foreach ($namespacedCommands as &$commandsSet) {
+            ksort($commandsSet);
         }
+        // unset reference to keep scope clear
+        unset($commandsSet);
 
         return $namespacedCommands;
     }

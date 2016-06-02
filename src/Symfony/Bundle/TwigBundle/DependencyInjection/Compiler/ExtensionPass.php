@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -37,6 +38,42 @@ class ExtensionPass implements CompilerPassInterface
 
         if ($container->has('fragment.handler')) {
             $container->getDefinition('twig.extension.httpkernel')->addTag('twig.extension');
+
+            // inject Twig in the hinclude service if Twig is the only registered templating engine
+            if (
+                !$container->hasParameter('templating.engines')
+                || array('twig') == $container->getParameter('templating.engines')
+            ) {
+                $container->getDefinition('fragment.renderer.hinclude')
+                    ->addTag('kernel.fragment_renderer', array('alias' => 'hinclude'))
+                    ->replaceArgument(0, new Reference('twig'))
+                ;
+            }
+        }
+
+        if ($container->has('request_stack')) {
+            $container->getDefinition('twig.extension.httpfoundation')->addTag('twig.extension');
+        }
+
+        if ($container->hasParameter('templating.helper.code.file_link_format')) {
+            $container->getDefinition('twig.extension.code')->replaceArgument(0, $container->getParameter('templating.helper.code.file_link_format'));
+        }
+
+        if ($container->getParameter('kernel.debug')) {
+            $container->getDefinition('twig.extension.profiler')->addTag('twig.extension');
+            $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
+        }
+
+        if (!$container->has('templating')) {
+            $loader = $container->getDefinition('twig.loader.native_filesystem');
+            $loader->addTag('twig.loader');
+            $loader->setMethodCalls($container->getDefinition('twig.loader.filesystem')->getMethodCalls());
+
+            $container->setDefinition('twig.loader.filesystem', $loader);
+        }
+
+        if ($container->has('assets.packages')) {
+            $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
         }
     }
 }

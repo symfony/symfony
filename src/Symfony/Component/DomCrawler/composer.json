@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony DomCrawler Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,26 +12,29 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.5.9",
+        "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "symfony/css-selector": "~2.0"
+        "symfony/css-selector": "~2.8|~3.0"
     },
     "suggest": {
         "symfony/css-selector": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\DomCrawler\\": "" }
+        "psr-4": { "Symfony\\Component\\DomCrawler\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
-    "target-dir": "Symfony/Component/DomCrawler",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "3.2-dev"
         }
     }
 }

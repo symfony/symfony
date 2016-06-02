@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
-use Symfony\Component\Validator\ValidationVisitorInterface;
 
 /**
  * Default implementation of {@link ClassMetadataInterface}.
@@ -27,7 +26,7 @@ use Symfony\Component\Validator\ValidationVisitorInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
+class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 {
     /**
      * @var string
@@ -111,7 +110,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     private $reflClass;
 
     /**
-     * Constructs a metadata for the given class
+     * Constructs a metadata for the given class.
      *
      * @param string $class
      */
@@ -123,45 +122,6 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
             $this->defaultGroup = substr($class, $nsSep + 1);
         } else {
             $this->defaultGroup = $class;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @deprecated Deprecated since version 2.5, to be removed in Symfony 3.0.
-     */
-    public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath, $propagatedGroup = null)
-    {
-        if (null === $propagatedGroup && Constraint::DEFAULT_GROUP === $group
-                && ($this->hasGroupSequence() || $this->isGroupSequenceProvider())) {
-            if ($this->hasGroupSequence()) {
-                $groups = $this->getGroupSequence();
-            } else {
-                $groups = $value->getGroupSequence();
-            }
-
-            foreach ($groups as $group) {
-                $this->accept($visitor, $value, $group, $propertyPath, Constraint::DEFAULT_GROUP);
-
-                if (count($visitor->getViolations()) > 0) {
-                    break;
-                }
-            }
-
-            return;
-        }
-
-        $visitor->visit($this, $value, $group, $propertyPath);
-
-        if (null !== $value) {
-            $pathPrefix = empty($propertyPath) ? '' : $propertyPath.'.';
-
-            foreach ($this->getConstrainedProperties() as $property) {
-                foreach ($this->getPropertyMetadata($property) as $member) {
-                    $member->accept($visitor, $member->getPropertyValue($value), $group, $pathPrefix.$property, $propagatedGroup);
-                }
-            }
         }
     }
 
@@ -195,7 +155,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     }
 
     /**
-     * Returns the name of the default group for this class
+     * Returns the name of the default group for this class.
      *
      * For each class, the group "Default" is an alias for the group
      * "<ClassName>", where <ClassName> is the non-namespaced name of the
@@ -207,7 +167,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      * will validate the group sequence. The constraints assigned to "Default"
      * can still be validated by validating the class in "<ClassName>".
      *
-     * @return string  The name of the default group
+     * @return string The name of the default group
      */
     public function getDefaultGroup()
     {
@@ -367,46 +327,6 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     }
 
     /**
-     * Adds a member metadata.
-     *
-     * @param MemberMetadata $metadata
-     *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0.
-     */
-    protected function addMemberMetadata(MemberMetadata $metadata)
-    {
-        $this->addPropertyMetadata($metadata);
-    }
-
-    /**
-     * Returns true if metadatas of members is present for the given property.
-     *
-     * @param string $property The name of the property
-     *
-     * @return bool
-     *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use {@link hasPropertyMetadata} instead.
-     */
-    public function hasMemberMetadatas($property)
-    {
-        return $this->hasPropertyMetadata($property);
-    }
-
-    /**
-     * Returns all metadatas of members describing the given property.
-     *
-     * @param string $property The name of the property
-     *
-     * @return MemberMetadata[] An array of MemberMetadata
-     *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use {@link getPropertyMetadata} instead.
-     */
-    public function getMemberMetadatas($property)
-    {
-        return $this->getPropertyMetadata($property);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function hasPropertyMetadata($property)
@@ -471,7 +391,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
      */
     public function hasGroupSequence()
     {
-        return count($this->groupSequence) > 0;
+        return $this->groupSequence && count($this->groupSequence->groups) > 0;
     }
 
     /**
@@ -499,7 +419,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
     /**
      * Sets whether a group sequence provider should be used.
      *
-     * @param bool    $active
+     * @param bool $active
      *
      * @throws GroupDefinitionException
      */

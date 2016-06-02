@@ -15,6 +15,7 @@ namespace Symfony\Component\Security\Csrf\TokenStorage;
  * Stores CSRF tokens.
  *
  * @since  2.4
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface TokenStorageInterface
@@ -53,7 +54,7 @@ interface TokenStorageInterface
      *
      * @param string $tokenId The token ID
      *
-     * @return bool    Whether a token exists with the given ID
+     * @return bool Whether a token exists with the given ID
      */
     public function hasToken($tokenId);
 }

@@ -1,0 +1,64 @@
+build: false
+clone_depth: 1
+clone_folder: c:\projects\symfony
+
+cache:
+    - c:\php -> appveyor.yml
+    - .phpunit -> phpunit
+
+init:
+    - SET PATH=c:\php;%PATH%
+    - SET COMPOSER_NO_INTERACTION=1
+    - SET SYMFONY_DEPRECATIONS_HELPER=strict
+    - SET PHP=1
+    - SET ANSICON=121x90 (121x90)
+    - SET SYMFONY_PHPUNIT_SKIPPED_TESTS=phpunit.skipped
+    - REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Command Processor" /v DelayedExpansion /t REG_DWORD /d 1 /f
+
+install:
+    - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
+    - cd c:\php
+    - IF %PHP%==1 appveyor DownloadFile https://raw.githubusercontent.com/symfony/binary-utils/master/cacert.pem
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/php-5.5.9-nts-Win32-VC11-x86.zip
+    - IF %PHP%==1 7z x php-5.5.9-nts-Win32-VC11-x86.zip -y >nul
+    - IF %PHP%==1 del /Q *.zip
+    - IF %PHP%==1 cd ext
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/apcu/4.0.10/php_apcu-4.0.10-5.5-nts-vc11-x86.zip
+    - IF %PHP%==1 7z x php_apcu-4.0.10-5.5-nts-vc11-x86.zip -y >nul
+    - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/pecl/releases/memcache/3.0.8/php_memcache-3.0.8-5.5-nts-vc11-x86.zip
+    - IF %PHP%==1 7z x php_memcache-3.0.8-5.5-nts-vc11-x86.zip -y >nul
+    - IF %PHP%==1 del /Q *.zip
+    - IF %PHP%==1 cd ..
+    - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+    - IF %PHP%==1 copy /Y php.ini-development php.ini-min
+    - IF %PHP%==1 echo max_execution_time=1200 >> php.ini-min
+    - IF %PHP%==1 echo date.timezone="UTC" >> php.ini-min
+    - IF %PHP%==1 echo extension_dir=ext >> php.ini-min
+    - IF %PHP%==1 copy /Y php.ini-min php.ini-max
+    - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_apcu.dll >> php.ini-max
+    - IF %PHP%==1 echo apc.enable_cli=1 >> php.ini-max
+    - IF %PHP%==1 echo extension=php_memcache.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_intl.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_pdo_sqlite.dll >> php.ini-max
+    - IF %PHP%==1 echo extension=php_curl.dll >> php.ini-max
+    - IF %PHP%==1 echo curl.cainfo=c:\php\cacert.pem >> php.ini-max
+    - IF %PHP%==1 appveyor DownloadFile https://getcomposer.org/download/1.0.3/composer.phar
+    - copy /Y php.ini-max php.ini
+    - cd c:\projects\symfony
+    - mkdir %APPDATA%\Composer
+    - copy /Y .composer\* %APPDATA%\Composer\
+    - php phpunit install
+    - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
+    - composer update --no-progress --ansi
+
+test_script:
+    - cd c:\projects\symfony
+    - SET X=0
+    - copy /Y c:\php\php.ini-min c:\php\php.ini
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
+    - copy /Y c:\php\php.ini-max c:\php\php.ini
+    - php phpunit symfony --exclude-group benchmark,intl-data || SET X=!errorlevel!
+    - exit %X%

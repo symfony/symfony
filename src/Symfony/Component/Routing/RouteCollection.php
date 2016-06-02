@@ -22,8 +22,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @api
  */
 class RouteCollection implements \IteratorAggregate, \Countable
 {
@@ -73,8 +71,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @param string $name  The route name
      * @param Route  $route A Route instance
-     *
-     * @api
      */
     public function add($name, Route $route)
     {
@@ -106,7 +102,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Removes a route or an array of routes by name from the collection
+     * Removes a route or an array of routes by name from the collection.
      *
      * @param string|array $name The route name or an array of route names
      */
@@ -121,9 +117,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * Adds a route collection at the end of the current set by appending all
      * routes of the added collection.
      *
-     * @param RouteCollection $collection      A RouteCollection instance
-     *
-     * @api
+     * @param RouteCollection $collection A RouteCollection instance
      */
     public function addCollection(RouteCollection $collection)
     {
@@ -143,8 +137,6 @@ class RouteCollection implements \IteratorAggregate, \Countable
      * @param string $prefix       An optional prefix to add before each pattern of the route collection
      * @param array  $defaults     An array of default values
      * @param array  $requirements An array of requirements
-     *
-     * @api
      */
     public function addPrefix($prefix, array $defaults = array(), array $requirements = array())
     {

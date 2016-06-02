@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -25,7 +25,7 @@ use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
  *     <webprofiler:config
  *        toolbar="true"
  *        intercept-redirects="true"
- *    />
+ *     />
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

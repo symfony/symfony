@@ -18,8 +18,6 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  * This definition decorates another definition.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- *
- * @api
  */
 class DefinitionDecorator extends Definition
 {
@@ -27,11 +25,7 @@ class DefinitionDecorator extends Definition
     private $changes = array();
 
     /**
-     * Constructor.
-     *
      * @param string $parent The id of Definition instance to decorate.
-     *
-     * @api
      */
     public function __construct($parent)
     {
@@ -44,8 +38,6 @@ class DefinitionDecorator extends Definition
      * Returns the Definition being decorated.
      *
      * @return string
-     *
-     * @api
      */
     public function getParent()
     {
@@ -56,8 +48,6 @@ class DefinitionDecorator extends Definition
      * Returns all changes tracked for the Definition object.
      *
      * @return array An array of changes for this Definition
-     *
-     * @api
      */
     public function getChanges()
     {
@@ -66,8 +56,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setClass($class)
     {
@@ -88,44 +76,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
-     */
-    public function setFactoryClass($class)
-    {
-        $this->changes['factory_class'] = true;
-
-        return parent::setFactoryClass($class);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function setFactoryMethod($method)
-    {
-        $this->changes['factory_method'] = true;
-
-        return parent::setFactoryMethod($method);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function setFactoryService($service)
-    {
-        $this->changes['factory_service'] = true;
-
-        return parent::setFactoryService($service);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @api
      */
     public function setConfigurator($callable)
     {
@@ -136,8 +86,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setFile($file)
     {
@@ -148,8 +96,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setPublic($boolean)
     {
@@ -160,8 +106,6 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function setLazy($boolean)
     {
@@ -171,18 +115,36 @@ class DefinitionDecorator extends Definition
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setDecoratedService($id, $renamedId = null, $priority = 0)
+    {
+        $this->changes['decorated_service'] = true;
+
+        return parent::setDecoratedService($id, $renamedId, $priority);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDeprecated($boolean = true, $template = null)
+    {
+        $this->changes['deprecated'] = true;
+
+        return parent::setDeprecated($boolean, $template);
+    }
+
+    /**
      * Gets an argument to pass to the service constructor/factory method.
      *
      * If replaceArgument() has been used to replace an argument, this method
      * will return the replacement value.
      *
-     * @param int     $index
+     * @param int $index
      *
      * @return mixed The argument value
      *
      * @throws OutOfBoundsException When the argument does not exist
-     *
-     * @api
      */
     public function getArgument($index)
     {
@@ -207,13 +169,12 @@ class DefinitionDecorator extends Definition
      * certain conventions when you want to overwrite the arguments of the
      * parent definition, otherwise your arguments will only be appended.
      *
-     * @param int     $index
-     * @param mixed   $value
+     * @param int   $index
+     * @param mixed $value
      *
      * @return DefinitionDecorator the current instance
-     * @throws InvalidArgumentException when $index isn't an integer
      *
-     * @api
+     * @throws InvalidArgumentException when $index isn't an integer
      */
     public function replaceArgument($index, $value)
     {

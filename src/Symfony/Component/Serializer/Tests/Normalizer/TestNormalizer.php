@@ -21,15 +21,15 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class TestNormalizer implements NormalizerInterface
 {
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function normalize($object, $format = null, array $context = array())
     {
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function supportsNormalization($data, $format = null)
     {
         return true;

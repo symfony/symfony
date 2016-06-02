@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>Questo campo è manca.</target>
+                <target>Questo campo è mancante.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
@@ -301,6 +301,18 @@
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
                 <target>Un file vuoto non è consentito.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>L'host non può essere risolto.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Questo valore non corrisponde al charset {{ charset }}.</target>
+            </trans-unit>
+            <trans-unit id="81">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>Questo valore non è un codice BIC valido.</target>
             </trans-unit>
         </body>
     </file>

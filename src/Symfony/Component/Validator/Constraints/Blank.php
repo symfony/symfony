@@ -18,10 +18,14 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Blank extends Constraint
 {
+    const NOT_BLANK_ERROR = '183ad2de-533d-4796-a439-6d3c3852b549';
+
+    protected static $errorNames = array(
+        self::NOT_BLANK_ERROR => 'NOT_BLANK_ERROR',
+    );
+
     public $message = 'This value should be blank.';
 }

@@ -61,67 +61,78 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class Form implements \IteratorAggregate, FormInterface
 {
     /**
-     * The form's configuration
+     * The form's configuration.
+     *
      * @var FormConfigInterface
      */
     private $config;
 
     /**
-     * The parent of this form
+     * The parent of this form.
+     *
      * @var FormInterface
      */
     private $parent;
 
     /**
-     * The children of this form
+     * The children of this form.
+     *
      * @var FormInterface[] A map of FormInterface instances
      */
     private $children;
 
     /**
-     * The errors of this form
+     * The errors of this form.
+     *
      * @var FormError[] An array of FormError instances
      */
     private $errors = array();
 
     /**
-     * Whether this form was submitted
+     * Whether this form was submitted.
+     *
      * @var bool
      */
     private $submitted = false;
 
     /**
-     * The button that was used to submit the form
+     * The button that was used to submit the form.
+     *
      * @var Button
      */
     private $clickedButton;
 
     /**
-     * The form data in model format
+     * The form data in model format.
+     *
      * @var mixed
      */
     private $modelData;
 
     /**
-     * The form data in normalized format
+     * The form data in normalized format.
+     *
      * @var mixed
      */
     private $normData;
 
     /**
-     * The form data in view format
+     * The form data in view format.
+     *
      * @var mixed
      */
     private $viewData;
 
     /**
-     * The submitted values that don't belong to any children
+     * The submitted values that don't belong to any children.
+     *
      * @var array
      */
     private $extraData = array();
 
     /**
-     * Returns the transformation failure generated during submission, if any
+     * Returns the transformation failure generated during submission, if any.
+     *
      * @var TransformationFailedException|null
      */
     private $transformationFailure;
@@ -142,6 +153,7 @@ class Form implements \IteratorAggregate, FormInterface
 
     /**
      * Whether setData() is currently being called.
+     *
      * @var bool
      */
     private $lockSetData = false;
@@ -343,21 +355,11 @@ class Form implements \IteratorAggregate, FormInterface
         if (!FormUtil::isEmpty($viewData)) {
             $dataClass = $this->config->getDataClass();
 
-            $actualType = is_object($viewData) ? 'an instance of class '.get_class($viewData) : ' a(n) '.gettype($viewData);
-
-            if (null === $dataClass && is_object($viewData) && !$viewData instanceof \ArrayAccess) {
-                $expectedType = 'scalar, array or an instance of \ArrayAccess';
-
-                throw new LogicException(
-                    'The form\'s view data is expected to be of type '.$expectedType.', '.
-                    'but is '.$actualType.'. You '.
-                    'can avoid this error by setting the "data_class" option to '.
-                    '"'.get_class($viewData).'" or by adding a view transformer '.
-                    'that transforms '.$actualType.' to '.$expectedType.'.'
-                );
-            }
-
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
+                $actualType = is_object($viewData)
+                    ? 'an instance of class '.get_class($viewData)
+                    : 'a(n) '.gettype($viewData);
+
                 throw new LogicException(
                     'The form\'s view data is expected to be an instance of class '.
                     $dataClass.', but is '.$actualType.'. You can avoid this error '.
@@ -657,26 +659,15 @@ class Form implements \IteratorAggregate, FormInterface
     }
 
     /**
-     * Alias of {@link submit()}.
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link submit()} instead.
-     */
-    public function bind($submittedData)
-    {
-        return $this->submit($submittedData);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function addError(FormError $error)
     {
-        if ($this->parent && $this->config->getErrorBubbling()) {
-            if (null === $error->getOrigin()) {
-                $error->setOrigin($this);
-            }
+        if (null === $error->getOrigin()) {
+            $error->setOrigin($this);
+        }
 
+        if ($this->parent && $this->config->getErrorBubbling()) {
             $this->parent->addError($error);
         } else {
             $this->errors[] = $error;
@@ -689,17 +680,6 @@ class Form implements \IteratorAggregate, FormInterface
      * {@inheritdoc}
      */
     public function isSubmitted()
-    {
-        return $this->submitted;
-    }
-
-    /**
-     * Alias of {@link isSubmitted()}.
-     *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
-     *             {@link isSubmitted()} instead.
-     */
-    public function isBound()
     {
         return $this->submitted;
     }
@@ -751,11 +731,7 @@ class Form implements \IteratorAggregate, FormInterface
             return true;
         }
 
-        if (count($this->getErrors(true)) > 0) {
-            return false;
-        }
-
-        return true;
+        return 0 === count($this->getErrors(true));
     }
 
     /**
@@ -807,23 +783,6 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return new FormErrorIterator($this, $errors);
-    }
-
-    /**
-     * Returns a string representation of all form errors (including children errors).
-     *
-     * This method should only be used to help debug a form.
-     *
-     * @param int     $level The indentation level (used internally)
-     *
-     * @return string A string representation of all errors
-     *
-     * @deprecated Deprecated since version 2.5, to be removed in 3.0. Use
-     *             {@link getErrors()} instead and cast the result to a string.
-     */
-    public function getErrorsAsString($level = 0)
-    {
-        return self::indent((string) $this->getErrors(true, false), $level);
     }
 
     /**
@@ -882,6 +841,10 @@ class Form implements \IteratorAggregate, FormInterface
             // Never initialize child forms automatically
             $options['auto_initialize'] = false;
 
+            if (null === $type && null === $this->config->getDataClass()) {
+                $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
+            }
+
             if (null === $type) {
                 $child = $this->config->getFormFactory()->createForProperty($this->config->getDataClass(), $child, null, $options);
             } else {
@@ -900,7 +863,7 @@ class Form implements \IteratorAggregate, FormInterface
         $child->setParent($this);
 
         if (!$this->lockSetData && $this->defaultDataSet && !$this->config->getInheritData()) {
-            $iterator = new InheritDataAwareIterator(new \ArrayIterator(array($child)));
+            $iterator = new InheritDataAwareIterator(new \ArrayIterator(array($child->getName() => $child)));
             $iterator = new \RecursiveIteratorIterator($iterator);
             $this->config->getDataMapper()->mapDataToForms($viewData, $iterator);
         }
@@ -1015,7 +978,7 @@ class Form implements \IteratorAggregate, FormInterface
     /**
      * Returns the number of form children (implements the \Countable interface).
      *
-     * @return int     The number of embedded form children
+     * @return int The number of embedded form children
      */
     public function count()
     {
@@ -1169,20 +1132,5 @@ class Form implements \IteratorAggregate, FormInterface
         }
 
         return $value;
-    }
-
-    /**
-     * Utility function for indenting multi-line strings.
-     *
-     * @param string  $string The string
-     * @param int     $level  The number of spaces to use for indentation
-     *
-     * @return string The indented string
-     */
-    private static function indent($string, $level)
-    {
-        $indentation = str_repeat(' ', $level);
-
-        return rtrim($indentation.str_replace("\n", "\n".$indentation, $string), ' ');
     }
 }

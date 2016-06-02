@@ -50,7 +50,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * view to the normalized format.
      *
      * @param DataTransformerInterface $viewTransformer
-     * @param bool                     $forcePrepend if set to true, prepend instead of appending
+     * @param bool                     $forcePrepend    if set to true, prepend instead of appending
      *
      * @return self The configuration object.
      */
@@ -72,7 +72,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * normalized to the model format.
      *
      * @param DataTransformerInterface $modelTransformer
-     * @param bool                     $forceAppend if set to true, append instead of prepending
+     * @param bool                     $forceAppend      if set to true, append instead of prepending
      *
      * @return self The configuration object.
      */
@@ -153,8 +153,8 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * Sets the property path that the form should be mapped to.
      *
      * @param null|string|PropertyPathInterface $propertyPath
-     *             The property path or null if the path should be set
-     *             automatically based on the form's name.
+     *                                                        The property path or null if the path should be set
+     *                                                        automatically based on the form's name.
      *
      * @return self The configuration object.
      */
@@ -174,7 +174,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * Sets whether the form's data should be modified by reference.
      *
      * @param bool $byReference Whether the data should be
-     *                              modified by reference.
+     *                          modified by reference.
      *
      * @return self The configuration object.
      */

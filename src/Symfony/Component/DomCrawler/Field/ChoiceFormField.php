@@ -17,8 +17,6 @@ namespace Symfony\Component\DomCrawler\Field;
  * It is constructed from a HTML select tag, or a HTML checkbox, or radio inputs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ChoiceFormField extends FormField
 {
@@ -42,7 +40,7 @@ class ChoiceFormField extends FormField
     /**
      * Returns true if the field should be included in the submitted values.
      *
-     * @return bool    true if the field should be included in the submitted values, false otherwise
+     * @return bool true if the field should be included in the submitted values, false otherwise
      */
     public function hasValue()
     {
@@ -55,12 +53,16 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Check if the current selected option is disabled
+     * Check if the current selected option is disabled.
      *
      * @return bool
      */
     public function isDisabled()
     {
+        if (parent::isDisabled() && 'select' === $this->type) {
+            return true;
+        }
+
         foreach ($this->options as $option) {
             if ($option['value'] == $this->value && $option['disabled']) {
                 return true;
@@ -74,8 +76,6 @@ class ChoiceFormField extends FormField
      * Sets the value of the field.
      *
      * @param string $value The value of the field
-     *
-     * @api
      */
     public function select($value)
     {
@@ -86,8 +86,6 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \LogicException When the type provided is not correct
-     *
-     * @api
      */
     public function tick()
     {
@@ -102,8 +100,6 @@ class ChoiceFormField extends FormField
      * Ticks a checkbox.
      *
      * @throws \LogicException When the type provided is not correct
-     *
-     * @api
      */
     public function untick()
     {
@@ -192,7 +188,7 @@ class ChoiceFormField extends FormField
     /**
      * Returns true if the field accepts multiple values.
      *
-     * @return bool    true if the field accepts multiple values, false otherwise
+     * @return bool true if the field accepts multiple values, false otherwise
      */
     public function isMultiple()
     {
@@ -257,7 +253,7 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Returns option value with associated disabled flag
+     * Returns option value with associated disabled flag.
      *
      * @param \DOMElement $node
      *
@@ -267,7 +263,8 @@ class ChoiceFormField extends FormField
     {
         $option = array();
 
-        $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : 'on';
+        $defaultDefaultValue = 'select' === $this->node->nodeName ? '' : 'on';
+        $defaultValue = (isset($node->nodeValue) && !empty($node->nodeValue)) ? $node->nodeValue : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
         $option['disabled'] = $node->hasAttribute('disabled');
 
@@ -275,7 +272,7 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Checks whether given value is in the existing options
+     * Checks whether given value is in the existing options.
      *
      * @param string $optionValue
      * @param array  $options
@@ -298,7 +295,7 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Returns list of available field options
+     * Returns list of available field options.
      *
      * @return array
      */

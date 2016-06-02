@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Console\Formatter;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+
 /**
  * Formatter class for console output.
  *
  * @author Konstantin Kudryashov <ever.zet@gmail.com>
- *
- * @api
  */
 class OutputFormatter implements OutputFormatterInterface
 {
@@ -33,16 +33,22 @@ class OutputFormatter implements OutputFormatterInterface
      */
     public static function escape($text)
     {
-        return preg_replace('/([^\\\\]?)</is', '$1\\<', $text);
+        $text = preg_replace('/([^\\\\]?)</', '$1\\<', $text);
+
+        if ('\\' === substr($text, -1)) {
+            $len = strlen($text);
+            $text = rtrim($text, '\\');
+            $text .= str_repeat('<<', $len - strlen($text));
+        }
+
+        return $text;
     }
 
     /**
      * Initializes console output formatter.
      *
-     * @param bool             $decorated Whether this formatter should actually decorate strings
+     * @param bool                            $decorated Whether this formatter should actually decorate strings
      * @param OutputFormatterStyleInterface[] $styles    Array of "name => FormatterStyle" instances
-     *
-     * @api
      */
     public function __construct($decorated = false, array $styles = array())
     {
@@ -63,9 +69,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Sets the decorated flag.
      *
-     * @param bool    $decorated Whether to decorate the messages or not
-     *
-     * @api
+     * @param bool $decorated Whether to decorate the messages or not
      */
     public function setDecorated($decorated)
     {
@@ -75,9 +79,7 @@ class OutputFormatter implements OutputFormatterInterface
     /**
      * Gets the decorated flag.
      *
-     * @return bool    true if the output will decorate messages, false otherwise
-     *
-     * @api
+     * @return bool true if the output will decorate messages, false otherwise
      */
     public function isDecorated()
     {
@@ -89,8 +91,6 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string                        $name  The style name
      * @param OutputFormatterStyleInterface $style The style instance
-     *
-     * @api
      */
     public function setStyle($name, OutputFormatterStyleInterface $style)
     {
@@ -103,8 +103,6 @@ class OutputFormatter implements OutputFormatterInterface
      * @param string $name
      *
      * @return bool
-     *
-     * @api
      */
     public function hasStyle($name)
     {
@@ -118,14 +116,12 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @return OutputFormatterStyleInterface
      *
-     * @throws \InvalidArgumentException When style isn't defined
-     *
-     * @api
+     * @throws InvalidArgumentException When style isn't defined
      */
     public function getStyle($name)
     {
         if (!$this->hasStyle($name)) {
-            throw new \InvalidArgumentException(sprintf('Undefined style: %s', $name));
+            throw new InvalidArgumentException(sprintf('Undefined style: %s', $name));
         }
 
         return $this->styles[strtolower($name)];
@@ -137,18 +133,21 @@ class OutputFormatter implements OutputFormatterInterface
      * @param string $message The message to style
      *
      * @return string The styled message
-     *
-     * @api
      */
     public function format($message)
     {
+        $message = (string) $message;
         $offset = 0;
         $output = '';
-        $tagRegex = '[a-z][a-z0-9_=;-]*';
-        preg_match_all("#<(($tagRegex) | /($tagRegex)?)>#isx", $message, $matches, PREG_OFFSET_CAPTURE);
+        $tagRegex = '[a-z][a-z0-9_=;-]*+';
+        preg_match_all("#<(($tagRegex) | /($tagRegex)?)>#ix", $message, $matches, PREG_OFFSET_CAPTURE);
         foreach ($matches[0] as $i => $match) {
             $pos = $match[1];
             $text = $match[0];
+
+            if (0 != $pos && '\\' == $message[$pos - 1]) {
+                continue;
+            }
 
             // add the text up to the next tag
             $output .= $this->applyCurrentStyle(substr($message, $offset, $pos - $offset));
@@ -164,9 +163,6 @@ class OutputFormatter implements OutputFormatterInterface
             if (!$open && !$tag) {
                 // </>
                 $this->styleStack->pop();
-            } elseif ($pos && '\\' == $message[$pos - 1]) {
-                // escaped tag
-                $output .= $this->applyCurrentStyle($text);
             } elseif (false === $style = $this->createStyleFromString(strtolower($tag))) {
                 $output .= $this->applyCurrentStyle($text);
             } elseif ($open) {
@@ -177,6 +173,10 @@ class OutputFormatter implements OutputFormatterInterface
         }
 
         $output .= $this->applyCurrentStyle(substr($message, $offset));
+
+        if (false !== strpos($output, '<<')) {
+            return strtr($output, array('\\<' => '<', '<<' => '\\'));
+        }
 
         return str_replace('\\<', '<', $output);
     }
@@ -194,7 +194,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $string
      *
-     * @return OutputFormatterStyle|bool    false if string is not format string
+     * @return OutputFormatterStyle|bool false if string is not format string
      */
     private function createStyleFromString($string)
     {

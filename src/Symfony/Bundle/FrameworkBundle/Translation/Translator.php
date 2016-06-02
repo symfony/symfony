@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Translation;
 
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Translator extends BaseTranslator
+class Translator extends BaseTranslator implements WarmableInterface
 {
     protected $container;
     protected $loaderIds;
@@ -28,7 +29,13 @@ class Translator extends BaseTranslator
     protected $options = array(
         'cache_dir' => null,
         'debug' => false,
+        'resource_files' => array(),
     );
+
+    /**
+     * @var array
+     */
+    private $resourceLocales;
 
     /**
      * Constructor.
@@ -37,6 +44,7 @@ class Translator extends BaseTranslator
      *
      *   * cache_dir: The cache directory (or null to disable caching)
      *   * debug:     Whether to enable debugging or not (false by default)
+     *   * resource_files: List of translation resources available grouped by locale.
      *
      * @param ContainerInterface $container A ContainerInterface instance
      * @param MessageSelector    $selector  The message selector for pluralization
@@ -56,8 +64,33 @@ class Translator extends BaseTranslator
         }
 
         $this->options = array_merge($this->options, $options);
+        $this->resourceLocales = array_keys($this->options['resource_files']);
+        if (null !== $this->options['cache_dir'] && $this->options['debug']) {
+            $this->loadResources();
+        }
 
-        parent::__construct(null, $selector, $this->options['cache_dir'], $this->options['debug']);
+        parent::__construct($container->getParameter('kernel.default_locale'), $selector, $this->options['cache_dir'], $this->options['debug']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUp($cacheDir)
+    {
+        // skip warmUp when translator doesn't use cache
+        if (null === $this->options['cache_dir']) {
+            return;
+        }
+
+        $locales = array_merge($this->getFallbackLocales(), array($this->getLocale()), $this->resourceLocales);
+        foreach (array_unique($locales) as $locale) {
+            // reset catalogue in case it's already loaded during the dump of the other locales.
+            if (isset($this->catalogues[$locale])) {
+                unset($this->catalogues[$locale]);
+            }
+
+            $this->loadCatalogue($locale);
+        }
     }
 
     /**
@@ -71,9 +104,22 @@ class Translator extends BaseTranslator
 
     protected function initialize()
     {
+        $this->loadResources();
         foreach ($this->loaderIds as $id => $aliases) {
             foreach ($aliases as $alias) {
                 $this->addLoader($alias, $this->container->get($id));
+            }
+        }
+    }
+
+    private function loadResources()
+    {
+        foreach ($this->options['resource_files'] as $locale => $files) {
+            foreach ($files as $key => $file) {
+                // filename is domain.locale.format
+                list($domain, $locale, $format) = explode('.', basename($file), 3);
+                $this->addResource($format, $file, $locale, $domain);
+                unset($this->options['resource_files'][$locale][$key]);
             }
         }
     }

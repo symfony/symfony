@@ -1,55 +1,81 @@
 .sf-reset .traces {
-    padding-bottom: 14px;
+    padding: 0 0 1em 1.5em;
+}
+.sf-reset .traces a {
+    font-size: 14px;
+}
+.sf-reset .traces abbr {
+    border-bottom-color: #AAA;
+    padding-bottom: 2px;
 }
 .sf-reset .traces li {
-    font-size: 12px;
-    color: #868686;
-    padding: 5px 4px;
+    ccolor: #222;
+    font-size: 14px;
+    padding: 5px 0;
     list-style-type: decimal;
-    margin-left: 20px;
-    white-space: break-word;
+    margin: 0 0 0 1em;
+}
+.sf-reset .traces li.selected {
+    background: rgba(255, 255, 153, 0.5);
+}
+
+.sf-reset .traces ol li {
+    font-size: 12px;
+    color: #777;
 }
 .sf-reset #logs .traces li.error {
-    font-style: normal;
     color: #AA3333;
-    background: #f9ecec;
 }
 .sf-reset #logs .traces li.warning {
-    font-style: normal;
-    background: #ffcc00;
-}
-/* fix for Opera not liking empty <li> */
-.sf-reset .traces li:after {
-    content: "\00A0";
+    background: #FFCC00;
 }
 .sf-reset .trace {
-    border: 1px solid #D3D3D3;
+    border: 1px solid #DDD;
+    background: #FFF;
     padding: 10px;
     overflow: auto;
-    margin: 10px 0 20px;
+    margin: 1em 0;
+}
+.sf-reset .trace code,
+#traces-text pre {
+    font-size: 13px;
 }
 .sf-reset .block-exception {
-    border-radius: 16px;
-    margin-bottom: 20px;
-    background-color: #f6f6f6;
-    border: 1px solid #dfdfdf;
-    padding: 30px 28px;
+    margin-bottom: 2em;
+    background-color: #FFF;
+    border: 1px solid #EEE;
+    padding: 28px;
     word-wrap: break-word;
     overflow: hidden;
 }
+.sf-reset .block-exception h1 {
+    font-size: 21px;
+    font-weight: normal;
+    margin: 0 0 12px;
+}
+.sf-reset .block-exception .linked {
+    margin-top: 1em;
+}
+
+.sf-reset .block {
+    margin-bottom: 2em;
+}
+.sf-reset .block h2 {
+    font-size: 16px;
+}
 .sf-reset .block-exception div {
-    color: #313131;
-    font-size: 10px;
+    font-size: 14px;
 }
 .sf-reset .block-exception-detected .illustration-exception,
 .sf-reset .block-exception-detected .text-exception {
     float: left;
 }
 .sf-reset .block-exception-detected .illustration-exception {
-    width: 152px;
+    width: 110px;
 }
 .sf-reset .block-exception-detected .text-exception {
-    width: 670px;
+    width: 650px;
+    margin-left: 20px;
     padding: 30px 44px 24px 46px;
     position: relative;
 }
@@ -65,40 +91,6 @@
     bottom: 0;
     right: 50px;
 }
-.sf-reset .block-exception p {
-    font-family: Arial, Helvetica, sans-serif;
-}
-.sf-reset .block-exception p a,
-.sf-reset .block-exception p a:hover {
-    color: #565656;
-}
-.sf-reset .logs h2 {
-    float: left;
-    width: 654px;
-}
-.sf-reset .error-count {
-    float: right;
-    width: 170px;
-    text-align: right;
-}
-.sf-reset .error-count span {
-    display: inline-block;
-    background-color: #aacd4e;
-    border-radius: 6px;
-    padding: 4px;
-    color: white;
-    margin-right: 2px;
-    font-size: 11px;
-    font-weight: bold;
-}
 .sf-reset .toggle {
     vertical-align: middle;
-}
-.sf-reset .linked ul,
-.sf-reset .linked li {
-    display: inline;
-}
-.sf-reset #output-content {
-    color: #000;
-    font-size: 12px;
 }

@@ -126,9 +126,23 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened->setPrevious($flattened2);
 
-        $this->assertSame($flattened2,$flattened->getPrevious());
+        $this->assertSame($flattened2, $flattened->getPrevious());
 
-        $this->assertSame(array($flattened2),$flattened->getAllPrevious());
+        $this->assertSame(array($flattened2), $flattened->getAllPrevious());
+    }
+
+    /**
+     * @requires PHP 7.0
+     */
+    public function testPreviousError()
+    {
+        $exception = new \Exception('test', 123, new \ParseError('Oh noes!', 42));
+
+        $flattened = FlattenException::create($exception)->getPrevious();
+
+        $this->assertEquals($flattened->getMessage(), 'Parse error: Oh noes!', 'The message is copied from the original exception.');
+        $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
+        $this->assertEquals($flattened->getClass(), 'Symfony\Component\Debug\Exception\FatalThrowableError', 'The class is set to the class of the original exception');
     }
 
     /**
@@ -162,7 +176,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                 'message' => 'test',
                 'class' => 'Exception',
                 'trace' => array(array(
-                    'namespace' => '', 'short_class' => '', 'class' => '','type' => '','function' => '', 'file' => 'foo.php', 'line' => 123,
+                    'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '', 'file' => 'foo.php', 'line' => 123,
                     'args' => array(),
                 )),
             ),
@@ -184,6 +198,28 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         $flattened = FlattenException::create($exception);
         $trace = $flattened->getTrace();
         $this->assertContains('*DEEP NESTED ARRAY*', serialize($trace));
+    }
+
+    public function testTooBigArray()
+    {
+        $a = array();
+        for ($i = 0; $i < 20; ++$i) {
+            for ($j = 0; $j < 50; ++$j) {
+                for ($k = 0; $k < 10; ++$k) {
+                    $a[$i][$j][$k] = 'value';
+                }
+            }
+        }
+        $a[20] = 'value';
+        $a[21] = 'value1';
+        $exception = $this->createException($a);
+
+        $flattened = FlattenException::create($exception);
+        $trace = $flattened->getTrace();
+        $serializeTrace = serialize($trace);
+
+        $this->assertContains('*SKIPPED over 10000 entries*', $serializeTrace);
+        $this->assertNotContains('*value1*', $serializeTrace);
     }
 
     private function createException($foo)
@@ -214,12 +250,12 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
                 'class' => 'Exception',
                 'trace' => array(
                     array(
-                        'namespace' => '', 'short_class' => '', 'class' => '','type' => '','function' => '',
+                        'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '',
                         'file' => 'foo.php', 'line' => 123,
                         'args' => array(),
                     ),
                     array(
-                        'namespace' => '', 'short_class' => '', 'class' => '','type' => '','function' => 'test',
+                        'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => 'test',
                         'file' => __FILE__, 'line' => 123,
                         'args' => array(
                             array(

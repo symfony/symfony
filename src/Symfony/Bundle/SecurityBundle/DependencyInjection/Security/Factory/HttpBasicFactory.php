@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -30,6 +29,7 @@ class HttpBasicFactory implements SecurityFactoryInterface
         $container
             ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProvider))
+            ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)
         ;
 

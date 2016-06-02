@@ -19,8 +19,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class FileValidator extends ConstraintValidator
 {
@@ -63,7 +61,7 @@ class FileValidator extends ConstraintValidator
                     }
 
                     list($sizeAsString, $limitAsString, $suffix) = $this->factorizeSizes(0, $limitInBytes, $binaryFormat);
-                    $this->buildViolation($constraint->uploadIniSizeErrorMessage)
+                    $this->context->buildViolation($constraint->uploadIniSizeErrorMessage)
                         ->setParameter('{{ limit }}', $limitAsString)
                         ->setParameter('{{ suffix }}', $suffix)
                         ->setCode(UPLOAD_ERR_INI_SIZE)
@@ -71,43 +69,43 @@ class FileValidator extends ConstraintValidator
 
                     return;
                 case UPLOAD_ERR_FORM_SIZE:
-                    $this->buildViolation($constraint->uploadFormSizeErrorMessage)
+                    $this->context->buildViolation($constraint->uploadFormSizeErrorMessage)
                         ->setCode(UPLOAD_ERR_FORM_SIZE)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_PARTIAL:
-                    $this->buildViolation($constraint->uploadPartialErrorMessage)
+                    $this->context->buildViolation($constraint->uploadPartialErrorMessage)
                         ->setCode(UPLOAD_ERR_PARTIAL)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_NO_FILE:
-                    $this->buildViolation($constraint->uploadNoFileErrorMessage)
+                    $this->context->buildViolation($constraint->uploadNoFileErrorMessage)
                         ->setCode(UPLOAD_ERR_NO_FILE)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_NO_TMP_DIR:
-                    $this->buildViolation($constraint->uploadNoTmpDirErrorMessage)
+                    $this->context->buildViolation($constraint->uploadNoTmpDirErrorMessage)
                         ->setCode(UPLOAD_ERR_NO_TMP_DIR)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_CANT_WRITE:
-                    $this->buildViolation($constraint->uploadCantWriteErrorMessage)
+                    $this->context->buildViolation($constraint->uploadCantWriteErrorMessage)
                         ->setCode(UPLOAD_ERR_CANT_WRITE)
                         ->addViolation();
 
                     return;
                 case UPLOAD_ERR_EXTENSION:
-                    $this->buildViolation($constraint->uploadExtensionErrorMessage)
+                    $this->context->buildViolation($constraint->uploadExtensionErrorMessage)
                         ->setCode(UPLOAD_ERR_EXTENSION)
                         ->addViolation();
 
                     return;
                 default:
-                    $this->buildViolation($constraint->uploadErrorMessage)
+                    $this->context->buildViolation($constraint->uploadErrorMessage)
                         ->setCode($value->getError())
                         ->addViolation();
 
@@ -122,7 +120,7 @@ class FileValidator extends ConstraintValidator
         $path = $value instanceof FileObject ? $value->getPathname() : (string) $value;
 
         if (!is_file($path)) {
-            $this->buildViolation($constraint->notFoundMessage)
+            $this->context->buildViolation($constraint->notFoundMessage)
                 ->setParameter('{{ file }}', $this->formatValue($path))
                 ->setCode(File::NOT_FOUND_ERROR)
                 ->addViolation();
@@ -131,7 +129,7 @@ class FileValidator extends ConstraintValidator
         }
 
         if (!is_readable($path)) {
-            $this->buildViolation($constraint->notReadableMessage)
+            $this->context->buildViolation($constraint->notReadableMessage)
                 ->setParameter('{{ file }}', $this->formatValue($path))
                 ->setCode(File::NOT_READABLE_ERROR)
                 ->addViolation();
@@ -142,7 +140,7 @@ class FileValidator extends ConstraintValidator
         $sizeInBytes = filesize($path);
 
         if (0 === $sizeInBytes) {
-            $this->buildViolation($constraint->disallowEmptyMessage)
+            $this->context->buildViolation($constraint->disallowEmptyMessage)
                 ->setParameter('{{ file }}', $this->formatValue($path))
                 ->setCode(File::EMPTY_ERROR)
                 ->addViolation();
@@ -155,7 +153,7 @@ class FileValidator extends ConstraintValidator
 
             if ($sizeInBytes > $limitInBytes) {
                 list($sizeAsString, $limitAsString, $suffix) = $this->factorizeSizes($sizeInBytes, $limitInBytes, $constraint->binaryFormat);
-                $this->buildViolation($constraint->maxSizeMessage)
+                $this->context->buildViolation($constraint->maxSizeMessage)
                     ->setParameter('{{ file }}', $this->formatValue($path))
                     ->setParameter('{{ size }}', $sizeAsString)
                     ->setParameter('{{ limit }}', $limitAsString)
@@ -187,7 +185,7 @@ class FileValidator extends ConstraintValidator
                 }
             }
 
-            $this->buildViolation($constraint->mimeTypesMessage)
+            $this->context->buildViolation($constraint->mimeTypesMessage)
                 ->setParameter('{{ file }}', $this->formatValue($path))
                 ->setParameter('{{ type }}', $this->formatValue($mime))
                 ->setParameter('{{ types }}', $this->formatValues($mimeTypes))
@@ -203,7 +201,7 @@ class FileValidator extends ConstraintValidator
 
     /**
      * Convert the limit to the smallest possible number
-     * (i.e. try "MB", then "kB", then "bytes")
+     * (i.e. try "MB", then "kB", then "bytes").
      */
     private function factorizeSizes($size, $limit, $binaryFormat)
     {

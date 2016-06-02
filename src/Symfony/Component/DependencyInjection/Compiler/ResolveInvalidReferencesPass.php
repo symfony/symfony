@@ -47,7 +47,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             foreach ($definition->getMethodCalls() as $call) {
                 try {
                     $calls[] = array($call[0], $this->processArguments($call[1], true));
-                } catch (RuntimeException $ignore) {
+                } catch (RuntimeException $e) {
                     // this call is simply removed
                 }
             }
@@ -58,7 +58,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 try {
                     $value = $this->processArguments(array($value), true);
                     $properties[$name] = reset($value);
-                } catch (RuntimeException $ignore) {
+                } catch (RuntimeException $e) {
                     // ignore property
                 }
             }
@@ -69,18 +69,21 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
     /**
      * Processes arguments to determine invalid references.
      *
-     * @param array   $arguments    An array of Reference objects
-     * @param bool    $inMethodCall
+     * @param array $arguments    An array of Reference objects
+     * @param bool  $inMethodCall
+     * @param bool  $inCollection
      *
      * @return array
      *
      * @throws RuntimeException When the config is invalid
      */
-    private function processArguments(array $arguments, $inMethodCall = false)
+    private function processArguments(array $arguments, $inMethodCall = false, $inCollection = false)
     {
+        $isNumeric = array_keys($arguments) === range(0, count($arguments) - 1);
+
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
-                $arguments[$k] = $this->processArguments($argument, $inMethodCall);
+                $arguments[$k] = $this->processArguments($argument, $inMethodCall, true);
             } elseif ($argument instanceof Reference) {
                 $id = (string) $argument;
 
@@ -91,6 +94,10 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                 if (!$exists && ContainerInterface::NULL_ON_INVALID_REFERENCE === $invalidBehavior) {
                     $arguments[$k] = null;
                 } elseif (!$exists && ContainerInterface::IGNORE_ON_INVALID_REFERENCE === $invalidBehavior) {
+                    if ($inCollection) {
+                        unset($arguments[$k]);
+                        continue;
+                    }
                     if ($inMethodCall) {
                         throw new RuntimeException('Method shouldn\'t be called.');
                     }
@@ -98,6 +105,11 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                     $arguments[$k] = null;
                 }
             }
+        }
+
+        // Ensure numerically indexed arguments have sequential numeric keys.
+        if ($isNumeric) {
+            $arguments = array_values($arguments);
         }
 
         return $arguments;

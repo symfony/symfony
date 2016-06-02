@@ -14,15 +14,11 @@ namespace Symfony\Component\Translation\Tests\Loader;
 use Symfony\Component\Translation\Loader\IcuDatFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
+/**
+ * @requires extension intl
+ */
 class IcuDatFileLoaderTest extends LocalizedTestCase
 {
-    protected function setUp()
-    {
-        if (!extension_loaded('intl')) {
-            $this->markTestSkipped('This test requires intl extension to work.');
-        }
-    }
-
     /**
      * @expectedException \Symfony\Component\Translation\Exception\InvalidResourceException
      */

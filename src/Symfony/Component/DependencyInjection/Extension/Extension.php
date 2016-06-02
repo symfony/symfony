@@ -27,9 +27,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 abstract class Extension implements ExtensionInterface, ConfigurationExtensionInterface
 {
     /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
+     * {@inheritdoc}
      */
     public function getXsdValidationBasePath()
     {
@@ -37,9 +35,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     }
 
     /**
-     * Returns the namespace to be used for this extension (XML namespace).
-     *
-     * @return string The XML namespace
+     * {@inheritdoc}
      */
     public function getNamespace()
     {
@@ -91,9 +87,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
             $container->addResource(new FileResource($r->getFileName()));
 
             if (!method_exists($class, '__construct')) {
-                $configuration = new $class();
-
-                return $configuration;
+                return new $class();
             }
         }
     }
@@ -109,7 +103,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
      * @param ContainerBuilder $container
      * @param array            $config
      *
-     * @return bool    Whether the configuration is enabled
+     * @return bool Whether the configuration is enabled
      *
      * @throws InvalidArgumentException When the config is not enableable
      */

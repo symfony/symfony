@@ -33,6 +33,17 @@ yaml: |
         isit: tested
     head:
         <<: [ *foo , *dong , *foo2 ]
+    taz: &taz
+        a: Steve
+        w:
+            p: 1234
+    nested:
+        <<: *taz
+        d: Doug
+        w: &nestedref
+            p: 12345
+        z:
+            <<: *nestedref
 php: |
     array(
         'foo' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian'),
@@ -41,5 +52,7 @@ php: |
         'foo2' => array('a' => 'Ballmer'),
         'ding' => array('fi', 'fei', 'fo', 'fam'),
         'check' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam', 'isit' => 'tested'),
-        'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam')
+        'head' => array('a' => 'Steve', 'b' => 'Clark', 'c' => 'Brian', 'fi', 'fei', 'fo', 'fam'),
+        'taz' => array('a' => 'Steve', 'w' => array('p' => 1234)),
+        'nested' => array('a' => 'Steve', 'w' => array('p' => 12345), 'd' => 'Doug', 'z' => array('p' => 12345))
     )

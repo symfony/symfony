@@ -62,7 +62,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        if ($child instanceof self) {
+        if ($child instanceof FormBuilderInterface) {
             $this->children[$child->getName()] = $child;
 
             // In case an unresolved child with the same name exists
@@ -72,7 +72,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (!is_string($child) && !is_int($child)) {
-            throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormBuilder');
+            throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormBuilderInterface');
         }
 
         if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
@@ -99,7 +99,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (null === $type && null === $this->getDataClass()) {
-            $type = 'text';
+            $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
         }
 
         if (null !== $type) {
@@ -138,8 +138,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        unset($this->unresolvedChildren[$name]);
-        unset($this->children[$name]);
+        unset($this->unresolvedChildren[$name], $this->children[$name]);
 
         return $this;
     }
@@ -245,7 +244,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * Converts an unresolved child into a {@link FormBuilder} instance.
      *
-     * @param  string $name The name of the unresolved child.
+     * @param string $name The name of the unresolved child.
      *
      * @return FormBuilder The created instance.
      */

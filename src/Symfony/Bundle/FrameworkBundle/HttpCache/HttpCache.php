@@ -72,18 +72,6 @@ abstract class HttpCache extends BaseHttpCache
 
     protected function createSurrogate()
     {
-        return $this->createEsi();
-    }
-
-    /**
-     * Creates new ESI instance
-     *
-     * @return Esi
-     *
-     * @deprecated Deprecated since version 2.6, to be removed in 3.0. Use createSurrogate() instead
-     */
-    protected function createEsi()
-    {
         return new Esi();
     }
 

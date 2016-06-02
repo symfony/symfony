@@ -58,7 +58,7 @@ class ConsoleExceptionEvent extends ConsoleEvent
     /**
      * Gets the exit code.
      *
-     * @return int     The command exit code
+     * @return int The command exit code
      */
     public function getExitCode()
     {

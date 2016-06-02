@@ -25,7 +25,7 @@ class ExpressionLanguage extends BaseExpressionLanguage
 {
     public function __construct(ParserCacheInterface $cache = null, array $providers = array())
     {
-        // prepend the default provider to let users overide it easily
+        // prepend the default provider to let users override it easily
         array_unshift($providers, new ExpressionLanguageProvider());
 
         parent::__construct($cache, $providers);

@@ -383,20 +383,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * This method should not be invoked.
      *
-     * @param bool $virtual
-     *
-     * @throws BadMethodCallException
-     */
-    public function setVirtual($virtual)
-    {
-        throw new BadMethodCallException('Buttons cannot be virtual.');
-    }
-
-    /**
-     * Unsupported method.
-     *
-     * This method should not be invoked.
-     *
      * @param bool $compound
      *
      * @throws BadMethodCallException
@@ -495,7 +481,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function setRequestHandler(RequestHandlerInterface $requestHandler)
     {
-        throw new BadMethodCallException('Buttons do not support form processors.');
+        throw new BadMethodCallException('Buttons do not support request handlers.');
     }
 
     /**
@@ -544,8 +530,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getEventDispatcher()
     {
@@ -561,8 +545,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getPropertyPath()
     {
@@ -584,16 +566,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      * @return bool Always returns false.
      */
     public function getByReference()
-    {
-        return false;
-    }
-
-    /**
-     * Unsupported method.
-     *
-     * @return bool Always returns false.
-     */
-    public function getVirtual()
     {
         return false;
     }
@@ -640,8 +612,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getDataMapper()
     {
@@ -679,8 +649,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getEmptyData()
     {
@@ -723,8 +691,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getData()
     {
@@ -732,8 +698,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getDataClass()
     {
@@ -751,8 +715,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getFormFactory()
     {
@@ -760,8 +722,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getAction()
     {
@@ -769,8 +729,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getMethod()
     {
@@ -778,8 +736,6 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
 
     /**
      * Unsupported method.
-     *
-     * @return null Always returns null.
      */
     public function getRequestHandler()
     {

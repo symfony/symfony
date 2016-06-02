@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegerType extends AbstractType
 {
@@ -25,7 +25,7 @@ class IntegerType extends AbstractType
     {
         $builder->addViewTransformer(
             new IntegerToLocalizedStringTransformer(
-                $options['precision'],
+                $options['scale'],
                 $options['grouping'],
                 $options['rounding_mode']
         ));
@@ -34,34 +34,34 @@ class IntegerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            // default precision is locale specific (usually around 3)
-            'precision' => null,
+            // default scale is locale specific (usually around 3)
+            'scale' => null,
             'grouping' => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode' => IntegerToLocalizedStringTransformer::ROUND_DOWN,
             'compound' => false,
         ));
 
-        $resolver->setAllowedValues(array(
-            'rounding_mode' => array(
-                IntegerToLocalizedStringTransformer::ROUND_FLOOR,
-                IntegerToLocalizedStringTransformer::ROUND_DOWN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN,
-                IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
-                IntegerToLocalizedStringTransformer::ROUND_UP,
-                IntegerToLocalizedStringTransformer::ROUND_CEILING,
-            ),
+        $resolver->setAllowedValues('rounding_mode', array(
+            IntegerToLocalizedStringTransformer::ROUND_FLOOR,
+            IntegerToLocalizedStringTransformer::ROUND_DOWN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_EVEN,
+            IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
+            IntegerToLocalizedStringTransformer::ROUND_UP,
+            IntegerToLocalizedStringTransformer::ROUND_CEILING,
         ));
+
+        $resolver->setAllowedTypes('scale', array('null', 'int'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integer';
     }

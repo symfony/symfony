@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Finder\Iterator;
 
-use Symfony\Component\Finder\Expression\Expression;
+use Symfony\Component\Finder\Glob;
 
 /**
  * FilenameFilterIterator filters files by patterns (a regexp, a glob, or a string).
@@ -23,31 +23,11 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
     /**
      * Filters the iterator values.
      *
-     * @return bool    true if the value should be kept, false otherwise
+     * @return bool true if the value should be kept, false otherwise
      */
     public function accept()
     {
-        $filename = $this->current()->getFilename();
-
-        // should at least not match one rule to exclude
-        foreach ($this->noMatchRegexps as $regex) {
-            if (preg_match($regex, $filename)) {
-                return false;
-            }
-        }
-
-        // should at least match one rule
-        $match = true;
-        if ($this->matchRegexps) {
-            $match = false;
-            foreach ($this->matchRegexps as $regex) {
-                if (preg_match($regex, $filename)) {
-                    return true;
-                }
-            }
-        }
-
-        return $match;
+        return $this->isAccepted($this->current()->getFilename());
     }
 
     /**
@@ -62,6 +42,6 @@ class FilenameFilterIterator extends MultiplePcreFilterIterator
      */
     protected function toRegex($str)
     {
-        return Expression::create($str)->getRegex()->render();
+        return $this->isRegex($str) ? $str : Glob::toRegex($str);
     }
 }

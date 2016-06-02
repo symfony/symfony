@@ -64,7 +64,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     /**
      * Checks if a templating engine has been set.
      *
-     * @return bool    true if the templating engine has been set, false otherwise
+     * @return bool true if the templating engine has been set, false otherwise
      */
     public function hasTemplating()
     {
@@ -107,11 +107,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
         $renderedAttributes = '';
         if (count($attributes) > 0) {
-            if (PHP_VERSION_ID >= 50400) {
-                $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-            } else {
-                $flags = ENT_QUOTES;
-            }
+            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
             foreach ($attributes as $attribute => $value) {
                 $renderedAttributes .= sprintf(
                     ' %s="%s"',

@@ -127,8 +127,8 @@ class ViolationMapper implements ViolationMapperInterface
             $scope->addError(new FormError(
                 $violation->getMessage(),
                 $violation->getMessageTemplate(),
-                $violation->getMessageParameters(),
-                $violation->getMessagePluralization(),
+                $violation->getParameters(),
+                $violation->getPlural(),
                 $violation
             ));
         }
@@ -148,12 +148,9 @@ class ViolationMapper implements ViolationMapperInterface
      */
     private function matchChild(FormInterface $form, PropertyPathIteratorInterface $it)
     {
-        // Remember at what property path underneath "data"
-        // we are looking. Check if there is a child with that
-        // path, otherwise increase path by one more piece
+        $target = null;
         $chunk = '';
-        $foundChild = null;
-        $foundAtIndex = 0;
+        $foundAtIndex = null;
 
         // Construct mapping rules for the given form
         $rules = array();
@@ -165,17 +162,9 @@ class ViolationMapper implements ViolationMapperInterface
             }
         }
 
-        // Skip forms inheriting their parent data when iterating the children
-        $childIterator = new \RecursiveIteratorIterator(
-            new InheritDataAwareIterator($form)
-        );
+        $children = iterator_to_array(new \RecursiveIteratorIterator(new InheritDataAwareIterator($form)), false);
 
-        // Make the path longer until we find a matching child
-        while (true) {
-            if (!$it->valid()) {
-                return;
-            }
-
+        while ($it->valid()) {
             if ($it->isIndex()) {
                 $chunk .= '['.$it->current().']';
             } else {
@@ -197,40 +186,34 @@ class ViolationMapper implements ViolationMapperInterface
                 }
             }
 
-            // Test children unless we already found one
-            if (null === $foundChild) {
-                foreach ($childIterator as $child) {
-                    /* @var FormInterface $child */
-                    $childPath = (string) $child->getPropertyPath();
-
-                    // Child found, mark as return value
-                    if ($chunk === $childPath) {
-                        $foundChild = $child;
-                        $foundAtIndex = $it->key();
-                    }
+            /** @var FormInterface $child */
+            foreach ($children as $i => $child) {
+                $childPath = (string) $child->getPropertyPath();
+                if ($childPath === $chunk) {
+                    $target = $child;
+                    $foundAtIndex = $it->key();
+                } elseif (0 === strpos($childPath, $chunk)) {
+                    continue;
                 }
+
+                unset($children[$i]);
             }
 
-            // Add element to the chunk
             $it->next();
-
-            // If we reached the end of the path or if there are no
-            // more matching mapping rules, return the found child
-            if (null !== $foundChild && (!$it->valid() || count($rules) === 0)) {
-                // Reset index in case we tried to find mapping
-                // rules further down the path
-                $it->seek($foundAtIndex);
-
-                return $foundChild;
-            }
         }
+
+        if (null !== $foundAtIndex) {
+            $it->seek($foundAtIndex);
+        }
+
+        return $target;
     }
 
     /**
      * Reconstructs a property path from a violation path and a form tree.
      *
-     * @param  ViolationPath $violationPath The violation path.
-     * @param  FormInterface $origin        The root form of the tree.
+     * @param ViolationPath $violationPath The violation path.
+     * @param FormInterface $origin        The root form of the tree.
      *
      * @return RelativePath The reconstructed path.
      */

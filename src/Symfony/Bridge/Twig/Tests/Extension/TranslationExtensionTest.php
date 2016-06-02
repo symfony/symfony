@@ -31,7 +31,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
     public function testTrans($template, $expected, array $variables = array())
     {
         if ($expected != $this->getTemplate($template)->render($variables)) {
-            print $template."\n";
+            echo $template."\n";
             $loader = new \Twig_Loader_Array(array('index' => $template));
             $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
             $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));
@@ -87,17 +87,17 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
 
             // transchoice
             array('{% transchoice count from "messages" %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is no apples', array('count' => 0),),
+                'There is no apples', array('count' => 0)),
             array('{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is 5 apples', array('count' => 5),),
+                'There is 5 apples', array('count' => 5)),
             array('{% transchoice count %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony)', array('count' => 5, 'name' => 'Symfony'),),
+                'There is 5 apples (Symfony)', array('count' => 5, 'name' => 'Symfony')),
             array('{% transchoice count with { \'%name%\': \'Symfony\' } %}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples (%name%){% endtranschoice %}',
-                'There is 5 apples (Symfony)', array('count' => 5),),
+                'There is 5 apples (Symfony)', array('count' => 5)),
             array('{% transchoice count into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is no apples', array('count' => 0),),
+                'There is no apples', array('count' => 0)),
             array('{% transchoice 5 into "fr"%}{0} There is no apples|{1} There is one apple|]1,Inf] There is %count% apples{% endtranschoice %}',
-                'There is 5 apples',),
+                'There is 5 apples'),
 
             // trans filter
             array('{{ "Hello"|trans }}', 'Hello'),
@@ -145,6 +145,40 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
         $template = $this->getTemplate($templates, $translator);
 
         $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render(array())));
+    }
+
+    public function testDefaultTranslationDomainWithNamedArguments()
+    {
+        $templates = array(
+            'index' => '
+                {%- trans_default_domain "foo" %}
+
+                {%- block content %}
+                    {{- "foo"|trans(arguments = {}, domain = "custom") }}
+                    {{- "foo"|transchoice(count = 1) }}
+                    {{- "foo"|transchoice(count = 1, arguments = {}, domain = "custom") }}
+                    {{- "foo"|trans({}, domain = "custom") }}
+                    {{- "foo"|trans({}, "custom", locale = "fr") }}
+                    {{- "foo"|transchoice(1, arguments = {}, domain = "custom") }}
+                    {{- "foo"|transchoice(1, {}, "custom", locale = "fr") }}
+                {% endblock %}
+            ',
+
+            'base' => '
+                {%- block content "" %}
+            ',
+        );
+
+        $translator = new Translator('en', new MessageSelector());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource('array', array('foo' => 'foo (messages)'), 'en');
+        $translator->addResource('array', array('foo' => 'foo (custom)'), 'en', 'custom');
+        $translator->addResource('array', array('foo' => 'foo (foo)'), 'en', 'foo');
+        $translator->addResource('array', array('foo' => 'foo (fr)'), 'fr', 'custom');
+
+        $template = $this->getTemplate($templates, $translator);
+
+        $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render(array())));
     }
 
     protected function getTemplate($template, $translator = null)

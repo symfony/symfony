@@ -16,7 +16,7 @@ abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
     protected function assertIterator($expected, \Traversable $iterator)
     {
         // set iterator_to_array $use_key to false to avoid values merge
-        // this made FinderTest::testAppendWithAnArray() failed with GnuFinderAdapter
+        // this made FinderTest::testAppendWithAnArray() fail with GnuFinderAdapter
         $values = array_map(function (\SplFileInfo $fileinfo) { return str_replace('/', DIRECTORY_SEPARATOR, $fileinfo->getPathname()); }, iterator_to_array($iterator, false));
 
         $expected = array_map(function ($path) { return str_replace('/', DIRECTORY_SEPARATOR, $path); }, $expected);
@@ -51,7 +51,7 @@ abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
         foreach ($expected as $subarray) {
             $temp = array();
             while (count($values) && count($temp) < count($subarray)) {
-                array_push($temp, array_shift($values));
+                $temp[] = array_shift($values);
             }
             sort($temp);
             sort($subarray);
@@ -60,9 +60,9 @@ abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Same as IteratorTestCase::assertIterator with foreach usage
+     * Same as IteratorTestCase::assertIterator with foreach usage.
      *
-     * @param array $expected
+     * @param array        $expected
      * @param \Traversable $iterator
      */
     protected function assertIteratorInForeach($expected, \Traversable $iterator)
@@ -80,9 +80,9 @@ abstract class IteratorTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Same as IteratorTestCase::assertOrderedIterator with foreach usage
+     * Same as IteratorTestCase::assertOrderedIterator with foreach usage.
      *
-     * @param array $expected
+     * @param array        $expected
      * @param \Traversable $iterator
      */
     protected function assertOrderedIteratorInForeach($expected, \Traversable $iterator)

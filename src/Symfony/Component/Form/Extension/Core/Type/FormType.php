@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -71,7 +71,6 @@ class FormType extends BaseType
         parent::buildView($view, $form, $options);
 
         $name = $form->getName();
-        $readOnly = $options['read_only'];
 
         if ($view->parent) {
             if ('' === $name) {
@@ -79,20 +78,17 @@ class FormType extends BaseType
             }
 
             // Complex fields are read-only if they themselves or their parents are.
-            if (!$readOnly) {
-                $readOnly = $view->parent->vars['read_only'];
+            if (!isset($view->vars['attr']['readonly']) && isset($view->parent->vars['attr']['readonly']) && false !== $view->parent->vars['attr']['readonly']) {
+                $view->vars['attr']['readonly'] = true;
             }
         }
 
         $view->vars = array_replace($view->vars, array(
-            'read_only' => $readOnly,
             'errors' => $form->getErrors(),
             'valid' => $form->isSubmitted() ? $form->isValid() : true,
             'value' => $form->getViewData(),
             'data' => $form->getNormData(),
             'required' => $form->isRequired(),
-            'max_length' => isset($options['attr']['maxlength']) ? $options['attr']['maxlength'] : null, // Deprecated
-            'pattern' => isset($options['attr']['pattern']) ? $options['attr']['pattern'] : null, // Deprecated
             'size' => null,
             'label_attr' => $options['label_attr'],
             'compound' => $form->getConfig()->getCompound(),
@@ -122,9 +118,9 @@ class FormType extends BaseType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         // Derive "data_class" option from passed "data" object
         $dataClass = function (Options $options) {
@@ -152,66 +148,33 @@ class FormType extends BaseType
             return $options['compound'];
         };
 
-        // BC with old "virtual" option
-        $inheritData = function (Options $options) {
-            if (null !== $options['virtual']) {
-                // Uncomment this as soon as the deprecation note should be shown
-                // trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
-                return $options['virtual'];
-            }
-
-            return false;
-        };
-
         // If data is given, the form is locked to that data
         // (independent of its value)
-        $resolver->setOptional(array(
+        $resolver->setDefined(array(
             'data',
         ));
-
-        // BC clause for the "max_length" and "pattern" option
-        // Add these values to the "attr" option instead
-        $defaultAttr = function (Options $options) {
-            $attributes = array();
-
-            if (null !== $options['max_length']) {
-                $attributes['maxlength'] = $options['max_length'];
-            }
-
-            if (null !== $options['pattern']) {
-                $attributes['pattern'] = $options['pattern'];
-            }
-
-            return $attributes;
-        };
 
         $resolver->setDefaults(array(
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'trim' => true,
             'required' => true,
-            'read_only' => false,
-            'max_length' => null,
-            'pattern' => null,
             'property_path' => null,
             'mapped' => true,
             'by_reference' => true,
             'error_bubbling' => $errorBubbling,
             'label_attr' => array(),
-            'virtual' => null,
-            'inherit_data' => $inheritData,
+            'inherit_data' => false,
             'compound' => true,
             'method' => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action' => '',
-            'attr' => $defaultAttr,
+            'attr' => array(),
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
 
-        $resolver->setAllowedTypes(array(
-            'label_attr' => 'array',
-        ));
+        $resolver->setAllowedTypes('label_attr', 'array');
     }
 
     /**
@@ -224,7 +187,7 @@ class FormType extends BaseType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form';
     }

@@ -52,7 +52,10 @@ class IcuDatFileLoader extends IcuResFileLoader
         $messages = $this->flatten($rb);
         $catalogue = new MessageCatalogue($locale);
         $catalogue->add($messages, $domain);
-        $catalogue->addResource(new FileResource($resource.'.dat'));
+
+        if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $catalogue->addResource(new FileResource($resource.'.dat'));
+        }
 
         return $catalogue;
     }

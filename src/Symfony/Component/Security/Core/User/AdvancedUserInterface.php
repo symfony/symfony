@@ -43,7 +43,7 @@ interface AdvancedUserInterface extends UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw an AccountExpiredException and prevent login.
      *
-     * @return bool    true if the user's account is non expired, false otherwise
+     * @return bool true if the user's account is non expired, false otherwise
      *
      * @see AccountExpiredException
      */
@@ -55,7 +55,7 @@ interface AdvancedUserInterface extends UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw a LockedException and prevent login.
      *
-     * @return bool    true if the user is not locked, false otherwise
+     * @return bool true if the user is not locked, false otherwise
      *
      * @see LockedException
      */
@@ -67,7 +67,7 @@ interface AdvancedUserInterface extends UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw a CredentialsExpiredException and prevent login.
      *
-     * @return bool    true if the user's credentials are non expired, false otherwise
+     * @return bool true if the user's credentials are non expired, false otherwise
      *
      * @see CredentialsExpiredException
      */
@@ -79,7 +79,7 @@ interface AdvancedUserInterface extends UserInterface
      * Internally, if this method returns false, the authentication system
      * will throw a DisabledException and prevent login.
      *
-     * @return bool    true if the user is enabled, false otherwise
+     * @return bool true if the user is enabled, false otherwise
      *
      * @see DisabledException
      */

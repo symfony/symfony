@@ -278,6 +278,38 @@
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
                 <target>该值不应与 {{ compared_value_type }} {{ compared_value }} 相同。</target>
             </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>图片宽高比太大 ({{ ratio }})。允许的最大宽高比为 {{ max_ratio }}。</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>图片宽高比太小 ({{ ratio }})。允许的最大宽高比为 {{ min_ratio }}。</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>图片是方形的 ({{ width }}x{{ height }}px)。不允许使用方形的图片。</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>图片是横向的 ({{ width }}x{{ height }}px)。不允许使用横向的图片。</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>图片是纵向的 ({{ width }}x{{ height }}px)。不允许使用纵向的图片。</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>不允许使用空文件。</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>主机名无法解析。</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>该值不符合 {{ charset }} 编码。</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

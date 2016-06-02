@@ -11,25 +11,28 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-class LocalizedController extends ContainerAware
+class LocalizedController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     public function loginAction(Request $request)
     {
         // get the login error if there is one
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
+        if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
+            $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
         } else {
-            $error = $request->getSession()->get(SecurityContext::AUTHENTICATION_ERROR);
+            $error = $request->getSession()->get(Security::AUTHENTICATION_ERROR);
         }
 
         return $this->container->get('templating')->renderResponse('FormLoginBundle:Localized:login.html.twig', array(
             // last username entered by the user
-            'last_username' => $request->getSession()->get(SecurityContext::LAST_USERNAME),
+            'last_username' => $request->getSession()->get(Security::LAST_USERNAME),
             'error' => $error,
         ));
     }

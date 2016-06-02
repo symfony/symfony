@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * SwitchUserEvent
+ * SwitchUserEvent.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

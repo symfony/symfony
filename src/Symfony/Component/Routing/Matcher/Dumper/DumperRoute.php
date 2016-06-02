@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Route;
  * Container for a Route.
  *
  * @author Arnaud Le Blanc <arnaud.lb@gmail.com>
+ *
+ * @internal
  */
 class DumperRoute
 {

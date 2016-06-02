@@ -12,7 +12,7 @@
 namespace Symfony\Component\Finder;
 
 /**
- * Extends \SplFileInfo to support relative paths
+ * Extends \SplFileInfo to support relative paths.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -22,7 +22,7 @@ class SplFileInfo extends \SplFileInfo
     private $relativePathname;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param string $file             The file name
      * @param string $relativePath     The relative path
@@ -36,7 +36,9 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the relative path
+     * Returns the relative path.
+     *
+     * This path does not contain the file name.
      *
      * @return string the relative path
      */
@@ -46,7 +48,9 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the relative path name
+     * Returns the relative path name.
+     *
+     * This path contains the file name.
      *
      * @return string the relative path name
      */
@@ -56,7 +60,7 @@ class SplFileInfo extends \SplFileInfo
     }
 
     /**
-     * Returns the contents of the file
+     * Returns the contents of the file.
      *
      * @return string the contents of the file
      *

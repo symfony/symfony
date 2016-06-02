@@ -11,11 +11,16 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerAwareTrait;
+
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
  */
-class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
+class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
+    use SerializerAwareTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -59,8 +64,10 @@ class CustomNormalizer extends SerializerAwareNormalizer implements NormalizerIn
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
-        $class = new \ReflectionClass($type);
+        if (!class_exists($type)) {
+            return false;
+        }
 
-        return $class->isSubclassOf('Symfony\Component\Serializer\Normalizer\DenormalizableInterface');
+        return is_subclass_of($type, 'Symfony\Component\Serializer\Normalizer\DenormalizableInterface');
     }
 }

@@ -17,7 +17,7 @@ class WithComments
     public static $loaded = true;
 }
 
-$string = 'string shoult not be   modified {$string}';
+$string = 'string should not be   modified {$string}';
 
 $heredoc = (<<<HD
 

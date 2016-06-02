@@ -32,10 +32,6 @@ class SessionTokenStorageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!interface_exists('Symfony\Component\HttpFoundation\Session\SessionInterface')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $this->session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')
             ->disableOriginalConstructor()
             ->getMock();

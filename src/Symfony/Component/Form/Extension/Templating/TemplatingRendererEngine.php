@@ -52,7 +52,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      * @param FormView $view      The form view for finding the applying themes.
      * @param string   $blockName The name of the block to load.
      *
-     * @return bool    True if the resource could be loaded, false otherwise.
+     * @return bool True if the resource could be loaded, false otherwise.
      */
     protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName)
     {
@@ -110,7 +110,7 @@ class TemplatingRendererEngine extends AbstractRendererEngine
      * @param string $blockName The name of the block to load a resource for.
      * @param mixed  $theme     The theme to load the block from.
      *
-     * @return bool    True if the resource could be loaded, false otherwise.
+     * @return bool True if the resource could be loaded, false otherwise.
      */
     protected function loadResourceFromTheme($cacheKey, $blockName, $theme)
     {

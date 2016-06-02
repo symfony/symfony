@@ -13,19 +13,15 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
 
-/**
- * @group functional
- */
 class FirewallEntryPointTest extends WebTestCase
 {
     public function testItUsesTheConfiguredEntryPointWhenUsingUnknownCredentials()
     {
         $client = $this->createClient(array('test_case' => 'FirewallEntryPoint'));
-        $client->insulate();
 
         $client->request('GET', '/secure/resource', array(), array(), array(
             'PHP_AUTH_USER' => 'unknown',
-            'PHP_AUTH_PW'   => 'credentials',
+            'PHP_AUTH_PW' => 'credentials',
         ));
 
         $this->assertEquals(
@@ -35,17 +31,26 @@ class FirewallEntryPointTest extends WebTestCase
         );
     }
 
-    protected function setUp()
+    public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials()
     {
-        parent::setUp();
+        $client = $this->createClient(array('test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml'));
 
-        $this->deleteTmpDir('FirewallEntryPoint');
+        $client->request('GET', '/secure/resource');
+
+        $this->assertEquals(
+            EntryPointStub::RESPONSE_TEXT,
+            $client->getResponse()->getContent(),
+            "Custom entry point wasn't started"
+        );
     }
 
-    protected function tearDown()
+    public static function setUpBeforeClass()
     {
-        parent::tearDown();
+        parent::deleteTmpDir('FirewallEntryPoint');
+    }
 
-        $this->deleteTmpDir('FirewallEntryPoint');
+    public static function tearDownAfterClass()
+    {
+        parent::deleteTmpDir('FirewallEntryPoint');
     }
 }

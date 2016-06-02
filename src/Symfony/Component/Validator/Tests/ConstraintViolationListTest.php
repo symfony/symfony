@@ -110,7 +110,7 @@ class ConstraintViolationListTest extends \PHPUnit_Framework_TestCase
             $this->getViolation('Error 5', '', '[baz]'),
         ));
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 Root:
     Error 1
 Root.foo.bar:

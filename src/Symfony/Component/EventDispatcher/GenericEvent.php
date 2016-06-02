@@ -71,7 +71,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
             return $this->arguments[$key];
         }
 
-        throw new \InvalidArgumentException(sprintf('%s not found in %s', $key, $this->getName()));
+        throw new \InvalidArgumentException(sprintf('Argument "%s" not found.', $key));
     }
 
     /**
@@ -175,7 +175,7 @@ class GenericEvent extends Event implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * IteratorAggregate for iterating over the object like an array
+     * IteratorAggregate for iterating over the object like an array.
      *
      * @return \ArrayIterator
      */

@@ -14,13 +14,14 @@ namespace Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactoryInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 
 /**
  * Recursive implementation of {@link ValidatorInterface}.
  *
  * @since  2.5
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class RecursiveValidator implements ValidatorInterface

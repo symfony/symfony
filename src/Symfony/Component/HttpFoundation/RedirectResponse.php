@@ -15,8 +15,6 @@ namespace Symfony\Component\HttpFoundation;
  * RedirectResponse represents an HTTP response doing a redirect.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class RedirectResponse extends Response
 {
@@ -25,22 +23,17 @@ class RedirectResponse extends Response
     /**
      * Creates a redirect response so that it conforms to the rules defined for a redirect status code.
      *
-     * @param string  $url     The URL to redirect to
-     * @param int     $status  The status code (302 by default)
-     * @param array   $headers The headers (Location is always set to the given URL)
+     * @param string $url     The URL to redirect to. The URL should be a full URL, with schema etc.,
+     *                        but practically every browser redirects on paths only as well
+     * @param int    $status  The status code (302 by default)
+     * @param array  $headers The headers (Location is always set to the given URL)
      *
      * @throws \InvalidArgumentException
      *
      * @see http://tools.ietf.org/html/rfc2616#section-10.3
-     *
-     * @api
      */
     public function __construct($url, $status = 302, $headers = array())
     {
-        if (empty($url)) {
-            throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
-        }
-
         parent::__construct('', $status, $headers);
 
         $this->setTargetUrl($url);
@@ -71,7 +64,7 @@ class RedirectResponse extends Response
     /**
      * Sets the redirect target of this response.
      *
-     * @param string  $url     The URL to redirect to
+     * @param string $url The URL to redirect to
      *
      * @return RedirectResponse The current response.
      *

@@ -12,9 +12,11 @@
 namespace Symfony\Component\Intl\DateFormatter\DateFormat;
 
 /**
- * Parser and formatter for day format
+ * Parser and formatter for day format.
  *
  * @author Igor Wiedler <igor@wiedler.ch>
+ *
+ * @internal
  */
 class DayTransformer extends Transformer
 {

@@ -25,8 +25,6 @@ use Symfony\Component\HttpFoundation\Response;
  * Client simulates a browser and makes requests to a Kernel object.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class Client extends BaseClient
 {
@@ -101,10 +99,13 @@ class Client extends BaseClient
 
         $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
         $requirePath = str_replace("'", "\\'", $r->getFileName());
-        $symfonyPath = str_replace("'", "\\'", realpath(__DIR__.'/../../..'));
+        $symfonyPath = str_replace("'", "\\'", dirname(dirname(dirname(__DIR__))));
+        $errorReporting = error_reporting();
 
         $code = <<<EOF
 <?php
+
+error_reporting($errorReporting);
 
 require_once '$requirePath';
 
@@ -159,7 +160,7 @@ EOF;
      * If the size of a file is greater than the allowed size (from php.ini) then
      * an invalid UploadedFile is returned with an error set to UPLOAD_ERR_INI_SIZE.
      *
-     * @see Symfony\Component\HttpFoundation\File\UploadedFile
+     * @see UploadedFile
      *
      * @param array $files An array of files
      *

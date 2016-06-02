@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
  * Collects and structures information about forms.
  *
  * @since  2.4
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface FormDataCollectorInterface extends DataCollectorInterface

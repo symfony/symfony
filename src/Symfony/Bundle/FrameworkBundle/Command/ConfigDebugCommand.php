@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -31,15 +32,11 @@ class ConfigDebugCommand extends AbstractConfigCommand
     {
         $this
             ->setName('debug:config')
-            ->setAliases(array(
-                'config:debug',
-            ))
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
+                new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
             ))
             ->setDescription('Dumps the current configuration for an extension')
             ->setHelp(<<<EOF
-
 The <info>%command.name%</info> command dumps the current configuration for an
 extension/bundle.
 
@@ -58,20 +55,17 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getArgument('name');
+        $io = new SymfonyStyle($input, $output);
 
-        if (empty($name)) {
-            $this->listBundles($output);
+        if (null === $name = $input->getArgument('name')) {
+            $this->listBundles($io);
+            $io->comment('Provide the name of a bundle as the first argument of this command to dump its configuration. (e.g. <comment>debug:config FrameworkBundle</comment>)');
 
             return;
         }
 
         $extension = $this->findExtension($name);
-
-        $kernel = $this->getContainer()->get('kernel');
-        $method = new \ReflectionMethod($kernel, 'buildContainer');
-        $method->setAccessible(true);
-        $container = $method->invoke($kernel);
+        $container = $this->compileContainer();
 
         $configs = $container->getExtensionConfig($extension->getAlias());
         $configuration = $extension->getConfiguration($configs, $container);
@@ -84,11 +78,24 @@ EOF
         $config = $processor->processConfiguration($configuration, $configs);
 
         if ($name === $extension->getAlias()) {
-            $output->writeln(sprintf('# Current configuration for extension with alias: "%s"', $name));
+            $io->title(sprintf('Current configuration for extension with alias "%s"', $name));
         } else {
-            $output->writeln(sprintf('# Current configuration for "%s"', $name));
+            $io->title(sprintf('Current configuration for "%s"', $name));
         }
 
-        $output->writeln(Yaml::dump(array($extension->getAlias() => $config), 3));
+        $io->writeln(Yaml::dump(array($extension->getAlias() => $config), 10));
+    }
+
+    private function compileContainer()
+    {
+        $kernel = clone $this->getContainer()->get('kernel');
+        $kernel->boot();
+
+        $method = new \ReflectionMethod($kernel, 'buildContainer');
+        $method->setAccessible(true);
+        $container = $method->invoke($kernel);
+        $container->getCompiler()->compile($container);
+
+        return $container;
     }
 }

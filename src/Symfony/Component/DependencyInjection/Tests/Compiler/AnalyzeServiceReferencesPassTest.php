@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Reference;
@@ -88,7 +87,7 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $factory = new Definition();
-        $factory->setFactoryService('a');
+        $factory->setFactory(array(new Reference('a'), 'a'));
 
         $container
             ->register('b')
@@ -125,13 +124,11 @@ class AnalyzeServiceReferencesPassTest extends \PHPUnit_Framework_TestCase
 
         $container
             ->register('foo', 'stdClass')
-            ->setFactoryClass('stdClass')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array('stdClass', 'getInstance'));
 
         $container
             ->register('bar', 'stdClass')
-            ->setFactoryService('foo')
-            ->setFactoryMethod('getInstance');
+            ->setFactory(array(new Reference('foo'), 'getInstance'));
 
         $graph = $this->process($container);
 

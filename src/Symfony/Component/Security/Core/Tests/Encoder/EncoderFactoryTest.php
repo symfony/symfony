@@ -107,7 +107,7 @@ class EncoderFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testGetInvalidNamedEncoderForEncoderAware()
     {
@@ -139,15 +139,19 @@ class SomeUser implements UserInterface
     public function getRoles()
     {
     }
+
     public function getPassword()
     {
     }
+
     public function getSalt()
     {
     }
+
     public function getUsername()
     {
     }
+
     public function eraseCredentials()
     {
     }

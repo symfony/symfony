@@ -22,6 +22,12 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         $this->assertEquals('y-M-d', $formatter->getPattern());
     }
 
+    public function testConstructorWithoutLocale()
+    {
+        $formatter = new IntlDateFormatter(null, IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT, 'UTC', IntlDateFormatter::GREGORIAN, 'y-M-d');
+        $this->assertEquals('y-M-d', $formatter->getPattern());
+    }
+
     /**
      * @expectedException \Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException
      */
@@ -57,11 +63,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException', $e);
 
-            if (PHP_VERSION_ID >= 50304) {
-                $this->assertStringEndsWith('Only integer Unix timestamps and DateTime objects are supported.  Please install the "intl" extension for full localization capabilities.', $e->getMessage());
-            } else {
-                $this->assertStringEndsWith('Only integer Unix timestamps are supported.  Please install the "intl" extension for full localization capabilities.', $e->getMessage());
-            }
+            $this->assertStringEndsWith('Only integer Unix timestamps and DateTime objects are supported.  Please install the "intl" extension for full localization capabilities.', $e->getMessage());
         }
     }
 

@@ -18,8 +18,6 @@ namespace Symfony\Component\DomCrawler\Field;
  * specialized classes (cf. FileFormField and ChoiceFormField).
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class InputFormField extends FormField
 {

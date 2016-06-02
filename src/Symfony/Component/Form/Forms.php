@@ -24,11 +24,11 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  * $formFactory = Forms::createFormFactory();
  *
  * $form = $formFactory->createBuilder()
- *     ->add('firstName', 'text')
- *     ->add('lastName', 'text')
- *     ->add('age', 'integer')
- *     ->add('gender', 'choice', array(
- *         'choices' => array('m' => 'Male', 'f' => 'Female'),
+ *     ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+ *     ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+ *     ->add('age', 'Symfony\Component\Form\Extension\Core\Type\IntegerType')
+ *     ->add('gender', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
+ *         'choices' => array('Male' => 'm', 'Female' => 'f'),
  *     ))
  *     ->getForm();
  * </code>
@@ -52,39 +52,6 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *     ->addType(new PersonType())
  *     ->addType(new PhoneNumberType())
  *     ->addTypeExtension(new FormTypeHelpTextExtension())
- *     ->getFormFactory();
- * </code>
- *
- * Support for CSRF protection is provided by the CsrfExtension.
- * This extension needs a CSRF provider with a strong secret
- * (e.g. a 20 character long random string). The default
- * implementation for this is DefaultCsrfProvider:
- *
- * <code>
- * use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
- * use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
- *
- * $secret = 'V8a5Z97e...';
- * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new CsrfExtension(new DefaultCsrfProvider($secret)))
- *     ->getFormFactory();
- * </code>
- *
- * Support for the HttpFoundation is provided by the
- * HttpFoundationExtension. You are also advised to load the CSRF
- * extension with the driver for HttpFoundation's Session class:
- *
- * <code>
- * use Symfony\Component\HttpFoundation\Session\Session;
- * use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
- * use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
- * use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
- *
- * $session = new Session();
- * $secret = 'V8a5Z97e...';
- * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new HttpFoundationExtension())
- *     ->addExtension(new CsrfExtension(new SessionCsrfProvider($session, $secret)))
  *     ->getFormFactory();
  * </code>
  *
@@ -125,26 +92,6 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  *     ->addExtension(new TemplatingExtension($engine, null, array(
  *         'FrameworkBundle:Form',
  *         'FrameworkBundle:FormTable',
- *     )))
- *     ->getFormFactory();
- * </code>
- *
- * If you also loaded the CsrfExtension, you should pass the CSRF provider
- * to the extension so that you can render CSRF tokens in your templates
- * more easily:
- *
- * <code>
- * use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
- * use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
- * use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
- *
- *
- * $secret = 'V8a5Z97e...';
- * $csrfProvider = new DefaultCsrfProvider($secret);
- * $formFactory = Forms::createFormFactoryBuilder()
- *     ->addExtension(new CsrfExtension($csrfProvider))
- *     ->addExtension(new TemplatingExtension($engine, $csrfProvider, array(
- *         'FrameworkBundle:Form',
  *     )))
  *     ->getFormFactory();
  * </code>

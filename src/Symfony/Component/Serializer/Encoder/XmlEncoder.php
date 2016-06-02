@@ -19,22 +19,29 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author John Wards <jwards@whiteoctober.co.uk>
  * @author Fabian Vogler <fabian@equivalence.ch>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface
 {
+    /**
+     * @var \DOMDocument
+     */
     private $dom;
     private $format;
     private $context;
     private $rootNodeName = 'response';
+    private $loadOptions;
 
     /**
      * Construct new XmlEncoder and allow to change the root node element name.
      *
-     * @param string $rootNodeName
+     * @param string   $rootNodeName
+     * @param int|null $loadOptions  A bit field of LIBXML_* constants
      */
-    public function __construct($rootNodeName = 'response')
+    public function __construct($rootNodeName = 'response', $loadOptions = null)
     {
         $this->rootNodeName = $rootNodeName;
+        $this->loadOptions = null !== $loadOptions ? $loadOptions : LIBXML_NONET | LIBXML_NOBLANKS;
     }
 
     /**
@@ -77,7 +84,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
-        $dom->loadXML($data, LIBXML_NONET | LIBXML_NOBLANKS);
+        $dom->loadXML($data, $this->loadOptions);
 
         libxml_use_internal_errors($internalErrors);
         libxml_disable_entity_loader($disableEntities);
@@ -132,18 +139,18 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * {@inheritdoc}
      */
-     public function supportsEncoding($format)
-     {
-         return 'xml' === $format;
-     }
+    public function supportsEncoding($format)
+    {
+        return 'xml' === $format;
+    }
 
-     /**
+    /**
      * {@inheritdoc}
      */
-     public function supportsDecoding($format)
-     {
-         return 'xml' === $format;
-     }
+    public function supportsDecoding($format)
+    {
+        return 'xml' === $format;
+    }
 
     /**
      * Sets the root node name.
@@ -362,22 +369,20 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     {
         $append = true;
 
-        if (is_array($data) || $data instanceof \Traversable) {
+        if (is_array($data) || ($data instanceof \Traversable && !$this->serializer->supportsNormalization($data, $this->format))) {
             foreach ($data as $key => $data) {
                 //Ah this is the magic @ attribute types.
-                if (0 === strpos($key, "@") && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key, 1))) {
+                if (0 === strpos($key, '@') && is_scalar($data) && $this->isElementNameValid($attributeName = substr($key, 1))) {
                     $parentNode->setAttribute($attributeName, $data);
                 } elseif ($key === '#') {
                     $append = $this->selectNodeType($parentNode, $data);
                 } elseif (is_array($data) && false === is_numeric($key)) {
-                    /**
-                     * Is this array fully numeric keys?
-                     */
+                    // Is this array fully numeric keys?
                     if (ctype_digit(implode('', array_keys($data)))) {
-                        /**
+                        /*
                          * Create nodes to append to $parentNode based on the $key of this array
                          * Produces <xml><item>0</item><item>1</item></xml>
-                         * From array("item" => array(0,1));
+                         * From array("item" => array(0,1));.
                          */
                         foreach ($data as $subData) {
                             $append = $this->appendNode($parentNode, $subData, $key);
@@ -386,7 +391,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                         $append = $this->appendNode($parentNode, $data, $key);
                     }
                 } elseif (is_numeric($key) || !$this->isElementNameValid($key)) {
-                    $append = $this->appendNode($parentNode, $data, "item", $key);
+                    $append = $this->appendNode($parentNode, $data, 'item', $key);
                 } else {
                     $append = $this->appendNode($parentNode, $data, $key);
                 }
@@ -514,6 +519,8 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
 
         // Set an attribute on the DOM document specifying, as part of the XML declaration,
         $xmlOptions = array(
+            // nicely formats output with indentation and extra space
+            'xml_format_output' => 'formatOutput',
             // the version number of the document
             'xml_version' => 'xmlVersion',
             // the encoding of the document

@@ -43,10 +43,7 @@ interface UserProviderInterface
      *
      * @return UserInterface
      *
-     * @see UsernameNotFoundException
-     *
      * @throws UsernameNotFoundException if the user is not found
-     *
      */
     public function loadUserByUsername($username);
 
@@ -57,6 +54,7 @@ interface UserProviderInterface
      * totally reloaded (e.g. from the database), or if the UserInterface
      * object can just be merged into some internal array of users / identity
      * map.
+     *
      * @param UserInterface $user
      *
      * @return UserInterface
@@ -66,7 +64,7 @@ interface UserProviderInterface
     public function refreshUser(UserInterface $user);
 
     /**
-     * Whether this provider supports the given user class
+     * Whether this provider supports the given user class.
      *
      * @param string $class
      *

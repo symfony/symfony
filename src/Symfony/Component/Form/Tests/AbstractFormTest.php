@@ -1,13 +1,13 @@
 <?php
 
-    /*
-    * This file is part of the Symfony package.
-    *
-    * (c) Fabien Potencier <fabien@symfony.com>
-    *
-    * For the full copyright and license information, please view the LICENSE
-    * file that was distributed with this source code.
-    */
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Symfony\Component\Form\Tests;
 
@@ -34,8 +34,6 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        // We need an actual dispatcher to use the deprecated
-        // bindRequest() method
         $this->dispatcher = new EventDispatcher();
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->form = $this->createForm();
@@ -67,7 +65,7 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param  string $name
+     * @param string $name
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */

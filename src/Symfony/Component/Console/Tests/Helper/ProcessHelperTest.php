@@ -13,7 +13,6 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Process\Process;
@@ -59,7 +58,7 @@ EOT;
 
 EOT;
         $successOutputDebugWithTags = <<<EOT
-  RUN  php -r "echo \"<info>42</info>\";"
+  RUN  php -r "echo '<info>42</info>';"
   OUT  <info>42</info>
   RES  Command ran successfully
 
@@ -76,7 +75,7 @@ EOT;
 
 EOT;
         $syntaxErrorOutputDebug = <<<EOT
-  RUN  php -r "fwrite(STDERR, 'error message');usleep(50000);fwrite(STDOUT, 'out message');exit(252);"
+  RUN  php -r "fwrite(STDERR, 'error message');usleep(500000);fwrite(STDOUT, 'out message');exit(252);"
   ERR  error message
   OUT  out message
   RES  252 Command did not run successfully
@@ -84,7 +83,7 @@ EOT;
 EOT;
 
         $errorMessage = 'An error occurred';
-        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $successOutputProcessDebug = str_replace("'", '"', $successOutputProcessDebug);
         }
 
@@ -92,13 +91,13 @@ EOT;
             array('', 'php -r "echo 42;"', StreamOutput::VERBOSITY_VERBOSE, null),
             array($successOutputVerbose, 'php -r "echo 42;"', StreamOutput::VERBOSITY_VERY_VERBOSE, null),
             array($successOutputDebug, 'php -r "echo 42;"', StreamOutput::VERBOSITY_DEBUG, null),
-            array($successOutputDebugWithTags, 'php -r "echo \"<info>42</info>\";"', StreamOutput::VERBOSITY_DEBUG, null),
+            array($successOutputDebugWithTags, 'php -r "echo \'<info>42</info>\';"', StreamOutput::VERBOSITY_DEBUG, null),
             array('', 'php -r "syntax error"', StreamOutput::VERBOSITY_VERBOSE, null),
             array($syntaxErrorOutputVerbose, 'php -r "fwrite(STDERR, \'error message\');usleep(50000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_VERY_VERBOSE, null),
-            array($syntaxErrorOutputDebug, 'php -r "fwrite(STDERR, \'error message\');usleep(50000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_DEBUG, null),
+            array($syntaxErrorOutputDebug, 'php -r "fwrite(STDERR, \'error message\');usleep(500000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_DEBUG, null),
             array($errorMessage.PHP_EOL, 'php -r "fwrite(STDERR, \'error message\');usleep(50000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_VERBOSE, $errorMessage),
             array($syntaxErrorOutputVerbose.$errorMessage.PHP_EOL, 'php -r "fwrite(STDERR, \'error message\');usleep(50000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_VERY_VERBOSE, $errorMessage),
-            array($syntaxErrorOutputDebug.$errorMessage.PHP_EOL, 'php -r "fwrite(STDERR, \'error message\');usleep(50000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_DEBUG, $errorMessage),
+            array($syntaxErrorOutputDebug.$errorMessage.PHP_EOL, 'php -r "fwrite(STDERR, \'error message\');usleep(500000);fwrite(STDOUT, \'out message\');exit(252);"', StreamOutput::VERBOSITY_DEBUG, $errorMessage),
             array($successOutputProcessDebug, array('php', '-r', 'echo 42;'), StreamOutput::VERBOSITY_DEBUG, null),
             array($successOutputDebug, new Process('php -r "echo 42;"'), StreamOutput::VERBOSITY_DEBUG, null),
         );

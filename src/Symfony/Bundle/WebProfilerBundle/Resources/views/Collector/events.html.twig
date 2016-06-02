@@ -1,79 +1,117 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% from _self import display_listener %}
+{% import _self as helper %}
 
 {% block menu %}
 <span class="label">
-    <span class="icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAiCAQAAADragGFAAAD60lEQVR42o2UfUxbVRjGb7fy4ah2QwdECSgjEpcYUP8hmtiWljbt+Gih62zGVqBjXkqgVcYQKzNLJF1HBxt0S9YMgqHVLt1oZRqidcpcgQ1dMpkxgyVK2NSYyWTAJoPB4/1g0iLQnZub+348v3vOPe95L/FogFO+pbBMbtPmgEsEDXC1OXJbYVn5FnBoPwg4wVfVCc7J3WRToxoxIbmYRjXZJHcLzqnqTvAZkEUsSfI2iddxCHtR8LkIvBCIR0UKsNdxSOKVt1mSwGGQ87GKNk3ncO1ARdFxkU/qxMYQaKPUKfIVHR+oGK7VdCrazsdSGKJKqsW+oRqnMcu7s91Td02FuBAo7prKU7ezPcvrNA7ViH0l1Ygi/Kmiz+y2H3Tirvqj0PvLqk09ieAsfW1PYrXJXwZ9/VFx11Vda2OW159KmEvFvkkdadvunN19oEbYrXSczMD6/6D1JzOUDmH3gZrZ3dudpG1SJ/aZSwnSuqsDebIz9oZBtbC7/SDykATu0oZTXl77QWH3oNreIDuD3F0dpJXoU3sMU9nG5ku6lop8N9RIAw9ccqvGoDGQWymIR0XUqk+PVF0qNjZPZXsMfWoCKUijrky8Qt0KyuIiWtMqnBdAAOG8phXRVORFKvM6rWC0KQQiqfAG8PEUnkY8ZUVW7hdg6arcTyk2UJlnKAWfsqIRSSwfSFDeDIaUN5FAhBtIlz4IhqQPkB4eytROBEPaCWQ+xkyu3mDI1fs4Mz33dUsw9KUdieGhzVXf0GIF8hmoPIC4sNBEmuweLbbca56kn9kzI+ngrIkgosHMLqu/90c/a31oQVSYxemu0ELNDCph0E0z+3cd8WshnMAb4jlaqP/rjuwPWelt2hYtfCHFutWhJ95vXTw8v6l/yh3dNyphPJMLMatDz6rHaJHhnwsXJQ+33R/z1d6l/dxxJK+GrHMVsvOUTOdNX+ztvKycaLnORo6Vg7sy9GRVFyspnhp2wIDKs+6cGTay5wI2rQj9nbpt8dTtuzVM4gW89JVlB7V/a1QLEUeMrEBDNaDkfvHht07TrVi/eObrrStUC7H6AJ0smH848MnPWUzn5swM9qNHzyxRO4KE/1XoRoZklk5aRy/bdX8KIJ8XLwhQ+ut3H526ylbLk7OsWogy29hlkL+LKPEHd25f+WXIdJf+T7xzQ8RkjG7wljW5duRRM+yYDvThMIpQjGP+79mtWKzW8yEV8snp9wsgWzh1a64De/Ay+NiEV0HOdXw8plhgsaaKoGohxuSigxKM9cOMN7GZTSIC8ZT33vi3BczG6AOIXYKS85mj+e443kYKokO/FsnQWUeZl84OvUZX618UFpIDvqMM6gAAAABJRU5ErkJggg==" alt="Events"></span>
+    <span class="icon">{{ include('@WebProfiler/Icon/event.svg') }}</span>
     <strong>Events</strong>
 </span>
 {% endblock %}
 
 {% block panel %}
-    {% if collector.calledlisteners|length %}
-        {{ block('panelContent') }}
+    <h2>Event Dispatcher</h2>
+
+    {% if collector.calledlisteners is empty %}
+        <div class="empty">
+            <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
+        </div>
     {% else %}
-        <h2>Events</h2>
-        <p>
-            <em>No events have been recorded. Are you sure that debugging is enabled in the kernel?</em>
-        </p>
+        <div class="sf-tabs">
+            <div class="tab">
+                <h3 class="tab-title">Called Listeners <span class="badge">{{ collector.calledlisteners|length }}</span></h3>
+
+                <div class="tab-content">
+                    {{ helper.render_table(collector.calledlisteners) }}
+                </div>
+            </div>
+
+            <div class="tab">
+                <h3 class="tab-title">Not Called Listeners <span class="badge">{{ collector.notcalledlisteners|length }}</span></h3>
+                <div class="tab-content">
+                    {% if collector.notcalledlisteners is empty %}
+                        <div class="empty">
+                            <p>
+                                <strong>There are no uncalled listeners</strong>.
+                            </p>
+                            <p>
+                                All listeners were called for this request or an error occurred
+                                when trying to collect uncalled listeners (in which case check the
+                                logs to get more information).
+                            </p>
+                        </div>
+                    {% else %}
+                        {{ helper.render_table(collector.notcalledlisteners) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     {% endif %}
 {% endblock %}
 
-{% block panelContent %}
-    <h2>Called Listeners</h2>
-
+{% macro render_table(listeners) %}
     <table>
-        <tr>
-            <th>Event name</th>
-            <th>Listener</th>
-        </tr>
-        {% for listener in collector.calledlisteners %}
+        <thead>
             <tr>
-                <td><code>{{ listener.event }}</code></td>
-                <td><code>{{ display_listener(listener) }}</code></td>
-            </tr>
-        {% endfor %}
-    </table>
-
-    <h2>Not Called Listeners</h2>
-
-    {% if collector.notcalledlisteners %}
-        <table>
-            <tr>
-                <th>Event name</th>
+                <th class="text-right">Priority</th>
                 <th>Listener</th>
             </tr>
-            {% set listeners = collector.notcalledlisteners %}
-            {% for listener in listeners|keys|sort %}
-                <tr>
-                    <td><code>{{ listeners[listener].event }}</code></td>
-                    <td><code>{{ display_listener(listeners[listener]) }}</code></td>
-                </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p>
-            <strong>No uncalled listeners</strong>.
-        </p>
-        <p>
+        </thead>
 
-            All listeners were called for this request or an error occurred
-            when trying to collect uncalled listeners (in which case check the
-            logs to get more information).
+        {% set previous_event = (listeners|first).event %}
+        {% for listener in listeners %}
+            {% if loop.first or listener.event != previous_event %}
+                {% if not loop.first %}
+                    </tbody>
+                {% endif %}
 
-        </p>
-    {% endif %}
-{% endblock %}
+                <tbody>
+                    <tr>
+                        <th colspan="2" class="colored font-normal">{{ listener.event }}</th>
+                    </tr>
 
-{% macro display_listener(listener) %}
-    {% if listener.type == "Closure" %}
-        Closure
-    {% elseif listener.type == "Function" %}
-        {% set link = listener.file|file_link(listener.line) %}
-        {% if link %}<a href="{{ link }}">{{ listener.function }}</a>{% else %}{{ listener.function }}{% endif %}
-    {% elseif listener.type == "Method" %}
-        {% set link = listener.file|file_link(listener.line) %}
-        {{ listener.class|abbr_class }}::{% if link %}<a href="{{ link }}">{{ listener.method }}</a>{% else %}{{ listener.method }}{% endif %}
-    {% endif %}
+                {% set previous_event = listener.event %}
+            {% endif %}
+
+            <tr>
+                <td class="text-right">{{ listener.priority|default('-') }}</td>
+                <td class="font-normal">
+                    {% if listener.type == 'Closure' %}
+
+                        Closure
+                        <span class="text-muted text-small">(there is no class or file information)</span>
+
+                    {% elseif listener.type == 'Function' %}
+
+                        {% set link = listener.file|file_link(listener.line) %}
+                        {% if link %}
+                            <a href="{{ link }}">{{ listener.function }}()</a>
+                            <span class="text-muted text-small">({{ listener.file }})</span>
+                        {% else %}
+                            {{ listener.function }}()
+                            <span class="text-muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
+                        {% endif %}
+
+                    {% elseif listener.type == "Method" %}
+
+                        {% set link = listener.file|file_link(listener.line) %}
+                        {% set class_namespace = listener.class|split('\\', -1)|join('\\') %}
+
+                        {% if link %}
+                            <a href="{{ link }}"><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()</a>
+                            <span class="text-muted text-small">({{ listener.class }})</span>
+                        {% else %}
+                            <span>{{ class_namespace }}\</span><strong>{{ listener.class|abbr_class|striptags }}</strong>::{{ listener.method }}()
+                            <span class="text-muted newline text-small">{{ listener.file }} (line {{ listener.line }})</span>
+                        {% endif %}
+
+                    {% endif %}
+                </td>
+            </tr>
+
+            {% if loop.last %}
+                </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
 {% endmacro %}

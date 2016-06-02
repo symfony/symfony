@@ -12,13 +12,14 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 {
+    private static $containerCache = array();
+
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
     public function testRolesHierarchy()
@@ -93,6 +94,13 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 'security.authentication.listener.anonymous.host',
                 'security.access_listener',
             ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.1',
+                'security.authentication.listener.basic.with_user_checker',
+                'security.authentication.listener.anonymous.with_user_checker',
+                'security.access_listener',
+            ),
         ), $listeners);
     }
 
@@ -134,8 +142,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         }
 
         $matcherIds = array();
-        foreach ($rules as $rule) {
-            list($matcherId, $attributes, $channel) = $rule;
+        foreach ($rules as list($matcherId, $attributes, $channel)) {
             $requestMatcher = $container->getDefinition($matcherId);
 
             $this->assertFalse(isset($matcherIds[$matcherId]));
@@ -180,24 +187,24 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(array(
             'JMS\FooBundle\Entity\User1' => array(
-                'class' => new Parameter('security.encoder.plain.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder',
                 'arguments' => array(false),
             ),
             'JMS\FooBundle\Entity\User2' => array(
-                'class' => new Parameter('security.encoder.digest.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder',
                 'arguments' => array('sha1', false, 5),
             ),
             'JMS\FooBundle\Entity\User3' => array(
-                'class' => new Parameter('security.encoder.digest.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder',
                 'arguments' => array('md5', true, 5000),
             ),
             'JMS\FooBundle\Entity\User4' => new Reference('security.encoder.foo'),
             'JMS\FooBundle\Entity\User5' => array(
-                'class' => new Parameter('security.encoder.pbkdf2.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\Pbkdf2PasswordEncoder',
                 'arguments' => array('sha1', false, 5, 30),
             ),
             'JMS\FooBundle\Entity\User6' => array(
-                'class' => new Parameter('security.encoder.bcrypt.class'),
+                'class' => 'Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder',
                 'arguments' => array(15),
             ),
         )), $container->getDefinition('security.encoder_factory.generic')->getArguments());
@@ -233,8 +240,26 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($service->getArgument(5));
     }
 
+    public function testUserCheckerConfig()
+    {
+        $this->assertEquals('app.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.with_user_checker'));
+    }
+
+    public function testUserCheckerConfigWithDefaultChecker()
+    {
+        $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.host'));
+    }
+
+    public function testUserCheckerConfigWithNoCheckers()
+    {
+        $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.secure'));
+    }
+
     protected function getContainer($file)
     {
+        if (isset(self::$containerCache[$file])) {
+            return self::$containerCache[$file];
+        }
         $container = new ContainerBuilder();
         $security = new SecurityExtension();
         $container->registerExtension($security);
@@ -247,6 +272,6 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $container->getCompilerPassConfig()->setRemovingPasses(array());
         $container->compile();
 
-        return $container;
+        return self::$containerCache[$file] = $container;
     }
 }

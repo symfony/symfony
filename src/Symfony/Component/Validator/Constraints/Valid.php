@@ -19,17 +19,10 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class Valid extends Constraint
 {
     public $traverse = true;
-
-    /**
-     * @deprecated Deprecated as of version 2.5, to be removed in Symfony 3.0.
-     */
-    public $deep = true;
 
     public function __construct($options = null)
     {

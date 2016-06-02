@@ -1,43 +1,37 @@
-{% extends '@WebProfiler/Profiler/base.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% block body %}
-    <div id="content">
-        {% include '@WebProfiler/Profiler/header.html.twig' only %}
+{% set messages = {
+    'purge' : {
+        status:  'success',
+        title:   'The profiler database was purged successfully',
+        message: 'Now you need to browse some pages with the Symfony Profiler enabled to collect data.'
+    },
+    'no_token' : {
+        status:  'error',
+        title:   (token|default('') == 'latest') ? 'There are no profiles' : 'Token not found',
+        message: (token|default('') == 'latest') ? 'No profiles found in the database.' : 'Token "' ~ token|default('') ~ '" was not found in the database.'
+    },
+    'upload_error' : {
+        status:  'error',
+        title:   'A problem occurred when uploading the data',
+        message: 'No file given or the file was not uploaded successfully.'
+    },
+    'already_exists' : {
+        status:  'error',
+        title:   'A problem occurred when uploading the data',
+        message: 'The token already exists in the database.'
+    }
+} %}
 
-        <div id="main">
-            <div class="clear-fix">
-                <div id="collector-wrapper">
-                    <div id="collector-content">
-                        {% block panel %}
-                            {% if about == 'purge' %}
-                                <h2>The profiler database was purged successfully</h2>
-                                <p>
-                                    <em>Now you need to browse some pages with the Symfony Profiler enabled to collect data.</em>
-                                </p>
-                            {% elseif about == 'upload_error' %}
-                                <h2>A problem occurred when uploading the data</h2>
-                                <p>
-                                    <em>No file given or the file was not uploaded successfully.</em>
-                                </p>
-                            {% elseif about == 'already_exists' %}
-                                <h2>A problem occurred when uploading the data</h2>
-                                <p>
-                                    <em>The token already exists in the database.</em>
-                                </p>
-                            {% elseif about == 'no_token' %}
-                                <h2>Token not found</h2>
-                                <p>
-                                    <em>Token "{{ token }}" was not found in the database.</em>
-                                </p>
-                            {% endif %}
-                        {% endblock %}
-                    </div>
-                </div>
-                <div id="navigation">
-                    {{ render(path('_profiler_search_bar')) }}
-                    {% include '@WebProfiler/Profiler/admin.html.twig' with { 'token': '' } only %}
-                </div>
-            </div>
+{% block summary %}
+    <div class="status status-{{ messages[about].status }}">
+        <div class="container">
+            <h2>{{ messages[about].status|title }}</h2>
         </div>
     </div>
+{% endblock %}
+
+{% block panel %}
+    <h2>{{ messages[about].title }}</h2>
+    <p>{{ messages[about].message }}</p>
 {% endblock %}

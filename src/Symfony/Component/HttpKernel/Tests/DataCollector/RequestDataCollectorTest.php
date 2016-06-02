@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
@@ -66,7 +67,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                 '"Regular" callable',
                 array($this, 'testControllerInspection'),
                 array(
-                    'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
+                    'class' => __NAMESPACE__.'\RequestDataCollectorTest',
                     'method' => 'testControllerInspection',
                     'file' => __FILE__,
                     'line' => $r1->getStartLine(),
@@ -86,8 +87,13 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
 
             array(
                 'Static callback as string',
-                'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest::staticControllerMethod',
-                'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest::staticControllerMethod',
+                __NAMESPACE__.'\RequestDataCollectorTest::staticControllerMethod',
+                array(
+                    'class' => 'Symfony\Component\HttpKernel\Tests\DataCollector\RequestDataCollectorTest',
+                    'method' => 'staticControllerMethod',
+                    'file' => __FILE__,
+                    'line' => $r2->getStartLine(),
+                ),
             ),
 
             array(
@@ -173,9 +179,9 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'application/json');
-        $response->headers->setCookie(new Cookie('foo','bar',1,'/foo','localhost',true,true));
-        $response->headers->setCookie(new Cookie('bar','foo',new \DateTime('@946684800')));
-        $response->headers->setCookie(new Cookie('bazz','foo','2000-12-12'));
+        $response->headers->setCookie(new Cookie('foo', 'bar', 1, '/foo', 'localhost', true, true));
+        $response->headers->setCookie(new Cookie('bar', 'foo', new \DateTime('@946684800')));
+        $response->headers->setCookie(new Cookie('bazz', 'foo', '2000-12-12'));
 
         return $response;
     }
@@ -186,13 +192,13 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     protected function injectController($collector, $controller, $request)
     {
         $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver);
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->getMock(ArgumentResolverInterface::class));
         $event = new FilterControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MASTER_REQUEST);
         $collector->onKernelController($event);
     }
 
     /**
-     * Dummy method used as controller callable
+     * Dummy method used as controller callable.
      */
     public static function staticControllerMethod()
     {

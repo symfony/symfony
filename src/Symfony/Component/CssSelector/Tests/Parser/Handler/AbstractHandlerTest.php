@@ -43,7 +43,9 @@ abstract class AbstractHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     abstract public function getHandleValueTestData();
+
     abstract public function getDontHandleValueTestData();
+
     abstract protected function generateHandler();
 
     protected function assertStreamEmpty(TokenStream $stream)

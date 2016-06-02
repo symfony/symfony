@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Exception\OutOfBoundsException;
-
 /**
  * A sequence of validation groups.
  *
@@ -53,13 +51,11 @@ use Symfony\Component\Validator\Exception\OutOfBoundsException;
  * @Target({"CLASS", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
-class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
+class GroupSequence
 {
     /**
-     * The groups in the sequence
+     * The groups in the sequence.
      *
      * @var string[]|GroupSequence[]
      */
@@ -90,105 +86,5 @@ class GroupSequence implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         // Support for Doctrine annotations
         $this->groups = isset($groups['value']) ? $groups['value'] : $groups;
-    }
-
-    /**
-     * Returns an iterator for this group.
-     *
-     * @return \Traversable The iterator
-     *
-     * @see \IteratorAggregate::getIterator()
-     *
-     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
-     *             To be removed in Symfony 3.0.
-     */
-    public function getIterator()
-    {
-        return new \ArrayIterator($this->groups);
-    }
-
-    /**
-     * Returns whether the given offset exists in the sequence.
-     *
-     * @param int     $offset The offset
-     *
-     * @return bool    Whether the offset exists
-     *
-     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
-     *             To be removed in Symfony 3.0.
-     */
-    public function offsetExists($offset)
-    {
-        return isset($this->groups[$offset]);
-    }
-
-    /**
-     * Returns the group at the given offset.
-     *
-     * @param int     $offset The offset
-     *
-     * @return string The group a the given offset
-     *
-     * @throws OutOfBoundsException If the object does not exist
-     *
-     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
-     *             To be removed in Symfony 3.0.
-     */
-    public function offsetGet($offset)
-    {
-        if (!isset($this->groups[$offset])) {
-            throw new OutOfBoundsException(sprintf(
-                'The offset "%s" does not exist.',
-                $offset
-            ));
-        }
-
-        return $this->groups[$offset];
-    }
-
-    /**
-     * Sets the group at the given offset.
-     *
-     * @param int     $offset The offset
-     * @param string  $value  The group name
-     *
-     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
-     *             To be removed in Symfony 3.0.
-     */
-    public function offsetSet($offset, $value)
-    {
-        if (null !== $offset) {
-            $this->groups[$offset] = $value;
-
-            return;
-        }
-
-        $this->groups[] = $value;
-    }
-
-    /**
-     * Removes the group at the given offset.
-     *
-     * @param int     $offset The offset
-     *
-     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
-     *             To be removed in Symfony 3.0.
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->groups[$offset]);
-    }
-
-    /**
-     * Returns the number of groups in the sequence.
-     *
-     * @return int     The number of groups
-     *
-     * @deprecated Implemented for backwards compatibility with Symfony < 2.5.
-     *             To be removed in Symfony 3.0.
-     */
-    public function count()
-    {
-        return count($this->groups);
     }
 }

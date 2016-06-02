@@ -28,7 +28,7 @@ class YamlReferenceDumperTest extends \PHPUnit_Framework_TestCase
 
     private function getConfigurationAsString()
     {
-        return <<<EOL
+        return <<<'EOL'
 acme_root:
     boolean:              true
     scalar_empty:         ~
@@ -43,6 +43,7 @@ acme_root:
         - elem1
         - elem2
     scalar_required:      ~ # Required
+    enum_with_default:    this # One of "this"; "that"
     enum:                 ~ # One of "this"; "that"
 
     # some info
@@ -56,7 +57,7 @@ acme_root:
         child3:               ~ # Example: example setting
     parameters:
 
-        # Prototype
+        # Prototype: Parameter name
         name:                 ~
     connections:
         # Prototype

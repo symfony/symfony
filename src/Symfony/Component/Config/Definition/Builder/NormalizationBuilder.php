@@ -23,7 +23,7 @@ class NormalizationBuilder
     public $remappings = array();
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param NodeDefinition $node The related node
      */

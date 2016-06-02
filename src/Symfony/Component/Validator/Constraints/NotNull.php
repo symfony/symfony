@@ -18,10 +18,14 @@ use Symfony\Component\Validator\Constraint;
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class NotNull extends Constraint
 {
+    const IS_NULL_ERROR = 'ad32d13f-c3d4-423b-909a-857b961eb720';
+
+    protected static $errorNames = array(
+        self::IS_NULL_ERROR => 'IS_NULL_ERROR',
+    );
+
     public $message = 'This value should not be null.';
 }

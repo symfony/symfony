@@ -11,12 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 
 /**
- * Tests for the SerializerPass class
+ * Tests for the SerializerPass class.
  *
  * @author Javier Lopez <f12loalf@gmail.com>
  */
@@ -88,7 +87,7 @@ class SerializerPassTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder', array('findTaggedServiceIds'));
 
-        $container->expects($this->atLeastOnce())
+        $container->expects($this->any())
             ->method('findTaggedServiceIds')
             ->will($this->returnValue($services));
 

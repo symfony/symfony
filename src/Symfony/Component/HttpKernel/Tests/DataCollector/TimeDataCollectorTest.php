@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\DataCollector\TimeDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @group time-sensitive
+ */
 class TimeDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCollect()

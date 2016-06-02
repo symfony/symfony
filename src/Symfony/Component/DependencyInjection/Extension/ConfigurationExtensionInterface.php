@@ -22,7 +22,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 interface ConfigurationExtensionInterface
 {
     /**
-     * Returns extension configuration
+     * Returns extension configuration.
      *
      * @param array            $config    An array of configuration values
      * @param ContainerBuilder $container A ContainerBuilder instance

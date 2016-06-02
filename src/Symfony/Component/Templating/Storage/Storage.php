@@ -15,8 +15,6 @@ namespace Symfony\Component\Templating\Storage;
  * Storage is the base class for all storage classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class Storage
 {
@@ -26,8 +24,6 @@ abstract class Storage
      * Constructor.
      *
      * @param string $template The template name
-     *
-     * @api
      */
     public function __construct($template)
     {
@@ -48,8 +44,6 @@ abstract class Storage
      * Returns the content of the template.
      *
      * @return string The template content
-     *
-     * @api
      */
     abstract public function getContent();
 }

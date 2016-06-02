@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\HttpKernel;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
+use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -30,38 +33,35 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * HttpKernel notifies events to convert a Request object to a Response one.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
     protected $dispatcher;
     protected $resolver;
     protected $requestStack;
+    private $argumentResolver;
 
-    /**
-     * Constructor
-     *
-     * @param EventDispatcherInterface    $dispatcher   An EventDispatcherInterface instance
-     * @param ControllerResolverInterface $resolver     A ControllerResolverInterface instance
-     * @param RequestStack                $requestStack A stack for master/sub requests
-     *
-     * @api
-     */
-    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null)
+    public function __construct(EventDispatcherInterface $dispatcher, ControllerResolverInterface $resolver, RequestStack $requestStack = null, ArgumentResolverInterface $argumentResolver = null)
     {
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?: new RequestStack();
+        $this->argumentResolver = $argumentResolver;
+
+        if (null === $this->argumentResolver) {
+            @trigger_error(sprintf('As of 3.1 an %s is used to resolve arguments. In 4.0 the $argumentResolver becomes the %s if no other is provided instead of using the $resolver argument.', ArgumentResolverInterface::class, ArgumentResolver::class), E_USER_DEPRECATED);
+            // fallback in case of deprecations
+            $this->argumentResolver = $resolver;
+        }
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
+        $request->headers->set('X-Php-Ob-Level', ob_get_level());
+
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
@@ -77,8 +77,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function terminate(Request $request, Response $response)
     {
@@ -114,7 +112,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      *
      * @return Response A Response instance
      *
-     * @throws \LogicException If one of the listener does not behave as expected
+     * @throws \LogicException       If one of the listener does not behave as expected
      * @throws NotFoundHttpException When controller cannot be found
      */
     private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
@@ -139,7 +137,12 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         $controller = $event->getController();
 
         // controller arguments
-        $arguments = $this->resolver->getArguments($request, $controller);
+        $arguments = $this->argumentResolver->getArguments($request, $controller);
+
+        $event = new FilterControllerArgumentsEvent($this, $controller, $arguments, $request, $type);
+        $this->dispatcher->dispatch(KernelEvents::CONTROLLER_ARGUMENTS, $event);
+        $controller = $event->getController();
+        $arguments = $event->getArguments();
 
         // call controller
         $response = call_user_func_array($controller, $arguments);
@@ -267,7 +270,7 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
                 $a[] = sprintf('%s => %s', $k, $this->varToString($v));
             }
 
-            return sprintf("Array(%s)", implode(', ', $a));
+            return sprintf('Array(%s)', implode(', ', $a));
         }
 
         if (is_resource($var)) {

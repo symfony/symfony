@@ -20,6 +20,7 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
 {
     /**
      * The proxied dispatcher.
+     *
      * @var EventDispatcherInterface
      */
     private $dispatcher;
@@ -80,6 +81,14 @@ class ImmutableEventDispatcher implements EventDispatcherInterface
     public function getListeners($eventName = null)
     {
         return $this->dispatcher->getListeners($eventName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getListenerPriority($eventName, $listener)
+    {
+        return $this->dispatcher->getListenerPriority($eventName, $listener);
     }
 
     /**

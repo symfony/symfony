@@ -18,17 +18,17 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testOnCoreSecurityDoesNotTryToPopulateNonEmptySecurityContext()
+    public function testOnCoreSecurityDoesNotTryToPopulateNonEmptyTokenStorage()
     {
-        list($listener, $context,,,,) = $this->getListener();
+        list($listener, $tokenStorage) = $this->getListener();
 
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
         ;
 
-        $context
+        $tokenStorage
             ->expects($this->never())
             ->method('setToken')
         ;
@@ -38,9 +38,9 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnCoreSecurityDoesNothingWhenNoCookieIsSet()
     {
-        list($listener, $context, $service,,) = $this->getListener();
+        list($listener, $tokenStorage, $service) = $this->getListener();
 
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(null))
@@ -64,9 +64,9 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
     {
-        list($listener, $context, $service, $manager,) = $this->getListener();
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener();
 
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(null))
@@ -106,9 +106,9 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
     {
-        list($listener, $context, $service, $manager,) = $this->getListener(false, false);
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, false);
 
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(null))
@@ -144,9 +144,9 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnCoreSecurity()
     {
-        list($listener, $context, $service, $manager,) = $this->getListener();
+        list($listener, $tokenStorage, $service, $manager) = $this->getListener();
 
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(null))
@@ -159,7 +159,7 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($token))
         ;
 
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('setToken')
             ->with($this->equalTo($token))
@@ -181,11 +181,11 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         $listener->handle($event);
     }
 
-    public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent()
+    public function testSessionStrategy()
     {
-        list($listener, $context, $service, $manager,, $dispatcher) = $this->getListener(true);
+        list($listener, $tokenStorage, $service, $manager, , $dispatcher, $sessionStrategy) = $this->getListener(false, true, true);
 
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('getToken')
             ->will($this->returnValue(null))
@@ -198,7 +198,135 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($token))
         ;
 
-        $context
+        $tokenStorage
+            ->expects($this->once())
+            ->method('setToken')
+            ->with($this->equalTo($token))
+        ;
+
+        $manager
+            ->expects($this->once())
+            ->method('authenticate')
+            ->will($this->returnValue($token))
+        ;
+
+        $session = $this->getMock('\Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session
+            ->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(true))
+        ;
+
+        $request = $this->getMock('\Symfony\Component\HttpFoundation\Request');
+        $request
+            ->expects($this->once())
+            ->method('hasSession')
+            ->will($this->returnValue(true))
+        ;
+
+        $request
+            ->expects($this->once())
+            ->method('getSession')
+            ->will($this->returnValue($session))
+        ;
+
+        $event = $this->getGetResponseEvent();
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue($request))
+        ;
+
+        $sessionStrategy
+            ->expects($this->once())
+            ->method('onAuthentication')
+            ->will($this->returnValue(null))
+        ;
+
+        $listener->handle($event);
+    }
+
+    public function testSessionIsMigratedByDefault()
+    {
+        list($listener, $tokenStorage, $service, $manager, , $dispatcher, $sessionStrategy) = $this->getListener(false, true, false);
+
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null))
+        ;
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $service
+            ->expects($this->once())
+            ->method('autoLogin')
+            ->will($this->returnValue($token))
+        ;
+
+        $tokenStorage
+            ->expects($this->once())
+            ->method('setToken')
+            ->with($this->equalTo($token))
+        ;
+
+        $manager
+            ->expects($this->once())
+            ->method('authenticate')
+            ->will($this->returnValue($token))
+        ;
+
+        $session = $this->getMock('\Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session
+            ->expects($this->once())
+            ->method('isStarted')
+            ->will($this->returnValue(true))
+        ;
+        $session
+            ->expects($this->once())
+            ->method('migrate')
+        ;
+
+        $request = $this->getMock('\Symfony\Component\HttpFoundation\Request');
+        $request
+            ->expects($this->any())
+            ->method('hasSession')
+            ->will($this->returnValue(true))
+        ;
+
+        $request
+            ->expects($this->any())
+            ->method('getSession')
+            ->will($this->returnValue($session))
+        ;
+
+        $event = $this->getGetResponseEvent();
+        $event
+            ->expects($this->once())
+            ->method('getRequest')
+            ->will($this->returnValue($request))
+        ;
+
+        $listener->handle($event);
+    }
+
+    public function testOnCoreSecurityInteractiveLoginEventIsDispatchedIfDispatcherIsPresent()
+    {
+        list($listener, $tokenStorage, $service, $manager, , $dispatcher) = $this->getListener(true);
+
+        $tokenStorage
+            ->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null))
+        ;
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $service
+            ->expects($this->once())
+            ->method('autoLogin')
+            ->will($this->returnValue($token))
+        ;
+
+        $tokenStorage
             ->expects($this->once())
             ->method('setToken')
             ->with($this->equalTo($token))
@@ -240,18 +368,19 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('Symfony\Component\HttpKernel\Event\FilterResponseEvent', array(), array(), '', false);
     }
 
-    protected function getListener($withDispatcher = false, $catchExceptions = true)
+    protected function getListener($withDispatcher = false, $catchExceptions = true, $withSessionStrategy = false)
     {
         $listener = new RememberMeListener(
-            $context = $this->getContext(),
+            $tokenStorage = $this->getTokenStorage(),
             $service = $this->getService(),
             $manager = $this->getManager(),
             $logger = $this->getLogger(),
             $dispatcher = ($withDispatcher ? $this->getDispatcher() : null),
-            $catchExceptions
+            $catchExceptions,
+            $sessionStrategy = ($withSessionStrategy ? $this->getSessionStrategy() : null)
         );
 
-        return array($listener, $context, $service, $manager, $logger, $dispatcher);
+        return array($listener, $tokenStorage, $service, $manager, $logger, $dispatcher, $sessionStrategy);
     }
 
     protected function getLogger()
@@ -269,13 +398,18 @@ class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
         return $this->getMock('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface');
     }
 
-    protected function getContext()
+    protected function getTokenStorage()
     {
-        return $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
     }
 
     protected function getDispatcher()
     {
         return $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+    }
+
+    private function getSessionStrategy()
+    {
+        return $this->getMock('\Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface');
     }
 }

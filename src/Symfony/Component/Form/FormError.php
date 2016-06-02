@@ -14,7 +14,7 @@ namespace Symfony\Component\Form;
 use Symfony\Component\Form\Exception\BadMethodCallException;
 
 /**
- * Wraps errors in forms
+ * Wraps errors in forms.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -26,47 +26,52 @@ class FormError implements \Serializable
     private $message;
 
     /**
-     * The template for the error message
+     * The template for the error message.
+     *
      * @var string
      */
     protected $messageTemplate;
 
     /**
-     * The parameters that should be substituted in the message template
+     * The parameters that should be substituted in the message template.
+     *
      * @var array
      */
     protected $messageParameters;
 
     /**
-     * The value for error message pluralization
+     * The value for error message pluralization.
+     *
      * @var int|null
      */
     protected $messagePluralization;
 
     /**
-     * The cause for this error
+     * The cause for this error.
+     *
      * @var mixed
      */
     private $cause;
 
     /**
-     * The form that spawned this error
+     * The form that spawned this error.
+     *
      * @var FormInterface
      */
     private $origin;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * Any array key in $messageParameters will be used as a placeholder in
      * $messageTemplate.
      *
-     * @param string       $message              The translated error message
-     * @param string|null  $messageTemplate      The template for the error message
-     * @param array        $messageParameters    The parameters that should be
-     *                                           substituted in the message template
-     * @param int|null     $messagePluralization The value for error message pluralization
-     * @param mixed        $cause                The cause of the error
+     * @param string      $message              The translated error message
+     * @param string|null $messageTemplate      The template for the error message
+     * @param array       $messageParameters    The parameters that should be
+     *                                          substituted in the message template
+     * @param int|null    $messagePluralization The value for error message pluralization
+     * @param mixed       $cause                The cause of the error
      *
      * @see \Symfony\Component\Translation\Translator
      */
@@ -80,7 +85,7 @@ class FormError implements \Serializable
     }
 
     /**
-     * Returns the error message
+     * Returns the error message.
      *
      * @return string
      */
@@ -90,7 +95,7 @@ class FormError implements \Serializable
     }
 
     /**
-     * Returns the error message template
+     * Returns the error message template.
      *
      * @return string
      */
@@ -100,7 +105,7 @@ class FormError implements \Serializable
     }
 
     /**
-     * Returns the parameters to be inserted in the message template
+     * Returns the parameters to be inserted in the message template.
      *
      * @return array
      */

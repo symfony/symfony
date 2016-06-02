@@ -21,12 +21,12 @@ use Symfony\Component\Validator\Constraint;
  */
 class Uuid extends Constraint
 {
-    const TOO_SHORT_ERROR = 1;
-    const TOO_LONG_ERROR = 2;
-    const INVALID_CHARACTERS_ERROR = 3;
-    const INVALID_HYPHEN_PLACEMENT_ERROR = 4;
-    const INVALID_VERSION_ERROR = 5;
-    const INVALID_VARIANT_ERROR = 6;
+    const TOO_SHORT_ERROR = 'aa314679-dac9-4f54-bf97-b2049df8f2a3';
+    const TOO_LONG_ERROR = '494897dd-36f8-4d31-8923-71a8d5f3000d';
+    const INVALID_CHARACTERS_ERROR = '51120b12-a2bc-41bf-aa53-cd73daf330d0';
+    const INVALID_HYPHEN_PLACEMENT_ERROR = '98469c83-0309-4f5d-bf95-a496dcaa869c';
+    const INVALID_VERSION_ERROR = '21ba13b4-b185-4882-ac6f-d147355987eb';
+    const INVALID_VARIANT_ERROR = '164ef693-2b9d-46de-ad7f-836201f0c2db';
 
     protected static $errorNames = array(
         self::TOO_SHORT_ERROR => 'TOO_SHORT_ERROR',
@@ -45,14 +45,14 @@ class Uuid extends Constraint
     const V5_SHA1 = 5;
 
     /**
-     * Message to display when validation fails
+     * Message to display when validation fails.
      *
      * @var string
      */
     public $message = 'This is not a valid UUID.';
 
     /**
-     * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 4122
+     * Strict mode only allows UUIDs that meet the formal definition and formatting per RFC 4122.
      *
      * Set this to `false` to allow legacy formats with different dash positioning or wrapping characters
      *
@@ -61,7 +61,7 @@ class Uuid extends Constraint
     public $strict = true;
 
     /**
-     * Array of allowed versions (see version constants above)
+     * Array of allowed versions (see version constants above).
      *
      * All UUID versions are allowed by default
      *

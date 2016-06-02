@@ -57,4 +57,15 @@ class MoFileLoaderTest extends \PHPUnit_Framework_TestCase
         $resource = __DIR__.'/../fixtures/empty.mo';
         $loader->load($resource, 'en', 'domain1');
     }
+
+    public function testLoadEmptyTranslation()
+    {
+        $loader = new MoFileLoader();
+        $resource = __DIR__.'/../fixtures/empty-translation.mo';
+        $catalogue = $loader->load($resource, 'en', 'message');
+
+        $this->assertEquals(array(), $catalogue->all('message'));
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals(array(new FileResource($resource)), $catalogue->getResources());
+    }
 }

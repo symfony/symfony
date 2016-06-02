@@ -71,7 +71,7 @@ class TokenStream
     }
 
     /**
-     * Checks if end of stream was reached
+     * Checks if end of stream was reached.
      *
      * @return bool
      */

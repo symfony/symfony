@@ -22,8 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
  * A Controller can be any valid PHP callable.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface ControllerResolverInterface
 {
@@ -42,8 +40,6 @@ interface ControllerResolverInterface
      *                        or false if this resolver is not able to determine the controller
      *
      * @throws \LogicException If the controller can't be found
-     *
-     * @api
      */
     public function getController(Request $request);
 
@@ -57,7 +53,7 @@ interface ControllerResolverInterface
      *
      * @throws \RuntimeException When value for argument given is not provided
      *
-     * @api
+     * @deprecated This method is deprecated as of 3.1 and will be removed in 4.0. Please use the {@see ArgumentResolverInterface} instead.
      */
     public function getArguments(Request $request, $controller);
 }

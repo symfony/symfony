@@ -16,44 +16,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSupportsClass()
-    {
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsClass(true),
-            $this->getVoterSupportsClass(false),
-        ));
-        $this->assertTrue($manager->supportsClass('FooClass'));
-
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsClass(false),
-            $this->getVoterSupportsClass(false),
-        ));
-        $this->assertFalse($manager->supportsClass('FooClass'));
-    }
-
-    public function testSupportsAttribute()
-    {
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsAttribute(true),
-            $this->getVoterSupportsAttribute(false),
-        ));
-        $this->assertTrue($manager->supportsAttribute('foo'));
-
-        $manager = new AccessDecisionManager(array(
-            $this->getVoterSupportsAttribute(false),
-            $this->getVoterSupportsAttribute(false),
-        ));
-        $this->assertFalse($manager->supportsAttribute('foo'));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testSetVotersEmpty()
-    {
-        $manager = new AccessDecisionManager(array());
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -104,11 +66,11 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     protected function getVoterFor2Roles($token, $vote1, $vote2)
     {
         $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
-        $voter->expects($this->exactly(2))
+        $voter->expects($this->any())
               ->method('vote')
               ->will($this->returnValueMap(array(
-                  array($token, null, array("ROLE_FOO"),$vote1),
-                  array($token, null, array("ROLE_BAR"),$vote2),
+                  array($token, null, array('ROLE_FOO'), $vote1),
+                  array($token, null, array('ROLE_BAR'), $vote2),
               )))
         ;
 
@@ -153,13 +115,13 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     protected function getVoters($grants, $denies, $abstains)
     {
         $voters = array();
-        for ($i = 0; $i < $grants; $i++) {
+        for ($i = 0; $i < $grants; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_GRANTED);
         }
-        for ($i = 0; $i < $denies; $i++) {
+        for ($i = 0; $i < $denies; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_DENIED);
         }
-        for ($i = 0; $i < $abstains; $i++) {
+        for ($i = 0; $i < $abstains; ++$i) {
             $voters[] = $this->getVoter(VoterInterface::ACCESS_ABSTAIN);
         }
 
@@ -172,26 +134,6 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $voter->expects($this->any())
               ->method('vote')
               ->will($this->returnValue($vote));
-
-        return $voter;
-    }
-
-    protected function getVoterSupportsClass($ret)
-    {
-        $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
-        $voter->expects($this->any())
-              ->method('supportsClass')
-              ->will($this->returnValue($ret));
-
-        return $voter;
-    }
-
-    protected function getVoterSupportsAttribute($ret)
-    {
-        $voter = $this->getMock('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface');
-        $voter->expects($this->any())
-              ->method('supportsAttribute')
-              ->will($this->returnValue($ret));
 
         return $voter;
     }

@@ -11,16 +11,12 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface as ExecutionContextInterface2Dot5;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
-use Symfony\Component\Validator\Violation\LegacyConstraintViolationBuilder;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * Base class for constraint validators
+ * Base class for constraint validators.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 abstract class ConstraintValidator implements ConstraintValidatorInterface
 {
@@ -53,47 +49,6 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     }
 
     /**
-     * Wrapper for {@link ExecutionContextInterface::buildViolation} that
-     * supports the 2.4 context API.
-     *
-     * @param string $message    The violation message
-     * @param array  $parameters The message parameters
-     *
-     * @return ConstraintViolationBuilderInterface The violation builder
-     *
-     * @deprecated This method will be removed in Symfony 3.0.
-     */
-    protected function buildViolation($message, array $parameters = array())
-    {
-        if ($this->context instanceof ExecutionContextInterface2Dot5) {
-            return $this->context->buildViolation($message, $parameters);
-        }
-
-        return new LegacyConstraintViolationBuilder($this->context, $message, $parameters);
-    }
-
-    /**
-     * Wrapper for {@link ExecutionContextInterface::buildViolation} that
-     * supports the 2.4 context API.
-     *
-     * @param ExecutionContextInterface $context    The context to use
-     * @param string                          $message    The violation message
-     * @param array                           $parameters The message parameters
-     *
-     * @return ConstraintViolationBuilderInterface The violation builder
-     *
-     * @deprecated This method will be removed in Symfony 3.0.
-     */
-    protected function buildViolationInContext(ExecutionContextInterface $context, $message, array $parameters = array())
-    {
-        if ($context instanceof ExecutionContextInterface2Dot5) {
-            return $context->buildViolation($message, $parameters);
-        }
-
-        return new LegacyConstraintViolationBuilder($context, $message, $parameters);
-    }
-
-    /**
      * Returns a string representation of the type of the value.
      *
      * This method should be used if you pass the type of a value as
@@ -116,9 +71,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * This method returns the equivalent PHP tokens for most scalar types
      * (i.e. "false" for false, "1" for 1 etc.). Strings are always wrapped
      * in double quotes ("). Objects, arrays and resources are formatted as
-     * "object", "array" and "resource". If the parameter $prettyDateTime
-     * is set to true, {@link \DateTime} objects will be formatted as
-     * RFC-3339 dates ("Y-m-d H:i:s").
+     * "object", "array" and "resource". If the $format bitmask contains
+     * the PRETTY_DATE bit, then {@link \DateTime} objects will be formatted
+     * as RFC-3339 dates ("Y-m-d H:i:s").
      *
      * Be careful when passing message parameters to a constraint violation
      * that (may) contain objects, arrays or resources. These parameters
@@ -126,15 +81,15 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * won't know what an "object", "array" or "resource" is and will be
      * confused by the violation message.
      *
-     * @param mixed   $value  The value to format as string
-     * @param int     $format A bitwise combination of the format
-     *                        constants in this class
+     * @param mixed $value  The value to format as string
+     * @param int   $format A bitwise combination of the format
+     *                      constants in this class
      *
      * @return string The string representation of the passed value
      */
     protected function formatValue($value, $format = 0)
     {
-        $isDateTime = $value instanceof \DateTime || $value instanceof \DateTimeInterface;
+        $isDateTime = $value instanceof \DateTimeInterface;
 
         if (($format & self::PRETTY_DATE) && $isDateTime) {
             if (class_exists('IntlDateFormatter')) {
@@ -157,7 +112,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         if (is_object($value)) {
-            if ($format & self::OBJECT_TO_STRING && method_exists($value, '__toString')) {
+            if (($format & self::OBJECT_TO_STRING) && method_exists($value, '__toString')) {
                 return $value->__toString();
             }
 
@@ -197,9 +152,9 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * Each of the values is converted to a string using
      * {@link formatValue()}. The values are then concatenated with commas.
      *
-     * @param array   $values A list of values
-     * @param int     $format A bitwise combination of the format
-     *                        constants in this class
+     * @param array $values A list of values
+     * @param int   $format A bitwise combination of the format
+     *                      constants in this class
      *
      * @return string The string representation of the value list
      *

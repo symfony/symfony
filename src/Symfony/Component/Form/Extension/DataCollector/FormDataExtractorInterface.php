@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormView;
  * Extracts arrays of information out of forms.
  *
  * @since  2.4
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface FormDataExtractorInterface

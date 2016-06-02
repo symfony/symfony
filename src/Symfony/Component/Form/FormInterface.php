@@ -23,13 +23,13 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Sets the parent form.
      *
-     * @param  FormInterface|null $parent The parent form or null if it's the root.
+     * @param FormInterface|null $parent The parent form or null if it's the root.
      *
      * @return FormInterface The form instance
      *
      * @throws Exception\AlreadySubmittedException If the form has already been submitted.
-     * @throws Exception\LogicException        When trying to set a parent for a form with
-     *                                         an empty name.
+     * @throws Exception\LogicException            When trying to set a parent for a form with
+     *                                             an empty name.
      */
     public function setParent(FormInterface $parent = null);
 
@@ -43,15 +43,15 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds or replaces a child to the form.
      *
-     * @param FormInterface|string|int     $child   The FormInterface instance or the name of the child.
-     * @param string|null                  $type    The child's type, if a name was passed.
-     * @param array                        $options The child's options, if a name was passed.
+     * @param FormInterface|string|int $child   The FormInterface instance or the name of the child.
+     * @param string|null              $type    The child's type, if a name was passed.
+     * @param array                    $options The child's options, if a name was passed.
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadySubmittedException   If the form has already been submitted.
-     * @throws Exception\LogicException          When trying to add a child to a non-compound form.
-     * @throws Exception\UnexpectedTypeException If $child or $type has an unexpected type.
+     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
+     * @throws Exception\LogicException            When trying to add a child to a non-compound form.
+     * @throws Exception\UnexpectedTypeException   If $child or $type has an unexpected type.
      */
     public function add($child, $type = null, array $options = array());
 
@@ -78,7 +78,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Removes a child from the form.
      *
-     * @param  string $name The name of the child to remove
+     * @param string $name The name of the child to remove
      *
      * @return FormInterface The form instance
      *
@@ -96,9 +96,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the errors of this form.
      *
-     * @param bool    $deep    Whether to include errors of child forms as well
-     * @param bool    $flatten Whether to flatten the list of errors in case
-     *                         $deep is set to true
+     * @param bool $deep    Whether to include errors of child forms as well
+     * @param bool $flatten Whether to flatten the list of errors in case
+     *                      $deep is set to true
      *
      * @return FormErrorIterator An iterator over the {@link FormError}
      *                           instances that where added to this form
@@ -111,14 +111,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Updates the form with default data.
      *
-     * @param  mixed $modelData The data formatted as expected for the underlying object
+     * @param mixed $modelData The data formatted as expected for the underlying object
      *
      * @return FormInterface The form instance
      *
      * @throws Exception\AlreadySubmittedException If the form has already been submitted.
-     * @throws Exception\LogicException        If listeners try to call setData in a cycle. Or if
-     *                                         the view data does not match the expected type
-     *                                         according to {@link FormConfigInterface::getDataClass}.
+     * @throws Exception\LogicException            If listeners try to call setData in a cycle. Or if
+     *                                             the view data does not match the expected type
+     *                                             according to {@link FormConfigInterface::getDataClass}.
      */
     public function setData($modelData);
 
@@ -162,7 +162,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns whether the form is submitted.
      *
-     * @return bool    true if the form is submitted, false otherwise
+     * @return bool true if the form is submitted, false otherwise
      */
     public function isSubmitted();
 
@@ -183,7 +183,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Adds an error to this form.
      *
-     * @param  FormError $error
+     * @param FormError $error
      *
      * @return FormInterface The form instance
      */

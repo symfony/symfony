@@ -1,13 +1,77 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * deprecated the "choices_as_values" option of ChoiceType
+ * deprecated support for data objects that implements both `Traversable` and
+   `ArrayAccess` in `ResizeFormListener::preSubmit` method
+ * Using callable strings as choice options in `ChoiceType` has been deprecated
+   and will be used as `PropertyPath` instead of callable in Symfony 4.0.
+ * implemented `DataTransformerInterface` in `TextType`
+ * deprecated caching loaded choice list in `LazyChoiceList::$loadedList`
+
+3.0.0
+-----
+
+ * removed `FormTypeInterface::setDefaultOptions()` method
+ * removed `AbstractType::setDefaultOptions()` method
+ * removed `FormTypeExtensionInterface::setDefaultOptions()` method
+ * removed `AbstractTypeExtension::setDefaultOptions()` method
+ * added `FormTypeInterface::configureOptions()` method
+ * added `FormTypeExtensionInterface::configureOptions()` method
+
+2.8.0
+-----
+
+ * added option "choice_translation_domain" to DateType, TimeType and DateTimeType.
+ * deprecated option "read_only" in favor of "attr['readonly']"
+ * added the html5 "range" FormType
+ * deprecated the "cascade_validation" option in favor of setting "constraints"
+   with the Valid constraint
+ * moved data trimming logic of TrimListener into StringUtil
+ * [BC BREAK] When registering a type extension through the DI extension, the tag alias has to match the actual extended type.
+
+2.7.0
+-----
+
+ * added option "choice_translation_domain" to ChoiceType.
+ * deprecated option "precision" in favor of "scale"
+ * deprecated the overwriting of AbstractType::setDefaultOptions() in favor of overwriting AbstractType::configureOptions().
+ * deprecated the overwriting of AbstractTypeExtension::setDefaultOptions() in favor of overwriting AbstractTypeExtension::configureOptions().
+ * added new ChoiceList interface and implementations in the Symfony\Component\Form\ChoiceList namespace
+ * added new ChoiceView in the Symfony\Component\Form\ChoiceList\View namespace
+ * choice groups are now represented by ChoiceGroupView objects in the view
+ * deprecated the old ChoiceList interface and implementations
+ * deprecated the old ChoiceView class
+ * added CheckboxListMapper and RadioListMapper
+ * deprecated ChoiceToBooleanArrayTransformer and ChoicesToBooleanArrayTransformer
+ * deprecated FixCheckboxInputListener and FixRadioInputListener
+ * deprecated the "choice_list" option of ChoiceType
+ * added new options to ChoiceType:
+   * "choices_as_values"
+   * "choice_loader"
+   * "choice_label"
+   * "choice_name"
+   * "choice_value"
+   * "choice_attr"
+   * "group_by"
+
+2.6.2
+-----
+
+ * Added back the `model_timezone` and `view_timezone` options for `TimeType`, `DateType`
+   and `BirthdayType`
+
 2.6.0
 -----
 
  * added "html5" option to Date, Time and DateTimeFormType to be able to
    enable/disable HTML5 input date when widget option is "single_text"
  * added "label_format" option with possible placeholders "%name%" and "%id%"
- * [BC BREAK] drop support for model_timezone and view_timezone options in TimeType, DateType and BirthdayType
+ * [BC BREAK] drop support for model_timezone and view_timezone options in TimeType, DateType and BirthdayType,
+   update to 2.6.2 to get back support for these options
 
 2.5.0
 ------
@@ -30,7 +94,7 @@ CHANGELOG
 
  * moved CSRF implementation to the new Security CSRF sub-component
  * deprecated CsrfProviderInterface and its implementations
- * deprecated options "csrf_provider" and "intention" in favor of the new options "csrf_token_generator" and "csrf_token_id"
+ * deprecated options "csrf_provider" and "intention" in favor of the new options "csrf_token_manager" and "csrf_token_id"
 
 2.3.0
 -----

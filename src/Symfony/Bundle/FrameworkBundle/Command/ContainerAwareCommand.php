@@ -29,6 +29,7 @@ abstract class ContainerAwareCommand extends Command implements ContainerAwareIn
 
     /**
      * @return ContainerInterface
+     *
      * @throws \LogicException
      */
     protected function getContainer()

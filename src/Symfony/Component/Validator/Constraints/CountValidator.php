@@ -36,7 +36,7 @@ class CountValidator extends ConstraintValidator
         $count = count($value);
 
         if (null !== $constraint->max && $count > $constraint->max) {
-            $this->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
+            $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->maxMessage)
                 ->setParameter('{{ count }}', $count)
                 ->setParameter('{{ limit }}', $constraint->max)
                 ->setInvalidValue($value)
@@ -48,7 +48,7 @@ class CountValidator extends ConstraintValidator
         }
 
         if (null !== $constraint->min && $count < $constraint->min) {
-            $this->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
+            $this->context->buildViolation($constraint->min == $constraint->max ? $constraint->exactMessage : $constraint->minMessage)
                 ->setParameter('{{ count }}', $count)
                 ->setParameter('{{ limit }}', $constraint->min)
                 ->setInvalidValue($value)

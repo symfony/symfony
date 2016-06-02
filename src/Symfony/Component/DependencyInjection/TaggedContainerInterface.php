@@ -15,8 +15,6 @@ namespace Symfony\Component\DependencyInjection;
  * TaggedContainerInterface is the interface implemented when a container knows how to deals with tags.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface TaggedContainerInterface extends ContainerInterface
 {
@@ -26,8 +24,6 @@ interface TaggedContainerInterface extends ContainerInterface
      * @param string $name The tag name
      *
      * @return array An array of tags
-     *
-     * @api
      */
     public function findTaggedServiceIds($name);
 }

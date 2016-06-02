@@ -2,7 +2,6 @@
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -11,7 +10,7 @@ use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
- * ProjectServiceContainer
+ * ProjectServiceContainer.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
@@ -23,14 +22,7 @@ class LazyServiceProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        $this->services =
-        $this->scopedServices =
-        $this->scopeStacks = array();
-
-        $this->set('service_container', $this);
-
-        $this->scopes = array();
-        $this->scopeChildren = array();
+        $this->services = array();
     }
 
     /**
@@ -46,11 +38,9 @@ class LazyServiceProjectServiceContainer extends Container
     public function getFooService($lazyLoad = true)
     {
         if ($lazyLoad) {
-            $container = $this;
-
             return $this->services['foo'] = new stdClass_c1d194250ee2e2b7d2eab8b8212368a8(
-                function (& $wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) use ($container) {
-                    $wrappedInstance = $container->getFooService(false);
+                function (&$wrappedInstance, \ProxyManager\Proxy\LazyLoadingInterface $proxy) {
+                    $wrappedInstance = $this->getFooService(false);
 
                     $proxy->setProxyInitializer(null);
 
@@ -97,7 +87,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function __set($name, $value)
     {

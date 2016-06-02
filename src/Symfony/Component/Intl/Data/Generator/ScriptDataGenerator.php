@@ -25,7 +25,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
 class ScriptDataGenerator extends AbstractDataGenerator
 {
     /**
-     * Collects all available language codes
+     * Collects all available language codes.
      *
      * @var string[]
      */

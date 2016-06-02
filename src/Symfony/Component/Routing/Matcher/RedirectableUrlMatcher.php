@@ -16,8 +16,6 @@ use Symfony\Component\Routing\Route;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class RedirectableUrlMatcher extends UrlMatcher implements RedirectableUrlMatcherInterface
 {

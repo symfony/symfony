@@ -22,7 +22,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    protected static $currencies = array (
+    protected static $currencies = array(
         'ADP',
         'AED',
         'AFA',
@@ -309,7 +309,7 @@ abstract class AbstractCurrencyDataProviderTest extends AbstractDataProviderTest
         'ZWR',
     );
 
-    protected static $alpha3ToNumeric = array (
+    protected static $alpha3ToNumeric = array(
         'ADP' => 20,
         'AED' => 784,
         'AFA' => 4,

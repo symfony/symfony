@@ -11,9 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
-/**
- * @group functional
- */
 class SessionTest extends WebTestCase
 {
     /**

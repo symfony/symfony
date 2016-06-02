@@ -145,14 +145,14 @@ class TextBundleWriter implements BundleWriterInterface
             fprintf($file, "%s%d,\n", str_repeat('    ', $indentation + 1), $int);
         }
 
-        fprintf($file, "%s}", str_repeat('    ', $indentation));
+        fprintf($file, '%s}', str_repeat('    ', $indentation));
     }
 
     /**
      * Writes a "string" node.
      *
-     * @param resource $file         The file handle to write to.
-     * @param string   $value        The value of the node.
+     * @param resource $file          The file handle to write to.
+     * @param string   $value         The value of the node.
      * @param bool     $requireBraces Whether to require braces to be printed
      *                                around the value.
      *
@@ -212,7 +212,7 @@ class TextBundleWriter implements BundleWriterInterface
         }
 
         if (!$fallback) {
-            fwrite($file, ":table(nofallback)");
+            fwrite($file, ':table(nofallback)');
         }
 
         fwrite($file, "{\n");

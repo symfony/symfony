@@ -48,26 +48,10 @@ class Route
         foreach ($data as $key => $value) {
             $method = 'set'.str_replace('_', '', $key);
             if (!method_exists($this, $method)) {
-                throw new \BadMethodCallException(sprintf("Unknown property '%s' on annotation '%s'.", $key, get_class($this)));
+                throw new \BadMethodCallException(sprintf('Unknown property "%s" on annotation "%s".', $key, get_class($this)));
             }
             $this->$method($value);
         }
-    }
-
-    /**
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
-     */
-    public function setPattern($pattern)
-    {
-        $this->path = $pattern;
-    }
-
-    /**
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
-     */
-    public function getPattern()
-    {
-        return $this->path;
     }
 
     public function setPath($path)

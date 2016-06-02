@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>CSRF tarkiste on virheellinen. Olen hyvä ja yritä lähettää lomake uudestaan.</target>
+                <target>CSRF tarkiste on virheellinen. Ole hyvä ja yritä lähettää lomake uudestaan.</target>
             </trans-unit>
         </body>
     </file>

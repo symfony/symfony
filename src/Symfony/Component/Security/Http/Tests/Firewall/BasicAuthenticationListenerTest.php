@@ -29,13 +29,13 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue(null))
         ;
-        $context
+        $tokenStorage
             ->expects($this->once())
             ->method('setToken')
             ->with($this->equalTo($token))
@@ -50,7 +50,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $listener = new BasicAuthenticationListener(
-            $context,
+            $tokenStorage,
             $authenticationManager,
             'TheProviderKey',
             $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
@@ -75,13 +75,13 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue(null))
         ;
-        $context
+        $tokenStorage
             ->expects($this->never())
             ->method('setToken')
         ;
@@ -97,7 +97,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $listener = new BasicAuthenticationListener(
-            $context,
+            $tokenStorage,
             new AuthenticationProviderManager(array($this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface'))),
             'TheProviderKey',
             $authenticationEntryPoint
@@ -122,14 +122,14 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->never())
             ->method('getToken')
         ;
 
         $listener = new BasicAuthenticationListener(
-            $context,
+            $tokenStorage,
             $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
             'TheProviderKey',
             $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
@@ -151,8 +151,8 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $token = new UsernamePasswordToken('TheUsername', 'ThePassword', 'TheProviderKey', array('ROLE_FOO'));
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($token))
@@ -165,7 +165,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $listener = new BasicAuthenticationListener(
-            $context,
+            $tokenStorage,
             $authenticationManager,
             'TheProviderKey',
             $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
@@ -188,7 +188,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
     public function testItRequiresProviderKey()
     {
         new BasicAuthenticationListener(
-            $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'),
             $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface'),
             '',
             $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')
@@ -204,13 +204,13 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
         $token = new PreAuthenticatedToken('TheUser', 'TheCredentials', 'TheProviderKey', array('ROLE_FOO'));
 
-        $context = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $context
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage
             ->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($token))
         ;
-        $context
+        $tokenStorage
             ->expects($this->never())
             ->method('setToken')
         ;
@@ -226,7 +226,7 @@ class BasicAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $listener = new BasicAuthenticationListener(
-            $context,
+            $tokenStorage,
             new AuthenticationProviderManager(array($this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface'))),
             'TheProviderKey',
             $authenticationEntryPoint

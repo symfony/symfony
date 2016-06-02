@@ -25,12 +25,12 @@ class ClassCollectionLoader
     /**
      * Loads a list of classes and caches them in one big file.
      *
-     * @param array   $classes    An array of classes to load
-     * @param string  $cacheDir   A cache directory
-     * @param string  $name       The cache name prefix
-     * @param bool    $autoReload Whether to flush the cache when the cache is stale or not
-     * @param bool    $adaptive   Whether to remove already declared classes or not
-     * @param string  $extension  File extension of the resulting file
+     * @param array  $classes    An array of classes to load
+     * @param string $cacheDir   A cache directory
+     * @param string $name       The cache name prefix
+     * @param bool   $autoReload Whether to flush the cache when the cache is stale or not
+     * @param bool   $adaptive   Whether to remove already declared classes or not
+     * @param string $extension  File extension of the resulting file
      *
      * @throws \InvalidArgumentException When class can't be loaded
      */
@@ -43,10 +43,7 @@ class ClassCollectionLoader
 
         self::$loaded[$name] = true;
 
-        $declared = array_merge(get_declared_classes(), get_declared_interfaces());
-        if (function_exists('get_declared_traits')) {
-            $declared = array_merge($declared, get_declared_traits());
-        }
+        $declared = array_merge(get_declared_classes(), get_declared_interfaces(), get_declared_traits());
 
         if ($adaptive) {
             // don't include already declared classes
@@ -116,8 +113,8 @@ class ClassCollectionLoader
         }
 
         // cache the core classes
-        if (!is_dir(dirname($cache))) {
-            mkdir(dirname($cache), 0777, true);
+        if (!is_dir($cacheDir) && !@mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
+            throw new \RuntimeException(sprintf('Class Collection Loader was not able to create directory "%s"', $cacheDir));
         }
         self::writeCacheFile($cache, '<?php '.$content);
 
@@ -137,8 +134,8 @@ class ClassCollectionLoader
     public static function fixNamespaceDeclarations($source)
     {
         if (!function_exists('token_get_all') || !self::$useTokenizer) {
-            if (preg_match('/namespace(.*?)\s*;/', $source)) {
-                $source = preg_replace('/namespace(.*?)\s*;/', "namespace$1\n{", $source)."}\n";
+            if (preg_match('/(^|\s)namespace(.*?)\s*;/', $source)) {
+                $source = preg_replace('/(^|\s)namespace(.*?)\s*;/', "$1namespace$2\n{", $source)."}\n";
             }
 
             return $source;
@@ -149,8 +146,9 @@ class ClassCollectionLoader
         $inNamespace = false;
         $tokens = token_get_all($source);
 
-        for (reset($tokens); false !== $token = current($tokens); next($tokens)) {
-            if (is_string($token)) {
+        for ($i = 0; isset($tokens[$i]); ++$i) {
+            $token = $tokens[$i];
+            if (!isset($token[1]) || 'b"' === $token) {
                 $rawChunk .= $token;
             } elseif (in_array($token[0], array(T_COMMENT, T_DOC_COMMENT))) {
                 // strip comments
@@ -162,12 +160,12 @@ class ClassCollectionLoader
                 $rawChunk .= $token[1];
 
                 // namespace name and whitespaces
-                while (($t = next($tokens)) && is_array($t) && in_array($t[0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
-                    $rawChunk .= $t[1];
+                while (isset($tokens[++$i][1]) && in_array($tokens[$i][0], array(T_WHITESPACE, T_NS_SEPARATOR, T_STRING))) {
+                    $rawChunk .= $tokens[$i][1];
                 }
-                if ('{' === $t) {
+                if ('{' === $tokens[$i]) {
                     $inNamespace = false;
-                    prev($tokens);
+                    --$i;
                 } else {
                     $rawChunk = rtrim($rawChunk)."\n{";
                     $inNamespace = true;
@@ -175,8 +173,8 @@ class ClassCollectionLoader
             } elseif (T_START_HEREDOC === $token[0]) {
                 $output .= self::compressCode($rawChunk).$token[1];
                 do {
-                    $token = next($tokens);
-                    $output .= is_string($token) ? $token : $token[1];
+                    $token = $tokens[++$i];
+                    $output .= isset($token[1]) && 'b"' !== $token ? $token[1] : $token;
                 } while ($token[0] !== T_END_HEREDOC);
                 $output .= "\n";
                 $rawChunk = '';
@@ -192,7 +190,15 @@ class ClassCollectionLoader
             $rawChunk .= "}\n";
         }
 
-        return $output.self::compressCode($rawChunk);
+        $output .= self::compressCode($rawChunk);
+
+        if (PHP_VERSION_ID >= 70000) {
+            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
+            unset($tokens, $rawChunk);
+            gc_mem_caches();
+        }
+
+        return $output;
     }
 
     /**
@@ -283,12 +289,10 @@ class ClassCollectionLoader
 
         $traits = array();
 
-        if (function_exists('get_declared_traits')) {
-            foreach ($classes as $c) {
-                foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
-                    if ($trait !== $c) {
-                        $traits[] = $trait;
-                    }
+        foreach ($classes as $c) {
+            foreach (self::resolveDependencies(self::computeTraitDeps($c), $c) as $trait) {
+                if ($trait !== $c) {
+                    $traits[] = $trait;
                 }
             }
         }
@@ -335,10 +339,10 @@ class ClassCollectionLoader
      * This function does not check for circular dependencies as it should never
      * occur with PHP traits.
      *
-     * @param array             $tree       The dependency tree
-     * @param \ReflectionClass  $node       The node
-     * @param \ArrayObject      $resolved   An array of already resolved dependencies
-     * @param \ArrayObject      $unresolved An array of dependencies to be resolved
+     * @param array            $tree       The dependency tree
+     * @param \ReflectionClass $node       The node
+     * @param \ArrayObject     $resolved   An array of already resolved dependencies
+     * @param \ArrayObject     $unresolved An array of dependencies to be resolved
      *
      * @return \ArrayObject The dependencies for the given node
      *
@@ -353,14 +357,17 @@ class ClassCollectionLoader
             $unresolved = new \ArrayObject();
         }
         $nodeName = $node->getName();
-        $unresolved[$nodeName] = $node;
-        foreach ($tree[$nodeName] as $dependency) {
-            if (!$resolved->offsetExists($dependency->getName())) {
-                self::resolveDependencies($tree, $dependency, $resolved, $unresolved);
+
+        if (isset($tree[$nodeName])) {
+            $unresolved[$nodeName] = $node;
+            foreach ($tree[$nodeName] as $dependency) {
+                if (!$resolved->offsetExists($dependency->getName())) {
+                    self::resolveDependencies($tree, $dependency, $resolved, $unresolved);
+                }
             }
+            $resolved[$nodeName] = $node;
+            unset($unresolved[$nodeName]);
         }
-        $resolved[$nodeName] = $node;
-        unset($unresolved[$nodeName]);
 
         return $resolved;
     }

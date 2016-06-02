@@ -29,8 +29,6 @@ class Variable
     private $name;
 
     /**
-     * Constructor
-     *
      * @param string $name
      */
     public function __construct($name)
@@ -39,7 +37,7 @@ class Variable
     }
 
     /**
-     * Converts the object to a string
+     * Converts the object to a string.
      *
      * @return string
      */

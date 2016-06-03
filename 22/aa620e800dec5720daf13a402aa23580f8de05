@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-06-02T17:16:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-02T17:23:26Z
+
+In the `collect` method session access, e.g. `$request->getSession()->set('sf_redirect'` must also be prevented when the session is not started already.
+
+In general, it looks good to me then. It means redirection detection won't work if session are not already used.
+
+Related to #6036
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-03T07:14:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-06-03T08:34:15Z
+
+I've updated the PR according to @Tobion comment, see https://github.com/symfony/symfony/pull/18954/files#diff-e8f5b14fbfbbeac60fc9f3abe310c3b0R133

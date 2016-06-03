@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-02T11:07:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-06-02T11:08:26Z
+
+I've not added test because this class is not tested at all. If you want, I can add some
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-02T11:13:26Z
+
+would be great to add some tests, yeah
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-06-02T11:33:03Z
+
+PR updated, tests added
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-06-02T14:35:24Z
+
+PR updated, comments addressed

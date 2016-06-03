@@ -135,6 +135,10 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testReadConvertsStreamToString()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('PHPUnit_MockObject cannot mock the PDOStatement class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
+        }
+
         $pdo = new MockPdo('pgsql');
         $pdo->prepareResult = $this->getMock('PDOStatement');
 
@@ -152,6 +156,10 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testReadLockedConvertsStreamToString()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('PHPUnit_MockObject cannot mock the PDOStatement class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
+        }
+
         $pdo = new MockPdo('pgsql');
         $selectStmt = $this->getMock('PDOStatement');
         $insertStmt = $this->getMock('PDOStatement');

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-03T10:16:00Z
+
+Eventually ready: by running the full test suite in a single phpunit run, we gain ~2 minutes on the HHVM matrix line.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-03T10:25:32Z
+
+OK for me if it is faster. :+1:
+
+We may be hit by the JIT cost when parallelizing (redoing JIT for the same classes for each component, while doing a single run allows to JIT phpunit classes only once)

@@ -17,7 +17,11 @@ env:
 
 matrix:
     include:
+        # Use the newer stack for HHVM as HHVM does not support Precise anymore since a long time and so Precise has an outdated version
         - php: hhvm
+          sudo: required
+          dist: trusty
+          group: edge
         - php: 5.5
         - php: 5.6
           env: deps=high
@@ -33,12 +37,13 @@ cache:
 services: mongodb
 
 before_install:
+    - stty cols 120
     - PHP=$TRAVIS_PHP_VERSION
     # Matrix lines for intermediate PHP versions are skipped for pull requests
-    - if [[ ! $deps && ! $PHP = ${MIN_PHP%.*} && $PHP != hhvm && $TRAVIS_PULL_REQUEST != false ]]; then deps=skip; skip=1; fi
+    - if [[ ! $deps && ! $PHP = ${MIN_PHP%.*} && ! $PHP = hhvm* && $TRAVIS_PULL_REQUEST != false ]]; then deps=skip; skip=1; fi
     # A sigchild-enabled-PHP is used to test the Process component on the lowest PHP matrix line
     - if [[ ! $deps && $PHP = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then wget http://museum.php.net/php5/php-$MIN_PHP.tar.bz2 -O - | tar -xj; (cd php-$MIN_PHP; ./configure --enable-sigchild --enable-pcntl; make -j2); fi
-    - if [[ $PHP != hhvm ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi
+    - if [[ ! $PHP = hhvm* ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi
     - if [[ ! $skip ]]; then echo memory_limit = -1 >> $INI_FILE; fi
     - if [[ ! $skip ]]; then echo session.gc_probability = 0 >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then echo extension = mongo.so >> $INI_FILE; fi
@@ -47,8 +52,8 @@ before_install:
     - if [[ ! $skip && $PHP = 7.* ]]; then (echo yes | pecl install -f apcu-5.1.2 && echo apc.enable_cli = 1 >> $INI_FILE); fi
     - if [[ ! $deps && $PHP = 5.* ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> $INI_FILE); fi
     - if [[ ! $skip && $PHP = 5.* ]]; then pecl install -f memcached-2.1.0; fi
-    - if [[ ! $skip && $PHP != hhvm ]]; then echo extension = ldap.so >> $INI_FILE; fi
-    - if [[ ! $skip && $PHP != hhvm ]]; then phpenv config-rm xdebug.ini; fi
+    - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = ldap.so >> $INI_FILE; fi
+    - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini; fi
     - if [[ ! $skip ]]; then composer self-update --stable; fi
     - if [[ ! $skip ]]; then cp .composer/* ~/.composer/; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
@@ -66,12 +71,13 @@ install:
     - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
     - if [[ ! $deps ]]; then composer update; else export SYMFONY_DEPRECATIONS_HELPER=weak; fi
     - if [[ $TRAVIS_BRANCH = master ]]; then export SYMFONY_PHPUNIT_OVERLOAD=1; fi
-    - if [[ $PHP != hhvm ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
+    - if [[ ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
 
 script:
     - if [[ $skip ]]; then echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"; fi
-    - if [[ ! $deps ]]; then echo "$COMPONENTS" | parallel --gnu '$PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi
-    - if [[ ! $deps ]]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi
+    - if [[ ! $deps && ! $PHP = hhvm* ]]; then echo "$COMPONENTS" | parallel --gnu '$PHPUNIT --exclude-group tty,benchmark,intl-data {}'; fi
+    - if [[ ! $deps && ! $PHP = hhvm* ]]; then echo -e "\\nRunning tests requiring tty"; $PHPUNIT --group tty; fi
+    - if [[ ! $deps && $PHP = hhvm* ]]; then $PHPUNIT --exclude-group benchmark,intl-data; fi
     - if [[ ! $deps && $PHP = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | xargs -I{} sh -c 'echo "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi
     - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --no-progress --ansi; $PHPUNIT --exclude-group tty,benchmark,intl-data'$LEGACY; fi
     - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --no-progress --ansi --prefer-lowest --prefer-stable; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi

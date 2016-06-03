@@ -169,6 +169,8 @@ class DnsMock
         if (0 < strpos($class, '\\Tests\\')) {
             $ns = str_replace('\\Tests\\', '\\', $class);
             $mockedNs[] = substr($ns, 0, strrpos($ns, '\\'));
+        } elseif (0 === strpos($class, 'Tests\\')) {
+            $mockedNs[] = substr($class, 6, strrpos($class, '\\') - 6);
         }
         foreach ($mockedNs as $ns) {
             if (function_exists($ns.'\checkdnsrr')) {

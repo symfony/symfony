@@ -44,7 +44,7 @@
                             </dl>
                         {%- endif %}
 
-                        {% if request_collector and request_collector.forward and request_collector.forward.controller.class is defined -%}
+                        {% if request_collector and request_collector.forward|default(false) and request_collector.forward.controller.class is defined -%}
                             {%- set forward = request_collector.forward -%}
                             {%- set controller = forward.controller -%}
                             <dl class="metadata">

@@ -128,7 +128,7 @@ EOTXT;
         $line = __LINE__ - 1;
 
         ob_start();
-        $collector = null;
+        $collector->__destruct();
         if (PHP_VERSION_ID >= 50400) {
             $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", ob_get_clean());
         } else {

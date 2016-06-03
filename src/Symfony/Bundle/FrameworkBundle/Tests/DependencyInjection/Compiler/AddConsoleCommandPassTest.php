@@ -45,8 +45,9 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue($container->hasDefinition($alias));
         }
 
+        $id = $public ? 'my-command' : 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
         $this->assertTrue($container->hasParameter('console.command.ids'));
-        $this->assertSame(array('console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand'), $container->getParameter('console.command.ids'));
+        $this->assertSame(array($id), $container->getParameter('console.command.ids'));
     }
 
     public function visibilityProvider()

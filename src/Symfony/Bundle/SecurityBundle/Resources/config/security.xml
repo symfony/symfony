@@ -127,6 +127,7 @@
             <argument /> <!-- default_roles -->
             <argument /> <!-- uid key -->
             <argument /> <!-- filter -->
+            <argument /> <!-- password_attribute -->
         </service>
 
         <service id="security.user.provider.chain" class="Symfony\Component\Security\Core\User\ChainUserProvider" abstract="true" public="false" />

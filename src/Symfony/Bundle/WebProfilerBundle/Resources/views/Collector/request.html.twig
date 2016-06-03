@@ -13,7 +13,7 @@
         {% endset %}
     {% endif %}
 
-    {% if collector.forward %}
+    {% if collector.forward|default(false) %}
         {% set forward_handler %}
             {% import _self as helper %}
             {{ helper.set_handler(collector.forward.controller) }}
@@ -26,7 +26,7 @@
         <span class="sf-toolbar-status sf-toolbar-status-{{ request_status_code_color }}">{{ collector.statuscode }}</span>
         {% if collector.route %}
             {% if collector.redirect %}{{ include('@WebProfiler/Icon/redirect.svg') }}{% endif %}
-            {% if collector.forward %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
+            {% if collector.forward|default(false) %}{{ include('@WebProfiler/Icon/forward.svg') }}{% endif %}
             <span class="sf-toolbar-label">{{ 'GET' != collector.method ? collector.method }} @</span>
             <span class="sf-toolbar-value sf-toolbar-info-piece-additional">{{ collector.route }}</span>
         {% endif %}

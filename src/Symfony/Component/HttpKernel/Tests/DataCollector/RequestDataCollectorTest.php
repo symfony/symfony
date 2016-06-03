@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
@@ -50,6 +53,20 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('OK', $c->getStatusText());
         $this->assertSame(200, $c->getStatusCode());
         $this->assertSame('application/json', $c->getContentType());
+    }
+
+    public function testKernelResponseDoesNotStartSession()
+    {
+        $kernel = $this->getMock(HttpKernelInterface::class);
+        $request = new Request();
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+        $response = new Response();
+
+        $c = new RequestDataCollector();
+        $c->onKernelResponse(new FilterResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response));
+
+        $this->assertFalse($session->isStarted());
     }
 
     /**

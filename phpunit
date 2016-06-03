@@ -53,6 +53,9 @@ if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__
     chdir("phpunit-$PHPUNIT_VERSION");
     passthru("$COMPOSER remove --no-update phpspec/prophecy");
     passthru("$COMPOSER remove --no-update symfony/yaml");
+    if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
+        passthru("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
+    }
     passthru("$COMPOSER require --dev --no-update symfony/phpunit-bridge \">=3.1@dev\"");
     passthru("$COMPOSER install --prefer-dist --no-progress --ansi", $exit);
     if ($exit) {
@@ -170,8 +173,11 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
                 unlink($file);
             }
 
-            // Fail on any individual component failures but ignore STATUS_STACK_BUFFER_OVERRUN (-1073740791/0xC0000409) and STATUS_ACCESS_VIOLATION (-1073741819/0xC0000005) on Windows when APCu is enabled
-            if ($procStatus && ('\\' !== DIRECTORY_SEPARATOR || !extension_loaded('apcu') || !ini_get('apc.enable_cli') || (-1073740791 !== $procStatus && -1073741819 !== $procStatus))) {
+            // Fail on any individual component failures but ignore some error codes on Windows when APCu is enabled:
+            // STATUS_STACK_BUFFER_OVERRUN (-1073740791/0xC0000409)
+            // STATUS_ACCESS_VIOLATION (-1073741819/0xC0000005)
+            // STATUS_HEAP_CORRUPTION (-1073740940/0xC0000374)
+            if ($procStatus && ('\\' !== DIRECTORY_SEPARATOR || !extension_loaded('apcu') || !ini_get('apc.enable_cli') || !in_array($procStatus, array(-1073740791, -1073741819, -1073740940)))) {
                 $exit = $procStatus;
                 echo "\033[41mKO\033[0m $component\n\n";
             } else {

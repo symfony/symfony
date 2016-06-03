@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-06-02T08:27:14Z
+
+Note that I'm not using the trusty infrastructure for normal PHP builds, because it is slower than the docker-based environment:
+
+- PHP is not pre-installed in the image, so it needs to be installed on-demand for each build
+- there is less capacity on this infra currently, so it takes longer to boot
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-02T09:44:03Z
+
+Here we go. Tests are now running against the latest HHVM on Travis rather than running on an outdated version.
+
+@nicolas-grekas there is 1 failure on HHVM in a test related to the VarDumper profiler collector. Could you check it to decide whether we should skip it or fix it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-03T07:40:41Z
+
+Fix embedded in #18960
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-03T08:03:00Z
+
+OK, then this PR is ready

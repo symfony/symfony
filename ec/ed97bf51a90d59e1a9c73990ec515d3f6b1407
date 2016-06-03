@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-02T07:29:37Z
+
+There is already a redis server detection, but it checks for `127.0.0.1`, then it uses `localhost`, which might not be the same (e.g. if `localhost` is `[::1]`). I suggest to replace all `redis://localhost` strings in the tests with `redis://127.0.0.1` instead.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-02T09:06:06Z
+
+@nicolas-grekas I tried to apply your suggestion, unfortunately it doesn't helped.
+
+In fact the exception doesn't match with `\PHPUnit_Framework_Error_Warning`, even by removing the `if (0 !== strpos('unable to...') { throw $e; }` the test continues then fails at the first exception.
+
+Strangely, this error occurs only from the `testRedisCachePools`, not in the `testRedisCustomCachePools`. I think I need to investigate what happen in the `redis_config.yml`.
+The catch I added seems to solve it, but the problem may come from the default cache configuration of the framework. WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-02T09:09:52Z
+
+Ok, then :+1:

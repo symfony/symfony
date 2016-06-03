@@ -61,7 +61,7 @@ class Application
     private $autoExit;
     private $definition;
     private $helperSet;
-    private $dispatcher;
+    protected $dispatcher;
 
     /**
      * Constructor.

@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by Dword123 at 2016-06-01T11:47:23Z
+
+This is my first pull request, please don't hurt me :)
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-06-01T13:50:46Z
+
+> greatly improving memory efficiency
+
+can you show some statistics about that?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-01T14:53:46Z
+
+@Dword123 congrats on your first pull request and thanks for contributing to Symfony!
+
+The kind of improvement that you propose here is always tricky for us. This affects the console output stream, which is something that it's not used frequently or on every request. That's why most of the times these improvements don't provide enough gains to be worthy. So let's see what other contributors think about this.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2016-06-01T16:15:49Z
+
+We're using symfony/console over at https://github.com/webfactory/slimdump, a tool that makes SQL dumps to `stdout` somewhat similar to what `mysqldump` does.
+
+In that case, the `message` can be a hex-encoded BLOB (files or the like) and a few dozen MB in size.
+
+If the newline is added to the string before being written, PHP has to allocate additional memory about the size of `$message` to store the new resulting value.
+
+Asked the other way round: What problem could this change cause?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-02T07:23:57Z
+
+:+1:

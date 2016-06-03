@@ -103,7 +103,14 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         if (!is_object($object)) {
-            return sprintf('%s (%s)', gettype($object), $object);
+            if (is_bool($object)) {
+                return sprintf('%s (%s)', gettype($object), $object ? 'true' : 'false');
+            }
+            if (is_scalar($object)) {
+                return sprintf('%s (%s)', gettype($object), $object);
+            }
+
+            return gettype($object);
         }
 
         $objectClass = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($object) : get_class($object);

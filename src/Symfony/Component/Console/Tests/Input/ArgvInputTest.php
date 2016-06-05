@@ -149,9 +149,9 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideInvalidInput
      */
-    public function testInvalidInput($argv, $definition, $expectedExceptionMessage)
+    public function testInvalidInput($argv, $definition, $expectedExceptionType, $expectedExceptionMessage)
     {
-        $this->setExpectedException('RuntimeException', $expectedExceptionMessage);
+        $this->setExpectedException($expectedExceptionType, $expectedExceptionMessage);
 
         $input = new ArgvInput($argv);
         $input->bind($definition);
@@ -163,41 +163,49 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
             array(
                 array('cli.php', '--foo'),
                 new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))),
+                'Symfony\Component\Console\Exception\InvalidOptionException',
                 'The "--foo" option requires a value.',
             ),
             array(
                 array('cli.php', '-f'),
                 new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_REQUIRED))),
+                'Symfony\Component\Console\Exception\InvalidOptionException',
                 'The "--foo" option requires a value.',
             ),
             array(
                 array('cli.php', '-ffoo'),
                 new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_NONE))),
+                'Symfony\Component\Console\Exception\InvalidOptionException',
                 'The "-o" option does not exist.',
             ),
             array(
                 array('cli.php', '--foo=bar'),
                 new InputDefinition(array(new InputOption('foo', 'f', InputOption::VALUE_NONE))),
+                'Symfony\Component\Console\Exception\InvalidOptionException',
                 'The "--foo" option does not accept a value.',
             ),
             array(
                 array('cli.php', 'foo', 'bar'),
                 new InputDefinition(),
+                'RuntimeException',
                 'Too many arguments.',
             ),
             array(
                 array('cli.php', '--foo'),
                 new InputDefinition(),
+                'Symfony\Component\Console\Exception\InvalidOptionException',
                 'The "--foo" option does not exist.',
             ),
             array(
                 array('cli.php', '-f'),
                 new InputDefinition(),
+                'Symfony\Component\Console\Exception\InvalidOptionException',
                 'The "-f" option does not exist.',
             ),
             array(
                 array('cli.php', '-1'),
                 new InputDefinition(array(new InputArgument('number'))),
+                'Symfony\Component\Console\Exception\InvalidOptionException',
                 'The "-1" option does not exist.',
             ),
         );

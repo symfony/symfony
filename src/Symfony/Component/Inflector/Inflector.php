@@ -138,6 +138,7 @@ final class Inflector
     private static $irregularNouns = array(
         'committee' => 'committee',
         'feedback' => 'feedback',
+        'screenshots' => 'screenshot',
     );
 
     /**
@@ -226,11 +227,6 @@ final class Inflector
                 }
             }
         }
-
-        $irregularNouns = array(
-            'committee' => 'committee',
-            'feedback' => 'feedback',
-        );
 
         // Convert teeth to tooth, feet to foot
         if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && !isset(self::$irregularNouns[strtolower($plural)])) {

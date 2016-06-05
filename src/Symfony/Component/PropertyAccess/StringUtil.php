@@ -133,6 +133,7 @@ class StringUtil
     private static $irregularNouns = array(
         'committee' => 'committee',
         'feedback' => 'feedback',
+        'screenshots' => 'screenshot',
     );
 
     /**

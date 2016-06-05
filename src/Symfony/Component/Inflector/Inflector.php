@@ -131,6 +131,16 @@ final class Inflector
     );
 
     /**
+     * Irregular nouns which will not be converted 'ee' to 'oo'
+     *
+     * @var array
+     */
+    private static $irregularNouns = array(
+        'committee' => 'committee',
+        'feedback' => 'feedback',
+    );
+
+    /**
      * This class should not be instantiated.
      */
     private function __construct()
@@ -223,7 +233,7 @@ final class Inflector
         );
 
         // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && !isset($irregularNouns[strtolower($plural)])) {
+        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && !isset(self::$irregularNouns[strtolower($plural)])) {
             return substr_replace($plural, 'oo', $pos, 2);
         }
 

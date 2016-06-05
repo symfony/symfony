@@ -84,6 +84,21 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testToolbarIsInjected
+     */
+    public function testToolbarIsNotInjectedOnContentDispositionAttachment()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('Content-Disposition', 'attachment; filename=test.html');
+        $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(false, 'html'), HttpKernelInterface::MASTER_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    /**
+     * @depends testToolbarIsInjected
      * @dataProvider provideRedirects
      */
     public function testToolbarIsNotInjectedOnRedirection($statusCode, $hasSession)

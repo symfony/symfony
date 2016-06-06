@@ -58,9 +58,9 @@ class Parser implements ParserInterface
      *
      * @param Token[] $tokens
      *
-     * @throws SyntaxErrorException
-     *
      * @return array
+     *
+     * @throws SyntaxErrorException
      */
     public static function parseSeries(array $tokens)
     {
@@ -133,9 +133,9 @@ class Parser implements ParserInterface
      *
      * @param TokenStream $stream
      *
-     * @throws SyntaxErrorException
-     *
      * @return Node\SelectorNode
+     *
+     * @throws SyntaxErrorException
      */
     private function parserSelectorNode(TokenStream $stream)
     {
@@ -173,9 +173,9 @@ class Parser implements ParserInterface
      * @param TokenStream $stream
      * @param bool        $insideNegation
      *
-     * @throws SyntaxErrorException
-     *
      * @return array
+     *
+     * @throws SyntaxErrorException
      */
     private function parseSimpleSelector(TokenStream $stream, $insideNegation = false)
     {
@@ -330,9 +330,9 @@ class Parser implements ParserInterface
      * @param Node\NodeInterface $selector
      * @param TokenStream        $stream
      *
-     * @throws SyntaxErrorException
-     *
      * @return Node\AttributeNode
+     *
+     * @throws SyntaxErrorException
      */
     private function parseAttributeNode(Node\NodeInterface $selector, TokenStream $stream)
     {

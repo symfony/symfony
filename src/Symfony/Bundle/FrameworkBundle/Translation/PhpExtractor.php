@@ -182,9 +182,9 @@ class PhpExtractor extends AbstractFileExtractor implements ExtractorInterface
     /**
      * @param string $file
      *
-     * @throws \InvalidArgumentException
-     *
      * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     protected function canBeExtracted($file)
     {

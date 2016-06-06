@@ -27,11 +27,11 @@
     },
     "require-dev": {
         "symfony/serializer": "~2.7|~3.0.0",
-        "phpdocumentor/reflection": "^1.0.7",
+        "phpdocumentor/reflection": "^3.0.1",
         "doctrine/annotations": "~1.0"
     },
     "conflict": {
-        "phpdocumentor/reflection": "<1.0.7"
+        "phpdocumentor/reflection": "<3.0.1"
     },
     "suggest": {
         "symfony/doctrine-bridge": "To use Doctrine metadata",

@@ -86,10 +86,10 @@
         "monolog/monolog": "~1.11",
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
         "egulias/email-validator": "~1.2",
-        "phpdocumentor/reflection": "^1.0.7"
+        "phpdocumentor/reflection": "^3.0.1"
     },
     "conflict": {
-        "phpdocumentor/reflection": "<1.0.7"
+        "phpdocumentor/reflection": "<3.0.1"
     },
     "autoload": {
         "psr-4": {

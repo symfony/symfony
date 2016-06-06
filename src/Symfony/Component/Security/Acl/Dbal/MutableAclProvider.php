@@ -554,9 +554,9 @@ QUERY;
      *
      * @param SecurityIdentityInterface $sid
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getInsertSecurityIdentitySql(SecurityIdentityInterface $sid)
     {
@@ -626,9 +626,9 @@ QUERY;
      *
      * @param SecurityIdentityInterface $sid
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
@@ -655,9 +655,9 @@ QUERY;
      *
      * @param SecurityIdentityInterface $sid
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getDeleteSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
@@ -673,9 +673,9 @@ QUERY;
      * @param int   $pk
      * @param array $changes
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getUpdateObjectIdentitySql($pk, array $changes)
     {
@@ -723,9 +723,9 @@ QUERY;
      * @param int   $pk
      * @param array $sets
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getUpdateAccessControlEntrySql($pk, array $sets)
     {

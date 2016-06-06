@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
-
 /**
  * Defines the most basic interface a class must implement to be normalizable.
  *
@@ -34,8 +32,6 @@ interface NormalizableInterface
      * @param string|null         $format     The format is optionally given to be able to normalize differently
      *                                        based on different output formats.
      * @param array               $context    Options for normalizing this object
-     *
-     * @throws ExceptionInterface
      *
      * @return array|scalar
      */

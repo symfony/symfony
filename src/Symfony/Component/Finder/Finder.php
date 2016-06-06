@@ -128,9 +128,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string $name
      *
-     * @throws \InvalidArgumentException
-     *
      * @return Finder The current Finder instance
+     *
+     * @throws \InvalidArgumentException
      */
     public function setAdapter($name)
     {

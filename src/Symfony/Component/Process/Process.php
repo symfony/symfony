@@ -477,10 +477,10 @@ class Process
      * In comparison with the getOutput method which always return the whole
      * output, this one returns the new output since the last call.
      *
+     * @return string The process output since the last call
+     *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
-     *
-     * @return string The process output since the last call
      */
     public function getIncrementalOutput()
     {
@@ -536,10 +536,10 @@ class Process
      * whole error output, this one returns the new error output since the last
      * call.
      *
+     * @return string The process error output since the last call
+     *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
-     *
-     * @return string The process error output since the last call
      */
     public function getIncrementalErrorOutput()
     {

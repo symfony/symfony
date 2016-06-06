@@ -7,6 +7,35 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.7 (2016-06-06)
+
+ * bug #18908 [DependencyInjection] force enabling the external XML entity loaders (xabbuh)
+ * bug #18893 [DependencyInjection] Skip deep reference check for 'service_container' (RobertMe)
+ * bug #18812 Catch \Throwable (fprochazka)
+ * bug #18821 [Form] Removed UTC specification with timestamp (francisbesset)
+ * bug #18861 Fix for #18843 (inso)
+ * bug #18889 [Console] SymfonyStyle: Fix alignment/prefixing of multi-line comments (chalasr)
+ * bug #18907 [Routing] Fix the annotation loader taking a class constant as a beginning of a class name (jakzal, nicolas-grekas)
+ * bug #18879 [Console] SymfonyStyle: Align multi-line/very-long-line blocks (chalasr)
+ * bug #18864 [Console][DX] Fixed ambiguous error message when using a duplicate option shortcut (peterrehm)
+ * bug #18883 Fix js comment in profiler (linnaea)
+ * bug #18844 [Yaml] fix exception contexts (xabbuh)
+ * bug #18840 [Yaml] properly handle unindented collections (xabbuh)
+ * bug #18765 Catch \Throwable (fprochazka)
+ * bug #18813 Catch \Throwable (fprochazka)
+ * bug #18839 People - person singularization (Keeo)
+ * bug #18828 [Yaml] chomp newlines only at the end of YAML documents (xabbuh)
+ * bug #18814 Fixed server status command when port has been omitted (peterrehm)
+ * bug #18799 Use levenshtein level for better Bundle matching (j0k3r)
+ * bug #18413 [WebProfilerBundle] Fix CORS ajax security issues (romainneutron)
+ * bug #18774 [console][table] adjust width of colspanned cell. (aitboudad)
+ * bug #18507 [BUG] Delete class 'control-group' in bootstrap 3 (Philippe Degeeter)
+ * bug #18747  [Form] Modified iterator_to_array's 2nd parameter to false in ViolationMapper (issei-m)
+ * bug #18635 [Console] Prevent fatal error when calling Command::getHelper without helperSet (chalasr)
+ * bug #18686 [console][table] adjust width of colspanned cell. (aitboudad)
+ * bug #18761  [Form] Modified iterator_to_array's 2nd parameter to false in ViolationMapper (issei-m)
+ * bug #18737 [Debug] Fix fatal error handlers on PHP 7 (nicolas-grekas)
+
 * 2.8.6 (2016-05-09)
 
  * security #18736 Fixed issue with blank password with Ldap (csarrazi)

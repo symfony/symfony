@@ -160,6 +160,8 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
+     * Validates and parses the given file into a DOMDocument.
+     *
      * @param string       $file
      * @param \DOMDocument $dom
      * @param string       $schema source of the schema

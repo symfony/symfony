@@ -87,8 +87,6 @@ class StopwatchEvent
     /**
      * Stops the last started event period.
      *
-     * @throws \LogicException When start wasn't called before stopping
-     *
      * @return StopwatchEvent The event
      *
      * @throws \LogicException When stop() is called without a matching call to start()

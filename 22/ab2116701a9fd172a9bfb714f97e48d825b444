@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-06T12:53:09Z
+
+@jakzal It seems your e-mail address is wrongly configured for Git, as your user linkage is broken for the commit.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-06-06T12:58:06Z
+
+@sstok oops. Thanks for letting me know. Fixed now :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-06T14:00:23Z
+
+2.3 is not maintained anymore :)
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-06-06T14:08:43Z
+
+@nicolas-grekas Old habbits die hard ;)
+
+This should be merged to 2.7, and the conflict on 2.8 should be resolved to `~2.1|~3.0.0`.

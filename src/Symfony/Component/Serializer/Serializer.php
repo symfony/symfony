@@ -183,6 +183,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
      * @return NormalizerInterface|null
+     *
+     * @throws RuntimeException
      */
     private function getNormalizer($data, $format)
     {
@@ -201,6 +203,8 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
      * @param string $format format name, present to give the option to normalizers to act differently based on formats
      *
      * @return DenormalizerInterface|null
+     *
+     * @throws RuntimeException
      */
     private function getDenormalizer($data, $class, $format)
     {

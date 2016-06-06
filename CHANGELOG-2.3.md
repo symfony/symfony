@@ -7,6 +7,22 @@ in 2.3 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.3.0...v2.3.1
 
+* 2.3.42 (2016-05-30)
+
+ * bug #18908 [DependencyInjection] force enabling the external XML entity loaders (xabbuh)
+ * bug #18893 [DependencyInjection] Skip deep reference check for 'service_container' (RobertMe)
+ * bug #18812 Catch \Throwable (fprochazka)
+ * bug #18821 [Form] Removed UTC specification with timestamp (francisbesset)
+ * bug #18861 Fix for #18843 (inso)
+ * bug #18907 [Routing] Fix the annotation loader taking a class constant as a beginning of a class name (jakzal, nicolas-grekas)
+ * bug #18864 [Console][DX] Fixed ambiguous error message when using a duplicate option shortcut (peterrehm)
+ * bug #18844 [Yaml] fix exception contexts (xabbuh)
+ * bug #18840 [Yaml] properly handle unindented collections (xabbuh)
+ * bug #18839 People - person singularization (Keeo)
+ * bug #18828 [Yaml] chomp newlines only at the end of YAML documents (xabbuh)
+ * bug #18635 [Console] Prevent fatal error when calling Command::getHelper without helperSet (chalasr)
+ * bug #18761  [Form] Modified iterator_to_array's 2nd parameter to false in ViolationMapper (issei-m)
+
 * 2.3.41 (2016-05-09)
 
  * security #18733 limited the maximum length of a submitted username (fabpot)

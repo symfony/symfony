@@ -314,6 +314,11 @@ class Container implements IntrospectableContainerInterface
                 }
 
                 throw $e;
+            } catch (\Throwable $e) {
+                unset($this->loading[$id]);
+                unset($this->services[$id]);
+
+                throw $e;
             }
 
             unset($this->loading[$id]);

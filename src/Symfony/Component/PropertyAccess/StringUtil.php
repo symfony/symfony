@@ -68,6 +68,15 @@ class StringUtil
         // movies (movie)
         array('seivom', 6, true, true, 'movie'),
 
+        // feet (foot)
+        array('teef', 4, true, true, 'foot'),
+
+        // geese (goose)
+        array('eseeg', 5, true, true, 'goose'),
+
+        // teeth (tooth)
+        array('hteet', 5, true, true, 'tooth'),
+
         // news (news)
         array('swen', 4, true, true, 'news'),
 
@@ -123,17 +132,6 @@ class StringUtil
 
         // chateaux (chateau)
         array('xuae', 4, false, true, 'eau'),
-    );
-
-    /**
-     * Irregular nouns which will not be converted 'ee' to 'oo'
-     *
-     * @var array
-     */
-    private static $irregularNouns = array(
-        'committee' => 'committee',
-        'feedback' => 'feedback',
-        'screenshots' => 'screenshot',
     );
 
     /**
@@ -219,11 +217,6 @@ class StringUtil
                     break;
                 }
             }
-        }
-
-        // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && !isset(self::$irregularNouns[strtolower($plural)])) {
-            return substr_replace($plural, 'oo', $pos, 2);
         }
 
         // Assume that plural and singular is identical

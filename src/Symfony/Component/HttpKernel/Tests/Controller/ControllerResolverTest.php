@@ -127,7 +127,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('foo'),
-            array('foo::bar'),
+            array('oof::bar'),
             array('stdClass'),
             array('Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar'),
         );

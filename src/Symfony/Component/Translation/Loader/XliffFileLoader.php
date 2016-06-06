@@ -160,10 +160,13 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
+     * Validates and parses the given file into a DOMDocument.
+     *
      * @param string       $file
      * @param \DOMDocument $dom
      * @param string       $schema source of the schema
      *
+     * @throws \RuntimeException
      * @throws InvalidResourceException
      */
     private function validateSchema($file, \DOMDocument $dom, $schema)

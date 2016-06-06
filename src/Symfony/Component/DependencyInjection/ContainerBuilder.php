@@ -481,6 +481,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
 
             throw $e;
+        } catch (\Throwable $e) {
+            unset($this->loading[$id]);
+
+            throw $e;
         }
 
         unset($this->loading[$id]);

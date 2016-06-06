@@ -133,9 +133,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string $name
      *
-     * @throws \InvalidArgumentException
-     *
      * @return Finder The current Finder instance
+     *
+     * @throws \InvalidArgumentException
      *
      * @deprecated since 2.8, to be removed in 3.0.
      */

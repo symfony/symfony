@@ -154,7 +154,7 @@ class ControllerResolverTest extends BaseControllerResolverTest
     {
         return array(
             array('foo', '\LogicException', '/Unable to parse the controller name "foo"\./'),
-            array('foo::bar', '\InvalidArgumentException', '/Class "foo" does not exist\./'),
+            array('oof::bar', '\InvalidArgumentException', '/Class "oof" does not exist\./'),
             array('stdClass', '\LogicException', '/Unable to parse the controller name "stdClass"\./'),
             array(
                 'Symfony\Component\HttpKernel\Tests\Controller\ControllerResolverTest::bar',

@@ -95,9 +95,9 @@ class AssetsExtension extends \Twig_Extension
      *
      * @param string $url The URL that has to be absolute
      *
-     * @throws \RuntimeException
-     *
      * @return string The absolute URL
+     *
+     * @throws \RuntimeException
      */
     private function ensureUrlIsAbsolute($url)
     {

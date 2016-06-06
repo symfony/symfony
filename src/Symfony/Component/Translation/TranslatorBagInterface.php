@@ -23,9 +23,9 @@ interface TranslatorBagInterface
      *
      * @param string|null $locale The locale or null to use the default
      *
-     * @throws \InvalidArgumentException If the locale contains invalid characters
-     *
      * @return MessageCatalogueInterface
+     *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
      */
     public function getCatalogue($locale = null);
 }

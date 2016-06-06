@@ -70,6 +70,15 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
     public static function createSystemCache($namespace, $defaultLifetime, $version, $directory, LoggerInterface $logger = null)
     {
+        if (!ApcuAdapter::isSupported() && PhpFilesAdapter::isSupported()) {
+            $opcache = new PhpFilesAdapter($namespace, $defaultLifetime, $directory);
+            if (null !== $logger) {
+                $opcache->setLogger($logger);
+            }
+
+            return $opcache;
+        }
+
         $fs = new FilesystemAdapter($namespace, $defaultLifetime, $directory);
         if (null !== $logger) {
             $fs->setLogger($logger);

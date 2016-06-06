@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer;
 
-use Symfony\Component\Serializer\Exception\Exception;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
  * Defines the interface of the Serializer.
@@ -27,8 +27,8 @@ interface SerializerInterface
      * @param string $format  format name
      * @param array  $context options normalizers/encoders have access to
      *
-     * @throws Exception
-     *                    
+     * @throws ExceptionInterface
+     *
      * @return string
      */
     public function serialize($data, $format, array $context = array());
@@ -41,8 +41,8 @@ interface SerializerInterface
      * @param string $format
      * @param array  $context
      *
-     * @throws Exception
-     * 
+     * @throws ExceptionInterface
+     *
      * @return object
      */
     public function deserialize($data, $type, $format, array $context = array());

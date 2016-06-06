@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Exception\Exception;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
  * Defines the interface of normalizers.
@@ -27,9 +27,9 @@ interface NormalizerInterface
      * @param string $format  format the normalization result will be encoded as
      * @param array  $context Context options for the normalizer
      *
-     * @throws Exception
-     *                                           
-     * @return array|string|bool|int|float|null
+     * @throws ExceptionInterface
+     *
+     * @return array|scalar
      */
     public function normalize($object, $format = null, array $context = array());
 

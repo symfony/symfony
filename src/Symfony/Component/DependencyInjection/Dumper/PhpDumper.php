@@ -1268,7 +1268,7 @@ EOF;
                     return true;
                 }
 
-                if ($deep && !isset($visited[$argumentId]) && 'service_container' !== (string) $argument) {
+                if ($deep && !isset($visited[$argumentId]) && 'service_container' !== $argumentId) {
                     $visited[$argumentId] = true;
 
                     $service = $this->container->getDefinition($argumentId);

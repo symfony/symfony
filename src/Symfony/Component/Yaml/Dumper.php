@@ -85,7 +85,7 @@ class Dumper
         if ($inline <= 0 || !is_array($input) || empty($input)) {
             $output .= $prefix.Inline::dump($input, $flags);
         } else {
-            $isAHash = array_keys($input) !== range(0, count($input) - 1);
+            $isAHash = Inline::isHash($input);
 
             foreach ($input as $key => $value) {
                 if ($inline > 1 && Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK & $flags && is_string($value) && false !== strpos($value, "\n")) {

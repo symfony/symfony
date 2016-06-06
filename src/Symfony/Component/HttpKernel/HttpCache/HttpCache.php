@@ -154,6 +154,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Gets the Surrogate instance.
      *
      * @return SurrogateInterface A Surrogate instance
+     *
+     * @throws \LogicException
      */
     public function getSurrogate()
     {

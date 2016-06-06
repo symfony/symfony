@@ -98,6 +98,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             || $response->isRedirection()
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()
+            || false !== strpos($response->headers->get('Content-Disposition'), 'attachment')
         ) {
             return;
         }
@@ -112,11 +113,6 @@ class WebDebugToolbarListener implements EventSubscriberInterface
      */
     protected function injectToolbar(Response $response, Request $request)
     {
-        // The toolbar shall not be injected if the header enforces a download of the content
-        if (false !== strpos($response->headers->get('Content-Disposition'), 'attachment')) {
-            return;
-        }
-
         $content = $response->getContent();
         $pos = strripos($content, '</body>');
 

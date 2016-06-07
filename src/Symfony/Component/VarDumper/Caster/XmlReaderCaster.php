@@ -37,7 +37,22 @@ class XmlReaderCaster
         \XmlReader::SIGNIFICANT_WHITESPACE => 'SIGNIFICANT_WHITESPACE',
         \XmlReader::END_ELEMENT => 'END_ELEMENT',
         \XmlReader::END_ENTITY => 'END_ENTITY',
-        \XmlReader::XML_DECLARATION => 'XML_DECLARATION'
+        \XmlReader::XML_DECLARATION => 'XML_DECLARATION',
+    );
+
+    private static $filteredTypes = array(
+        \XmlReader::ATTRIBUTE => true,
+        \XmlReader::ENTITY_REF => true,
+        \XmlReader::ENTITY => true,
+        \XmlReader::PI => true,
+        \XmlReader::DOC => true,
+        \XmlReader::DOC_TYPE => true,
+        \XmlReader::DOC_FRAGMENT => true,
+        \XmlReader::NOTATION => true,
+        \XmlReader::WHITESPACE => true,
+        \XmlReader::SIGNIFICANT_WHITESPACE => true,
+        \XmlReader::END_ELEMENT => true,
+        \XmlReader::END_ENTITY => true,
     );
 
     public static function castXmlReader(\XmlReader $reader, array $a, Stub $stub, $isNested)
@@ -71,6 +86,21 @@ class XmlReaderCaster
             for ($i = 0; $i < $reader->attributeCount; ++$i) {
                 $infos[Caster::PREFIX_VIRTUAL.'attributes'][] = $reader->getAttributeNo($i);
             }
+        }
+
+        if (isset(static::$filteredTypes[$reader->nodeType])) {
+            $cut = array(
+                'nodeType' => $nodeType,
+                'depth' => $reader->depth,
+            );
+
+            if ('#text' !== $reader->localName) {
+                $cut['localName'] = $reader->localName;
+            }
+
+            $stub->cut += count($infos) - count($cut);
+
+            return $cut;
         }
 
         return $a + $infos;

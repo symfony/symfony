@@ -12,6 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -28,6 +32,7 @@ use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Validator\Mapping\Cache\CacheInterface;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -1063,11 +1068,11 @@ class FrameworkExtension extends Extension
         }
 
         $this->addClassesToCompile(array(
-            'Psr\Cache\CacheItemInterface',
-            'Psr\Cache\CacheItemPoolInterface',
-            'Symfony\Component\Cache\Adapter\AdapterInterface',
-            'Symfony\Component\Cache\Adapter\AbstractAdapter',
-            'Symfony\Component\Cache\CacheItem',
+            CacheInterface::class,
+            CacheItemPoolInterface::class,
+            AdapterInterface::class,
+            AbstractAdapter::class,
+            CacheItem::class,
         ));
     }
 

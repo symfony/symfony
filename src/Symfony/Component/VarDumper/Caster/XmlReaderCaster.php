@@ -66,10 +66,10 @@ class XmlReaderCaster
         }
 
         if ($reader->hasAttributes) {
-            $infos[Caster::PREFIX_VIRTUAL . 'attributes'] = array();
+            $infos[Caster::PREFIX_VIRTUAL.'attributes'] = array();
 
-            while ($reader->moveToNextAttribute()) {
-                $infos[Caster::PREFIX_VIRTUAL . 'attributes'][$reader->name] = $reader->value;
+            for ($i = 0; $i < $reader->attributeCount; ++$i) {
+                $infos[Caster::PREFIX_VIRTUAL.'attributes'][] = $reader->getAttributeNo($i);
             }
         }
 

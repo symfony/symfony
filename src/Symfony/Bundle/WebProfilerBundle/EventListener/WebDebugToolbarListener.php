@@ -98,7 +98,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             || $response->isRedirection()
             || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
             || 'html' !== $request->getRequestFormat()
-            || false !== strpos($response->headers->get('Content-Disposition'), 'attachment')
+            || false !== strpos(strtolower($response->headers->get('Content-Disposition')), 'attachment;')
         ) {
             return;
         }

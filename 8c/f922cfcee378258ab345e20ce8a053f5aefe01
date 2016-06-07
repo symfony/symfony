@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-28T10:00:46Z
+
+AppVeyor errors not related.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-05T11:23:46Z
+
+@dunglas The Inflector component was merged.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-07T15:23:18Z
+
+@dunglas please update your PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-18T20:46:54Z
+
+Inflector component integrated and @teohhanhui comments fixed.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-02T20:37:59Z
+
+Changes from @teohhanhui are merged. This is ready to be merged.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-04T10:20:09Z
+
+Travis errors not related.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-05T06:51:03Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-05-22T19:23:13Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-24T11:05:22Z
+
+@fabpot ok to merge this one for the rc1?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-03T10:16:28Z
+
+@symfony/deciders, unfortunately this PR hasn't been merged in 3.1.
+It's a blocker for some projects (including API Platform v2). What do you think of backporting it in Symfony 2.8 as a bug fix?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-06-03T10:18:31Z
+
+@dunglas But the `Inflector` component was only introduced in 3.1, so perhaps this can be a bugfix in 3.1?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-03T10:25:33Z
+
+We can add `PropertyAccess` as a soft dependency for the >3.1.

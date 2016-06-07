@@ -17,7 +17,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 /**
  * @author Robin Chalas <robin.chalas@gmail.com
  */
-class PropertyAccessTest extends \PHPUnit_Framework_TestCase
+final class PropertyAccessTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreatePropertyAccessor()
     {

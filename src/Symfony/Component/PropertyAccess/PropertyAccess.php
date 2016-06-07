@@ -21,36 +21,25 @@ final class PropertyAccess
     /**
      * Creates a property accessor with the default configuration.
      *
-     * @param bool $throwExceptionOnInvalidIndex Will be added to the signature in 4.0
+     * @param bool $throwExceptionOnInvalidIndex
      *
      * @return PropertyAccessor The new property accessor
      */
-    public static function createPropertyAccessor(/* $throwExceptionOnInvalidIndex = false */)
+    public static function createPropertyAccessor($throwExceptionOnInvalidIndex = false)
     {
-        $throwExceptionOnInvalidIndex = false;
-
-        if (func_num_args()) {
-            $throwExceptionOnInvalidIndex = func_get_arg(0);
-        }
-
         return self::createPropertyAccessorBuilder($throwExceptionOnInvalidIndex)->getPropertyAccessor();
     }
 
     /**
      * Creates a property accessor builder.
      *
-     * @param bool $enableExceptionOnInvalidIndex Will be added to the signature in 4.0.
+     * @param bool $enableExceptionOnInvalidIndex
      *
      * @return PropertyAccessorBuilder The new property accessor builder
      */
-    public static function createPropertyAccessorBuilder(/* $enableExceptionOnInvalidIndex = false */)
+    public static function createPropertyAccessorBuilder($enableExceptionOnInvalidIndex = false)
     {
         $propertyAccessorBuilder = new PropertyAccessorBuilder();
-        $enableExceptionOnInvalidIndex = false;
-
-        if (func_num_args()) {
-            $enableExceptionOnInvalidIndex = func_get_arg(0);
-        }
 
         if ($enableExceptionOnInvalidIndex) {
             $propertyAccessorBuilder->enableExceptionOnInvalidIndex();

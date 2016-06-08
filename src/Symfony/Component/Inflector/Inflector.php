@@ -26,7 +26,6 @@ final class Inflector
      * @var array
      *
      * @see http://english-zone.com/spelling/plurals.html
-     * @see http://www.scribd.com/doc/3271143/List-of-100-Irregular-Plural-Nouns-in-English
      */
     private static $pluralMap = array(
         // First entry: plural suffix, reversed
@@ -70,6 +69,15 @@ final class Inflector
 
         // movies (movie)
         array('seivom', 6, true, true, 'movie'),
+
+        // feet (foot)
+        array('teef', 4, true, true, 'foot'),
+
+        // geese (goose)
+        array('eseeg', 5, true, true, 'goose'),
+
+        // teeth (tooth)
+        array('hteet', 5, true, true, 'tooth'),
 
         // news (news)
         array('swen', 4, true, true, 'news'),
@@ -216,11 +224,6 @@ final class Inflector
                     break;
                 }
             }
-        }
-
-        // Convert teeth to tooth, feet to foot
-        if (false !== ($pos = strpos($plural, 'ee')) && strlen($plural) > 3 && 'feedback' !== $plural) {
-            return substr_replace($plural, 'oo', $pos, 2);
         }
 
         // Assume that plural and singular is identical

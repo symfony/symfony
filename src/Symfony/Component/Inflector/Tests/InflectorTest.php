@@ -53,6 +53,7 @@ class InflectorTest extends \PHPUnit_Framework_TestCase
             array('children', 'child'),
             array('circuses', array('circus', 'circuse', 'circusis')),
             array('cliffs', 'cliff'),
+            array('committee', 'committee'),
             array('crises', array('cris', 'crise', 'crisis')),
             array('criteria', array('criterion', 'criterium')),
             array('cups', 'cup'),

@@ -162,7 +162,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     {
         $this->magicCall = $magicCall;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
-        $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Change the null logger to null
+        $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
     }
 
     /**
@@ -912,7 +912,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     public static function createCache($namespace, $defaultLifetime, $version, LoggerInterface $logger = null)
     {
         if (!class_exists('Symfony\Component\Cache\Adapter\ApcuAdapter')) {
-            throw new \RuntimeException(sprintf('The Cache Component must be installed to use the "%s::%s" factory.', __CLASS__, __METHOD__));
+            throw new \RuntimeException(sprintf('The Symfony Cache component must be installed to use %s().', __METHOD__));
         }
 
         if (!ApcuAdapter::isSupported()) {

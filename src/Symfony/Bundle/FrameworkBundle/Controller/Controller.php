@@ -400,7 +400,19 @@ abstract class Controller implements ContainerAwareInterface
     {
         return $this->container->getParameter($name);
     }
-
+    
+    /**
+     * Returns true if the parameter is defined.
+     *
+     * @param string $name The parameter name
+     *
+     * @return bool true if the parameter is defined
+     */
+    protected function hasParameter($name)
+    {
+        return $this->container->hasParameter($name);
+    }
+    
     /**
      * Checks the validity of a CSRF token.
      *

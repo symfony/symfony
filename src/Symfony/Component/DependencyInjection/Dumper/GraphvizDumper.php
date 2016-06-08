@@ -180,14 +180,17 @@ class GraphvizDumper extends Dumper
         }
 
         foreach ($container->getServiceIds() as $id) {
-            $service = $container->get($id);
-
             if (array_key_exists($id, $container->getAliases())) {
                 continue;
             }
 
             if (!$container->hasDefinition($id)) {
-                $class = ('service_container' === $id) ? get_class($this->container) : get_class($service);
+                if ('service_container' === $id) {
+                    $class = get_class($this->container);
+                } else {
+                    $class = get_class($container->get($id));
+                }
+
                 $nodes[$id] = array('class' => str_replace('\\', '\\\\', $class), 'attributes' => $this->options['node.instance']);
             }
         }

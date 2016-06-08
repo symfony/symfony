@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-11-19T13:00:11Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2015-11-19T15:49:50Z
+
+wouldn't it be better to update the list from the Apache list rather than adding a single element in it ?
+
+---------------------------------------------------------------------------
+
+by Koc at 2015-11-19T15:55:37Z
+
+pjpeg is missed in Apache list http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-04-28T11:35:19Z
+
+Closed by accident.

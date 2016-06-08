@@ -1,0 +1,582 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-04T22:59:35Z
+
+IMO when a doctrine cache is injected, the internal array cache should not be used.
+
+If I already inject an in-memory cache, I probably don't want to have it cached twice in memory. Also doctrine already has an `ArrayCache`. For multi-caching, there is `ChainCache`.
+The internal cache would thus only be useful when I don't have the doctrine cache library.
+
+---------------------------------------------------------------------------
+
+by Koc at 2015-12-04T23:13:23Z
+
+@Tobion class property could save 2 methods call: `Cache::fetch` and `apc_fetch` (and maybe `Cache::doFetch` and maybe other)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-04T23:13:29Z
+
+@Tobion if we go that way, we can just remove totally the local cache array and rely only on Doctrine Cache to enable this performance optimization.
+It will require the installation of an extra library (that can be preconfigured in the standard edition) but simplifies the code base and maintenance.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-05T00:55:59Z
+
+Yes relying fully on doctrine cache is also possible and the most flexible and the most explicit.
+
+The problem with an internal array cache like now is that it is magic from the outside. And it doesn't really work well together with another cache layer like doctrine.
+
+---------------------------------------------------------------------------
+
+by Koc at 2015-12-05T08:49:40Z
+
+Guys, please measure performance before and after removing internal array cache, maybe using blackfire profile. There is enough funnction calls to retrieve values from cache: `fetch`, `doFetch`, `getNamespacedId`, `getNamespaceVersion` etc. https://github.com/doctrine/cache/blob/master/lib/Doctrine/Common/Cache/CacheProvider.php
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-05T10:31:22Z
+
+Here is a benchmark (tldr use the internal cache, not Doctrine ArrayCache).
+
+The comparison: https://blackfire.io/profiles/compare/3a1b8a29-125e-4f19-b5ba-ff0785c082fe/graph
+
+It's more than 30% faster and consume less memory to use the internal cache than relying on the DoctrineChain. I remove this commit.
+
+**With Doctrine Cache only** (internal array removed and chained ArrayCache and ApcCache):
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+require 'Foo.php';
+
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\ApcCache;
+use Doctrine\Common\Cache\ChainCache;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
+$cache = new ChainCache([new ArrayCache(), new ApcCache()]);
+$accessor = new PropertyAccessor(false, false, $cache);
+
+echo 'Property Access Benchmark'.PHP_EOL;
+
+$start = microtime(true);
+
+for ($i = 0; $i < 10000; ++$i) {
+    $foo = new Foo();
+    $accessor->setValue($foo, 'bar', 'Lorem');
+    $accessor->setValue($foo, 'baz', 'Ipsum');
+    $accessor->getValue($foo, 'bar');
+    $accessor->getValue($foo, 'baz');
+}
+
+echo 'Time: '.(microtime(true) - $start).PHP_EOL;
+```
+
+**With internal array and Doctrine ApcCache**:
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+require 'Foo.php';
+
+use Doctrine\Common\Cache\ApcCache;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
+$cache = new ApcCache();
+$accessor = new PropertyAccessor(false, false, $cache);
+
+echo 'Property Access Benchmark'.PHP_EOL;
+
+$start = microtime(true);
+
+for ($i = 0; $i < 10000; ++$i) {
+    $foo = new Foo();
+    $accessor->setValue($foo, 'bar', 'Lorem');
+    $accessor->setValue($foo, 'baz', 'Ipsum');
+    $accessor->getValue($foo, 'bar');
+    $accessor->getValue($foo, 'baz');
+}
+
+echo 'Time: '.(microtime(true) - $start).PHP_EOL;
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-05T12:56:18Z
+
+I've just added support for `PropertyPath` caching (it was the last bottleneck) and it's impressive:
+
+35% of performance improvement just for this specific optim: https://blackfire.io/profiles/compare/4e5545b5-7537-4502-851b-baf65ad2f2e4/graph
+And if we compare to Symfony 2.7.6 (before I start to optimize PropertyAccess), the Component is now **82%** faster (after the first run, as the cache must be warmed): https://blackfire.io/profiles/compare/c4142593-9195-4426-806c-9a055670fada/graph
+
+@stof you pointed out on the previous PR that `PropertyPath` is used outside of this component. I've looked to add factories to share the cache between components but it introduces a lof of complexity: bunch of new classes and services, complex dependency graph because of Doctrine cache... Everything done here is private, so I think we can start like that and refactor it to share the cache between components if someone need/want to work on it.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-05T13:09:24Z
+
+How is invalidation of the cache handled? Does the user have to clear his cache manually each time an object in the property path is changed as this can change the access strategy?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-05T14:05:13Z
+
+I'm not sure I understand your point. It caches the structure of classes and properties so the only time cache must be flushed it's when the code is modified (and it's almost always the time).
+
+---------------------------------------------------------------------------
+
+by Koc at 2015-12-05T14:31:50Z
+
+User should use same invalidation method like for apc class loader or validator metadata cache: clear cache after deploy.
+
+@dunglas nice results :+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-12-05T15:49:52Z
+
+So the recommended way is to only use caching on the property accessor in production mode I assume? Would be worth to mention that in the phpdoc I think.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-05T16:02:11Z
+
+@Tobion yes it's only for production but it's already what we suggest for other similar caches. Using the standard edition, you just need to install APC and to uncomment these lines https://github.com/symfony/symfony-standard/blob/master/app/config/config_prod.yml#L4-L14 and you get good performance for free. It's also why I think we need to keep APC services (it's user friendly).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-05T16:04:19Z
+
+Travis failures look unrelated.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-09T21:29:30Z
+
+@Tobion to follow https://github.com/symfony/symfony/pull/16917#discussion_r47077914 this is not possible to use a decorator here because we don't cache the result but the access strategy.
+
+Or it will require to extract the strategy guessing logic in a new class with a related interface and a cache decorator, then to inject it in `PropertyAccess` and add a backward compatibility layer. Maybe overkill what do you think?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2015-12-14T20:55:41Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-18T15:17:37Z
+
+Status: needs work
+
+Should be ported to PSR-6
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-26T21:05:52Z
+
+Status: Needs review
+
+Now use PSR-6. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-01-28T12:33:07Z
+
+@dunglas what gain of performance after changing to PSR-6?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-04T15:06:36Z
+
+@Koc it depends of the underlying PSR-6 implementation but it should be similar. I've not benchmarked it yet but it's sure that it's better than currently :-)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-16T16:49:39Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-17T16:48:54Z
+
+Why do we implement this in the `PropertyAccessor` class and don't implement a separate implementation of the `PropertyAccessorInterface` decorating other implementations?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-17T18:33:35Z
+
+@xabbuh it's not possible to decorate `PropertyAccessor` because we cache the access info (`getAccessInfo()`) that is used internally by the accessor, not the result.
+
+What we can do instead is creating a new `AccessInfoRetrieverInterface` interface, extract the logic guessing the access method in this class and create a cache decorator. But It means introducing a new interface and two new classes for no real gain (IMO). An advantage of using PSR-6 is avoiding the need for cache adapters.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-04T11:34:21Z
+
+Status: needs work
+And requires #17556 I guess
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-04T12:33:22Z
+
+Why does it needs work? It looks finished to me. Do you want that I extract the logic in another class?
+
+It doesn't require the ChainAdapter because it has a built-in cache array that we cannot remove (it was introduced in 2.8).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-03-04T12:51:12Z
+
+I though it required ChainAdapter but looks like I was too quick... Still, it needs a rebase (ouf) ;-)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-06T18:00:27Z
+
+Rebased and @unexge comment fixed.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-06T18:01:02Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-07T15:16:06Z
+
+What do you think about generating property accessors optimized for specific classes? The generated code would be something like:
+
+~~~php
+use Foo\Namespace\Class;
+
+class FooNamespaceClassPropertyAccessorProxy implements ClassPropertyAccessorInterface
+{
+    public function getClassName()
+    {
+        return Class::class;
+    }
+
+    public function getProperty($object, $propertyName)
+    {
+        switch ($propertyName) {
+            case 'foo':
+                return $object->getFoo();
+
+            case 'bar':
+                return $object->__call('getBar');
+        }
+    }
+
+    public function setProperty($object, $propertyName, $value)
+    {
+        // likewise
+    }
+}
+~~~
+
+This kind of improvement would bring **so** much more performance benefit than yet more layers of caching. :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-07T15:26:40Z
+
+@webmozart yes it's exactly what I do for my personal projects but it requires specific development and leads to issues like #16179.
+
+This PR has the advantage of drastically increasing the speed of this component without requiring any adaptation for the developper.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-07T15:33:35Z
+
+@dunglas Why does it need custom development? Can't we generate the proxy based on the same rules that we use in the property accessor?
+
+Why does it lead to issues like https://github.com/symfony/symfony/issues/16179?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-07T15:35:51Z
+
+You mean generating them when the cache is built? Interesting. Then we will need something like a `ChainPropertyAccessor` to call the good "proxy"?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-07T15:36:58Z
+
+@dunglas Yes exactly :) You have a list of optimized accessors per class. When you access properties, you load the matching accessor and it does the job, e.g.:
+
+```php
+class ProxyPropertyAccessor implements PropertyAccessorInterface
+{
+    public function getProperty($object, $propertyName)
+    {
+        return $this->loadGeneratedProxy($object)->getProperty($object, $propertyName);
+    }
+
+    private function loadGeneratedProxy($data)
+    {
+        // generate proxy class or load if it exists already
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-07T16:44:52Z
+
+It raises another question: how to know at compile time the list of classes access trough the PropertyAccessor?
+
+Configurable paths and automatic scanning of the `*Bundle/Entity` directory in FrameworkBundle?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-08T07:18:45Z
+
+@dunglas I think so, yes. We can support on-the-fly solution if no proxy exists, together with messages in the WDT in order to remind the developer to configure the paths so that we can create the proxies during warmup.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-29T15:25:29Z
+
+@webmozart I like your idea and I'll work on it when I'll have some time. But this PR is ready and improve drastically performance of this component and of the serializer now.
+
+Can we merge it? It doesn't prevent us to make something better later.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-31T18:32:00Z
+
+@dunglas This needs a rebase again. ;)
+
+I am fine with merging this for 3.1 and maybe improve this even more in 3.2 with something like what @webmozart suggested.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-31T19:22:30Z
+
+Ok there is a lot of conflicts... I'll not be able to work on this PR before 2 weeks. It will probably be too late for 3.1.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-01T09:44:54Z
+
+@dunglas no worries, as this is about integrating a new 3.1 feature, we can accept merging it during the stabilization phase.
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-04-01T09:51:22Z
+
+@dunglas I'm afraid of big merge confilcts with #18016
+
+---------------------------------------------------------------------------
+
+by lrlopez at 2016-04-03T21:15:22Z
+
+I don't think it would be difficult integrating both #18016 and this PR. In fact, in #18016 PSR-6 caching is being used although for a different purpose (metadata caching). But then a question arises: is ok to use the same cache pool for both method and metadata caching?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-17T15:38:16Z
+
+@dunglas this one would be great on 3.1. The code looks good to me. It just misses wiring in the FrameworkBundle. Could you please rebase and add it (see e.g. #18561)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-18T06:43:13Z
+
+@dunglas see https://github.com/symfony/symfony/compare/master...nicolas-grekas:prop-cache
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-18T12:32:33Z
+
+@nicolas-grekas reseted. Thanks!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-18T12:47:22Z
+
+:+1: (failures not related)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-02T20:23:49Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-04T16:50:03Z
+
+Rebase needed now that #18667 is merged (see comments to resolve conflicts).
+@dunglas could you bench this with the FilesystemAdapter also? Since this is going to be the default, it would be good to verify that this is going to be faster *by default*.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-05T07:50:12Z
+
+The filesystem adapter is a bad default, it is slower that no cache at all.
+
+Profiles:
+
+* [without PSR-6 cache (but using the built-in one)](https://blackfire.io/profiles/b31b4a63-21af-4329-9ca2-5546915ed3ab/graph)
+* [with filesystem cache](https://blackfire.io/profiles/2ed8b973-558f-4e32-b2a1-3f7532958430/graph)
+* [with APCu cache (fastest)](https://blackfire.io/profiles/6954f810-cc23-4324-8814-b6c285625cf6/graph)
+
+The code use to generate profiles:
+
+```php
+
+<?php
+
+require 'vendor/autoload.php';
+
+class Foo
+{
+    private $baz;
+    public $bar;
+
+    public function getBaz()
+    {
+        return $this->baz;
+    }
+
+    public function setBaz($baz)
+    {
+        $this->baz = $baz;
+    }
+}
+
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
+
+echo 'Property Access Benchmark'.PHP_EOL;
+
+$start = microtime(true);
+
+$adapter = new ApcuAdapter();
+
+for ($i = 0; $i < 10000; ++$i) {
+    $accessor = new PropertyAccessor(false, false, $adapter);
+
+    $foo = new Foo();
+    $accessor->setValue($foo, 'bar', 'Lorem');
+    $accessor->setValue($foo, 'baz', 'Ipsum');
+    $accessor->getValue($foo, 'bar');
+    $accessor->getValue($foo, 'baz');
+}
+
+echo 'Time: '.(microtime(true) - $start).PHP_EOL;
+```
+
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/dunglas/symfony"
+        }
+    ],
+    "require": {
+        "symfony/symfony": "dev-propertypath_perf as 3.1.0"
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-05T07:58:41Z
+
+And here is a comparison between this branch without PSR-6 cache and Symfony 3.0.5 (7.2% faster): https://blackfire.io/profiles/compare/abff531c-583e-4ac1-8e1b-973f5d32c4c3/graph
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-05T08:06:38Z
+
+So, the question is: is it really worth it?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-05T08:08:59Z
+
+A gain of 7% without cache (and 12% with APCu enabled - https://blackfire.io/profiles/compare/ac8147c9-9b12-4b88-9faf-44b91f848063/graph) is signifiant, especially for APIs using the default `ObjectNormalizer`.
+
+I'm updating the PR to disable the PSR-6 cache by default.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-05T08:37:27Z
+
+PSR-6 cache is now disabled by default (if the system cache is filesystem).
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-05-05T09:07:13Z
+
+@dunglas was the test done on SSD or a spinning rust?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-05T09:10:05Z
+
+@mvrhov a Macbook with a SSD
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-05T18:28:11Z
+
+I just pushed an alternative way to register only APCu cache. Now the cache always default to APCu expect if it has been defined explicitly.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-05-05T18:33:00Z
+
+There is a "drawback": it's not possible to disable the ApcAdapter if apcu is installed and enabled. Is it acceptable?
+But also a benefit: event using the standalone component, the class will be as fast as possible without having to create services manually.
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-05-05T19:01:48Z
+
+@dunglas: I'm not comfortable with apc being default. The cache cannot be cleared from the console this means that after each deploy the php-fpm/apache should be restarted, ...
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-05-10T12:55:03Z
+
+@dunglas can you try temporary disable psr6-caching inside `getPropertyPath` method and leave only class property cache? Also you can create instance of the property accessor outside foreach - for cases when we read/write many data inside one request
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-07T19:17:12Z
+
+:+1:, please squash my commit :-)
+Could be interesting to see the perf with PhpFilesAdapter (in another PR)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-08T09:35:19Z
+
+@symfony/deciders can I merge this PR please (one +1 missing)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-08T11:38:49Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-08T15:57:24Z
+
+Comments from @nicolas-grekas @fabpot fixed. Can be merged.

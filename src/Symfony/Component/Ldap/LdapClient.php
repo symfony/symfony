@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Ldap;
 
+@trigger_error('The '.__NAMESPACE__.'\LdapClient class is deprecated since version 3.1 and will be removed in 4.0. Use the Ldap class directly instead.', E_USER_DEPRECATED);
+
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Francis Besset <francis.besset@gmail.com>
@@ -24,14 +26,7 @@ final class LdapClient implements LdapClientInterface
 
     public function __construct($host = null, $port = 389, $version = 3, $useSsl = false, $useStartTls = false, $optReferrals = false, LdapInterface $ldap = null)
     {
-        $config = array(
-            'host' => $host,
-            'port' => $port,
-            'version' => $version,
-            'useSsl' => (bool) $useSsl,
-            'useStartTls' => (bool) $useStartTls,
-            'optReferrals' => (bool) $optReferrals,
-        );
+        $config = $this->normalizeConfig($host, $port, $version, $useSsl, $useStartTls, $optReferrals);
 
         $this->ldap = null !== $ldap ? $ldap : Ldap::create('ext_ldap', $config);
     }
@@ -97,5 +92,26 @@ final class LdapClient implements LdapClientInterface
     public function escape($subject, $ignore = '', $flags = 0)
     {
         return $this->ldap->escape($subject, $ignore, $flags);
+    }
+
+    private function normalizeConfig($host, $port, $version, $useSsl, $useStartTls, $optReferrals)
+    {
+        if ((bool) $useSsl) {
+            $encryption = 'ssl';
+        } elseif ((bool) $useStartTls) {
+            $encryption = 'tls';
+        } else {
+            $encryption = 'none';
+        }
+
+        return array(
+            'host' => $host,
+            'port' => $port,
+            'encryption' => $encryption,
+            'options' => array(
+                'protocol_version' => $version,
+                'referrals' => (bool) $optReferrals,
+            ),
+        );
     }
 }

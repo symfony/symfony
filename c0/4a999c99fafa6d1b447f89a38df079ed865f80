@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-02-09T07:40:37Z
+
+@paradajozsef I think the fix is a bit more complex. For example, I do not think that this will solve the issue for the following example too:
+
+```
+foo:
+    -
+        # foobar
+        baz: 123
+bar:
+    -
+        # bar
+        bar: "123",
+```
+
+Can you add it as a test case too?
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-02-11T00:51:15Z
+
+@xabbuh Sorry for late answer. I added the test case and as always you are right again. :smiley: In this case the line number is 9, but it should be 8. :confused: Still needs work.
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-02-13T00:22:26Z
+
+@xabbuh I changed the fix. `getNextEmbedBlock` will only skip comment lines, if comments are not in a collection. WDUT?
+
+The above test case passes, failing VarDumper tests unrelated imo.
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-02-13T00:22:48Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-28T10:34:21Z
+
+ping @xabbuh
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-04-30T06:25:16Z
+
+I apologize to everyone for late answer. (I've been lack of internet at home lately because of moving to another place.)
+
+@stof Thanks for the review. I changed the comment and method name. What about `checkIfPreviousNonCommentLineIsCollectionItem`? It's still kind of wierd imo. Any other ide is very welcome! Thanks!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-06T09:32:14Z
+
+@paradajozsef Can you please rebase and push again? Looks like Travis otherwise will not run builds for your changes otherwise.
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-05-06T09:42:52Z
+
+Sure, I can do it tonight.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-06T09:44:26Z
+
+@xabbuh the reason why Travis does not run tests is because the branch conflicts. As Travis is actually running PR tests on a merge commit rather than on the feature branch, it cannot run them in case of conflicts
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-05-06T22:37:05Z
+
+Rebase is done, tests are green.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-10T06:21:35Z
+
+👍
+
+Status: Reviewed
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by paradajozsef at 2016-05-11T06:45:17Z
+
+@xabbuh Thx for the review, I fixed them.

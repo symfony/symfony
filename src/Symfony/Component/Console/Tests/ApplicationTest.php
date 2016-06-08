@@ -1099,7 +1099,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($tester->getInput()->hasParameterOption(array('--no-interaction', '-n')));
 
-        $inputStream = $application->getHelperSet()->get('question')->getInputStream();
+        $inputStream = $tester->getInput()->getStream();
         $this->assertEquals($tester->getInput()->isInteractive(), @posix_isatty($inputStream));
     }
 }

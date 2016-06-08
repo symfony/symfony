@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -52,6 +53,10 @@ class QuestionHelper extends Helper
             return $question->getDefault();
         }
 
+        if ($input instanceof StreamableInputInterface && $stream = $input->getStream()) {
+            $this->inputStream = $stream;
+        }
+
         if (!$question->getValidator()) {
             return $this->doAsk($output, $question);
         }
@@ -68,12 +73,17 @@ class QuestionHelper extends Helper
      *
      * This is mainly useful for testing purpose.
      *
+     * @deprecated since version 3.2, to be removed in 4.0. Use
+     *             StreamableInputInterface::setStream() instead.
+     *
      * @param resource $stream The input stream
      *
      * @throws InvalidArgumentException In case the stream is not a resource
      */
     public function setInputStream($stream)
     {
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s:setStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
+
         if (!is_resource($stream)) {
             throw new InvalidArgumentException('Input stream must be a valid resource.');
         }
@@ -84,10 +94,17 @@ class QuestionHelper extends Helper
     /**
      * Returns the helper's input stream.
      *
+     * @deprecated since version 3.2, to be removed in 4.0. Use
+     *             StreamableInputInterface::getStream() instead.
+     *
      * @return resource
      */
-    public function getInputStream()
+    public function getInputStream($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s:getStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
+        }
+
         return $this->inputStream;
     }
 

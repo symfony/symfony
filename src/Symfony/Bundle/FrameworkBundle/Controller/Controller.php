@@ -351,6 +351,18 @@ class Controller extends ContainerAware
     }
 
     /**
+     * Returns true if the parameter is defined.
+     *
+     * @param string $name The parameter name
+     *
+     * @return bool true if the parameter is defined
+     */
+    protected function hasParameter($name)
+    {
+        return $this->container->hasParameter($name);
+    }
+
+    /**
      * Gets a container configuration parameter by its name.
      *
      * @param string $name The parameter name

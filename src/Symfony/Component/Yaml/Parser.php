@@ -426,7 +426,7 @@ class Parser
             }
 
             // we ignore "comment" lines only when we are not inside a scalar block
-            if (empty($blockScalarIndentations) && $this->isCurrentLineComment()) {
+            if (empty($blockScalarIndentations) && $this->isCurrentLineComment() && false === $this->checkIfPreviousNonCommentLineIsCollectionItem()) {
                 continue;
             }
 
@@ -462,10 +462,18 @@ class Parser
 
     /**
      * Moves the parser to the previous line.
+     *
+     * @return bool
      */
     private function moveToPreviousLine()
     {
+        if ($this->currentLineNb < 1) {
+            return false;
+        }
+
         $this->currentLine = $this->lines[--$this->currentLineNb];
+
+        return true;
     }
 
     /**
@@ -777,5 +785,45 @@ class Parser
     private function isBlockScalarHeader()
     {
         return (bool) preg_match('~'.self::BLOCK_SCALAR_HEADER_PATTERN.'$~', $this->currentLine);
+    }
+
+    /**
+     * Returns true if the current line is a collection item.
+     *
+     * @return bool
+     */
+    private function isCurrentLineCollectionItem()
+    {
+        $ltrimmedLine = ltrim($this->currentLine, ' ');
+
+        return '' !== $ltrimmedLine && '-' === $ltrimmedLine[0];
+    }
+
+    /**
+     * Tests whether the current comment line is in a collection.
+     *
+     * @return bool
+     */
+    private function checkIfPreviousNonCommentLineIsCollectionItem()
+    {
+        $isCollectionItem = false;
+        $moves = 0;
+        while ($this->moveToPreviousLine()) {
+            ++$moves;
+            // If previous line is a comment, move back again.
+            if ($this->isCurrentLineComment()) {
+                continue;
+            }
+            $isCollectionItem = $this->isCurrentLineCollectionItem();
+            break;
+        }
+
+        // Move parser back to previous line.
+        while ($moves > 0) {
+            $this->moveToNextLine();
+            --$moves;
+        }
+
+        return $isCollectionItem;
     }
 }

@@ -69,6 +69,9 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
+    /**
+     * @param \PHPUnit_Framework_TestSuite $suite
+     */
     public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
         $suiteName = $suite->getName();
@@ -124,6 +127,11 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
+    /**
+     * @param \PHPUnit_Framework_Test $test
+     * @param \Exception              $e
+     * @param $time
+     */
     public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
         if (0 < $this->state) {
@@ -139,6 +147,9 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
+    /**
+     * @param \PHPUnit_Framework_Test $test
+     */
     public function startTest(\PHPUnit_Framework_Test $test)
     {
         if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
@@ -154,6 +165,10 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
+    /**
+     * @param \PHPUnit_Framework_Test $test
+     * @param $time
+     */
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {
         if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {

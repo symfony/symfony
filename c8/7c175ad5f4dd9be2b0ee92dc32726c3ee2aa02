@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-05-29T12:15:06Z
+
+Fabbot should be ignored in this case...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-29T16:09:40Z
+
+Can you indeed also provide a PR for 2.3?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-05-29T16:21:39Z
+
+Just provided #18911
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-06-06T07:37:49Z
+
+@teohhanhui I was thinking about the whitelist approach as well but I see the problem that with the whitelist approach it will be hard to match all the relevent cases and the risk is high to introduce BC breaks whereas the blacklist approach should not break existing applications.
+
+---------------------------------------------------------------------------
+
+by TakTaki at 2016-06-06T07:50:38Z
+
+@peterrehm I don't totally agree with you as I currently have a `screenshot`attribute in some entities, and this patch will break my applications. But I rather have it break than have a `addScroonshot` in my app.
+
+---------------------------------------------------------------------------
+
+by TakTaki at 2016-06-06T07:54:07Z
+
+I was wondering: what if I have an attribute named `screen`? Does that mean we'll have to make a new patch to add `screen` to the blacklist?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-06-06T18:48:32Z
+
+@TakTaki It would have needed an explicit list. After some research I only found the 3 added nouns affected, I did not find more. So I switched to the whitelist approach which should be easier. The question is if this is a BC break or not? /cc @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-06T18:51:20Z
+
+Can you synchonize the PR targetting the older branch too ?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-06-06T18:52:38Z
+
+@stof It was, missed some changes it is already updated.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-06-06T18:53:31Z
+
+@stof The other PR is already updated as well. What do you think about the changed? I could not think of any better solution.

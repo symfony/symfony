@@ -8,6 +8,7 @@
         <service id="property_accessor" class="Symfony\Component\PropertyAccess\PropertyAccessor" >
             <argument /> <!-- magicCall, set by the extension -->
             <argument /> <!-- throwExceptionOnInvalidIndex, set by the extension -->
+            <argument type="service" id="cache.property_access" on-invalid="ignore" />
         </service>
     </services>
 </container>

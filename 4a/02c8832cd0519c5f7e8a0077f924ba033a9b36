@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-07T15:08:01Z
+
+You can even go one step further & cache all `*::isSupported` calls in static props
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-07T15:10:25Z
+
+@nicolas-grekas it is usually called several times during the same request?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-08T08:25:34Z
+
+Yes, once per namespace (ie per cache pool)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-08T09:22:49Z
+
+@nicolas-grekas updated to use `static` properties.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-08T09:31:12Z
+
+:+1:

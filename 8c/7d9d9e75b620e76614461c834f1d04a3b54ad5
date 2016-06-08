@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-01T19:57:51Z
+
+Any way to add some tests?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-06-01T20:59:05Z
+
+Sure! I'll try to find some time for this tomorrow
+
+---------------------------------------------------------------------------
+
+by uvups at 2016-06-02T14:45:24Z
+
+@csarrazi  This fix worked for me. Thanks
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-02T15:25:48Z
+
+btw, this class is missing its deprecation warning
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-06-02T17:12:50Z
+
+You mean in the constructor, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-08T09:16:13Z
+
+@csarrazi stof means after the namespace declaration. See `grep '^@trigger' src/ -r` (on 2.8)
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-06-08T09:26:50Z
+
+Ok. I'll check this tonight! Thanks for the info @nicolas-grekas!
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-06-08T10:04:53Z
+
+@nicolas-grekas @stof Done.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-08T10:07:07Z
+
+:+1:
+Just wondering: do the added tests make sense on the Ldap class also? Or will it be OK to just remove them when doing 4.0?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-06-08T10:20:25Z
+
+It will be okay to remove them for 4.0. The `LdapClientTest` tests only happen to test the BC layer:
+
+* whether the `Ldap` class is properly encapsulated or not in the `LdapClient` class;
+* the BC-compatible `find()` method;
+* the config change between the two classes.

@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-09T14:16:44Z
+
+👍 I like this proposal a lot (I suffered some problems related to this recently)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-09T15:38:18Z
+
+#18729 and #18730 need to be considered to make sure that tests on lower branches will not fail in the future if this one gets merged.
+
+I also split the big `testGet()` test into several small tests to prevent marking it as legacy.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-09T19:55:08Z
+
+Both related PRs have been merged now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-09T20:10:47Z
+
+@fabpot Thanks. This will need to be rebased then when lower branches are merged up.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-19T19:54:18Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-07T08:59:00Z
+
+Is there a better alternative for this? I'm actually using this.
+https://github.com/rollerworks/RouteAutowiringBundle/blob/master/src/DependencyInjection/Compiler/RouteAutowiringPass.php#L59
+
+Note. I'm only doing this ease the parameters resolving, else I need to do this manually and this is easier.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-07T09:11:09Z
+
+@sstok the issue is that you actually have no guarantee at all that your own code will work. The container is not yet ready to be used at this point, so your code works only if you are lucky (and any bundle could put the tag on a service requiring more configuration work done after your compiler pass and make your own compiler pass break badly, potentially with a fatal error)
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-07T10:23:17Z
+
+@stof OK, In my case it's only about the parameters so that's something I can change.
+*And the parameters must be static, changing them in the CompilerPass is an edge-case and not supported (in the Bundle Extension class one can use the registering system). Also found another bundle where I need to change this.*

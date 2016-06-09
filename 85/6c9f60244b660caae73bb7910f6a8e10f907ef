@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-17T06:27:23Z
+
+How could we ensure that strict CSP compliancy is preserved on the long run?
+I suggest looking at https://docs.travis-ci.com/user/gui-and-headless-browsers/
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-04-17T14:37:08Z
+
+Toggling to Need Work : I will disable CSP when browsing profiler pages and will introduce nonce only for toolbar injection.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-04-17T16:00:34Z
+
+Work done, it can now be reviewed
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-04-17T16:13:30Z
+
+> How could we ensure that strict CSP compliancy is preserved on the long run?
+
+@nicolas-grekas you asked this question. Checking if the injected script has the appropriate nonce, headers are included and rendered toolbar include nonce should be alright.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-06-01T16:27:53Z
+
+Thanks @stof for this review, I'm going to take care of this
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-06-02T08:45:04Z
+
+I've rename the PR to reflect that it only addresses the `unsafe-inline` topic. I think the PR now needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-08T11:06:42Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-06-09T11:04:25Z
+
+PR updated, comments addressed

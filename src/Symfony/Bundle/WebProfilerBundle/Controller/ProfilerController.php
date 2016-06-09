@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
+use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,6 +34,7 @@ class ProfilerController
     private $twig;
     private $templates;
     private $toolbarPosition;
+    private $cspHandler;
 
     /**
      * Constructor.
@@ -43,13 +45,14 @@ class ProfilerController
      * @param array                 $templates       The templates
      * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal')
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal', ContentSecurityPolicyHandler $cspHandler = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
         $this->twig = $twig;
         $this->templates = $templates;
         $this->toolbarPosition = $toolbarPosition;
+        $this->cspHandler = $cspHandler;
     }
 
     /**
@@ -87,6 +90,10 @@ class ProfilerController
         }
 
         $this->profiler->disable();
+
+        if (null !== $this->cspHandler) {
+            $this->cspHandler->disableCsp();
+        }
 
         $panel = $request->query->get('panel', 'request');
         $page = $request->query->get('page', 'home');
@@ -133,6 +140,10 @@ class ProfilerController
         }
 
         $this->profiler->disable();
+
+        if (null !== $this->cspHandler) {
+            $this->cspHandler->disableCsp();
+        }
 
         return new Response($this->twig->render('@WebProfiler/Profiler/info.html.twig', array(
             'about' => $about,
@@ -185,7 +196,7 @@ class ProfilerController
             // the profiler is not enabled
         }
 
-        return new Response($this->twig->render('@WebProfiler/Profiler/toolbar.html.twig', array(
+        return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/toolbar.html.twig', array(
             'request' => $request,
             'position' => $position,
             'profile' => $profile,
@@ -193,7 +204,7 @@ class ProfilerController
             'profiler_url' => $url,
             'token' => $token,
             'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar
-        )), 200, array('Content-Type' => 'text/html'));
+        ));
     }
 
     /**
@@ -212,6 +223,10 @@ class ProfilerController
         }
 
         $this->profiler->disable();
+
+        if (null !== $this->cspHandler) {
+            $this->cspHandler->disableCsp();
+        }
 
         if (null === $session = $request->getSession()) {
             $ip =
@@ -267,6 +282,10 @@ class ProfilerController
         }
 
         $this->profiler->disable();
+
+        if (null !== $this->cspHandler) {
+            $this->cspHandler->disableCsp();
+        }
 
         $profile = $this->profiler->loadProfile($token);
 
@@ -364,6 +383,10 @@ class ProfilerController
 
         $this->profiler->disable();
 
+        if (null !== $this->cspHandler) {
+            $this->cspHandler->disableCsp();
+        }
+
         ob_start();
         phpinfo();
         $phpinfo = ob_get_clean();
@@ -383,5 +406,19 @@ class ProfilerController
         }
 
         return $this->templateManager;
+    }
+
+    private function renderWithCspNonces(Request $request, $template, $variables, $code = 200, $headers = array('Content-Type' => 'text/html'))
+    {
+        $response = new Response('', $code, $headers);
+
+        $nonces = $this->cspHandler ? $this->cspHandler->getNonces($request, $response) : array();
+
+        $variables['csp_script_nonce'] = isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null;
+        $variables['csp_style_nonce'] = isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null;
+
+        $response->setContent($this->twig->render($template, $variables));
+
+        return $response;
     }
 }

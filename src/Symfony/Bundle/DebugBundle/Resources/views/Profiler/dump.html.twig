@@ -27,7 +27,6 @@
                     {{ dump.data|raw }}
                 </div>
             {% endfor %}
-            <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" onload="var h = this.parentNode.innerHTML, rx=/<script>(.*?)<\/script>/g, s; while (s = rx.exec(h)) {eval(s[1]);};" />
         {% endset %}
 
         {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}

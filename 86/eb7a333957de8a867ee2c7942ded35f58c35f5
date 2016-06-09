@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-06T18:57:06Z
+
+This can respect bc if you use ``func_num_args`` and ``func_get_arg``. ([as in this example](https://github.com/symfony/symfony/pull/18167/files))
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-06T19:24:06Z
+
+Many thanks @Ener-Getick, I was not sure about if it could be envisaged.
+If this is merged, should I reference somewhere that the argument should be really added to the method signature in 4.0?
+
+__EDIT__
+I just saw that you also modified the interface by adding a commented param.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-06-06T21:39:41Z
+
+LGTM 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-06T22:16:15Z
+
+Added doc PR and new tests.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-06-07T06:44:17Z
+
+Why do we care about adding an optional argument to the `PropertyAccess::createPropertyAccessor` method ? The class is final and thus cannot be extended, nor is part of an interface, right ? It appears there is no BC break to me.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-07T07:15:54Z
+
+Indeed @ogizanagi i didn't realize that this class is final. So we don't need any bc layer.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-07T07:26:47Z
+
+Me too, will remove this hack. Thank's @ogizanagi
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-09T11:06:21Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-06-09T11:09:59Z
+
+What about adding the `$magicCall` argument, too ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-09T11:12:45Z
+
+Done @ogizanagi

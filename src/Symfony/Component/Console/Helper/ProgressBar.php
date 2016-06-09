@@ -413,9 +413,7 @@ class ProgressBar
             $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
         }
 
-        $line = $this->buildLine();
-        $line = $this->adjustLineWidthToTerminalWidth($line);
-        $this->overwrite($line);
+        $this->overwrite($this->buildLine());
     }
 
     /**
@@ -601,7 +599,8 @@ class ProgressBar
      */
     private function buildLine()
     {
-        return preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
+        $regex = "{%([a-z\-_]+)(?:\:([^%]+))?%}i";
+        $callback = function ($matches) {
             if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
                 $text = call_user_func($formatter, $this, $this->output);
             } elseif (isset($this->messages[$matches[1]])) {
@@ -615,25 +614,17 @@ class ProgressBar
             }
 
             return $text;
-        }, $this->format);
-    }
+        };
+        $line = preg_replace_callback($regex, $callback, $this->format);
 
-    /**
-     * @param string $line
-     *
-     * @return bool
-     */
-    private function adjustLineWidthToTerminalWidth($line)
-    {
         $lineLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
         $terminalWidth = $this->terminal->getWidth();
-        if ($lineLength > $terminalWidth) {
-            $newBarWidth = $this->barWidth - $lineLength + $terminalWidth;
-            $this->setBarWidth($newBarWidth);
-
-            return $this->buildLine();
+        if ($lineLength <= $terminalWidth) {
+            return $line;
         }
 
-        return $line;
+        $this->setBarWidth($this->barWidth - $lineLength + $terminalWidth);
+
+        return preg_replace_callback($regex, $callback, $this->format);
     }
 }

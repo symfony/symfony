@@ -33,7 +33,7 @@ class Terminal
     /**
      * Sets the terminal width.
      *
-     * @param int
+     * @param int $width
      */
     public function setWidth($width)
     {
@@ -57,7 +57,7 @@ class Terminal
     /**
      * Sets the terminal height.
      *
-     * @param int
+     * @param int $height
      */
     public function setHeight($height)
     {

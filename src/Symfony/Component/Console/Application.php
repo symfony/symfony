@@ -36,7 +36,6 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
-use Symfony\Component\Console\Terminal;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**

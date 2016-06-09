@@ -625,7 +625,7 @@ class Application
 
             $len = $this->stringWidth($title);
 
-            $width = $this->getTerminalWidth() ? $this->getTerminalWidth() - 1 : PHP_INT_MAX;
+            $width = $this->terminal->getWidth() ? $this->terminal->getWidth() - 1 : PHP_INT_MAX;
             // HHVM only accepts 32 bits integer in str_split, even when PHP_INT_MAX is a 64 bit integer: https://github.com/facebook/hhvm/issues/1327
             if (defined('HHVM_VERSION') && $width > 1 << 31) {
                 $width = 1 << 31;
@@ -686,12 +686,26 @@ class Application
     }
 
     /**
+     * Returns the current terminal.
+     *
+     * @return Terminal
+     */
+    public function getTerminal()
+    {
+        return $this->terminal;
+    }
+
+    /**
      * Tries to figure out the terminal width in which this application runs.
      *
      * @return int|null
+     *
+     * @deprecated since version 3.2, to be removed in 4.0. Use the getTerminal() method instead.
      */
     protected function getTerminalWidth()
     {
+        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Use getTerminal() instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+
         return $this->terminal->getWidth();
     }
 
@@ -699,9 +713,13 @@ class Application
      * Tries to figure out the terminal height in which this application runs.
      *
      * @return int|null
+     *
+     * @deprecated since version 3.2, to be removed in 4.0. Use the getTerminal() method instead.
      */
     protected function getTerminalHeight()
     {
+        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Use getTerminal() instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+
         return $this->terminal->getHeight();
     }
 
@@ -709,10 +727,14 @@ class Application
      * Tries to figure out the terminal dimensions based on the current environment.
      *
      * @return array Array containing width and height
+     *
+     * @deprecated since version 3.2, to be removed in 4.0. Use the getTerminal() method instead.
      */
     public function getTerminalDimensions()
     {
-        return $this->terminal->getDimensions();
+        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Use getTerminal() instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+
+        return array($this->terminal->getWidth(), $this->terminal->getHeight());
     }
 
     /**
@@ -724,10 +746,15 @@ class Application
      * @param int $height The height
      *
      * @return Application The current application
+     *
+     * @deprecated since version 3.2, to be removed in 4.0. Use the getTerminal() method instead.
      */
     public function setTerminalDimensions($width, $height)
     {
-        $this->terminal->setDimensions($width, $height);
+        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Use getTerminal() instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+
+        $this->terminal->setWidth($width);
+        $this->terminal->setHeight($height);
 
         return $this;
     }

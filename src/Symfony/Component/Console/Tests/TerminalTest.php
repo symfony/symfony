@@ -15,14 +15,11 @@ use Symfony\Component\Console\Terminal;
 
 class TerminalTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetDimensions()
+    public function test()
     {
         $terminal = new Terminal();
-        $dimensions = $terminal->getDimensions();
-        $this->assertCount(2, $dimensions);
-
-        $terminal->setDimensions(100, 50);
-        $this->assertSame(array(100, 50), $terminal->getDimensions());
+        $terminal->setWidth(100);
+        $terminal->setHeight(50);
         $this->assertSame(100, $terminal->getWidth());
         $this->assertSame(50, $terminal->getHeight());
     }

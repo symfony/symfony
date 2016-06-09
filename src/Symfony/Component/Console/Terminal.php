@@ -17,7 +17,7 @@ class Terminal
     private $height;
 
     /**
-     * Tries to figure out the terminal width in which this application runs.
+     * Gets the terminal width.
      *
      * @return int|null
      */
@@ -41,7 +41,7 @@ class Terminal
     }
 
     /**
-     * Tries to figure out the terminal height in which this application runs.
+     * Gets the terminal height.
      *
      * @return int|null
      */

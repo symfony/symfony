@@ -523,7 +523,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $output = $this->getOutputStream();
 
         $bar = new ProgressBar($output);
-        $bar->getTerminal()->setDimensions(12, 50);
+        $bar->getTerminal()->setWidth(12);
         $bar->start();
         $bar->advance();
 

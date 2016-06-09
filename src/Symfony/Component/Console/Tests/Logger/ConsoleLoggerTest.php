@@ -88,5 +88,4 @@ class ConsoleLoggerTest extends LoggerInterfaceTest
             array(LogLevel::EMERGENCY, OutputInterface::VERBOSITY_QUIET, true, $quietMap),
         );
     }
-
 }

@@ -56,8 +56,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
             '->isHandling returns correct value depending on console verbosity and log level'
         );
 
-        //check that the handler actually outputs the record iff it handles it
-        //  (integration test for the issue #18767 fix)
+        // check that the handler actually outputs the record if it handles it
         $levelName = Logger::getLevelName($level);
 
         $realOutput = $this->getMock('Symfony\Component\Console\Output\Output', array('doWrite'));

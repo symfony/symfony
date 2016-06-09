@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
 
 /**
  * The ProgressBar provides helpers to display progress output.
@@ -49,12 +50,16 @@ class ProgressBar
     private static $formats;
 
     /**
-     * Constructor.
-     *
-     * @param OutputInterface $output An OutputInterface instance
-     * @param int             $max    Maximum steps (0 if unknown)
+     * @var TerminalDimensionsProvider
      */
-    public function __construct(OutputInterface $output, $max = 0)
+    private $terminalDimensionsProvider;
+
+    /**
+     * @param OutputInterface            $output                     An OutputInterface instance
+     * @param int                        $max                        Maximum steps (0 if unknown)
+     * @param TerminalDimensionsProvider $terminalDimensionsProvider
+     */
+    public function __construct(OutputInterface $output, $max = 0, TerminalDimensionsProvider $terminalDimensionsProvider = null)
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -62,6 +67,7 @@ class ProgressBar
 
         $this->output = $output;
         $this->setMaxSteps($max);
+        $this->terminalDimensionsProvider = $terminalDimensionsProvider ?: new TerminalDimensionsProvider();
 
         if (!$this->output->isDecorated()) {
             // disable overwrite when output does not support ANSI codes.
@@ -207,7 +213,7 @@ class ProgressBar
      */
     public function setBarWidth($size)
     {
-        $this->barWidth = (int) $size;
+        $this->barWidth = max(1, (int) $size);
     }
 
     /**
@@ -402,21 +408,9 @@ class ProgressBar
             $this->setRealFormat($this->internalFormat ?: $this->determineBestFormat());
         }
 
-        $this->overwrite(preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
-            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
-                $text = call_user_func($formatter, $this, $this->output);
-            } elseif (isset($this->messages[$matches[1]])) {
-                $text = $this->messages[$matches[1]];
-            } else {
-                return $matches[0];
-            }
-
-            if (isset($matches[2])) {
-                $text = sprintf('%'.$matches[2], $text);
-            }
-
-            return $text;
-        }, $this->format));
+        $line = $this->buildLine();
+        $line = $this->adjustLineWidthToTerminalWidth($line);
+        $this->overwrite($line);
     }
 
     /**
@@ -581,5 +575,46 @@ class ProgressBar
             'debug' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
             'debug_nomax' => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
         );
+    }
+
+    /**
+     * @return string
+     */
+    private function buildLine()
+    {
+        return preg_replace_callback("{%([a-z\-_]+)(?:\:([^%]+))?%}i", function ($matches) {
+            if ($formatter = $this::getPlaceholderFormatterDefinition($matches[1])) {
+                $text = call_user_func($formatter, $this, $this->output);
+            } elseif (isset($this->messages[$matches[1]])) {
+                $text = $this->messages[$matches[1]];
+            } else {
+                return $matches[0];
+            }
+
+            if (isset($matches[2])) {
+                $text = sprintf('%'.$matches[2], $text);
+            }
+
+            return $text;
+        }, $this->format);
+    }
+
+    /**
+     * @param string $line
+     *
+     * @return bool
+     */
+    private function adjustLineWidthToTerminalWidth($line)
+    {
+        $lineLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
+        $terminalWidth = $this->terminalDimensionsProvider->getTerminalWidth();
+        if ($lineLength > $terminalWidth) {
+            $newBarWidth = $this->barWidth - $lineLength + $terminalWidth;
+            $this->setBarWidth($newBarWidth);
+
+            return $this->buildLine();
+        }
+
+        return $line;
     }
 }

@@ -14,7 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Exception\LogicException;
-use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
+use Symfony\Component\Console\Terminal;
 
 /**
  * The ProgressBar provides helpers to display progress output.
@@ -45,21 +45,16 @@ class ProgressBar
     private $formatLineCount;
     private $messages = array();
     private $overwrite = true;
+    private $terminal;
 
     private static $formatters;
     private static $formats;
 
     /**
-     * @var TerminalDimensionsProvider
+     * @param OutputInterface $output An OutputInterface instance
+     * @param int             $max    Maximum steps (0 if unknown)
      */
-    private $terminalDimensionsProvider;
-
-    /**
-     * @param OutputInterface            $output                     An OutputInterface instance
-     * @param int                        $max                        Maximum steps (0 if unknown)
-     * @param TerminalDimensionsProvider $terminalDimensionsProvider
-     */
-    public function __construct(OutputInterface $output, $max = 0, TerminalDimensionsProvider $terminalDimensionsProvider = null)
+    public function __construct(OutputInterface $output, $max = 0)
     {
         if ($output instanceof ConsoleOutputInterface) {
             $output = $output->getErrorOutput();
@@ -67,7 +62,7 @@ class ProgressBar
 
         $this->output = $output;
         $this->setMaxSteps($max);
-        $this->terminalDimensionsProvider = $terminalDimensionsProvider ?: new TerminalDimensionsProvider();
+        $this->terminal = new Terminal();
 
         if (!$this->output->isDecorated()) {
             // disable overwrite when output does not support ANSI codes.
@@ -444,6 +439,20 @@ class ProgressBar
     }
 
     /**
+     * Gets the terminal.
+     *
+     * Can be useful to force terminal dimensions for functional tests.
+     *
+     * @return Terminal
+     *
+     * @internal
+     */
+    public function getTerminal()
+    {
+        return $this->terminal;
+    }
+
+    /**
      * Sets the progress bar format.
      *
      * @param string $format The format
@@ -617,7 +626,7 @@ class ProgressBar
     private function adjustLineWidthToTerminalWidth($line)
     {
         $lineLength = Helper::strlenWithoutDecoration($this->output->getFormatter(), $line);
-        $terminalWidth = $this->terminalDimensionsProvider->getTerminalWidth();
+        $terminalWidth = $this->terminal->getWidth();
         if ($lineLength > $terminalWidth) {
             $newBarWidth = $this->barWidth - $lineLength + $terminalWidth;
             $this->setBarWidth($newBarWidth);

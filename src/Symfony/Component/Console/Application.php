@@ -36,7 +36,7 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
-use Symfony\Component\Console\Terminal\TerminalDimensionsProvider;
+use Symfony\Component\Console\Terminal;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -66,24 +66,19 @@ class Application
     private $definition;
     private $helperSet;
     private $dispatcher;
+    private $terminal;
     private $defaultCommand;
     private $singleCommand;
 
     /**
-     * @var TerminalDimensionsProvider
+     * @param string $name    The name of the application
+     * @param string $version The version of the application
      */
-    private $terminalDimensionsProvider;
-
-    /**
-     * @param string                     $name                       The name of the application
-     * @param string                     $version                    The version of the application
-     * @param TerminalDimensionsProvider $terminalDimensionsProvider
-     */
-    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN', TerminalDimensionsProvider $terminalDimensionsProvider = null)
+    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
     {
         $this->name = $name;
         $this->version = $version;
-        $this->terminalDimensionsProvider = $terminalDimensionsProvider ?: new TerminalDimensionsProvider();
+        $this->terminal = new Terminal();
         $this->defaultCommand = 'list';
         $this->helperSet = $this->getDefaultHelperSet();
         $this->definition = $this->getDefaultInputDefinition();
@@ -697,7 +692,7 @@ class Application
      */
     protected function getTerminalWidth()
     {
-        return $this->terminalDimensionsProvider->getTerminalWidth();
+        return $this->terminal->getWidth();
     }
 
     /**
@@ -707,7 +702,7 @@ class Application
      */
     protected function getTerminalHeight()
     {
-        return $this->terminalDimensionsProvider->getTerminalWidth();
+        return $this->terminal->getHeight();
     }
 
     /**
@@ -717,7 +712,7 @@ class Application
      */
     public function getTerminalDimensions()
     {
-        return $this->terminalDimensionsProvider->getTerminalDimensions();
+        return $this->terminal->getDimensions();
     }
 
     /**
@@ -732,7 +727,7 @@ class Application
      */
     public function setTerminalDimensions($width, $height)
     {
-        $this->terminalDimensionsProvider->setTerminalDimensions($width, $height);
+        $this->terminal->setDimensions($width, $height);
 
         return $this;
     }

@@ -58,4 +58,9 @@ class UnaryNode extends Node
 
         return $value;
     }
+
+    public function dump()
+    {
+        return sprintf('(%s %s)', $this->attributes['operator'], $this->nodes['node']->dump());
+    }
 }

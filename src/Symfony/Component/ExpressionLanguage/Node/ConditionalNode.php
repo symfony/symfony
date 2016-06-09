@@ -48,4 +48,9 @@ class ConditionalNode extends Node
 
         return $this->nodes['expr3']->evaluate($functions, $values);
     }
+
+    public function dump()
+    {
+        return sprintf('(%s ? %s : %s)', $this->nodes['expr1']->dump(), $this->nodes['expr2']->dump(), $this->nodes['expr3']->dump());
+    }
 }

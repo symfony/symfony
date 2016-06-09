@@ -58,6 +58,36 @@ class ArrayNode extends Node
         return $result;
     }
 
+    public function dump()
+    {
+        $array = array();
+        foreach ($this->getKeyValuePairs() as $pair) {
+            $array[$pair['key']->attributes['value']] = $pair['value']->dump();
+        }
+
+        if ($this->isHash($array)) {
+            $str = '{';
+
+            foreach ($array as $key => $value) {
+                if (is_int($key)) {
+                    $str .= sprintf('%s: %s, ', $key, $value);
+                } else {
+                    $str .= sprintf('"%s": %s, ', $this->dumpEscaped($key), $value);
+                }
+            }
+
+            return rtrim($str, ', ').'}';
+        }
+
+        $str = '[';
+
+        foreach ($array as $key => $value) {
+            $str .= sprintf('%s, ', $value);
+        }
+
+        return rtrim($str, ', ').']';
+    }
+
     protected function getKeyValuePairs()
     {
         $pairs = array();

@@ -37,4 +37,9 @@ class NameNode extends Node
     {
         return $values[$this->attributes['name']];
     }
+
+    public function dump()
+    {
+        return $this->attributes['name'];
+    }
 }

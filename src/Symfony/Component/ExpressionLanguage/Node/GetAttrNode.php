@@ -94,4 +94,18 @@ class GetAttrNode extends Node
                 return $array[$this->nodes['attribute']->evaluate($functions, $values)];
         }
     }
+
+    public function dump()
+    {
+        switch ($this->attributes['type']) {
+            case self::PROPERTY_CALL:
+                return sprintf('%s.%s', $this->nodes['node']->dump(), trim($this->nodes['attribute']->dump(), '"'));
+
+            case self::METHOD_CALL:
+                return sprintf('%s.%s(%s)', $this->nodes['node']->dump(), trim($this->nodes['attribute']->dump(), '"'), $this->nodes['arguments']->dump());
+
+            case self::ARRAY_CALL:
+                return sprintf('%s[%s]', $this->nodes['node']->dump(), $this->nodes['attribute']->dump());
+        }
+    }
 }

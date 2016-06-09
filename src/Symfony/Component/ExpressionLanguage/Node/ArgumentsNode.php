@@ -24,4 +24,15 @@ class ArgumentsNode extends ArrayNode
     {
         $this->compileArguments($compiler, false);
     }
+
+    public function dump()
+    {
+        $str = '';
+
+        foreach ($this->getKeyValuePairs() as $pair) {
+            $str .= sprintf('%s, ', $pair['value']->dump());
+        }
+
+        return rtrim($str, ', ');
+    }
 }

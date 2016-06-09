@@ -28,4 +28,9 @@ final class PropertyAccessTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf(PropertyAccessor::class, PropertyAccess::createPropertyAccessor(true));
     }
+
+    public function testCreatePropertyAccessorWithMagicCallEnabled()
+    {
+        $this->assertInstanceOf(PropertyAccessor::class, PropertyAccess::createPropertyAccessor(false, true));
+    }
 }

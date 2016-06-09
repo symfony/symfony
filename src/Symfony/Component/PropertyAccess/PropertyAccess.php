@@ -21,21 +21,35 @@ final class PropertyAccess
     /**
      * Creates a property accessor with the default configuration.
      *
+     * @param bool $throwExceptionOnInvalidIndex
+     *
      * @return PropertyAccessor The new property accessor
      */
-    public static function createPropertyAccessor()
+    public static function createPropertyAccessor($throwExceptionOnInvalidIndex = false, $magicCall = false)
     {
-        return self::createPropertyAccessorBuilder()->getPropertyAccessor();
+        return self::createPropertyAccessorBuilder($throwExceptionOnInvalidIndex, $magicCall)->getPropertyAccessor();
     }
 
     /**
      * Creates a property accessor builder.
      *
+     * @param bool $enableExceptionOnInvalidIndex
+     *
      * @return PropertyAccessorBuilder The new property accessor builder
      */
-    public static function createPropertyAccessorBuilder()
+    public static function createPropertyAccessorBuilder($enableExceptionOnInvalidIndex = false, $enableMagicCall = false)
     {
-        return new PropertyAccessorBuilder();
+        $propertyAccessorBuilder = new PropertyAccessorBuilder();
+
+        if ($enableExceptionOnInvalidIndex) {
+            $propertyAccessorBuilder->enableExceptionOnInvalidIndex();
+        }
+
+        if ($enableMagicCall) {
+            $propertyAccessorBuilder->enableMagicCall();
+        }
+
+        return $propertyAccessorBuilder;
     }
 
     /**

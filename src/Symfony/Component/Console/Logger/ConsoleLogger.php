@@ -88,8 +88,10 @@ class ConsoleLogger extends AbstractLogger
             $output = $this->output;
         }
 
+        // the if condition check isn't necessary -- it's the same one that $output will do internally anyway.
+        // We only do it for efficiency here as the message formatting is relatively expensive.
         if ($output->getVerbosity() >= $this->verbosityLevelMap[$level]) {
-            $output->writeln(sprintf('<%1$s>[%2$s] %3$s</%1$s>', $this->formatLevelMap[$level], $level, $this->interpolate($message, $context)));
+            $output->writeln(sprintf('<%1$s>[%2$s] %3$s</%1$s>', $this->formatLevelMap[$level], $level, $this->interpolate($message, $context)), $this->verbosityLevelMap[$level]);
         }
     }
 

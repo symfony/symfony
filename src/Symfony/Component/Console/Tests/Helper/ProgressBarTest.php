@@ -522,9 +522,10 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $output = $this->getOutputStream();
 
         $bar = new ProgressBar($output);
-        $bar->getTerminal()->setWidth(12);
+        putenv('COLUMNS=12');
         $bar->start();
         $bar->advance();
+        putenv('COLUMNS=120');
 
         rewind($output->getStream());
         $this->assertEquals(
@@ -577,6 +578,8 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testAnsiColorsAndEmojis()
     {
+        putenv('COLUMNS=156');
+
         $bar = new ProgressBar($output = $this->getOutputStream(), 15);
         ProgressBar::setPlaceholderFormatterDefinition('memory', function (ProgressBar $bar) {
             static $i = 0;
@@ -592,10 +595,6 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
         $bar->setMessage('Starting the demo... fingers crossed', 'title');
         $bar->start();
-        $bar->setMessage('Looks good to me...', 'title');
-        $bar->advance(4);
-        $bar->setMessage('Thanks, bye', 'title');
-        $bar->finish();
 
         rewind($output->getStream());
         $this->assertEquals(
@@ -603,12 +602,32 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
                 " \033[44;37m Starting the demo... fingers crossed  \033[0m\n".
                 '  0/15 '.$progress.str_repeat($empty, 26)."   0%\n".
                 " \xf0\x9f\x8f\x81  < 1 sec                        \033[44;37m 0 B \033[0m"
-            ).
+            ),
+            stream_get_contents($output->getStream())
+        );
+        ftruncate($output->getStream(), 0);
+        rewind($output->getStream());
+
+        $bar->setMessage('Looks good to me...', 'title');
+        $bar->advance(4);
+
+        rewind($output->getStream());
+        $this->assertEquals(
             $this->generateOutput(
                 " \033[44;37m Looks good to me...                   \033[0m\n".
                 '  4/15 '.str_repeat($done, 7).$progress.str_repeat($empty, 19)."  26%\n".
                 " \xf0\x9f\x8f\x81  < 1 sec                     \033[41;37m 97 KiB \033[0m"
-            ).
+            ),
+            stream_get_contents($output->getStream())
+        );
+        ftruncate($output->getStream(), 0);
+        rewind($output->getStream());
+
+        $bar->setMessage('Thanks, bye', 'title');
+        $bar->finish();
+
+        rewind($output->getStream());
+        $this->assertEquals(
             $this->generateOutput(
                 " \033[44;37m Thanks, bye                           \033[0m\n".
                 ' 15/15 '.str_repeat($done, 28)." 100%\n".
@@ -616,6 +635,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
             ),
             stream_get_contents($output->getStream())
         );
+        putenv('COLUMNS=120');
     }
 
     public function testSetFormat()

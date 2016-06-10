@@ -685,25 +685,15 @@ class Application
     }
 
     /**
-     * Returns the current terminal.
-     *
-     * @return Terminal
-     */
-    public function getTerminal()
-    {
-        return $this->terminal;
-    }
-
-    /**
      * Tries to figure out the terminal width in which this application runs.
      *
      * @return int|null
      *
-     * @deprecated since version 3.2, to be removed in 4.0. Use the getTerminal() method instead.
+     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
      */
     protected function getTerminalWidth()
     {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Use getTerminal() instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
 
         return $this->terminal->getWidth();
     }
@@ -713,11 +703,11 @@ class Application
      *
      * @return int|null
      *
-     * @deprecated since version 3.2, to be removed in 4.0. Use the getTerminal() method instead.
+     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
      */
     protected function getTerminalHeight()
     {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Use getTerminal() instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
 
         return $this->terminal->getHeight();
     }
@@ -727,11 +717,11 @@ class Application
      *
      * @return array Array containing width and height
      *
-     * @deprecated since version 3.2, to be removed in 4.0. Use the getTerminal() method instead.
+     * @deprecated since version 3.2, to be removed in 4.0. Create a Terminal instance instead.
      */
     public function getTerminalDimensions()
     {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Use getTerminal() instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Create a Terminal instance instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
 
         return array($this->terminal->getWidth(), $this->terminal->getHeight());
     }
@@ -746,14 +736,14 @@ class Application
      *
      * @return Application The current application
      *
-     * @deprecated since version 3.2, to be removed in 4.0. Use the getTerminal() method instead.
+     * @deprecated since version 3.2, to be removed in 4.0. Set the COLUMNS and LINES env vars instead.
      */
     public function setTerminalDimensions($width, $height)
     {
-        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Use getTerminal() instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('%s is deprecated as of 3.2 and will be removed in 4.0. Set the COLUMNS and LINES env vars instead.', __METHOD__, ArgumentResolverInterface::class), E_USER_DEPRECATED);
 
-        $this->terminal->setWidth($width);
-        $this->terminal->setHeight($height);
+        putenv('COLUMNS='.$width);
+        putenv('LINES='.$height);
 
         return $this;
     }

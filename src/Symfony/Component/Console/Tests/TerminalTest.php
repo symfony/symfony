@@ -17,10 +17,16 @@ class TerminalTest extends \PHPUnit_Framework_TestCase
 {
     public function test()
     {
+        putenv('COLUMNS=100');
+        putenv('LINES=50');
         $terminal = new Terminal();
-        $terminal->setWidth(100);
-        $terminal->setHeight(50);
         $this->assertSame(100, $terminal->getWidth());
         $this->assertSame(50, $terminal->getHeight());
+
+        putenv('COLUMNS=120');
+        putenv('LINES=60');
+        $terminal = new Terminal();
+        $this->assertSame(120, $terminal->getWidth());
+        $this->assertSame(60, $terminal->getHeight());
     }
 }

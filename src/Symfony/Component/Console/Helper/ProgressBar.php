@@ -437,20 +437,6 @@ class ProgressBar
     }
 
     /**
-     * Gets the terminal.
-     *
-     * Can be useful to force terminal dimensions for functional tests.
-     *
-     * @return Terminal
-     *
-     * @internal
-     */
-    public function getTerminal()
-    {
-        return $this->terminal;
-    }
-
-    /**
      * Sets the progress bar format.
      *
      * @param string $format The format

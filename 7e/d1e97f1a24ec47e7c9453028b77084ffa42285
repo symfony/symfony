@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-06-09T14:57:30Z
+
+IIRC, making the service immutable was done on purpose
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-09T14:58:17Z
+
+it make make sense to have a static method returning the array of builtin value resolvers though, to make it easier to register them when adding additional ones
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-06-09T15:04:01Z
+
+I've updated the PR according to @stof comment
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-06-09T17:37:14Z
+
+The static method is nice, adds a good DX when used outside of the full framework.

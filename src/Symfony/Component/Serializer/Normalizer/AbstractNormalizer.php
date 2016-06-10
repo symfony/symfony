@@ -319,7 +319,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
         if (!$reflectionClass->isInstantiable()) {
             return $reflectionClass->newInstanceWithoutConstructor();            
         }
-        
+
         $constructor = $reflectionClass->getConstructor();
         if ($constructor) {
             $constructorParameters = $constructor->getParameters();

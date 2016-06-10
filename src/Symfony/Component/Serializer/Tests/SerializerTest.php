@@ -187,7 +187,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $result = $serializer->deserialize(json_encode($data), '\Symfony\Component\Serializer\Tests\Model', 'json');
         $this->assertEquals($data, $result->toArray());
     }
-    
+
     public function testDeserializeObjectWithPrivateConstructor()
     {
         $serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new JsonEncoder()));

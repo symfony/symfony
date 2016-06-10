@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-19T07:28:52Z
+
+@multi-io it would be cool if you could also look at fixing ConsoleLogger.php: let's not leave a bug that someone else will hit and spend time on, whereas it's cheap to fix now that we know about it :) thanks
+
+---------------------------------------------------------------------------
+
+by multi-io at 2016-05-21T08:55:53Z
+
+@nicolas-grekas ok I've applied the fix to ConsoleLogger too. I've added a ConsoleLogger-specific test that would reproduce the fixed bug.
+
+The ["if" query condition](https://github.com/symfony/symfony/pull/18781/files#diff-84e574ab0bb629e124c5752bb81259ccL91) in ConsoleLogger's output pipeline that compares input and output verbosity to determine whether the output should take place or not is actually redundant because the output will do the exact same thing   [internally](https://github.com/symfony/symfony/blob/2.8/src/Symfony/Component/Console/Output/Output.php#L138). I guess it still makes sense to leave it in because it short-cuts and avoids formatting the output message in the case where we're not going to write it out anyway. But I've added a comment that at least documents this. We might want to remove the if query instead if we regard the small win in code clarity higher than the performance gain. :)
+
+It _may_ be advisable to change the default $verbosityLevelMap of ConsoleLogger so that errors and emergencies are output even to a VERBOSITY_QUIET output (which is used e.g. when running a Symfony command with -q -- quite a common thing, and you may not want to suppress all output there). But I'm not sure about Symfony's actual policy regarding this (if any), and it would technically be a breaking change, so I haven't done it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-08T13:09:58Z
+
+:+1:, as a feature to me
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-08T13:11:45Z
+
+👍 for master
+
+---------------------------------------------------------------------------
+
+by multi-io at 2016-06-09T10:55:49Z
+
+Thanks for the review. If you don't mind, I'll rewrite the branch history to avoid multiple tiny style fix commits.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-09T10:58:06Z
+
+@multi-io You can squash the commits if you like but just to let you know, we can do it automatically when merging.
+
+---------------------------------------------------------------------------
+
+by multi-io at 2016-06-09T11:00:25Z
+
+@fabpot ah, ok. I'll do style commits then.
+
+---------------------------------------------------------------------------
+
+by multi-io at 2016-06-09T12:53:42Z
+
+Fixes pushed.
+
+---------------------------------------------------------------------------
+
+by multi-io at 2016-06-09T14:52:02Z
+
+Sorry, I guess I misunderstood your earlier description. This should be the right fix now.

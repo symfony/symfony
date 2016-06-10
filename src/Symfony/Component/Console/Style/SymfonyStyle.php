@@ -40,6 +40,7 @@ class SymfonyStyle extends OutputStyle
     private $progressBar;
     private $lineLength;
     private $bufferedOutput;
+    private $inputStream;
 
     /**
      * @param InputInterface  $input
@@ -350,6 +351,10 @@ class SymfonyStyle extends OutputStyle
 
         if (!$this->questionHelper) {
             $this->questionHelper = new SymfonyQuestionHelper();
+
+            if ($this->inputStream) {
+                $this->questionHelper->setInputStream($this->inputStream);
+            }
         }
 
         $answer = $this->questionHelper->ask($this->input, $this, $question);
@@ -387,6 +392,22 @@ class SymfonyStyle extends OutputStyle
     {
         parent::newLine($count);
         $this->bufferedOutput->write(str_repeat("\n", $count));
+    }
+
+    /**
+     * Sets the input stream to read from when interacting with the user.
+     *
+     * This is mainly useful for testing purpose.
+     *
+     * @param resource $stream The input stream
+     */
+    public function setInputStream($stream)
+    {
+        $this->inputStream = $stream;
+
+        if ($this->questionHelper) {
+            $this->questionHelper->setInputStream($stream);
+        }
     }
 
     /**

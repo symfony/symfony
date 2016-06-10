@@ -71,7 +71,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $serializer = new Serializer(array(new TestDenormalizer()), array());
         $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
     }
-    
+
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */

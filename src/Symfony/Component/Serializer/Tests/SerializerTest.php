@@ -64,7 +64,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $serializer = new Serializer(array(new TestDenormalizer()), array());
         $this->assertTrue($serializer->normalize(new \stdClass(), 'json'));
     }
-
+    
     /**
      * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
@@ -187,6 +187,14 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         $result = $serializer->deserialize(json_encode($data), '\Symfony\Component\Serializer\Tests\Model', 'json');
         $this->assertEquals($data, $result->toArray());
     }
+    
+    public function testDeserializeObjectWithPrivateConstructor()
+    {
+        $serializer = new Serializer(array(new GetSetMethodNormalizer()), array('json' => new JsonEncoder()));
+        $data = array('title' => 'foo', 'numbers' => array(5, 3));
+        $result = $serializer->deserialize(json_encode($data), '\Symfony\Component\Serializer\Tests\ModelWithPrivateConstructor', 'json');
+        $this->assertEquals($data, $result->toArray());
+    }
 
     public function testDeserializeUseCache()
     {
@@ -270,6 +278,54 @@ class Model
 {
     private $title;
     private $numbers;
+
+    public static function fromArray($array)
+    {
+        $model = new self();
+        if (isset($array['title'])) {
+            $model->setTitle($array['title']);
+        }
+        if (isset($array['numbers'])) {
+            $model->setNumbers($array['numbers']);
+        }
+
+        return $model;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    public function getNumbers()
+    {
+        return $this->numbers;
+    }
+
+    public function setNumbers($numbers)
+    {
+        $this->numbers = $numbers;
+    }
+
+    public function toArray()
+    {
+        return array('title' => $this->title, 'numbers' => $this->numbers);
+    }
+}
+
+class ModelWithPrivateConstructor
+{
+    private $title;
+    private $numbers;
+
+    private function __construct()
+    {
+    }
 
     public static function fromArray($array)
     {

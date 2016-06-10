@@ -36,12 +36,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
     public function __construct(ArgumentMetadataFactoryInterface $argumentMetadataFactory = null, array $argumentValueResolvers = array())
     {
         $this->argumentMetadataFactory = $argumentMetadataFactory ?: new ArgumentMetadataFactory();
-        $this->argumentValueResolvers = $argumentValueResolvers ?: array(
-            new RequestAttributeValueResolver(),
-            new RequestValueResolver(),
-            new DefaultValueResolver(),
-            new VariadicValueResolver(),
-        );
+        $this->argumentValueResolvers = $argumentValueResolvers ?: self::getDefaultArgumentValueResolvers();
     }
 
     /**
@@ -83,5 +78,15 @@ final class ArgumentResolver implements ArgumentResolverInterface
         }
 
         return $arguments;
+    }
+
+    public static function getDefaultArgumentValueResolvers()
+    {
+        return array(
+            new RequestAttributeValueResolver(),
+            new RequestValueResolver(),
+            new DefaultValueResolver(),
+            new VariadicValueResolver(),
+        );
     }
 }

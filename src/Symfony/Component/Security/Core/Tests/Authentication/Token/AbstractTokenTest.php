@@ -65,9 +65,11 @@ class AbstractTokenTest extends \PHPUnit_Framework_TestCase
         $token->setUser('fabien');
         $this->assertEquals('fabien', $token->getUsername());
 
+        $token = $this->getToken(array('ROLE_FOO'));
         $token->setUser(new TestUser('fabien'));
         $this->assertEquals('fabien', $token->getUsername());
 
+        $token = $this->getToken(array('ROLE_FOO'));
         $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->expects($this->once())->method('getUsername')->will($this->returnValue('fabien'));
         $token->setUser($user);

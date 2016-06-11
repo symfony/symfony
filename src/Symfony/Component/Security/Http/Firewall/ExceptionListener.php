@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Firewall;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
@@ -200,6 +201,15 @@ class ExceptionListener
 
             if (null !== $this->logger) {
                 $this->logger->info('The security token was removed due to an AccountStatusException.', array('exception' => $authException));
+            }
+        }
+
+        if ($authException instanceof BadCredentialsException) {
+            // remove the security token to prevent infinite redirect loops
+            $this->tokenStorage->setToken(null);
+
+            if (null !== $this->logger) {
+                $this->logger->info('The security token was removed due to a BadCredentialsException.', array('exception' => $authException));
             }
         }
 

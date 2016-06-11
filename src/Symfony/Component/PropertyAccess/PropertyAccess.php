@@ -22,6 +22,7 @@ final class PropertyAccess
      * Creates a property accessor with the default configuration.
      *
      * @param bool $throwExceptionOnInvalidIndex
+     * @param bool $magicCall
      *
      * @return PropertyAccessor The new property accessor
      */
@@ -34,6 +35,7 @@ final class PropertyAccess
      * Creates a property accessor builder.
      *
      * @param bool $enableExceptionOnInvalidIndex
+     * @param bool $enableMagicCall
      *
      * @return PropertyAccessorBuilder The new property accessor builder
      */

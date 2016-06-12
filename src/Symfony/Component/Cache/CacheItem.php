@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Cache;
 
-use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class CacheItem implements CacheItemInterface
+final class CacheItem implements TaggedCacheItemInterface
 {
     /**
      * @internal
@@ -30,6 +29,7 @@ final class CacheItem implements CacheItemInterface
     private $isHit;
     private $expiry;
     private $defaultLifetime;
+    private $tags = array();
 
     /**
      * {@inheritdoc}
@@ -97,6 +97,60 @@ final class CacheItem implements CacheItemInterface
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function tag($tags)
+    {
+        $this->tags += self::normalizeTags($tags);
+
+        return $this;
+    }
+
+    /**
+     * Normalizes cache tags.
+     *
+     * @param string|string[] $tags The tags to validate.
+     *
+     * @throws InvalidArgumentException When $tags is not valid.
+     */
+    public static function normalizeTags($tags)
+    {
+        if (!is_array($tags)) {
+            $tags = array($tags);
+        }
+        $normalizedTags = array();
+
+        foreach ($tags as $tag) {
+            if (!is_string($tag)) {
+                throw new InvalidArgumentException(sprintf('Cache tag must be string, "%s" given', is_object($tag) ? get_class($tag) : gettype($tag)));
+            }
+            if (!isset($tag[0])) {
+                throw new InvalidArgumentException('Cache tag length must be greater than zero');
+            }
+            if (isset($tag[strcspn($tag, '{}()\@:')])) {
+                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters {}()*\@:', $tag));
+            }
+            if (false === $r = strrpos($tag, '/')) {
+                $tag = '/'.$tag;
+                $normalizedTags[$tag] = $tag;
+                continue;
+            }
+            if (!isset($tag[$r + 1])) {
+                throw new InvalidArgumentException(sprintf('Cache tag "%s" ends with a slash', $tag));
+            }
+            if (false !== strpos($tag, '//')) {
+                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains double slashes', $tag));
+            }
+            if ('/' !== $tag[0]) {
+                $tag = '/'.$tag;
+            }
+            $normalizedTags[$tag] = $tag;
+        }
+
+        return $normalizedTags;
     }
 
     /**

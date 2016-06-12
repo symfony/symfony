@@ -50,4 +50,44 @@ class CacheItemTest extends \PHPUnit_Framework_TestCase
             array(new \Exception('foo')),
         );
     }
+
+    public function testNormalizeTag()
+    {
+        $this->assertSame(array('/foo' => '/foo'), CacheItem::normalizeTags('foo'));
+        $this->assertSame(array('/foo/bar' => '/foo/bar'), CacheItem::normalizeTags(array('/foo/bar')));
+    }
+
+    /**
+     * @dataProvider provideInvalidTag
+     * @expectedException Symfony\Component\Cache\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Cache tag
+     */
+    public function testInvalidTag($tag)
+    {
+        CacheItem::normalizeTags($tag);
+    }
+
+    public function provideInvalidTag()
+    {
+        return array(
+            array('/'),
+            array('foo/'),
+            array('//foo'),
+            array('foo//bar'),
+            array(''),
+            array('{'),
+            array('}'),
+            array('('),
+            array(')'),
+            array('\\'),
+            array('@'),
+            array(':'),
+            array(true),
+            array(null),
+            array(1),
+            array(1.1),
+            array(array(array())),
+            array(new \Exception('foo')),
+        );
+    }
 }

@@ -333,7 +333,8 @@ EOF;
             }
         }
 
-        $retOffset = strlen($code);
+        // the offset where the return value is appended below, with indendation
+        $retOffset = 12 + strlen($code);
 
         // optimize parameters array
         if ($matches || $hostMatches) {
@@ -385,7 +386,7 @@ EOF;
         if ($hasTrailingSlash || $schemes) {
             $code .= "            return \$ret;\n";
         } else {
-            $code = substr_replace($code, 'return', $retOffset + 12, 6);
+            $code = substr_replace($code, 'return', $retOffset, 6);
         }
         $code .= "        }\n";
 

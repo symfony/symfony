@@ -163,17 +163,11 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
 
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
-            if (self::ROUTE_MATCH === $status[0]) {
-                $attributes = array_replace($matches, $hostMatches, (array) $status[1]);
-
-                return $this->mergeDefaults($attributes, $route->getDefaults());
-            }
-
             if (self::REQUIREMENT_MISMATCH === $status[0]) {
                 continue;
             }
 
-            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
+            return $this->getAttributes($route, $name, array_replace($matches, $hostMatches, isset($status[1]) ? $status[1] : array()));
         }
     }
 

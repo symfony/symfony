@@ -23,7 +23,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo', new Route('/foo/'));
 
         $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
-        $matcher->expects($this->once())->method('redirect');
+        $matcher->expects($this->once())->method('redirect')->will($this->returnValue(array()));
         $matcher->match('/foo');
     }
 
@@ -68,7 +68,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->match('/foo');
     }
 
-    public function testRedirectWithParams()
+    public function testSchemeRedirectWithParams()
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{bar}', array(), array(), array(), '', array('https')));
@@ -78,8 +78,23 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('redirect')
             ->with('/foo/baz', 'foo', 'https')
-            ->will($this->returnValue(array('_route' => 'foo')))
+            ->will($this->returnValue(array('redirect' => 'value')))
         ;
-        $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz'), $matcher->match('/foo/baz'));
+        $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'), $matcher->match('/foo/baz'));
+    }
+
+    public function testSlashRedirectWithParams()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{bar}/'));
+
+        $matcher = $this->getMockForAbstractClass('Symfony\Component\Routing\Matcher\RedirectableUrlMatcher', array($coll, new RequestContext()));
+        $matcher
+            ->expects($this->once())
+            ->method('redirect')
+            ->with('/foo/baz/', 'foo', null)
+            ->will($this->returnValue(array('redirect' => 'value')))
+        ;
+        $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'), $matcher->match('/foo/baz'));
     }
 }

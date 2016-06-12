@@ -32,7 +32,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
                 'scheme' => null,
                 'httpPort' => $context->getHttpPort(),
                 'httpsPort' => $context->getHttpsPort(),
-                '_route' => null,
+                '_route' => 'foo',
             ),
             $matcher->match('/foo')
         );

@@ -92,6 +92,11 @@ class AnnotationFileLoader extends FileLoader
         $class = false;
         $namespace = false;
         $tokens = token_get_all(file_get_contents($file));
+
+        if (1 === count($tokens) && T_INLINE_HTML === $tokens[0][0]) {
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain PHP code. Did you forgot to add the "<?php" start tag at the beginning of the file?', $file));
+        }
+
         for ($i = 0; isset($tokens[$i]); ++$i) {
             $token = $tokens[$i];
 

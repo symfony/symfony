@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-25T10:42:09Z
+
+A minor comment to reviewers: missing the opening PHP tag may seem like a stupid problem ... but please trust us when we say that we have received lots of reports about this error. We really need to fix this issue one way or another. Thank you!
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-05-25T11:25:39Z
+
+PR looks appropriate to me 👍 , but yes it is a BC break
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-05-26T06:18:10Z
+
+Besides of being a silly check forgotten, it's also quite embarrassing how you miss this error when helping someone. As more experienced phper, I kind of expect to see an open tag and if not present-make the basic assumption people simply left it out of the example. :+1: for this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-03T11:03:57Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-06-07T07:45:21Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-07T07:49:19Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-07T07:51:59Z
+
+Personally I'd be OK to merge this into 2.7 btw. The potential BC break is not more allowed on master than on 2.7. Thus if we're ok to consider its potentiality is near to zero, then 2.7 should be the target.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-07T07:53:29Z
+
+@nicolas-grekas I don't agree. Introducing a potential BC break in master is ok and can be documented. Introducing a small BC break in a patch version is a no-go.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-12T06:46:12Z
+
+:+1:

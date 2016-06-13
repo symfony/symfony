@@ -62,7 +62,7 @@ class ChainAdapter implements AdapterInterface
                 $adapter->save($item);
                 $item->defaultLifetime = $origDefaultLifetime;
             },
-            $this,
+            null,
             CacheItem::class
         );
     }

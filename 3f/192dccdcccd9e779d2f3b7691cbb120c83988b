@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-30T08:44:13Z
+
+@nicolas-grekas @sstok I don't see the security issue here. The `XmlUltils` class still disables the entity loaders and switches the setting back to the old value after documents have been processed. The only place where we did not take into account whether the entity loaders are disabled are the validation of DI extension config files (which currently implicitly assumes that loaders are not disabled).
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-05-30T08:59:14Z
+
+~~What I mean is will `schemaValidateSource()` load any external resources of the source or will it parse the source as-is? And if it will load external resources, are then any security risks with that (including DoS attacks).~~
+
+Edit. OK, that's no problem as the Document is parsed before the validation takes place.
+So the parser should warn about that, only when a schema loads external resources it can be a problem, but who is crazy enough to load schema's from an untrusted source 😄
+
+> The only place where we did not take into account whether the entity loaders are disabled are the validation of DI extension config files (which currently implicitly assumes that loaders are not disabled).
+
+I'm confused here, is the problem still existent or does this pull request solve the issue?
+
+And as @nicolas-grekas pointed out it also needs to be done for the XliffFileLoader schema validator also as it loads at least one external resource https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Translation/Loader/schema/dic/xliff-core/xliff-core-1.2-strict.xsd#L33 (gets replaced by a local version).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-08T12:29:34Z
+
+There are other calls to `schemaValidateSource` in some other components, do we also need to make the same change?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-09T11:35:51Z
+
+@fabpot One place is in the XliffFileLoader which afaik doesn't support to import resources anyway (and thus would not be affected). And forcing the value in the `XmlUtils` does not sound like a good idea to me as we do not know how people use that class and imo they should force the proper value themselves if necessary.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-09T11:43:29Z
+
+Ah no I was mistaken. The `XliffFileLoader` needs to be updated as well.

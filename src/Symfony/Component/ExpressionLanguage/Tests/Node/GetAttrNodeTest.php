@@ -44,6 +44,60 @@ class GetAttrNodeTest extends AbstractNodeTest
         );
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Object of class Symfony\Component\ExpressionLanguage\Tests\Node\Obj does not support property baz.
+     */
+    public function testAccessorException()
+    {
+        $node = new GetAttrNode(
+            new NameNode('foo'),
+            new ConstantNode('baz'),
+            $this->getArrayNode(),
+            GetAttrNode::PROPERTY_CALL
+        );
+        $variables = array('foo' => new Obj());
+        $functions = [];
+
+        $node->evaluate($functions, $variables);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Object of class Symfony\Component\ExpressionLanguage\Tests\Node\Obj does not support call of method baz.
+     */
+    public function testMethodException()
+    {
+        $node = new GetAttrNode(
+            new NameNode('foo'),
+            new ConstantNode('baz'),
+            $this->getArrayNode(),
+            GetAttrNode::METHOD_CALL
+        );
+        $variables = array('foo' => new Obj());
+        $functions = [];
+
+        $node->evaluate($functions, $variables);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to access requested index 0 in array foo.
+     */
+    public function testArrayIndexException()
+    {
+        $node = new GetAttrNode(
+            new NameNode('foo'),
+            new ConstantNode('0'),
+            $this->getArrayNode(),
+            GetAttrNode::ARRAY_CALL
+        );
+        $variables = array('foo' => []);
+        $functions = [];
+
+        $node->evaluate($functions, $variables);
+    }
+
     protected function getArrayNode()
     {
         $array = new ArrayNode();

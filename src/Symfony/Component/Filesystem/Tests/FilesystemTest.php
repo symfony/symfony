@@ -565,6 +565,20 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chown($link, $this->getFileOwner($link));
     }
 
+    public function testChownLink()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->hardlink($file, $link);
+
+        $this->filesystem->chown($link, $this->getFileOwner($link));
+    }
+
     /**
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
@@ -578,6 +592,23 @@ class FilesystemTest extends FilesystemTestCase
         touch($file);
 
         $this->filesystem->symlink($file, $link);
+
+        $this->filesystem->chown($link, 'user'.time().mt_rand(1000, 9999));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testChownLinkFails()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->hardlink($file, $link);
 
         $this->filesystem->chown($link, 'user'.time().mt_rand(1000, 9999));
     }
@@ -631,6 +662,20 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chgrp($link, $this->getFileGroup($link));
     }
 
+    public function testChgrpLink()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->hardlink($file, $link);
+
+        $this->filesystem->chgrp($link, $this->getFileGroup($link));
+    }
+
     /**
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
@@ -644,6 +689,23 @@ class FilesystemTest extends FilesystemTestCase
         touch($file);
 
         $this->filesystem->symlink($file, $link);
+
+        $this->filesystem->chgrp($link, 'user'.time().mt_rand(1000, 9999));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testChgrpLinkFails()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        $this->filesystem->hardlink($file, $link);
 
         $this->filesystem->chgrp($link, 'user'.time().mt_rand(1000, 9999));
     }
@@ -797,6 +859,103 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals($file, readlink($link1));
         $this->assertTrue(is_link($link2));
         $this->assertEquals($file, readlink($link2));
+    }
+
+    public function testLink()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+        $this->filesystem->hardlink($file, $link);
+
+        $this->assertTrue(is_file($link));
+        $this->assertEquals(fileinode($file), fileinode($link));
+    }
+
+    /**
+     * @depends testLink
+     */
+    public function testRemoveLink()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        $this->filesystem->remove($link);
+
+        $this->assertTrue(!is_file($link));
+    }
+
+    public function testLinkIsOverwrittenIfPointsToDifferentTarget()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $file2 = $this->workspace.DIRECTORY_SEPARATOR.'file2';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+        touch($file2);
+        link($file2, $link);
+
+        $this->filesystem->hardlink($file, $link);
+
+        $this->assertTrue(is_file($link));
+        $this->assertEquals(fileinode($file), fileinode($link));
+    }
+
+    public function testLinkIsNotOverwrittenIfAlreadyCreated()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+        link($file, $link);
+
+        $this->filesystem->hardlink($file, $link);
+
+        $this->assertTrue(is_file($link));
+        $this->assertEquals(fileinode($file), fileinode($link));
+
+    }
+
+    public function testLinkWithSeveralTargets()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link1 = $this->workspace.DIRECTORY_SEPARATOR.'link';
+        $link2 = $this->workspace.DIRECTORY_SEPARATOR.'link2';
+
+        touch($file);
+
+        $this->filesystem->hardlink($file, array($link1,$link2));
+
+        $this->assertTrue(is_file($link1));
+        $this->assertEquals(fileinode($file), fileinode($link1));
+        $this->assertTrue(is_file($link2));
+        $this->assertEquals(fileinode($file), fileinode($link2));
+    }
+
+    public function testLinkWithSameTarget()
+    {
+        $this->markAsSkippedIfLinkIsMissing();
+
+        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
+        $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
+
+        touch($file);
+
+        // practically same as testLinkIsNotOverwrittenIfAlreadyCreated
+        $this->filesystem->hardlink($file, array($link,$link));
+
+        $this->assertTrue(is_file($link));
+        $this->assertEquals(fileinode($file), fileinode($link));
     }
 
     /**

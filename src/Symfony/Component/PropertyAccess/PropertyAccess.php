@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyAccess;
 
+use Psr\Cache\CacheItemPoolInterface;
+
 /**
  * Entry point of the PropertyAccess component.
  *
@@ -19,39 +21,30 @@ namespace Symfony\Component\PropertyAccess;
 final class PropertyAccess
 {
     /**
-     * Creates a property accessor with the default configuration.
+     * Creates a property accessor.
      *
-     * @param bool $throwExceptionOnInvalidIndex
-     * @param bool $magicCall
+     * For dealing with several property accessor configured differently, use
+     * the createPropertyAccessorBuilder() method instead.
+     *
+     * @param bool                        $throwExceptionOnInvalidIndex
+     * @param bool                        $magicCall
+     * @param CacheItemPoolInterface|null $cacheItemPool
      *
      * @return PropertyAccessor The new property accessor
      */
-    public static function createPropertyAccessor($throwExceptionOnInvalidIndex = false, $magicCall = false)
+    public static function createPropertyAccessor($magicCall = false, $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null)
     {
-        return self::createPropertyAccessorBuilder($throwExceptionOnInvalidIndex, $magicCall)->getPropertyAccessor();
+        return new PropertyAccessor($magicCall, $throwExceptionOnInvalidIndex, $cacheItemPool);
     }
 
     /**
      * Creates a property accessor builder.
      *
-     * @param bool $enableExceptionOnInvalidIndex
-     * @param bool $enableMagicCall
-     *
      * @return PropertyAccessorBuilder The new property accessor builder
      */
-    public static function createPropertyAccessorBuilder($enableExceptionOnInvalidIndex = false, $enableMagicCall = false)
+    public static function createPropertyAccessorBuilder()
     {
-        $propertyAccessorBuilder = new PropertyAccessorBuilder();
-
-        if ($enableExceptionOnInvalidIndex) {
-            $propertyAccessorBuilder->enableExceptionOnInvalidIndex();
-        }
-
-        if ($enableMagicCall) {
-            $propertyAccessorBuilder->enableMagicCall();
-        }
-
-        return $propertyAccessorBuilder;
+        return new PropertyAccessorBuilder();
     }
 
     /**

@@ -75,4 +75,27 @@ class Node
 
         return $results;
     }
+
+    public function dump()
+    {
+        throw new \BadMethodCallException(sprintf('Dumping a "%s" instance is not supported yet.', get_class($this)));
+    }
+
+    protected function dumpEscaped($value)
+    {
+        return str_replace(array('\\', '"'), array('\\\\', '\"'), $value);
+    }
+
+    protected function isHash(array $value)
+    {
+        $expectedKey = 0;
+
+        foreach ($value as $key => $val) {
+            if ($key !== $expectedKey++) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

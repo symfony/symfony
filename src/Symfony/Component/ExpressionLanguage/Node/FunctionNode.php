@@ -49,4 +49,17 @@ class FunctionNode extends Node
 
         return call_user_func_array($functions[$this->attributes['name']]['evaluator'], $arguments);
     }
+
+    public function dump()
+    {
+        $str = $this->attributes['name'];
+
+        $str .= '(';
+
+        foreach ($this->nodes['arguments']->nodes as $node) {
+            $str .= $node->dump().', ';
+        }
+
+        return rtrim($str, ', ').')';
+    }
 }

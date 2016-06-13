@@ -39,4 +39,9 @@ class ParsedExpression extends Expression
     {
         return $this->nodes;
     }
+
+    public function dump()
+    {
+        return $this->nodes->dump();
+    }
 }

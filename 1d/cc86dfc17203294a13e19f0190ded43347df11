@@ -1,0 +1,501 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-29T07:31:05Z
+
+Ok so I dropped 8298b1d because the `CachingFactoryDecorator` (ref #16747) already do the job, then there is no gain in caching the `array_flip` even if it is justified for `TimezoneType`.
+
+I still think this abstract class is good for DX and maintainability. For example introducing the `choice_translation_domain` option would have required one line to this abstract class instead of modifying 5 classes.
+And extending `ImmutableChoiceType` to only implement `loadChoices` is better for DX than implementing `ChoiceLoaderInterface`.
+
+This may be trivial but there is no harm in performance, I've tried this code in SE:
+```php
+$builder = $this->createFormBuilder();
+
+for ($i = 0; $i < 10; ++$i) {
+    $builder->add('country'.$i, FormType\CountryType::class);
+    $builder->add('currency'.$i, FormType\CurrencyType::class);
+    $builder->add('language'.$i, FormType\LanguageType::class);
+    $builder->add('locale'.$i, FormType\LocaleType::class);
+    $builder->add('timezone'.$i, FormType\TimezoneType::class);
+}
+$form = $builder->getForm();
+```
+From base to 8298b1d (try to improve cache with static properties:
+![10_form_base_to_cache](https://cloud.githubusercontent.com/assets/10107633/14100862/d824f90a-f590-11e5-82fd-c7218e4c190a.jpg)
+
+And from base to refactoring (current PR):
+![10_from_base_to_refactor](https://cloud.githubusercontent.com/assets/10107633/14100873/e9d8d3a6-f590-11e5-9044-b6bf99a7a04c.jpg)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T15:55:25Z
+
+ping @webmozart, does it fit with #18368 ?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-03-30T17:11:12Z
+
+A simpler and more flexible solution would be to add a `CallableChoiceLoader`. To the constructor of that loader, we can pass a callable in each of these types that loads the choices, e.g.:
+
+~~~php
+class CountryType extends AbstractType
+{
+    private $choiceLoader;
+
+    public function __construct()
+    {
+        $this->choiceLoader = new CallableChoiceLoader(function () {
+            return array_flip(Intl::getRegionBundle()->getCountryNames());
+        });
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'choice_loader' => $this->choiceLoader,
+        ]);
+    }
+}
+~~~
+
+For each type, we make sure to reuse the same loader instance, then the caching mechanisms in `ChoiceType` will automatically take effect.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-30T17:16:25Z
+
+I thought about it too since it is very easy to do, I'm glad you brought that up, I might be done in time :)
+
+Should I go on with it ?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-03-30T21:11:41Z
+
+I prefer the solution suggested by @webmozart
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T06:32:07Z
+
+Rebased.
+
+I first thought of using `choice_loader` as any callable when dealing with #18334, but I was not sure that it would be good to add an interface for that, although that's looks very great for those sub types!
+
+I think this callable choice loader will really improve performances, I will try to profile something today :)
+
+Also, I still think of some things:
+ - it would be good to decouple the need to inherit from choice type basis from the need to load choices in a permanent way to ease maintaining them.
+
+ This was originally sent as PoC, but it would be good to find a better name for such an abstract class:
+  `LoadedChoiceType` or `AbstractLazyChoiceType`, it would be a more generic core version of `DoctrineType`.
+
+- I feel `TimezoneType` is looking really good now but the four others could be more optimised soon (in regard of #18368) to directly implement the `ChoiceLoaderInterface` as we can do for mappers or transformers (e.g #18357).
+
+Concerning choice loaders in general, if this PR is merged, this would be the first one implemented in the form core and in regard of the work I'm trying to do in #18359, I think there is two much caching when using loaders here's a schema:
+```
+Needs choice list (configuration | loading form types)
+|
+=> factory
+   |
+   |__ from choices ?
+   |   |
+   |   |__ decorated with cache ?
+   |   |   |
+   |   |   |__ => return ArrayChoiceList
+   |   |
+   |   |
+   |   |__ decorates
+   |   |
+   |   |__ => creates
+   |       |
+   |       |__ => cache => return ArrayChoiceList
+   |
+   |
+   |__ from loader ?
+	   |
+       |__ decorated with cache ?
+           |
+           |__ => return ArrayChoiceList
+		   |
+		   |
+		   |__ decorates
+		       |
+			   |__ => cache (*1) and return **LazyChoiceList**
+
+Then later or not uses choice list (actually build form or view)
+|
+=> not lazy ?
+    |
+	|__ => return classic (good)
+	|
+	|__ is loaded ?
+	    |
+		|__ => return classic
+		|
+		|__ call loader
+		    |
+			|__ is loaded ?
+			|   |
+			|   |__ => return classic
+			|   |
+			|   |__ call factory
+			|   |   |
+			|   |   |__ decorated with cache
+			|   |   |    |
+			|   |   |    |__ wtf ?
+			|   |   |
+			|   |   |__ decorated with property path ?
+			|   |   |    |
+			|   |   |    |__ wtf ?
+			|   |   |
+			|   |   |__ factory creates, cache (*2) and return ArrayChoiceList
+			|   |
+			|   |__ loader cache (*3)
+			|
+			|__ lazy choice list cache (*4)
+```
+
+The `(*n)` marker indicates when the caching implies the number of copy of the same choice list.
+
+So I suggest to use the following code in `LazyChoiceList`:
+```
+    public function getChoices()
+    {
+        // BC
+        if (!$this->isLoaded) {
+            $this->loadedList = $this->loader->loadChoiceList($this->value);
+            $this->isLoaded = true;
+        } else {
+            if ($this->loadedList !== $loadedList = $this->loader->loadChoiceList($this->value) {
+                // Trigger deprecation notice for caching in lazy choice list
+                // not caching in choice loader unsupported in 4.0
+                return $this->loadedList->getChoices();
+            }
+        }
+        // End bc
+        return $this->loader->loadChoiceList($this->value)->getChoices();
+    }
+```
+
+And together with the change of #18359 we can get in 4.0:
+```
+Uses choice list (actually build form or view)
+|
+=> not lazy ?
+    |
+	|__ => return classic (good)
+	|
+	|
+	|__ call loader
+		|
+		|__ is loaded ?
+	        |
+		    |__ => return classic
+		    |
+		    |__ loader creates, cache (*2) and returns ChoiceListInterface
+```
+
+I think the loader should not know about factories. The `DoctrineChoiceLoader` is not registered as service, it is only instantiated by default in the `DoctrineType` which passes it the factory so it's not really an extension point.
+
+What do you think ?
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T16:41:39Z
+
+When exactly will 3.1 be feature frozen ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-31T16:47:03Z
+
+End of the month :) Old PR can be merged next week at the latest, new ones, no.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T16:49:02Z
+
+@fabpot the underlying question: can the first commit (just adding the `CallbackChoiceLoader` feature) be merged now as its ready, and the internal "enhancement/refactoring" of the sub choice types be worked on during the beta ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T16:50:22Z
+
+OK I've got your message after typing the second :) so no need to rush!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-03-31T16:50:29Z
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T10:36:43Z
+
+Comments addressed, rebased, updated title and description.
+
+Looks really good now! I'll try to send blackfire profiles soon!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-01T11:14:11Z
+
+@webmozart I still think it can be improved for all classes excepted `TimezoneType` by letting them implementing `ChoiceLoaderInterface` directly once #18334 dealt with:
+```php
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Form\Extension\Core\Type;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class CountryType extends AbstractType implements ChoiceLoaderInterface
+{
+    /**
+     * The loaded countries.
+     *
+     * @var ArrayChoiceList
+     */
+    private $countries;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'choice_loader' => $this,
+            'choice_translation_domain' => false,
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return __NAMESPACE__.'\ChoiceType';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
+        return 'country';
+    }
+
+    public function loadChoiceList()
+    {
+        if ($this->countries) {
+            return $this->countries;
+        }
+
+        $countries = array_flip(Intl::getRegionBundle()->getCountryNames());
+
+        return $this->countries = new ArrayChoiceList($countries);
+    }
+
+    public function loadChoicesForValues($values, $value)
+    {
+        // Optimize, as already done in this PR
+        if (empty($values) {
+            return array();
+        }
+
+        if ($this->countries) {
+            return $this->countries->getChoicesForValues($values);
+        }
+
+        // Optimisation not implement in this PR requiring new API in \Intl component
+        return Intl::getRegionBundle()->getCountriesWithNames($values);
+    }
+
+    // ...
+```
+
+What do you think ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T19:07:33Z
+
+I've made some profiling. Symfony standard, a simple form with a field for each optimised type involved in that PR:
+
+- [on initial display](https://blackfire.io/profiles/compare/921fa862-70bd-42a3-bbf6-7e04ebf9cec5/graph)
+
+![init_immutable](https://cloud.githubusercontent.com/assets/10107633/14234280/7db2e902-f9df-11e5-95b2-84bec4e36816.jpg)
+
+- [on cached display](https://blackfire.io/profiles/compare/81181fc8-b11c-48a5-bf99-f7ec5d6c8b31/graph)
+
+![display_immutable](https://cloud.githubusercontent.com/assets/10107633/14234276/4b3f42cc-f9df-11e5-93d6-8987e645824a.jpg)
+
+- [on submit](https://blackfire.io/profiles/compare/f8a2da88-542f-4919-a9a5-ab0511da0711/graph)
+
+![submit_immutbale](https://cloud.githubusercontent.com/assets/10107633/14234264/f7947ba6-f9de-11e5-8791-5ffd5f7ae9d2.jpg)
+
+Check the real numbers, they are cool :)
+
+Here's the test on symfony-standard:
+```php
+/**
+ * @Route("/", name="homepage")
+ */
+public function indexAction(Request $request)
+{
+    $builder = $this->createFormBuilder()
+        ->add('country', '\Symfony\Component\Form\Extension\Core\Type\CountryType')
+        ->add('currency', '\Symfony\Component\Form\Extension\Core\Type\CurrencyType')
+        ->add('language', '\Symfony\Component\Form\Extension\Core\Type\LanguageType')
+        ->add('locale', '\Symfony\Component\Form\Extension\Core\Type\LocaleType')
+        ->add('timezone', '\Symfony\Component\Form\Extension\Core\Type\TimezoneType')
+        ->add('Save', '\Symfony\Component\Form\Extension\Core\Type\SubmitType')
+    ;
+
+    // Start profiling
+    $probe = $this->createBlackFireProbe();
+
+    // Loads the types
+    $form = $builder->getForm();
+
+    // On submit load the choice by callback
+    $form->handleRequest($request);
+
+    // Load the choices by callback if needed
+    $view = $form->createView();
+
+    // End profiling
+    $this->sendProbe($probe);
+
+    return $this->render('default/index.html.twig', [
+        'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..'),
+        'form' => $view,
+    ]);
+}
+```
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T19:11:50Z
+
+That would be nice to get final reviews so it gets in 3.1. Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T23:07:43Z
+
+This PR enhancements are also impacted with the lazy choice list optimized from #18359 compared to current 3.1 we got:
+
+ - [on display](https://blackfire.io/profiles/compare/cbf990be-622c-4e84-ad4c-25e1f94ce667/graph)
+
+![bonus_display](https://cloud.githubusercontent.com/assets/10107633/14234878/830b4eee-f9ee-11e5-86e6-e8b21d0eaeb8.jpg)
+
+ - [on submit](https://blackfire.io/profiles/compare/547924a8-0d0c-48f4-a106-ad20a6e3952e/graph)
+
+![bonus_submit](https://cloud.githubusercontent.com/assets/10107633/14234555/1cfd285a-f9e6-11e5-9c69-1fd5a2504689.jpg)
+
+And in 4.0 without BC layer compared to current 3.1:
+
+ - [on display](https://blackfire.io/profiles/compare/114de490-ed93-43b2-82a4-cfc595881252/graph)
+
+![init_4](https://cloud.githubusercontent.com/assets/10107633/14234653/2de69a3c-f9e8-11e5-991f-86fc82a4663b.jpg)
+
+ - [on submit](https://blackfire.io/profiles/compare/7731289f-35a8-4c1b-b35f-99bb683cb495/graph)
+
+![submit_4](https://cloud.githubusercontent.com/assets/10107633/14235527/5f8d0cba-fa01-11e5-9c32-7726bb69f9b5.jpg)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-03T23:18:16Z
+
+Maybe we should also define the default `choice_value` to:
+```php
+function ($choice) { return $choice;}
+```
+to prevent the `castableToString` being called, it's not needed here, what do you think @webmozart ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-06T10:30:52Z
+
+Thanks @stof for that review :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-06T17:56:43Z
+
+Comments addressed, rebased on master, tests green.
+
+Final round of reviews and maybe a chance to get this in 3.1 ? Thanks.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-07T16:00:21Z
+
+@stof All comments addressed here, plus the optimization by implementing the `ChoiceLoaderInterface` directly!
+
+This one still has a chance. I'm just waiting for the appveyor tests to be green :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-07T16:10:58Z
+
+Green :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-07T16:12:33Z
+
+I will try to profile again but there's no doubt that they'll be better than above :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-11T10:19:06Z
+
+Alright, last comments addressed! Failures are unrelated, I think I'm done here :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-11T12:55:02Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-25T14:12:51Z
+
+Rebased. Tests still green.
+
+Last comment here is @fabpot approval. Is this still planned for 3.1? If so, it should be merged as soon as possible to be tested during beta.
+
+ping __@symfony/deciders__
+
+Thanks.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-30T06:16:03Z
+
+Re-re-rebased :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-13T10:13:12Z
+
+Comments addressed and changelog updated to target 3.2.

@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by andrerom at 2015-08-06T19:05:35Z
+
+@hhamon fixed those + suggestions from fabbot.io in 029faeb
+
+---------------------------------------------------------------------------
+
+by andrerom at 2015-08-11T11:21:35Z
+
+Open question: *Would it be ok to aim at backporting this for 2.3 and up? I have seen similar small useful features being backported before which is why I ask. For FOSHttpCache that would be helpful to not have to require 2.8.*
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-11T11:23:26Z
+
+@andrerom no it is not. New features are never backported, unless it is necessary to fix a security issue (or a PHP compatibility issue)
+
+---------------------------------------------------------------------------
+
+by andrerom at 2015-08-11T11:25:20Z
+
+ok, clear.
+
+---------------------------------------------------------------------------
+
+by stof at 2015-08-11T11:30:26Z
+
+> Symlinks are good for directories, but for files hardlinks are a better match when needing to represent same file in several locations.
+
+This actually depends on the use case. Saying that hardlinks is better is misleading.
+
+For instance, if you use hardlinks on a PHP file, ``__DIR__`` will be related to the hardlink location, not to the original location AFAIK (I may be wrong though), which could actually break it.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2015-08-11T11:39:16Z
+
+> This actually depends on the use case. Saying that hardlinks is better is misleading.
+
+Right, corrected that statement, I was actually never considering the use case of linking executable php files with actual code as opposed to cache files or binary files. I would have expected it to report `__DIR__` for the link, but the gotcha is maybe more that `__FILE__` will most likely point to origin?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-27T16:15:00Z
+
+Not sure why this PR staled. @andrerom Can you rebase on current 2.8? I will then be able to merge this into master.
+
+---------------------------------------------------------------------------
+
+by andrerom at 2016-01-27T18:02:32Z
+
+@fabpot done, failure with fabbot.io seems to be unrelated to changes here.

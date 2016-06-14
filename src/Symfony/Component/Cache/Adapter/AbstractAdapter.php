@@ -45,7 +45,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
                 return $item;
             },
-            $this,
+            null,
             CacheItem::class
         );
         $this->mergeByLifetime = \Closure::bind(
@@ -66,7 +66,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
                 return $byLifetime;
             },
-            $this,
+            null,
             CacheItem::class
         );
     }

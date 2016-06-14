@@ -45,7 +45,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
 
                 return $item;
             },
-            $this,
+            null,
             CacheItem::class
         );
     }
@@ -132,9 +132,9 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
             return false;
         }
         $item = (array) $item;
-        $key = $item[CacheItem::CAST_PREFIX.'key'];
-        $value = $item[CacheItem::CAST_PREFIX.'value'];
-        $expiry = $item[CacheItem::CAST_PREFIX.'expiry'];
+        $key = $item["\0*\0key"];
+        $value = $item["\0*\0value"];
+        $expiry = $item["\0*\0expiry"];
 
         if (null !== $expiry && $expiry <= time()) {
             $this->deleteItem($key);

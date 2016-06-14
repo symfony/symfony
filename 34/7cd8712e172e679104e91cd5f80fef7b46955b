@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-14T09:16:28Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-14T09:35:29Z
+
+Please update https://github.com/nicolas-grekas/symfony/blob/0b5b693f19915a263630ea85bc3cce208f9bad9d/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php#L350 to say "like in Postgres < 9.5" to avoid confusion.
+
+Apart from that :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-14T09:39:03Z
+
+updated

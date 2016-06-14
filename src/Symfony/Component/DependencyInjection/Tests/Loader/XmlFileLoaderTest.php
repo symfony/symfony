@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -546,29 +547,19 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testAliasDefinitionContainsUnsupportedElements()
     {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $deprecations = array(
+            'Using the attribute "class" is deprecated for alias definition "bar"',
+            'Using the element "tag" is deprecated for alias definition "bar"',
+            'Using the element "factory" is deprecated for alias definition "bar"',
+        );
 
-        $deprecations = array();
-        set_error_handler(function ($type, $msg) use (&$deprecations) {
-            if (E_USER_DEPRECATED !== $type) {
-                restore_error_handler();
+        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
+            $container = new ContainerBuilder();
+            $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
 
-                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
-            }
+            $loader->load('legacy_invalid_alias_definition.xml');
 
-            $deprecations[] = $msg;
+            $this->assertTrue($container->has('bar'));
         });
-
-        $loader->load('legacy_invalid_alias_definition.xml');
-
-        restore_error_handler();
-
-        $this->assertTrue($container->has('bar'));
-
-        $this->assertCount(3, $deprecations);
-        $this->assertContains('Using the attribute "class" is deprecated for alias definition "bar"', $deprecations[0]);
-        $this->assertContains('Using the element "tag" is deprecated for alias definition "bar"', $deprecations[1]);
-        $this->assertContains('Using the element "factory" is deprecated for alias definition "bar"', $deprecations[2]);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
@@ -88,26 +89,13 @@ class TemplateNameParserTest extends TestCase
      */
     public function testAbsolutePathsAreDeprecated($name, $logicalName, $path, $ref)
     {
-        $deprecations = array();
-        set_error_handler(function ($type, $msg) use (&$deprecations) {
-            if (E_USER_DEPRECATED !== $type) {
-                restore_error_handler();
+        ErrorAssert::assertDeprecationsAreTriggered('Absolute template path support is deprecated since Symfony 3.1 and will be removed in 4.0.', function () use ($name, $logicalName, $path, $ref) {
+            $template = $this->parser->parse($name);
 
-                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
-            }
-
-            $deprecations[] = $msg;
+            $this->assertSame($ref->getLogicalName(), $template->getLogicalName());
+            $this->assertSame($logicalName, $template->getLogicalName());
+            $this->assertSame($path, $template->getPath());
         });
-
-        $template = $this->parser->parse($name);
-
-        restore_error_handler();
-
-        $this->assertSame($ref->getLogicalName(), $template->getLogicalName());
-        $this->assertSame($logicalName, $template->getLogicalName());
-        $this->assertSame($path, $template->getPath());
-        $this->assertCount(1, $deprecations);
-        $this->assertContains('Absolute template path support is deprecated since Symfony 3.1 and will be removed in 4.0.', $deprecations[0]);
     }
 
     public function provideAbsolutePaths()

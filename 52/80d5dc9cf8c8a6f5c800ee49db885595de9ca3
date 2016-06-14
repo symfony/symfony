@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-14T09:53:11Z
+
+This should make the test suite for `master` green again.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-14T10:18:00Z
+
+Ah, we need to update the required version of the DependencyInjection component too.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-14T10:27:19Z
+
+@symfony/deciders tests are passing

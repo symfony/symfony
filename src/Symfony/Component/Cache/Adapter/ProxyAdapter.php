@@ -24,23 +24,28 @@ class ProxyAdapter implements AdapterInterface
     private $namespace;
     private $namespaceLen;
     private $createCacheItem;
+    private $poolHash;
 
     public function __construct(CacheItemPoolInterface $pool, $namespace = '', $defaultLifetime = 0)
     {
         $this->pool = $pool;
+        $this->poolHash = $poolHash = spl_object_hash($pool);
         $this->namespace = '' === $namespace ? '' : $this->getId($namespace);
         $this->namespaceLen = strlen($namespace);
         $this->createCacheItem = \Closure::bind(
-            function ($key, $value, $isHit) use ($defaultLifetime) {
+            function ($key, $innerItem) use ($defaultLifetime, $poolHash) {
                 $item = new CacheItem();
                 $item->key = $key;
-                $item->value = $value;
-                $item->isHit = $isHit;
+                $item->value = $innerItem->get();
+                $item->isHit = $innerItem->isHit();
                 $item->defaultLifetime = $defaultLifetime;
+                $item->innerItem = $innerItem;
+                $item->poolHash = $poolHash;
+                $innerItem->set(null);
 
                 return $item;
             },
-            $this,
+            null,
             CacheItem::class
         );
     }
@@ -53,7 +58,7 @@ class ProxyAdapter implements AdapterInterface
         $f = $this->createCacheItem;
         $item = $this->pool->getItem($this->getId($key));
 
-        return $f($key, $item->get(), $item->isHit());
+        return $f($key, $item);
     }
 
     /**
@@ -138,12 +143,12 @@ class ProxyAdapter implements AdapterInterface
             return false;
         }
         $item = (array) $item;
-        $expiry = $item[CacheItem::CAST_PREFIX.'expiry'];
-        $poolItem = $this->pool->getItem($this->namespace.$item[CacheItem::CAST_PREFIX.'key']);
-        $poolItem->set($item[CacheItem::CAST_PREFIX.'value']);
-        $poolItem->expiresAt(null !== $expiry ? \DateTime::createFromFormat('U', $expiry) : null);
+        $expiry = $item["\0*\0expiry"];
+        $innerItem = $item["\0*\0poolHash"] === $this->poolHash ? $item["\0*\0innerItem"] : $this->pool->getItem($this->namespace.$item["\0*\0key"]);
+        $innerItem->set($item["\0*\0value"]);
+        $innerItem->expiresAt(null !== $expiry ? \DateTime::createFromFormat('U', $expiry) : null);
 
-        return $this->pool->$method($poolItem);
+        return $this->pool->$method($innerItem);
     }
 
     private function generateItems($items)
@@ -155,7 +160,7 @@ class ProxyAdapter implements AdapterInterface
                 $key = substr($key, $this->namespaceLen);
             }
 
-            yield $key => $f($key, $item->get(), $item->isHit());
+            yield $key => $f($key, $item);
         }
     }
 

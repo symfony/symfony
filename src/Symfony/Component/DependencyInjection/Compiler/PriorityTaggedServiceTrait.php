@@ -38,10 +38,10 @@ trait PriorityTaggedServiceTrait
         foreach ($services as $serviceId => $tags) {
             foreach ($tags as $attributes) {
                 $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
-                $queue->insert(new Reference($serviceId), $priority * -1);
+                $queue->insert(new Reference($serviceId), $priority);
             }
         }
 
-        return iterator_to_array($queue);
+        return iterator_to_array($queue, false);
     }
 }

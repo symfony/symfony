@@ -72,7 +72,7 @@ class ValueToSignedTransformer implements DataTransformerInterface
 
         $newSignature = $this->calculateSignature($array[$this->fieldKey]);
 
-        if (!$this->checkSignature($array[$this->signedKey], $newSignature)) {
+        if (!hash_equals($array[$this->signedKey], $newSignature)) {
             throw new TransformationFailedException(
                 'The signature does not match with the provided data.'
             );
@@ -99,37 +99,5 @@ class ValueToSignedTransformer implements DataTransformerInterface
         }
 
         return hash_final($ctx);
-    }
-
-    /**
-     * Check two signature with protection on timing attack.
-     *
-     * @param $signatureA
-     * @param $signatureB
-     *
-     * @return bool
-     */
-    protected static function checkSignature($signatureA, $signatureB)
-    {
-        if (!is_string($signatureA) || !is_string($signatureB)) {
-            return false;
-        }
-
-        /*
-         * Trying to avoid timing attack due to the behavior of string equality condition (==)
-         *
-         * In certain cases, information can be leaked by using a timing attack.
-         * It takes advantage of the == operator only comparing until it finds a difference in the two strings. To prevent it, you have two options.
-         */
-        if (($len = strlen($signatureA)) != strlen($signatureB)) {
-            return false;
-        }
-
-        $status = 0;
-        for ($i = 0; $i < $len; ++$i) {
-            $status |= ord($signatureA[$i]) ^ ord($signatureB[$i]);
-        }
-
-        return $status === 0;
     }
 }

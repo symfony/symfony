@@ -1357,6 +1357,40 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('456', $p2->getOutput());
     }
 
+    public function testInheritEnvEnabled()
+    {
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo serialize($_SERVER);'), null, array('BAR' => 'BAZ'));
+
+        putenv('FOO=BAR');
+
+        $this->assertSame($process, $process->inheritEnvironmentVariables(1));
+        $this->assertTrue($process->areEnvironmentVariablesInherited());
+
+        $process->run();
+
+        $expected = array('BAR' => 'BAZ', 'FOO' => 'BAR');
+        $env = array_intersect_key(unserialize($process->getOutput()), $expected);
+
+        $this->assertSame($expected, $env);
+    }
+
+    public function testInheritEnvDisabled()
+    {
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo serialize($_SERVER);'), null, array('BAR' => 'BAZ'));
+
+        putenv('FOO=BAR');
+
+        $this->assertFalse($process->areEnvironmentVariablesInherited());
+
+        $process->run();
+
+        $expected = array('BAR' => 'BAZ', 'FOO' => 'BAR');
+        $env = array_intersect_key(unserialize($process->getOutput()), $expected);
+        unset($expected['FOO']);
+
+        $this->assertSame($expected, $env);
+    }
+
     /**
      * @param string      $commandline
      * @param null|string $cwd

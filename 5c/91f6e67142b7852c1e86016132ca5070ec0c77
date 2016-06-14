@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carlosV2 at 2016-04-07T15:39:59Z
+
+Sorry @stof, I realised while you where commenting it. It should be fixed now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-11T09:04:57Z
+
+What about something like this:
+
+```html
+<form>
+  <div>
+   <label for="my_field">Input the result of 3 + 4:</label>
+  </div>
+  <div>
+   <input type="text" id="my_field" name="my_field" />
+  </div>
+</form>
+```
+
+---------------------------------------------------------------------------
+
+by carlosV2 at 2016-04-11T09:59:11Z
+
+@xabbuh it will work as far as the label is within the form node computed by the crawler. In this case, parenting would fail but the label will still be found by the `for` attribute.
+
+If it is suitable, I can add a new test to prove this although it seems to be working on my local.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-11T10:04:11Z
+
+@carlosV2 You are right. I misread the way the XPath object is created.

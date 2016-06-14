@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-11T07:57:39Z
+
+@javiereguiluz I've updated it to contain the SplPriorityQueue, had to inverse the insert priority in order to get the proper sorting though.
+
+*failure in travis is unrelated*
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-20T18:51:15Z
+
+LGTM :+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-23T09:30:12Z
+
+@iltar Can you rebase on the latest `master` branch to make all tests pass?

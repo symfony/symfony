@@ -41,7 +41,8 @@
         "symfony/property-info": "",
         "doctrine/data-fixtures": "",
         "doctrine/dbal": "",
-        "doctrine/orm": ""
+        "doctrine/orm": "",
+        "symfony/property-access": ""
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" },

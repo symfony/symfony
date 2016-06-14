@@ -12,11 +12,11 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Unique Entity Validator checks if one or a set of fields contain unique values.
@@ -128,16 +128,24 @@ class UniqueEntityValidator extends ConstraintValidator
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
         $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
 
-        if ($this->context instanceof ExecutionContextInterface) {
-            $this->context->buildViolation($constraint->message)
-                ->atPath($errorPath)
-                ->setInvalidValue($invalidValue)
-                ->addViolation();
-        } else {
-            $this->buildViolation($constraint->message)
-                ->atPath($errorPath)
-                ->setInvalidValue($invalidValue)
-                ->addViolation();
+        $parameters = array();
+
+        if (preg_match_all('/{{ ([a-zA-Z0-9_]+) }}/', $constraint->message, $vars) > 0) {
+
+            if (!class_exists('Symfony\\Component\\PropertyAccess\\PropertyAccess')) {
+                throw new \RuntimeException('Unable to access entity property as the Symfony PropertyAccess is not installed.');
+            }
+
+            $accessor = PropertyAccess::createPropertyAccessor();
+
+            foreach ($vars[1] as $var) {
+                $parameters[sprintf('{{ %s }}', $var)] = $accessor->getValue($entity, $var);
+            }
         }
+
+        $this->context->buildViolation($constraint->message, $parameters)
+            ->atPath($errorPath)
+            ->setInvalidValue($invalidValue)
+            ->addViolation();
     }
 }

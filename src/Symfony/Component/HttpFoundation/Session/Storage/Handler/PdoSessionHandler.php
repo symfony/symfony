@@ -347,7 +347,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             $updateStmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $updateStmt->execute();
 
-            // When MERGE is not supported, like in Postgres, we have to use this approach that can result in
+            // When MERGE is not supported, like in Postgres < 9.5, we have to use this approach that can result in
             // duplicate key errors when the same session is written simultaneously (given the LOCK_NONE behavior).
             // We can just catch such an error and re-execute the update. This is similar to a serializable
             // transaction with retry logic on serialization failures but without the overhead and without possible
@@ -659,11 +659,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
      */
     private function getMergeSql()
     {
-        switch ($this->driver) {
-            case 'mysql':
+        switch (true) {
+            case 'mysql' === $this->driver:
                 return "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time) ".
                     "ON DUPLICATE KEY UPDATE $this->dataCol = VALUES($this->dataCol), $this->lifetimeCol = VALUES($this->lifetimeCol), $this->timeCol = VALUES($this->timeCol)";
-            case 'oci':
+            case 'oci' === $this->driver:
                 // DUAL is Oracle specific dummy table
                 return "MERGE INTO $this->table USING DUAL ON ($this->idCol = :id) ".
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time) ".
@@ -674,8 +674,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 return "MERGE INTO $this->table WITH (HOLDLOCK) USING (SELECT 1 AS dummy) AS src ON ($this->idCol = :id) ".
                     "WHEN NOT MATCHED THEN INSERT ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time) ".
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data, $this->lifetimeCol = :lifetime, $this->timeCol = :time;";
-            case 'sqlite':
+            case 'sqlite' === $this->driver:
                 return "INSERT OR REPLACE INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time)";
+            case 'pgsql' === $this->driver && version_compare($this->pdo->getAttribute(\PDO::ATTR_SERVER_VERSION), '9.5', '>='):
+                return "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (:id, :data, :lifetime, :time) ".
+                    "ON CONFLICT ($this->idCol) DO UPDATE SET ($this->dataCol, $this->lifetimeCol, $this->timeCol) = (:data, :lifetime, :time) WHERE $this->idCol = :id";
         }
     }
 

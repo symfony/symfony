@@ -29,17 +29,21 @@ class Parser
     private $currentLineNb = -1;
     private $currentLine = '';
     private $refs = array();
+    private $skippedLineNumbers = array();
+    private $locallySkippedLineNumbers = array();
 
     /**
      * Constructor.
      *
      * @param int      $offset             The offset of YAML document (used for line numbers in error messages)
      * @param int|null $totalNumberOfLines The overall number of lines being parsed
+     * @param int[]    $skippedLineNumbers Number of comment lines that have been skipped by the parser
      */
-    public function __construct($offset = 0, $totalNumberOfLines = null)
+    public function __construct($offset = 0, $totalNumberOfLines = null, array $skippedLineNumbers = array())
     {
         $this->offset = $offset;
         $this->totalNumberOfLines = $totalNumberOfLines;
+        $this->skippedLineNumbers = $skippedLineNumbers;
     }
 
     /**
@@ -124,25 +128,18 @@ class Parser
 
                 // array
                 if (!isset($values['value']) || '' == trim($values['value'], ' ') || 0 === strpos(ltrim($values['value'], ' '), '#')) {
-                    $c = $this->getRealCurrentLineNb() + 1;
-                    $parser = new self($c, $this->totalNumberOfLines);
-                    $parser->refs = &$this->refs;
-                    $data[] = $parser->parse($this->getNextEmbedBlock(null, true), $flags);
+                    $data[] = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags);
                 } else {
                     if (isset($values['leadspaces'])
                         && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $values['value'], $matches)
                     ) {
                         // this is a compact notation element, add to next block and parse
-                        $c = $this->getRealCurrentLineNb();
-                        $parser = new self($c, $this->totalNumberOfLines);
-                        $parser->refs = &$this->refs;
-
                         $block = $values['value'];
                         if ($this->isNextLineIndented()) {
                             $block .= "\n".$this->getNextEmbedBlock($this->getCurrentLineIndentation() + strlen($values['leadspaces']) + 1);
                         }
 
-                        $data[] = $parser->parse($block, $flags);
+                        $data[] = $this->parseBlock($this->getRealCurrentLineNb(), $block, $flags);
                     } else {
                         $data[] = $this->parseValue($values['value'], $flags, $context);
                     }
@@ -198,10 +195,7 @@ class Parser
                         } else {
                             $value = $this->getNextEmbedBlock();
                         }
-                        $c = $this->getRealCurrentLineNb() + 1;
-                        $parser = new self($c, $this->totalNumberOfLines);
-                        $parser->refs = &$this->refs;
-                        $parsed = $parser->parse($value, $flags);
+                        $parsed = $this->parseBlock($this->getRealCurrentLineNb() + 1, $value, $flags);
 
                         if (!is_array($parsed)) {
                             throw new ParseException('YAML merge keys used with a scalar value instead of an array.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
@@ -249,10 +243,7 @@ class Parser
                             $data[$key] = null;
                         }
                     } else {
-                        $c = $this->getRealCurrentLineNb() + 1;
-                        $parser = new self($c, $this->totalNumberOfLines);
-                        $parser->refs = &$this->refs;
-                        $value = $parser->parse($this->getNextEmbedBlock(), $flags);
+                        $value = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(), $flags);
                         // Spec: Keys MUST be unique; first one wins.
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
@@ -346,6 +337,24 @@ class Parser
         return empty($data) ? null : $data;
     }
 
+    private function parseBlock($offset, $yaml, $flags)
+    {
+        $skippedLineNumbers = $this->skippedLineNumbers;
+
+        foreach ($this->locallySkippedLineNumbers as $lineNumber) {
+            if ($lineNumber < $offset) {
+                continue;
+            }
+
+            $skippedLineNumbers[] = $lineNumber;
+        }
+
+        $parser = new self($offset, $this->totalNumberOfLines, $skippedLineNumbers);
+        $parser->refs = &$this->refs;
+
+        return $parser->parse($yaml, $flags);
+    }
+
     /**
      * Returns the current line number (takes the offset into account).
      *
@@ -353,7 +362,17 @@ class Parser
      */
     private function getRealCurrentLineNb()
     {
-        return $this->currentLineNb + $this->offset;
+        $realCurrentLineNumber = $this->currentLineNb + $this->offset;
+
+        foreach ($this->skippedLineNumbers as $skippedLineNumber) {
+            if ($skippedLineNumber > $realCurrentLineNumber) {
+                break;
+            }
+
+            ++$realCurrentLineNumber;
+        }
+
+        return $realCurrentLineNumber;
     }
 
     /**
@@ -456,6 +475,14 @@ class Parser
 
             // we ignore "comment" lines only when we are not inside a scalar block
             if (empty($blockScalarIndentations) && $this->isCurrentLineComment()) {
+                // remember ignored comment lines (they are used later in nested
+                // parser calls to determine real line numbers)
+                //
+                // CAUTION: beware to not populate the global property here as it
+                // will otherwise influence the getRealCurrentLineNb() call here
+                // for consecutive comment lines and subsequent embedded blocks
+                $this->locallySkippedLineNumbers[] = $this->getRealCurrentLineNb();
+
                 continue;
             }
 
@@ -491,10 +518,18 @@ class Parser
 
     /**
      * Moves the parser to the previous line.
+     *
+     * @return bool
      */
     private function moveToPreviousLine()
     {
+        if ($this->currentLineNb < 1) {
+            return false;
+        }
+
         $this->currentLine = $this->lines[--$this->currentLineNb];
+
+        return true;
     }
 
     /**

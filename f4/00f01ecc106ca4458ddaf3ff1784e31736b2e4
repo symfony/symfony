@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T12:39:59Z
+
+@aitboudad Any news on this one?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-08T07:48:33Z
+
+technically, this is a BC break if someone has a ``\`` at the end of a part.
+
+Btw, a simpler solution (avoiding the issue about having to escape ``\`` itself) would be to escape the pipe by doubling it (similar to the escaping of single quotes in YAML, or in SQL strings on Postgresql).
+And this would even be almost BC. People cannot have a part ending with a pipe character today anyway. the only reason to have a double pipe would be to have one of the pluralization alternatives being an empty string, but this looks really weird.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-14T07:03:23Z
+
+I agree with @stof. Doubling the pipe to escape it seems the way to go. @aitboudad What do you think?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-06-14T14:31:06Z
+
+sounds good to me, I updated the PR!

@@ -134,8 +134,6 @@ abstract class Controller implements ContainerAwareInterface
      * @param string      $disposition Disposition of response ("attachment" is default, other type is "inline")
      *
      * @return BinaryFileResponse
-     *
-     * @throws \LogicException|\InvalidArgumentException|\RuntimeException
      */
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {

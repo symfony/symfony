@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T07:11:37Z
+
+Should this one be merged as is?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-15T07:26:19Z
+
+For now I'd say yes. Preventing loading the choices should be done using `choices` option set with an empty array.

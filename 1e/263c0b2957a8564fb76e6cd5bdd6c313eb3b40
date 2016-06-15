@@ -1,0 +1,168 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-10T19:59:03Z
+
+@dfridrich thanks for sending this contribution to improve Symfony (and its associated docs too).
+
+Just a comment for your next contributions: it's always better to open an issue to propose new features without sending the PR to implement them. That allows the community to review your idea and propose changes to it. Besides, if the idea is ultimately rejected, creating a PR will make you waste your time whereas creating an issue is quick and easy. Thanks!
+
+---------------------------------------------------------------------------
+
+by dfridrich at 2016-04-10T20:12:36Z
+
+@javiereguiluz thanks for information, I'll remember next time.
+
+---------------------------------------------------------------------------
+
+by dfridrich at 2016-05-02T07:29:15Z
+
+I think this my PR is really very useful, what do you think @symfony/deciders?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-05-02T09:06:40Z
+
+Besides my minor comments, I think this is a nice addition. Thanks :)
+
+---------------------------------------------------------------------------
+
+by dfridrich at 2016-05-02T09:27:15Z
+
+@HeahDude Thanks for your feedback, I really appreciate it! I just commited fixed version of this great feature 👻
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-05-02T09:37:13Z
+
+I don't think allowing to pass a string containing the file contents is a good idea. If you already have the content of the response, why storing it in a temporary file to then read back from it ?
+
+Plus this means passing a string as a first argument can mean two totally different things, which means if for example you make a typo in the name of the file you want to send you will get this name as a file instead of an error.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-02T09:59:28Z
+
+I agree with @jvasseur. We had something similar in the YAML parser in the past which was not a good idea (we cleared things in 3.0). We should simply not support passing file contents here.
+
+---------------------------------------------------------------------------
+
+by dfridrich at 2016-05-02T10:59:49Z
+
+@jvasseur and @xabbuh but what if you want to send e.g. some simple txt file. Or image with QR code from string? It is much more easier to pass is to file helper than to store it, pass object to file helper and then delete it, huh?
+
+`$this->file("this is\nsome content", "export.txt");`
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-02T11:24:49Z
+
+@dfridrich I see two options: Support streams and let the user write everything to an in-memory stream before and/or provide a dedicated method that does not work with a file but with its contents instead.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-05-02T12:28:46Z
+
+👍 for two methods
+
+---------------------------------------------------------------------------
+
+by dfridrich at 2016-05-02T12:36:08Z
+
+@xabbuh and @HeahDude, so two methods like `file()` and `fileFromString()`?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-05-02T12:39:55Z
+
+What about `file($path, $fileName, ...)` and `fileContent($content, $fileName, ...)`?
+
+---------------------------------------------------------------------------
+
+by dfridrich at 2016-05-02T12:42:55Z
+
+@HeahDude `fileContent` is shorter than my `fileFromString`. Sometimes I'm too verbose. I like `fileContent`.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-02T13:12:25Z
+
+Just saying: I'm not sure that the Core Team will accept adding two different methods for this.
+
+---------------------------------------------------------------------------
+
+by dfridrich at 2016-05-02T13:15:18Z
+
+@javiereguiluz and what do you think about it how the method is now implemented? I think it is totally clear. I showed it to some people who are using Symfony and they really liked it the way it is now (with one method handling `File` and `string`).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-05-02T13:24:18Z
+
+@dfridrich The point of @jvasseur which is approved by @xabbuh (and me for what it's worth) is that it's not only "File and string" because the string here can have two meanings which leads to more potential error/misusage.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-05-02T14:59:34Z
+
+BTW sending a file from a string doesn't need to use a temporary file:
+```php
+$response = new Response($content);
+$response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename));
+
+return $response;
+```
+You just lose the handling of the `Range` header. But if you are storing the file content as a string in memory, the file is probably not big enough to justify it.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2016-05-31T22:26:47Z
+
+I like the idea, there is this kind of [method in Silex](https://github.com/silexphp/Silex/blob/master/src/Silex/Application.php#L432) (but a lot simpler).
+What about making a factory service for that ? It would be more easily testable and could be included in other frameworks like Silex or Laravel.
+
+Also, using a `BinaryFileResponse` for data that is already in memory is counterproductive.
+
+---------------------------------------------------------------------------
+
+by dfridrich at 2016-06-15T08:27:48Z
+
+@fabpot I commited changes upon your comments, please, check it if it looks good now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T08:32:28Z
+
+I would remove the possibility to pass a string instead of a filename (as mentioned by some other reviewers).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T10:52:04Z
+
+The method should read as follows:
+
+```php
+    protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
+    {
+        $response = new BinaryFileResponse($file);
+        $response->setContentDisposition($disposition, null === $fileName ? $file->getFileName() : $fileName);
+
+        return $response;
+    }
+```
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-06-15T10:57:35Z
+
+@fabpot your version doesn't work if `$file` is a string and `$fileName` is null.
+
+Maybe something like this:
+```php
+    protected function file($file, $fileName = '', $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
+    {
+        $response = new BinaryFileResponse($file);
+        $response->setContentDisposition($disposition, $fileName);
+
+        return $response;
+    }
+```

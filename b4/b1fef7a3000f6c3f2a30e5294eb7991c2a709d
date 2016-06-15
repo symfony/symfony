@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by e-moe at 2016-03-18T08:57:51Z
+
+probably we can add `$withDefaultCacheControl` parameter to `\Symfony\Component\HttpFoundation\ResponseHeaderBag::__construct` and do something like this:
+
+```
+/**
+     * Constructor.
+     *
+     * @param array $headers An array of HTTP headers
+     * @param bool $withDefaultCacheControl
+     */
+    public function __construct(array $headers = array(), $withDefaultCacheControl = true)
+    {
+        parent::__construct($headers);
+
+        if ($withDefaultCacheControl && !isset($this->headers['cache-control'])) {
+            $this->set('Cache-Control', '');
+        }
+    }
+```
+
+then, in `Response` constructor:
+
+`$this->headers = new ResponseHeaderBag($headers, 301 != $status);` or, even better check against array like `$this->headers = new ResponseHeaderBag($headers, in_array($status, self::$useDefaultCacheControl));`

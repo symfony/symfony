@@ -58,34 +58,34 @@ class ArrayNode extends Node
         return $result;
     }
 
-    public function dump()
+    public function toArray()
     {
-        $array = array();
+        $value = array();
         foreach ($this->getKeyValuePairs() as $pair) {
-            $array[$pair['key']->attributes['value']] = $pair['value']->dump();
+            $value[$pair['key']->attributes['value']] = $pair['value'];
         }
 
-        if ($this->isHash($array)) {
-            $str = '{';
+        $array = array();
 
-            foreach ($array as $key => $value) {
-                if (is_int($key)) {
-                    $str .= sprintf('%s: %s, ', $key, $value);
-                } else {
-                    $str .= sprintf('"%s": %s, ', $this->dumpEscaped($key), $value);
-                }
+        if ($this->isHash($value)) {
+            foreach ($value as $k => $v) {
+                $array[] = ', ';
+                $array[] = new ConstantNode($k);
+                $array[] = ': ';
+                $array[] = $v;
             }
-
-            return rtrim($str, ', ').'}';
+            $array[0] = '{';
+            $array[] = '}';
+        } else {
+            foreach ($value as $v) {
+                $array[] = ', ';
+                $array[] = $v;
+            }
+            $array[0] = '[';
+            $array[] = ']';
         }
 
-        $str = '[';
-
-        foreach ($array as $key => $value) {
-            $str .= sprintf('%s, ', $value);
-        }
-
-        return rtrim($str, ', ').']';
+        return $array;
     }
 
     protected function getKeyValuePairs()

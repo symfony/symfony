@@ -38,51 +38,39 @@ class ConstantNode extends Node
         return $this->attributes['value'];
     }
 
-    public function dump()
+    public function toArray()
     {
-        return $this->dumpValue($this->attributes['value']);
-    }
+        $array = array();
+        $value = $this->attributes['value'];
 
-    private function dumpValue($value)
-    {
-        switch (true) {
-            case true === $value:
-                return 'true';
-
-            case false === $value:
-                return 'false';
-
-            case null === $value:
-                return 'null';
-
-            case is_numeric($value):
-                return $value;
-
-            case is_array($value):
-                if ($this->isHash($value)) {
-                    $str = '{';
-
-                    foreach ($value as $key => $v) {
-                        if (is_int($key)) {
-                            $str .= sprintf('%s: %s, ', $key, $this->dumpValue($v));
-                        } else {
-                            $str .= sprintf('"%s": %s, ', $this->dumpEscaped($key), $this->dumpValue($v));
-                        }
-                    }
-
-                    return rtrim($str, ', ').'}';
-                }
-
-                $str = '[';
-
-                foreach ($value as $key => $v) {
-                    $str .= sprintf('%s, ', $this->dumpValue($v));
-                }
-
-                return rtrim($str, ', ').']';
-
-            default:
-                return sprintf('"%s"', $this->dumpEscaped($value));
+        if (true === $value) {
+            $array[] = 'true';
+        } elseif (false === $value) {
+            $array[] = 'false';
+        } elseif (null === $value) {
+            $array[] = 'null';
+        } elseif (is_numeric($value)) {
+            $array[] = $value;
+        } elseif (!is_array($value)) {
+            $array[] = $this->dumpString($value);
+        } elseif ($this->isHash($value)) {
+            foreach ($value as $k => $v) {
+                $array[] = ', ';
+                $array[] = new self($k);
+                $array[] = ': ';
+                $array[] = new self($v);
+            }
+            $array[0] = '{';
+            $array[] = '}';
+        } else {
+            foreach ($value as $v) {
+                $array[] = ', ';
+                $array[] = new self($v);
+            }
+            $array[0] = '[';
+            $array[] = ']';
         }
+
+        return $array;
     }
 }

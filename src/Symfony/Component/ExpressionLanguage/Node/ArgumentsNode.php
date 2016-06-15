@@ -25,14 +25,16 @@ class ArgumentsNode extends ArrayNode
         $this->compileArguments($compiler, false);
     }
 
-    public function dump()
+    public function toArray()
     {
-        $str = '';
+        $array = array();
 
         foreach ($this->getKeyValuePairs() as $pair) {
-            $str .= sprintf('%s, ', $pair['value']->dump());
+            $array[] = $pair['value'];
+            $array[] = ', ';
         }
+        array_pop($array);
 
-        return rtrim($str, ', ');
+        return $array;
     }
 }

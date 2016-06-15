@@ -13,8 +13,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\TimeValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class TimeValidatorTest extends AbstractConstraintValidatorTest
+class TimeValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

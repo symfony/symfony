@@ -199,3 +199,30 @@ Validator
 ---------
 
  * The `DateTimeValidator::PATTERN` constant was removed.
+
+ * `Tests\Constraints\AbstractConstraintValidatorTest` has been removed in
+   favor of `Test\ConstraintValidatorTestCase`.
+
+   Before:
+
+   ```php
+   // ...
+   use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+
+   class MyCustomValidatorTest extends AbstractConstraintValidatorTest
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   // ...
+   use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+
+   class MyCustomValidatorTest extends ConstraintValidatorTestCase
+   {
+       // ...
+   }
+   ```

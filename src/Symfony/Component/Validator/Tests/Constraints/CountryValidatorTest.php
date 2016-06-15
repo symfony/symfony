@@ -14,8 +14,9 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Country;
 use Symfony\Component\Validator\Constraints\CountryValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class CountryValidatorTest extends AbstractConstraintValidatorTest
+class CountryValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator()
     {

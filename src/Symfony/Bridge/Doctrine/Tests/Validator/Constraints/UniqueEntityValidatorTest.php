@@ -26,6 +26,8 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @todo use ConstraintValidatorTestCase when symfony/validator ~3.2 is required.
  */
 class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 {

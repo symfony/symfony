@@ -13,11 +13,12 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @requires extension fileinfo
  */
-class ImageValidatorTest extends AbstractConstraintValidatorTest
+class ImageValidatorTest extends ConstraintValidatorTestCase
 {
     protected $context;
 

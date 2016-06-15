@@ -86,35 +86,30 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * Transforms a DateTime object into a date string with the configured format
      * and timezone.
      *
-     * @param \DateTime|\DateTimeInterface $value A DateTime object
+     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
      * @return string A value as produced by PHP's date() function
      *
-     * @throws TransformationFailedException If the given value is not a \DateTime
-     *                                       instance or if the output timezone
-     *                                       is not supported.
+     * @throws TransformationFailedException If the given value is not an
+     *                                       instance of \DateTime or \DateTimeInterface
      */
-    public function transform($value)
+    public function transform($dateTime)
     {
-        if (null === $value) {
+        if (null === $dateTime) {
             return '';
         }
 
-        if (!$value instanceof \DateTime && !$value instanceof \DateTimeInterface) {
+        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
             throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
         }
 
-        if (!$value instanceof \DateTimeImmutable) {
-            $value = clone $value;
+        if (!$dateTime instanceof \DateTimeImmutable) {
+            $dateTime = clone $dateTime;
         }
 
-        try {
-            $value = $value->setTimezone(new \DateTimeZone($this->outputTimezone));
-        } catch (\Exception $e) {
-            throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
-        }
+        $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
 
-        return $value->format($this->generateFormat);
+        return $dateTime->format($this->generateFormat);
     }
 
     /**
@@ -125,8 +120,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @return \DateTime An instance of \DateTime
      *
      * @throws TransformationFailedException If the given value is not a string,
-     *                                       if the date could not be parsed or
-     *                                       if the input timezone is not supported.
+     *                                       or could not be transformed
      */
     public function reverseTransform($value)
     {

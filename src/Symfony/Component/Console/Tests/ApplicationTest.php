@@ -1086,6 +1086,24 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('interact called'.PHP_EOL.'called'.PHP_EOL, $tester->getDisplay(), 'Application runs the default set command if different from \'list\' command');
     }
 
+    public function testSetRunCustomSingleCommand()
+    {
+        $command = new \FooCommand();
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add($command);
+        $application->setDefaultCommand($command->getName(), true);
+
+        $tester = new ApplicationTester($application);
+
+        $tester->run(array());
+        $this->assertContains('called', $tester->getDisplay());
+
+        $tester->run(array('--help' => true));
+        $this->assertContains('The foo:bar command', $tester->getDisplay());
+    }
+
     /**
      * @requires function posix_isatty
      */

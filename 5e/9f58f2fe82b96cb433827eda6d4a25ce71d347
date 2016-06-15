@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-26T06:44:19Z
+
+@nicolas-grekas Any idea why the `deps=low` build is failing?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-05-28T20:16:02Z
+
+@xabbuh the phpunit-bridge is not required in several composer files such the one of the framework bundle (https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/composer.json).
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-05-28T20:17:50Z
+
+Anyway the tests probably won't pass as long as this isn't merged.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-31T14:27:27Z
+
+@Ener-Getick we have a special phpunit launcher performing a local composer-based installation of PHPUnit (to remove unnecessary dependency which would hurt us, for instance ``symfony/yaml`` as we don't want to run tests on the version shipped in PHPUnit and we don't use the PHPUnit feature needing it). This special wrapper includes the bridge in the phpunit installation.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-05-31T14:29:44Z
+
+@xabbuh looks like the PHPUnit setup installed the 3.1.0-beta1 version of the bridge, and so does not use the updated version of the bridge: https://travis-ci.org/symfony/symfony/jobs/133035973#L578
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-01T17:50:57Z
+
+@stof thanks for the explanation, I didn't know that.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-14T06:07:08Z
+
+ping @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-14T12:11:30Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-15T13:36:10Z
+
+Status: reviewed

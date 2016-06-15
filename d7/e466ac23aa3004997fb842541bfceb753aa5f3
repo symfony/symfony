@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-05-09T20:12:36Z
+
+@nykopol Can you please also add a test to prevent future regressions?
+
+---------------------------------------------------------------------------
+
+by nykopol at 2016-05-10T06:52:30Z
+
+@xabbuh I added the test.

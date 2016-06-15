@@ -310,6 +310,17 @@ class ControllerTest extends TestCase
         $this->assertContains('test.php', $response->headers->get('content-disposition'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException
+     */
+    public function testFileWhichDoesNotExist()
+    {
+        $controller = new TestController();
+
+        /* @var BinaryFileResponse $response */
+        $response = $controller->file('some-file.txt', 'test.php');
+    }
+
     public function testIsGranted()
     {
         $authorizationChecker = $this->getMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');

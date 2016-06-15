@@ -138,7 +138,7 @@ abstract class Controller implements ContainerAwareInterface
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
         if (!is_string($file) && !$file instanceof File) {
-            throw new \InvalidArgumentException(sprint('The "%s" method expects first argument to be a string or an instance of "%s"', __METHOD__, File::class));
+            throw new \InvalidArgumentException(sprintf('The "%s" method expects first argument to be a string or an instance of "%s"', __METHOD__, File::class));
         }
 
         if (!$file instanceof File) {

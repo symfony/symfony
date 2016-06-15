@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T10:39:46Z
+
+You should also add a phpdoc to the `dump()` method on `Node` at least for the return value.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T10:41:40Z
+
+And I think that the `dump()` method on `Node`s should be changed to something else as I would expect a dump method to return a string, not an array.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-15T10:47:00Z
+
+Comments addressed, `dump()` renamed to `toArray()`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T10:52:30Z
+
+👍

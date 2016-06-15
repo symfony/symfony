@@ -149,32 +149,6 @@ abstract class Controller implements ContainerAwareInterface
             $file = new File($file);
         }
 
-        if (is_string($file)) {
-            if ('' === $file) {
-                throw new \InvalidArgumentException('File content can\'t be empty.');
-            }
-
-            if (empty($fileName)) {
-                throw new \InvalidArgumentException('File name can\'t be empty.');
-            }
-            $cacheDir = $this->container->get('kernel')->getCacheDir();
-            $tmpName = md5($fileName);
-            $tmpPath = $cacheDir.DIRECTORY_SEPARATOR.$tmpName;
-
-            try {
-                file_put_contents($tmpPath, $file);
-            } catch (\Exception $e) {
-                throw new \RuntimeException(sprintf('Temporary file "%s" couldn\'t be created.', $tmpPath), 0, $e);
-            }
-
-            $deleteFileAfterSend = true;
-            $file = new File($tmpPath);
-        }
-
-        if (!$file->isReadable()) {
-            throw new \RuntimeException(sprintf('"%s" is not readable.', $file->getPath()));
-        }
-
         $response = new BinaryFileResponse($file);
         $mimeType = $file->getMimeType();
 
@@ -183,10 +157,7 @@ abstract class Controller implements ContainerAwareInterface
         }
 
         $response->headers->set('Content-Type', $mimeType);
-        $disposition = $response->headers->makeDisposition(
-            $disposition,
-            $fileName === null ? $file->getFileName() : $fileName
-        );
+        $disposition = $response->headers->makeDisposition($disposition, $fileName === null ? $file->getFileName() : $fileName);
         $response->headers->set('Content-Disposition', $disposition);
 
         return $response;

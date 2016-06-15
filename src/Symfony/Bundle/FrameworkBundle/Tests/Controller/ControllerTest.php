@@ -230,7 +230,7 @@ class ControllerTest extends TestCase
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
         $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
+        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileAsInline()
@@ -248,7 +248,7 @@ class ControllerTest extends TestCase
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
         $this->assertContains(ResponseHeaderBag::DISPOSITION_INLINE, $response->headers->get('content-disposition'));
-        $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
+        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileWithOwnFileName()
@@ -302,7 +302,7 @@ class ControllerTest extends TestCase
             $this->assertSame('text/x-php', $response->headers->get('content-type'));
         }
         $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertContains(pathinfo(__FILE__, PATHINFO_BASENAME), $response->headers->get('content-disposition'));
+        $this->assertContains(basename(__FILE__), $response->headers->get('content-disposition'));
     }
 
     public function testFileFromPathWithCustomizedFileName()

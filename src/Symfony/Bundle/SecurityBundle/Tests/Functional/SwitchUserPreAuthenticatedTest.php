@@ -63,10 +63,10 @@ class SwitchUserPreAuthenticatedTest extends WebTestCase
         $client = $this->createClient(array('test_case' => 'StandardFormLogin', 'root_config' => 'switchuser_preauthenticated.yml'));
         $client->followRedirects(true);
 
-        $client->setServerParameters([
+        $client->setServerParameters(array(
             'SSL_CLIENT_S_DN_Email' => $username,
-            'SSL_CLIENT_S_DN' => 'test',
-        ]);
+            'SSL_CLIENT_S_DN' => 'test'
+        ));
 
         return $client;
     }

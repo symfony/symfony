@@ -148,6 +148,11 @@ class PdoSessionHandler implements \SessionHandlerInterface
     private $gcCalled = false;
 
     /**
+     * @var int Seconds after which data will be seen as garbage
+     */
+    private $gcMaxlifetime;
+
+    /**
      * Constructor.
      *
      * You can either pass an existing database connection as PDO instance or
@@ -164,6 +169,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
      *  * db_username: The username when lazy-connect [default: '']
      *  * db_password: The password when lazy-connect [default: '']
      *  * db_connection_options: An array of driver-specific connection options [default: array()]
+     *  * gc_maxlifetime: Number of seconds after which data will be seen as garbage
      *  * lock_mode: The strategy for locking, see constants [default: LOCK_TRANSACTIONAL]
      *
      * @param \PDO|string|null $pdoOrDsn A \PDO instance or DSN string or null
@@ -192,6 +198,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
         $this->username = isset($options['db_username']) ? $options['db_username'] : $this->username;
         $this->password = isset($options['db_password']) ? $options['db_password'] : $this->password;
         $this->connectionOptions = isset($options['db_connection_options']) ? $options['db_connection_options'] : $this->connectionOptions;
+        $this->gcMaxlifetime = isset($options['gc_maxlifetime']) ? $options['gc_maxlifetime'] : (int) ini_get('session.gc_maxlifetime');
         $this->lockMode = isset($options['lock_mode']) ? $options['lock_mode'] : $this->lockMode;
     }
 
@@ -321,8 +328,6 @@ class PdoSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        $maxlifetime = (int) ini_get('session.gc_maxlifetime');
-
         try {
             // We use a single MERGE SQL query when supported by the database.
             $mergeSql = $this->getMergeSql();
@@ -331,7 +336,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 $mergeStmt = $this->pdo->prepare($mergeSql);
                 $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
                 $mergeStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-                $mergeStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+                $mergeStmt->bindParam(':lifetime', $this->gcMaxlifetime, \PDO::PARAM_INT);
                 $mergeStmt->bindValue(':time', time(), \PDO::PARAM_INT);
                 $mergeStmt->execute();
 
@@ -343,7 +348,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
             );
             $updateStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
             $updateStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-            $updateStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+            $updateStmt->bindParam(':lifetime', $this->gcMaxlifetime, \PDO::PARAM_INT);
             $updateStmt->bindValue(':time', time(), \PDO::PARAM_INT);
             $updateStmt->execute();
 
@@ -359,7 +364,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                     );
                     $insertStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
                     $insertStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
-                    $insertStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);
+                    $insertStmt->bindParam(':lifetime', $this->gcMaxlifetime, \PDO::PARAM_INT);
                     $insertStmt->bindValue(':time', time(), \PDO::PARAM_INT);
                     $insertStmt->execute();
                 } catch (\PDOException $e) {

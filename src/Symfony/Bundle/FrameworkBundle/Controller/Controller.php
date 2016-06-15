@@ -129,7 +129,7 @@ abstract class Controller implements ContainerAwareInterface
     /**
      * Returns a BinaryFileResponse object with original or customized file name and disposition header.
      *
-     * @param File|string $file        File object, path to file or string with content to be sent as response
+     * @param File|string $file        File object or path to file to be sent as response
      * @param string|null $fileName    File name to be sent to response or null (will use original file name)
      * @param string      $disposition Disposition of response ("attachment" is default, other type is "inline")
      *
@@ -145,7 +145,7 @@ abstract class Controller implements ContainerAwareInterface
             throw new \InvalidArgumentException(sprint('The "%s" method expects first argument to be a string or an instance of "%s"', __METHOD__, File::class));
         }
 
-        if (is_string($file) && file_exists($file)) {
+        if (!$file instanceof File) {
             $file = new File($file);
         }
 
@@ -180,16 +180,6 @@ abstract class Controller implements ContainerAwareInterface
 
         if (true === $deleteFileAfterSend) {
             $response->deleteFileAfterSend($deleteFileAfterSend);
-        }
-
-        if (null === $disposition) {
-            $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT;
-        }
-
-        if(!in_array($disposition, array(ResponseHeaderBag::DISPOSITION_INLINE, ResponseHeaderBag::DISPOSITION_ATTACHMENT), true)) {
-            throw new \LogicException(
-                sprintf('You can\'t use disposition "%s". Use "attachment" or "inline".', $disposition)
-            );
         }
 
         $response->headers->set('Content-Type', $mimeType);

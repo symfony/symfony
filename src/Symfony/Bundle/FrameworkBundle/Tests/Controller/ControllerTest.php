@@ -282,58 +282,6 @@ class ControllerTest extends TestCase
         $this->assertContains($fileName, $response->headers->get('content-disposition'));
     }
 
-    public function testFileFromString()
-    {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
-        $kernel->expects($this->at(0))->method('getCacheDir')->will($this->returnValue(sys_get_temp_dir()));
-
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $container->expects($this->at(0))->method('get')->will($this->returnValue($kernel));
-
-        $controller = new TestController();
-        $controller->setContainer($container);
-
-        /* @var BinaryFileResponse $response */
-        $fileName = 'test.txt';
-        $tmpName = md5($fileName);
-        $content = 'This is my testing file';
-        $response = $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
-        $response->sendContent();
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('text/plain', $response->headers->get('content-type'));
-        $this->assertContains(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $response->headers->get('content-disposition'));
-        $this->assertContains($fileName, $response->headers->get('content-disposition'));
-        $this->assertFileNotExists(sys_get_temp_dir().DIRECTORY_SEPARATOR.md5($fileName));
-    }
-
-    public function testFileFromStringWithoutFileName()
-    {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $controller = new TestController();
-        $controller->setContainer($container);
-
-        /* @var BinaryFileResponse $response */
-        $fileName = '';
-        $content = 'This is my testing file';
-        $this->setExpectedException(\InvalidArgumentException::class);
-        $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
-    }
-
-    public function testFileFromStringWithoutContent()
-    {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $controller = new TestController();
-        $controller->setContainer($container);
-
-        /* @var BinaryFileResponse $response */
-        $fileName = 'test.txt';
-        $content = '';
-        $this->setExpectedException(\InvalidArgumentException::class);
-        $controller->file($content, $fileName, ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'text/plain');
-    }
-
     public function testFileFromPath()
     {
         $controller = new TestController();

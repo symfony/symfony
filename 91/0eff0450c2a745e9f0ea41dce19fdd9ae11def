@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-14T16:41:06Z
+
+Can you add a new test to prevent regressions?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-14T17:03:19Z
+
+@xabbuh I'd like to, but there is no test for this exception in other transformers. I don't know how to make it fail. Any ideas ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-14T17:13:32Z
+
+After a deeper look into this, I don't understand why this `try` block is in all the other transformers since they all extend the `BaseDateTimeTransformer` which tests timezones in the constructor. If `setTimeZone()` fails it just return `false`. So shouldn't we test `false` before throwing instead ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-14T17:16:12Z
+
+ref https://github.com/symfony/symfony/blob/2.3/src/Symfony/Component/Form/Extension/Core/DataTransformer/BaseDateTimeTransformer.php#L58
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-19T14:23:35Z
+
+Ok updated after [Stof's comment](https://github.com/symfony/symfony/pull/18548#discussion_r60235992).
+
+If you agree with this [condition change](https://github.com/symfony/symfony/pull/18548/files#diff-0053dabfa8d04abefbbe3648cb352c79R78), this one should be finished.
+
+Thanks for the reviews.

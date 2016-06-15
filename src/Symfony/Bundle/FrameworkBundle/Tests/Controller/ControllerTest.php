@@ -224,7 +224,6 @@ class ControllerTest extends TestCase
 
         /* @var BinaryFileResponse $response */
         $response = $controller->file(new File(__FILE__));
-
         $this->assertInstanceOf(BinaryFileResponse::class, $response);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('text/x-php', $response->headers->get('content-type'));

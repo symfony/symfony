@@ -55,7 +55,7 @@ abstract class AbstractPreAuthenticatedListener implements ListenerInterface
     final public function handle(GetResponseEvent $event)
     {
         $token = $this->tokenStorage->getToken();
-        if(null !== $token && false === ($token instanceof PreAuthenticatedToken) && $token->isAuthenticated()) {
+        if(null !== $token && !$token instanceof PreAuthenticatedToken && $token->isAuthenticated()) {
             if (null !== $this->logger) {
                 $this->logger->debug('An authenticated token is already provided, bypass PreAuthenticatedListener.', array('token' => (string) $token));
             }

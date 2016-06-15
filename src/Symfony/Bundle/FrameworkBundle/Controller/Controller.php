@@ -137,12 +137,9 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
-        if (!$file instanceof File) {
-            $file = new File($file);
-        }
-
-        $response = new BinaryFileResponse($file, 200, ['Content-type' => $file->getMimeType()]);
-        $disposition = $response->headers->makeDisposition($disposition, $fileName === null ? $file->getFileName() : $fileName);
+        $response = new BinaryFileResponse($file);
+        $response->headers->set('Content-type', $response->getFile()->getMimeType());
+        $disposition = $response->headers->makeDisposition($disposition, $fileName === null ? $response->getFile()->getFilename() : $fileName);
 //        $response->setContentDisposition($disposition, $fileName === null ? $file->getFileName() : $fileName);
         $response->headers->set('Content-Disposition', $disposition);
 

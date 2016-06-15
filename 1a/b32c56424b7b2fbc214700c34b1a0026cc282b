@@ -1,0 +1,159 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-10T17:07:18Z
+
+"Unique command" doesn't imply that there's only one command. How about calling it a "single command"?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-12-10T17:16:22Z
+
+Indeed ;) I will update my PR.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-12-11T15:06:16Z
+
+PR updated ;)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-12-11T15:13:42Z
+
+I like this proposal. However, I don't like these two lines from the above example:
+
+```php
+    ->getApplication()
+    ->setSingleCommand('echo')
+```
+
+Would this other code work?
+
+```php
+(new Application())
+    ->register('echo')
+        ->addArgument('foo', InputArgument::OPTIONAL, 'The directory', 'foo')
+        ->addOption('bar', null, InputOption::VALUE_REQUIRED, 'Foobar', 'bar')
+        ->setCode(function(InputInterface $input, OutputInterface $output) {
+            // ...
+        })
+    ->run();
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-12-11T15:32:30Z
+
+@javiereguiluz I think we can implement that, but it's a bit too magic for me. And we don't want magic in symfony.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-12-11T15:40:26Z
+
+@javiereguiluz
+
+What about:
+
+```
+(new Application('echo', '1.0.0'))
+    ->registerSingleCommand('echo') // <--------------------- The change is HERE
+        ->addArgument('foo', InputArgument::OPTIONAL, 'The directory', 'foo')
+        ->addOption('bar', null, InputOption::VALUE_REQUIRED, 'Foobar', 'bar')
+        ->setCode(function(InputInterface $input, OutputInterface $output) {
+            $output->writeln('start');
+            $output->writeln($input->getArgument('foo'));
+            $output->writeln($input->getOption('bar'));
+        })
+    ->run();
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-11T15:42:39Z
+
+I like it :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-12-11T15:43:20Z
+
+I'm afraid that the new example doesn't follow the Symfony philosophy either. It complicates the learning curve because it adds a new method (`registerSingleCommand()`) and it doesn't follow Fabien's idea of priming composition (generic methods that can be combined, instead of specific and "niche" methods).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-12-11T15:45:48Z
+
+Then `setSingleCommand` is the best choice for now.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2015-12-11T15:54:48Z
+
+Yes. Would this work?
+
+```php
+(new Application())
+    ->register('echo')
+        ->addArgument('foo', InputArgument::OPTIONAL, 'The directory', 'foo')
+        ->addOption('bar', null, InputOption::VALUE_REQUIRED, 'Foobar', 'bar')
+        ->setCode(function(InputInterface $input, OutputInterface $output) {
+            // ...
+        })
+    ->run('echo');  // <-- pass the command to run
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-12-11T16:23:49Z
+
+This is a good idea, but a BC break ([ref](https://github.com/symfony/symfony/blob/45e26ca067582e8895c344ebb53b0dc20d78ae2d/src/Symfony/Component/Console/Application.php#L104))
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2015-12-11T17:13:25Z
+
+`->runSingleCommand('echo')`?
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2015-12-11T17:27:01Z
+
+Why not
+```php
+(new SingleCommandApplication())
+    ->addArgument('foo', InputArgument::OPTIONAL, 'The directory', 'foo')
+    ->addOption('bar', null, InputOption::VALUE_REQUIRED, 'Foobar', 'bar')
+    ->setCode(function(InputInterface $input, OutputInterface $output) {
+            // ...
+    })
+    ->run();
+```
+?
+
+---------------------------------------------------------------------------
+
+by stof at 2015-12-11T17:28:31Z
+
+@nicolas-grekas this might complicate the Application a lot though, as ``run()`` is only indirectly responsible for resolving the command name, so we would have to do weird things.
+
+@jvasseur this is a bad idea, as your SingleCommandApplication does not have the API of the Application anymore, but of the Command
+
+---------------------------------------------------------------------------
+
+by jakzal at 2015-12-11T17:28:54Z
+
+@jvasseur I personally like your idea the most.
+
+@lyrixx is it possible to achieve this with a small amount of code? :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2015-12-11T20:27:35Z
+
+Yes, but whit black magic :-)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T10:22:43Z
+
+👍

@@ -155,8 +155,8 @@ class BinaryNode extends Node
         }
     }
 
-    public function dump()
+    public function toArray()
     {
-        return sprintf('(%s %s %s)', $this->nodes['left']->dump(), $this->attributes['operator'], $this->nodes['right']->dump());
+        return array('(', $this->nodes['left'], ' '.$this->attributes['operator'].' ', $this->nodes['right'], ')');
     }
 }

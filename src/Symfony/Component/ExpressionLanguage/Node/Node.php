@@ -76,14 +76,14 @@ class Node
         return $results;
     }
 
-    public function dump()
+    public function toArray()
     {
         throw new \BadMethodCallException(sprintf('Dumping a "%s" instance is not supported yet.', get_class($this)));
     }
 
-    protected function dumpEscaped($value)
+    protected function dumpString($value)
     {
-        return str_replace(array('\\', '"'), array('\\\\', '\"'), $value);
+        return sprintf('"%s"', addcslashes($value, "\0\t\"\\"));
     }
 
     protected function isHash(array $value)

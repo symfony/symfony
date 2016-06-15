@@ -330,7 +330,7 @@ class Parser
                     throw new SyntaxError('Expected name', $token->cursor);
                 }
 
-                $arg = new Node\ConstantNode($token->value);
+                $arg = new Node\NameNode($token->value);
 
                 $arguments = new Node\ArgumentsNode();
                 if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '(')) {

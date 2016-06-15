@@ -42,6 +42,17 @@ class ParsedExpression extends Expression
 
     public function dump()
     {
-        return $this->nodes->dump();
+        return $this->dumpNode($this->nodes);
+    }
+
+    private function dumpNode(Node $node)
+    {
+        $dump = '';
+
+        foreach($node->toArray() as $v) {
+            $dump .= is_scalar($v) ? $v : $this->dumpNode($v);
+        }
+
+        return $dump;
     }
 }

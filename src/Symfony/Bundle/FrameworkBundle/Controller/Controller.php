@@ -145,10 +145,7 @@ abstract class Controller implements ContainerAwareInterface
             $file = new File($file);
         }
 
-        $response = new BinaryFileResponse($file);
-        $mimeType = $file->getMimeType();
-
-        $response->headers->set('Content-Type', $mimeType);
+        $response = new BinaryFileResponse($file, 200, ['Content-type' => $file->getMimeType()]);
         $disposition = $response->headers->makeDisposition($disposition, $fileName === null ? $file->getFileName() : $fileName);
         $response->headers->set('Content-Disposition', $disposition);
 

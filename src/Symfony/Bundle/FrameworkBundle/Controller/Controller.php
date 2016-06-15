@@ -139,8 +139,6 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
-        $deleteFileAfterSend = false;
-
         if (!is_string($file) && !$file instanceof File) {
             throw new \InvalidArgumentException(sprint('The "%s" method expects first argument to be a string or an instance of "%s"', __METHOD__, File::class));
         }
@@ -151,10 +149,6 @@ abstract class Controller implements ContainerAwareInterface
 
         $response = new BinaryFileResponse($file);
         $mimeType = $file->getMimeType();
-
-        if (true === $deleteFileAfterSend) {
-            $response->deleteFileAfterSend($deleteFileAfterSend);
-        }
 
         $response->headers->set('Content-Type', $mimeType);
         $disposition = $response->headers->makeDisposition($disposition, $fileName === null ? $file->getFileName() : $fileName);

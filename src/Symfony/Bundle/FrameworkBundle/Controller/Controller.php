@@ -13,9 +13,12 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -121,6 +124,23 @@ abstract class Controller implements ContainerAwareInterface
         }
 
         return new JsonResponse($data, $status, $headers);
+    }
+
+    /**
+     * Returns a BinaryFileResponse object with original or customized file name and disposition header.
+     *
+     * @param File|string $file        File object or path to file to be sent as response
+     * @param string|null $fileName    File name to be sent to response or null (will use original file name)
+     * @param string      $disposition Disposition of response ("attachment" is default, other type is "inline")
+     *
+     * @return BinaryFileResponse
+     */
+    protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
+    {
+        $response = new BinaryFileResponse($file);
+        $response->setContentDisposition($disposition, $fileName === null ? $response->getFile()->getFileName() : $fileName);
+
+        return $response;
     }
 
     /**

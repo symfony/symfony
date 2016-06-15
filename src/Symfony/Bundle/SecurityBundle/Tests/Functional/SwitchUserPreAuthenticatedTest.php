@@ -64,8 +64,8 @@ class SwitchUserPreAuthenticatedTest extends WebTestCase
         $client->followRedirects(true);
 
         $client->setServerParameters([
-            "SSL_CLIENT_S_DN_Email" => $username,
-            "SSL_CLIENT_S_DN" => 'test'
+            'SSL_CLIENT_S_DN_Email' => $username,
+            'SSL_CLIENT_S_DN' => 'test',
         ]);
 
         return $client;

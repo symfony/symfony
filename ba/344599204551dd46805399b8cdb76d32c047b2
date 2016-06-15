@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by WouterJ at 2015-12-31T17:29:47Z
+
+Thanks for your quick review, @stof! I've fixed the PR now.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-01-12T12:51:25Z
+
+We do not maintain BC for test files in `Tests` namespace. So these deprecations are not needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-13T09:39:44Z
+
+I agree with @Tobion, no need to preserve BC for tests
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-13T09:59:33Z
+
+Well, given that some tests are using this class in other components, we would have to preserve BC (and people might use it elsewhere too already). The point is that this base testcase is meant to be extended when writing tests. We just messed up its location when introducing it (and this is the drawback of the inclusion of tests inside the runtime, as our testsuite is autoloadable by any code installing the component as a dependency)
+We were maintaining BC for similar base testcases in the Form component in 2.x
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-13T10:08:59Z
+
+@stof, then I suggest to NOT deprecate anything in this PR
+
+---------------------------------------------------------------------------
+
+by stof at 2016-01-13T10:37:29Z
+
+@nicolas-grekas I don't understand what you mean. Do you suggest moving the class without deprecating the old class name ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-01-13T10:44:24Z
+
+@stof yes, that's the best idea I have for now to still allow ~2.8 in composer json files...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-25T07:50:59Z
+
+I think we are going too far with BC. Files under `Tests` are internal and private. Let's move the file and not care about BC here.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-01-25T14:10:35Z
+
+Alright, removed the class and file.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-29T17:04:57Z
+
+@nicolas-grekas The only remaining issue is the composer deps changes
+@WouterJ Can you rebase?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-02-29T19:15:01Z
+
+Rebased
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-02-29T20:05:02Z
+
+Thanks, fixed your comments @stof.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-01T20:27:28Z
+
+This seems to need a rebase again.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T08:38:24Z
+
+@WouterJ IIUC, it would be better to keep `AbstractConstraintValidatorTest.php` for now along side the new one and keep 2.8 as the min requirement. Is that correct @nicolas-grekas? If yes, let's do this and merge.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-06-15T09:44:04Z
+
+Updated the PR to keep both classes and deprecate the old one. We can't trigger a deprecation warning, as we can't update all core packages to use the new class.

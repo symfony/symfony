@@ -20,7 +20,7 @@ final class ErrorAssert
 {
     /**
      * @param string[] $expectedMessages Expected deprecation messages
-     * @param callable $testCode         A callable that is expected to trigger the expected deprecation messages when being executed
+     * @param callable $testCode         A callable that is expected to trigger the deprecation messages
      */
     public static function assertDeprecationsAreTriggered($expectedMessages, $testCode)
     {
@@ -34,7 +34,7 @@ final class ErrorAssert
     /**
      * @param int      $expectedType     Expected triggered error type (pass one of PHP's E_* constants)
      * @param string[] $expectedMessages Expected error messages
-     * @param callable $testCode         A callable that is expected to trigger the expected messages when being executed
+     * @param callable $testCode         A callable that is expected to trigger the error messages
      */
     public static function assertErrorsAreTriggered($expectedType, $expectedMessages, $testCode)
     {
@@ -42,6 +42,7 @@ final class ErrorAssert
             throw new \InvalidArgumentException(sprintf('The code to be tested must be a valid callable ("%s" given).', gettype($testCode)));
         }
 
+        $e = null;
         $triggeredMessages = array();
 
         try {
@@ -56,17 +57,16 @@ final class ErrorAssert
         } catch (\Exception $e) {
         } catch (\Throwable $e) {
         }
-
         restore_error_handler();
 
-        if (isset($e)) {
+        if (null !== $e) {
             throw $e;
         }
 
         \PHPUnit_Framework_Assert::assertCount(count($expectedMessages), $triggeredMessages);
 
-        for ($i = 0; $i < count($triggeredMessages); ++$i) {
-            \PHPUnit_Framework_Assert::assertContains($expectedMessages[$i], $triggeredMessages[$i]);
+        foreach ($triggeredMessages as $i => $message) {
+            \PHPUnit_Framework_Assert::assertContains($expectedMessages[$i], $message);
         }
     }
 }

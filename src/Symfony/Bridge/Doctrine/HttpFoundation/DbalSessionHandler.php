@@ -243,7 +243,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
                 return "INSERT OR REPLACE INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)";
             case 'postgresql' === $platform && version_compare($this->con->getServerVersion(), '9.5', '>='):
                 return "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) ".
-                    "ON CONFLICT ($this->idCol) DO UPDATE SET ($this->dataCol, $this->timeCol) = (:data, :time) WHERE $this->idCol = :id";
+                    "ON CONFLICT ($this->idCol) DO UPDATE SET ($this->dataCol, $this->timeCol) = (EXCLUDED.$this->dataCol, EXCLUDED.$this->timeCol)";
         }
     }
 }

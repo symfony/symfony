@@ -51,13 +51,11 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date.
      *
-     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
+     * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
      * @return array Localized date.
      *
-     * @throws TransformationFailedException If the given value is not an
-     *                                       instance of \DateTime or if the
-     *                                       output timezone is not supported.
+     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
     public function transform($dateTime)
     {
@@ -81,11 +79,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
                 $dateTime = clone $dateTime;
             }
 
-            try {
-                $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
-            } catch (\Exception $e) {
-                throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
-            }
+            $dateTime = $dateTime->setTimezone(new \DateTimeZone($this->outputTimezone));
         }
 
         $result = array_intersect_key(array(
@@ -118,8 +112,6 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @throws TransformationFailedException If the given value is not an array,
      *                                       if the value could not be transformed
-     *                                       or if the input timezone is not
-     *                                       supported.
      */
     public function reverseTransform($value)
     {

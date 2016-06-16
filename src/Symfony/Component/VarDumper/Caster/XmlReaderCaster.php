@@ -60,6 +60,20 @@ class XmlReaderCaster
         $nodeType = new ConstStub(self::$nodeTypes[$reader->nodeType], $reader->nodeType);
 
         $infos = array(
+            'nodeType' => $nodeType,
+            Caster::PREFIX_VIRTUAL.'parserProperties' => array(
+                'LOADDTD' => $reader->getParserProperty(\XmlReader::LOADDTD),
+                'DEFAULTATTRS' => $reader->getParserProperty(\XmlReader::DEFAULTATTRS),
+                'VALIDATE' => $reader->getParserProperty(\XmlReader::VALIDATE),
+                'SUBST_ENTITIES' => $reader->getParserProperty(\XmlReader::SUBST_ENTITIES),
+            ),
+        );
+
+        if (\XmlReader::NONE === $reader->nodeType) {
+            return $infos;
+        }
+
+        $infos = $infos + array(
             'localName' => $reader->localName,
 
             'depth' => $reader->depth,
@@ -70,14 +84,6 @@ class XmlReaderCaster
             'hasValue' => $reader->hasValue,
             'isDefault' => $reader->isDefault,
             'isEmptyElement' => $reader->isEmptyElement,
-            'nodeType' => $nodeType,
-
-            Caster::PREFIX_VIRTUAL.'parserProperties' => array(
-                'LOADDTD' => $reader->getParserProperty(\XmlReader::LOADDTD),
-                'DEFAULTATTRS' => $reader->getParserProperty(\XmlReader::DEFAULTATTRS),
-                'VALIDATE' => $reader->getParserProperty(\XmlReader::VALIDATE),
-                'SUBST_ENTITIES' => $reader->getParserProperty(\XmlReader::SUBST_ENTITIES),
-            ),
         );
 
         if ('' !== $reader->prefix) {

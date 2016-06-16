@@ -33,13 +33,6 @@ class XmlReaderCasterTest extends \PHPUnit_Framework_TestCase
     {
         $dump = <<<'DUMP'
 XMLReader {
-  +localName: "foo"
-  +depth: 0
-  +attributeCount: 0
-  +hasAttributes: false
-  +hasValue: false
-  +isDefault: false
-  +isEmptyElement: false
   +nodeType: ELEMENT
   parserProperties: array:4 [
     "LOADDTD" => false
@@ -47,6 +40,13 @@ XMLReader {
     "VALIDATE" => false
     "SUBST_ENTITIES" => false
   ]
+  +localName: "foo"
+  +depth: 0
+  +attributeCount: 0
+  +hasAttributes: false
+  +hasValue: false
+  +isDefault: false
+  +isEmptyElement: false
 }
 DUMP;
 
@@ -59,13 +59,6 @@ DUMP;
     {
         $dump = <<<'DUMP'
 XMLReader {
-  +localName: "bar"
-  +depth: 1
-  +attributeCount: 0
-  +hasAttributes: false
-  +hasValue: false
-  +isDefault: false
-  +isEmptyElement: false
   +nodeType: ELEMENT
   parserProperties: array:4 [
     "LOADDTD" => false
@@ -73,6 +66,13 @@ XMLReader {
     "VALIDATE" => false
     "SUBST_ENTITIES" => false
   ]
+  +localName: "bar"
+  +depth: 1
+  +attributeCount: 0
+  +hasAttributes: false
+  +hasValue: false
+  +isDefault: false
+  +isEmptyElement: false
 }
 
 DUMP;
@@ -86,13 +86,6 @@ DUMP;
     {
         $dump = <<<'DUMP'
 XMLReader {
-  +localName: "bar"
-  +depth: 1
-  +attributeCount: 0
-  +hasAttributes: false
-  +hasValue: false
-  +isDefault: false
-  +isEmptyElement: true
   +nodeType: ELEMENT
   parserProperties: array:4 [
     "LOADDTD" => false
@@ -100,6 +93,13 @@ XMLReader {
     "VALIDATE" => false
     "SUBST_ENTITIES" => false
   ]
+  +localName: "bar"
+  +depth: 1
+  +attributeCount: 0
+  +hasAttributes: false
+  +hasValue: false
+  +isDefault: false
+  +isEmptyElement: true
 }
 
 DUMP;
@@ -115,13 +115,6 @@ DUMP;
     {
         $dump = <<<'DUMP'
 XMLReader {
-  +localName: "bar"
-  +depth: 1
-  +attributeCount: 2
-  +hasAttributes: true
-  +hasValue: false
-  +isDefault: false
-  +isEmptyElement: false
   +nodeType: ELEMENT
   parserProperties: array:4 [
     "LOADDTD" => false
@@ -129,6 +122,13 @@ XMLReader {
     "VALIDATE" => false
     "SUBST_ENTITIES" => false
   ]
+  +localName: "bar"
+  +depth: 1
+  +attributeCount: 2
+  +hasAttributes: true
+  +hasValue: false
+  +isDefault: false
+  +isEmptyElement: false
   attributes: array:2 [
     0 => "bar"
     1 => "fubar"
@@ -150,12 +150,6 @@ DUMP;
     {
         $dump = <<<'DUMP'
 XMLReader {
-  +depth: 2
-  +attributeCount: 0
-  +hasAttributes: false
-  +hasValue: true
-  +isDefault: false
-  +isEmptyElement: false
   +nodeType: TEXT
   parserProperties: array:4 [
     "LOADDTD" => false
@@ -163,6 +157,12 @@ XMLReader {
     "VALIDATE" => false
     "SUBST_ENTITIES" => false
   ]
+  +depth: 2
+  +attributeCount: 0
+  +hasAttributes: false
+  +hasValue: true
+  +isDefault: false
+  +isEmptyElement: false
   +value: "With text"
    …1
 }
@@ -266,13 +266,6 @@ DUMP;
     {
         $dump = <<<'DUMP'
 XMLReader {
-  +localName: "baz"
-  +depth: 2
-  +attributeCount: 0
-  +hasAttributes: false
-  +hasValue: false
-  +isDefault: false
-  +isEmptyElement: false
   +nodeType: ELEMENT
   parserProperties: array:4 [
     "LOADDTD" => false
@@ -280,12 +273,38 @@ XMLReader {
     "VALIDATE" => false
     "SUBST_ENTITIES" => false
   ]
+  +localName: "baz"
+  +depth: 2
+  +attributeCount: 0
+  +hasAttributes: false
+  +hasValue: false
+  +isDefault: false
+  +isEmptyElement: false
   +prefix: "baz"
   +namespaceURI: "http://symfony.com"
 }
 DUMP;
 
         while ($this->reader->read() && $this->reader->localName !== 'baz');
+
+        $this->assertDumpEquals($dump, $this->reader);
+    }
+
+    public function testNone()
+    {
+        $dump = <<<'DUMP'
+XMLReader {
+  +nodeType: NONE
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
+}
+DUMP;
+
+        while ($this->reader->read());
 
         $this->assertDumpEquals($dump, $this->reader);
     }

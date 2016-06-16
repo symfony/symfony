@@ -71,6 +71,13 @@ class XmlReaderCaster
             'isDefault' => $reader->isDefault,
             'isEmptyElement' => $reader->isEmptyElement,
             'nodeType' => $nodeType,
+
+            Caster::PREFIX_VIRTUAL.'parserProperties' => array(
+                'LOADDTD' => $reader->getParserProperty(\XmlReader::LOADDTD),
+                'DEFAULTATTRS' => $reader->getParserProperty(\XmlReader::DEFAULTATTRS),
+                'VALIDATE' => $reader->getParserProperty(\XmlReader::VALIDATE),
+                'SUBST_ENTITIES' => $reader->getParserProperty(\XmlReader::SUBST_ENTITIES),
+            ),
         );
 
         if ($reader->hasValue && (\XmlReader::TEXT === $reader->nodeType || \XmlReader::ATTRIBUTE === $reader->nodeType)) {
@@ -92,6 +99,8 @@ class XmlReaderCaster
             $cut = array(
                 'nodeType' => $nodeType,
                 'depth' => $reader->depth,
+
+                Caster::PREFIX_VIRTUAL.'parserProperties' => $infos[Caster::PREFIX_VIRTUAL.'parserProperties'],
             );
 
             if ('#text' !== $reader->localName) {

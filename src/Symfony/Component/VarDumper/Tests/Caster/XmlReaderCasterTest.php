@@ -41,6 +41,12 @@ XMLReader {
   +isDefault: false
   +isEmptyElement: false
   +nodeType: ELEMENT
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
 }
 DUMP;
 
@@ -61,6 +67,12 @@ XMLReader {
   +isDefault: false
   +isEmptyElement: false
   +nodeType: ELEMENT
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
 }
 
 DUMP;
@@ -82,6 +94,12 @@ XMLReader {
   +isDefault: false
   +isEmptyElement: true
   +nodeType: ELEMENT
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
 }
 
 DUMP;
@@ -105,6 +123,12 @@ XMLReader {
   +isDefault: false
   +isEmptyElement: false
   +nodeType: ELEMENT
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
   attributes: array:2 [
     0 => "bar"
     1 => "fubar"
@@ -133,6 +157,12 @@ XMLReader {
   +isDefault: false
   +isEmptyElement: false
   +nodeType: TEXT
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
   +value: "With text"
    …1
 }
@@ -151,6 +181,12 @@ DUMP;
 XMLReader {
   +nodeType: $nodeTypeName
   +depth: $depth
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
    …6
 }
 
@@ -175,6 +211,12 @@ DUMP;
 XMLReader {
   +nodeType: $nodeTypeName
   +depth: $depth
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
   +localName: "$localName"
    …5
 }
@@ -199,6 +241,12 @@ DUMP;
 XMLReader {
   +nodeType: ATTRIBUTE
   +depth: 2
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
   +localName: "foo"
   +hasValue: true
   +value: "bar"

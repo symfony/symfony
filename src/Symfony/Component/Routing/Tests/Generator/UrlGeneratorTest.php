@@ -634,6 +634,25 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFragmentsCanBeAppendedToUrls()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing'));
+
+        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => 'frag ment'), true);
+        $this->assertEquals('/app.php/testing#frag%20ment', $url);
+
+        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => '0'), true);
+        $this->assertEquals('/app.php/testing#0', $url);
+    }
+
+    public function testFragmentsDoNotEscapeValidCharacters()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => '?/'), true);
+
+        $this->assertEquals('/app.php/testing#?/', $url);
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');

@@ -7,6 +7,32 @@ in 3.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.1.0...v3.1.1
 
+* 3.1.1 (2016-06-15)
+
+ * bug #19048 [HttpFoundation] Use UPSERT for sessions stored in PgSql >= 9.5 (nicolas-grekas)
+ * bug #19042 [Cache] Fix double fetch in ProxyAdapter (nicolas-grekas)
+ * bug #19038 Fix feature detection for IE (Alsciende)
+ * bug #18915 [DependencyInjection] force enabling the external XML entity loaders (xabbuh)
+ * bug #19020 [Form] Fixed collapsed choice attributes (HeahDude)
+ * bug #19028 [Yaml] properly count skipped comment lines (xabbuh)
+ * bug #19009 [WebProfilerBundle] Fix invalid CSS style (romainneutron)
+ * bug #17733 [Yaml] Fix wrong line number when comments are inserted in the middle of a block. (paradajozsef)
+ * bug #18909 Fixed singular of committee (peterrehm)
+ * bug #18911 Fixed singular of committee (peterrehm)
+ * bug #18971 Do not inject web debug toolbar on attachments (peterrehm)
+ * bug #18944 [Ldap] Fixed issue with legacy client initialisation (csarrazi)
+ * bug #18974 Added missing APCU CacheProvider of doctrine/cache 1.6.x (Carsten Eilers)
+ * bug #18954 [HttpKernel] Fix RequestDataCollector starting the session (romainneutron)
+ * bug #18949 [Security] Fix DebugAccessDecisionManager when object is not a scalar (romainneutron)
+ * bug #18959 [WebProfilerBundle] Fixed forwarded request data in templates (HeahDude)
+ * bug #18943 [Ldap][Security] The Ldap user provider abstract service now has the correct number of arguments (csarrazi)
+ * bug #18925 [Console] Fix BC break introduced by #18101 (dunglas)
+ * bug #18908 [DependencyInjection] force enabling the external XML entity loaders (xabbuh)
+ * bug #18893 [DependencyInjection] Skip deep reference check for 'service_container' (RobertMe)
+ * bug #18812 Catch \Throwable (fprochazka)
+ * bug #18821 [Form] Removed UTC specification with timestamp (francisbesset)
+ * bug #18861 Fix for #18843 (inso)
+
 * 3.1.0 (2016-05-30)
 
  * bug #18889 [Console] SymfonyStyle: Fix alignment/prefixing of multi-line comments (chalasr)

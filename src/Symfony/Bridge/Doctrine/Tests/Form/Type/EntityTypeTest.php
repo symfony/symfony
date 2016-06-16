@@ -209,8 +209,13 @@ class EntityTypeTest extends TypeTestCase
         $field->submit('2');
     }
 
-    public function testConfigureQueryBuilderWithClosureReturningNull()
+    public function testConfigureQueryBuilderWithClosureReturningNullUseDefault()
     {
+        $entity1 = new SingleIntIdEntity(1, 'Foo');
+        $entity2 = new SingleIntIdEntity(2, 'Bar');
+
+        $this->persist(array($entity1, $entity2));
+
         $field = $this->factory->createNamed('name', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', null, array(
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
@@ -219,7 +224,7 @@ class EntityTypeTest extends TypeTestCase
             },
         ));
 
-        $this->assertEquals(array(), $field->createView()->vars['choices']);
+        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
     }
 
     public function testSetDataSingleNull()

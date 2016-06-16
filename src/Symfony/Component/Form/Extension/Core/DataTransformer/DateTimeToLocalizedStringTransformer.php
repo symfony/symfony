@@ -70,13 +70,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a normalized date into a localized date string/array.
      *
-     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
+     * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
      * @return string|array Localized date string/array.
      *
-     * @throws TransformationFailedException If the given value is not an instance
-     *                                       of \DateTime or if the date could not
-     *                                       be transformed.
+     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
+     *                                       or if the date could not be transformed.
      */
     public function transform($dateTime)
     {
@@ -105,8 +104,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      * @return \DateTime Normalized date
      *
      * @throws TransformationFailedException if the given value is not a string,
-     *                                       if the date could not be parsed or
-     *                                       if the input timezone is not supported
+     *                                       if the date could not be parsed
      */
     public function reverseTransform($value)
     {
@@ -132,11 +130,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         }
 
         if ('UTC' !== $this->inputTimezone) {
-            try {
-                $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
-            } catch (\Exception $e) {
-                throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
-            }
+            $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
         }
 
         return $dateTime;

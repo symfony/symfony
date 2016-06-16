@@ -65,6 +65,11 @@ class Route implements \Serializable
     private $condition = '';
 
     /**
+     * @var bool
+     */
+    private $allowAnyReqs = false;
+
+    /**
      * Constructor.
      *
      * Available options:
@@ -79,9 +84,11 @@ class Route implements \Serializable
      * @param string|array $schemes      A required URI scheme or an array of restricted schemes
      * @param string|array $methods      A required HTTP method or an array of restricted methods
      * @param string       $condition    A condition that should evaluate to true for the route to match
+     * @param bool         $allowAnyReqs Whether non-string requirements are accepted or not
      */
-    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '')
+    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '', $allowAnyReqs = false)
     {
+        $this->allowAnyReqs = $allowAnyReqs;
         $this->setPath($path);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
@@ -435,10 +442,16 @@ class Route implements \Serializable
     /**
      * Returns the requirements.
      *
+     * @param bool $allowAny Whether non-string requirements are handled or not.
+     *
      * @return array The requirements
      */
-    public function getRequirements()
+    public function getRequirements($allowAny = false)
     {
+        if (!$allowAny && $this->allowAnyReqs) {
+            return array_filter($this->requirements, 'is_string');
+        }
+
         return $this->requirements;
     }
 
@@ -480,25 +493,27 @@ class Route implements \Serializable
     /**
      * Returns the requirement for the given key.
      *
-     * @param string $key The key
+     * @param string $key      The key
+     * @param bool   $allowAny Whether non-string requirements are handled or not.
      *
-     * @return string|null The regex or null when not given
+     * @return string|mixed|null The requirement as a string or any type when $allowAny is true, null when not set
      */
-    public function getRequirement($key)
+    public function getRequirement($key, $allowAny = false)
     {
-        return isset($this->requirements[$key]) ? $this->requirements[$key] : null;
+        return isset($this->requirements[$key]) && ($allowAny || !$this->allowAnyReqs || is_string($this->requirements[$key])) ? $this->requirements[$key] : null;
     }
 
     /**
      * Checks if a requirement is set for the given key.
      *
-     * @param string $key A variable name
+     * @param string $key      A variable name
+     * @param bool   $allowAny Whether non-string requirements are handled or not.
      *
      * @return bool true if a requirement is specified, false otherwise
      */
-    public function hasRequirement($key)
+    public function hasRequirement($key, $allowAny = false)
     {
-        return array_key_exists($key, $this->requirements);
+        return isset($this->requirements[$key]) && ($allowAny || !$this->allowAnyReqs || is_string($this->requirements[$key]));
     }
 
     /**
@@ -567,8 +582,16 @@ class Route implements \Serializable
 
     private function sanitizeRequirement($key, $regex)
     {
+        if (null === $regex) {
+            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" cannot be null.', $key));
+        }
+
         if (!is_string($regex)) {
-            throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
+            if (!$this->allowAnyReqs) {
+                throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $key));
+            }
+
+            return $regexp;
         }
 
         if ('' !== $regex && '^' === $regex[0]) {

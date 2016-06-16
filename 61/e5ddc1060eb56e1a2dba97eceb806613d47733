@@ -1,0 +1,118 @@
+---------------------------------------------------------------------------
+
+by henrikbjorn at 2014-12-15T07:47:19Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Koc at 2014-12-15T08:29:00Z
+
+ref #3910
+
+---------------------------------------------------------------------------
+
+by Koc at 2014-12-15T08:35:18Z
+
+Also interface changes is a BC-break
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2014-12-15T08:54:09Z
+
+I didn't see that other ticket, thanks for referencing it. I would counter the reason it was closed though because...
+
+1. Fragment generation requires encoding that could gain correctness from framework help (rather than having to encode the fragment yourself)
+
+2. With the redirectToRoute helper in 2.6 it now remains clumsy if you are redirecting to a route with a fragment (ie. You can't so need to use generateUrl and redirect)
+
+I also didn't think of the BC break... That's unfortunate.
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2014-12-15T09:07:50Z
+
+I didn't realise there were special parameters (underscore prefixed) to generate, that sounds like a better approach - hopefully my reasons above will help get that other ticket reopened at least.
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2014-12-15T10:15:34Z
+
+I reworked the patch to use a 'special' parameter inline with other Symfony special parameters for the fragment. This removes the BC issue with the interface, though would obviously cause a problem if people were already using _fragment as a valid query string parameter.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-12-15T12:30:01Z
+
+Still a BC break as you figured yourself.
+
+---------------------------------------------------------------------------
+
+by dawehner at 2014-12-21T15:27:08Z
+
+Just a quick comment. In Drupal we have all kind of additional options, like the fragment, but also language, whether we want to render it as http or https ...
+The signature looks like the following:
+
+````
+  public function generateFromRoute($name, $parameters = array(), $options = array());
+````
+
+---------------------------------------------------------------------------
+
+by Tobion at 2015-02-03T22:27:39Z
+
+I agree that a helper for the fragment is useful because of the encoding need. And I cannot think of a better solution than the one provided here. And the tiny BC break is negligible because it's unlikely.
+
+Three things are missing for me to be merged:
+1. the special meaning of `_fragment` must be documented in the phpdoc of UrlGeneratorInterface
+2. the slash `/` should be decoded from the fragment just as it has been done for the query in #12223. this is also part of the rfc: "The characters slash ("/") and question mark ("?") are allowed to
+   represent data within the fragment identifier."
+3. we should add a test when`_fragment` is used as a path parameter name, e.g. `/fragment/{_fragment}` both for generating and matching. and a test with a same document relative reference with just a fragment, e.g. `#fragment` as a result.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2015-09-14T07:46:45Z
+
+@rodnaph Can you address @Tobion concerns?
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2015-09-14T09:14:35Z
+
+@Tobion
+
+I've addressed your first two concerns.
+
+For the third I thought the best solution would be to throw a LogicException when compiling the route, as \_fragment has no meaning as a path parameter. I'm not sure what you meant about _"a test with a same document relative reference with just a fragment"_ - would that be a route with no pattern? eg. `new Route('');` ?
+
+I also rebased onto current master as there were some failing lint issues.
+
+/cc @fabpot
+
+---------------------------------------------------------------------------
+
+by bendavies at 2015-09-17T08:52:11Z
+
++1 @Tobion
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2015-09-21T08:48:42Z
+
+@inso Fixed, thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-04T11:15:53Z
+
+Apart from my small comment, :+1:
+
+ping @Tobion
+
+@rodnaph Can you rebase on current master?
+
+---------------------------------------------------------------------------
+
+by rodnaph at 2016-03-04T12:15:35Z
+
+@fabpot done

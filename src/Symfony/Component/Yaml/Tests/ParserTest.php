@@ -931,13 +931,12 @@ EOF;
      */
     public function testColonInMappingValueException()
     {
-        $parser = $this->parser;
-
-        ErrorAssert::assertDeprecationsAreTriggered('Using a colon in the unquoted mapping value "bar: baz" in line 1 is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', function () use ($parser) {
+        ErrorAssert::assertDeprecationsAreTriggered('Using a colon in the unquoted mapping value "bar: baz" in line 1 is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', function () {
             $yaml = <<<EOF
 foo: bar: baz
 EOF;
-            $parser->parse($yaml);
+
+            $this->parser->parse($yaml);
         });
     }
 

@@ -536,6 +536,22 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getTimestampTests
+     */
+    public function testParseNestedTimestampListAsDateTimeObject($yaml, $year, $month, $day, $hour, $minute, $second)
+    {
+        $expected = new \DateTime($yaml);
+        $expected->setTimeZone(new \DateTimeZone('UTC'));
+        $expected->setDate($year, $month, $day);
+        $expected->setTime($hour, $minute, $second);
+
+        $expectedNested = array('nested' => array($expected));
+        $yamlNested = "{nested: [$yaml]}";
+
+        $this->assertEquals($expectedNested, Inline::parse($yamlNested, Yaml::PARSE_DATETIME));
+    }
+
+    /**
      * @dataProvider getDateTimeDumpTests
      */
     public function testDumpDateTime($dateTime, $expected)

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Parser;
 
@@ -931,13 +930,11 @@ EOF;
      */
     public function testColonInMappingValueException()
     {
-        ErrorAssert::assertDeprecationsAreTriggered('Using a colon in the unquoted mapping value "bar: baz" in line 1 is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', function () {
-            $yaml = <<<EOF
+        $yaml = <<<EOF
 foo: bar: baz
 EOF;
 
-            $this->parser->parse($yaml);
-        });
+        $this->parser->parse($yaml);
     }
 
     public function testColonInMappingValueExceptionNotTriggeredByColonInComment()

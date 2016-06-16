@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Yaml;
 
@@ -258,23 +259,9 @@ class InlineTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseUnquotedScalarStartingWithPercentCharacter()
     {
-        $deprecations = array();
-        set_error_handler(function ($type, $msg) use (&$deprecations) {
-            if (E_USER_DEPRECATED !== $type) {
-                restore_error_handler();
-
-                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
-            }
-
-            $deprecations[] = $msg;
+        ErrorAssert::assertDeprecationsAreTriggered('Not quoting a scalar starting with the "%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', function () {
+            Inline::parse('{ foo: %foo }');
         });
-
-        Inline::parse('{ foo: %foo }');
-
-        restore_error_handler();
-
-        $this->assertCount(1, $deprecations);
-        $this->assertContains('Not quoting a scalar starting with the "%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', $deprecations[0]);
     }
 
     /**

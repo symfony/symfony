@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-05-24T13:22:29Z
+
+this should be documented somewhere
+
+thanks for your effort 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-24T13:52:50Z
+
+@OskarStark Thanks for the review.
+I am waiting for the opinion of a maintainer before proposing the changes in the doc to make it in one shot.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-24T13:54:46Z
+
+@chalasr could you please make the test more complex to simulate several inputs in a row? Thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-24T20:56:17Z
+
+@javiereguiluz Of course, I added a failure test (3 questions for only 2 inputs) and made the first taking 3 questions for 3 inputs.
+
+I also fixed the @OskarStark line notes and started to write documentation.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2016-05-24T21:44:55Z
+
+> I also fixed the @OskarStark line notes and started to write documentation.
+
+Thank you for your effort 👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-26T19:30:16Z
+
+According to #17136, this will not work if the SymfonyStyle is used.
+I'm working for find a clean solution (out of this PR), but making the SymfonyQuestionHelper out of the command HelperSet made interactive command testing very hard.
+In a perfect world, the SymfonyQuestionHelper should be set in the helperSet and be accessible through `Command::getHelper('question')`. Actually the SymfonyStyle cannot access the Command and the Command cannot access the SymfonyStyle...
+
+__EDIT__ Should be fixed by #18902
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-05-28T08:10:10Z
+
+Doc [submitted](https://github.com/symfony/symfony-docs/pull/6623).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-02T08:43:38Z
+
+I made the changes and updated the doc.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-07T16:50:36Z
+
+@fabpot I made the changes related to your line notes.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-09T20:22:31Z
+
+Rebased this on #18999 to see the benefit by testing commands using both QuestionHelper and SymfonyQuestionHelper (via SymfonyStyle, no need of an HelperSet).
+Would be closed otherwise.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T06:27:50Z
+
+@chalasr Now that #18999 is merged, can you rebase this one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T06:29:58Z
+
+Just noticed that the second commit messages contain all messages from squashed commits, can you remove them as they are useless? Thanks.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-16T07:35:30Z
+
+Made the changes, rebased and cleaned the commit message.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-16T07:44:58Z
+
+@fabpot As it takes the inputs as argument, I made the `getStream()` method static.

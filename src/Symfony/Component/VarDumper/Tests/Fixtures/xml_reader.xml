@@ -4,4 +4,7 @@
     <bar />
     <bar>With text</bar>
     <bar foo="bar" baz="fubar"></bar>
+    <bar xmlns:baz="http://symfony.com">
+        <baz:baz></baz:baz>
+    </bar>
 </foo>

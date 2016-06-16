@@ -262,6 +262,34 @@ DUMP;
         $this->assertDumpEquals($dump, $this->reader);
     }
 
+    public function testPrefixedElements()
+    {
+        $dump = <<<'DUMP'
+XMLReader {
+  +localName: "baz"
+  +depth: 2
+  +attributeCount: 0
+  +hasAttributes: false
+  +hasValue: false
+  +isDefault: false
+  +isEmptyElement: false
+  +nodeType: ELEMENT
+  parserProperties: array:4 [
+    "LOADDTD" => false
+    "DEFAULTATTRS" => false
+    "VALIDATE" => false
+    "SUBST_ENTITIES" => false
+  ]
+  +prefix: "baz"
+  +namespaceURI: "http://symfony.com"
+}
+DUMP;
+
+        while ($this->reader->read() && $this->reader->localName !== 'baz');
+
+        $this->assertDumpEquals($dump, $this->reader);
+    }
+
     public function tearDown()
     {
         $this->reader->close();

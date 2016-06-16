@@ -80,6 +80,11 @@ class XmlReaderCaster
             ),
         );
 
+        if ('' !== $reader->prefix) {
+            $infos['prefix'] = $reader->prefix;
+            $infos['namespaceURI'] = $reader->namespaceURI;
+        }
+
         if ($reader->hasValue && (\XmlReader::TEXT === $reader->nodeType || \XmlReader::ATTRIBUTE === $reader->nodeType)) {
             $infos['value'] = $reader->value;
 
@@ -113,6 +118,11 @@ class XmlReaderCaster
                 if ($reader->hasValue) {
                     $cut['value'] = $reader->value;
                 }
+            }
+
+            if ('' !== $reader->prefix) {
+                $cut['prefix'] = $reader->prefix;
+                $cut['namespaceURI'] = $reader->namespaceURI;
             }
 
             $stub->cut += count($infos) - count($cut);

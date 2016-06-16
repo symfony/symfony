@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-06-08T19:33:16Z
+
+Implementation looks good to me & conform to what we talked about 👍
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-06-08T21:10:03Z
+
+I think (but not sure about the policy for such cases) some legacy tests should be kept, but marked with the `@group legacy`, to ensure the deprecated methods still work, and new ones created.
+Then, legacy ones will be removed once in 4.0.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-08T22:51:31Z
+
+Re added old tests as legacy.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-09T18:43:23Z
+
+I moved the current QuestionHelperTest tests into a separated LegacyQuestionHelperTest class and made the changes (line notes), hope that clarifies what I mean.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-09T18:53:10Z
+
+@chalasr would be better to avoid moving them, but only marking them as legacy, so that we have less conflicts when merging branches
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-09T19:00:41Z
+
+@stof Reverted.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-14T20:53:41Z
+
+`getInputStream()` methods should also be deprecated, right?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-14T20:54:17Z
+
+In the description, you mention `SymfonyQuestionHelper`, but this class is not changed in this PR.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-14T21:09:59Z
+
+@fabpot Yes the SymfonyQuestionHelper class is not changed, it would just become testable via the CommandTester as well as the QuestionHelper (see [this test](https://github.com/symfony/symfony/pull/18710/commits/69dd333eda69554690d586755e9706ffbd000d70#diff-0b70ff51433c3b759581d6f8753c8ae5R140) in another PR based on this one). The changes are inherited from the parent `QuestionHelper` class.
+
+About the `getInputStream()`  method you're right, it should also be deprecated.
+The problem is that the method [is called](https://github.com/symfony/symfony/pull/18999/files#diff-38eebdda7d6ebfcb7405b91167f05c9cR783) in ``Application::configureIO` to preserve BC, that causes lots of deprecation warnings from ApplicationTest, each time `Application::run()` is called.
+
+As there is no reason to call `getInputStream()` without `setInputStream()`, I assumed that depreciate the `setInputStream()` method would be sufficient.
+Seeing your comment I guess that doesn't work like that, right? :)
+
+What do you think about this?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T05:29:09Z
+
+@chalasr Here is how you can make it work: add a `$triggerDeprecationError = true` argument to `getInputStream()` and only trigger the deprecation when `$triggerDeprecationError` is true. When you call it yourself, pass `false`.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-15T09:24:08Z
+
+The `getInputStream()` method is now deprecated.
+@fabpot Thank you!

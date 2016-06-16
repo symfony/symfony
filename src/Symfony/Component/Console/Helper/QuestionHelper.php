@@ -99,9 +99,9 @@ class QuestionHelper extends Helper
      *
      * @return resource
      */
-    public function getInputStream($triggerDeprecationError = true)
+    public function getInputStream()
     {
-        if ($triggerDeprecationError) {
+        if (0 === func_num_args() || func_get_arg(0)) {
             @trigger_error(sprintf('The %s() method is deprecated since version 3.2 and will be removed in 4.0. Use %s:getStream() instead.', __METHOD__, StreamableInputInterface::class), E_USER_DEPRECATED);
         }
 

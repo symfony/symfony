@@ -98,6 +98,14 @@ class XmlReaderCaster
                 $cut['localName'] = $reader->localName;
             }
 
+            if (\XmlReader::ATTRIBUTE === $reader->nodeType) {
+                $cut['hasValue'] = $reader->hasValue;
+
+                if ($reader->hasValue) {
+                    $cut['value'] = $reader->value;
+                }
+            }
+
             $stub->cut += count($infos) - count($cut);
 
             return $cut;

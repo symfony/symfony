@@ -116,7 +116,7 @@ class RouteCompiler implements RouteCompilerInterface
                 $tokens[] = array('text', $precedingText);
             }
 
-            $regexp = $route->getRequirement($varName);
+            $regexp = $route->getRequirement($varName, true);
             if (null === $regexp) {
                 $followingPattern = (string) substr($pattern, $pos);
                 // Find the next static character after the variable that functions as a separator. By default, this separator and '/'
@@ -140,6 +140,8 @@ class RouteCompiler implements RouteCompilerInterface
                     // directly adjacent, e.g. '/{x}{y}'.
                     $regexp .= '+';
                 }
+            } elseif (!is_string($regexp)) {
+                throw new \InvalidArgumentException(sprintf('Routing requirement for "%s" must be a string.', $varName));
             }
 
             $tokens[] = array('variable', $isSeparator ? $precedingChar : '', $regexp, $varName);

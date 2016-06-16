@@ -69,7 +69,7 @@ class ArgvInput extends Input
     }
 
     /**
-     * Processes command line arguments.
+     * {@inheritdoc}
      */
     protected function parse()
     {
@@ -253,9 +253,7 @@ class ArgvInput extends Input
     }
 
     /**
-     * Returns the first argument from the raw parameters (not parsed).
-     *
-     * @return string The value of the first argument or null otherwise
+     * {@inheritdoc}
      */
     public function getFirstArgument()
     {
@@ -269,15 +267,7 @@ class ArgvInput extends Input
     }
 
     /**
-     * Returns true if the raw parameters (not parsed) contain a value.
-     *
-     * This method is to be used to introspect the input parameters
-     * before they have been validated. It must be used carefully.
-     *
-     * @param string|array $values     The value(s) to look for in the raw parameters (can be an array)
-     * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
-     *
-     * @return bool true if the value is contained in the raw parameters
+     * {@inheritdoc}
      */
     public function hasParameterOption($values, $onlyParams = false)
     {
@@ -298,16 +288,7 @@ class ArgvInput extends Input
     }
 
     /**
-     * Returns the value of a raw option (not parsed).
-     *
-     * This method is to be used to introspect the input parameters
-     * before they have been validated. It must be used carefully.
-     *
-     * @param string|array $values     The value(s) to look for in the raw parameters (can be an array)
-     * @param mixed        $default    The default value to return if no result is found
-     * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
-     *
-     * @return mixed The option value
+     * {@inheritdoc}
      */
     public function getParameterOption($values, $default = false, $onlyParams = false)
     {

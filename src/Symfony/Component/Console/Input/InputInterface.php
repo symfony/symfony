@@ -60,11 +60,9 @@ interface InputInterface
     public function bind(InputDefinition $definition);
 
     /**
-     * Validates if arguments given are correct.
+     * Validates the input.
      *
-     * Throws an exception when not enough arguments are given.
-     *
-     * @throws \RuntimeException
+     * @throws \RuntimeException When not enough arguments are given
      */
     public function validate();
 
@@ -76,11 +74,13 @@ interface InputInterface
     public function getArguments();
 
     /**
-     * Gets argument by name.
+     * Returns the argument value for a given argument name.
      *
-     * @param string $name The name of the argument
+     * @param string $name The argument name
      *
-     * @return mixed
+     * @return mixed The argument value
+     *
+     * @throws \InvalidArgumentException When argument given doesn't exist
      */
     public function getArgument($name);
 
@@ -90,7 +90,7 @@ interface InputInterface
      * @param string $name  The argument name
      * @param string $value The argument value
      *
-     * @throws InvalidArgumentException When argument given doesn't exist
+     * @throws \InvalidArgumentException When argument given doesn't exist
      */
     public function setArgument($name, $value);
 
@@ -111,11 +111,13 @@ interface InputInterface
     public function getOptions();
 
     /**
-     * Gets an option by name.
+     * Returns the option value for a given option name.
      *
-     * @param string $name The name of the option
+     * @param string $name The option name
      *
-     * @return mixed
+     * @return mixed The option value
+     *
+     * @throws \InvalidArgumentException When option given doesn't exist
      */
     public function getOption($name);
 
@@ -125,7 +127,7 @@ interface InputInterface
      * @param string      $name  The option name
      * @param string|bool $value The option value
      *
-     * @throws InvalidArgumentException When option given doesn't exist
+     * @throws \InvalidArgumentException When option given doesn't exist
      */
     public function setOption($name, $value);
 

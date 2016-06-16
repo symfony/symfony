@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -61,27 +62,13 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateDeprecatedService()
     {
-        $deprecations = array();
-        set_error_handler(function ($type, $msg) use (&$deprecations) {
-            if (E_USER_DEPRECATED !== $type) {
-                restore_error_handler();
+        ErrorAssert::assertDeprecationsAreTriggered('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', function () {
+            $definition = new Definition('stdClass');
+            $definition->setDeprecated(true);
 
-                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
-            }
-
-            $deprecations[] = $msg;
+            $builder = new ContainerBuilder();
+            $builder->createService($definition, 'deprecated_foo');
         });
-
-        $definition = new Definition('stdClass');
-        $definition->setDeprecated(true);
-
-        $builder = new ContainerBuilder();
-        $builder->createService($definition, 'deprecated_foo');
-
-        restore_error_handler();
-
-        $this->assertCount(1, $deprecations);
-        $this->assertContains('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', $deprecations[0]);
     }
 
     public function testRegister()

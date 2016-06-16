@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T17:04:59Z
+
+Can you test it on a real DB?
+
+---------------------------------------------------------------------------
+
+by aashley at 2016-06-16T01:31:55Z
+
+I have tested this against my system for #19057 and can confirm it fixes the issue.

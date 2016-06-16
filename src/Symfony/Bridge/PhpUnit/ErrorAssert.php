@@ -53,8 +53,14 @@ final class ErrorAssert
             });
 
             $testCode();
-        } finally {
-            restore_error_handler();
+        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+        }
+
+        restore_error_handler();
+
+        if (isset($e)) {
+            throw $e;
         }
 
         \PHPUnit_Framework_Assert::assertCount(count($expectedMessages), $triggeredMessages);

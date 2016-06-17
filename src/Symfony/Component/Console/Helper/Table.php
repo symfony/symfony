@@ -225,6 +225,13 @@ class Table
         return $this;
     }
 
+    /**
+     * Sets the headers.
+     *
+     * @param string[] $headers
+     *
+     * @return Table
+     */
     public function setHeaders(array $headers)
     {
         $headers = array_values($headers);
@@ -237,6 +244,13 @@ class Table
         return $this;
     }
 
+    /**
+     * Sets the rows.
+     *
+     * @param array $rows
+     *
+     * @return Table
+     */
     public function setRows(array $rows)
     {
         $this->rows = array();
@@ -244,6 +258,13 @@ class Table
         return $this->addRows($rows);
     }
 
+    /**
+     * Adds a list of rows, each row must must be an array or a TableSeparator instance.
+     *
+     * @param array $rows
+     *
+     * @return Table
+     */
     public function addRows(array $rows)
     {
         foreach ($rows as $row) {
@@ -253,6 +274,13 @@ class Table
         return $this;
     }
 
+    /**
+     * Adds a row.
+     *
+     * @param string[]|TableSeparator $row
+     *
+     * @return Table
+     */
     public function addRow($row)
     {
         if ($row instanceof TableSeparator) {
@@ -270,6 +298,14 @@ class Table
         return $this;
     }
 
+    /**
+     * Sets the row.
+     *
+     * @param int   $column
+     * @param array $row
+     *
+     * @return Table
+     */
     public function setRow($column, array $row)
     {
         $this->rows[$column] = $row;
@@ -377,6 +413,8 @@ class Table
      * @param array  $row
      * @param int    $column
      * @param string $cellFormat
+     *
+     * @return string
      */
     private function renderCell(array $row, $column, $cellFormat)
     {

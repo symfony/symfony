@@ -899,8 +899,7 @@ UPGRADE FROM 2.x to 3.0
  * The `getMatcherDumperInstance()` and `getGeneratorDumperInstance()` methods in the
    `Symfony\Component\Routing\Router` have been changed from `public` to `protected`.
 
- * Deprecated the hardcoded value for the `$referenceType` argument of the `UrlGeneratorInterface::generate` method.
-   Use the constants defined in the `UrlGeneratorInterface` instead.
+ * Use the constants defined in the UrlGeneratorInterface for the $referenceType argument of the UrlGeneratorInterface::generate method.
 
    Before:
 

@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-02-01T19:51:52Z
+
+We cannot do 2. as it would be a BC break (and would be impossible to make it a soft-migration as there would be no sane way to decide what we should return in this method: the old or new return value)
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-02-01T20:01:53Z
+
+@stof this is a quote of https://github.com/symfony/symfony/issues/7737 (it was removed when I submitted my message).
+
+I guess it would be better to continue the conversation in https://github.com/symfony/symfony/issues/7737 if we still don't know which option to choose.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T19:53:04Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T19:53:15Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T19:53:57Z
+
+@Ener-Getick Can you fix the tests?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T19:54:15Z
+
+Also, can you update the CHANGELOG/UPGRADE files?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-16T19:59:33Z
+
+@fabpot i won't be able to do it during the next weeks but of course i'll do it as soon as i can ☺
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-17T16:00:42Z
+
+After all I found some time to update this PR.
+So the tests pass now and I updated the UPGRADE files.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-06-17T16:39:21Z
+
+Looks good
+
+Status: reviewed
+
+(oh, btw, the color of "feature" and "status: reviewed" labels look very ugly next to eachother)

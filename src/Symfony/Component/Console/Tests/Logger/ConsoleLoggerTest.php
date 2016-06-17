@@ -88,4 +88,17 @@ class ConsoleLoggerTest extends LoggerInterfaceTest
             array(LogLevel::EMERGENCY, OutputInterface::VERBOSITY_QUIET, true, $quietMap),
         );
     }
+
+    public function testHasErrored()
+    {
+        $logger = new ConsoleLogger(new BufferedOutput());
+
+        $this->assertFalse($logger->hasErrored());
+
+        $logger->warning('foo');
+        $this->assertFalse($logger->hasErrored());
+
+        $logger->error('bar');
+        $this->assertTrue($logger->hasErrored());
+    }
 }

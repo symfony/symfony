@@ -46,8 +46,31 @@ class CacheItemTest extends \PHPUnit_Framework_TestCase
             array(null),
             array(1),
             array(1.1),
-            array(array()),
+            array(array(array())),
             array(new \Exception('foo')),
         );
+    }
+
+    public function testTag()
+    {
+        $item = new CacheItem();
+
+        $this->assertSame($item, $item->tag('foo'));
+        $this->assertSame($item, $item->tag(array('bar', 'baz')));
+
+        call_user_func(\Closure::bind(function () use ($item) {
+            $this->assertSame(array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz'), $item->tags);
+        }, $this, CacheItem::class));
+    }
+
+    /**
+     * @dataProvider provideInvalidKey
+     * @expectedException Symfony\Component\Cache\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Cache tag
+     */
+    public function testInvalidTag($tag)
+    {
+        $item = new CacheItem();
+        $item->tag($tag);
     }
 }

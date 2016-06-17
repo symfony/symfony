@@ -11,20 +11,20 @@
 
 namespace Symfony\Component\Cache;
 
-use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class CacheItem implements CacheItemInterface
+final class CacheItem implements TaggedCacheItemInterface
 {
     protected $key;
     protected $value;
     protected $isHit;
     protected $expiry;
     protected $defaultLifetime;
+    protected $tags = array();
     protected $innerItem;
     protected $poolHash;
 
@@ -91,6 +91,33 @@ final class CacheItem implements CacheItemInterface
             $this->expiry = $time + time();
         } else {
             throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', is_object($time) ? get_class($time) : gettype($time)));
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function tag($tags)
+    {
+        if (!is_array($tags)) {
+            $tags = array($tags);
+        }
+        foreach ($tags as $tag) {
+            if (!is_string($tag)) {
+                throw new InvalidArgumentException(sprintf('Cache tag must be string, "%s" given', is_object($tag) ? get_class($tag) : gettype($tag)));
+            }
+            if (isset($this->tags[$tag])) {
+                continue;
+            }
+            if (!isset($tag[0])) {
+                throw new InvalidArgumentException('Cache tag length must be greater than zero');
+            }
+            if (isset($tag[strcspn($tag, '{}()/\@:')])) {
+                throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters {}()/\@:', $tag));
+            }
+            $this->tags[$tag] = $tag;
         }
 
         return $this;

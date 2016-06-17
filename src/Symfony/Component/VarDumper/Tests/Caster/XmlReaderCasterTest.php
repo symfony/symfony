@@ -34,12 +34,12 @@ class XmlReaderCasterTest extends \PHPUnit_Framework_TestCase
         $dump = <<<'DUMP'
 XMLReader {
   +nodeType: ELEMENT
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
   +localName: "foo"
   +depth: 0
   +attributeCount: 0
@@ -60,12 +60,12 @@ DUMP;
         $dump = <<<'DUMP'
 XMLReader {
   +nodeType: ELEMENT
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
   +localName: "bar"
   +depth: 1
   +attributeCount: 0
@@ -87,12 +87,12 @@ DUMP;
         $dump = <<<'DUMP'
 XMLReader {
   +nodeType: ELEMENT
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
   +localName: "bar"
   +depth: 1
   +attributeCount: 0
@@ -116,12 +116,12 @@ DUMP;
         $dump = <<<'DUMP'
 XMLReader {
   +nodeType: ELEMENT
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
   +localName: "bar"
   +depth: 1
   +attributeCount: 2
@@ -151,12 +151,12 @@ DUMP;
         $dump = <<<'DUMP'
 XMLReader {
   +nodeType: TEXT
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
   +depth: 2
   +attributeCount: 0
   +hasAttributes: false
@@ -181,12 +181,12 @@ DUMP;
 XMLReader {
   +nodeType: $nodeTypeName
   +depth: $depth
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
    …6
 }
 
@@ -211,12 +211,12 @@ DUMP;
 XMLReader {
   +nodeType: $nodeTypeName
   +depth: $depth
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
   +localName: "$localName"
    …5
 }
@@ -241,12 +241,12 @@ DUMP;
 XMLReader {
   +nodeType: ATTRIBUTE
   +depth: 2
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
   +localName: "foo"
   +hasValue: true
   +value: "bar"
@@ -267,12 +267,12 @@ DUMP;
         $dump = <<<'DUMP'
 XMLReader {
   +nodeType: ELEMENT
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
   +localName: "baz"
   +depth: 2
   +attributeCount: 0
@@ -295,12 +295,12 @@ DUMP;
         $dump = <<<'DUMP'
 XMLReader {
   +nodeType: NONE
-  parserProperties: array:4 [
-    "LOADDTD" => false
-    "DEFAULTATTRS" => false
-    "VALIDATE" => false
-    "SUBST_ENTITIES" => false
-  ]
+  parserProperties: {
+    LOADDTD: false
+    DEFAULTATTRS: false
+    VALIDATE: false
+    SUBST_ENTITIES: false
+  }
 }
 DUMP;
 

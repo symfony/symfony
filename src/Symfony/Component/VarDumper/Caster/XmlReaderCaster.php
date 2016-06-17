@@ -58,15 +58,16 @@ class XmlReaderCaster
     public static function castXmlReader(\XmlReader $reader, array $a, Stub $stub, $isNested)
     {
         $nodeType = new ConstStub(self::$nodeTypes[$reader->nodeType], $reader->nodeType);
+        $parserProperties = new EnumStub(array(
+            'LOADDTD' => $reader->getParserProperty(\XmlReader::LOADDTD),
+            'DEFAULTATTRS' => $reader->getParserProperty(\XmlReader::DEFAULTATTRS),
+            'VALIDATE' => $reader->getParserProperty(\XmlReader::VALIDATE),
+            'SUBST_ENTITIES' => $reader->getParserProperty(\XmlReader::SUBST_ENTITIES),
+        ));
 
         $infos = array(
             'nodeType' => $nodeType,
-            Caster::PREFIX_VIRTUAL.'parserProperties' => array(
-                'LOADDTD' => $reader->getParserProperty(\XmlReader::LOADDTD),
-                'DEFAULTATTRS' => $reader->getParserProperty(\XmlReader::DEFAULTATTRS),
-                'VALIDATE' => $reader->getParserProperty(\XmlReader::VALIDATE),
-                'SUBST_ENTITIES' => $reader->getParserProperty(\XmlReader::SUBST_ENTITIES),
-            ),
+            Caster::PREFIX_VIRTUAL.'parserProperties' => $parserProperties,
         );
 
         if (\XmlReader::NONE === $reader->nodeType) {
@@ -111,7 +112,7 @@ class XmlReaderCaster
                 'nodeType' => $nodeType,
                 'depth' => $reader->depth,
 
-                Caster::PREFIX_VIRTUAL.'parserProperties' => $infos[Caster::PREFIX_VIRTUAL.'parserProperties'],
+                Caster::PREFIX_VIRTUAL.'parserProperties' => $parserProperties,
             );
 
             if ('#text' !== $reader->localName) {

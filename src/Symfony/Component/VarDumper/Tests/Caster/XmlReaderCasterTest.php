@@ -150,6 +150,7 @@ DUMP;
     {
         $dump = <<<'DUMP'
 XMLReader {
+  +localName: "#text"
   +nodeType: TEXT
   +depth: 2
   +attributeCount: 0
@@ -164,7 +165,6 @@ XMLReader {
     VALIDATE: false
     SUBST_ENTITIES: false
   }
-   …1
 }
 
 DUMP;
@@ -175,10 +175,11 @@ DUMP;
     }
 
     /** @dataProvider textFilteredProvider */
-    public function testFilteredTextElement($nodeType, $nodeTypeName, $depth)
+    public function testFilteredTextElement($nodeType, $nodeTypeName, $depth, $localName)
     {
         $dump = <<<DUMP
 XMLReader {
+  +localName: "$localName"
   +nodeType: $nodeTypeName
   +depth: $depth
   parserProperties: {
@@ -187,7 +188,7 @@ XMLReader {
     VALIDATE: false
     SUBST_ENTITIES: false
   }
-   …6
+   …5
 }
 
 DUMP;
@@ -200,7 +201,7 @@ DUMP;
     public function textFilteredProvider()
     {
         return array(
-            'Significant Whiltespace element' => array(\XmlReader::SIGNIFICANT_WHITESPACE, 'SIGNIFICANT_WHITESPACE', 1),
+            'Significant Whiltespace element' => array(\XmlReader::SIGNIFICANT_WHITESPACE, 'SIGNIFICANT_WHITESPACE', 1, '#text'),
         );
     }
 
@@ -209,9 +210,9 @@ DUMP;
     {
         $dump = <<<DUMP
 XMLReader {
+  +localName: "$localName"
   +nodeType: $nodeTypeName
   +depth: $depth
-  +localName: "$localName"
   parserProperties: {
     LOADDTD: false
     DEFAULTATTRS: false
@@ -239,9 +240,10 @@ DUMP;
     {
         $dump = <<<'DUMP'
 XMLReader {
+  +localName: "foo"
   +nodeType: ATTRIBUTE
   +depth: 2
-  +localName: "foo"
+  +isDefault: false
   +hasValue: true
   +value: "bar"
   parserProperties: {
@@ -250,7 +252,6 @@ XMLReader {
     VALIDATE: false
     SUBST_ENTITIES: false
   }
-   …4
 }
 
 DUMP;
@@ -314,4 +315,3 @@ DUMP;
         $this->reader->close();
     }
 }
-

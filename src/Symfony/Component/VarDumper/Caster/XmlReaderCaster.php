@@ -41,7 +41,6 @@ class XmlReaderCaster
     );
 
     private static $filteredTypes = array(
-        \XmlReader::ATTRIBUTE => true,
         \XmlReader::ENTITY_REF => true,
         \XmlReader::ENTITY => true,
         \XmlReader::PI => true,
@@ -66,21 +65,19 @@ class XmlReaderCaster
         ));
 
         if (\XmlReader::NONE === $reader->nodeType) {
-            return array(
-                'nodeType' => $nodeType,
-                Caster::PREFIX_VIRTUAL.'parserProperties' => $parserProperties,
-            );
+            return $a + self::castXmlNone($nodeType, $parserProperties);
+        }
+
+        if (\XmlReader::ATTRIBUTE === $reader->nodeType) {
+            return $a + self::castAttribute($reader, $nodeType, $parserProperties);
         }
 
         $infos = array(
             'localName' => $reader->localName,
             'nodeType' => $nodeType,
-
             'depth' => $reader->depth,
-
             'attributeCount' => $reader->attributeCount,
             'hasAttributes' => $reader->hasAttributes,
-
             'hasValue' => $reader->hasValue,
             'isDefault' => $reader->isDefault,
             'isEmptyElement' => $reader->isEmptyElement,
@@ -91,11 +88,8 @@ class XmlReaderCaster
             $infos['namespaceURI'] = $reader->namespaceURI;
         }
 
-        if ($reader->hasValue && (\XmlReader::TEXT === $reader->nodeType || \XmlReader::ATTRIBUTE === $reader->nodeType)) {
+        if ($reader->hasValue && \XmlReader::TEXT === $reader->nodeType) {
             $infos['value'] = $reader->value;
-
-            unset($infos['localName']);
-            $stub->cut += 1;
         }
 
         if ($reader->hasAttributes) {
@@ -106,38 +100,57 @@ class XmlReaderCaster
             }
         }
 
-        $infos[Caster::PREFIX_VIRTUAL.'parserProperties'] = $parserProperties;
-
-        if (isset(static::$filteredTypes[$reader->nodeType])) {
-            $cut = array(
-                'nodeType' => $nodeType,
-                'depth' => $reader->depth,
-            );
-
-            if ('#text' !== $reader->localName) {
-                $cut['localName'] = $reader->localName;
-            }
-
-            if (\XmlReader::ATTRIBUTE === $reader->nodeType) {
-                $cut['hasValue'] = $reader->hasValue;
-
-                if ($reader->hasValue) {
-                    $cut['value'] = $reader->value;
-                }
-            }
-
-            if ('' !== $reader->prefix) {
-                $cut['prefix'] = $reader->prefix;
-                $cut['namespaceURI'] = $reader->namespaceURI;
-            }
-
-            $cut[Caster::PREFIX_VIRTUAL.'parserProperties'] = $parserProperties;
-
-            $stub->cut += count($infos) - count($cut);
-
-            return $cut;
+        if (isset(self::$filteredTypes[$reader->nodeType])) {
+            $infos = self::castFilteredElement($reader, $infos, $stub, $nodeType);
         }
 
+        $infos[Caster::PREFIX_VIRTUAL.'parserProperties'] = $parserProperties;
+
         return $a + $infos;
+    }
+
+    private static function castXmlNone(ConstStub $type, EnumStub $properties)
+    {
+        return array(
+            'nodeType' => $type,
+            Caster::PREFIX_VIRTUAL.'parserProperties' => $properties,
+        );
+    }
+
+    private static function castFilteredElement(\XmlReader $reader, array $infos, Stub $stub, ConstStub $type)
+    {
+        $cut = array(
+            'localName' => $reader->localName,
+            'nodeType' => $type,
+            'depth' => $reader->depth,
+        );
+
+        $stub->cut += count($infos) - count($cut);
+
+        return $cut;
+    }
+
+    private static function castAttribute(\XmlReader $reader, ConstStub $type, EnumStub $properties)
+    {
+        $infos = array(
+            'localName' => $reader->localName,
+            'nodeType' => $type,
+            'depth' => $reader->depth,
+            'isDefault' => $reader->isDefault,
+            'hasValue' => $reader->hasValue,
+        );
+
+        if ($reader->hasValue) {
+            $infos['value'] = $reader->value;
+        }
+
+        if ('' !== $reader->prefix) {
+            $infos['prefix'] = $reader->prefix;
+            $infos['namespaceURI'] = $reader->namespaceURI;
+        }
+
+        $infos[Caster::PREFIX_VIRTUAL.'parserProperties'] = $properties;
+
+        return $infos;
     }
 }

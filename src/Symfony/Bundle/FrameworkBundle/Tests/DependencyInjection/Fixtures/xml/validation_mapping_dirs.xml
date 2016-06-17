@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony">
+
+    <framework:config>
+        <framework:validation>
+            <framework:mapping>
+                <framework:dir>%kernel.root_dir%/Fixtures/TestBundle/Resources/config</framework:dir>
+            </framework:mapping>
+        </framework:validation>
+    </framework:config>
+</container>

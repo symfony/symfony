@@ -1,0 +1,5 @@
+framework:
+  validation:
+    mapping:
+      dirs:
+        - "%kernel.root_dir%/Fixtures/TestBundle/Resources/config"

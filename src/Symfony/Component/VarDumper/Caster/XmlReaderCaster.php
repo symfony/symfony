@@ -65,17 +65,16 @@ class XmlReaderCaster
             'SUBST_ENTITIES' => $reader->getParserProperty(\XmlReader::SUBST_ENTITIES),
         ));
 
-        $infos = array(
-            'nodeType' => $nodeType,
-            Caster::PREFIX_VIRTUAL.'parserProperties' => $parserProperties,
-        );
-
         if (\XmlReader::NONE === $reader->nodeType) {
-            return $infos;
+            return array(
+                'nodeType' => $nodeType,
+                Caster::PREFIX_VIRTUAL.'parserProperties' => $parserProperties,
+            );
         }
 
-        $infos = $infos + array(
+        $infos = array(
             'localName' => $reader->localName,
+            'nodeType' => $nodeType,
 
             'depth' => $reader->depth,
 
@@ -107,12 +106,12 @@ class XmlReaderCaster
             }
         }
 
+        $infos[Caster::PREFIX_VIRTUAL.'parserProperties'] = $parserProperties;
+
         if (isset(static::$filteredTypes[$reader->nodeType])) {
             $cut = array(
                 'nodeType' => $nodeType,
                 'depth' => $reader->depth,
-
-                Caster::PREFIX_VIRTUAL.'parserProperties' => $parserProperties,
             );
 
             if ('#text' !== $reader->localName) {
@@ -131,6 +130,8 @@ class XmlReaderCaster
                 $cut['prefix'] = $reader->prefix;
                 $cut['namespaceURI'] = $reader->namespaceURI;
             }
+
+            $cut[Caster::PREFIX_VIRTUAL.'parserProperties'] = $parserProperties;
 
             $stub->cut += count($infos) - count($cut);
 

@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-06-09T15:19:05Z
+
+There is still 1 drawback here: as the ProgressBar uses its own Terminal instance, it will ignore any explicit overwrite done in the Application.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-09T15:20:46Z
+
+do you want to merge this in 3.2 only or in older branches as a bugfix ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-09T15:23:57Z
+
+I'm aware of the drawback. I don't see how to fix this and TBH, I don't think it matters too much as playing with the dimensions should only be done when testing an app.
+
+Only for 3.2.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-09T15:24:15Z
+
+Added some deprecations now.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-09T15:28:45Z
+
+The new `Symfony\Component\Console\Terminal` class is missing in the PR.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-09T15:41:56Z
+
+added the deprecations and simplified the code again by removing `getDimensions()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-09T17:25:21Z
+
+It could be useful to configure width+height with an env var, especially in tests.
+This would allow testing commands that hardcode `new SymfonyStyle` and would replace the `stty cols 120` in the .travis.yml file (and could replace the `getTerminal` extension points and replace related mocks).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-10T06:27:49Z
+
+@nicolas-grekas Done. I've kept the config in .travis.yml
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-10T08:21:01Z
+
+LGTM, except a test failure
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-13T19:55:07Z
+
+I've changed the implementation to use COLUMNS and LINES env vars instead of ANSICON.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T13:22:06Z
+
+Broken test on HHVM not related.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-16T13:54:53Z
+
+:+1: with this patch:
+```patch
+--- a/src/Symfony/Bundle/SecurityBundle/Tests/Functional/UserPasswordEncoderCommandTest.php
++++ b/src/Symfony/Bundle/SecurityBundle/Tests/Functional/UserPasswordEncoderCommandTest.php
+@@ -28,6 +28,8 @@ class UserPasswordEncoderCommandTest extends WebTestCase
+
+    public function testEncodePasswordEmptySalt()
+    {
++        putenv('COLUMNS=120');
++
+        $this->passwordEncoderCommandTester->execute(array(
+            'command' => 'security:encode-password',
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-16T13:54:57Z
+
+@fabpot are you sure ? the failing test is related to line wrapping in commands.
+
+I think one of your Console test does not properly reset the env variables on teardown, and so it impacts subsequent tests. Non-hhvm builds are unaffected because they use a separate PHP process per component to run things in parallel
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T16:07:03Z
+
+should be good now :)

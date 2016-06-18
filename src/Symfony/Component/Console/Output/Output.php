@@ -94,21 +94,33 @@ abstract class Output implements OutputInterface
         return $this->verbosity;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isQuiet()
     {
         return self::VERBOSITY_QUIET === $this->verbosity;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isVerbose()
     {
         return self::VERBOSITY_VERBOSE <= $this->verbosity;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isVeryVerbose()
     {
         return self::VERBOSITY_VERY_VERBOSE <= $this->verbosity;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isDebug()
     {
         return self::VERBOSITY_DEBUG <= $this->verbosity;

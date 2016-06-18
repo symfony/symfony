@@ -257,7 +257,7 @@ class Table
      */
     private function renderColumnSeparator()
     {
-        $this->output->write(sprintf($this->style->getBorderFormat(), $this->style->getVerticalBorderChar()));
+        return sprintf($this->style->getBorderFormat(), $this->style->getVerticalBorderChar());
     }
 
     /**
@@ -274,12 +274,12 @@ class Table
             return;
         }
 
-        $this->renderColumnSeparator();
+        $rowContent = $this->renderColumnSeparator();
         foreach ($this->getRowColumns($row) as $column) {
-            $this->renderCell($row, $column, $cellFormat);
-            $this->renderColumnSeparator();
+            $rowContent .= $this->renderCell($row, $column, $cellFormat);
+            $rowContent .= $this->renderColumnSeparator();
         }
-        $this->output->writeln('');
+        $this->output->writeln($rowContent);
     }
 
     /**
@@ -306,12 +306,13 @@ class Table
         }
 
         if ($cell instanceof TableSeparator) {
-            $this->output->write(sprintf($this->style->getBorderFormat(), str_repeat($this->style->getHorizontalBorderChar(), $width)));
-        } else {
-            $width += Helper::strlen($cell) - Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
-            $content = sprintf($this->style->getCellRowContentFormat(), $cell);
-            $this->output->write(sprintf($cellFormat, str_pad($content, $width, $this->style->getPaddingChar(), $this->style->getPadType())));
+            return sprintf($this->style->getBorderFormat(), str_repeat($this->style->getHorizontalBorderChar(), $width));
         }
+
+        $width += Helper::strlen($cell) - Helper::strlenWithoutDecoration($this->output->getFormatter(), $cell);
+        $content = sprintf($this->style->getCellRowContentFormat(), $cell);
+
+        return sprintf($cellFormat, str_pad($content, $width, $this->style->getPaddingChar(), $this->style->getPadType()));
     }
 
     /**

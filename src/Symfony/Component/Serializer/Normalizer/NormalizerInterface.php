@@ -25,7 +25,7 @@ interface NormalizerInterface
      * @param string $format  format the normalization result will be encoded as
      * @param array  $context Context options for the normalizer
      *
-     * @return array|string|bool|int|float|null
+     * @return array|scalar
      */
     public function normalize($object, $format = null, array $context = array());
 

@@ -266,9 +266,9 @@ class Translator implements TranslatorInterface
      * @param string    $attribute
      * @param string    $value
      *
-     * @throws ExpressionErrorException
-     *
      * @return XPathExpr
+     *
+     * @throws ExpressionErrorException
      */
     public function addAttributeMatching(XPathExpr $xpath, $operator, $attribute, $value)
     {

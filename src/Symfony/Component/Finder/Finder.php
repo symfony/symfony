@@ -128,9 +128,9 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * @param string $name
      *
-     * @throws \InvalidArgumentException
-     *
      * @return Finder The current Finder instance
+     *
+     * @throws \InvalidArgumentException
      */
     public function setAdapter($name)
     {
@@ -646,7 +646,7 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * This method implements the IteratorAggregate interface.
      *
-     * @return \Iterator An iterator
+     * @return \Iterator|SplFileInfo[] An iterator
      *
      * @throws \LogicException if the in() method has not been called
      */

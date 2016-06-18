@@ -107,6 +107,8 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
 
     /**
      * {@inheritdoc}
+     *
+     * @return \ArrayIterator|ConstraintViolationInterface[]
      */
     public function getIterator()
     {

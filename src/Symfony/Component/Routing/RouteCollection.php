@@ -49,7 +49,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @see all()
      *
-     * @return \ArrayIterator An \ArrayIterator object for iterating over routes
+     * @return \ArrayIterator|Route[] An \ArrayIterator object for iterating over routes
      */
     public function getIterator()
     {

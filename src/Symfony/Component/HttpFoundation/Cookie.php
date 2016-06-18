@@ -110,7 +110,7 @@ class Cookie
         if (true === $this->isHttpOnly()) {
             $str .= '; httponly';
         }
-        
+
         if (false !== $this->hasSameSite()) {
             $str .= '; samesite='.$this->getSameSite();
         }
@@ -207,7 +207,7 @@ class Cookie
     {
         return $this->raw;
     }
-    
+
     /**
      * Gets the SameSite attribute.
      *
@@ -217,7 +217,7 @@ class Cookie
     {
         return $this->sameSite;
     }
-    
+
     /**
      * Checks if the cookie value should be sent with a SameSite attribute.
      *

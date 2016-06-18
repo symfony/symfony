@@ -48,16 +48,25 @@ class ExpressionFunction
         $this->evaluator = $evaluator;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @return callable
+     */
     public function getCompiler()
     {
         return $this->compiler;
     }
 
+    /**
+     * @return callable
+     */
     public function getEvaluator()
     {
         return $this->evaluator;

@@ -41,6 +41,9 @@ class Compiler
         return $this->source;
     }
 
+    /**
+     * @return Compiler
+     */
     public function reset()
     {
         $this->source = '';

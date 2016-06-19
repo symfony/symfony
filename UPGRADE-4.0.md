@@ -1,6 +1,12 @@
 UPGRADE FROM 3.x to 4.0
 =======================
 
+Debug
+-----
+
+ * `FlattenException::getTrace()` now returns additional type descriptions
+   `integer` and `float`.
+
 DependencyInjection
 -------------------
 

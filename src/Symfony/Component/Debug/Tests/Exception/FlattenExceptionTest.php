@@ -190,6 +190,60 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testArguments()
+    {
+        $dh = opendir(__DIR__);
+
+        $incomplete = unserialize('O:14:"BogusTestClass":0:{}');
+
+        $exception = $this->createException(array(
+            (object) array('foo' => 1),
+            new NotFoundHttpException(),
+            $incomplete,
+            $dh,
+            function() {},
+            array(1, 2),
+            array('foo' => 123),
+            null,
+            true,
+            false,
+            0,
+            0.0,
+            '0',
+            '',
+            INF,
+            NAN,
+        ));
+
+        $flattened = FlattenException::create($exception);
+        $trace = $flattened->getTrace();
+        $args = $trace[1]['args'];
+        $array = $args[0][1];
+
+        closedir($dh);
+
+        $i = 0;
+        $this->assertSame($array[$i++], array('object', 'stdClass'));
+        $this->assertSame($array[$i++], array('object', 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'));
+        $this->assertSame($array[$i++], array('incomplete-object', 'BogusTestClass'));
+        $this->assertSame($array[$i++], array('resource', 'stream'));
+        $this->assertSame($array[$i++], array('object', 'Closure'));
+        $this->assertSame($array[$i++], array('array', array(array('integer', 1), array('integer', 2))));
+        $this->assertSame($array[$i++], array('array', array('foo' => array('integer', 123))));
+        $this->assertSame($array[$i++], array('null', null));
+        $this->assertSame($array[$i++], array('boolean', true));
+        $this->assertSame($array[$i++], array('boolean', false));
+        $this->assertSame($array[$i++], array('integer', 0));
+        $this->assertSame($array[$i++], array('float', 0.0));
+        $this->assertSame($array[$i++], array('string', '0'));
+        $this->assertSame($array[$i++], array('string', ''));
+        $this->assertSame($array[$i++], array('float', INF));
+
+        // assertEquals() does not like NAN values.
+        $this->assertEquals($array[$i][0], 'float');
+        $this->assertTrue(is_nan($array[$i++][1]));
+    }
+
     public function testRecursionInArguments()
     {
         $a = array('foo', array(2, &$a));
@@ -216,6 +270,9 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
 
         $flattened = FlattenException::create($exception);
         $trace = $flattened->getTrace();
+
+        $this->assertSame($trace[1]['args'][0], array('array', array('array', '*SKIPPED over 10000 entries*')));
+
         $serializeTrace = serialize($trace);
 
         $this->assertContains('*SKIPPED over 10000 entries*', $serializeTrace);
@@ -225,46 +282,5 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     private function createException($foo)
     {
         return new \Exception();
-    }
-
-    public function testSetTraceIncompleteClass()
-    {
-        $flattened = FlattenException::create(new \Exception('test', 123));
-        $flattened->setTrace(
-            array(
-                array(
-                    'file' => __FILE__,
-                    'line' => 123,
-                    'function' => 'test',
-                    'args' => array(
-                        unserialize('O:14:"BogusTestClass":0:{}'),
-                    ),
-                ),
-            ),
-            'foo.php', 123
-        );
-
-        $this->assertEquals(array(
-            array(
-                'message' => 'test',
-                'class' => 'Exception',
-                'trace' => array(
-                    array(
-                        'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => '',
-                        'file' => 'foo.php', 'line' => 123,
-                        'args' => array(),
-                    ),
-                    array(
-                        'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '', 'function' => 'test',
-                        'file' => __FILE__, 'line' => 123,
-                        'args' => array(
-                            array(
-                                'incomplete-object', 'BogusTestClass',
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ), $flattened->toArray());
     }
 }

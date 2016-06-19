@@ -21,6 +21,7 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 trait OptionsAwareTrait
 {
     private $strictOptions = true;
+    private $defaultOptionValue = null;
     private $options = array();
     private $optionsResolver;
 
@@ -60,7 +61,7 @@ trait OptionsAwareTrait
             ));
         }
 
-        return $default;
+        return (func_num_args() > 1 ? $default : $this->defaultOptionValue);
     }
 
     private function getOptionsResolver()

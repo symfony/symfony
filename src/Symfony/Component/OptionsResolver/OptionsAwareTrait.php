@@ -32,6 +32,7 @@ trait OptionsAwareTrait
 
     private function setOptions(array $options)
     {
+        // @TODO allow for arbitrary options if $strictOptions is disabled?
         $this->options = $this->getOptionsResolver()->resolve($options);
     }
 
@@ -61,7 +62,7 @@ trait OptionsAwareTrait
             ));
         }
 
-        return (func_num_args() > 1 ? $default : $this->defaultOptionValue);
+        return func_num_args() > 1 ? $default : $this->defaultOptionValue;
     }
 
     private function getOptionsResolver()

@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-11T08:37:49Z
+
+Imo a proper fix would rather change the queries to not use a named parameter more than once.
+
+---------------------------------------------------------------------------
+
+by slootjes at 2016-04-18T08:13:02Z
+
+I can confirm this fix is working for me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-28T10:56:53Z
+
+@Tobion Can you have a look at this one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T06:35:01Z
+
+@hjkl Have you tested @xabbuh's suggestion instead?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-16T09:50:12Z
+
+@hjkl please change `getMergeSql` (probably rename it as well to `getMergeStatement`) to return the PDO statement directly with the params already bound. Since the params and the sql are now dependent on each other, it should be done in one place.
+Apart from that it looks correct to me.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-16T12:08:38Z
+
+This PR needs a rebase.
+
+---------------------------------------------------------------------------
+
+by hjkl at 2016-06-18T19:20:10Z
+
+@fabpot I haven't attempted @xabbuh's suggestion - I don't have the TSQL expertise to refactor the merge query to only use each parameter once.
+
+@Tobion Done, thanks for the advice.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-18T22:47:02Z
+
+> Imo a proper fix would rather change the queries to not use a named parameter more than once.
+
+This is exactly what this PR does. NAMED params cannot be used more than once but it's not possible to change the MERGE queries to only use each param once as they need to be repeated. It only works for the MySQL for example because mysql supports the ` VALUES($this->dataCol)` syntax to reuse values. Otherwise we would also be forced into using numeric values several times for mysql. For reference, if you disable emulated prepares in MySQL and use the same named param more than once you get a `SQLSTATE[HY093]: Invalid parameter number` error as I just tried.
+
+:+1: good to merge
+Status: Reviewed

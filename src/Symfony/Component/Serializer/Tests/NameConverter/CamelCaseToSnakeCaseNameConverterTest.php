@@ -48,6 +48,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends \PHPUnit_Framework_TestCase
             array('coop_tilleuls', 'coopTilleuls'),
             array('_kevin_dunglas', '_kevinDunglas'),
             array('this_is_a_test', 'thisIsATest'),
+            array('first_character_no_underscore', 'FirstCharacterNoUnderscore'),
         );
     }
 }

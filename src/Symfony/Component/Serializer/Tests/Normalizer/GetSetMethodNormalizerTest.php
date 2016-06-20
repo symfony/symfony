@@ -654,7 +654,7 @@ class GetSetDummy
 
     protected function getPrivate()
     {
-        throw new \RuntimeException('Dummy::getPrivate() should not be called');        
+        throw new \RuntimeException('Dummy::getPrivate() should not be called');
     }
 }
 

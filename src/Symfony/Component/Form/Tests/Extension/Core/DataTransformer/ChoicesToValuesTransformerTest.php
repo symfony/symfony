@@ -68,7 +68,7 @@ class ChoicesToValuesTransformerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($out, $this->transformer->reverseTransform($in));
         // values are expected to be valid choices and stay the same
-        $inWithNull = array('0','1','2','3');
+        $inWithNull = array('0', '1', '2', '3');
         $out[] = null;
 
         $this->assertSame($out, $this->transformerWithNull->reverseTransform($inWithNull));

@@ -249,7 +249,8 @@ XML;
         $this->assertEquals($expected, $serializer->serialize($array, 'xml', $options));
     }
 
-    public function testEncodeTraversableWhenNormalizable() {
+    public function testEncodeTraversableWhenNormalizable()
+    {
         $this->encoder = new XmlEncoder();
         $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
@@ -261,7 +262,6 @@ XML;
 XML;
 
         $this->assertEquals($expected, $serializer->serialize(new NormalizableTraversableDummy(), 'xml'));
-
     }
 
     public function testDecode()

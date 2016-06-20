@@ -193,6 +193,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     public function testArguments()
     {
         $dh = opendir(__DIR__);
+        $fh = tmpfile();
 
         $incomplete = unserialize('O:14:"BogusTestClass":0:{}');
 
@@ -201,6 +202,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
             new NotFoundHttpException(),
             $incomplete,
             $dh,
+            $fh,
             function() {},
             array(1, 2),
             array('foo' => 123),
@@ -221,23 +223,29 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
         $array = $args[0][1];
 
         closedir($dh);
+        fclose($fh);
 
         $i = 0;
-        $this->assertSame($array[$i++], array('object', 'stdClass'));
-        $this->assertSame($array[$i++], array('object', 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'));
-        $this->assertSame($array[$i++], array('incomplete-object', 'BogusTestClass'));
-        $this->assertSame($array[$i++], array('resource', 'stream'));
-        $this->assertSame($array[$i++], array('object', 'Closure'));
-        $this->assertSame($array[$i++], array('array', array(array('integer', 1), array('integer', 2))));
-        $this->assertSame($array[$i++], array('array', array('foo' => array('integer', 123))));
-        $this->assertSame($array[$i++], array('null', null));
-        $this->assertSame($array[$i++], array('boolean', true));
-        $this->assertSame($array[$i++], array('boolean', false));
-        $this->assertSame($array[$i++], array('integer', 0));
-        $this->assertSame($array[$i++], array('float', 0.0));
-        $this->assertSame($array[$i++], array('string', '0'));
-        $this->assertSame($array[$i++], array('string', ''));
-        $this->assertSame($array[$i++], array('float', INF));
+        $this->assertSame(array('object', 'stdClass'), $array[$i++]);
+        $this->assertSame(array('object', 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'), $array[$i++]);
+        $this->assertSame(array('incomplete-object', 'BogusTestClass'), $array[$i++]);
+        $this->assertSame(array('resource', defined('HHVM_VERSION') ? 'Directory' : 'stream'), $array[$i++]);
+        $this->assertSame(array('resource', 'stream'), $array[$i++]);
+
+        $args = $array[$i++];
+        $this->assertSame($args[0], 'object');
+        $this->assertTrue('Closure' === $args[1] || is_subclass_of($args[1], '\Closure'), 'Expect object class name to be Closure or a subclass of Closure.');
+
+        $this->assertSame(array('array', array(array('integer', 1), array('integer', 2))), $array[$i++]);
+        $this->assertSame(array('array', array('foo' => array('integer', 123))), $array[$i++]);
+        $this->assertSame(array('null', null), $array[$i++]);
+        $this->assertSame(array('boolean', true), $array[$i++]);
+        $this->assertSame(array('boolean', false), $array[$i++]);
+        $this->assertSame(array('integer', 0), $array[$i++]);
+        $this->assertSame(array('float', 0.0), $array[$i++]);
+        $this->assertSame(array('string', '0'), $array[$i++]);
+        $this->assertSame(array('string', ''), $array[$i++]);
+        $this->assertSame(array('float', INF), $array[$i++]);
 
         // assertEquals() does not like NAN values.
         $this->assertEquals($array[$i][0], 'float');

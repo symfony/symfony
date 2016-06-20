@@ -147,10 +147,11 @@
     <xsd:complexType name="templating">
         <xsd:sequence>
             <xsd:element name="loader" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="engine" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="engine" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="form" type="form-resources" minOccurs="0" maxOccurs="1" />
         </xsd:sequence>
 
+        <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="hinclude-default-template" type="xsd:string" />
     </xsd:complexType>

@@ -23,6 +23,8 @@ trait OptionsAwareTrait
     private $options = array();
     private $optionsResolver;
 
+    abstract protected function configureOptions(OptionsResolver $resolver);
+
     private function initOptions(array $options = array())
     {
         $this->setOptions($options);
@@ -68,6 +70,4 @@ trait OptionsAwareTrait
 
         return $this->optionsResolver;
     }
-
-    abstract protected function configureOptions(OptionsResolver $resolver);
 }

@@ -20,8 +20,6 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
  */
 trait OptionsAwareTrait
 {
-    private $strictOptions = true;
-    private $defaultOptionValue = null;
     private $options = array();
     private $optionsResolver;
 
@@ -32,7 +30,6 @@ trait OptionsAwareTrait
 
     private function setOptions(array $options)
     {
-        // @TODO allow for arbitrary options if $strictOptions is disabled?
         $this->options = $this->getOptionsResolver()->resolve($options);
     }
 
@@ -49,12 +46,9 @@ trait OptionsAwareTrait
     /**
      * @throws UndefinedOptionsException If the option name is undefined and strict options are enabled
      */
-    private function getOption($name, $default = null)
+    private function getOption($name)
     {
-        if ($this->getOptionsResolver()->isDefined($name)) {
-            return $this->options[$name];
-        }
-        if ($this->strictOptions) {
+        if (!$this->getOptionsResolver()->isDefined($name)) {
             throw new UndefinedOptionsException(sprintf(
                'The option "%s" does not exist. Defined options are: "%s".',
                 $name,
@@ -62,7 +56,7 @@ trait OptionsAwareTrait
             ));
         }
 
-        return func_num_args() > 1 ? $default : $this->defaultOptionValue;
+        return $this->options[$name];
     }
 
     private function getOptionsResolver()

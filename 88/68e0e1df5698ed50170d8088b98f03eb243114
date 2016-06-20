@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-20T11:25:25Z
+
+Do we know why it broke without any change on our side?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-20T11:26:16Z
+
+@fabpot The failing test was added in #19079.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-20T11:26:41Z
+
+see https://github.com/symfony/symfony/pull/19079/files#diff-012ea9fdf4f90d7e4582c87039a4fed4R193
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-20T11:27:56Z
+
+and this simply seems to be the returned value in all HVM versions: https://3v4l.org/D8sLi
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-20T11:45:36Z
+
+Looks like the tests still do not pass on HHVM.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-20T13:33:42Z
+
+Tests finally pass (we had to swap the expected and actual arguments for the assertions too).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-20T16:02:42Z
+
+Tests do now pass again on HHVM.

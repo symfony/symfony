@@ -149,6 +149,14 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         }
 
         if ($this->getHttpKernel() instanceof TerminableInterface) {
+            if (!$this->debug) {
+                if (function_exists('fastcgi_finish_request')) {
+                    fastcgi_finish_request();
+                } elseif ('cli' !== PHP_SAPI) {
+                    Response::closeOutputBuffers(0, true);
+                }
+            }
+
             $this->getHttpKernel()->terminate($request, $response);
         }
     }

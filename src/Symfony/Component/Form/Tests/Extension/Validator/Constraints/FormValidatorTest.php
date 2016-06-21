@@ -21,7 +21,6 @@ use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\ExecutionContextInterface;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
 
 /**

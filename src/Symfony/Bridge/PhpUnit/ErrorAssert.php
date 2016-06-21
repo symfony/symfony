@@ -53,7 +53,7 @@ final class ErrorAssert
                 $triggeredMessages[] = $message;
             });
 
-            $testCode();
+            call_user_func($testCode);
         } catch (\Exception $e) {
         } catch (\Throwable $e) {
         }

@@ -180,7 +180,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
             ->with($list, 'end')
             ->willReturn('RESULT');
 
-        $this->assertSame('RESULT',$this->factory->createView(
+        $this->assertSame('RESULT', $this->factory->createView(
             $list,
             'end'
         ));

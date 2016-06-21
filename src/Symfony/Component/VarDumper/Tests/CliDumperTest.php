@@ -163,7 +163,7 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=1');
 
         $var = array(
-            range(1,3),
+            range(1, 3),
             array('foo', 2 => 'bar'),
         );
 

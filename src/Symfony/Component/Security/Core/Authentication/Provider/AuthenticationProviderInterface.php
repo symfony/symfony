@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterfac
 interface AuthenticationProviderInterface extends AuthenticationManagerInterface
 {
     /**
-     * Use this constant for not provided username
+     * Use this constant for not provided username.
      *
      * @var string
      */

@@ -324,7 +324,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             ->method('setNormalizer')
             ->with($this->isInstanceOf(NormalizerInterface::class));
 
-        new Serializer([$normalizerAware]);
+        new Serializer(array($normalizerAware));
     }
 
     public function testDenormalizerAware()
@@ -334,7 +334,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
             ->method('setDenormalizer')
             ->with($this->isInstanceOf(DenormalizerInterface::class));
 
-        new Serializer([$denormalizerAware]);
+        new Serializer(array($denormalizerAware));
     }
 }
 

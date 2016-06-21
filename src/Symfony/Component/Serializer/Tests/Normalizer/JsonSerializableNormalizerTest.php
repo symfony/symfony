@@ -49,7 +49,7 @@ class JsonSerializableNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->serializer
             ->expects($this->once())
             ->method('normalize')
-            ->will($this->returnCallback(function($data) {
+            ->will($this->returnCallback(function ($data) {
                 $this->assertArraySubset(array('foo' => 'a', 'bar' => 'b', 'baz' => 'c'), $data);
 
                 return 'string_object';
@@ -69,7 +69,7 @@ class JsonSerializableNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->serializer
             ->expects($this->once())
             ->method('normalize')
-            ->will($this->returnCallback(function($data, $format, $context) {
+            ->will($this->returnCallback(function ($data, $format, $context) {
                 $this->normalizer->normalize($data['qux'], $format, $context);
 
                 return 'string_object';

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-21T06:06:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-21T06:21:07Z
+
+Does this mean that we explicitly do not allow the short array syntax even for new code introduced in 3.0 or higher?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T06:23:32Z
+
+@xabbuh Yes, that's what I propose. There is no consequence is using only the long syntax and it makes code more consistent.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-21T06:35:06Z
+
+👍 Fine for me. But we should clarify that in the contribution docs then imo.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T06:39:00Z
+
+Not sure if there is something to change in the documentation as http://symfony.com/doc/current/contributing/code/standards.html already uses `array()` everywhere

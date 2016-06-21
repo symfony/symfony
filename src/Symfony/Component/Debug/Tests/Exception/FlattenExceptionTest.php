@@ -203,7 +203,7 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
             $incomplete,
             $dh,
             $fh,
-            function() {},
+            function () {},
             array(1, 2),
             array('foo' => 123),
             null,

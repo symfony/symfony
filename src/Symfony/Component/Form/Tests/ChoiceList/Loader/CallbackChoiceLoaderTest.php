@@ -22,31 +22,31 @@ class CallbackChoiceLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader
      */
-    static private $loader;
+    private static $loader;
 
     /**
      * @var callable
      */
-    static private $value;
+    private static $value;
 
     /**
      * @var array
      */
-    static private $choices;
+    private static $choices;
 
     /**
      * @var string[]
      */
-    static private $choiceValues;
+    private static $choiceValues;
 
     /**
      * @var \Symfony\Component\Form\ChoiceList\LazyChoiceList
      */
-    static private $lazyChoiceList;
+    private static $lazyChoiceList;
 
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
-        self::$loader = new CallbackChoiceLoader(function() {
+        self::$loader = new CallbackChoiceLoader(function () {
             return self::$choices;
         });
         self::$value = function ($choice) {
@@ -90,7 +90,7 @@ class CallbackChoiceLoaderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    static public function tearDownAfterClass()
+    public static function tearDownAfterClass()
     {
         self::$loader = null;
         self::$value = null;

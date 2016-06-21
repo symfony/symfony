@@ -49,7 +49,7 @@ class ParsedExpression extends Expression
     {
         $dump = '';
 
-        foreach($node->toArray() as $v) {
+        foreach ($node->toArray() as $v) {
             $dump .= is_scalar($v) ? $v : $this->dumpNode($v);
         }
 

@@ -921,7 +921,6 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertTrue(is_file($link));
         $this->assertEquals(fileinode($file), fileinode($link));
-
     }
 
     public function testLinkWithSeveralTargets()
@@ -934,7 +933,7 @@ class FilesystemTest extends FilesystemTestCase
 
         touch($file);
 
-        $this->filesystem->hardlink($file, array($link1,$link2));
+        $this->filesystem->hardlink($file, array($link1, $link2));
 
         $this->assertTrue(is_file($link1));
         $this->assertEquals(fileinode($file), fileinode($link1));
@@ -952,7 +951,7 @@ class FilesystemTest extends FilesystemTestCase
         touch($file);
 
         // practically same as testLinkIsNotOverwrittenIfAlreadyCreated
-        $this->filesystem->hardlink($file, array($link,$link));
+        $this->filesystem->hardlink($file, array($link, $link));
 
         $this->assertTrue(is_file($link));
         $this->assertEquals(fileinode($file), fileinode($link));

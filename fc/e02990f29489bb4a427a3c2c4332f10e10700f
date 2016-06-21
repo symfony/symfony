@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-21T08:17:26Z
+
+👍 LGTM
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-21T11:22:39Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by rybakit at 2016-06-21T11:34:19Z
+
+What about replacing `getMock()` with `createMock()` and adding compatibility trait for phpunit < 5.4:
+
+```php
+trait PhpUnitCompat
+{
+    /**
+     * @param string $originalClassName
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function createMock($originalClassName)
+    {
+        if (is_callable('parent::createMock')) {
+            return parent::createMock($originalClassName);
+        }
+
+        return $this->getMockBuilder($originalClassName)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->getMock();
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-21T11:37:28Z
+
+We would have to include the trait everywhere in our testsuite, because we cannot require PHPUnit 5 in our testsuite (as we support PHP 5.5). So it is not worth it IMO.

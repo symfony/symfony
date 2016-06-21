@@ -30,6 +30,11 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
     protected $workspace = null;
 
     /**
+     * @var array
+     */
+    protected $workspacesToRemove = array();
+
+    /**
      * @var null|bool Flag for hard links on Windows
      */
     private static $linkOnWindows = null;
@@ -84,7 +89,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
             $this->longPathNamesWindows = array();
         }
 
-        $this->filesystem->remove($this->workspace);
+        $this->filesystem->remove($this->workspacesToRemove);
         umask($this->umask);
     }
 
@@ -95,6 +100,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
     {
         $workspace = sys_get_temp_dir().'/'.microtime(true).'.'.mt_rand();
         mkdir($workspace, 0777, true);
+        $this->workspacesToRemove[] = $workspace;
 
         return realpath($workspace);
     }

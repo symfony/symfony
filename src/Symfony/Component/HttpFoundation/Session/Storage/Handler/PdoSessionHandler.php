@@ -694,8 +694,7 @@ class PdoSessionHandler implements \SessionHandlerInterface
                 $mergeStmt->bindParam(6, $data, \PDO::PARAM_LOB);
                 $mergeStmt->bindParam(7, $maxlifetime, \PDO::PARAM_INT);
                 $mergeStmt->bindValue(8, time(), \PDO::PARAM_INT);
-            }
-            else {
+            } else {
                 $mergeStmt->bindParam(':id', $sessionId, \PDO::PARAM_STR);
                 $mergeStmt->bindParam(':data', $data, \PDO::PARAM_LOB);
                 $mergeStmt->bindParam(':lifetime', $maxlifetime, \PDO::PARAM_INT);

@@ -298,14 +298,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds a compiler pass.
      *
-     * @param CompilerPassInterface $pass A compiler pass
-     * @param string                $type The type of compiler pass
+     * @param CompilerPassInterface $pass     A compiler pass
+     * @param string                $type     The type of compiler pass
+     * @param int                   $priority Used to sort the passes
      *
      * @return ContainerBuilder The current instance
      */
-    public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
+    public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION/**, $priority = 0*/)
     {
-        $this->getCompiler()->addPass($pass, $type);
+        // For BC
+        if (func_num_args() >= 3) {
+            $priority = func_get_arg(2);
+        } else {
+            $priority = 0;
+        }
+
+        $this->getCompiler()->addPass($pass, $type, $priority);
 
         $this->addObjectResource($pass);
 

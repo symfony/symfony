@@ -69,7 +69,7 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
         if (!is_string($resource)) {
             return false;
         }
-        
+
         try {
             $path = $this->locator->locate($resource);
         } catch (\Exception $e) {

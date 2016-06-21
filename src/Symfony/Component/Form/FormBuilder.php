@@ -231,6 +231,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
+     *
+     * @return FormBuilderInterface[]
      */
     public function getIterator()
     {

@@ -22,6 +22,9 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class PassConfig
 {
+    const TYPE_BEFORE_CUSTOMIZATION = 'beforeCustomization';
+    const TYPE_CUSTOMIZE = 'customization';
+    const TYPE_AFTER_CUSTOMIZATION = 'afterCustomization';
     const TYPE_AFTER_REMOVING = 'afterRemoving';
     const TYPE_BEFORE_OPTIMIZATION = 'beforeOptimization';
     const TYPE_BEFORE_REMOVING = 'beforeRemoving';
@@ -29,6 +32,9 @@ class PassConfig
     const TYPE_REMOVE = 'removing';
 
     private $mergePass;
+    private $beforeCustomizationPasses = array();
+    private $customizationPasses = array();
+    private $afterCustomizationPasses = array();
     private $afterRemovingPasses = array();
     private $beforeOptimizationPasses = array();
     private $beforeRemovingPasses = array();
@@ -76,6 +82,9 @@ class PassConfig
     {
         return array_merge(
             array($this->mergePass),
+            $this->beforeCustomizationPasses,
+            $this->customizationPasses,
+            $this->afterCustomizationPasses,
             $this->beforeOptimizationPasses,
             $this->optimizationPasses,
             $this->beforeRemovingPasses,
@@ -100,6 +109,42 @@ class PassConfig
         }
 
         $this->{$property}[] = $pass;
+    }
+
+    /**
+     * Gets all passes for the BeforeCustomization pass.
+     *
+     * @return array An array of passes
+     *
+     * @api
+     */
+    public function getBeforeCustomizationPasses()
+    {
+        return $this->beforeCustomizationPasses;
+    }
+
+    /**
+     * Gets all passes for the Customization pass.
+     *
+     * @return array An array of passes
+     *
+     * @api
+     */
+    public function getCustomizationPasses()
+    {
+        return $this->customizationPasses;
+    }
+
+    /**
+     * Gets all passes for the AfterCustomization pass.
+     *
+     * @return array An array of passes
+     *
+     * @api
+     */
+    public function getAfterCustomizationPasses()
+    {
+        return $this->afterCustomizationPasses;
     }
 
     /**
@@ -170,6 +215,42 @@ class PassConfig
     public function setMergePass(CompilerPassInterface $pass)
     {
         $this->mergePass = $pass;
+    }
+
+    /**
+     * Sets the BeforeCustomization passes.
+     *
+     * @param array $passes An array of passes
+     *
+     * @api
+     */
+    public function setBeforeCustomizationPasses(array $passes)
+    {
+        $this->beforeCustomizationPasses = $passes;
+    }
+
+    /**
+     * Sets the Customization passes.
+     *
+     * @param array $passes An array of passes
+     *
+     * @api
+     */
+    public function setCustomizationPasses(array $passes)
+    {
+        $this->customizationPasses = $passes;
+    }
+
+    /**
+     * Sets the AfterCustomization passes.
+     *
+     * @param array $passes An array of passes
+     *
+     * @api
+     */
+    public function setAfterCustomizationPasses(array $passes)
+    {
+        $this->afterCustomizationPasses = $passes;
     }
 
     /**

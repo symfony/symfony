@@ -93,9 +93,9 @@ abstract class ConstraintValidatorTestCase extends \PHPUnit_Framework_TestCase
 
     protected function createContext()
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
-        $contextualValidator = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
+        $contextualValidator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
 
         $context = new ExecutionContext($validator, $this->root, $translator);
         $context->setGroup($this->group);

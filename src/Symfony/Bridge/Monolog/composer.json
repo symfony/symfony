@@ -17,10 +17,10 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "monolog/monolog": "~1.11"
+        "monolog/monolog": "~1.11",
+        "symfony/http-kernel": "~2.4"
     },
     "require-dev": {
-        "symfony/http-kernel": "~2.4",
         "symfony/console": "~2.4|~3.0.0",
         "symfony/event-dispatcher": "~2.2|~3.0.0"
     },

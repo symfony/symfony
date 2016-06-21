@@ -9,6 +9,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\AbstractNormalizerDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ProxyDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\StaticConstructorNormalizer;
 
 /**
  * Provides a dummy Normalizer which extends the AbstractNormalizer.
@@ -102,5 +104,15 @@ class AbstractNormalizerTest extends \PHPUnit_Framework_TestCase
         $normalizer->denormalize(array('foo' => 'bar'), 'Symfony\Component\Serializer\Tests\Fixtures\ToBeProxyfiedDummy', null, $context);
 
         $this->assertSame('bar', $proxyDummy->getFoo());
+    }
+
+    public function testObjectWithStaticConstructor()
+    {
+        $normalizer = new StaticConstructorNormalizer();
+        $dummy = $normalizer->denormalize(array('foo' => 'baz'), StaticConstructorDummy::class);
+
+        $this->assertInstanceOf(StaticConstructorDummy::class, $dummy);
+        $this->assertEquals('baz', $dummy->quz);
+        $this->assertNull($dummy->foo);
     }
 }

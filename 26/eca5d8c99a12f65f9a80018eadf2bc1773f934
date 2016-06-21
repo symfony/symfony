@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T07:19:14Z
+
+But Symfony 3.x does not support PHP 5.3 anymore.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-21T07:21:01Z
+
+No, but we explicitly support PHP 5.3 for the PHPUnit bridge to use the latest version in tests for older Symfony versions for example (see https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/PhpUnit/composer.json#L19-L21).

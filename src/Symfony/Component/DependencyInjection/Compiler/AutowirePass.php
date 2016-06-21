@@ -229,7 +229,6 @@ class AutowirePass implements CompilerPassInterface
             $matchingServices = implode(', ', $this->types[$typeHint->name]);
 
             throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $typeHint->name, $id, $classOrInterface, $matchingServices));
-
         }
 
         if (!$typeHint->isInstantiable()) {

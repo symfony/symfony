@@ -17,6 +17,8 @@ return Symfony\CS\Config\Config::create()
                 // fixture templates
                 'src/Symfony/Component/Templating/Tests/Fixtures/templates',
                 'src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom',
+                // generated fixtures
+                'src/Symfony/Component/VarDumper/Tests/Fixtures',
                 // resource templates
                 'src/Symfony/Bundle/FrameworkBundle/Resources/views/Form',
             ))

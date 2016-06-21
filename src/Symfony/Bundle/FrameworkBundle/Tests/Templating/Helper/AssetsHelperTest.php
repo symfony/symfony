@@ -25,7 +25,7 @@ class AssetsHelperTest extends \PHPUnit_Framework_TestCase
         $fooPackage = new Package(new StaticVersionStrategy('42', '%s?v=%s'));
         $barPackage = new Package(new StaticVersionStrategy('22', '%s?%s'));
 
-        $packages = new Packages($fooPackage, ['bar' => $barPackage]);
+        $packages = new Packages($fooPackage, array('bar' => $barPackage));
 
         $this->helper = new AssetsHelper($packages);
     }

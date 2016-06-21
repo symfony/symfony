@@ -3,6 +3,10 @@
 return Symfony\CS\Config\Config::create()
     ->setUsingLinter(false)
     ->setUsingCache(true)
+    ->fixers(array(
+        'long_array_syntax',
+        'php_unit_construct',
+    ))
     ->finder(
         Symfony\CS\Finder\DefaultFinder::create()
             ->in(__DIR__)
@@ -12,6 +16,9 @@ return Symfony\CS\Config\Config::create()
                 'src/Symfony/Component/Routing/Tests/Fixtures/dumper',
                 // fixture templates
                 'src/Symfony/Component/Templating/Tests/Fixtures/templates',
+                'src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom',
+                // generated fixtures
+                'src/Symfony/Component/VarDumper/Tests/Fixtures',
                 // resource templates
                 'src/Symfony/Bundle/FrameworkBundle/Resources/views/Form',
             ))

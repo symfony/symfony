@@ -157,7 +157,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
 
         if (is_string($label) && !is_callable($label)) {
             $label = new PropertyPath($label);
-        }  elseif (is_string($label) && is_callable($label)) {
+        } elseif (is_string($label) && is_callable($label)) {
             @trigger_error('Passing callable strings is deprecated since version 3.1 and PropertyAccessDecorator will treat them as property paths in 4.0. You should use a "\Closure" instead.', E_USER_DEPRECATED);
         }
 

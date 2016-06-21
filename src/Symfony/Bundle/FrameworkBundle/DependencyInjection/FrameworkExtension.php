@@ -913,7 +913,7 @@ class FrameworkExtension extends Extension
             // Run after serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.data_uri', DataUriNormalizer::class);
             $definition->setPublic(false);
-            $definition->addTag('serializer.normalizer', ['priority' => -920]);
+            $definition->addTag('serializer.normalizer', array('priority' => -920));
         }
 
         if (class_exists('Symfony\Component\Serializer\Normalizer\DateTimeNormalizer')) {

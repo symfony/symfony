@@ -28,7 +28,7 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testSignature1()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature1']);
+        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature1'));
 
         $this->assertEquals(array(
             new ArgumentMetadata('foo', self::class, false, false, null),
@@ -39,7 +39,7 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testSignature2()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature2']);
+        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature2'));
 
         $this->assertEquals(array(
             new ArgumentMetadata('foo', self::class, false, true, null),
@@ -50,7 +50,7 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testSignature3()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature3']);
+        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature3'));
 
         $this->assertEquals(array(
             new ArgumentMetadata('bar', __NAMESPACE__.'\FakeClassThatDoesNotExist', false, false, null),
@@ -60,18 +60,18 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testSignature4()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature4']);
+        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature4'));
 
         $this->assertEquals(array(
             new ArgumentMetadata('foo', null, false, true, 'default'),
             new ArgumentMetadata('bar', null, false, true, 500),
-            new ArgumentMetadata('baz', null, false, true, []),
+            new ArgumentMetadata('baz', null, false, true, array()),
         ), $arguments);
     }
 
     public function testSignature5()
     {
-        $arguments = $this->factory->createArgumentMetadata([$this, 'signature5']);
+        $arguments = $this->factory->createArgumentMetadata(array($this, 'signature5'));
 
         $this->assertEquals(array(
             new ArgumentMetadata('foo', 'array', false, true, null),
@@ -84,7 +84,7 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testVariadicSignature()
     {
-        $arguments = $this->factory->createArgumentMetadata([new VariadicController(), 'action']);
+        $arguments = $this->factory->createArgumentMetadata(array(new VariadicController(), 'action'));
 
         $this->assertEquals(array(
             new ArgumentMetadata('foo', null, false, false, null),
@@ -97,7 +97,7 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBasicTypesSignature()
     {
-        $arguments = $this->factory->createArgumentMetadata([new BasicTypesController(), 'action']);
+        $arguments = $this->factory->createArgumentMetadata(array(new BasicTypesController(), 'action'));
 
         $this->assertEquals(array(
             new ArgumentMetadata('foo', 'string', false, false, null),
@@ -108,26 +108,21 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     private function signature1(ArgumentMetadataFactoryTest $foo, array $bar, callable $baz)
     {
-
     }
 
     private function signature2(ArgumentMetadataFactoryTest $foo = null, FakeClassThatDoesNotExist $bar = null, ImportedAndFake $baz = null)
     {
-
     }
 
     private function signature3(FakeClassThatDoesNotExist $bar, ImportedAndFake $baz)
     {
-
     }
 
-    private function signature4($foo = 'default', $bar = 500, $baz = [])
+    private function signature4($foo = 'default', $bar = 500, $baz = array())
     {
-
     }
 
     private function signature5(array $foo = null, $bar)
     {
-
     }
 }

@@ -29,7 +29,7 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-            $this->generateOutput('    0 [>---------------------------]').
+            '    0 [>---------------------------]'.
             $this->generateOutput('    1 [->--------------------------]').
             $this->generateOutput('    0 [>---------------------------]'),
             stream_get_contents($output->getStream())

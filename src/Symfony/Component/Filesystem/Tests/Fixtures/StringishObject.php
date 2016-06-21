@@ -12,7 +12,7 @@
 namespace Symfony\Component\Filesystem\Tests\Fixtures;
 
 /**
- * Represents a stringish object (i.e. an object implementing __toString())
+ * Represents a stringish object (i.e. an object implementing __toString()).
  */
 class StringishObject
 {

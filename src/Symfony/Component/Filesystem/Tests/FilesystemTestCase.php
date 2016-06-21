@@ -72,9 +72,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
-        $this->workspace = sys_get_temp_dir().'/'.microtime(true).'.'.mt_rand();
-        mkdir($this->workspace, 0777, true);
-        $this->workspace = realpath($this->workspace);
+        $this->workspace = $this->createWorkspace();
     }
 
     protected function tearDown()
@@ -88,6 +86,17 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->remove($this->workspace);
         umask($this->umask);
+    }
+
+    /**
+     * @return string
+     */
+    protected function createWorkspace()
+    {
+        $workspace = sys_get_temp_dir().'/'.microtime(true).'.'.mt_rand();
+        mkdir($workspace, 0777, true);
+
+        return realpath($workspace);
     }
 
     /**

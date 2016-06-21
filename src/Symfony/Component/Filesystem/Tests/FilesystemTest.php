@@ -18,22 +18,32 @@ use Symfony\Component\Filesystem\Tests\Fixtures\StringishObject;
  */
 class FilesystemTest extends FilesystemTestCase
 {
-    public function testCopyCreatesNewFile()
+    public function provideSourceTargetPaths()
     {
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+        $workspace = $this->createWorkspace();
 
-        file_put_contents($sourceFilePath, 'SOURCE FILE');
+        return array(
+            array($workspace.DIRECTORY_SEPARATOR.'copy_source_file', $workspace.DIRECTORY_SEPARATOR.'copy_target_file'),
+            array(
+                new StringishObject($workspace.DIRECTORY_SEPARATOR.'copy_source_file_v2'),
+                new StringishObject($workspace.DIRECTORY_SEPARATOR.'copy_target_file_v2'),
+            ),
+            array(
+                new StringishObject($workspace.DIRECTORY_SEPARATOR.'copy_source_file_v3'),
+                $workspace.DIRECTORY_SEPARATOR.'copy_target_file_v3',
+            ),
+            array(
+                $workspace.DIRECTORY_SEPARATOR.'copy_source_file_v4',
+                new StringishObject($workspace.DIRECTORY_SEPARATOR.'copy_target_file_v4'),
+            ),
+        );
+    }
 
-        $this->filesystem->copy($sourceFilePath, $targetFilePath);
-
-        $this->assertFileExists($targetFilePath);
-        $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
-
-        // stringish variant
-        $sourceFilePath = new StringishObject($sourceFilePath.'_v2');
-        $targetFilePath = new StringishObject($targetFilePath.'_v2');
-
+    /**
+     * @dataProvider provideSourceTargetPaths
+     */
+    public function testCopyCreatesNewFile($sourceFilePath, $targetFilePath)
+    {
         file_put_contents($sourceFilePath, 'SOURCE FILE');
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
@@ -43,28 +53,24 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
+     * @dataProvider provideSourceTargetPaths
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
-    public function testCopyFails()
+    public function testCopyFails($sourceFilePath, $targetFilePath)
     {
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
-
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
     }
 
     /**
+     * @dataProvider provideSourceTargetPaths
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
-    public function testCopyUnreadableFileFails()
+    public function testCopyUnreadableFileFails($sourceFilePath, $targetFilePath)
     {
         // skip test on Windows; PHP can't easily set file as unreadable on Windows
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test cannot run on Windows.');
         }
-
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
 
@@ -74,26 +80,26 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
     }
 
-    public function testCopyOverridesExistingFileIfModified()
+    /**
+     * @dataProvider provideSourceTargetPaths
+     */
+    public function testCopyOverridesExistingFileIfModified($sourceFilePath, $targetFilePath)
     {
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
-
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         file_put_contents($targetFilePath, 'TARGET FILE');
         touch($targetFilePath, time() - 1000);
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
-        $this->assertFileExists($targetFilePath);
+        $this->assertFileExists((string) $targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
     }
 
-    public function testCopyDoesNotOverrideExistingFileByDefault()
+    /**
+     * @dataProvider provideSourceTargetPaths
+     */
+    public function testCopyDoesNotOverrideExistingFileByDefault($sourceFilePath, $targetFilePath)
     {
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
-
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         file_put_contents($targetFilePath, 'TARGET FILE');
 
@@ -104,15 +110,15 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
-        $this->assertFileExists($targetFilePath);
+        $this->assertFileExists((string) $targetFilePath);
         $this->assertEquals('TARGET FILE', file_get_contents($targetFilePath));
     }
 
-    public function testCopyOverridesExistingFileIfForced()
+    /**
+     * @dataProvider provideSourceTargetPaths
+     */
+    public function testCopyOverridesExistingFileIfForced($sourceFilePath, $targetFilePath)
     {
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
-
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         file_put_contents($targetFilePath, 'TARGET FILE');
 
@@ -123,22 +129,20 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath, true);
 
-        $this->assertFileExists($targetFilePath);
+        $this->assertFileExists((string) $targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
     }
 
     /**
+     * @dataProvider provideSourceTargetPaths
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
-    public function testCopyWithOverrideWithReadOnlyTargetFails()
+    public function testCopyWithOverrideWithReadOnlyTargetFails($sourceFilePath, $targetFilePath)
     {
         // skip test on Windows; PHP can't easily set file as unwritable on Windows
         if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test cannot run on Windows.');
         }
-
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
         file_put_contents($targetFilePath, 'TARGET FILE');
@@ -154,31 +158,43 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->copy($sourceFilePath, $targetFilePath, true);
     }
 
-    public function testCopyCreatesTargetDirectoryIfItDoesNotExist()
+    /**
+     * @dataProvider provideSourceTargetPaths
+     */
+    public function testCopyCreatesTargetDirectoryIfItDoesNotExist($sourceFilePath, $targetFilePath)
     {
-        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
-        $targetFileDirectory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
-        $targetFilePath = $targetFileDirectory.DIRECTORY_SEPARATOR.'copy_target_file';
+        $targetFileDirectory = dirname($sourceFilePath).DIRECTORY_SEPARATOR.'directory';
+        if ($targetFilePath instanceof StringishObject) {
+            $targetFilePath = new StringishObject($targetFileDirectory.DIRECTORY_SEPARATOR.'copy_target_file');
+        } else {
+            $targetFilePath = $targetFileDirectory.DIRECTORY_SEPARATOR.'copy_target_file';
+        }
 
         file_put_contents($sourceFilePath, 'SOURCE FILE');
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
         $this->assertTrue(is_dir($targetFileDirectory));
-        $this->assertFileExists($targetFilePath);
+        $this->assertFileExists((string) $targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
     }
 
-    public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy()
+    /**
+     * @dataProvider provideSourceTargetPaths
+     */
+    public function testCopyForOriginUrlsAndExistingLocalFileDefaultsToCopy($sourceFilePath, $targetFilePath)
     {
-        $sourceFilePath = 'http://symfony.com/images/common/logo/logo_symfony_header.png';
-        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+        if ($sourceFilePath instanceof StringishObject) {
+            $sourceFilePath = new StringishObject('http://symfony.com/images/common/logo/logo_symfony_header.png');
+        } else {
+            $sourceFilePath = 'http://symfony.com/images/common/logo/logo_symfony_header.png';
+        }
 
         file_put_contents($targetFilePath, 'TARGET FILE');
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath, false);
 
-        $this->assertFileExists($targetFilePath);
+        $this->assertFileExists((string) $targetFilePath);
         $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
     }
 

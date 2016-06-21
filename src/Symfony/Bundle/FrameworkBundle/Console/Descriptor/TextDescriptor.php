@@ -276,7 +276,7 @@ class TextDescriptor extends Descriptor
 
         $calls = $definition->getMethodCalls();
         if (count($calls) > 0) {
-            $callInformation = [];
+            $callInformation = array();
             foreach ($calls as $call) {
                 $callInformation[] = $call[0];
             }

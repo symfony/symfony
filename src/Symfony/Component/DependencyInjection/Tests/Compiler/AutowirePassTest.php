@@ -457,8 +457,8 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     public function getCreateResourceTests()
     {
         return array(
-            ['IdenticalClassResource', true],
-            ['ClassChangedConstructorArgs', false],
+            array('IdenticalClassResource', true),
+            array('ClassChangedConstructorArgs', false),
         );
     }
 

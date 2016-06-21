@@ -101,7 +101,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
             $refClass = $parameter->getClass();
         } catch (\ReflectionException $e) {
             // mandatory; extract it from the exception message
-            return str_replace(['Class ', ' does not exist'], '', $e->getMessage());
+            return str_replace(array('Class ', ' does not exist'), '', $e->getMessage());
         }
 
         return $refClass ? $refClass->getName() : null;

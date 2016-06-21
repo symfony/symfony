@@ -198,53 +198,67 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
     }
 
-    public function testMkdirCreatesDirectoriesRecursively()
+    public function provideSubDirectoryPaths()
     {
-        $directory = $this->workspace
-            .DIRECTORY_SEPARATOR.'directory'
-            .DIRECTORY_SEPARATOR.'sub_directory';
+        $workspace = $this->createWorkspace();
 
+        return array(
+            array($workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR.'sub_directory'),
+            array(new StringishObject($workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR.'sub_directory')),
+        );
+    }
+
+    /**
+     * @dataProvider provideSubDirectoryPaths
+     */
+    public function testMkdirCreatesDirectoriesRecursively($directory)
+    {
         $this->filesystem->mkdir($directory);
 
         $this->assertTrue(is_dir($directory));
     }
 
-    public function testMkdirCreatesDirectoriesFromArray()
+    public function provideDirectoryCollectionPaths()
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-        $directories = array(
-            $basePath.'1', $basePath.'2', $basePath.'3',
+        $workspace = $this->createWorkspace();
+        $files = array(
+            $workspace.DIRECTORY_SEPARATOR.'1', $workspace.DIRECTORY_SEPARATOR.'2', new StringishObject($workspace.DIRECTORY_SEPARATOR.'3'),
         );
 
-        $this->filesystem->mkdir($directories);
-
-        $this->assertTrue(is_dir($basePath.'1'));
-        $this->assertTrue(is_dir($basePath.'2'));
-        $this->assertTrue(is_dir($basePath.'3'));
-    }
-
-    public function testMkdirCreatesDirectoriesFromTraversableObject()
-    {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-        $directories = new \ArrayObject(array(
-            $basePath.'1', $basePath.'2', $basePath.'3',
-        ));
-
-        $this->filesystem->mkdir($directories);
-
-        $this->assertTrue(is_dir($basePath.'1'));
-        $this->assertTrue(is_dir($basePath.'2'));
-        $this->assertTrue(is_dir($basePath.'3'));
+        return array(
+            array($files),
+            array(new \ArrayObject($files)),
+        );
     }
 
     /**
+     * @dataProvider provideDirectoryCollectionPaths
+     */
+    public function testMkdirCreatesDirectoriesFromIterable($directories)
+    {
+        $this->filesystem->mkdir($directories);
+
+        foreach ($directories as $directory) {
+            $this->assertTrue(is_dir($directory));
+        }
+    }
+
+    public function providePaths()
+    {
+        $workspace = $this->createWorkspace();
+
+        return array(
+            array($workspace.DIRECTORY_SEPARATOR.'1'),
+            array(new StringishObject($workspace.DIRECTORY_SEPARATOR.'2')),
+        );
+    }
+
+    /**
+     * @dataProvider providePaths
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
-    public function testMkdirCreatesDirectoriesFails()
+    public function testMkdirCreatesDirectoriesFails($dir)
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-        $dir = $basePath.'2';
-
         file_put_contents($dir, '');
 
         $this->filesystem->mkdir($dir);

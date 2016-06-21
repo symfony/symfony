@@ -1,0 +1,132 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-07T12:08:47Z
+
+What about instead of removing the type support adding support for adding a priority within a type? In my opinion, being able to choose the compiler pass type makes it much easier to determine when a compiler pass will be executed than it would be when there were only priorities (and some things even could not fully be accomplished when using only priorities).
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-07T12:25:35Z
+
+Well that's still possible @xabbuh but only through the class constants.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-07T12:43:45Z
+
+But technically I would now only be able to add 100 compiler passes per type (after that priorities cannot be distinguished).
+
+---------------------------------------------------------------------------
+
+by Taluu at 2016-03-07T13:34:38Z
+
+Well, this PR does not bring a solution... it just  basically rename the key. As @xabbuh has proposed, I think it would be better to have a notion a priority inside each types, which would be sorted out before the big merge.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-07T14:44:33Z
+
+Well you could add more than 100 passes per type (a type corresponds to a priority which is not incremented) the only restriction is that you have only 99 differents priorities available between each type for doing whatever you want but that's the same thing for event listeners.
+And your solution @Taluu won't respect bc.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-07T17:08:14Z
+
+I think this idea has been proposed in the past and rejected. Basically, I don't like to give too much flexibility here. People should not rely on precise ordering within one pass. Adding new passes where it makes sense seems better and could be considered if we have enough real-world use cases.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-07T17:23:04Z
+
+@fabpot I've searched PRs solving the same issue but I only found https://github.com/symfony/symfony/pull/10778 which propose a different approach which doesn't solve all issues.
+A typical use case is when a bundle uses a compiler pass to change the attributes of a definition. If another bundle needs to access this definition attributes before the container optimization, it isn't able to be sure which version of the definition it has.
+
+Even the core depends on the compiler passes ordering : would symfony still work if we shuffled [this array](https://github.com/symfony/dependency-injection/blob/master/Compiler/PassConfig.php#L45-L57) ?
+
+---------------------------------------------------------------------------
+
+by egeloen at 2016-03-07T17:53:42Z
+
+I also dig into this issue in #13609 for the exact same use case @Ener-Getick describes.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-10T16:27:17Z
+
+Did you take a decision about this ?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-12T14:27:16Z
+
+BTW the build fail is unrelated.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-04-01T18:11:12Z
+
+I've been thinking how to improve this PR and I finally agree with @xabbuh and @Taluu that this could be confusing to replace the types by a priority system.
+So instead I added a new ``$priority`` attribute which is completely BC as they proposed.
+
+@fabpot are you still against this change?
+As an example, I often see this kind of code:
+```php
+public function build(ContainerBuilder $container) {
+    $passConfig = $container->getCompilerPassConfig();
+    $passes = $passConfig->getBeforeOptimizationPasses();
+
+    // This allows to be certain that your pass will be executed before a pass
+    // located in a third party bundle
+    array_unshift($passes, new MyPass());
+    $passConfig->setBeforeOptimizationPasses($passes);
+}
+```
+This could be simplified with this PR to:
+```php
+public function build(ContainerBuilder $container) {
+    $container->addCompilerPass(new MyPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 50);
+}
+```
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-05-19T20:29:46Z
+
+I'd love to see this merged.
+Is the repository still in a feature freeze ? or is it possible to decide whether or not to merge this ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-14T06:55:55Z
+
+Adding a priority like done here looks good to me.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-15T17:13:03Z
+
+@fabpot I'll add some tests then :)
+
+BTW maybe we will have to deprecate the ``set*`` functions now ?
+They were useful to put a pass before the built-in ones but now I don't know if we should keep them. If we keep them, we should then decide if it should be possible to define priorities or if the passes should always be added with a priority of 0 as done for now.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T05:45:04Z
+
+I would indeed deprecate the set* methods.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-21T15:26:22Z
+
+@fabpot it looks like these methods are often used in tests to remove the default passes and have a non altered/fast container.
+
+What do you think about moving them to another class such as the ``Compiler`` or the ``ContainerBuilder`` ?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-21T19:05:01Z
+
+I think if we really want to deprecate the ``set*`` methods we should probably do that later in another PR as we need to find a cleaner substitute which is out of the scope of this PR

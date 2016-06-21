@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
+use Symfony\Component\Filesystem\Tests\Fixtures\StringishObject;
+
 /**
  * Test class for Filesystem.
  */
@@ -26,6 +28,17 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
         $this->assertFileExists($targetFilePath);
+        $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
+
+        // stringish variant
+        $sourceFilePath = new StringishObject($sourceFilePath.'_v2');
+        $targetFilePath = new StringishObject($targetFilePath.'_v2');
+
+        file_put_contents($sourceFilePath, 'SOURCE FILE');
+
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
+
+        $this->assertFileExists((string) $targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
     }
 

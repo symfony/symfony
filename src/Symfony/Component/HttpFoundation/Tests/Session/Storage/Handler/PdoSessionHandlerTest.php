@@ -362,4 +362,8 @@ class MockPdo extends \PDO
     public function beginTransaction()
     {
     }
+
+    public function rollBack()
+    {
+    }
 }

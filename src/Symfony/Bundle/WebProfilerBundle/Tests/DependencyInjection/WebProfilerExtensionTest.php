@@ -16,6 +16,7 @@ use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\AmbiguousServiceException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 
@@ -34,6 +35,10 @@ class WebProfilerExtensionTest extends TestCase
             try {
                 $container->get($id);
             } catch (\Exception $e) {
+                if ($e instanceof AmbiguousServiceException) {
+                    continue;
+                }
+
                 $errors[$id] = $e->getMessage();
             }
         }

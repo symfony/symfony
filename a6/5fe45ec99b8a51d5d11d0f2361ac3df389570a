@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-21T08:10:38Z
+
+Is this the only class that would need an update?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-21T08:12:15Z
+
+By the way, according to our new [maintenance document](http://symfony.com/doc/current/contributing/code/maintenance.html) we must do this change in the `master` branch:
+
+> **Support for newer major versions of Composer dependencies**: Taking into account support for newer versions of an existing dependency is not acceptable.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-06-21T08:14:59Z
+
+@xabbuh I've made a new PR (master) for the other changes as they are only in the master.
+
+This is not a major version though, this is a minor (5.1 vs 5.4), thus I think it should be merged upwards as it's a minor change anyway.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-21T11:22:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-21T11:24:35Z
+
+:+1:

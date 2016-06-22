@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\DumpExtension;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
@@ -102,5 +103,40 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
                 ."</pre><script>Sfdump(\"sf-dump\")</script>\n",
             ),
         );
+    }
+
+    public function testCustomDumper()
+    {
+        $output = '';
+        $lineDumper = function ($line) use (&$output) {
+            $output .= $line;
+        };
+
+        $dumper = new HtmlDumper($lineDumper);
+
+        $dumper->setDumpHeader('');
+        $dumper->setDumpBoundaries(
+            '<pre class=sf-dump-test id=%s data-indent-pad="%s">',
+            '</pre><script>Sfdump("%s")</script>'
+        );
+        $extension = new DumpExtension(new VarCloner(), $dumper);
+        $twig = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array(
+            'debug' => true,
+            'cache' => false,
+            'optimizations' => 0,
+        ));
+
+        $dump = $extension->dump($twig, array(), 'foo');
+        $dump = preg_replace('/sf-dump-\d+/', 'sf-dump', $dump);
+
+        $this->assertEquals(
+            '<pre class=sf-dump-test id=sf-dump data-indent-pad="  ">"'.
+            "<span class=sf-dump-str title=\"3 characters\">foo</span>\"\n".
+            "</pre><script>Sfdump(\"sf-dump\")</script>\n",
+            $dump,
+            'Custom dumper should be used to dump data.'
+        );
+
+        $this->assertEmpty($output, 'Dumper output should be ignored.');
     }
 }

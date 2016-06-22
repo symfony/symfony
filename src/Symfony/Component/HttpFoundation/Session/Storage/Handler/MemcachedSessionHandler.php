@@ -29,7 +29,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     private $memcached;
 
     /**
-     * @var integer Time to live in seconds
+     * @var int Time to live in seconds
      */
     private $ttl;
 
@@ -65,7 +65,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function open($savePath, $sessionName)
     {
@@ -73,7 +73,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function close()
     {
@@ -81,7 +81,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function read($sessionId)
     {
@@ -89,7 +89,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function write($sessionId, $data)
     {
@@ -97,7 +97,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function destroy($sessionId)
     {
@@ -105,11 +105,21 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function gc($lifetime)
+    public function gc($maxlifetime)
     {
         // not required here because memcached will auto expire the records anyhow.
         return true;
+    }
+
+    /**
+     * Return a Memcached instance.
+     *
+     * @return \Memcached
+     */
+    protected function getMemcached()
+    {
+        return $this->memcached;
     }
 }

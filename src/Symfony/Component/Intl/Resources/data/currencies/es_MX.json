@@ -1,0 +1,317 @@
+{
+    "Version": "2.1.13.23",
+    "Names": {
+        "AFN": [
+            "Af",
+            "afgani afgano"
+        ],
+        "ALL": [
+            "ALL",
+            "lek albanés"
+        ],
+        "ANG": [
+            "Naf",
+            "florín de las Antillas Neerlandesas"
+        ],
+        "AOA": [
+            "Kz",
+            "kwanza angoleño"
+        ],
+        "ARA": [
+            "ARA",
+            "austral argentino"
+        ],
+        "ARS": [
+            "$a",
+            "peso argentino"
+        ],
+        "AUD": [
+            "AU$",
+            "dólar australiano"
+        ],
+        "AWG": [
+            "Afl.",
+            "florín arubeño"
+        ],
+        "BDT": [
+            "BDT",
+            "taka de Bangladesh"
+        ],
+        "BND": [
+            "BND",
+            "dólar de Brunéi"
+        ],
+        "BOL": [
+            "BOL",
+            "BOL"
+        ],
+        "BOP": [
+            "BOP",
+            "peso boliviano"
+        ],
+        "BOV": [
+            "BOV",
+            "MVDOL boliviano"
+        ],
+        "BRB": [
+            "BRB",
+            "nuevo cruceiro brasileño (1967–1986)"
+        ],
+        "BRC": [
+            "BRC",
+            "cruzado brasileño"
+        ],
+        "BRE": [
+            "BRE",
+            "cruceiro brasileño (1990–1993)"
+        ],
+        "BRN": [
+            "BRN",
+            "nuevo cruzado brasileño"
+        ],
+        "BRR": [
+            "BRR",
+            "cruceiro brasileño"
+        ],
+        "BRZ": [
+            "BRZ",
+            "BRZ"
+        ],
+        "BTN": [
+            "BTN",
+            "ngultrum butanés"
+        ],
+        "BWP": [
+            "BWP",
+            "pula botsuano"
+        ],
+        "CLE": [
+            "CLE",
+            "CLE"
+        ],
+        "CLF": [
+            "CLF",
+            "unidad de fomento chilena"
+        ],
+        "CNY": [
+            "CN¥",
+            "yuan chino"
+        ],
+        "COU": [
+            "COU",
+            "unidad de valor real colombiana"
+        ],
+        "ECS": [
+            "ECS",
+            "sucre ecuatoriano"
+        ],
+        "ECV": [
+            "ECV",
+            "unidad de valor constante (UVC) ecuatoriana"
+        ],
+        "ETB": [
+            "ETB",
+            "birr etíope"
+        ],
+        "GEL": [
+            "GEL",
+            "lari georgiano"
+        ],
+        "GHS": [
+            "GHS",
+            "cedi ghanés"
+        ],
+        "GMD": [
+            "GMD",
+            "dalasi gambiano"
+        ],
+        "HKD": [
+            "HKD",
+            "dólar de Hong Kong"
+        ],
+        "HRK": [
+            "HRK",
+            "kuna croata"
+        ],
+        "ILS": [
+            "ILS",
+            "nuevo shéquel israelí"
+        ],
+        "JPY": [
+            "JPY",
+            "yen japonés"
+        ],
+        "KGS": [
+            "KGS",
+            "som kirguís"
+        ],
+        "KHR": [
+            "KHR",
+            "riel camboyano"
+        ],
+        "KZT": [
+            "KZT",
+            "tenge kazajo"
+        ],
+        "LAK": [
+            "LAK",
+            "kip laosiano"
+        ],
+        "LKR": [
+            "LKR",
+            "rupia de Sri Lanka"
+        ],
+        "MGA": [
+            "MGA",
+            "ariary malgache"
+        ],
+        "MMK": [
+            "MMK",
+            "kyat de Myanmar"
+        ],
+        "MNT": [
+            "MNT",
+            "tugrik mongol"
+        ],
+        "MRO": [
+            "MRO",
+            "ouguiya mauritano"
+        ],
+        "MVR": [
+            "MVR",
+            "rufiyaa de Maldivas"
+        ],
+        "MXN": [
+            "$",
+            "peso mexicano"
+        ],
+        "MXP": [
+            "MXP",
+            "peso de plata mexicano (1861–1992)"
+        ],
+        "MYR": [
+            "MYR",
+            "ringgit malayo"
+        ],
+        "MZN": [
+            "MZN",
+            "metical mozambiqueño"
+        ],
+        "NGN": [
+            "NGN",
+            "naira nigeriano"
+        ],
+        "NIC": [
+            "NIC",
+            "córdoba nicaragüense (1988–1991)"
+        ],
+        "PEI": [
+            "PEI",
+            "inti peruano"
+        ],
+        "PES": [
+            "PES",
+            "sol peruano"
+        ],
+        "PGK": [
+            "PGK",
+            "kina de Papúa Nueva Guinea"
+        ],
+        "PLN": [
+            "PLN",
+            "zloty polaco"
+        ],
+        "QAR": [
+            "QAR",
+            "riyal de Qatar"
+        ],
+        "SAR": [
+            "SAR",
+            "riyal saudí"
+        ],
+        "SBD": [
+            "SBD",
+            "dólar de las Islas Salomón"
+        ],
+        "SCR": [
+            "SCR",
+            "rupia de Seychelles"
+        ],
+        "SLL": [
+            "SLL",
+            "leone de Sierra Leona"
+        ],
+        "SRG": [
+            "SRG",
+            "florín surinamés"
+        ],
+        "STD": [
+            "STD",
+            "dobra de Santo Tomé y Príncipe"
+        ],
+        "SVC": [
+            "SVC",
+            "colón salvadoreño"
+        ],
+        "SZL": [
+            "SZL",
+            "lilangeni suazi"
+        ],
+        "THB": [
+            "THB",
+            "baht tailandés"
+        ],
+        "TMT": [
+            "TMT",
+            "manat turkmeno"
+        ],
+        "TOP": [
+            "TOP",
+            "paʻanga tongano"
+        ],
+        "UAH": [
+            "UAH",
+            "grivna ucraniana"
+        ],
+        "USN": [
+            "USN",
+            "dólar estadounidense (día siguiente)"
+        ],
+        "USS": [
+            "USS",
+            "dólar estadounidense (mismo día)"
+        ],
+        "UYI": [
+            "UYI",
+            "peso uruguayo en unidades indexadas"
+        ],
+        "UZS": [
+            "UZS",
+            "som uzbeko"
+        ],
+        "VND": [
+            "VND",
+            "dong vietnamita"
+        ],
+        "VUV": [
+            "VUV",
+            "vatu vanuatuense"
+        ],
+        "WST": [
+            "WST",
+            "tala samoano"
+        ],
+        "XPF": [
+            "XPF",
+            "franco CFP"
+        ],
+        "ZAR": [
+            "ZAR",
+            "rand sudafricano"
+        ],
+        "ZMW": [
+            "ZMW",
+            "kwacha zambiano"
+        ]
+    }
+}

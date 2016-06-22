@@ -16,7 +16,7 @@ namespace Symfony\Component\Routing;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class CompiledRoute
+class CompiledRoute implements \Serializable
 {
     private $variables;
     private $tokens;
@@ -30,14 +30,14 @@ class CompiledRoute
     /**
      * Constructor.
      *
-     * @param string      $staticPrefix       The static prefix of the compiled route
-     * @param string      $regex              The regular expression to use to match this route
-     * @param array       $tokens             An array of tokens to use to generate URL for this route
-     * @param array       $pathVariables      An array of path variables
-     * @param string|null $hostRegex          Host regex
-     * @param array       $hostTokens         Host tokens
-     * @param array       $hostVariables      An array of host variables
-     * @param array       $variables          An array of variables (variables defined in the path and in the host patterns)
+     * @param string      $staticPrefix  The static prefix of the compiled route
+     * @param string      $regex         The regular expression to use to match this route
+     * @param array       $tokens        An array of tokens to use to generate URL for this route
+     * @param array       $pathVariables An array of path variables
+     * @param string|null $hostRegex     Host regex
+     * @param array       $hostTokens    Host tokens
+     * @param array       $hostVariables An array of host variables
+     * @param array       $variables     An array of variables (variables defined in the path and in the host patterns)
      */
     public function __construct($staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = null, array $hostTokens = array(), array $hostVariables = array(), array $variables = array())
     {
@@ -49,6 +49,39 @@ class CompiledRoute
         $this->hostTokens = $hostTokens;
         $this->hostVariables = $hostVariables;
         $this->variables = $variables;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            'vars' => $this->variables,
+            'path_prefix' => $this->staticPrefix,
+            'path_regex' => $this->regex,
+            'path_tokens' => $this->tokens,
+            'path_vars' => $this->pathVariables,
+            'host_regex' => $this->hostRegex,
+            'host_tokens' => $this->hostTokens,
+            'host_vars' => $this->hostVariables,
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+        $this->variables = $data['vars'];
+        $this->staticPrefix = $data['path_prefix'];
+        $this->regex = $data['path_regex'];
+        $this->tokens = $data['path_tokens'];
+        $this->pathVariables = $data['path_vars'];
+        $this->hostRegex = $data['host_regex'];
+        $this->hostTokens = $data['host_tokens'];
+        $this->hostVariables = $data['host_vars'];
     }
 
     /**
@@ -72,7 +105,7 @@ class CompiledRoute
     }
 
     /**
-     * Returns the host regex
+     * Returns the host regex.
      *
      * @return string|null The host regex or null
      */
@@ -130,5 +163,4 @@ class CompiledRoute
     {
         return $this->hostVariables;
     }
-
 }

@@ -20,7 +20,7 @@ namespace Symfony\Component\Security\Core\Exception;
 class TokenNotFoundException extends AuthenticationException
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageKey()
     {

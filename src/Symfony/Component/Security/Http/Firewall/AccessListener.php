@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Http\AccessMapInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -27,19 +26,17 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class AccessListener implements ListenerInterface
 {
-    private $context;
+    private $tokenStorage;
     private $accessDecisionManager;
     private $map;
     private $authManager;
-    private $logger;
 
-    public function __construct(SecurityContextInterface $context, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager, LoggerInterface $logger = null)
+    public function __construct(TokenStorageInterface $tokenStorage, AccessDecisionManagerInterface $accessDecisionManager, AccessMapInterface $map, AuthenticationManagerInterface $authManager)
     {
-        $this->context = $context;
+        $this->tokenStorage = $tokenStorage;
         $this->accessDecisionManager = $accessDecisionManager;
         $this->map = $map;
         $this->authManager = $authManager;
-        $this->logger = $logger;
     }
 
     /**
@@ -52,13 +49,13 @@ class AccessListener implements ListenerInterface
      */
     public function handle(GetResponseEvent $event)
     {
-        if (null === $token = $this->context->getToken()) {
-            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the SecurityContext.');
+        if (null === $token = $this->tokenStorage->getToken()) {
+            throw new AuthenticationCredentialsNotFoundException('A Token was not found in the TokenStorage.');
         }
 
         $request = $event->getRequest();
 
-        list($attributes, $channel) = $this->map->getPatterns($request);
+        list($attributes) = $this->map->getPatterns($request);
 
         if (null === $attributes) {
             return;
@@ -66,7 +63,7 @@ class AccessListener implements ListenerInterface
 
         if (!$token->isAuthenticated()) {
             $token = $this->authManager->authenticate($token);
-            $this->context->setToken($token);
+            $this->tokenStorage->setToken($token);
         }
 
         if (!$this->accessDecisionManager->decide($token, $attributes, $request)) {

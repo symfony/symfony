@@ -11,18 +11,17 @@
 
 namespace Symfony\Component\Form\Extension\Validator\Type;
 
-use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class FormTypeValidatorExtension extends AbstractTypeExtension
+class FormTypeValidatorExtension extends BaseValidatorExtension
 {
     /**
      * @var ValidatorInterface
@@ -51,20 +50,9 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        // Make sure that validation groups end up as null, closure or array
-        $validationGroupsNormalizer = function (Options $options, $groups) {
-            if (empty($groups)) {
-                return null;
-            }
-
-            if (is_callable($groups)) {
-                return $groups;
-            }
-
-            return (array) $groups;
-        };
+        parent::configureOptions($resolver);
 
         // Constraint should always be converted to an array
         $constraintsNormalizer = function (Options $options, $constraints) {
@@ -72,20 +60,15 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
         };
 
         $resolver->setDefaults(array(
-            'error_mapping'              => array(),
-            'validation_groups'          => null,
-            'constraints'                => null,
-            'cascade_validation'         => false,
-            'invalid_message'            => 'This value is not valid.',
+            'error_mapping' => array(),
+            'constraints' => array(),
+            'invalid_message' => 'This value is not valid.',
             'invalid_message_parameters' => array(),
-            'extra_fields_message'       => 'This form should not contain extra fields.',
-            'post_max_size_message'      => 'The uploaded file was too large. Please try to upload a smaller file.',
+            'allow_extra_fields' => false,
+            'extra_fields_message' => 'This form should not contain extra fields.',
         ));
 
-        $resolver->setNormalizers(array(
-            'validation_groups' => $validationGroupsNormalizer,
-            'constraints'       => $constraintsNormalizer,
-        ));
+        $resolver->setNormalizer('constraints', $constraintsNormalizer);
     }
 
     /**
@@ -93,6 +76,6 @@ class FormTypeValidatorExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'form';
+        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
     }
 }

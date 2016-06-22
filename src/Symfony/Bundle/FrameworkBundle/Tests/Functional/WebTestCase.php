@@ -23,15 +23,6 @@ class WebTestCase extends BaseWebTestCase
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
     }
 
-    protected function setUp()
-    {
-        if (!class_exists('Twig_Environment')) {
-            $this->markTestSkipped('Twig is not available.');
-        }
-
-        parent::setUp();
-    }
-
     protected function deleteTmpDir($testCase)
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$testCase)) {
@@ -46,7 +37,7 @@ class WebTestCase extends BaseWebTestCase
     {
         require_once __DIR__.'/app/AppKernel.php';
 
-        return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\AppKernel';
+        return 'Symfony\Bundle\FrameworkBundle\Tests\Functional\app\AppKernel';
     }
 
     protected static function createKernel(array $options = array())

@@ -3,4 +3,14 @@
 {% block body %}
     Hello {{ app.user.username }}!<br /><br />
     You're browsing to path "{{ app.request.pathInfo }}".
+
+    <a href="{{ logout_path('default') }}">Log out</a>.
+    <a href="{{ logout_url('default') }}">Log out</a>.
+
+    <a href="{{ logout_path('second_area') }}">Log out</a>.
+    <a href="{{ logout_url('second_area') }}">Log out</a>.
+
+    <a href="{{ logout_path() }}">Log out</a>.
+    <a href="{{ logout_url() }}">Log out</a>.
+
 {% endblock %}

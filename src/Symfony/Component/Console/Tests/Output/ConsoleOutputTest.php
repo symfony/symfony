@@ -20,5 +20,6 @@ class ConsoleOutputTest extends \PHPUnit_Framework_TestCase
     {
         $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true);
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
+        $this->assertSame($output->getFormatter(), $output->getErrorOutput()->getFormatter(), '__construct() takes a formatter or null as the third argument');
     }
 }

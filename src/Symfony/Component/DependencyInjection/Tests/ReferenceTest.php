@@ -15,9 +15,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ReferenceTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\DependencyInjection\Reference::__construct
-     */
     public function testConstructor()
     {
         $ref = new Reference('foo');

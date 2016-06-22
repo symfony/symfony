@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Test;
 
-interface FormBuilderInterface extends \Iterator, \Symfony\Component\Form\FormBuilderInterface
+use Symfony\Component\Form\FormBuilderInterface as BaseFormBuilderInterface;
+
+interface FormBuilderInterface extends \Iterator, BaseFormBuilderInterface
 {
 }

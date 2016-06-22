@@ -1,0 +1,16 @@
+{
+    "class": "Full\\Qualified\\Class1",
+    "public": true,
+    "synthetic": false,
+    "lazy": true,
+    "shared": true,
+    "abstract": true,
+    "file": null,
+    "factory_class": "Full\\Qualified\\FactoryClass",
+    "factory_method": "get",
+    "tags": [
+
+    ],
+    "autowire": false,
+    "autowiring_types": []
+}

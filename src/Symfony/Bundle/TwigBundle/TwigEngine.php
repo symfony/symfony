@@ -41,37 +41,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
         $this->locator = $locator;
     }
 
-    public function setDefaultEscapingStrategy($strategy)
-    {
-        $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
-    }
-
-    public function guessDefaultEscapingStrategy($filename)
-    {
-        // remove .twig
-        $filename = substr($filename, 0, -5);
-
-        // get the format
-        $format = substr($filename, strrpos($filename, '.') + 1);
-
-        if ('js' === $format) {
-            return 'js';
-        }
-
-        return 'html';
-    }
-
     /**
-     * Renders a template.
-     *
-     * @param mixed $name       A template name
-     * @param array $parameters An array of parameters to pass to the template
-     *
-     * @return string The evaluated template as a string
-     *
-     * @throws \InvalidArgumentException if the template does not exist
-     * @throws \RuntimeException         if the template cannot be rendered
-     * @throws \Twig_Error
+     * {@inheritdoc}
      */
     public function render($name, array $parameters = array())
     {
@@ -82,7 +53,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
                 try {
                     // try to get the real file name of the template where the error occurred
                     $e->setTemplateFile(sprintf('%s', $this->locator->locate($this->parser->parse($e->getTemplateFile()))));
-                } catch (\Exception $ex) {
+                } catch (\Exception $e2) {
                 }
             }
 
@@ -91,13 +62,9 @@ class TwigEngine extends BaseEngine implements EngineInterface
     }
 
     /**
-     * Renders a view and returns a Response.
+     * {@inheritdoc}
      *
-     * @param string   $view       The view name
-     * @param array    $parameters An array of parameters to pass to the view
-     * @param Response $response   A Response instance
-     *
-     * @return Response A Response instance
+     * @throws \Twig_Error if something went wrong like a thrown exception while rendering the template
      */
     public function renderResponse($view, array $parameters = array(), Response $response = null)
     {

@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FileType extends AbstractType
 {
@@ -23,8 +23,13 @@ class FileType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        if ($options['multiple']) {
+            $view->vars['full_name'] .= '[]';
+            $view->vars['attr']['multiple'] = 'multiple';
+        }
+
         $view->vars = array_replace($view->vars, array(
-            'type'  => 'file',
+            'type' => 'file',
             'value' => '',
         ));
     }
@@ -42,19 +47,20 @@ class FileType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'compound' => false,
             'data_class' => 'Symfony\Component\HttpFoundation\File\File',
             'empty_data' => null,
+            'multiple' => false,
         ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'file';
     }

@@ -45,7 +45,7 @@ abstract class AccountStatusException extends AuthenticationException
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -56,7 +56,7 @@ abstract class AccountStatusException extends AuthenticationException
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function unserialize($str)
     {

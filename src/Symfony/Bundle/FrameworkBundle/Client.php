@@ -29,9 +29,10 @@ class Client extends BaseClient
 {
     private $hasPerformedRequest = false;
     private $profiler = false;
+    private $reboot = true;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(KernelInterface $kernel, array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
@@ -41,7 +42,7 @@ class Client extends BaseClient
     /**
      * Returns the container.
      *
-     * @return ContainerInterface
+     * @return ContainerInterface|null Returns null when the Kernel has been shutdown or not started yet
      */
     public function getContainer()
     {
@@ -85,7 +86,26 @@ class Client extends BaseClient
     }
 
     /**
-     * Makes a request.
+     * Disables kernel reboot between requests.
+     *
+     * By default, the Client reboots the Kernel for each request. This method
+     * allows to keep the same kernel across requests.
+     */
+    public function disableReboot()
+    {
+        $this->reboot = false;
+    }
+
+    /**
+     * Enables kernel reboot between requests.
+     */
+    public function enableReboot()
+    {
+        $this->reboot = true;
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @param Request $request A Request instance
      *
@@ -95,7 +115,7 @@ class Client extends BaseClient
     {
         // avoid shutting down the Kernel if no request has been performed yet
         // WebTestCase::createClient() boots the Kernel but do not handle a request
-        if ($this->hasPerformedRequest) {
+        if ($this->hasPerformedRequest && $this->reboot) {
             $this->kernel->shutdown();
         } else {
             $this->hasPerformedRequest = true;
@@ -113,6 +133,10 @@ class Client extends BaseClient
 
     /**
      * {@inheritdoc}
+     *
+     * @param Request $request A Request instance
+     *
+     * @return Response A Response instance
      */
     protected function doRequestInProcess($request)
     {
@@ -156,8 +180,12 @@ class Client extends BaseClient
             $profilerCode = '$kernel->getContainer()->get(\'profiler\')->enable();';
         }
 
-        return <<<EOF
+        $errorReporting = error_reporting();
+
+        $code = <<<EOF
 <?php
+
+error_reporting($errorReporting);
 
 if ('$autoloader') {
     require_once '$autoloader';
@@ -167,7 +195,10 @@ require_once '$path';
 \$kernel = unserialize('$kernel');
 \$kernel->boot();
 $profilerCode
-echo serialize(\$kernel->handle(unserialize('$request')));
+
+\$request = unserialize('$request');
 EOF;
+
+        return $code.$this->getHandleScript();
     }
 }

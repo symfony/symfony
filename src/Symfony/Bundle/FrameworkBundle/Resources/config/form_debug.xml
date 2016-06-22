@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="form.resolved_type_factory" class="Symfony\Component\Form\Extension\DataCollector\Proxy\ResolvedTypeFactoryDataCollectorProxy">
+            <argument type="service">
+                <service class="Symfony\Component\Form\ResolvedFormTypeFactory" />
+            </argument>
+            <argument type="service" id="data_collector.form" />
+        </service>
+
+        <!-- DataCollectorTypeExtension -->
+        <service id="form.type_extension.form.data_collector" class="Symfony\Component\Form\Extension\DataCollector\Type\DataCollectorTypeExtension">
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
+            <argument type="service" id="data_collector.form" />
+        </service>
+
+        <!-- DataCollector -->
+        <service id="data_collector.form.extractor" class="Symfony\Component\Form\Extension\DataCollector\FormDataExtractor" />
+
+        <service id="data_collector.form" class="Symfony\Component\Form\Extension\DataCollector\FormDataCollector">
+            <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="310" />
+            <argument type="service" id="data_collector.form.extractor" />
+        </service>
+    </services>
+</container>

@@ -25,20 +25,24 @@ use Symfony\Component\Process\PhpProcess;
  * you need to also implement the getScript() method.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 abstract class Client
 {
     protected $history;
     protected $cookieJar;
-    protected $server;
+    protected $server = array();
+    protected $internalRequest;
     protected $request;
+    protected $internalResponse;
     protected $response;
     protected $crawler;
-    protected $insulated;
+    protected $insulated = false;
     protected $redirect;
-    protected $followRedirects;
+    protected $followRedirects = true;
+
+    private $maxRedirects = -1;
+    private $redirectCount = 0;
+    private $isMainRequest = true;
 
     /**
      * Constructor.
@@ -46,61 +50,79 @@ abstract class Client
      * @param array     $server    The server parameters (equivalent of $_SERVER)
      * @param History   $history   A History instance to store the browser history
      * @param CookieJar $cookieJar A CookieJar instance to store the cookies
-     *
-     * @api
      */
     public function __construct(array $server = array(), History $history = null, CookieJar $cookieJar = null)
     {
         $this->setServerParameters($server);
-        $this->history = null === $history ? new History() : $history;
-        $this->cookieJar = null === $cookieJar ? new CookieJar() : $cookieJar;
-        $this->insulated = false;
-        $this->followRedirects = true;
+        $this->history = $history ?: new History();
+        $this->cookieJar = $cookieJar ?: new CookieJar();
     }
 
     /**
      * Sets whether to automatically follow redirects or not.
      *
-     * @param Boolean $followRedirect Whether to follow redirects
-     *
-     * @api
+     * @param bool $followRedirect Whether to follow redirects
      */
     public function followRedirects($followRedirect = true)
     {
-        $this->followRedirects = (Boolean) $followRedirect;
+        $this->followRedirects = (bool) $followRedirect;
+    }
+
+    /**
+     * Returns whether client automatically follows redirects or not.
+     *
+     * @return bool
+     */
+    public function isFollowingRedirects()
+    {
+        return $this->followRedirects;
+    }
+
+    /**
+     * Sets the maximum number of requests that crawler can follow.
+     *
+     * @param int $maxRedirects
+     */
+    public function setMaxRedirects($maxRedirects)
+    {
+        $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
+        $this->followRedirects = -1 != $this->maxRedirects;
+    }
+
+    /**
+     * Returns the maximum number of requests that crawler can follow.
+     *
+     * @return int
+     */
+    public function getMaxRedirects()
+    {
+        return $this->maxRedirects;
     }
 
     /**
      * Sets the insulated flag.
      *
-     * @param Boolean $insulated Whether to insulate the requests or not
+     * @param bool $insulated Whether to insulate the requests or not
      *
      * @throws \RuntimeException When Symfony Process Component is not installed
-     *
-     * @api
      */
     public function insulate($insulated = true)
     {
         if ($insulated && !class_exists('Symfony\\Component\\Process\\Process')) {
-            // @codeCoverageIgnoreStart
             throw new \RuntimeException('Unable to isolate requests as the Symfony Process Component is not installed.');
-            // @codeCoverageIgnoreEnd
         }
 
-        $this->insulated = (Boolean) $insulated;
+        $this->insulated = (bool) $insulated;
     }
 
     /**
      * Sets server parameters.
      *
      * @param array $server An array of server parameters
-     *
-     * @api
      */
     public function setServerParameters(array $server)
     {
         $this->server = array_merge(array(
-            'HTTP_HOST'       => 'localhost',
             'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
         ), $server);
     }
@@ -126,15 +148,13 @@ abstract class Client
      */
     public function getServerParameter($key, $default = '')
     {
-        return (isset($this->server[$key])) ? $this->server[$key] : $default;
+        return isset($this->server[$key]) ? $this->server[$key] : $default;
     }
 
     /**
      * Returns the History instance.
      *
      * @return History A History instance
-     *
-     * @api
      */
     public function getHistory()
     {
@@ -145,8 +165,6 @@ abstract class Client
      * Returns the CookieJar instance.
      *
      * @return CookieJar A CookieJar instance
-     *
-     * @api
      */
     public function getCookieJar()
     {
@@ -156,9 +174,7 @@ abstract class Client
     /**
      * Returns the current Crawler instance.
      *
-     * @return Crawler A Crawler instance
-     *
-     * @api
+     * @return Crawler|null A Crawler instance
      */
     public function getCrawler()
     {
@@ -166,11 +182,24 @@ abstract class Client
     }
 
     /**
-     * Returns the current Response instance.
+     * Returns the current BrowserKit Response instance.
      *
-     * @return Response A Response instance
+     * @return Response|null A BrowserKit Response instance
+     */
+    public function getInternalResponse()
+    {
+        return $this->internalResponse;
+    }
+
+    /**
+     * Returns the current origin response instance.
      *
-     * @api
+     * The origin response is the response instance that is returned
+     * by the code that handles requests.
+     *
+     * @return object|null A response instance
+     *
+     * @see doRequest()
      */
     public function getResponse()
     {
@@ -178,11 +207,24 @@ abstract class Client
     }
 
     /**
-     * Returns the current Request instance.
+     * Returns the current BrowserKit Request instance.
      *
-     * @return Request A Request instance
+     * @return Request|null A BrowserKit Request instance
+     */
+    public function getInternalRequest()
+    {
+        return $this->internalRequest;
+    }
+
+    /**
+     * Returns the current origin Request instance.
      *
-     * @api
+     * The origin request is the request instance that is sent
+     * to the code that handles requests.
+     *
+     * @return object|null A Request instance
+     *
+     * @see doRequest()
      */
     public function getRequest()
     {
@@ -195,8 +237,6 @@ abstract class Client
      * @param Link $link A Link instance
      *
      * @return Crawler
-     *
-     * @api
      */
     public function click(Link $link)
     {
@@ -214,8 +254,6 @@ abstract class Client
      * @param array $values An array of form field values
      *
      * @return Crawler
-     *
-     * @api
      */
     public function submit(Form $form, array $values = array())
     {
@@ -227,35 +265,48 @@ abstract class Client
     /**
      * Calls a URI.
      *
-     * @param string  $method        The request method
-     * @param string  $uri           The URI to fetch
-     * @param array   $parameters    The Request parameters
-     * @param array   $files         The files
-     * @param array   $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
-     * @param string  $content       The raw body data
-     * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param string $method        The request method
+     * @param string $uri           The URI to fetch
+     * @param array  $parameters    The Request parameters
+     * @param array  $files         The files
+     * @param array  $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
+     * @param string $content       The raw body data
+     * @param bool   $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
-     *
-     * @api
      */
     public function request($method, $uri, array $parameters = array(), array $files = array(), array $server = array(), $content = null, $changeHistory = true)
     {
+        if ($this->isMainRequest) {
+            $this->redirectCount = 0;
+        } else {
+            ++$this->redirectCount;
+        }
+
         $uri = $this->getAbsoluteUri($uri);
 
         $server = array_merge($this->server, $server);
+
+        if (isset($server['HTTPS'])) {
+            $uri = preg_replace('{^'.parse_url($uri, PHP_URL_SCHEME).'}', $server['HTTPS'] ? 'https' : 'http', $uri);
+        }
+
         if (!$this->history->isEmpty()) {
             $server['HTTP_REFERER'] = $this->history->current()->getUri();
         }
-        $server['HTTP_HOST'] = parse_url($uri, PHP_URL_HOST);
+
+        if (empty($server['HTTP_HOST'])) {
+            $server['HTTP_HOST'] = $this->extractHost($uri);
+        }
+
         $server['HTTPS'] = 'https' == parse_url($uri, PHP_URL_SCHEME);
 
-        $request = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
+        $this->internalRequest = new Request($uri, $method, $parameters, $files, $this->cookieJar->allValues($uri), $server, $content);
 
-        $this->request = $this->filterRequest($request);
+        $this->request = $this->filterRequest($this->internalRequest);
 
         if (true === $changeHistory) {
-            $this->history->add($request);
+            $this->history->add($this->internalRequest);
         }
 
         if ($this->insulated) {
@@ -264,36 +315,41 @@ abstract class Client
             $this->response = $this->doRequest($this->request);
         }
 
-        $response = $this->filterResponse($this->response);
+        $this->internalResponse = $this->filterResponse($this->response);
 
-        $this->cookieJar->updateFromResponse($response);
+        $this->cookieJar->updateFromResponse($this->internalResponse, $uri);
 
-        $this->redirect = $response->getHeader('Location');
+        $status = $this->internalResponse->getStatus();
+
+        if ($status >= 300 && $status < 400) {
+            $this->redirect = $this->internalResponse->getHeader('Location');
+        } else {
+            $this->redirect = null;
+        }
 
         if ($this->followRedirects && $this->redirect) {
             return $this->crawler = $this->followRedirect();
         }
 
-        return $this->crawler = $this->createCrawlerFromContent($request->getUri(), $response->getContent(), $response->getHeader('Content-Type'));
+        return $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type'));
     }
 
     /**
      * Makes a request in another process.
      *
-     * @param Request $request A Request instance
+     * @param object $request An origin request instance
      *
-     * @return Response A Response instance
+     * @return object An origin response instance
      *
      * @throws \RuntimeException When processing returns exit code
      */
     protected function doRequestInProcess($request)
     {
-        // We set the TMPDIR (for Macs) and TEMP (for Windows), because on these platforms the temp directory changes based on the user.
-        $process = new PhpProcess($this->getScript($request), null, array('TMPDIR' => sys_get_temp_dir(), 'TEMP' => sys_get_temp_dir()));
+        $process = new PhpProcess($this->getScript($request), null, null);
         $process->run();
 
         if (!$process->isSuccessful() || !preg_match('/^O\:\d+\:/', $process->getOutput())) {
-            throw new \RuntimeException('OUTPUT: '.$process->getOutput().' ERROR OUTPUT: '.$process->getErrorOutput());
+            throw new \RuntimeException(sprintf('OUTPUT: %s ERROR OUTPUT: %s', $process->getOutput(), $process->getErrorOutput()));
         }
 
         return unserialize($process->getOutput());
@@ -302,32 +358,30 @@ abstract class Client
     /**
      * Makes a request.
      *
-     * @param Request $request A Request instance
+     * @param object $request An origin request instance
      *
-     * @return Response A Response instance
+     * @return object An origin response instance
      */
     abstract protected function doRequest($request);
 
     /**
      * Returns the script to execute when the request must be insulated.
      *
-     * @param Request $request A Request instance
+     * @param object $request An origin request instance
      *
      * @throws \LogicException When this abstract class is not implemented
      */
     protected function getScript($request)
     {
-        // @codeCoverageIgnoreStart
         throw new \LogicException('To insulate requests, you need to override the getScript() method.');
-        // @codeCoverageIgnoreEnd
     }
 
     /**
-     * Filters the request.
+     * Filters the BrowserKit request to the origin one.
      *
-     * @param Request $request The request to filter
+     * @param Request $request The BrowserKit Request to filter
      *
-     * @return Request
+     * @return object An origin request instance
      */
     protected function filterRequest(Request $request)
     {
@@ -335,11 +389,11 @@ abstract class Client
     }
 
     /**
-     * Filters the Response.
+     * Filters the origin response to the BrowserKit one.
      *
-     * @param Response $response The Response to filter
+     * @param object $response The origin response to filter
      *
-     * @return Response
+     * @return Response An BrowserKit Response instance
      */
     protected function filterResponse($response)
     {
@@ -351,7 +405,7 @@ abstract class Client
      *
      * This method returns null if the DomCrawler component is not available.
      *
-     * @param string $uri     A uri
+     * @param string $uri     A URI
      * @param string $content Content for the crawler to use
      * @param string $type    Content type
      *
@@ -360,7 +414,7 @@ abstract class Client
     protected function createCrawlerFromContent($uri, $content, $type)
     {
         if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
-            return null;
+            return;
         }
 
         $crawler = new Crawler(null, $uri);
@@ -373,8 +427,6 @@ abstract class Client
      * Goes back in the browser history.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function back()
     {
@@ -385,8 +437,6 @@ abstract class Client
      * Goes forward in the browser history.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function forward()
     {
@@ -397,8 +447,6 @@ abstract class Client
      * Reloads the current browser.
      *
      * @return Crawler
-     *
-     * @api
      */
     public function reload()
     {
@@ -411,8 +459,6 @@ abstract class Client
      * @return Crawler
      *
      * @throws \LogicException If request was not a redirect
-     *
-     * @api
      */
     public function followRedirect()
     {
@@ -420,15 +466,47 @@ abstract class Client
             throw new \LogicException('The request was not redirected.');
         }
 
-        return $this->request('get', $this->redirect);
+        if (-1 !== $this->maxRedirects) {
+            if ($this->redirectCount > $this->maxRedirects) {
+                throw new \LogicException(sprintf('The maximum number (%d) of redirections was reached.', $this->maxRedirects));
+            }
+        }
+
+        $request = $this->internalRequest;
+
+        if (in_array($this->internalResponse->getStatus(), array(302, 303))) {
+            $method = 'get';
+            $files = array();
+            $content = null;
+        } else {
+            $method = $request->getMethod();
+            $files = $request->getFiles();
+            $content = $request->getContent();
+        }
+
+        if ('get' === strtolower($method)) {
+            // Don't forward parameters for GET request as it should reach the redirection URI
+            $parameters = array();
+        } else {
+            $parameters = $request->getParameters();
+        }
+
+        $server = $request->getServer();
+        $server = $this->updateServerFromUri($server, $this->redirect);
+
+        $this->isMainRequest = false;
+
+        $response = $this->request($method, $this->redirect, $parameters, $files, $server, $content);
+
+        $this->isMainRequest = true;
+
+        return $response;
     }
 
     /**
      * Restarts the client.
      *
      * It flushes history and all cookies.
-     *
-     * @api
      */
     public function restart()
     {
@@ -439,14 +517,14 @@ abstract class Client
     /**
      * Takes a URI and converts it to absolute if it is not already absolute.
      *
-     * @param string $uri A uri
+     * @param string $uri A URI
      *
-     * @return string An absolute uri
+     * @return string An absolute URI
      */
     protected function getAbsoluteUri($uri)
     {
         // already absolute?
-        if (0 === strpos($uri, 'http')) {
+        if (0 === strpos($uri, 'http://') || 0 === strpos($uri, 'https://')) {
             return $uri;
         }
 
@@ -457,6 +535,11 @@ abstract class Client
                 isset($this->server['HTTPS']) ? 's' : '',
                 isset($this->server['HTTP_HOST']) ? $this->server['HTTP_HOST'] : 'localhost'
             );
+        }
+
+        // protocol relative URL
+        if (0 === strpos($uri, '//')) {
+            return parse_url($currentUri, PHP_URL_SCHEME).':'.$uri;
         }
 
         // anchor?
@@ -481,12 +564,33 @@ abstract class Client
      * Makes a request from a Request object directly.
      *
      * @param Request $request       A Request instance
-     * @param Boolean $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
+     * @param bool    $changeHistory Whether to update the history or not (only used internally for back(), forward(), and reload())
      *
      * @return Crawler
      */
     protected function requestFromRequest(Request $request, $changeHistory = true)
     {
         return $this->request($request->getMethod(), $request->getUri(), $request->getParameters(), $request->getFiles(), $request->getServer(), $request->getContent(), $changeHistory);
+    }
+
+    private function updateServerFromUri($server, $uri)
+    {
+        $server['HTTP_HOST'] = $this->extractHost($uri);
+        $scheme = parse_url($uri, PHP_URL_SCHEME);
+        $server['HTTPS'] = null === $scheme ? $server['HTTPS'] : 'https' == $scheme;
+        unset($server['HTTP_IF_NONE_MATCH'], $server['HTTP_IF_MODIFIED_SINCE']);
+
+        return $server;
+    }
+
+    private function extractHost($uri)
+    {
+        $host = parse_url($uri, PHP_URL_HOST);
+
+        if ($port = parse_url($uri, PHP_URL_PORT)) {
+            return $host.':'.$port;
+        }
+
+        return $host;
     }
 }

@@ -16,13 +16,6 @@ use Symfony\Component\Config\Resource\FileResource;
 
 class QtFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
     public function testLoad()
     {
         $loader = new QtFileLoader();
@@ -61,6 +54,14 @@ class QtFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../fixtures/invalid-xml-resources.xlf';
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    public function testLoadEmptyResource()
+    {
+        $loader = new QtFileLoader();
+        $resource = __DIR__.'/../fixtures/empty.xlf';
+        $this->setExpectedException('Symfony\Component\Translation\Exception\InvalidResourceException', sprintf('Unable to load "%s".', $resource));
         $loader->load($resource, 'en', 'domain1');
     }
 }

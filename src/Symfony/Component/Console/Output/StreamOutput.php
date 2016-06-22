@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Output;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 
 /**
@@ -25,8 +27,6 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  * $output = new StreamOutput(fopen('/path/to/output.log', 'a', false));
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class StreamOutput extends Output
 {
@@ -35,20 +35,17 @@ class StreamOutput extends Output
     /**
      * Constructor.
      *
-     * @param mixed                    $stream    A stream resource
-     * @param integer                  $verbosity The verbosity level (self::VERBOSITY_QUIET, self::VERBOSITY_NORMAL,
-     *                                                                 self::VERBOSITY_VERBOSE)
-     * @param Boolean                  $decorated Whether to decorate messages or not (null for auto-guessing)
-     * @param OutputFormatterInterface $formatter Output formatter instance
+     * @param resource                      $stream    A stream resource
+     * @param int                           $verbosity The verbosity level (one of the VERBOSITY constants in OutputInterface)
+     * @param bool|null                     $decorated Whether to decorate messages (null for auto-guessing)
+     * @param OutputFormatterInterface|null $formatter Output formatter instance (null to use default OutputFormatter)
      *
-     * @throws \InvalidArgumentException When first argument is not a real stream
-     *
-     * @api
+     * @throws InvalidArgumentException When first argument is not a real stream
      */
     public function __construct($stream, $verbosity = self::VERBOSITY_NORMAL, $decorated = null, OutputFormatterInterface $formatter = null)
     {
         if (!is_resource($stream) || 'stream' !== get_resource_type($stream)) {
-            throw new \InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
+            throw new InvalidArgumentException('The StreamOutput class needs a stream as its first argument.');
         }
 
         $this->stream = $stream;
@@ -71,20 +68,13 @@ class StreamOutput extends Output
     }
 
     /**
-     * Writes a message to the output.
-     *
-     * @param string  $message A message to write to the output
-     * @param Boolean $newline Whether to add a newline or not
-     *
-     * @throws \RuntimeException When unable to write output (should never happen)
+     * {@inheritdoc}
      */
     protected function doWrite($message, $newline)
     {
-        if (false === @fwrite($this->stream, $message.($newline ? PHP_EOL : ''))) {
-            // @codeCoverageIgnoreStart
+        if (false === @fwrite($this->stream, $message) || ($newline && (false === @fwrite($this->stream, PHP_EOL)))) {
             // should never happen
-            throw new \RuntimeException('Unable to write output.');
-            // @codeCoverageIgnoreEnd
+            throw new RuntimeException('Unable to write output.');
         }
 
         fflush($this->stream);
@@ -95,19 +85,21 @@ class StreamOutput extends Output
      *
      * Colorization is disabled if not supported by the stream:
      *
-     *  -  windows without ansicon and ConEmu
+     *  -  Windows before 10.0.10586 without Ansicon, ConEmu or Mintty
      *  -  non tty consoles
      *
-     * @return Boolean true if the stream supports colorization, false otherwise
+     * @return bool true if the stream supports colorization, false otherwise
      */
     protected function hasColorSupport()
     {
-        // @codeCoverageIgnoreStart
-        if (DIRECTORY_SEPARATOR == '\\') {
-            return false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI');
+        if (DIRECTORY_SEPARATOR === '\\') {
+            return
+                0 >= version_compare('10.0.10586', PHP_WINDOWS_VERSION_MAJOR.'.'.PHP_WINDOWS_VERSION_MINOR.'.'.PHP_WINDOWS_VERSION_BUILD)
+                || false !== getenv('ANSICON')
+                || 'ON' === getenv('ConEmuANSI')
+                || 'xterm' === getenv('TERM');
         }
 
         return function_exists('posix_isatty') && @posix_isatty($this->stream);
-        // @codeCoverageIgnoreEnd
     }
 }

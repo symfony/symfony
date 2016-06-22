@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Tests\FormPerformanceTestCase;
+use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -30,7 +30,7 @@ class ChoiceTypePerformanceTest extends FormPerformanceTestCase
         $choices = range(1, 300);
 
         for ($i = 0; $i < 100; ++$i) {
-            $this->factory->create('choice', rand(1, 400), array(
+            $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', mt_rand(1, 400), array(
                 'choices' => $choices,
             ));
         }

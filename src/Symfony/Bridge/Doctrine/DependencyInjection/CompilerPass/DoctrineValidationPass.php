@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
- * Registers additional validators
+ * Registers additional validators.
  *
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  */
@@ -33,7 +33,7 @@ class DoctrineValidationPass implements CompilerPassInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
@@ -43,7 +43,7 @@ class DoctrineValidationPass implements CompilerPassInterface
 
     /**
      * Gets the validation mapping files for the format and extends them with
-     * files matching a doctrine search pattern (Resources/config/validation.orm.xml)
+     * files matching a doctrine search pattern (Resources/config/validation.orm.xml).
      *
      * @param ContainerBuilder $container
      * @param string           $mapping
@@ -60,7 +60,7 @@ class DoctrineValidationPass implements CompilerPassInterface
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/'.$validationPath)) {
+            if (is_file($file = dirname($reflection->getFileName()).'/'.$validationPath)) {
                 $files[] = realpath($file);
                 $container->addResource(new FileResource($file));
             }

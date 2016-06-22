@@ -15,16 +15,14 @@ namespace Symfony\Component\HttpFoundation;
  * ResponseHeaderBag is a container for Response HTTP headers.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 class ResponseHeaderBag extends HeaderBag
 {
-    const COOKIES_FLAT           = 'flat';
-    const COOKIES_ARRAY          = 'array';
+    const COOKIES_FLAT = 'flat';
+    const COOKIES_ARRAY = 'array';
 
     const DISPOSITION_ATTACHMENT = 'attachment';
-    const DISPOSITION_INLINE     = 'inline';
+    const DISPOSITION_INLINE = 'inline';
 
     /**
      * @var array
@@ -34,19 +32,17 @@ class ResponseHeaderBag extends HeaderBag
     /**
      * @var array
      */
-    protected $cookies              = array();
+    protected $cookies = array();
 
     /**
      * @var array
      */
-    protected $headerNames          = array();
+    protected $headerNames = array();
 
     /**
      * Constructor.
      *
      * @param array $headers An array of HTTP headers
-     *
-     * @api
      */
     public function __construct(array $headers = array())
     {
@@ -84,8 +80,6 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function replace(array $headers = array())
     {
@@ -100,14 +94,12 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function set($key, $values, $replace = true)
     {
         parent::set($key, $values, $replace);
 
-        $uniqueKey = strtr(strtolower($key), '_', '-');
+        $uniqueKey = str_replace('_', '-', strtolower($key));
         $this->headerNames[$uniqueKey] = $key;
 
         // ensure the cache-control header has sensible defaults
@@ -121,14 +113,12 @@ class ResponseHeaderBag extends HeaderBag
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function remove($key)
     {
         parent::remove($key);
 
-        $uniqueKey = strtr(strtolower($key), '_', '-');
+        $uniqueKey = str_replace('_', '-', strtolower($key));
         unset($this->headerNames[$uniqueKey]);
 
         if ('cache-control' === $uniqueKey) {
@@ -156,8 +146,6 @@ class ResponseHeaderBag extends HeaderBag
      * Sets a cookie.
      *
      * @param Cookie $cookie
-     *
-     * @api
      */
     public function setCookie(Cookie $cookie)
     {
@@ -165,13 +153,11 @@ class ResponseHeaderBag extends HeaderBag
     }
 
     /**
-     * Removes a cookie from the array, but does not unset it in the browser
+     * Removes a cookie from the array, but does not unset it in the browser.
      *
      * @param string $name
      * @param string $path
      * @param string $domain
-     *
-     * @api
      */
     public function removeCookie($name, $path = '/', $domain = null)
     {
@@ -191,15 +177,13 @@ class ResponseHeaderBag extends HeaderBag
     }
 
     /**
-     * Returns an array with all cookies
+     * Returns an array with all cookies.
      *
      * @param string $format
      *
-     * @throws \InvalidArgumentException When the $format is invalid
-     *
      * @return array
      *
-     * @api
+     * @throws \InvalidArgumentException When the $format is invalid
      */
     public function getCookies($format = self::COOKIES_FLAT)
     {
@@ -224,17 +208,17 @@ class ResponseHeaderBag extends HeaderBag
     }
 
     /**
-     * Clears a cookie in the browser
+     * Clears a cookie in the browser.
      *
      * @param string $name
      * @param string $path
      * @param string $domain
-     *
-     * @api
+     * @param bool   $secure
+     * @param bool   $httpOnly
      */
-    public function clearCookie($name, $path = '/', $domain = null)
+    public function clearCookie($name, $path = '/', $domain = null, $secure = false, $httpOnly = true)
     {
-        $this->setCookie(new Cookie($name, null, 1, $path, $domain));
+        $this->setCookie(new Cookie($name, null, 1, $path, $domain, $secure, $httpOnly));
     }
 
     /**
@@ -249,6 +233,7 @@ class ResponseHeaderBag extends HeaderBag
      * @return string A string suitable for use as a Content-Disposition field-value.
      *
      * @throws \InvalidArgumentException
+     *
      * @see RFC 6266
      */
     public function makeDisposition($disposition, $filename, $filenameFallback = '')

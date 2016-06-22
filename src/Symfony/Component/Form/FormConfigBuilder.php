@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -28,7 +28,27 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
 class FormConfigBuilder implements FormConfigBuilderInterface
 {
     /**
-     * @var Boolean
+     * Caches a globally unique {@link NativeRequestHandler} instance.
+     *
+     * @var NativeRequestHandler
+     */
+    private static $nativeRequestProcessor;
+
+    /**
+     * The accepted request methods.
+     *
+     * @var array
+     */
+    private static $allowedMethods = array(
+        'GET',
+        'PUT',
+        'POST',
+        'DELETE',
+        'PATCH',
+    );
+
+    /**
+     * @var bool
      */
     protected $locked = false;
 
@@ -48,22 +68,22 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $propertyPath;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $mapped = true;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $byReference = true;
 
     /**
-     * @var Boolean
+     * @var bool
      */
-    private $virtual = false;
+    private $inheritData = false;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $compound = false;
 
@@ -88,22 +108,17 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $dataMapper;
 
     /**
-     * @var array
-     */
-    private $validators = array();
-
-    /**
-     * @var Boolean
+     * @var bool
      */
     private $required = true;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $disabled = false;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $errorBubbling = false;
 
@@ -128,7 +143,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $dataClass;
 
     /**
-     * @var Boolean
+     * @var bool
      */
     private $dataLocked;
 
@@ -138,6 +153,26 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     private $formFactory;
 
     /**
+     * @var string
+     */
+    private $action;
+
+    /**
+     * @var string
+     */
+    private $method = 'POST';
+
+    /**
+     * @var RequestHandlerInterface
+     */
+    private $requestHandler;
+
+    /**
+     * @var bool
+     */
+    private $autoInitialize = false;
+
+    /**
      * @var array
      */
     private $options;
@@ -145,20 +180,20 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Creates an empty form configuration.
      *
-     * @param string|integer           $name       The form name
+     * @param string|int               $name       The form name
      * @param string                   $dataClass  The class of the form's data
      * @param EventDispatcherInterface $dispatcher The event dispatcher
      * @param array                    $options    The form options
      *
-     * @throws \InvalidArgumentException If the data class is not a valid class or if
-     *                                   the name contains invalid characters.
+     * @throws InvalidArgumentException If the data class is not a valid class or if
+     *                                  the name contains invalid characters.
      */
     public function __construct($name, $dataClass, EventDispatcherInterface $dispatcher, array $options = array())
     {
         self::validateName($name);
 
-        if (null !== $dataClass && !class_exists($dataClass)) {
-            throw new \InvalidArgumentException(sprintf('The data class "%s" is not a valid class.', $dataClass));
+        if (null !== $dataClass && !class_exists($dataClass) && !interface_exists($dataClass)) {
+            throw new InvalidArgumentException(sprintf('Class "%s" not found. Is the "data_class" form option set correctly?', $dataClass));
         }
 
         $this->name = (string) $name;
@@ -264,6 +299,10 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getEventDispatcher()
     {
+        if ($this->locked && !$this->dispatcher instanceof ImmutableEventDispatcher) {
+            $this->dispatcher = new ImmutableEventDispatcher($this->dispatcher);
+        }
+
         return $this->dispatcher;
     }
 
@@ -302,9 +341,9 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVirtual()
+    public function getInheritData()
     {
-        return $this->virtual;
+        return $this->inheritData;
     }
 
     /**
@@ -392,7 +431,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function hasAttribute($name)
     {
-        return isset($this->attributes[$name]);
+        return array_key_exists($name, $this->attributes);
     }
 
     /**
@@ -400,7 +439,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getAttribute($name, $default = null)
     {
-        return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
+        return array_key_exists($name, $this->attributes) ? $this->attributes[$name] : $default;
     }
 
     /**
@@ -438,6 +477,45 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequestHandler()
+    {
+        if (null === $this->requestHandler) {
+            if (null === self::$nativeRequestProcessor) {
+                self::$nativeRequestProcessor = new NativeRequestHandler();
+            }
+            $this->requestHandler = self::$nativeRequestProcessor;
+        }
+
+        return $this->requestHandler;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAutoInitialize()
+    {
+        return $this->autoInitialize;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOptions()
     {
         return $this->options;
@@ -448,7 +526,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function hasOption($name)
     {
-        return isset($this->options[$name]);
+        return array_key_exists($name, $this->options);
     }
 
     /**
@@ -456,7 +534,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      */
     public function getOption($name, $default = null)
     {
-        return isset($this->options[$name]) ? $this->options[$name] : $default;
+        return array_key_exists($name, $this->options) ? $this->options[$name] : $default;
     }
 
     /**
@@ -510,7 +588,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->disabled = (Boolean) $disabled;
+        $this->disabled = (bool) $disabled;
 
         return $this;
     }
@@ -538,7 +616,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->errorBubbling = null === $errorBubbling ? null : (Boolean) $errorBubbling;
+        $this->errorBubbling = null === $errorBubbling ? null : (bool) $errorBubbling;
 
         return $this;
     }
@@ -552,7 +630,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->required = (Boolean) $required;
+        $this->required = (bool) $required;
 
         return $this;
     }
@@ -606,13 +684,13 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setVirtual($virtual)
+    public function setInheritData($inheritData)
     {
         if ($this->locked) {
             throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        $this->virtual = $virtual;
+        $this->inheritData = $inheritData;
 
         return $this;
     }
@@ -690,6 +768,72 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setAction($action)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $this->action = $action;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMethod($method)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $upperCaseMethod = strtoupper($method);
+
+        if (!in_array($upperCaseMethod, self::$allowedMethods)) {
+            throw new InvalidArgumentException(sprintf(
+                'The form method is "%s", but should be one of "%s".',
+                $method,
+                implode('", "', self::$allowedMethods)
+            ));
+        }
+
+        $this->method = $upperCaseMethod;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRequestHandler(RequestHandlerInterface $requestHandler)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+        }
+
+        $this->requestHandler = $requestHandler;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAutoInitialize($initialize)
+    {
+        if ($this->locked) {
+            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
+        }
+
+        $this->autoInitialize = (bool) $initialize;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFormConfig()
     {
         if ($this->locked) {
@@ -700,20 +844,16 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         $config = clone $this;
         $config->locked = true;
 
-        if (!$config->dispatcher instanceof ImmutableEventDispatcher) {
-            $config->dispatcher = new ImmutableEventDispatcher($config->dispatcher);
-        }
-
         return $config;
     }
 
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string|integer $name The tested form name.
+     * @param string|int $name The tested form name.
      *
-     * @throws UnexpectedTypeException   If the name is not a string or an integer.
-     * @throws \InvalidArgumentException If the name contains invalid characters.
+     * @throws UnexpectedTypeException  If the name is not a string or an integer.
+     * @throws InvalidArgumentException If the name contains invalid characters.
      */
     public static function validateName($name)
     {
@@ -722,7 +862,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
         }
 
         if (!self::isValidName($name)) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'The name "%s" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                 $name
             ));
@@ -741,7 +881,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *
      * @param string $name The tested form name.
      *
-     * @return Boolean Whether the name is valid.
+     * @return bool Whether the name is valid.
      */
     public static function isValidName($name)
     {

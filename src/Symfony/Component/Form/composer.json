@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Symfony Form Component",
     "keywords": [],
-    "homepage": "http://symfony.com",
+    "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
         {
@@ -12,32 +12,47 @@
         },
         {
             "name": "Symfony Community",
-            "homepage": "http://symfony.com/contributors"
+            "homepage": "https://symfony.com/contributors"
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/event-dispatcher": "~2.1",
-        "symfony/locale": "~2.0",
-        "symfony/options-resolver": ">=2.1,<2.4-dev",
-        "symfony/property-access": ">=2.2,<2.4-dev"
+        "php": ">=5.5.9",
+        "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/intl": "~2.8|~3.0",
+        "symfony/options-resolver": "~2.8|~3.0",
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/property-access": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/validator": ">=2.2,<2.4-dev",
-        "symfony/http-foundation": ">=2.1,<2.4-dev"
+        "doctrine/collections": "~1.0",
+        "symfony/validator": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/security-csrf": "~2.8|~3.0",
+        "symfony/translation": "~2.8|~3.0"
+    },
+    "conflict": {
+        "symfony/doctrine-bridge": "<2.7",
+        "symfony/framework-bundle": "<2.7",
+        "symfony/twig-bridge": "<2.7"
     },
     "suggest": {
-        "symfony/validator": "2.2.*",
-        "symfony/http-foundation": "2.2.*"
+        "symfony/validator": "For form validation.",
+        "symfony/security-csrf": "For protecting forms against CSRF attacks.",
+        "symfony/twig-bridge": "For templating with Twig.",
+        "symfony/framework-bundle": "For templating with PHP."
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Form\\": "" }
+        "psr-4": { "Symfony\\Component\\Form\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
-    "target-dir": "Symfony/Component/Form",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "3.2-dev"
         }
     }
 }

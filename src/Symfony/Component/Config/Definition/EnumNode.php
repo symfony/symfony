@@ -1,9 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Config\Definition;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
  * Node which only allows a finite set of values.
@@ -17,8 +25,8 @@ class EnumNode extends ScalarNode
     public function __construct($name, NodeInterface $parent = null, array $values = array())
     {
         $values = array_unique($values);
-        if (count($values) <= 1) {
-            throw new \InvalidArgumentException('$values must contain at least two distinct elements.');
+        if (empty($values)) {
+            throw new \InvalidArgumentException('$values must contain at least one element.');
         }
 
         parent::__construct($name, $parent);

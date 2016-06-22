@@ -55,7 +55,7 @@ class MappingRule
      * If the rule matches, the form mapped by the rule is returned.
      * Otherwise this method returns false.
      *
-     * @param  string $propertyPath The property path to match against the rule.
+     * @param string $propertyPath The property path to match against the rule.
      *
      * @return null|FormInterface The mapped form or null.
      */
@@ -64,8 +64,6 @@ class MappingRule
         if ($propertyPath === (string) $this->propertyPath) {
             return $this->getTarget();
         }
-
-        return null;
     }
 
     /**
@@ -73,7 +71,7 @@ class MappingRule
      *
      * @param string $propertyPath The property path to match against the rule.
      *
-     * @return Boolean Whether the property path is a prefix of the rule or not.
+     * @return bool Whether the property path is a prefix of the rule or not.
      */
     public function isPrefix($propertyPath)
     {

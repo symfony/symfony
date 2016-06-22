@@ -14,16 +14,16 @@ namespace Symfony\Component\Translation\Dumper;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * IniFileDumper generates a ini formatted string representation of a message catalogue.
+ * IniFileDumper generates an ini formatted string representation of a message catalogue.
  *
  * @author Stealth35
  */
 class IniFileDumper extends FileDumper
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function format(MessageCatalogue $messages, $domain = 'messages')
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         $output = '';
 
@@ -36,7 +36,7 @@ class IniFileDumper extends FileDumper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getExtension()
     {

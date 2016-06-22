@@ -25,7 +25,7 @@ namespace Symfony\Component\Routing\Generator;
  *   params because they come from third party libs but don't want to have a 404 in
  *   production environment. It should log the mismatch so one can review it.
  * - setStrictRequirements(null): Return the URL with the given parameters without
- *   checking the requirements at all. When generating an URL you should either trust
+ *   checking the requirements at all. When generating a URL you should either trust
  *   your params or you validated them beforehand because otherwise it would break your
  *   link anyway. So in production environment you should know that params always pass
  *   the requirements. Thus this option allows to disable the check on URL generation for
@@ -41,7 +41,7 @@ interface ConfigurableRequirementsInterface
      * Enables or disables the exception on incorrect parameters.
      * Passing null will deactivate the requirements check completely.
      *
-     * @param Boolean|null $enabled
+     * @param bool|null $enabled
      */
     public function setStrictRequirements($enabled);
 
@@ -49,7 +49,7 @@ interface ConfigurableRequirementsInterface
      * Returns whether to throw an exception on incorrect parameters.
      * Null means the requirements check is deactivated completely.
      *
-     * @return Boolean|null
+     * @return bool|null
      */
     public function isStrictRequirements();
 }

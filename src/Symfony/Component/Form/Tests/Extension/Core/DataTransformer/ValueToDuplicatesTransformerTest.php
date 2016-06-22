@@ -3,7 +3,7 @@
 /*
  * This file is part of the Symfony package.
  *
- * (c) Fabien Potencier <fabien.potencier@symfony-project.com>
+ * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -82,6 +82,28 @@ class ValueToDuplicatesTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
+    public function testReverseTransformEmptyArray()
+    {
+        $input = array(
+            'a' => array(),
+            'b' => array(),
+            'c' => array(),
+        );
+
+        $this->assertNull($this->transformer->reverseTransform($input));
+    }
+
+    public function testReverseTransformZeroString()
+    {
+        $input = array(
+            'a' => '0',
+            'b' => '0',
+            'c' => '0',
+        );
+
+        $this->assertSame('0', $this->transformer->reverseTransform($input));
+    }
+
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
@@ -111,7 +133,7 @@ class ValueToDuplicatesTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformRequiresArray()
     {

@@ -1,0 +1,7 @@
+SVN information
+===============
+
+URL: http://source.icu-project.org/repos/icu/icu/tags/release-55-1/source
+Revision: 37294
+Author: mow
+Date: 2015-03-27T17:27:46.562500Z

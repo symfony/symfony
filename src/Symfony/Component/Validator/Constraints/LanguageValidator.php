@@ -11,24 +11,27 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Intl\Intl;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
- * Validates whether a value is a valid language code
+ * Validates whether a value is a valid language code.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class LanguageValidator extends ConstraintValidator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof Language) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Language');
+        }
+
         if (null === $value || '' === $value) {
             return;
         }
@@ -38,9 +41,13 @@ class LanguageValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        $languages = Intl::getLanguageBundle()->getLanguageNames();
 
-        if (!in_array($value, \Symfony\Component\Locale\Locale::getLanguages())) {
-            $this->context->addViolation($constraint->message, array('{{ value }}' => $value));
+        if (!isset($languages[$value])) {
+            $this->context->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $this->formatValue($value))
+                ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
+                ->addViolation();
         }
     }
 }

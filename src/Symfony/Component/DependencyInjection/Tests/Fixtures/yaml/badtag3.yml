@@ -3,4 +3,4 @@ services:
         class:    FooClass
         tags:
           # tag-attribute is not a scalar
-          - { name: foo, foo: { foo: foo, bar: bar } }
+          - { name: foo, bar: { foo: foo, bar: bar } }

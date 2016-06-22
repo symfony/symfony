@@ -11,26 +11,32 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Constraints\Collection\Required;
-use Symfony\Component\Validator\Constraints\Collection\Optional;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * @Annotation
+ * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @api
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class Collection extends Constraint
+class Collection extends Composite
 {
-    public $fields;
+    const MISSING_FIELD_ERROR = '2fa2158c-2a7f-484b-98aa-975522539ff8';
+    const NO_SUCH_FIELD_ERROR = '7703c766-b5d5-4cef-ace7-ae0dd82304e9';
+
+    protected static $errorNames = array(
+        self::MISSING_FIELD_ERROR => 'MISSING_FIELD_ERROR',
+        self::NO_SUCH_FIELD_ERROR => 'NO_SUCH_FIELD_ERROR',
+    );
+
+    public $fields = array();
     public $allowExtraFields = false;
     public $allowMissingFields = false;
     public $extraFieldsMessage = 'This field was not expected.';
     public $missingFieldsMessage = 'This field is missing.';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($options = null)
     {
@@ -41,28 +47,28 @@ class Collection extends Constraint
         }
 
         parent::__construct($options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeNestedConstraints()
+    {
+        parent::initializeNestedConstraints();
 
         if (!is_array($this->fields)) {
-            throw new ConstraintDefinitionException('The option "fields" is expected to be an array in constraint '.__CLASS__);
+            throw new ConstraintDefinitionException(sprintf('The option "fields" is expected to be an array in constraint %s', __CLASS__));
         }
 
         foreach ($this->fields as $fieldName => $field) {
+            // the XmlFileLoader and YamlFileLoader pass the field Optional
+            // and Required constraint as an array with exactly one element
+            if (is_array($field) && count($field) == 1) {
+                $this->fields[$fieldName] = $field = $field[0];
+            }
+
             if (!$field instanceof Optional && !$field instanceof Required) {
                 $this->fields[$fieldName] = $field = new Required($field);
-            }
-
-            if (!is_array($field->constraints)) {
-                $field->constraints = array($field->constraints);
-            }
-
-            foreach ($field->constraints as $constraint) {
-                if (!$constraint instanceof Constraint) {
-                    throw new ConstraintDefinitionException('The value '.$constraint.' of the field '.$fieldName.' is not an instance of Constraint in constraint '.__CLASS__);
-                }
-
-                if ($constraint instanceof Valid) {
-                    throw new ConstraintDefinitionException('The constraint Valid cannot be nested inside constraint '.__CLASS__.'. You can only declare the Valid constraint directly on a field or method.');
-                }
             }
         }
     }
@@ -70,5 +76,10 @@ class Collection extends Constraint
     public function getRequiredOptions()
     {
         return array('fields');
+    }
+
+    protected function getCompositeOption()
+    {
+        return 'fields';
     }
 }

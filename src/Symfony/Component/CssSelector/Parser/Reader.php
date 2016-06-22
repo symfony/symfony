@@ -14,10 +14,12 @@ namespace Symfony\Component\CssSelector\Parser;
 /**
  * CSS selector reader.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class Reader
 {
@@ -34,7 +36,7 @@ class Reader
     /**
      * @var int
      */
-    private $position;
+    private $position = 0;
 
     /**
      * @param string $source
@@ -43,7 +45,6 @@ class Reader
     {
         $this->source = $source;
         $this->length = strlen($source);
-        $this->position = 0;
     }
 
     /**

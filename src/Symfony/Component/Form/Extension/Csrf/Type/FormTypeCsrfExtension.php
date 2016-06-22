@@ -12,27 +12,51 @@
 namespace Symfony\Component\Form\Extension\Csrf\Type;
 
 use Symfony\Component\Form\AbstractTypeExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormTypeCsrfExtension extends AbstractTypeExtension
 {
-    private $defaultCsrfProvider;
+    /**
+     * @var CsrfTokenManagerInterface
+     */
+    private $defaultTokenManager;
+
+    /**
+     * @var bool
+     */
     private $defaultEnabled;
+
+    /**
+     * @var string
+     */
     private $defaultFieldName;
 
-    public function __construct(CsrfProviderInterface $defaultCsrfProvider, $defaultEnabled = true, $defaultFieldName = '_token')
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
+
+    public function __construct(CsrfTokenManagerInterface $defaultTokenManager, $defaultEnabled = true, $defaultFieldName = '_token', TranslatorInterface $translator = null, $translationDomain = null)
     {
-        $this->defaultCsrfProvider = $defaultCsrfProvider;
+        $this->defaultTokenManager = $defaultTokenManager;
         $this->defaultEnabled = $defaultEnabled;
         $this->defaultFieldName = $defaultFieldName;
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
     }
 
     /**
@@ -48,8 +72,14 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
         }
 
         $builder
-            ->setAttribute('csrf_factory', $builder->getFormFactory())
-            ->addEventSubscriber(new CsrfValidationListener($options['csrf_field_name'], $options['csrf_provider'], $options['intention']))
+            ->addEventSubscriber(new CsrfValidationListener(
+                $options['csrf_field_name'],
+                $options['csrf_token_manager'],
+                $options['csrf_token_id'] ?: ($builder->getName() ?: get_class($builder->getType()->getInnerType())),
+                $options['csrf_message'],
+                $this->translator,
+                $this->translationDomain
+            ))
         ;
     }
 
@@ -63,10 +93,11 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
-            $factory = $form->getConfig()->getAttribute('csrf_factory');
-            $data = $options['csrf_provider']->generateCsrfToken($options['intention']);
+            $factory = $form->getConfig()->getFormFactory();
+            $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: get_class($form->getConfig()->getType()->getInnerType()));
+            $data = (string) $options['csrf_token_manager']->getToken($tokenId);
 
-            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'hidden', $data, array(
+            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'Symfony\Component\Form\Extension\Core\Type\HiddenType', $data, array(
                 'mapped' => false,
             ));
 
@@ -75,23 +106,24 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'csrf_protection'   => $this->defaultEnabled,
-            'csrf_field_name'   => $this->defaultFieldName,
-            'csrf_provider'     => $this->defaultCsrfProvider,
-            'intention'         => 'unknown',
+            'csrf_protection' => $this->defaultEnabled,
+            'csrf_field_name' => $this->defaultFieldName,
+            'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
+            'csrf_token_manager' => $this->defaultTokenManager,
+            'csrf_token_id' => null,
         ));
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getExtendedType()
     {
-        return 'form';
+        return 'Symfony\Component\Form\Extension\Core\Type\FormType';
     }
 }

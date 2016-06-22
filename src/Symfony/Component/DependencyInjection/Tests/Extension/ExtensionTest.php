@@ -54,7 +54,7 @@ class ExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(true),
-            array(false)
+            array(false),
         );
     }
 

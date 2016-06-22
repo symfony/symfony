@@ -1,0 +1,13 @@
+{
+    "Version": "2.1.11.59",
+    "Names": {
+        "AUD": [
+            "$",
+            "Australian Dollar"
+        ],
+        "SCR": [
+            "SCR",
+            "Seychelles Rupee"
+        ]
+    }
+}

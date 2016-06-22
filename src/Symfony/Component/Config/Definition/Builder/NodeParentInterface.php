@@ -12,7 +12,7 @@
 namespace Symfony\Component\Config\Definition\Builder;
 
 /**
- * An interface that must be implemented by all node parents
+ * An interface that must be implemented by all node parents.
  *
  * @author Victor Berchet <victor@suumit.com>
  */

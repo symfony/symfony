@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 /**
  * A wrapper for a form type and its extensions.
  *
@@ -19,16 +21,16 @@ namespace Symfony\Component\Form;
 interface ResolvedFormTypeInterface
 {
     /**
-     * Returns the name of the type.
+     * Returns the prefix of the template block name for this type.
      *
-     * @return string The type name.
+     * @return string The prefix of the template block name
      */
-    public function getName();
+    public function getBlockPrefix();
 
     /**
      * Returns the parent type.
      *
-     * @return ResolvedFormTypeInterface The parent type or null.
+     * @return ResolvedFormTypeInterface|null The parent type or null.
      */
     public function getParent();
 
@@ -52,17 +54,16 @@ interface ResolvedFormTypeInterface
      * @param FormFactoryInterface $factory The form factory.
      * @param string               $name    The name for the builder.
      * @param array                $options The builder options.
-     * @param FormBuilderInterface $parent  The parent builder object or null.
      *
      * @return FormBuilderInterface The created form builder.
      */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = array(), FormBuilderInterface $parent = null);
+    public function createBuilder(FormFactoryInterface $factory, $name, array $options = array());
 
     /**
      * Creates a new form view for a form of this type.
      *
-     * @param FormInterface     $form   The form to create a view for.
-     * @param FormView $parent The parent view or null.
+     * @param FormInterface $form   The form to create a view for.
+     * @param FormView      $parent The parent view or null.
      *
      * @return FormView The created form view.
      */
@@ -101,7 +102,7 @@ interface ResolvedFormTypeInterface
     /**
      * Returns the configured options resolver used for this type.
      *
-     * @return \Symfony\Component\OptionsResolver\OptionsResolverInterface The options resolver.
+     * @return OptionsResolver The options resolver.
      */
     public function getOptionsResolver();
 }

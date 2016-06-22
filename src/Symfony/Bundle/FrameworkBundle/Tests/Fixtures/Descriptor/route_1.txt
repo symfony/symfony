@@ -1,0 +1,17 @@
++--------------+---------------------------------------------------------+
+|[32m Property     [39m|[32m Value                                                   [39m|
++--------------+---------------------------------------------------------+
+| Route Name   |                                                         |
+| Path         | /hello/{name}                                           |
+| Path Regex   | #^/hello(?:/(?P<name>[a-z]+))?$#s                       |
+| Host         | localhost                                               |
+| Host Regex   | #^localhost$#si                                         |
+| Scheme       | http|https                                              |
+| Method       | GET|HEAD                                                |
+| Requirements | name: [a-z]+                                            |
+| Class        | Symfony\Component\Routing\Route                         |
+| Defaults     | name: Joseph                                            |
+| Options      | compiler_class: Symfony\Component\Routing\RouteCompiler |
+|              | opt1: val1                                              |
+|              | opt2: val2                                              |
++--------------+---------------------------------------------------------+

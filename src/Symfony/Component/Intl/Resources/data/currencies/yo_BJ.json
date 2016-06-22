@@ -1,0 +1,229 @@
+{
+    "Version": "2.1.13.24",
+    "Names": {
+        "AED": [
+            "AED",
+            "Diami ti Awon Orílɛ́ède Arabu"
+        ],
+        "AOA": [
+            "AOA",
+            "Wansa ti Orílɛ́ède Àngólà"
+        ],
+        "AUD": [
+            "A$",
+            "Dɔla ti Orílɛ́ède Ástràlìá"
+        ],
+        "BHD": [
+            "BHD",
+            "Dina ti Orílɛ́ède Báránì"
+        ],
+        "BIF": [
+            "BIF",
+            "Faransi ti Orílɛ́ède Bùùrúndì"
+        ],
+        "BWP": [
+            "BWP",
+            "Pula ti Orílɛ́ède Bɔ̀tìsúwánà"
+        ],
+        "CAD": [
+            "CA$",
+            "Dɔla ti Orílɛ́ède Kánádà"
+        ],
+        "CDF": [
+            "CDF",
+            "Faransi ti Orílɛ́ède Kóngò"
+        ],
+        "CHF": [
+            "CHF",
+            "Faransi ti Orílɛ́ède Siwisi"
+        ],
+        "CNY": [
+            "CN¥",
+            "Reminibi ti Orílɛ́ède sháínà"
+        ],
+        "CVE": [
+            "CVE",
+            "Kabofediano ti Orílɛ́ède Esuodo"
+        ],
+        "DJF": [
+            "DJF",
+            "Faransi ti Orílɛ́ède Dibouti"
+        ],
+        "DZD": [
+            "DZD",
+            "Dina ti Orílɛ́ède Àlùgèríánì"
+        ],
+        "EGP": [
+            "EGP",
+            "pɔɔn ti Orílɛ́ède Egipiti"
+        ],
+        "ERN": [
+            "ERN",
+            "Nakifa ti Orílɛ́ède Eriteriani"
+        ],
+        "ETB": [
+            "ETB",
+            "Biri ti Orílɛ́ède Eutopia"
+        ],
+        "EUR": [
+            "€",
+            "Uro"
+        ],
+        "GBP": [
+            "£",
+            "Pɔɔn ti Orílɛ́ède Bírítísì"
+        ],
+        "GHC": [
+            "GHC",
+            "shidi ti Orílɛ́ède Gana"
+        ],
+        "GMD": [
+            "GMD",
+            "Dalasi ti Orílɛ́ède Gamibia"
+        ],
+        "GNS": [
+            "GNS",
+            "Faransi ti Orílɛ́ède Gini"
+        ],
+        "INR": [
+            "₹",
+            "Rupi ti Orílɛ́ède Indina"
+        ],
+        "JPY": [
+            "JP¥",
+            "Yeni ti Orílɛ́ède Japani"
+        ],
+        "KES": [
+            "KES",
+            "shiili ti Orílɛ́ède Kenya"
+        ],
+        "KMF": [
+            "KMF",
+            "Faransi ti Orílɛ́ède shomoriani"
+        ],
+        "LRD": [
+            "LRD",
+            "Dɔla ti Orílɛ́ède Liberia"
+        ],
+        "LSL": [
+            "LSL",
+            "Loti ti Orílɛ́ède Lesoto"
+        ],
+        "LYD": [
+            "LYD",
+            "Dina ti Orílɛ́ède Libiya"
+        ],
+        "MAD": [
+            "MAD",
+            "Dirami ti Orílɛ́ède Moroko"
+        ],
+        "MGA": [
+            "MGA",
+            "Faransi ti Orílɛ́ède Malagasi"
+        ],
+        "MRO": [
+            "MRO",
+            "Ouguiya ti Orílɛ́ède Maritania"
+        ],
+        "MUR": [
+            "MUR",
+            "Rupi ti Orílɛ́ède Maritiusi"
+        ],
+        "MWK": [
+            "MWK",
+            "Kasha ti Orílɛ́ède Malawi"
+        ],
+        "MZM": [
+            "MZM",
+            "Metika ti Orílɛ́ède Mosamibiki"
+        ],
+        "NAD": [
+            "NAD",
+            "Dɔla ti Orílɛ́ède Namibia"
+        ],
+        "NGN": [
+            "₦",
+            "Naira ti Orílɛ́ède Nàìjíríà"
+        ],
+        "RWF": [
+            "RWF",
+            "Faransi ti Orílɛ́ède Ruwanda"
+        ],
+        "SAR": [
+            "SAR",
+            "Riya ti Orílɛ́ède Saudi"
+        ],
+        "SCR": [
+            "SCR",
+            "Rupi ti Orílɛ́ède Sayiselesi"
+        ],
+        "SDG": [
+            "SDG",
+            "Dina ti Orílɛ́ède Sudani"
+        ],
+        "SDP": [
+            "SDP",
+            "Pɔɔun ti Orílɛ́ède Sudani"
+        ],
+        "SHP": [
+            "SHP",
+            "Pɔɔun ti Orílɛ́ède ̣Elena"
+        ],
+        "SLL": [
+            "SLL",
+            "Lioni"
+        ],
+        "SOS": [
+            "SOS",
+            "Sile ti Orílɛ́ède Somali"
+        ],
+        "STD": [
+            "STD",
+            "Dobira ti Orílɛ́ède Sao tome Ati Pirisipe"
+        ],
+        "SZL": [
+            "SZL",
+            "Lilangeni"
+        ],
+        "TND": [
+            "TND",
+            "Dina ti Orílɛ́ède Tunisia"
+        ],
+        "TZS": [
+            "TZS",
+            "Sile ti Orílɛ́ède Tansania"
+        ],
+        "UGX": [
+            "UGX",
+            "Siile ti Orílɛ́ède Uganda"
+        ],
+        "USD": [
+            "US$",
+            "Dɔla ti Orílɛ́ède Amerika"
+        ],
+        "XAF": [
+            "FCFA",
+            "Faransi ti Orílɛ́ède BEKA"
+        ],
+        "XOF": [
+            "CFA",
+            "Faransi ti Orílɛ́ède BIKEAO"
+        ],
+        "ZAR": [
+            "ZAR",
+            "Randi ti Orílɛ́ède Ariwa Afirika"
+        ],
+        "ZMK": [
+            "ZMK",
+            "Kawasha ti Orílɛ́ède Saabia (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "Kawasha ti Orílɛ́ède Saabia"
+        ],
+        "ZWD": [
+            "ZWD",
+            "Dɔla ti Orílɛ́ède Siibabuwe"
+        ]
+    }
+}

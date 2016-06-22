@@ -1,0 +1,137 @@
+{
+    "Version": "2.1.13.23",
+    "Names": {
+        "ARS": [
+            "ARS",
+            "peso argentin"
+        ],
+        "AUD": [
+            "$ AU",
+            "dollar australien"
+        ],
+        "BMD": [
+            "BMD",
+            "dollar bermudien"
+        ],
+        "BND": [
+            "BND",
+            "dollar brunéien"
+        ],
+        "BSD": [
+            "BSD",
+            "dollar bahaméen"
+        ],
+        "BZD": [
+            "BZD",
+            "dollar bélizéen"
+        ],
+        "CAD": [
+            "$",
+            "dollar canadien"
+        ],
+        "CLP": [
+            "CLP",
+            "peso chilien"
+        ],
+        "CNY": [
+            "CN¥",
+            "yuan renminbi chinois"
+        ],
+        "COP": [
+            "COP",
+            "peso colombien"
+        ],
+        "FJD": [
+            "FJD",
+            "dollar fidjien"
+        ],
+        "FKP": [
+            "FKP",
+            "livre des Îles Malouines"
+        ],
+        "GBP": [
+            "£",
+            "livre sterling"
+        ],
+        "GIP": [
+            "GIP",
+            "livre de Gibraltar"
+        ],
+        "HKD": [
+            "$ HK",
+            "dollar de Hong Kong"
+        ],
+        "ILS": [
+            "ILS",
+            "nouveau shekel israélien"
+        ],
+        "INR": [
+            "INR",
+            "roupie indienne"
+        ],
+        "JPY": [
+            "¥",
+            "yen japonais"
+        ],
+        "KRW": [
+            "KRW",
+            "won sud-coréen"
+        ],
+        "LBP": [
+            "LBP",
+            "livre libanaise"
+        ],
+        "MXN": [
+            "MXN",
+            "peso mexicain"
+        ],
+        "NAD": [
+            "NAD",
+            "dollar namibien"
+        ],
+        "NZD": [
+            "$ NZ",
+            "dollar néo-zélandais"
+        ],
+        "SBD": [
+            "SBD",
+            "dollar des îles Salomon"
+        ],
+        "SGD": [
+            "$ SG",
+            "dollar de Singapour"
+        ],
+        "THB": [
+            "THB",
+            "baht thaïlandais"
+        ],
+        "TTD": [
+            "TTD",
+            "dollar de Trinité-et-Tobago"
+        ],
+        "USD": [
+            "$ US",
+            "dollar des États-Unis"
+        ],
+        "UYU": [
+            "UYU",
+            "peso uruguayen"
+        ],
+        "VND": [
+            "VND",
+            "dông vietnamien"
+        ],
+        "XAF": [
+            "XAF",
+            "franc CFA (BEAC)"
+        ],
+        "XOF": [
+            "XOF",
+            "franc CFA (BCEAO)"
+        ],
+        "XPF": [
+            "XPF",
+            "franc CFP"
+        ]
+    }
+}

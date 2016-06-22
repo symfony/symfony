@@ -1,0 +1,9 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    cache:
+        app: cache.adapter.redis
+        pools:
+            cache.test:
+                public: true

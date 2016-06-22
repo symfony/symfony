@@ -1,0 +1,13 @@
+{
+    "Version": "2.1.6.69",
+    "Names": {
+        "DOP": [
+            "$",
+            "peso dominicano"
+        ],
+        "USD": [
+            "US$",
+            "dólar estadounidense"
+        ]
+    }
+}

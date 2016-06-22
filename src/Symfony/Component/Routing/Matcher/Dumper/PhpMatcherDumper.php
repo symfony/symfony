@@ -13,6 +13,8 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * PhpMatcherDumper creates a PHP class able to match URLs for a given set of routes.
@@ -23,6 +25,13 @@ use Symfony\Component\Routing\RouteCollection;
  */
 class PhpMatcherDumper extends MatcherDumper
 {
+    private $expressionLanguage;
+
+    /**
+     * @var ExpressionFunctionProviderInterface[]
+     */
+    private $expressionLanguageProviders = array();
+
     /**
      * Dumps a set of routes to a PHP class.
      *
@@ -38,7 +47,7 @@ class PhpMatcherDumper extends MatcherDumper
     public function dump(array $options = array())
     {
         $options = array_replace(array(
-            'class'      => 'ProjectUrlMatcher',
+            'class' => 'ProjectUrlMatcher',
             'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
         ), $options);
 
@@ -54,7 +63,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * {$options['class']}
+ * {$options['class']}.
  *
  * This class has been auto-generated
  * by the Symfony Routing Component.
@@ -75,10 +84,15 @@ class {$options['class']} extends {$options['base_class']}
 EOF;
     }
 
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    {
+        $this->expressionLanguageProviders[] = $provider;
+    }
+
     /**
      * Generates the code for the match method implementing UrlMatcherInterface.
      *
-     * @param Boolean $supportsRedirections Whether redirections are supported by the base class
+     * @param bool $supportsRedirections Whether redirections are supported by the base class
      *
      * @return string Match method as PHP code
      */
@@ -91,6 +105,8 @@ EOF;
     {
         \$allow = array();
         \$pathinfo = rawurldecode(\$pathinfo);
+        \$context = \$this->context;
+        \$request = \$this->request;
 
 $code
 
@@ -103,7 +119,7 @@ EOF;
      * Generates PHP code to match a RouteCollection with all its routes.
      *
      * @param RouteCollection $routes               A RouteCollection instance
-     * @param Boolean         $supportsRedirections Whether redirections are supported by the base class
+     * @param bool            $supportsRedirections Whether redirections are supported by the base class
      *
      * @return string PHP code
      */
@@ -141,10 +157,10 @@ EOF;
     }
 
     /**
-     * Generates PHP code recursively to match a tree of routes
+     * Generates PHP code recursively to match a tree of routes.
      *
      * @param DumperPrefixCollection $collection           A DumperPrefixCollection instance
-     * @param Boolean                $supportsRedirections Whether redirections are supported by the base class
+     * @param bool                   $supportsRedirections Whether redirections are supported by the base class
      * @param string                 $parentPrefix         Prefix of the parent collection
      *
      * @return string PHP code
@@ -184,7 +200,7 @@ EOF;
      *
      * @param Route       $route                A Route instance
      * @param string      $name                 The name of the Route
-     * @param Boolean     $supportsRedirections Whether redirections are supported by the base class
+     * @param bool        $supportsRedirections Whether redirections are supported by the base class
      * @param string|null $parentPrefix         The prefix of the parent collection used to optimize the code
      *
      * @return string PHP code
@@ -199,14 +215,11 @@ EOF;
         $hasTrailingSlash = false;
         $matches = false;
         $hostMatches = false;
-        $methods = array();
+        $methods = $route->getMethods();
 
-        if ($req = $route->getRequirement('_method')) {
-            $methods = explode('|', strtoupper($req));
-            // GET and HEAD are equivalent
-            if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
-                $methods[] = 'HEAD';
-            }
+        // GET and HEAD are equivalent
+        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+            $methods[] = 'HEAD';
         }
 
         $supportsTrailingSlash = $supportsRedirections && (!$methods || in_array('HEAD', $methods));
@@ -216,11 +229,11 @@ EOF;
                 $conditions[] = sprintf("rtrim(\$pathinfo, '/') === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
             } else {
-                $conditions[] = sprintf("\$pathinfo === %s", var_export(str_replace('\\', '', $m['url']), true));
+                $conditions[] = sprintf('$pathinfo === %s', var_export(str_replace('\\', '', $m['url']), true));
             }
         } else {
             if ($compiledRoute->getStaticPrefix() && $compiledRoute->getStaticPrefix() !== $parentPrefix) {
-                $conditions[] = sprintf("0 === strpos(\$pathinfo, %s)", var_export($compiledRoute->getStaticPrefix(), true));
+                $conditions[] = sprintf('0 === strpos($pathinfo, %s)', var_export($compiledRoute->getStaticPrefix(), true));
             }
 
             $regex = $compiledRoute->getRegex();
@@ -228,13 +241,17 @@ EOF;
                 $regex = substr($regex, 0, $pos).'/?$'.substr($regex, $pos + 2);
                 $hasTrailingSlash = true;
             }
-            $conditions[] = sprintf("preg_match(%s, \$pathinfo, \$matches)", var_export($regex, true));
+            $conditions[] = sprintf('preg_match(%s, $pathinfo, $matches)', var_export($regex, true));
 
             $matches = true;
         }
 
         if ($compiledRoute->getHostVariables()) {
             $hostMatches = true;
+        }
+
+        if ($route->getCondition()) {
+            $conditions[] = $this->getExpressionLanguage()->compile($route->getCondition(), array('context', 'request'));
         }
 
         $conditions = implode(' && ', $conditions);
@@ -245,9 +262,8 @@ EOF;
 
 EOF;
 
+        $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
         if ($methods) {
-            $gotoname = 'not_'.preg_replace('/[^A-Za-z0-9_]/', '', $name);
-
             if (1 === count($methods)) {
                 $code .= <<<EOF
             if (\$this->context->getMethod() != '$methods[0]') {
@@ -280,14 +296,15 @@ EOF;
 EOF;
         }
 
-        if ($scheme = $route->getRequirement('_scheme')) {
+        if ($schemes = $route->getSchemes()) {
             if (!$supportsRedirections) {
-                throw new \LogicException('The "_scheme" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
+                throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
-
+            $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
             $code .= <<<EOF
-            if (\$this->context->getScheme() !== '$scheme') {
-                return \$this->redirect(\$pathinfo, '$name', '$scheme');
+            \$requiredSchemes = $schemes;
+            if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
+                return \$this->redirect(\$pathinfo, '$name', key(\$requiredSchemes));
             }
 
 
@@ -305,9 +322,11 @@ EOF;
             }
             $vars[] = "array('_route' => '$name')";
 
-            $code .= sprintf("            return \$this->mergeDefaults(array_replace(%s), %s);\n"
-                , implode(', ', $vars), str_replace("\n", '', var_export($route->getDefaults(), true)));
-
+            $code .= sprintf(
+                "            return \$this->mergeDefaults(array_replace(%s), %s);\n",
+                implode(', ', $vars),
+                str_replace("\n", '', var_export($route->getDefaults(), true))
+            );
         } elseif ($route->getDefaults()) {
             $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
         } else {
@@ -374,5 +393,17 @@ EOF;
         $tree->mergeSlashNodes();
 
         return $tree;
+    }
+
+    private function getExpressionLanguage()
+    {
+        if (null === $this->expressionLanguage) {
+            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+                throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
+            }
+            $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);
+        }
+
+        return $this->expressionLanguage;
     }
 }

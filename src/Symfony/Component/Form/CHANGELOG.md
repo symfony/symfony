@@ -1,11 +1,139 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
 
-2.3.0
+ * added `CallbackChoiceLoader`
+ * implemented `ChoiceLoaderInterface` in children of `ChoiceType`
+
+3.1.0
+-----
+
+ * deprecated the "choices_as_values" option of ChoiceType
+ * deprecated support for data objects that implements both `Traversable` and
+   `ArrayAccess` in `ResizeFormListener::preSubmit` method
+ * Using callable strings as choice options in `ChoiceType` has been deprecated
+   and will be used as `PropertyPath` instead of callable in Symfony 4.0.
+ * implemented `DataTransformerInterface` in `TextType`
+ * deprecated caching loaded choice list in `LazyChoiceList::$loadedList`
+
+3.0.0
+-----
+
+ * removed `FormTypeInterface::setDefaultOptions()` method
+ * removed `AbstractType::setDefaultOptions()` method
+ * removed `FormTypeExtensionInterface::setDefaultOptions()` method
+ * removed `AbstractTypeExtension::setDefaultOptions()` method
+ * added `FormTypeInterface::configureOptions()` method
+ * added `FormTypeExtensionInterface::configureOptions()` method
+
+2.8.0
+-----
+
+ * added option "choice_translation_domain" to DateType, TimeType and DateTimeType.
+ * deprecated option "read_only" in favor of "attr['readonly']"
+ * added the html5 "range" FormType
+ * deprecated the "cascade_validation" option in favor of setting "constraints"
+   with the Valid constraint
+ * moved data trimming logic of TrimListener into StringUtil
+ * [BC BREAK] When registering a type extension through the DI extension, the tag alias has to match the actual extended type.
+
+2.7.0
+-----
+
+ * added option "choice_translation_domain" to ChoiceType.
+ * deprecated option "precision" in favor of "scale"
+ * deprecated the overwriting of AbstractType::setDefaultOptions() in favor of overwriting AbstractType::configureOptions().
+ * deprecated the overwriting of AbstractTypeExtension::setDefaultOptions() in favor of overwriting AbstractTypeExtension::configureOptions().
+ * added new ChoiceList interface and implementations in the Symfony\Component\Form\ChoiceList namespace
+ * added new ChoiceView in the Symfony\Component\Form\ChoiceList\View namespace
+ * choice groups are now represented by ChoiceGroupView objects in the view
+ * deprecated the old ChoiceList interface and implementations
+ * deprecated the old ChoiceView class
+ * added CheckboxListMapper and RadioListMapper
+ * deprecated ChoiceToBooleanArrayTransformer and ChoicesToBooleanArrayTransformer
+ * deprecated FixCheckboxInputListener and FixRadioInputListener
+ * deprecated the "choice_list" option of ChoiceType
+ * added new options to ChoiceType:
+   * "choices_as_values"
+   * "choice_loader"
+   * "choice_label"
+   * "choice_name"
+   * "choice_value"
+   * "choice_attr"
+   * "group_by"
+
+2.6.2
+-----
+
+ * Added back the `model_timezone` and `view_timezone` options for `TimeType`, `DateType`
+   and `BirthdayType`
+
+2.6.0
+-----
+
+ * added "html5" option to Date, Time and DateTimeFormType to be able to
+   enable/disable HTML5 input date when widget option is "single_text"
+ * added "label_format" option with possible placeholders "%name%" and "%id%"
+ * [BC BREAK] drop support for model_timezone and view_timezone options in TimeType, DateType and BirthdayType,
+   update to 2.6.2 to get back support for these options
+
+2.5.0
 ------
 
+ * deprecated options "max_length" and "pattern" in favor of putting these values in "attr" option
+ * added an option for multiple files upload
+ * form errors now reference their cause (constraint violation, exception, ...)
+ * form errors now remember which form they were originally added to
+ * [BC BREAK] added two optional parameters to FormInterface::getErrors() and
+   changed the method to return a Symfony\Component\Form\FormErrorIterator
+   instance instead of an array
+ * errors mapped to unsubmitted forms are discarded now
+ * ObjectChoiceList now compares choices by their value, if a value path is
+   given
+ * you can now pass interface names in the "data_class" option
+ * [BC BREAK] added `FormInterface::getTransformationFailure()`
+
+2.4.0
+-----
+
+ * moved CSRF implementation to the new Security CSRF sub-component
+ * deprecated CsrfProviderInterface and its implementations
+ * deprecated options "csrf_provider" and "intention" in favor of the new options "csrf_token_manager" and "csrf_token_id"
+
+2.3.0
+-----
+
+ * deprecated FormPerformanceTestCase and FormIntegrationTestCase in the Symfony\Component\Form\Tests namespace and moved them to the Symfony\Component\Form\Test namespace
+ * deprecated TypeTestCase in the Symfony\Component\Form\Tests\Extension\Core\Type namespace and moved it to the Symfony\Component\Form\Test namespace
  * changed FormRenderer::humanize() to humanize also camel cased field name
+ * added RequestHandlerInterface and FormInterface::handleRequest()
+ * deprecated passing a Request instance to FormInterface::bind()
+ * added options "method" and "action" to FormType
+ * deprecated option "virtual" in favor "inherit_data"
+ * deprecated VirtualFormAwareIterator in favor of InheritDataAwareIterator
+ * [BC BREAK] removed the "array" type hint from DataMapperInterface
+ * improved forms inheriting their parent data to actually return that data from getData(), getNormData() and getViewData()
+ * added component-level exceptions for various SPL exceptions
+   changed all uses of the deprecated Exception class to use more specialized exceptions instead
+   removed NotInitializedException, NotValidException, TypeDefinitionException, TypeLoaderException, CreationException
+ * added events PRE_SUBMIT, SUBMIT and POST_SUBMIT
+ * deprecated events PRE_BIND, BIND and POST_BIND
+ * [BC BREAK] renamed bind() and isBound() in FormInterface to submit() and isSubmitted()
+ * added methods submit() and isSubmitted() to Form
+ * deprecated bind() and isBound() in Form
+ * deprecated AlreadyBoundException in favor of AlreadySubmittedException
+ * added support for PATCH requests
+ * [BC BREAK] added initialize() to FormInterface
+ * [BC BREAK] added getAutoInitialize() to FormConfigInterface
+ * [BC BREAK] added setAutoInitialize() to FormConfigBuilderInterface
+ * [BC BREAK] initialization for Form instances added to a form tree must be manually disabled
+ * PRE_SET_DATA is now guaranteed to be called after children were added by the form builder,
+   unless FormInterface::setData() is called manually
+ * fixed CSRF error message to be translated
+ * custom CSRF error messages can now be set through the "csrf_message" option
+ * fixed: expanded single-choice fields now show a radio button for the empty value
 
 2.2.0
 -----
@@ -28,6 +156,8 @@ CHANGELOG
  * added an optional PropertyAccessorInterface parameter to FormType,
    ObjectChoiceList and PropertyPathMapper
  * [BC BREAK] PropertyPathMapper and FormType now have a constructor
+ * [BC BREAK] setting the option "validation_groups" to ``false`` now disables validation
+   instead of assuming group "Default"
 
 2.1.0
 -----

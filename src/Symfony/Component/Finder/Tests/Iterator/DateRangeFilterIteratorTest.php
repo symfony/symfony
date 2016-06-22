@@ -21,7 +21,9 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
      */
     public function testAccept($size, $expected)
     {
-        $inner = new Iterator(self::$files);
+        $files = self::$files;
+        $files[] = self::toAbsolute('doesnotexist');
+        $inner = new Iterator($files);
 
         $iterator = new DateRangeFilterIterator($inner, $size);
 
@@ -37,6 +39,7 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             'foo/bar.tmp',
             'test.php',
             'toto',
+            'toto/.git',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -49,6 +52,7 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
             'test.py',
             'foo',
             'toto',
+            'toto/.git',
             '.bar',
             '.foo',
             '.foo/.bar',
@@ -57,12 +61,8 @@ class DateRangeFilterIteratorTest extends RealIteratorTestCase
         );
 
         $untilLastMonth = array(
-            '.git',
-            'foo',
             'foo/bar.tmp',
             'test.php',
-            'toto',
-            '.foo',
         );
 
         return array(

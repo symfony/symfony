@@ -12,7 +12,7 @@
 namespace Symfony\Component\ClassLoader;
 
 /**
- * ClassLoader implements an PSR-0 class loader
+ * ClassLoader implements an PSR-0 class loader.
  *
  * See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md
  *
@@ -76,7 +76,7 @@ class ClassLoader
     }
 
     /**
-     * Registers a set of classes
+     * Registers a set of classes.
      *
      * @param string       $prefix The classes prefix
      * @param array|string $paths  The location(s) of the classes
@@ -91,30 +91,34 @@ class ClassLoader
             return;
         }
         if (isset($this->prefixes[$prefix])) {
-            $this->prefixes[$prefix] = array_merge(
-                $this->prefixes[$prefix],
-                (array) $paths
-            );
+            if (is_array($paths)) {
+                $this->prefixes[$prefix] = array_unique(array_merge(
+                    $this->prefixes[$prefix],
+                    $paths
+                ));
+            } elseif (!in_array($paths, $this->prefixes[$prefix])) {
+                $this->prefixes[$prefix][] = $paths;
+            }
         } else {
-            $this->prefixes[$prefix] = (array) $paths;
+            $this->prefixes[$prefix] = array_unique((array) $paths);
         }
     }
 
     /**
      * Turns on searching the include for class files.
      *
-     * @param Boolean $useIncludePath
+     * @param bool $useIncludePath
      */
     public function setUseIncludePath($useIncludePath)
     {
-        $this->useIncludePath = $useIncludePath;
+        $this->useIncludePath = (bool) $useIncludePath;
     }
 
     /**
      * Can be used to check if the autoloader uses the include path to check
      * for classes.
      *
-     * @return Boolean
+     * @return bool
      */
     public function getUseIncludePath()
     {
@@ -124,7 +128,7 @@ class ClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param Boolean $prepend Whether to prepend the autoloader or not
+     * @param bool $prepend Whether to prepend the autoloader or not
      */
     public function register($prepend = false)
     {
@@ -144,7 +148,7 @@ class ClassLoader
      *
      * @param string $class The name of the class
      *
-     * @return Boolean|null True, if loaded
+     * @return bool|null True, if loaded
      */
     public function loadClass($class)
     {
@@ -164,10 +168,6 @@ class ClassLoader
      */
     public function findFile($class)
     {
-        if ('\\' == $class[0]) {
-            $class = substr($class, 1);
-        }
-
         if (false !== $pos = strrpos($class, '\\')) {
             // namespaced class name
             $classPath = str_replace('\\', DIRECTORY_SEPARATOR, substr($class, 0, $pos)).DIRECTORY_SEPARATOR;
@@ -181,7 +181,7 @@ class ClassLoader
         $classPath .= str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
 
         foreach ($this->prefixes as $prefix => $dirs) {
-            if (0 === strpos($class, $prefix)) {
+            if ($class === strstr($class, $prefix)) {
                 foreach ($dirs as $dir) {
                     if (file_exists($dir.DIRECTORY_SEPARATOR.$classPath)) {
                         return $dir.DIRECTORY_SEPARATOR.$classPath;

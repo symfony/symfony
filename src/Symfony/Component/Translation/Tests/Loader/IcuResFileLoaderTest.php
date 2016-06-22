@@ -14,19 +14,11 @@ namespace Symfony\Component\Translation\Tests\Loader;
 use Symfony\Component\Translation\Loader\IcuResFileLoader;
 use Symfony\Component\Config\Resource\DirectoryResource;
 
+/**
+ * @requires extension intl
+ */
 class IcuResFileLoaderTest extends LocalizedTestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-
-        if (!extension_loaded('intl')) {
-            $this->markTestSkipped('This test requires intl extension to work.');
-        }
-    }
-
     public function testLoad()
     {
         // resource is build using genrb command

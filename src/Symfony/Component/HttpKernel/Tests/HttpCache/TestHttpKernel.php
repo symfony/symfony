@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,14 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
+class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, ArgumentResolverInterface
 {
     protected $body;
     protected $status;
     protected $headers;
-    protected $called;
+    protected $called = false;
     protected $customizer;
-    protected $catch;
+    protected $catch = false;
     protected $backendRequest;
 
     public function __construct($body, $status, $headers, \Closure $customizer = null)
@@ -34,10 +35,8 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
         $this->status = $status;
         $this->headers = $headers;
         $this->customizer = $customizer;
-        $this->called = false;
-        $this->catch = false;
 
-        parent::__construct(new EventDispatcher(), $this);
+        parent::__construct(new EventDispatcher(), $this, null, $this);
     }
 
     public function getBackendRequest()
@@ -74,8 +73,8 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface
 
         $response = new Response($this->body, $this->status, $this->headers);
 
-        if (null !== $this->customizer) {
-            call_user_func($this->customizer, $request, $response);
+        if (null !== $customizer = $this->customizer) {
+            $customizer($request, $response);
         }
 
         return $response;

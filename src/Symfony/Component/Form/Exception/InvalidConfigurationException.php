@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class InvalidConfigurationException extends Exception
+class InvalidConfigurationException extends InvalidArgumentException
 {
 }

@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /**
- * Profiler Templates Manager
+ * Profiler Templates Manager.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Artur Wielogórski <wodor@wodor.net>
@@ -72,6 +72,7 @@ class TemplateManager
     public function getTemplates(Profile $profile)
     {
         $templates = $this->getNames($profile);
+
         foreach ($templates as $name => $template) {
             $templates[$name] = $this->twig->loadTemplate($template);
         }

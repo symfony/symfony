@@ -15,8 +15,33 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class RoutingTest extends \PHPUnit_Framework_TestCase
+class RouterTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGenerateWithServiceParam()
+    {
+        $routes = new RouteCollection();
+
+        $routes->add('foo', new Route(
+            ' /{_locale}',
+            array(
+                '_locale' => '%locale%',
+            ),
+            array(
+                '_locale' => 'en|es',
+            ), array(), '', array(), array(), '"%foo%" == "bar"'
+        ));
+
+        $sc = $this->getServiceContainer($routes);
+        $sc->setParameter('locale', 'es');
+        $sc->setParameter('foo', 'bar');
+
+        $router = new Router($sc, 'foo');
+
+        $this->assertSame('/en', $router->generate('foo', array('_locale' => 'en')));
+        $this->assertSame('/', $router->generate('foo', array('_locale' => 'es')));
+        $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
+    }
+
     public function testDefaultsPlaceholders()
     {
         $routes = new RouteCollection();
@@ -24,11 +49,11 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
         $routes->add('foo', new Route(
             '/foo',
             array(
-                'foo'    => 'before_%parameter.foo%',
-                'bar'    => '%parameter.bar%_after',
-                'baz'    => '%%unescaped%%',
-                'boo'    => array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
-                'bee'    => array('bee', 'bee'),
+                'foo' => 'before_%parameter.foo%',
+                'bar' => '%parameter.bar%_after',
+                'baz' => '%%escaped%%',
+                'boo' => array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
+                'bee' => array('bee', 'bee'),
             ),
             array(
             )
@@ -36,16 +61,10 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
 
         $sc = $this->getServiceContainer($routes);
 
-        $sc->expects($this->at(1))->method('hasParameter')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->will($this->returnValue('foo'));
-        $sc->expects($this->at(3))->method('hasParameter')->will($this->returnValue(true));
-        $sc->expects($this->at(4))->method('getParameter')->will($this->returnValue('bar'));
-
-        $sc->expects($this->at(5))->method('hasParameter')->will($this->returnValue(true));
-        $sc->expects($this->at(6))->method('getParameter')->will($this->returnValue('boo'));
-
-        $sc->expects($this->at(7))->method('hasParameter')->will($this->returnValue(true));
-        $sc->expects($this->at(8))->method('getParameter')->will($this->returnValue('foo_bee'));
+        $sc->setParameter('parameter.foo', 'foo');
+        $sc->setParameter('parameter.bar', 'bar');
+        $sc->setParameter('parameter', 'boo');
+        $sc->setParameter('bee_parameter', 'foo_bee');
 
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
@@ -54,7 +73,7 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
-                'baz' => '%unescaped%',
+                'baz' => '%escaped%',
                 'boo' => array('boo', '%escaped_parameter%', array('foo_bee', 'bee')),
                 'bee' => array('bee', 'bee'),
             ),
@@ -71,18 +90,15 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
             array(
             ),
             array(
-                'foo'    => 'before_%parameter.foo%',
-                'bar'    => '%parameter.bar%_after',
-                'baz'    => '%%unescaped%%',
+                'foo' => 'before_%parameter.foo%',
+                'bar' => '%parameter.bar%_after',
+                'baz' => '%%escaped%%',
             )
         ));
 
         $sc = $this->getServiceContainer($routes);
-
-        $sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
-        $sc->expects($this->at(3))->method('hasParameter')->with('parameter.bar')->will($this->returnValue(true));
-        $sc->expects($this->at(4))->method('getParameter')->with('parameter.bar')->will($this->returnValue('bar'));
+        $sc->setParameter('parameter.foo', 'foo');
+        $sc->setParameter('parameter.bar', 'bar');
 
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
@@ -91,7 +107,7 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
             array(
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
-                'baz' => '%unescaped%',
+                'baz' => '%escaped%',
             ),
             $route->getRequirements()
         );
@@ -101,18 +117,16 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
     {
         $routes = new RouteCollection();
 
-        $routes->add('foo', new Route('/before/%parameter.foo%/after/%%unescaped%%'));
+        $routes->add('foo', new Route('/before/%parameter.foo%/after/%%escaped%%'));
 
         $sc = $this->getServiceContainer($routes);
-
-        $sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
+        $sc->setParameter('parameter.foo', 'foo');
 
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            '/before/foo/after/%unescaped%',
+            '/before/foo/after/%escaped%',
             $route->getPath()
         );
     }
@@ -122,20 +136,18 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
         $routes = new RouteCollection();
 
         $route = new Route('foo');
-        $route->setHost('/before/%parameter.foo%/after/%%unescaped%%');
+        $route->setHost('/before/%parameter.foo%/after/%%escaped%%');
 
         $routes->add('foo', $route);
 
         $sc = $this->getServiceContainer($routes);
-
-        $sc->expects($this->at(1))->method('hasParameter')->with('parameter.foo')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->with('parameter.foo')->will($this->returnValue('foo'));
+        $sc->setParameter('parameter.foo', 'foo');
 
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            '/before/foo/after/%unescaped%',
+            '/before/foo/after/%escaped%',
             $route->getHost()
         );
     }
@@ -152,15 +164,13 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
 
         $sc = $this->getServiceContainer($routes);
 
-        $sc->expects($this->at(1))->method('hasParameter')->with('nope')->will($this->returnValue(false));
-
         $router = new Router($sc, 'foo');
         $router->getRouteCollection()->get('foo');
     }
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage  A string value must be composed of strings and/or numbers,but found parameter "object" of type object inside string value "/%object%".
+     * @expectedExceptionMessage The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type object.
      */
     public function testExceptionOnNonStringParameter()
     {
@@ -169,9 +179,7 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
         $routes->add('foo', new Route('/%object%'));
 
         $sc = $this->getServiceContainer($routes);
-
-        $sc->expects($this->at(1))->method('hasParameter')->with('object')->will($this->returnValue(true));
-        $sc->expects($this->at(2))->method('getParameter')->with('object')->will($this->returnValue(new \stdClass()));
+        $sc->setParameter('object', new \stdClass());
 
         $router = new Router($sc, 'foo');
         $router->getRouteCollection()->get('foo');
@@ -199,6 +207,11 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
         return array(array(null), array(false), array(true), array(new \stdClass()), array(array('foo', 'bar')), array(array(array())));
     }
 
+    /**
+     * @param RouteCollection $routes
+     *
+     * @return \Symfony\Component\DependencyInjection\Container
+     */
     private function getServiceContainer(RouteCollection $routes)
     {
         $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
@@ -209,7 +222,7 @@ class RoutingTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($routes))
         ;
 
-        $sc = $this->getMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
+        $sc = $this->getMock('Symfony\\Component\\DependencyInjection\\Container', array('get'));
 
         $sc
             ->expects($this->once())

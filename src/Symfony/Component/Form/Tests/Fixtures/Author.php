@@ -21,6 +21,12 @@ class Author
 
     private $privateProperty;
 
+    public function __construct($firstName = null, $lastName = null)
+    {
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
+    }
+
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;

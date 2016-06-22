@@ -22,9 +22,9 @@ use Symfony\Component\Translation\Loader\MoFileLoader;
 class MoFileDumper extends FileDumper
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function format(MessageCatalogue $messages, $domain = 'messages')
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         $output = $sources = $targets = $sourceOffsets = $targetOffsets = '';
         $offsets = array();
@@ -38,16 +38,16 @@ class MoFileDumper extends FileDumper
         }
 
         $header = array(
-            'magicNumber'      => MoFileLoader::MO_LITTLE_ENDIAN_MAGIC,
-            'formatRevision'   => 0,
-            'count'            => $size,
-            'offsetId'         => MoFileLoader::MO_HEADER_SIZE,
+            'magicNumber' => MoFileLoader::MO_LITTLE_ENDIAN_MAGIC,
+            'formatRevision' => 0,
+            'count' => $size,
+            'offsetId' => MoFileLoader::MO_HEADER_SIZE,
             'offsetTranslated' => MoFileLoader::MO_HEADER_SIZE + (8 * $size),
-            'sizeHashes'       => 0,
-            'offsetHashes'     => MoFileLoader::MO_HEADER_SIZE + (16 * $size),
+            'sizeHashes' => 0,
+            'offsetHashes' => MoFileLoader::MO_HEADER_SIZE + (16 * $size),
         );
 
-        $sourcesSize  = strlen($sources);
+        $sourcesSize = strlen($sources);
         $sourcesStart = $header['offsetHashes'] + 1;
 
         foreach ($offsets as $offset) {
@@ -68,7 +68,7 @@ class MoFileDumper extends FileDumper
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getExtension()
     {

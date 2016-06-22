@@ -21,7 +21,7 @@ interface HttpExceptionInterface
     /**
      * Returns the status code.
      *
-     * @return integer An HTTP response status code
+     * @return int An HTTP response status code
      */
     public function getStatusCode();
 

@@ -15,34 +15,49 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
+ * @Target({"CLASS", "PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @api
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class Callback extends Constraint
 {
-    public $methods;
+    /**
+     * @var string|callable
+     *
+     * @since 2.4
+     */
+    public $callback;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getRequiredOptions()
+    public function __construct($options = null)
     {
-        return array('methods');
+        // Invocation through annotations with an array parameter only
+        if (is_array($options) && 1 === count($options) && isset($options['value'])) {
+            $options = $options['value'];
+        }
+
+        if (is_array($options) && !isset($options['callback']) && !isset($options['groups']) && !isset($options['payload'])) {
+            $options = array('callback' => $options);
+        }
+
+        parent::__construct($options);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultOption()
     {
-        return 'methods';
+        return 'callback';
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTargets()
     {
-        return self::CLASS_CONSTRAINT;
+        return array(self::CLASS_CONSTRAINT, self::PROPERTY_CONSTRAINT);
     }
 }

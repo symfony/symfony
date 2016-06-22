@@ -8,11 +8,11 @@
             </trans-unit>
             <trans-unit id="29">
                 <source>The uploaded file was too large. Please try to upload a smaller file.</source>
-                <target>A feltöltött fájl túl nagy. Kérem próbáljon egy kisebb fájlt feltölteni.</target>
+                <target>A feltöltött fájl túl nagy. Kérem, próbáljon egy kisebb fájlt feltölteni.</target>
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>Érvénytelen CSRF token. Kérem próbálja újra elküldeni az űrlapot.</target>
+                <target>Érvénytelen CSRF token. Kérem, próbálja újra elküldeni az űrlapot.</target>
             </trans-unit>
         </body>
     </file>

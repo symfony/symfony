@@ -24,7 +24,7 @@ class LoaderResolver implements LoaderResolverInterface
     /**
      * @var LoaderInterface[] An array of LoaderInterface objects
      */
-    private $loaders;
+    private $loaders = array();
 
     /**
      * Constructor.
@@ -33,19 +33,13 @@ class LoaderResolver implements LoaderResolverInterface
      */
     public function __construct(array $loaders = array())
     {
-        $this->loaders = array();
         foreach ($loaders as $loader) {
             $this->addLoader($loader);
         }
     }
 
     /**
-     * Returns a loader able to load the resource.
-     *
-     * @param mixed  $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return LoaderInterface|false A LoaderInterface instance
+     * {@inheritdoc}
      */
     public function resolve($resource, $type = null)
     {

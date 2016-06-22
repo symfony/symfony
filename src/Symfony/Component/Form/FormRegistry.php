@@ -13,7 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\ExceptionInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
  * The central registry of the Form component.
@@ -23,14 +23,14 @@ use Symfony\Component\Form\Exception\Exception;
 class FormRegistry implements FormRegistryInterface
 {
     /**
-     * Extensions
+     * Extensions.
      *
      * @var FormExtensionInterface[] An array of FormExtensionInterface
      */
     private $extensions = array();
 
     /**
-     * @var array
+     * @var FormTypeInterface[]
      */
     private $types = array();
 
@@ -69,16 +69,10 @@ class FormRegistry implements FormRegistryInterface
      */
     public function getType($name)
     {
-        if (!is_string($name)) {
-            throw new UnexpectedTypeException($name, 'string');
-        }
-
         if (!isset($this->types[$name])) {
-            /** @var FormTypeInterface $type */
             $type = null;
 
             foreach ($this->extensions as $extension) {
-                /* @var FormExtensionInterface $extension */
                 if ($extension->hasType($name)) {
                     $type = $extension->getType($name);
                     break;
@@ -86,10 +80,15 @@ class FormRegistry implements FormRegistryInterface
             }
 
             if (!$type) {
-                throw new Exception(sprintf('Could not load type "%s"', $name));
+                // Support fully-qualified class names
+                if (class_exists($name) && in_array('Symfony\Component\Form\FormTypeInterface', class_implements($name))) {
+                    $type = new $name();
+                } else {
+                    throw new InvalidArgumentException(sprintf('Could not load type "%s"', $name));
+                }
             }
 
-            $this->resolveAndAddType($type);
+            $this->types[$name] = $this->resolveType($type);
         }
 
         return $this->types[$name];
@@ -103,26 +102,20 @@ class FormRegistry implements FormRegistryInterface
      *
      * @return ResolvedFormTypeInterface The resolved type.
      */
-    private function resolveAndAddType(FormTypeInterface $type)
+    private function resolveType(FormTypeInterface $type)
     {
-        $parentType = $type->getParent();
-
-        if ($parentType instanceof FormTypeInterface) {
-            $this->resolveAndAddType($parentType);
-            $parentType = $parentType->getName();
-        }
-
         $typeExtensions = array();
+        $parentType = $type->getParent();
+        $fqcn = get_class($type);
 
         foreach ($this->extensions as $extension) {
-            /* @var FormExtensionInterface $extension */
             $typeExtensions = array_merge(
                 $typeExtensions,
-                $extension->getTypeExtensions($type->getName())
+                $extension->getTypeExtensions($fqcn)
             );
         }
 
-        $this->types[$type->getName()] = $this->resolvedTypeFactory->createResolvedType(
+        return $this->resolvedTypeFactory->createResolvedType(
             $type,
             $typeExtensions,
             $parentType ? $this->getType($parentType) : null
@@ -156,7 +149,6 @@ class FormRegistry implements FormRegistryInterface
             $guessers = array();
 
             foreach ($this->extensions as $extension) {
-                /* @var FormExtensionInterface $extension */
                 $guesser = $extension->getTypeGuesser();
 
                 if ($guesser) {

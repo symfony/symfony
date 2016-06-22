@@ -34,14 +34,6 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\Event')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\PropertyAccess\PropertyAccess')) {
-            $this->markTestSkipped('The "PropertyAccess" component is not available');
-        }
-
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->propertyAccessor = $this->getMock('Symfony\Component\PropertyAccess\PropertyAccessorInterface');
         $this->mapper = new PropertyPathMapper($this->propertyAccessor);
@@ -49,6 +41,7 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $path
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getPropertyPath($path)
@@ -61,29 +54,27 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param FormConfigInterface $config
-     * @param Boolean $synchronized
+     * @param bool                $synchronized
+     * @param bool                $submitted
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getForm(FormConfigInterface $config, $synchronized = true)
+    private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->setConstructorArgs(array($config))
-            ->setMethods(array('isSynchronized'))
+            ->setMethods(array('isSynchronized', 'isSubmitted'))
             ->getMock();
 
         $form->expects($this->any())
             ->method('isSynchronized')
             ->will($this->returnValue($synchronized));
 
-        return $form;
-    }
+        $form->expects($this->any())
+            ->method('isSubmitted')
+            ->will($this->returnValue($submitted));
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getDataMapper()
-    {
-        return $this->getMock('Symfony\Component\Form\DataMapperInterface');
+        return $form;
     }
 
     public function testMapDataToFormsPassesObjectRefIfByReference()
@@ -165,8 +156,9 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($form->getData());
     }
 
-    public function testMapDataToFormsIgnoresEmptyData()
+    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()
     {
+        $default = new \stdClass();
         $propertyPath = $this->getPropertyPath('engine');
 
         $this->propertyAccessor->expects($this->never())
@@ -175,42 +167,43 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
         $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
-        $form = $this->getForm($config);
+        $config->setData($default);
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($config))
+            ->setMethods(array('setData'))
+            ->getMock();
+
+        $form->expects($this->once())
+            ->method('setData')
+            ->with($default);
 
         $this->mapper->mapDataToForms(null, array($form));
-
-        $this->assertNull($form->getData());
     }
 
-    public function testMapDataToFormsSkipsVirtualForms()
+    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsEmptyArray()
     {
-        $car = new \stdClass();
-        $engine = new \stdClass();
+        $default = new \stdClass();
         $propertyPath = $this->getPropertyPath('engine');
 
-        $this->propertyAccessor->expects($this->once())
-            ->method('getValue')
-            ->with($car, $propertyPath)
-            ->will($this->returnValue($engine));
+        $this->propertyAccessor->expects($this->never())
+            ->method('getValue');
 
         $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
         $config->setByReference(true);
-        $config->setVirtual(true);
-        $config->setCompound(true);
-        $config->setDataMapper($this->getDataMapper());
-        $form = $this->getForm($config);
-
-        $config = new FormConfigBuilder('engine', '\stdClass', $this->dispatcher);
-        $config->setByReference(true);
         $config->setPropertyPath($propertyPath);
-        $child = $this->getForm($config);
+        $config->setData($default);
 
-        $form->add($child);
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($config))
+            ->setMethods(array('setData'))
+            ->getMock();
 
-        $this->mapper->mapDataToForms($car, array($form));
+        $form->expects($this->once())
+            ->method('setData')
+            ->with($default);
 
-        $this->assertNull($form->getData());
-        $this->assertSame($engine, $child->getData());
+        $this->mapper->mapDataToForms(array(), array($form));
     }
 
     public function testMapFormsToDataWritesBackIfNotByReference()
@@ -294,6 +287,24 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $this->mapper->mapFormsToData(array($form), $car);
     }
 
+    public function testMapFormsToDataIgnoresUnsubmittedForms()
+    {
+        $car = new \stdClass();
+        $engine = new \stdClass();
+        $propertyPath = $this->getPropertyPath('engine');
+
+        $this->propertyAccessor->expects($this->never())
+            ->method('setValue');
+
+        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
+        $config->setByReference(true);
+        $config->setPropertyPath($propertyPath);
+        $config->setData($engine);
+        $form = $this->getForm($config, true, false);
+
+        $this->mapper->mapFormsToData(array($form), $car);
+    }
+
     public function testMapFormsToDataIgnoresEmptyData()
     {
         $car = new \stdClass();
@@ -344,40 +355,6 @@ class PropertyPathMapperTest extends \PHPUnit_Framework_TestCase
         $config->setData($engine);
         $config->setDisabled(true);
         $form = $this->getForm($config);
-
-        $this->mapper->mapFormsToData(array($form), $car);
-    }
-
-    public function testMapFormsToDataSkipsVirtualForms()
-    {
-        $car = new \stdClass();
-        $engine = new \stdClass();
-        $parentPath = $this->getPropertyPath('name');
-        $childPath = $this->getPropertyPath('engine');
-
-        // getValue() and setValue() must never be invoked for $parentPath
-
-        $this->propertyAccessor->expects($this->once())
-            ->method('getValue')
-            ->with($car, $childPath);
-        $this->propertyAccessor->expects($this->once())
-            ->method('setValue')
-            ->with($car, $childPath, $engine);
-
-        $config = new FormConfigBuilder('name', '\stdClass', $this->dispatcher);
-        $config->setPropertyPath($parentPath);
-        $config->setVirtual(true);
-        $config->setCompound(true);
-        $config->setDataMapper($this->getDataMapper());
-        $form = $this->getForm($config);
-
-        $config = new FormConfigBuilder('engine', '\stdClass', $this->dispatcher);
-        $config->setByReference(true);
-        $config->setPropertyPath($childPath);
-        $config->setData($engine);
-        $child = $this->getForm($config);
-
-        $form->add($child);
 
         $this->mapper->mapFormsToData(array($form), $car);
     }

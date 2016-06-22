@@ -22,11 +22,4 @@ class YamlFrameworkExtensionTest extends FrameworkExtensionTest
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
         $loader->load($file.'.yml');
     }
-
-    public function testCsrfProtectionShouldBeEnabledByDefault()
-    {
-        $container = $this->createContainerFromFile('csrf');
-
-        $this->assertTrue($container->getParameter('form.type_extension.csrf.enabled'));
-    }
 }

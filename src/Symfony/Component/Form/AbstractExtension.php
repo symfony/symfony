@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
@@ -20,26 +20,30 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 abstract class AbstractExtension implements FormExtensionInterface
 {
     /**
-     * The types provided by this extension
+     * The types provided by this extension.
+     *
      * @var FormTypeInterface[] An array of FormTypeInterface
      */
     private $types;
 
     /**
-     * The type extensions provided by this extension
+     * The type extensions provided by this extension.
+     *
      * @var FormTypeExtensionInterface[] An array of FormTypeExtensionInterface
      */
     private $typeExtensions;
 
     /**
-     * The type guesser provided by this extension
+     * The type guesser provided by this extension.
+     *
      * @var FormTypeGuesserInterface
      */
     private $typeGuesser;
 
     /**
-     * Whether the type guesser has been loaded
-     * @var Boolean
+     * Whether the type guesser has been loaded.
+     *
+     * @var bool
      */
     private $typeGuesserLoaded = false;
 
@@ -53,7 +57,7 @@ abstract class AbstractExtension implements FormExtensionInterface
         }
 
         if (!isset($this->types[$name])) {
-            throw new Exception(sprintf('The type "%s" can not be loaded by this extension', $name));
+            throw new InvalidArgumentException(sprintf('The type "%s" can not be loaded by this extension', $name));
         }
 
         return $this->types[$name];
@@ -136,7 +140,6 @@ abstract class AbstractExtension implements FormExtensionInterface
      */
     protected function loadTypeGuesser()
     {
-        return null;
     }
 
     /**
@@ -153,7 +156,7 @@ abstract class AbstractExtension implements FormExtensionInterface
                 throw new UnexpectedTypeException($type, 'Symfony\Component\Form\FormTypeInterface');
             }
 
-            $this->types[$type->getName()] = $type;
+            $this->types[get_class($type)] = $type;
         }
     }
 

@@ -19,13 +19,13 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class MemoryDataCollector extends DataCollector
+class MemoryDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     public function __construct()
     {
         $this->data = array(
-            'memory'       => 0,
-            'memory_limit' => $this->convertToBytes(strtolower(ini_get('memory_limit'))),
+            'memory' => 0,
+            'memory_limit' => $this->convertToBytes(ini_get('memory_limit')),
         );
     }
 
@@ -38,9 +38,17 @@ class MemoryDataCollector extends DataCollector
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function lateCollect()
+    {
+        $this->updateMemoryUsage();
+    }
+
+    /**
      * Gets the memory.
      *
-     * @return integer The memory
+     * @return int The memory
      */
     public function getMemory()
     {
@@ -50,7 +58,7 @@ class MemoryDataCollector extends DataCollector
     /**
      * Gets the PHP memory limit.
      *
-     * @return integer The memory limit
+     * @return int The memory limit
      */
     public function getMemoryLimit()
     {
@@ -79,13 +87,23 @@ class MemoryDataCollector extends DataCollector
             return -1;
         }
 
-        if (preg_match('#^\+?(0x?)?(.*?)([kmg]?)$#', $memoryLimit, $match)) {
-            $shifts = array('' => 0, 'k' => 10, 'm' => 20, 'g' => 30);
-            $bases = array('' => 10, '0' => 8, '0x' => 16);
-
-            return intval($match[2], $bases[$match[1]]) << $shifts[$match[3]];
+        $memoryLimit = strtolower($memoryLimit);
+        $max = strtolower(ltrim($memoryLimit, '+'));
+        if (0 === strpos($max, '0x')) {
+            $max = intval($max, 16);
+        } elseif (0 === strpos($max, '0')) {
+            $max = intval($max, 8);
+        } else {
+            $max = (int) $max;
         }
 
-        return 0;
+        switch (substr($memoryLimit, -1)) {
+            case 't': $max *= 1024;
+            case 'g': $max *= 1024;
+            case 'm': $max *= 1024;
+            case 'k': $max *= 1024;
+        }
+
+        return $max;
     }
 }

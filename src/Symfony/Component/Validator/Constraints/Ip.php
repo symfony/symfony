@@ -11,17 +11,17 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
- * Validates that a value is a valid IP address
+ * Validates that a value is a valid IP address.
  *
  * @Annotation
+ * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
+ *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @author Joseph Bielawski <stloyd@gmail.com>
- *
- * @api
  */
 class Ip extends Constraint
 {
@@ -44,6 +44,8 @@ class Ip extends Constraint
     const V6_ONLY_PUBLIC = '6_public';
     const ALL_ONLY_PUBLIC = 'all_public';
 
+    const INVALID_IP_ERROR = 'b1b427ae-9f6f-41b0-aa9b-84511fbb3c5b';
+
     protected static $versions = array(
         self::V4,
         self::V6,
@@ -62,12 +64,16 @@ class Ip extends Constraint
         self::ALL_ONLY_PUBLIC,
     );
 
+    protected static $errorNames = array(
+        self::INVALID_IP_ERROR => 'INVALID_IP_ERROR',
+    );
+
     public $version = self::V4;
 
     public $message = 'This is not a valid IP address.';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($options = null)
     {

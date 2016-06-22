@@ -13,13 +13,12 @@ namespace Symfony\Component\Security\Http\Authentication;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\ParameterBagUtils;
 
 /**
  * Class with the default authentication success handling logic.
- *
- * Can be optionally be extended from by the developer to alter the behaviour
- * while keeping the default behaviour.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -27,9 +26,18 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
+    use TargetPathTrait;
+
     protected $httpUtils;
     protected $options;
     protected $providerKey;
+    protected $defaultOptions = array(
+        'always_use_default_target_path' => false,
+        'default_target_path' => '/',
+        'login_path' => '/login',
+        'target_path_parameter' => '_target_path',
+        'use_referer' => false,
+    );
 
     /**
      * Constructor.
@@ -37,25 +45,38 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      * @param HttpUtils $httpUtils
      * @param array     $options   Options for processing a successful authentication attempt.
      */
-    public function __construct(HttpUtils $httpUtils, array $options)
+    public function __construct(HttpUtils $httpUtils, array $options = array())
     {
-        $this->httpUtils   = $httpUtils;
-
-        $this->options = array_merge(array(
-            'always_use_default_target_path' => false,
-            'default_target_path'            => '/',
-            'login_path'                     => '/login',
-            'target_path_parameter'          => '_target_path',
-            'use_referer'                    => false,
-        ), $options);
+        $this->httpUtils = $httpUtils;
+        $this->setOptions($options);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
         return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
+    }
+
+    /**
+     * Gets the options.
+     *
+     * @return array An array of options
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Sets the options.
+     *
+     * @param array $options An array of options
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array_merge($this->defaultOptions, $options);
     }
 
     /**
@@ -91,12 +112,12 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $this->options['default_target_path'];
         }
 
-        if ($targetUrl = $request->get($this->options['target_path_parameter'], null, true)) {
+        if ($targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter'])) {
             return $targetUrl;
         }
 
-        if (null !== $this->providerKey && $targetUrl = $request->getSession()->get('_security.'.$this->providerKey.'.target_path')) {
-            $request->getSession()->remove('_security.'.$this->providerKey.'.target_path');
+        if (null !== $this->providerKey && $targetUrl = $this->getTargetPath($request->getSession(), $this->providerKey)) {
+            $this->removeTargetPath($request->getSession(), $this->providerKey);
 
             return $targetUrl;
         }

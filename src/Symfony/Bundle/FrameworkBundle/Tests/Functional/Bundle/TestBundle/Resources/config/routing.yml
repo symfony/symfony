@@ -36,3 +36,11 @@ subrequest_fragment:
     path:     /subrequest/fragment/{_locale}.{_format}
     defaults: { _controller: TestBundle:SubRequest:fragment, _format: "html" }
     schemes:  [http]
+
+fragment_home:
+    path:     /fragment_home
+    defaults: { _controller: TestBundle:Fragment:index, _format: txt }
+
+fragment_inlined:
+    path:     /fragment_inlined
+    defaults: { _controller: TestBundle:Fragment:inlined }

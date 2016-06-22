@@ -24,22 +24,22 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
     private $resolvedTypeFactory;
 
     /**
-     * @var array
+     * @var FormExtensionInterface[]
      */
     private $extensions = array();
 
     /**
-     * @var array
+     * @var FormTypeInterface[]
      */
     private $types = array();
 
     /**
-     * @var array
+     * @var FormTypeExtensionInterface[]
      */
     private $typeExtensions = array();
 
     /**
-     * @var array
+     * @var FormTypeGuesserInterface[]
      */
     private $typeGuessers = array();
 
@@ -78,7 +78,7 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
      */
     public function addType(FormTypeInterface $type)
     {
-        $this->types[$type->getName()] = $type;
+        $this->types[] = $type;
 
         return $this;
     }
@@ -89,7 +89,7 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
     public function addTypes(array $types)
     {
         foreach ($types as $type) {
-            $this->types[$type->getName()] = $type;
+            $this->types[] = $type;
         }
 
         return $this;

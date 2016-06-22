@@ -26,9 +26,28 @@ class ConstraintViolationTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $expected = <<<EOF
+        $expected = <<<'EOF'
 Root.property.path:
     Array
+EOF;
+
+        $this->assertSame($expected, (string) $violation);
+    }
+
+    public function testToStringHandlesArrayRoots()
+    {
+        $violation = new ConstraintViolation(
+            '42 cannot be used here',
+            'this is the message template',
+            array(),
+            array('some_value' => 42),
+            'some_value',
+            null
+        );
+
+        $expected = <<<'EOF'
+Array.some_value:
+    42 cannot be used here
 EOF;
 
         $this->assertSame($expected, (string) $violation);

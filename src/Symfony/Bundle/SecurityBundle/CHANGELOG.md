@@ -1,11 +1,45 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * Removed the `security.context` service.
+
+2.8.0
+-----
+
+ * deprecated the `key` setting of `anonymous`, `remember_me` and `http_digest`
+   in favor of the `secret` setting.
+ * deprecated the `intention` firewall listener setting in favor of the `csrf_token_id`.
+
+2.6.0
+-----
+
+ * Added the possibility to override the default success/failure handler
+   to get the provider key and the options injected
+ * Deprecated the `security.context` service for the `security.token_storage` and
+   `security.authorization_checker` services.
+
+2.4.0
+-----
+
+ * Added 'host' option to firewall configuration
+ * Added 'csrf_token_generator' and 'csrf_token_id' options to firewall logout
+   listener configuration to supersede/alias 'csrf_provider' and 'intention'
+   respectively
+ * Moved 'security.secure_random' service configuration to FrameworkBundle
+
+2.3.0
+-----
+
+ * allowed for multiple IP address in security access_control rules
+
 2.2.0
 -----
 
-* Added PBKDF2 Password encoder
-* Added BCrypt password encoder
+ * Added PBKDF2 Password encoder
+ * Added BCrypt password encoder
 
 2.1.0
 -----
@@ -69,9 +103,9 @@ CHANGELOG
                 logout:
                     path: /logout_path
                     target: /
-                    csrf_parameter: _csrf_token        # Optional (defaults to "_csrf_token")
-                    csrf_provider:  form.csrf_provider # Required to enable protection
-                    intention:      logout             # Optional (defaults to "logout")
+                    csrf_parameter: _csrf_token                   # Optional (defaults to "_csrf_token")
+                    csrf_provider:  security.csrf.token_generator # Required to enable protection
+                    intention:      logout                        # Optional (defaults to "logout")
     ```
 
     If the LogoutListener has CSRF protection enabled but cannot validate a token,

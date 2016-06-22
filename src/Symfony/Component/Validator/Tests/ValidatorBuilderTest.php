@@ -75,10 +75,6 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testEnableAnnotationMapping()
     {
-        if (!class_exists('Doctrine\Common\Annotations\AnnotationReader')) {
-            $this->markTestSkipped('Annotations is required for this test');
-        }
-
         $this->assertSame($this->builder, $this->builder->enableAnnotationMapping());
     }
 
@@ -111,5 +107,10 @@ class ValidatorBuilderTest extends \PHPUnit_Framework_TestCase
     public function testSetTranslationDomain()
     {
         $this->assertSame($this->builder, $this->builder->setTranslationDomain('TRANS_DOMAIN'));
+    }
+
+    public function testGetValidator()
+    {
+        $this->assertInstanceOf('Symfony\Component\Validator\Validator\RecursiveValidator', $this->builder->getValidator());
     }
 }

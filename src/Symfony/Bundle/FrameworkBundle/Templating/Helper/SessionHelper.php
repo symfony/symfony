@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * SessionHelper provides read-only access to the session attributes.
@@ -22,19 +22,15 @@ use Symfony\Component\HttpFoundation\Request;
 class SessionHelper extends Helper
 {
     protected $session;
+    protected $requestStack;
 
-    /**
-     * Constructor.
-     *
-     * @param Request $request A Request instance
-     */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->session = $request->getSession();
+        $this->requestStack = $requestStack;
     }
 
     /**
-     * Returns an attribute
+     * Returns an attribute.
      *
      * @param string $name    The attribute name
      * @param mixed  $default The default value
@@ -43,28 +39,39 @@ class SessionHelper extends Helper
      */
     public function get($name, $default = null)
     {
-        return $this->session->get($name, $default);
+        return $this->getSession()->get($name, $default);
     }
 
     public function getFlash($name, array $default = array())
     {
-        return $this->session->getFlashBag()->get($name, $default);
+        return $this->getSession()->getFlashBag()->get($name, $default);
     }
 
     public function getFlashes()
     {
-        return $this->session->getFlashBag()->all();
+        return $this->getSession()->getFlashBag()->all();
     }
 
     public function hasFlash($name)
     {
-        return $this->session->getFlashBag()->has($name);
+        return $this->getSession()->getFlashBag()->has($name);
+    }
+
+    private function getSession()
+    {
+        if (null === $this->session) {
+            if (!$this->requestStack->getMasterRequest()) {
+                throw new \LogicException('A Request must be available.');
+            }
+
+            $this->session = $this->requestStack->getMasterRequest()->getSession();
+        }
+
+        return $this->session;
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {

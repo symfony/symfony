@@ -24,7 +24,7 @@ class HashParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new HashParser();
         $selectors = $parser->parse($source);
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
@@ -34,8 +34,11 @@ class HashParserTest extends \PHPUnit_Framework_TestCase
     public function getParseTestData()
     {
         return array(
-            array('#id', 'Hash[Element[*]#id]'),
-            array('h1#main', 'Hash[Element[h1]#main]'),
+            array('#testid', 'Hash[Element[*]#testid]'),
+            array('testel#testid', 'Hash[Element[testel]#testid]'),
+            array('testns|#testid', 'Hash[Element[testns|*]#testid]'),
+            array('testns|*#testid', 'Hash[Element[testns|*]#testid]'),
+            array('testns|testel#testid', 'Hash[Element[testns|testel]#testid]'),
         );
     }
 }

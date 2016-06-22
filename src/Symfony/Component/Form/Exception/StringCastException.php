@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Form\Exception;
 
-class StringCastException extends Exception
+class StringCastException extends RuntimeException
 {
 }

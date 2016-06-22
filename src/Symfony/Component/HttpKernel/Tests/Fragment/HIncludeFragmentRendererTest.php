@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\Fragment\Tests\FragmentRenderer;
+namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
@@ -18,13 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class HIncludeFragmentRendererTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     /**
      * @expectedException \LogicException
      */
@@ -38,7 +31,7 @@ class HIncludeFragmentRendererTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new HIncludeFragmentRenderer(null, new UriSigner('foo'));
 
-        $this->assertEquals('<hx:include src="http://localhost/_fragment?_path=_format%3Dhtml%26_controller%3Dmain_controller&amp;_hash=VI25qJj8J0qveB3bGKPhsJtexKg%3D"></hx:include>', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
+        $this->assertEquals('<hx:include src="/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller&amp;_hash=BP%2BOzCD5MRUI%2BHJpgPDOmoju00FnzLhP3TGcSHbbBLs%3D"></hx:include>', $strategy->render(new ControllerReference('main_controller', array(), array()), Request::create('/'))->getContent());
     }
 
     public function testRenderWithUri()
@@ -50,7 +43,7 @@ class HIncludeFragmentRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<hx:include src="/foo"></hx:include>', $strategy->render('/foo', Request::create('/'))->getContent());
     }
 
-    public function testRenderWhithDefault()
+    public function testRenderWithDefault()
     {
         // only default
         $strategy = new HIncludeFragmentRenderer();
@@ -78,5 +71,18 @@ class HIncludeFragmentRendererTest extends \PHPUnit_Framework_TestCase
         // with id & attributes
         $strategy = new HIncludeFragmentRenderer();
         $this->assertEquals('<hx:include src="/foo" p1="v1" p2="v2" id="bar">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default', 'id' => 'bar', 'attributes' => array('p1' => 'v1', 'p2' => 'v2')))->getContent());
+    }
+
+    public function testRenderWithDefaultText()
+    {
+        $engine = $this->getMock('Symfony\\Component\\Templating\\EngineInterface');
+        $engine->expects($this->once())
+            ->method('exists')
+            ->with('default')
+            ->will($this->throwException(new \InvalidArgumentException()));
+
+        // only default
+        $strategy = new HIncludeFragmentRenderer($engine);
+        $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), array('default' => 'default'))->getContent());
     }
 }

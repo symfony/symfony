@@ -41,7 +41,7 @@ class Router extends BaseRouter implements WarmableInterface
         $this->container = $container;
 
         $this->resource = $resource;
-        $this->context = null === $context ? new RequestContext() : $context;
+        $this->context = $context ?: new RequestContext();
         $this->setOptions($options);
     }
 
@@ -77,8 +77,10 @@ class Router extends BaseRouter implements WarmableInterface
      * Replaces placeholders with service container parameter values in:
      * - the route defaults,
      * - the route requirements,
-     * - the route pattern.
-     * - the route host.
+     * - the route path,
+     * - the route host,
+     * - the route schemes,
+     * - the route methods.
      *
      * @param RouteCollection $collection
      */
@@ -90,11 +92,24 @@ class Router extends BaseRouter implements WarmableInterface
             }
 
             foreach ($route->getRequirements() as $name => $value) {
-                 $route->setRequirement($name, $this->resolve($value));
+                $route->setRequirement($name, $this->resolve($value));
             }
 
             $route->setPath($this->resolve($route->getPath()));
             $route->setHost($this->resolve($route->getHost()));
+
+            $schemes = array();
+            foreach ($route->getSchemes() as $scheme) {
+                $schemes = array_merge($schemes, explode('|', $this->resolve($scheme)));
+            }
+            $route->setSchemes($schemes);
+
+            $methods = array();
+            foreach ($route->getMethods() as $method) {
+                $methods = array_merge($methods, explode('|', $this->resolve($method)));
+            }
+            $route->setMethods($methods);
+            $route->setCondition($this->resolve($route->getCondition()));
         }
     }
 
@@ -104,7 +119,7 @@ class Router extends BaseRouter implements WarmableInterface
      * @param mixed $value The source which might contain "%placeholders%"
      *
      * @return mixed The source with the placeholders replaced by the container
-     *               parameters. Array are resolved recursively.
+     *               parameters. Arrays are resolved recursively.
      *
      * @throws ParameterNotFoundException When a placeholder does not exist as a container parameter
      * @throws RuntimeException           When a container value is not a string or a numeric value
@@ -125,30 +140,25 @@ class Router extends BaseRouter implements WarmableInterface
 
         $container = $this->container;
 
-        $escapedValue = preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($container, $value) {
+        $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function ($match) use ($container, $value) {
             // skip %%
             if (!isset($match[1])) {
                 return '%%';
             }
 
-            $key = strtolower($match[1]);
-
-            if (!$container->hasParameter($key)) {
-                throw new ParameterNotFoundException($key);
-            }
-
-            $resolved = $container->getParameter($key);
+            $resolved = $container->getParameter($match[1]);
 
             if (is_string($resolved) || is_numeric($resolved)) {
                 return (string) $resolved;
             }
 
             throw new RuntimeException(sprintf(
-                'A string value must be composed of strings and/or numbers,' .
-                'but found parameter "%s" of type %s inside string value "%s".',
-                $key,
-                gettype($resolved),
-                $value)
+                'The container parameter "%s", used in the route configuration value "%s", '.
+                'must be a string or numeric, but it is of type %s.',
+                $match[1],
+                $value,
+                gettype($resolved)
+                )
             );
 
         }, $value);

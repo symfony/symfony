@@ -11,47 +11,82 @@
 
 namespace Symfony\Component\Validator;
 
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
  * Contains the properties of a constraint definition.
  *
- * A constraint can be defined on a class, an option or a getter method.
+ * A constraint can be defined on a class, a property or a getter method.
  * The Constraint class encapsulates all the configuration required for
- * validating this class, option or getter result successfully.
+ * validating this class, property or getter result successfully.
  *
  * Constraint instances are immutable and serializable.
  *
- * @author Bernhard Schussek <bschussek@gmail.com>
+ * @property array $groups The groups that the constraint belongs to
  *
- * @api
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class Constraint
 {
     /**
-     * The name of the group given to all constraints with no explicit group
+     * The name of the group given to all constraints with no explicit group.
+     *
      * @var string
      */
     const DEFAULT_GROUP = 'Default';
 
     /**
-     * Marks a constraint that can be put onto classes
+     * Marks a constraint that can be put onto classes.
+     *
      * @var string
      */
     const CLASS_CONSTRAINT = 'class';
 
     /**
-     * Marks a constraint that can be put onto properties
+     * Marks a constraint that can be put onto properties.
+     *
      * @var string
      */
     const PROPERTY_CONSTRAINT = 'property';
 
     /**
+     * Maps error codes to the names of their constants.
+     *
      * @var array
      */
-    public $groups = array(self::DEFAULT_GROUP);
+    protected static $errorNames = array();
+
+    /**
+     * Domain-specific data attached to a constraint.
+     *
+     * @var mixed
+     */
+    public $payload;
+
+    /**
+     * Returns the name of the given error code.
+     *
+     * @param string $errorCode The error code
+     *
+     * @return string The name of the error code
+     *
+     * @throws InvalidArgumentException If the error code does not exist
+     */
+    public static function getErrorName($errorCode)
+    {
+        if (!isset(static::$errorNames[$errorCode])) {
+            throw new InvalidArgumentException(sprintf(
+                'The error code "%s" does not exist for constraint of type "%s".',
+                $errorCode,
+                get_called_class()
+            ));
+        }
+
+        return static::$errorNames[$errorCode];
+    }
 
     /**
      * Initializes the constraint with options.
@@ -78,29 +113,32 @@ abstract class Constraint
      *                                       returned by getRequiredOptions()
      * @throws ConstraintDefinitionException When you don't pass an associative
      *                                       array, but getDefaultOption() returns
-     *                                       NULL
-     *
-     * @api
+     *                                       null
      */
     public function __construct($options = null)
     {
         $invalidOptions = array();
         $missingOptions = array_flip((array) $this->getRequiredOptions());
+        $knownOptions = get_object_vars($this);
 
-        if (is_array($options) && count($options) == 1 && isset($options['value'])) {
-            $options = $options['value'];
+        // The "groups" option is added to the object lazily
+        $knownOptions['groups'] = true;
+
+        if (is_array($options) && count($options) >= 1 && isset($options['value']) && !property_exists($this, 'value')) {
+            $options[$this->getDefaultOption()] = $options['value'];
+            unset($options['value']);
         }
 
         if (is_array($options) && count($options) > 0 && is_string(key($options))) {
             foreach ($options as $option => $value) {
-                if (property_exists($this, $option)) {
+                if (array_key_exists($option, $knownOptions)) {
                     $this->$option = $value;
                     unset($missingOptions[$option]);
                 } else {
                     $invalidOptions[] = $option;
                 }
             }
-        } elseif (null !== $options && ! (is_array($options) && count($options) === 0)) {
+        } elseif (null !== $options && !(is_array($options) && count($options) === 0)) {
             $option = $this->getDefaultOption();
 
             if (null === $option) {
@@ -109,7 +147,7 @@ abstract class Constraint
                 );
             }
 
-            if (property_exists($this, $option)) {
+            if (array_key_exists($option, $knownOptions)) {
                 $this->$option = $options;
                 unset($missingOptions[$option]);
             } else {
@@ -130,56 +168,92 @@ abstract class Constraint
                 array_keys($missingOptions)
             );
         }
-
-        $this->groups = (array) $this->groups;
     }
 
     /**
-     * Unsupported operation.
+     * Sets the value of a lazily initialized option.
+     *
+     * Corresponding properties are added to the object on first access. Hence
+     * this method will be called at most once per constraint instance and
+     * option name.
+     *
+     * @param string $option The option name
+     * @param mixed  $value  The value to set
+     *
+     * @throws InvalidOptionsException If an invalid option name is given
      */
     public function __set($option, $value)
     {
+        if ('groups' === $option) {
+            $this->groups = (array) $value;
+
+            return;
+        }
+
         throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, get_class($this)), array($option));
     }
 
     /**
-     * Adds the given group if this constraint is in the Default group
+     * Returns the value of a lazily initialized option.
+     *
+     * Corresponding properties are added to the object on first access. Hence
+     * this method will be called at most once per constraint instance and
+     * option name.
+     *
+     * @param string $option The option name
+     *
+     * @return mixed The value of the option
+     *
+     * @throws InvalidOptionsException If an invalid option name is given
+     *
+     * @internal This method should not be used or overwritten in userland code.
+     *
+     * @since 2.6
+     */
+    public function __get($option)
+    {
+        if ('groups' === $option) {
+            $this->groups = array(self::DEFAULT_GROUP);
+
+            return $this->groups;
+        }
+
+        throw new InvalidOptionsException(sprintf('The option "%s" does not exist in constraint %s', $option, get_class($this)), array($option));
+    }
+
+    /**
+     * Adds the given group if this constraint is in the Default group.
      *
      * @param string $group
-     *
-     * @api
      */
     public function addImplicitGroupName($group)
     {
-        if (in_array(Constraint::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
+        if (in_array(self::DEFAULT_GROUP, $this->groups) && !in_array($group, $this->groups)) {
             $this->groups[] = $group;
         }
     }
 
     /**
-     * Returns the name of the default option
+     * Returns the name of the default option.
      *
      * Override this method to define a default option.
      *
      * @return string
-     * @see __construct()
      *
-     * @api
+     * @see __construct()
      */
     public function getDefaultOption()
     {
-        return null;
     }
 
     /**
-     * Returns the name of the required options
+     * Returns the name of the required options.
      *
      * Override this method if you want to define required options.
      *
      * @return array
-     * @see __construct()
      *
-     * @api
+     * @see __construct()
      */
     public function getRequiredOptions()
     {
@@ -187,15 +261,13 @@ abstract class Constraint
     }
 
     /**
-     * Returns the name of the class that validates this constraint
+     * Returns the name of the class that validates this constraint.
      *
      * By default, this is the fully qualified name of the constraint class
      * suffixed with "Validator". You can override this method to change that
      * behaviour.
      *
      * @return string
-     *
-     * @api
      */
     public function validatedBy()
     {
@@ -204,17 +276,34 @@ abstract class Constraint
 
     /**
      * Returns whether the constraint can be put onto classes, properties or
-     * both
+     * both.
      *
      * This method should return one or more of the constants
      * Constraint::CLASS_CONSTRAINT and Constraint::PROPERTY_CONSTRAINT.
      *
-     * @return string|array  One or more constant values
-     *
-     * @api
+     * @return string|array One or more constant values
      */
     public function getTargets()
     {
         return self::PROPERTY_CONSTRAINT;
+    }
+
+    /**
+     * Optimizes the serialized value to minimize storage space.
+     *
+     * @return array The properties to serialize
+     *
+     * @internal This method may be replaced by an implementation of
+     *           {@link \Serializable} in the future. Please don't use or
+     *           overwrite it.
+     *
+     * @since 2.6
+     */
+    public function __sleep()
+    {
+        // Initialize "groups" option if it is not set
+        $this->groups;
+
+        return array_keys(get_object_vars($this));
     }
 }

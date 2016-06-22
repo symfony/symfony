@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
+namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app;
 
 // get the autoload file
 $dir = __DIR__;
@@ -24,6 +24,11 @@ while ($dir !== $lastDir) {
 
     if (file_exists($dir.'/autoload.php.dist')) {
         require_once $dir.'/autoload.php.dist';
+        break;
+    }
+
+    if (file_exists($dir.'/vendor/autoload.php')) {
+        require_once $dir.'/vendor/autoload.php';
         break;
     }
 
@@ -69,10 +74,6 @@ class AppKernel extends Kernel
         return include $filename;
     }
 
-    public function init()
-    {
-    }
-
     public function getRootDir()
     {
         return __DIR__;
@@ -100,7 +101,8 @@ class AppKernel extends Kernel
 
     public function unserialize($str)
     {
-        call_user_func_array(array($this, '__construct'), unserialize($str));
+        $a = unserialize($str);
+        $this->__construct($a[0], $a[1], $a[2], $a[3]);
     }
 
     protected function getKernelParameters()

@@ -6,7 +6,7 @@ parameters:
         - 0
         - 1000.3
     bar: foo
-    escape: @@escapeme
-    foo_bar: @foo_bar
+    escape: '@@escapeme'
+    foo_bar: '@foo_bar'
     MixedCase:
         MixedCaseKey: value

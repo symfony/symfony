@@ -11,22 +11,18 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\SubmitButtonBuilder;
 
 class FormBuilderTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
-
     private $factory;
-
     private $builder;
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
@@ -41,9 +37,9 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Changing the name is not allowed, otherwise the name and property path
-     * are not synchronized anymore
+     * are not synchronized anymore.
      *
-     * @see FormType::buildForm
+     * @see FormType::buildForm()
      */
     public function testNoSetName()
     {
@@ -71,21 +67,21 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddIsFluent()
     {
-        $builder = $this->builder->add('foo', 'text', array('bar' => 'baz'));
+        $builder = $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', array('bar' => 'baz'));
         $this->assertSame($builder, $this->builder);
     }
 
     public function testAdd()
     {
         $this->assertFalse($this->builder->has('foo'));
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->assertTrue($this->builder->has('foo'));
     }
 
     public function testAddIntegerName()
     {
         $this->assertFalse($this->builder->has(0));
-        $this->builder->add(0, 'text');
+        $this->builder->add(0, 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->assertTrue($this->builder->has(0));
     }
 
@@ -93,13 +89,13 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('foo', 'text')
+            ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType')
             ->will($this->returnValue(new FormBuilder('foo', null, $this->dispatcher, $this->factory)));
 
         $this->assertCount(0, $this->builder->all());
         $this->assertFalse($this->builder->has('foo'));
 
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $children = $this->builder->all();
 
         $this->assertTrue($this->builder->has('foo'));
@@ -112,9 +108,9 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function testMaintainOrderOfLazyAndExplicitChildren()
     {
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->add($this->getFormBuilder('bar'));
-        $this->builder->add('baz', 'text');
+        $this->builder->add('baz', 'Symfony\Component\Form\Extension\Core\Type\TextType');
 
         $children = $this->builder->all();
 
@@ -130,7 +126,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testRemove()
     {
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->remove('foo');
         $this->assertFalse($this->builder->has('foo'));
     }
@@ -144,7 +140,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     // https://github.com/symfony/symfony/pull/4826
     public function testRemoveAndGetForm()
     {
-        $this->builder->add('foo', 'text');
+        $this->builder->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $this->builder->remove('foo');
         $form = $this->builder->getForm();
         $this->assertInstanceOf('Symfony\Component\Form\Form', $form);
@@ -154,21 +150,27 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->factory->expects($this->once())
             ->method('createNamedBuilder')
-            ->with('foo', 'text', null, array())
+            ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array())
         ;
 
         $this->builder->create('foo');
     }
 
+    public function testAddButton()
+    {
+        $this->builder->add(new ButtonBuilder('reset'));
+        $this->builder->add(new SubmitButtonBuilder('submit'));
+    }
+
     public function testGetUnknown()
     {
-        $this->setExpectedException('Symfony\Component\Form\Exception\Exception', 'The child with the name "foo" does not exist.');
+        $this->setExpectedException('Symfony\Component\Form\Exception\InvalidArgumentException', 'The child with the name "foo" does not exist.');
         $this->builder->get('foo');
     }
 
     public function testGetExplicitType()
     {
-        $expectedType = 'text';
+        $expectedType = 'Symfony\Component\Form\Extension\Core\Type\TextType';
         $expectedName = 'foo';
         $expectedOptions = array('bar' => 'baz');
 
@@ -200,62 +202,19 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($builder, $this->builder);
     }
 
-    public function testGetParent()
-    {
-        $this->assertNull($this->builder->getParent());
-    }
-
-    public function testGetParentForAddedBuilder()
-    {
-        $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
-        $this->builder->add($builder);
-        $this->assertSame($this->builder, $builder->getParent());
-    }
-
-    public function testGetParentForRemovedBuilder()
-    {
-        $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
-        $this->builder->add($builder);
-        $this->builder->remove('name');
-        $this->assertNull($builder->getParent());
-    }
-
-    public function testGetParentForCreatedBuilder()
-    {
-        $this->builder = new FormBuilder('name', 'stdClass', $this->dispatcher, $this->factory);
-        $this->factory
-            ->expects($this->once())
-            ->method('createNamedBuilder')
-            ->with('bar', 'text', null, array(), $this->builder)
-        ;
-
-        $this->factory
-            ->expects($this->once())
-            ->method('createBuilderForProperty')
-            ->with('stdClass', 'foo', null, array(), $this->builder)
-        ;
-
-        $this->builder->create('foo');
-        $this->builder->create('bar', 'text');
-    }
-
     public function testGetFormConfigErasesReferences()
     {
         $builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
-        $builder->setParent(new FormBuilder('parent', null, $this->dispatcher, $this->factory));
         $builder->add(new FormBuilder('child', null, $this->dispatcher, $this->factory));
 
         $config = $builder->getFormConfig();
         $reflClass = new \ReflectionClass($config);
-        $parent = $reflClass->getProperty('parent');
         $children = $reflClass->getProperty('children');
         $unresolvedChildren = $reflClass->getProperty('unresolvedChildren');
 
-        $parent->setAccessible(true);
         $children->setAccessible(true);
         $unresolvedChildren->setAccessible(true);
 
-        $this->assertNull($parent->getValue($config));
         $this->assertEmpty($children->getValue($config));
         $this->assertEmpty($unresolvedChildren->getValue($config));
     }

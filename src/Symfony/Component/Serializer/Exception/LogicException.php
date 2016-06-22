@@ -12,10 +12,10 @@
 namespace Symfony\Component\Serializer\Exception;
 
 /**
- * LogicException
+ * LogicException.
  *
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  */
-class LogicException extends \LogicException implements Exception
+class LogicException extends \LogicException implements ExceptionInterface
 {
 }

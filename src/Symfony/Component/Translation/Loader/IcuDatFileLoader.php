@@ -36,7 +36,12 @@ class IcuDatFileLoader extends IcuResFileLoader
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
-        $rb = new \ResourceBundle($locale, $resource);
+        try {
+            $rb = new \ResourceBundle($locale, $resource);
+        } catch (\Exception $e) {
+            // HHVM compatibility: constructor throws on invalid resource
+            $rb = null;
+        }
 
         if (!$rb) {
             throw new InvalidResourceException(sprintf('Cannot load resource "%s"', $resource));
@@ -47,7 +52,10 @@ class IcuDatFileLoader extends IcuResFileLoader
         $messages = $this->flatten($rb);
         $catalogue = new MessageCatalogue($locale);
         $catalogue->add($messages, $domain);
-        $catalogue->addResource(new FileResource($resource.'.dat'));
+
+        if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
+            $catalogue->addResource(new FileResource($resource.'.dat'));
+        }
 
         return $catalogue;
     }

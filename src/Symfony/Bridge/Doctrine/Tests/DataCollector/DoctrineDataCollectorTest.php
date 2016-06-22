@@ -18,17 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Doctrine\DBAL\Platforms\MySqlPlatform')) {
-            $this->markTestSkipped('Doctrine DBAL is not available.');
-        }
-
-        if (!class_exists('Symfony\Component\HttpKernel\HttpKernel')) {
-            $this->markTestSkipped('The "HttpKernel" component is not available');
-        }
-    }
-
     public function testCollectConnections()
     {
         $c = $this->createCollector(array());
@@ -50,7 +39,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $c->getQueryCount());
 
         $queries = array(
-            array('sql' => "SELECT * FROM table1", 'params' => array(), 'types' => array(), 'executionMS' => 0)
+            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 0),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
@@ -64,15 +53,15 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $c->getTime());
 
         $queries = array(
-            array('sql' => "SELECT * FROM table1", 'params' => array(), 'types' => array(), 'executionMS' => 1)
+            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
         $this->assertEquals(1, $c->getTime());
 
         $queries = array(
-            array('sql' => "SELECT * FROM table1", 'params' => array(), 'types' => array(), 'executionMS' => 1),
-            array('sql' => "SELECT * FROM table2", 'params' => array(), 'types' => array(), 'executionMS' => 2)
+            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
+            array('sql' => 'SELECT * FROM table2', 'params' => array(), 'types' => array(), 'executionMS' => 2),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
@@ -85,14 +74,30 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
     public function testCollectQueries($param, $types, $expected, $explainable)
     {
         $queries = array(
-            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => $types, 'executionMS' => 1)
+            array('sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => array($param), 'types' => $types, 'executionMS' => 1),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
 
-        $collected_queries = $c->getQueries();
-        $this->assertEquals($expected, $collected_queries['default'][0]['params'][0]);
-        $this->assertEquals($explainable, $collected_queries['default'][0]['explainable']);
+        $collectedQueries = $c->getQueries();
+        $this->assertEquals($expected, $collectedQueries['default'][0]['params'][0]);
+        $this->assertEquals($explainable, $collectedQueries['default'][0]['explainable']);
+    }
+
+    public function testCollectQueryWithNoParams()
+    {
+        $queries = array(
+            array('sql' => 'SELECT * FROM table1', 'params' => array(), 'types' => array(), 'executionMS' => 1),
+            array('sql' => 'SELECT * FROM table1', 'params' => null, 'types' => null, 'executionMS' => 1),
+        );
+        $c = $this->createCollector($queries);
+        $c->collect(new Request(), new Response());
+
+        $collectedQueries = $c->getQueries();
+        $this->assertEquals(array(), $collectedQueries['default'][0]['params']);
+        $this->assertTrue($collectedQueries['default'][0]['explainable']);
+        $this->assertEquals(array(), $collectedQueries['default'][1]['params']);
+        $this->assertTrue($collectedQueries['default'][1]['explainable']);
     }
 
     /**
@@ -101,15 +106,15 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
     public function testSerialization($param, $types, $expected, $explainable)
     {
         $queries = array(
-            array('sql' => "SELECT * FROM table1 WHERE field1 = ?1", 'params' => array($param), 'types' => $types, 'executionMS' => 1)
+            array('sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => array($param), 'types' => $types, 'executionMS' => 1),
         );
         $c = $this->createCollector($queries);
         $c->collect(new Request(), new Response());
         $c = unserialize(serialize($c));
 
-        $collected_queries = $c->getQueries();
-        $this->assertEquals($expected, $collected_queries['default'][0]['params'][0]);
-        $this->assertEquals($explainable, $collected_queries['default'][0]['explainable']);
+        $collectedQueries = $c->getQueries();
+        $this->assertEquals($expected, $collectedQueries['default'][0]['params'][0]);
+        $this->assertEquals($explainable, $collectedQueries['default'][0]['explainable']);
     }
 
     public function paramProvider()

@@ -26,13 +26,13 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo', new Route('/foo'));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
-        $matcher->match('/foo');
+        $this->assertInternalType('array', $matcher->match('/foo'));
     }
 
     public function testMethodNotAllowed()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_method' => 'post')));
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('post')));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
 
@@ -47,17 +47,17 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     public function testHeadAllowedWhenRequirementContainsGet()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_method' => 'get')));
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('get')));
 
         $matcher = new UrlMatcher($coll, new RequestContext('', 'head'));
-        $matcher->match('/foo');
+        $this->assertInternalType('array', $matcher->match('/foo'));
     }
 
     public function testMethodNotAllowedAggregatesAllowedMethods()
     {
         $coll = new RouteCollection();
-        $coll->add('foo1', new Route('/foo', array(), array('_method' => 'post')));
-        $coll->add('foo2', new Route('/foo', array(), array('_method' => 'put|delete')));
+        $coll->add('foo1', new Route('/foo', array(), array(), array(), '', array(), array('post')));
+        $coll->add('foo2', new Route('/foo', array(), array(), array(), '', array(), array('put', 'delete')));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
 
@@ -78,7 +78,8 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         try {
             $matcher->match('/no-match');
             $this->fail();
-        } catch (ResourceNotFoundException $e) {}
+        } catch (ResourceNotFoundException $e) {
+        }
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz'), $matcher->match('/foo/baz'));
 
         // test that defaults are merged
@@ -89,7 +90,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         // test that route "method" is ignored if no method is given in the context
         $collection = new RouteCollection();
-        $collection->add('foo', new Route('/foo', array(), array('_method' => 'GET|head')));
+        $collection->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('get', 'head')));
         $matcher = new UrlMatcher($collection, new RequestContext());
         $this->assertInternalType('array', $matcher->match('/foo'));
 
@@ -98,7 +99,8 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         try {
             $matcher->match('/foo');
             $this->fail();
-        } catch (MethodNotAllowedException $e) {}
+        } catch (MethodNotAllowedException $e) {
+        }
 
         // route does match with GET or HEAD method context
         $matcher = new UrlMatcher($collection, new RequestContext());
@@ -242,12 +244,12 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         // 'w' eagerly matches as much as possible and the other variables match the remaining chars.
         // This also shows that the variables w-z must all exclude the separating char (the dot '.' in this case) by default requirement.
         // Otherwise they would also consume '.xml' and _format would never match as it's an optional variable.
-        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'Y', 'z' => 'Z','_format' => 'xml', '_route' => 'test'), $matcher->match('/wwwwwxYZ.xml'));
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'Y', 'z' => 'Z', '_format' => 'xml', '_route' => 'test'), $matcher->match('/wwwwwxYZ.xml'));
         // As 'y' has custom requirement and can only be of value 'y|Y', it will leave  'ZZZ' to variable z.
         // So with carefully chosen requirements adjacent variables, can be useful.
-        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'ZZZ','_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxyZZZ'));
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'ZZZ', '_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxyZZZ'));
         // z and _format are optional.
-        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'default-z','_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxy'));
+        $this->assertEquals(array('w' => 'wwwww', 'x' => 'x', 'y' => 'y', 'z' => 'default-z', '_format' => 'html', '_route' => 'test'), $matcher->match('/wwwwwxy'));
 
         $this->setExpectedException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
         $matcher->match('/wxy.html');
@@ -316,7 +318,20 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     public function testSchemeRequirement()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testCondition()
+    {
+        $coll = new RouteCollection();
+        $route = new Route('/foo');
+        $route->setCondition('context.getMethod() == "POST"');
+        $coll->add('foo', $route);
         $matcher = new UrlMatcher($coll, new RequestContext());
         $matcher->match('/foo');
     }
@@ -338,7 +353,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $subColl->add('bar', new Route('/bar'));
         $subColl->addPrefix('/prefix');
         // overwrite the pattern, so the prefix is not valid anymore for this route in the collection
-        $subColl->get('bar')->setPattern('/new');
+        $subColl->get('bar')->setPath('/new');
 
         $coll->addCollection($subColl);
 
@@ -379,5 +394,26 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'example.com'));
         $matcher->match('/foo/bar');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testPathIsCaseSensitive()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/locale', array(), array('locale' => 'EN|FR|DE')));
+
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/en');
+    }
+
+    public function testHostIsCaseInsensitive()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/', array(), array('locale' => 'EN|FR|DE'), array(), '{locale}.example.com'));
+
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
+        $this->assertEquals(array('_route' => 'foo', 'locale' => 'en'), $matcher->match('/'));
     }
 }

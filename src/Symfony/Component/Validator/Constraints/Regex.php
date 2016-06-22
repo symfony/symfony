@@ -15,18 +15,25 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
+ * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @api
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class Regex extends Constraint
 {
+    const REGEX_FAILED_ERROR = 'de1e3db3-5ed4-4941-aae4-59f3667cc3a3';
+
+    protected static $errorNames = array(
+        self::REGEX_FAILED_ERROR => 'REGEX_FAILED_ERROR',
+    );
+
     public $message = 'This value is not valid.';
     public $pattern;
-    public $htmlPattern = null;
+    public $htmlPattern;
     public $match = true;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultOption()
     {
@@ -34,7 +41,7 @@ class Regex extends Constraint
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRequiredOptions()
     {
@@ -42,7 +49,14 @@ class Regex extends Constraint
     }
 
     /**
-     * Returns htmlPattern if exists or pattern is convertible.
+     * Converts the htmlPattern to a suitable format for HTML5 pattern.
+     * Example: /^[a-z]+$/ would be converted to [a-z]+
+     * However, if options are specified, it cannot be converted.
+     *
+     * Pattern is also ignored if match=false since the pattern should
+     * then be reversed before application.
+     *
+     * @link http://dev.w3.org/html5/spec/single-page.html#the-pattern-attribute
      *
      * @return string|null
      */
@@ -55,42 +69,34 @@ class Regex extends Constraint
                 : $this->htmlPattern;
         }
 
-        return $this->getNonDelimitedPattern();
-    }
+        // Quit if delimiters not at very beginning/end (e.g. when options are passed)
+        if ($this->pattern[0] !== $this->pattern[strlen($this->pattern) - 1]) {
+            return;
+        }
 
-    /**
-     * Convert the htmlPattern to a suitable format for HTML5 pattern.
-     * Example: /^[a-z]+$/ would be converted to [a-z]+
-     * However, if options are specified, it cannot be converted
-     *
-     * Pattern is also ignored if match=false since the pattern should
-     * then be reversed before application.
-     *
-     * @todo reverse pattern in case match=false as per issue #5307
-     *
-     * @link http://dev.w3.org/html5/spec/single-page.html#the-pattern-attribute
-     *
-     * @return string|null
-     */
-    private function getNonDelimitedPattern()
-    {
-        // If match = false, pattern should not be added to HTML5 validation
+        $delimiter = $this->pattern[0];
+
+        // Unescape the delimiter
+        $pattern = str_replace('\\'.$delimiter, $delimiter, substr($this->pattern, 1, -1));
+
+        // If the pattern is inverted, we can simply wrap it in
+        // ((?!pattern).)*
         if (!$this->match) {
-            return null;
+            return '((?!'.$pattern.').)*';
         }
 
-        if (preg_match('/^(.)(\^?)(.*?)(\$?)\1$/', $this->pattern, $matches)) {
-            $delimiter = $matches[1];
-            $start     = empty($matches[2]) ? '.*' : '';
-            $pattern   = $matches[3];
-            $end       = empty($matches[4]) ? '.*' : '';
-
-            // Unescape the delimiter in pattern
-            $pattern = str_replace('\\'.$delimiter, $delimiter, $pattern);
-
-            return $start.$pattern.$end;
+        // If the pattern contains an or statement, wrap the pattern in
+        // .*(pattern).* and quit. Otherwise we'd need to parse the pattern
+        if (false !== strpos($pattern, '|')) {
+            return '.*('.$pattern.').*';
         }
 
-        return null;
+        // Trim leading ^, otherwise prepend .*
+        $pattern = '^' === $pattern[0] ? substr($pattern, 1) : '.*'.$pattern;
+
+        // Trim trailing $, otherwise append .*
+        $pattern = '$' === $pattern[strlen($pattern) - 1] ? substr($pattern, 0, -1) : $pattern.'.*';
+
+        return $pattern;
     }
 }

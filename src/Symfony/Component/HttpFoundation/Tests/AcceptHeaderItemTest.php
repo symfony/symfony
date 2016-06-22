@@ -30,19 +30,19 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 'text/html',
-                'text/html', array()
+                'text/html', array(),
             ),
             array(
                 '"this;should,not=matter"',
-                'this;should,not=matter', array()
+                'this;should,not=matter', array(),
             ),
             array(
                 "text/plain; charset=utf-8;param=\"this;should,not=matter\";\tfootnotes=true",
-                'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true')
+                'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'),
             ),
             array(
                 '"this;should,not=matter";charset=utf-8',
-                'this;should,not=matter', array('charset' => 'utf-8')
+                'this;should,not=matter', array('charset' => 'utf-8'),
             ),
         );
     }
@@ -61,11 +61,11 @@ class AcceptHeaderItemTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 'text/html', array(),
-                'text/html'
+                'text/html',
             ),
             array(
                 'text/plain', array('charset' => 'utf-8', 'param' => 'this;should,not=matter', 'footnotes' => 'true'),
-                'text/plain;charset=utf-8;param="this;should,not=matter";footnotes=true'
+                'text/plain;charset=utf-8;param="this;should,not=matter";footnotes=true',
             ),
         );
     }

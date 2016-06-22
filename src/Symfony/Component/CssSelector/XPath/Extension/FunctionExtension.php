@@ -21,10 +21,12 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 /**
  * XPath expression translator function extension.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class FunctionExtension extends AbstractExtension
 {
@@ -34,20 +36,20 @@ class FunctionExtension extends AbstractExtension
     public function getFunctionTranslators()
     {
         return array(
-            'nth-child'        => array($this, 'translateNthChild'),
-            'nth-last-child'   => array($this, 'translateNthLastChild'),
-            'nth-of-type'      => array($this, 'translateNthOfType'),
+            'nth-child' => array($this, 'translateNthChild'),
+            'nth-last-child' => array($this, 'translateNthLastChild'),
+            'nth-of-type' => array($this, 'translateNthOfType'),
             'nth-last-of-type' => array($this, 'translateNthLastOfType'),
-            'contains'         => array($this, 'translateContains'),
-            'lang'             => array($this, 'translateLang'),
+            'contains' => array($this, 'translateContains'),
+            'lang' => array($this, 'translateLang'),
         );
     }
 
     /**
      * @param XPathExpr    $xpath
      * @param FunctionNode $function
-     * @param boolean      $last
-     * @param boolean      $addNameTest
+     * @param bool         $last
+     * @param bool         $addNameTest
      *
      * @return XPathExpr
      *
@@ -58,7 +60,7 @@ class FunctionExtension extends AbstractExtension
         try {
             list($a, $b) = Parser::parseSeries($function->getArguments());
         } catch (SyntaxErrorException $e) {
-            throw new ExpressionErrorException('Invalid series: '.implode(', ', $function->getArguments()), 0, $e);
+            throw new ExpressionErrorException(sprintf('Invalid series: %s', implode(', ', $function->getArguments())), 0, $e);
         }
 
         $xpath->addStarPrefix();
@@ -67,24 +69,37 @@ class FunctionExtension extends AbstractExtension
         }
 
         if (0 === $a) {
-            return $xpath->addCondition('position() = '.($last ? 'last() - '.$b : $b));
+            return $xpath->addCondition('position() = '.($last ? 'last() - '.($b - 1) : $b));
         }
+
+        if ($a < 0) {
+            if ($b < 1) {
+                return $xpath->addCondition('false()');
+            }
+
+            $sign = '<=';
+        } else {
+            $sign = '>=';
+        }
+
+        $expr = 'position()';
 
         if ($last) {
-            // todo: verify if this is right
-            $a = - $a;
-            $b = - $b;
+            $expr = 'last() - '.$expr;
+            --$b;
         }
 
-        $conditions = 1 === $a
-            ? array()
-            : array(sprintf('(position() %s) mod %s = 0', $b > 0 ? (string) (- $b) : '+'.(- $b), $a));
-
-        if ($b >= 0) {
-            $conditions[] = 'position() >= '.$b;
-        } elseif ($last) {
-            $conditions[] = sprintf('position() < (last() %s)', $b);
+        if (0 !== $b) {
+            $expr .= ' - '.$b;
         }
+
+        $conditions = array(sprintf('%s %s 0', $expr, $sign));
+
+        if (1 !== $a && -1 !== $a) {
+            $conditions[] = sprintf('(%s) mod %d = 0', $expr, $a);
+        }
+
+        return $xpath->addCondition(implode(' and ', $conditions));
 
         // todo: handle an+b, odd, even
         // an+b means every-a, plus b, e.g., 2n+1 means odd
@@ -93,8 +108,6 @@ class FunctionExtension extends AbstractExtension
         // an means every a elements, i.e., 2n means even
         // -n means -1n
         // -1n+6 means elements 6 and previous
-
-        return empty($conditions) ? $xpath : $xpath->addCondition(implode(' and ', $conditions));
     }
 
     /**

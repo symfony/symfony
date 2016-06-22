@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class AddCacheClearerPass implements CompilerPassInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {

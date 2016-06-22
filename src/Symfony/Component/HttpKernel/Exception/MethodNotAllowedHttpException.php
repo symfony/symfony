@@ -24,7 +24,7 @@ class MethodNotAllowedHttpException extends HttpException
      * @param array      $allow    An array of allowed methods
      * @param string     $message  The internal exception message
      * @param \Exception $previous The previous exception
-     * @param integer    $code     The internal exception code
+     * @param int        $code     The internal exception code
      */
     public function __construct(array $allow, $message = null, \Exception $previous = null, $code = 0)
     {

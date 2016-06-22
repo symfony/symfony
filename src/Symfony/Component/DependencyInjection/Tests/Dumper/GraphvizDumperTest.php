@@ -41,8 +41,8 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new GraphvizDumper($container);
         $this->assertEquals($dumper->dump(array(
             'graph' => array('ratio' => 'normal'),
-            'node'  => array('fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'),
-            'edge'  => array('fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1),
+            'node' => array('fontsize' => 13, 'fontname' => 'Verdana', 'shape' => 'square'),
+            'edge' => array('fontsize' => 12, 'fontname' => 'Verdana', 'color' => 'white', 'arrowhead' => 'closed', 'arrowsize' => 1),
             'node.instance' => array('fillcolor' => 'green', 'style' => 'empty'),
             'node.definition' => array('fillcolor' => 'grey'),
             'node.missing' => array('fillcolor' => 'red', 'style' => 'empty'),
@@ -61,5 +61,13 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
         $container = include self::$fixturesPath.'/containers/container14.php';
         $dumper = new GraphvizDumper($container);
         $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services14.dot')), $dumper->dump(), '->dump() dumps services');
+    }
+
+    public function testDumpWithUnresolvedParameter()
+    {
+        $container = include self::$fixturesPath.'/containers/container17.php';
+        $dumper = new GraphvizDumper($container);
+
+        $this->assertEquals(str_replace('%path%', __DIR__, file_get_contents(self::$fixturesPath.'/graphviz/services17.dot')), $dumper->dump(), '->dump() dumps services');
     }
 }

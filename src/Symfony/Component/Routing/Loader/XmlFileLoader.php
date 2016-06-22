@@ -22,8 +22,6 @@ use Symfony\Component\Config\Util\XmlUtils;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
- *
- * @api
  */
 class XmlFileLoader extends FileLoader
 {
@@ -40,8 +38,6 @@ class XmlFileLoader extends FileLoader
      *
      * @throws \InvalidArgumentException When the file cannot be loaded or when the XML cannot be
      *                                   parsed because it does not validate against the scheme.
-     *
-     * @api
      */
     public function load($file, $type = null)
     {
@@ -94,8 +90,6 @@ class XmlFileLoader extends FileLoader
 
     /**
      * {@inheritdoc}
-     *
-     * @api
      */
     public function supports($resource, $type = null)
     {
@@ -113,25 +107,16 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseRoute(RouteCollection $collection, \DOMElement $node, $path)
     {
-        if ('' === ($id = $node->getAttribute('id')) || (!$node->hasAttribute('pattern') && !$node->hasAttribute('path'))) {
+        if ('' === ($id = $node->getAttribute('id')) || !$node->hasAttribute('path')) {
             throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" must have an "id" and a "path" attribute.', $path));
-        }
-
-        if ($node->hasAttribute('pattern')) {
-            if ($node->hasAttribute('path')) {
-                throw new \InvalidArgumentException(sprintf('The <route> element in file "%s" cannot define both a "path" and a "pattern" attribute. Use only "path".', $path));
-            }
-
-            $node->setAttribute('path', $node->getAttribute('pattern'));
-            $node->removeAttribute('pattern');
         }
 
         $schemes = preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY);
         $methods = preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY);
 
-        list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
+        list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
-        $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods);
+        $route = new Route($node->getAttribute('path'), $defaults, $requirements, $options, $node->getAttribute('host'), $schemes, $methods, $condition);
         $collection->add($id, $route);
     }
 
@@ -157,7 +142,7 @@ class XmlFileLoader extends FileLoader
         $schemes = $node->hasAttribute('schemes') ? preg_split('/[\s,\|]++/', $node->getAttribute('schemes'), -1, PREG_SPLIT_NO_EMPTY) : null;
         $methods = $node->hasAttribute('methods') ? preg_split('/[\s,\|]++/', $node->getAttribute('methods'), -1, PREG_SPLIT_NO_EMPTY) : null;
 
-        list($defaults, $requirements, $options) = $this->parseConfigs($node, $path);
+        list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
         $this->setCurrentDir(dirname($path));
 
@@ -166,6 +151,9 @@ class XmlFileLoader extends FileLoader
         $subCollection->addPrefix($prefix);
         if (null !== $host) {
             $subCollection->setHost($host);
+        }
+        if (null !== $condition) {
+            $subCollection->setCondition($condition);
         }
         if (null !== $schemes) {
             $subCollection->setSchemes($schemes);
@@ -211,11 +199,17 @@ class XmlFileLoader extends FileLoader
         $defaults = array();
         $requirements = array();
         $options = array();
+        $condition = null;
 
         foreach ($node->getElementsByTagNameNS(self::NAMESPACE_URI, '*') as $n) {
             switch ($n->localName) {
                 case 'default':
-                    $defaults[$n->getAttribute('key')] = trim($n->textContent);
+                    if ($this->isElementValueNull($n)) {
+                        $defaults[$n->getAttribute('key')] = null;
+                    } else {
+                        $defaults[$n->getAttribute('key')] = trim($n->textContent);
+                    }
+
                     break;
                 case 'requirement':
                     $requirements[$n->getAttribute('key')] = trim($n->textContent);
@@ -223,11 +217,25 @@ class XmlFileLoader extends FileLoader
                 case 'option':
                     $options[$n->getAttribute('key')] = trim($n->textContent);
                     break;
+                case 'condition':
+                    $condition = trim($n->textContent);
+                    break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "default", "requirement" or "option".', $n->localName, $path));
             }
         }
 
-        return array($defaults, $requirements, $options);
+        return array($defaults, $requirements, $options, $condition);
+    }
+
+    private function isElementValueNull(\DOMElement $element)
+    {
+        $namespaceUri = 'http://www.w3.org/2001/XMLSchema-instance';
+
+        if (!$element->hasAttributeNS($namespaceUri, 'nil')) {
+            return false;
+        }
+
+        return 'true' === $element->getAttributeNS($namespaceUri, 'nil') || '1' === $element->getAttributeNS($namespaceUri, 'nil');
     }
 }

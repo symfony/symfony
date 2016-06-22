@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
 use Symfony\Bridge\Twig\Node\TransDefaultDomainNode;
@@ -20,12 +29,14 @@ class TwigNodeProvider
         );
     }
 
-    public static function getTransFilter($message, $domain = null)
+    public static function getTransFilter($message, $domain = null, $arguments = null)
     {
-        $arguments = $domain ? array(
-            new \Twig_Node_Expression_Array(array(), 0),
-            new \Twig_Node_Expression_Constant($domain, 0),
-        ) : array();
+        if (!$arguments) {
+            $arguments = $domain ? array(
+                new \Twig_Node_Expression_Array(array(), 0),
+                new \Twig_Node_Expression_Constant($domain, 0),
+            ) : array();
+        }
 
         return new \Twig_Node_Expression_Filter(
             new \Twig_Node_Expression_Constant($message, 0),
@@ -35,13 +46,15 @@ class TwigNodeProvider
         );
     }
 
-    public static function getTransChoiceFilter($message, $domain = null)
+    public static function getTransChoiceFilter($message, $domain = null, $arguments = null)
     {
-        $arguments = $domain ? array(
-            new \Twig_Node_Expression_Constant(0, 0),
-            new \Twig_Node_Expression_Array(array(), 0),
-            new \Twig_Node_Expression_Constant($domain, 0),
-        ) : array();
+        if (!$arguments) {
+            $arguments = $domain ? array(
+                new \Twig_Node_Expression_Constant(0, 0),
+                new \Twig_Node_Expression_Array(array(), 0),
+                new \Twig_Node_Expression_Constant($domain, 0),
+            ) : array();
+        }
 
         return new \Twig_Node_Expression_Filter(
             new \Twig_Node_Expression_Constant($message, 0),

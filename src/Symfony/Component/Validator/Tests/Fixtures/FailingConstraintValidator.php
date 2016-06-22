@@ -19,7 +19,5 @@ class FailingConstraintValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         $this->context->addViolation($constraint->message, array());
-
-        return;
     }
 }

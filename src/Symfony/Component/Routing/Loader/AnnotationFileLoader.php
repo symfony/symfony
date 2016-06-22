@@ -31,17 +31,16 @@ class AnnotationFileLoader extends FileLoader
      *
      * @param FileLocatorInterface  $locator A FileLocator instance
      * @param AnnotationClassLoader $loader  An AnnotationClassLoader instance
-     * @param string|array          $paths   A path or an array of paths where to look for resources
      *
      * @throws \RuntimeException
      */
-    public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader, $paths = array())
+    public function __construct(FileLocatorInterface $locator, AnnotationClassLoader $loader)
     {
         if (!function_exists('token_get_all')) {
             throw new \RuntimeException('The Tokenizer extension is required for the routing annotation loaders.');
         }
 
-        parent::__construct($locator, $paths);
+        parent::__construct($locator);
 
         $this->loader = $loader;
     }
@@ -64,6 +63,10 @@ class AnnotationFileLoader extends FileLoader
         if ($class = $this->findClass($path)) {
             $collection->addResource(new FileResource($path));
             $collection->addCollection($this->loader->load($class, $type));
+        }
+        if (PHP_VERSION_ID >= 70000) {
+            // PHP 7 memory manager will not release after token_get_all(), see https://bugs.php.net/70098
+            gc_mem_caches();
         }
 
         return $collection;
@@ -89,10 +92,15 @@ class AnnotationFileLoader extends FileLoader
         $class = false;
         $namespace = false;
         $tokens = token_get_all(file_get_contents($file));
-        for ($i = 0, $count = count($tokens); $i < $count; $i++) {
+
+        if (1 === count($tokens) && T_INLINE_HTML === $tokens[0][0]) {
+            throw new \InvalidArgumentException(sprintf('The file "%s" does not contain PHP code. Did you forgot to add the "<?php" start tag at the beginning of the file?', $file));
+        }
+
+        for ($i = 0; isset($tokens[$i]); ++$i) {
             $token = $tokens[$i];
 
-            if (!is_array($token)) {
+            if (!isset($token[1])) {
                 continue;
             }
 
@@ -101,15 +109,32 @@ class AnnotationFileLoader extends FileLoader
             }
 
             if (true === $namespace && T_STRING === $token[0]) {
-                $namespace = '';
-                do {
-                    $namespace .= $token[1];
-                    $token = $tokens[++$i];
-                } while ($i < $count && is_array($token) && in_array($token[0], array(T_NS_SEPARATOR, T_STRING)));
+                $namespace = $token[1];
+                while (isset($tokens[++$i][1]) && in_array($tokens[$i][0], array(T_NS_SEPARATOR, T_STRING))) {
+                    $namespace .= $tokens[$i][1];
+                }
+                $token = $tokens[$i];
             }
 
             if (T_CLASS === $token[0]) {
-                $class = true;
+                // Skip usage of ::class constant
+                $isClassConstant = false;
+                for ($j = $i - 1; $j > 0; --$j) {
+                    if (!isset($tokens[$j][1])) {
+                        break;
+                    }
+
+                    if (T_DOUBLE_COLON === $tokens[$j][0]) {
+                        $isClassConstant = true;
+                        break;
+                    } elseif (!in_array($tokens[$j][0], array(T_WHITESPACE, T_DOC_COMMENT, T_COMMENT))) {
+                        break;
+                    }
+                }
+
+                if (!$isClassConstant) {
+                    $class = true;
+                }
             }
 
             if (T_NAMESPACE === $token[0]) {

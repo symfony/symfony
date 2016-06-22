@@ -1,12 +1,57 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * added truncate method to FormatterHelper
+ * added setColumnWidth(s) method to Table 
+
+2.8.3
+-----
+
+ * remove readline support from the question helper as it caused issues
+
+2.8.0
+-----
+
+ * use readline for user input in the question helper when available to allow
+   the use of arrow keys
+
+2.6.0
+-----
+
+ * added a Process helper
+ * added a DebugFormatter helper
+
+2.5.0
+-----
+
+ * deprecated the dialog helper (use the question helper instead)
+ * deprecated TableHelper in favor of Table
+ * deprecated ProgressHelper in favor of ProgressBar
+ * added ConsoleLogger
+ * added a question helper
+ * added a way to set the process name of a command
+ * added a way to set a default command instead of `ListCommand`
+
+2.4.0
+-----
+
+ * added a way to force terminal dimensions
+ * added a convenient method to detect verbosity level
+ * [BC BREAK] made descriptors use output instead of returning a string
+
 2.3.0
 -----
 
+ * added multiselect support to the select dialog helper
+ * added Table Helper for tabular data rendering
  * added support for events in `Application`
  * added a way to normalize EOLs in `ApplicationTester::getDisplay()` and `CommandTester::getDisplay()`
  * added a way to set the progress bar progress via the `setCurrent` method
+ * added support for multiple InputOption shortcuts, written as `'-a|-b|-c'`
+ * added two additional verbosity levels, VERBOSITY_VERY_VERBOSE and VERBOSITY_DEBUG
 
 2.2.0
 -----

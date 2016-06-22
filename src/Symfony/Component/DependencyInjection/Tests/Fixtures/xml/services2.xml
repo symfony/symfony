@@ -16,16 +16,16 @@
       <parameter>on</parameter>
       <parameter>off</parameter>
       <parameter key="float">1.3</parameter>
-      <parameter>1,000.3</parameter>
+      <parameter>1000.3</parameter>
       <parameter>a string</parameter>
       <parameter type="collection">
         <parameter>foo</parameter>
         <parameter>bar</parameter>
       </parameter>
     </parameter>
-    <parameter key="foo_bar" type="service" id="foo_bar" />
     <parameter key="MixedCase" type="collection"> <!-- Should be lower cased -->
       <parameter key="MixedCaseKey">value</parameter> <!-- Should stay mixed case -->
     </parameter>
+    <parameter key="constant" type="constant">PHP_EOL</parameter>
   </parameters>
 </container>

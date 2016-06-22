@@ -70,19 +70,15 @@ interface FormRendererEngineInterface
      * The type of the resource is decided by the implementation. The resource
      * is later passed to {@link renderBlock()} by the rendering algorithm.
      *
-     * @param FormView          $view               The view for determining the
-     *                                              used themes. First the themes
-     *                                              attached directly to the view
-     *                                              with {@link setTheme()} are
-     *                                              considered, then the ones of
-     *                                              its parent etc.
-     * @param array             $blockNameHierarchy The block name hierarchy, with
-     *                                              the root block at the beginning.
-     * @param integer           $hierarchyLevel     The level in the hierarchy at
-     *                                              which to start looking. Level 0
-     *                                              indicates the root block, i.e.
-     *                                              the first element of
-     *                                              $blockNameHierarchy.
+     * @param FormView $view               The view for determining the used themes.
+     *                                     First the themes  attached directly to
+     *                                     the view with {@link setTheme()} are
+     *                                     considered, then the ones of its parent etc.
+     * @param array    $blockNameHierarchy The block name hierarchy, with the root block
+     *                                     at the beginning.
+     * @param int      $hierarchyLevel     The level in the hierarchy at which to start
+     *                                     looking. Level 0 indicates the root block, i.e.
+     *                                     the first element of $blockNameHierarchy.
      *
      * @return mixed The renderer resource or false, if none was found.
      */
@@ -114,21 +110,17 @@ interface FormRendererEngineInterface
      * The type of the resource is decided by the implementation. The resource
      * is later passed to {@link renderBlock()} by the rendering algorithm.
      *
-     * @param FormView          $view               The view for determining the
-     *                                              used themes. First the themes
-     *                                              attached directly to the view
-     *                                              with {@link setTheme()} are
-     *                                              considered, then the ones of
-     *                                              its parent etc.
-     * @param array             $blockNameHierarchy The block name hierarchy, with
-     *                                              the root block at the beginning.
-     * @param integer           $hierarchyLevel     The level in the hierarchy at
-     *                                              which to start looking. Level 0
-     *                                              indicates the root block, i.e.
-     *                                              the first element of
-     *                                              $blockNameHierarchy.
+     * @param FormView $view               The view for determining the used themes.
+     *                                     First the themes  attached directly to
+     *                                     the view with {@link setTheme()} are
+     *                                     considered, then the ones of its parent etc.
+     * @param array    $blockNameHierarchy The block name hierarchy, with the root block
+     *                                     at the beginning.
+     * @param int      $hierarchyLevel     The level in the hierarchy at which to start
+     *                                     looking. Level 0 indicates the root block, i.e.
+     *                                     the first element of $blockNameHierarchy.
      *
-     * @return integer|Boolean The hierarchy level or false, if no resource was found.
+     * @return int|bool The hierarchy level or false, if no resource was found.
      */
     public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
 
@@ -139,10 +131,10 @@ interface FormRendererEngineInterface
      * or {@link getResourceForBlockHierarchy()}. The type of the resource is
      * decided by the implementation.
      *
-     * @param FormView          $view      The view to render.
-     * @param mixed             $resource  The renderer resource.
-     * @param string            $blockName The name of the block to render.
-     * @param array             $variables The variables to pass to the template.
+     * @param FormView $view      The view to render.
+     * @param mixed    $resource  The renderer resource.
+     * @param string   $blockName The name of the block to render.
+     * @param array    $variables The variables to pass to the template.
      *
      * @return string The HTML markup.
      */

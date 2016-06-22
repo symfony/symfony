@@ -11,9 +11,12 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
@@ -22,10 +25,10 @@ class CompoundFormTest extends AbstractFormTest
 {
     public function testValidIfAllChildrenAreValid()
     {
-        $this->form->add($this->getValidForm('firstName'));
-        $this->form->add($this->getValidForm('lastName'));
+        $this->form->add($this->getBuilder('firstName')->getForm());
+        $this->form->add($this->getBuilder('lastName')->getForm());
 
-        $this->form->bind(array(
+        $this->form->submit(array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ));
@@ -35,28 +38,97 @@ class CompoundFormTest extends AbstractFormTest
 
     public function testInvalidIfChildIsInvalid()
     {
-        $this->form->add($this->getValidForm('firstName'));
-        $this->form->add($this->getInvalidForm('lastName'));
+        $this->form->add($this->getBuilder('firstName')->getForm());
+        $this->form->add($this->getBuilder('lastName')->getForm());
 
-        $this->form->bind(array(
+        $this->form->submit(array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ));
 
+        $this->form->get('lastName')->addError(new FormError('Invalid'));
+
         $this->assertFalse($this->form->isValid());
     }
 
-    public function testBindForwardsNullIfValueIsMissing()
+    public function testDisabledFormsValidEvenIfChildrenInvalid()
+    {
+        $form = $this->getBuilder('person')
+            ->setDisabled(true)
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($this->getBuilder('name'))
+            ->getForm();
+
+        $form->submit(array('name' => 'Jacques Doe'));
+
+        $form->get('name')->addError(new FormError('Invalid'));
+
+        $this->assertTrue($form->isValid());
+    }
+
+    public function testSubmitForwardsNullIfNotClearMissingButValueIsExplicitlyNull()
     {
         $child = $this->getMockForm('firstName');
 
         $this->form->add($child);
 
         $child->expects($this->once())
-            ->method('bind')
+            ->method('submit')
             ->with($this->equalTo(null));
 
-        $this->form->bind(array());
+        $this->form->submit(array('firstName' => null), false);
+    }
+
+    public function testSubmitForwardsNullIfValueIsMissing()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('submit')
+            ->with($this->equalTo(null));
+
+        $this->form->submit(array());
+    }
+
+    public function testSubmitDoesNotForwardNullIfNotClearMissing()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->never())
+            ->method('submit');
+
+        $this->form->submit(array(), false);
+    }
+
+    public function testSubmitDoesNotAddExtraFieldForNullValues()
+    {
+        $factory = Forms::createFormFactoryBuilder()
+            ->getFormFactory();
+
+        $child = $factory->createNamed('file', 'Symfony\Component\Form\Extension\Core\Type\FileType', null, array('auto_initialize' => false));
+
+        $this->form->add($child);
+        $this->form->submit(array('file' => null), false);
+
+        $this->assertCount(0, $this->form->getExtraData());
+    }
+
+    public function testClearMissingFlagIsForwarded()
+    {
+        $child = $this->getMockForm('firstName');
+
+        $this->form->add($child);
+
+        $child->expects($this->once())
+            ->method('submit')
+            ->with($this->equalTo('foo'), false);
+
+        $this->form->submit(array('firstName' => 'foo'), false);
     }
 
     public function testCloneChildren()
@@ -68,6 +140,7 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->assertNotSame($this->form, $clone);
         $this->assertNotSame($child, $clone['child']);
+        $this->assertNotSame($this->form['child'], $clone['child']);
     }
 
     public function testNotEmptyIfChildNotEmpty()
@@ -81,37 +154,6 @@ class CompoundFormTest extends AbstractFormTest
         $this->form->add($child);
 
         $this->assertFalse($this->form->isEmpty());
-    }
-
-    public function testValidIfBoundAndDisabledWithChildren()
-    {
-        $this->factory->expects($this->once())
-            ->method('createNamedBuilder')
-            ->with('name', 'text', null, array())
-            ->will($this->returnValue($this->getBuilder('name')));
-
-        $form = $this->getBuilder('person')
-            ->setDisabled(true)
-            ->setCompound(true)
-            ->setDataMapper($this->getDataMapper())
-            ->add('name', 'text')
-            ->getForm();
-        $form->bind(array('name' => 'Jacques Doe'));
-
-        $this->assertTrue($form->isValid());
-    }
-
-    public function testNotValidIfChildNotValid()
-    {
-        $child = $this->getMockForm();
-        $child->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue(false));
-
-        $this->form->add($child);
-        $this->form->bind(array());
-
-        $this->assertFalse($this->form->isValid());
     }
 
     public function testAdd()
@@ -130,10 +172,13 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with('foo', 'text', null, array('bar' => 'baz'))
+            ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+                'bar' => 'baz',
+                'auto_initialize' => false,
+            ))
             ->will($this->returnValue($child));
 
-        $this->form->add('foo', 'text', array('bar' => 'baz'));
+        $this->form->add('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType', array('bar' => 'baz'));
 
         $this->assertTrue($this->form->has('foo'));
         $this->assertSame($this->form, $child->getParent());
@@ -146,15 +191,34 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createNamed')
-            ->with('0', 'text', null, array('bar' => 'baz'))
+            ->with('0', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, array(
+                'bar' => 'baz',
+                'auto_initialize' => false,
+            ))
             ->will($this->returnValue($child));
 
         // in order to make casting unnecessary
-        $this->form->add(0, 'text', array('bar' => 'baz'));
+        $this->form->add(0, 'Symfony\Component\Form\Extension\Core\Type\TextType', array('bar' => 'baz'));
 
         $this->assertTrue($this->form->has(0));
         $this->assertSame($this->form, $child->getParent());
         $this->assertSame(array(0 => $child), $this->form->all());
+    }
+
+    public function testAddWithoutType()
+    {
+        $child = $this->getBuilder('foo')->getForm();
+
+        $this->factory->expects($this->once())
+            ->method('createNamed')
+            ->with('foo', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->will($this->returnValue($child));
+
+        $this->form->add('foo');
+
+        $this->assertTrue($this->form->has('foo'));
+        $this->assertSame($this->form, $child->getParent());
+        $this->assertSame(array('foo' => $child), $this->form->all());
     }
 
     public function testAddUsingNameButNoType()
@@ -189,7 +253,10 @@ class CompoundFormTest extends AbstractFormTest
 
         $this->factory->expects($this->once())
             ->method('createForProperty')
-            ->with('\stdClass', 'foo', null, array('bar' => 'baz'))
+            ->with('\stdClass', 'foo', null, array(
+                'bar' => 'baz',
+                'auto_initialize' => false,
+            ))
             ->will($this->returnValue($child));
 
         $this->form->add('foo', null, array('bar' => 'baz'));
@@ -200,11 +267,11 @@ class CompoundFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadySubmittedException
      */
-    public function testAddThrowsExceptionIfAlreadyBound()
+    public function testAddThrowsExceptionIfAlreadySubmitted()
     {
-        $this->form->bind(array());
+        $this->form->submit(array());
         $this->form->add($this->getBuilder('foo')->getForm());
     }
 
@@ -219,12 +286,12 @@ class CompoundFormTest extends AbstractFormTest
     }
 
     /**
-     * @expectedException \Symfony\Component\Form\Exception\AlreadyBoundException
+     * @expectedException \Symfony\Component\Form\Exception\AlreadySubmittedException
      */
-    public function testRemoveThrowsExceptionIfAlreadyBound()
+    public function testRemoveThrowsExceptionIfAlreadySubmitted()
     {
         $this->form->add($this->getBuilder('foo')->setCompound(false)->getForm());
-        $this->form->bind(array('foo' => 'bar'));
+        $this->form->submit(array('foo' => 'bar'));
         $this->form->remove('foo');
     }
 
@@ -263,7 +330,7 @@ class CompoundFormTest extends AbstractFormTest
         $this->assertSame($this->form->all(), iterator_to_array($this->form));
     }
 
-    public function testAddMapsViewDataToForm()
+    public function testAddMapsViewDataToFormIfInitialized()
     {
         $mapper = $this->getDataMapper();
         $form = $this->getBuilder()
@@ -279,9 +346,81 @@ class CompoundFormTest extends AbstractFormTest
         $child = $this->getBuilder()->getForm();
         $mapper->expects($this->once())
             ->method('mapDataToForms')
-            ->with('bar', array($child));
+            ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
+            ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child) {
+                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertSame(array($child->getName() => $child), iterator_to_array($iterator));
+            }));
+
+        $form->initialize();
+        $form->add($child);
+    }
+
+    public function testAddDoesNotMapViewDataToFormIfNotInitialized()
+    {
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($mapper)
+            ->getForm();
+
+        $child = $this->getBuilder()->getForm();
+        $mapper->expects($this->never())
+            ->method('mapDataToForms');
 
         $form->add($child);
+    }
+
+    public function testAddDoesNotMapViewDataToFormIfInheritData()
+    {
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($mapper)
+            ->setInheritData(true)
+            ->getForm();
+
+        $child = $this->getBuilder()->getForm();
+        $mapper->expects($this->never())
+            ->method('mapDataToForms');
+
+        $form->initialize();
+        $form->add($child);
+    }
+
+    public function testSetDataSupportsDynamicAdditionAndRemovalOfChildren()
+    {
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            // We test using PropertyPathMapper on purpose. The traversal logic
+            // is currently contained in InheritDataAwareIterator, but even
+            // if that changes, this test should still function.
+            ->setDataMapper(new PropertyPathMapper())
+            ->getForm();
+
+        $child = $this->getMockForm('child');
+        $childToBeRemoved = $this->getMockForm('removed');
+        $childToBeAdded = $this->getMockForm('added');
+
+        $form->add($child);
+        $form->add($childToBeRemoved);
+
+        $child->expects($this->once())
+            ->method('setData')
+            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
+                $form->remove('removed');
+                $form->add($childToBeAdded);
+            }));
+
+        $childToBeRemoved->expects($this->never())
+            ->method('setData');
+
+        // once when it it is created, once when it is added
+        $childToBeAdded->expects($this->exactly(2))
+            ->method('setData');
+
+        // pass NULL to all children
+        $form->setData(array());
     }
 
     public function testSetDataMapsViewDataToChildren()
@@ -301,14 +440,45 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapDataToForms')
-            ->with('bar', array('firstName' => $child1, 'lastName' => $child2));
+            ->with('bar', $this->isInstanceOf('\RecursiveIteratorIterator'))
+            ->will($this->returnCallback(function ($data, \RecursiveIteratorIterator $iterator) use ($child1, $child2) {
+                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertSame(array('firstName' => $child1, 'lastName' => $child2), iterator_to_array($iterator));
+            }));
 
         $form->setData('foo');
     }
 
-    public function testBindMapsBoundChildrenOntoExistingViewData()
+    public function testSubmitSupportsDynamicAdditionAndRemovalOfChildren()
     {
-        $test = $this;
+        $child = $this->getMockForm('child');
+        $childToBeRemoved = $this->getMockForm('removed');
+        $childToBeAdded = $this->getMockForm('added');
+
+        $this->form->add($child);
+        $this->form->add($childToBeRemoved);
+
+        $form = $this->form;
+
+        $child->expects($this->once())
+            ->method('submit')
+            ->will($this->returnCallback(function () use ($form, $childToBeAdded) {
+                $form->remove('removed');
+                $form->add($childToBeAdded);
+            }));
+
+        $childToBeRemoved->expects($this->never())
+            ->method('submit');
+
+        $childToBeAdded->expects($this->once())
+            ->method('submit');
+
+        // pass NULL to all children
+        $this->form->submit(array());
+    }
+
+    public function testSubmitMapsSubmittedChildrenOntoExistingViewData()
+    {
         $mapper = $this->getDataMapper();
         $form = $this->getBuilder()
             ->setCompound(true)
@@ -325,13 +495,40 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapFormsToData')
-            ->with(array('firstName' => $child1, 'lastName' => $child2), 'bar')
-            ->will($this->returnCallback(function ($children, $bar) use ($test) {
-                $test->assertEquals('Bernhard', $children['firstName']->getData());
-                $test->assertEquals('Schussek', $children['lastName']->getData());
+            ->with($this->isInstanceOf('\RecursiveIteratorIterator'), 'bar')
+            ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child1, $child2) {
+                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertSame(array('firstName' => $child1, 'lastName' => $child2), iterator_to_array($iterator));
+                $this->assertEquals('Bernhard', $child1->getData());
+                $this->assertEquals('Schussek', $child2->getData());
             }));
 
-        $form->bind(array(
+        $form->submit(array(
+            'firstName' => 'Bernhard',
+            'lastName' => 'Schussek',
+        ));
+    }
+
+    public function testMapFormsToDataIsNotInvokedIfInheritData()
+    {
+        $mapper = $this->getDataMapper();
+        $form = $this->getBuilder()
+            ->setCompound(true)
+            ->setDataMapper($mapper)
+            ->setInheritData(true)
+            ->addViewTransformer(new FixedDataTransformer(array(
+                '' => '',
+                'foo' => 'bar',
+            )))
+            ->getForm();
+
+        $form->add($child1 = $this->getBuilder('firstName')->setCompound(false)->getForm());
+        $form->add($child2 = $this->getBuilder('lastName')->setCompound(false)->getForm());
+
+        $mapper->expects($this->never())
+            ->method('mapFormsToData');
+
+        $form->submit(array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
         ));
@@ -340,7 +537,7 @@ class CompoundFormTest extends AbstractFormTest
     /*
      * https://github.com/symfony/symfony/issues/4480
      */
-    public function testBindRestoresViewDataIfCompoundAndEmpty()
+    public function testSubmitRestoresViewDataIfCompoundAndEmpty()
     {
         $mapper = $this->getDataMapper();
         $object = new \stdClass();
@@ -350,12 +547,12 @@ class CompoundFormTest extends AbstractFormTest
             ->setData($object)
             ->getForm();
 
-        $form->bind(array());
+        $form->submit(array());
 
         $this->assertSame($object, $form->getData());
     }
 
-    public function testBindMapsBoundChildrenOntoEmptyData()
+    public function testSubmitMapsSubmittedChildrenOntoEmptyData()
     {
         $mapper = $this->getDataMapper();
         $object = new \stdClass();
@@ -370,9 +567,13 @@ class CompoundFormTest extends AbstractFormTest
 
         $mapper->expects($this->once())
             ->method('mapFormsToData')
-            ->with(array('name' => $child), $object);
+            ->with($this->isInstanceOf('\RecursiveIteratorIterator'), $object)
+            ->will($this->returnCallback(function (\RecursiveIteratorIterator $iterator) use ($child) {
+                $this->assertInstanceOf('Symfony\Component\Form\Util\InheritDataAwareIterator', $iterator->getInnerIterator());
+                $this->assertSame(array('name' => $child), iterator_to_array($iterator));
+            }));
 
-        $form->bind(array(
+        $form->submit(array(
             'name' => 'Bernhard',
         ));
     }
@@ -390,12 +591,8 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequest($method)
+    public function testSubmitPostOrPutRequest($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -421,14 +618,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('author')
+            ->setMethod($method)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bind($request);
+        $form->handleRequest($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -441,12 +639,8 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithEmptyRootFormName($method)
+    public function testSubmitPostOrPutRequestWithEmptyRootFormName($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -470,14 +664,15 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('')
+            ->setMethod($method)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
         $form->add($this->getBuilder('name')->getForm());
         $form->add($this->getBuilder('image')->getForm());
 
-        $form->bind($request);
+        $form->handleRequest($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -491,12 +686,8 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithSingleChildForm($method)
+    public function testSubmitPostOrPutRequestWithSingleChildForm($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -515,10 +706,11 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('image')
-            ->addEventSubscriber(new BindRequestListener())
+            ->setMethod($method)
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
 
-        $form->bind($request);
+        $form->handleRequest($request);
 
         $file = new UploadedFile($path, 'upload.png', 'image/png', 123, UPLOAD_ERR_OK);
 
@@ -530,12 +722,8 @@ class CompoundFormTest extends AbstractFormTest
     /**
      * @dataProvider requestMethodProvider
      */
-    public function testBindPostOrPutRequestWithSingleChildFormUploadedFile($method)
+    public function testSubmitPostOrPutRequestWithSingleChildFormUploadedFile($method)
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $path = tempnam(sys_get_temp_dir(), 'sf2');
         touch($path);
 
@@ -548,22 +736,19 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('name')
-            ->addEventSubscriber(new BindRequestListener())
+            ->setMethod($method)
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
 
-        $form->bind($request);
+        $form->handleRequest($request);
 
         $this->assertEquals('Bernhard', $form->getData());
 
         unlink($path);
     }
 
-    public function testBindGetRequest()
+    public function testSubmitGetRequest()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $values = array(
             'author' => array(
                 'firstName' => 'Bernhard',
@@ -576,29 +761,26 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('author')
+            ->setMethod('GET')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bind($request);
+        $form->handleRequest($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
     }
 
-    public function testBindGetRequestWithEmptyRootFormName()
+    public function testSubmitGetRequestWithEmptyRootFormName()
     {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-
         $values = array(
             'firstName' => 'Bernhard',
             'lastName' => 'Schussek',
-            'extra' => 'data'
+            'extra' => 'data',
         );
 
         $request = new Request($values, array(), array(), array(), array(), array(
@@ -606,33 +788,228 @@ class CompoundFormTest extends AbstractFormTest
         ));
 
         $form = $this->getBuilder('')
+            ->setMethod('GET')
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
-            ->addEventSubscriber(new BindRequestListener())
+            ->setRequestHandler(new HttpFoundationRequestHandler())
             ->getForm();
         $form->add($this->getBuilder('firstName')->getForm());
         $form->add($this->getBuilder('lastName')->getForm());
 
-        $form->bind($request);
+        $form->handleRequest($request);
 
         $this->assertEquals('Bernhard', $form['firstName']->getData());
         $this->assertEquals('Schussek', $form['lastName']->getData());
         $this->assertEquals(array('extra' => 'data'), $form->getExtraData());
     }
 
-    public function testGetErrorsAsStringDeep()
+    public function testGetErrors()
     {
-        $parent = $this->getBuilder()
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $errors = $this->form->getErrors();
+
+        $this->assertSame(
+             "ERROR: Error 1\n".
+             "ERROR: Error 2\n",
+             (string) $errors
+        );
+
+        $this->assertSame(array($error1, $error2), iterator_to_array($errors));
+    }
+
+    public function testGetErrorsDeep()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError($nestedError = new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $errors = $this->form->getErrors(true);
+
+        $this->assertSame(
+             "ERROR: Error 1\n".
+             "ERROR: Error 2\n".
+             "ERROR: Nested Error\n",
+             (string) $errors
+        );
+
+        $this->assertSame(
+             array($error1, $error2, $nestedError),
+             iterator_to_array($errors)
+        );
+    }
+
+    public function testGetErrorsDeepRecursive()
+    {
+        $this->form->addError($error1 = new FormError('Error 1'));
+        $this->form->addError($error2 = new FormError('Error 2'));
+
+        $childForm = $this->getBuilder('Child')->getForm();
+        $childForm->addError($nestedError = new FormError('Nested Error'));
+        $this->form->add($childForm);
+
+        $errors = $this->form->getErrors(true, false);
+
+        $this->assertSame(
+             "ERROR: Error 1\n".
+             "ERROR: Error 2\n".
+             "Child:\n".
+             "    ERROR: Nested Error\n",
+             (string) $errors
+        );
+
+        $errorsAsArray = iterator_to_array($errors);
+
+        $this->assertSame($error1, $errorsAsArray[0]);
+        $this->assertSame($error2, $errorsAsArray[1]);
+        $this->assertInstanceOf('Symfony\Component\Form\FormErrorIterator', $errorsAsArray[2]);
+
+        $nestedErrorsAsArray = iterator_to_array($errorsAsArray[2]);
+
+        $this->assertCount(1, $nestedErrorsAsArray);
+        $this->assertSame($nestedError, $nestedErrorsAsArray[0]);
+    }
+
+    // Basic cases are covered in SimpleFormTest
+    public function testCreateViewWithChildren()
+    {
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $options = array('a' => 'Foo', 'b' => 'Bar');
+        $field1 = $this->getMockForm('foo');
+        $field2 = $this->getMockForm('bar');
+        $view = new FormView();
+        $field1View = new FormView();
+        $field2View = new FormView();
+
+        $this->form = $this->getBuilder('form', null, null, $options)
             ->setCompound(true)
             ->setDataMapper($this->getDataMapper())
+            ->setType($type)
             ->getForm();
+        $this->form->add($field1);
+        $this->form->add($field2);
 
-        $this->form->addError(new FormError('Error!'));
+        $assertChildViewsEqual = function (array $childViews) {
+            return function (FormView $view) use ($childViews) {
+                $this->assertSame($childViews, $view->children);
+            };
+        };
 
-        $parent->add($this->form);
-        $parent->add($this->getBuilder('foo')->getForm());
+        // First create the view
+        $type->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($view));
 
-        $this->assertEquals("name:\n    ERROR: Error!\nfoo:\n    No errors\n", $parent->getErrorsAsString());
+        // Then build it for the form itself
+        $type->expects($this->once())
+            ->method('buildView')
+            ->with($view, $this->form, $options)
+            ->will($this->returnCallback($assertChildViewsEqual(array())));
+
+        // Then add the first child form
+        $field1->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($field1View));
+
+        // Then the second child form
+        $field2->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($field2View));
+
+        // Again build the view for the form itself. This time the child views
+        // exist.
+        $type->expects($this->once())
+            ->method('finishView')
+            ->with($view, $this->form, $options)
+            ->will($this->returnCallback($assertChildViewsEqual(array('foo' => $field1View, 'bar' => $field2View))));
+
+        $this->assertSame($view, $this->form->createView());
+    }
+
+    public function testNoClickedButtonBeforeSubmission()
+    {
+        $this->assertNull($this->form->getClickedButton());
+    }
+
+    public function testNoClickedButton()
+    {
+        $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
+            ->setConstructorArgs(array(new SubmitButtonBuilder('submit')))
+            ->setMethods(array('isClicked'))
+            ->getMock();
+
+        $button->expects($this->any())
+            ->method('isClicked')
+            ->will($this->returnValue(false));
+
+        $parentForm = $this->getBuilder('parent')->getForm();
+        $nestedForm = $this->getBuilder('nested')->getForm();
+
+        $this->form->setParent($parentForm);
+        $this->form->add($button);
+        $this->form->add($nestedForm);
+        $this->form->submit(array());
+
+        $this->assertNull($this->form->getClickedButton());
+    }
+
+    public function testClickedButton()
+    {
+        $button = $this->getMockBuilder('Symfony\Component\Form\SubmitButton')
+            ->setConstructorArgs(array(new SubmitButtonBuilder('submit')))
+            ->setMethods(array('isClicked'))
+            ->getMock();
+
+        $button->expects($this->any())
+            ->method('isClicked')
+            ->will($this->returnValue(true));
+
+        $this->form->add($button);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
+    }
+
+    public function testClickedButtonFromNestedForm()
+    {
+        $button = $this->getBuilder('submit')->getForm();
+
+        $nestedForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($this->getBuilder('nested')))
+            ->setMethods(array('getClickedButton'))
+            ->getMock();
+
+        $nestedForm->expects($this->any())
+            ->method('getClickedButton')
+            ->will($this->returnValue($button));
+
+        $this->form->add($nestedForm);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
+    }
+
+    public function testClickedButtonFromParentForm()
+    {
+        $button = $this->getBuilder('submit')->getForm();
+
+        $parentForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->setConstructorArgs(array($this->getBuilder('parent')))
+            ->setMethods(array('getClickedButton'))
+            ->getMock();
+
+        $parentForm->expects($this->any())
+            ->method('getClickedButton')
+            ->will($this->returnValue($button));
+
+        $this->form->setParent($parentForm);
+        $this->form->submit(array());
+
+        $this->assertSame($button, $this->form->getClickedButton());
     }
 
     protected function createForm()

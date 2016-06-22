@@ -17,16 +17,18 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class AllValidator extends ConstraintValidator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof All) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\All');
+        }
+
         if (null === $value) {
             return;
         }
@@ -35,12 +37,12 @@ class AllValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'array or Traversable');
         }
 
-        $group = $this->context->getGroup();
+        $context = $this->context;
+
+        $validator = $context->getValidator()->inContext($context);
 
         foreach ($value as $key => $element) {
-            foreach ($constraint->constraints as $constr) {
-                $this->context->validateValue($element, $constr, '['.$key.']', $group);
-            }
+            $validator->atPath('['.$key.']')->validate($element, $constraint->constraints);
         }
     }
 }

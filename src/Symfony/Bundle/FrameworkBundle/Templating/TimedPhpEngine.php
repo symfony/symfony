@@ -11,10 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
-use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Component\Templating\TemplateNameParserInterface;
-use Symfony\Component\HttpKernel\Debug\Stopwatch;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -30,11 +28,11 @@ class TimedPhpEngine extends PhpEngine
     /**
      * Constructor.
      *
-     * @param TemplateNameParserInterface $parser      A TemplateNameParserInterface instance
-     * @param ContainerInterface          $container   A ContainerInterface instance
-     * @param LoaderInterface             $loader      A LoaderInterface instance
-     * @param Stopwatch                   $stopwatch   A Stopwatch instance
-     * @param GlobalVariables             $globals     A GlobalVariables instance
+     * @param TemplateNameParserInterface $parser    A TemplateNameParserInterface instance
+     * @param ContainerInterface          $container A ContainerInterface instance
+     * @param LoaderInterface             $loader    A LoaderInterface instance
+     * @param Stopwatch                   $stopwatch A Stopwatch instance
+     * @param GlobalVariables             $globals   A GlobalVariables instance
      */
     public function __construct(TemplateNameParserInterface $parser, ContainerInterface $container, LoaderInterface $loader, Stopwatch $stopwatch, GlobalVariables $globals = null)
     {

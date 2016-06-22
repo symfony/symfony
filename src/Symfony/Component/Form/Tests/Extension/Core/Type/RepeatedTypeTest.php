@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-class RepeatedTypeTest extends TypeTestCase
+class RepeatedTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
     protected $form;
 
@@ -19,8 +19,8 @@ class RepeatedTypeTest extends TypeTestCase
     {
         parent::setUp();
 
-        $this->form = $this->factory->create('repeated', null, array(
-            'type' => 'text',
+        $this->form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         ));
         $this->form->setData(null);
     }
@@ -35,8 +35,8 @@ class RepeatedTypeTest extends TypeTestCase
 
     public function testSetOptions()
     {
-        $form = $this->factory->create('repeated', null, array(
-            'type'    => 'text',
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
             'options' => array('label' => 'Global'),
         ));
 
@@ -48,11 +48,11 @@ class RepeatedTypeTest extends TypeTestCase
 
     public function testSetOptionsPerChild()
     {
-        $form = $this->factory->create('repeated', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
             // the global required value cannot be overridden
-            'type'           => 'text',
-            'first_options'  => array('label' => 'Test', 'required' => false),
-            'second_options' => array('label' => 'Test2')
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'first_options' => array('label' => 'Test', 'required' => false),
+            'second_options' => array('label' => 'Test2'),
         ));
 
         $this->assertEquals('Test', $form['first']->getConfig()->getOption('label'));
@@ -63,18 +63,51 @@ class RepeatedTypeTest extends TypeTestCase
 
     public function testSetRequired()
     {
-        $form = $this->factory->create('repeated', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
             'required' => false,
-            'type'     => 'text',
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         ));
 
         $this->assertFalse($form['first']->isRequired());
         $this->assertFalse($form['second']->isRequired());
     }
 
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidOptions()
+    {
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'options' => 'bad value',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidFirstOptions()
+    {
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'first_options' => 'bad value',
+        ));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    public function testSetInvalidSecondOptions()
+    {
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'second_options' => 'bad value',
+        ));
+    }
+
     public function testSetErrorBubblingToTrue()
     {
-        $form = $this->factory->create('repeated', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
             'error_bubbling' => true,
         ));
 
@@ -85,7 +118,7 @@ class RepeatedTypeTest extends TypeTestCase
 
     public function testSetErrorBubblingToFalse()
     {
-        $form = $this->factory->create('repeated', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
             'error_bubbling' => false,
         ));
 
@@ -96,7 +129,7 @@ class RepeatedTypeTest extends TypeTestCase
 
     public function testSetErrorBubblingIndividually()
     {
-        $form = $this->factory->create('repeated', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
             'error_bubbling' => true,
             'options' => array('error_bubbling' => false),
             'second_options' => array('error_bubbling' => true),
@@ -109,10 +142,10 @@ class RepeatedTypeTest extends TypeTestCase
 
     public function testSetOptionsPerChildAndOverwrite()
     {
-        $form = $this->factory->create('repeated', null, array(
-            'type'           => 'text',
-            'options'        => array('label' => 'Label'),
-            'second_options' => array('label' => 'Second label')
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\RepeatedType', null, array(
+            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+            'options' => array('label' => 'Label'),
+            'second_options' => array('label' => 'Second label'),
         ));
 
         $this->assertEquals('Label', $form['first']->getConfig()->getOption('label'));
@@ -125,7 +158,7 @@ class RepeatedTypeTest extends TypeTestCase
     {
         $input = array('first' => 'foo', 'second' => 'bar');
 
-        $this->form->bind($input);
+        $this->form->submit($input);
 
         $this->assertEquals('foo', $this->form['first']->getViewData());
         $this->assertEquals('bar', $this->form['second']->getViewData());
@@ -138,7 +171,7 @@ class RepeatedTypeTest extends TypeTestCase
     {
         $input = array('first' => 'foo', 'second' => 'foo');
 
-        $this->form->bind($input);
+        $this->form->submit($input);
 
         $this->assertEquals('foo', $this->form['first']->getViewData());
         $this->assertEquals('foo', $this->form['second']->getViewData());

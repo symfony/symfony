@@ -15,16 +15,23 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
+ * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @api
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class Type extends Constraint
 {
+    const INVALID_TYPE_ERROR = 'ba785a8c-82cb-4283-967c-3cf342181b40';
+
+    protected static $errorNames = array(
+        self::INVALID_TYPE_ERROR => 'INVALID_TYPE_ERROR',
+    );
+
     public $message = 'This value should be of type {{ type }}.';
     public $type;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getDefaultOption()
     {
@@ -32,7 +39,7 @@ class Type extends Constraint
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getRequiredOptions()
     {

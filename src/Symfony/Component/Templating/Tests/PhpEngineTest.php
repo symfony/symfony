@@ -13,7 +13,6 @@ namespace Symfony\Component\Templating\Tests;
 
 use Symfony\Component\Templating\PhpEngine;
 use Symfony\Component\Templating\Loader\Loader;
-use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\TemplateNameParser;
@@ -104,16 +103,42 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'));
-        $this->loader->setTemplate('foo.php', '<?php $view->extend("layout.php"); echo $view[\'foo\'].$foo ?>');
-        $this->loader->setTemplate('layout.php', '-<?php echo $view[\'slots\']->get("_content") ?>-');
+        $this->loader->setTemplate('foo.php', '<?php $this->extend("layout.php"); echo $this[\'foo\'].$foo ?>');
+        $this->loader->setTemplate('layout.php', '-<?php echo $this[\'slots\']->get("_content") ?>-');
         $this->assertEquals('-barfoo-', $engine->render('foo.php', array('foo' => 'foo')), '->render() uses the decorator to decorate the template');
 
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'));
         $this->loader->setTemplate('bar.php', 'bar');
-        $this->loader->setTemplate('foo.php', '<?php $view->extend("layout.php"); echo $foo ?>');
-        $this->loader->setTemplate('layout.php', '<?php echo $view->render("bar.php") ?>-<?php echo $view[\'slots\']->get("_content") ?>-');
+        $this->loader->setTemplate('foo.php', '<?php $this->extend("layout.php"); echo $foo ?>');
+        $this->loader->setTemplate('layout.php', '<?php echo $this->render("bar.php") ?>-<?php echo $this[\'slots\']->get("_content") ?>-');
         $this->assertEquals('bar-foo-', $engine->render('foo.php', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
+    }
+
+    public function testRenderParameter()
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $this->loader->setTemplate('foo.php', '<?php echo $template . $parameters ?>');
+        $this->assertEquals('foobar', $engine->render('foo.php', array('template' => 'foo', 'parameters' => 'bar')), '->render() extract variables');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @dataProvider forbiddenParameterNames
+     */
+    public function testRenderForbiddenParameter($name)
+    {
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
+        $this->loader->setTemplate('foo.php', 'bar');
+        $engine->render('foo.php', array($name => 'foo'));
+    }
+
+    public function forbiddenParameterNames()
+    {
+        return array(
+            array('this'),
+            array('view'),
+        );
     }
 
     public function testEscape()
@@ -126,10 +151,14 @@ class PhpEngineTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetCharset()
     {
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
-        $this->assertEquals('UTF-8', $engine->getCharset(), '->getCharset() returns UTF-8 by default');
+        $helper = new SlotsHelper();
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array($helper));
+        $this->assertEquals('UTF-8', $engine->getCharset(), 'EngineInterface::getCharset() returns UTF-8 by default');
+        $this->assertEquals('UTF-8', $helper->getCharset(), 'HelperInterface::getCharset() returns UTF-8 by default');
+
         $engine->setCharset('ISO-8859-1');
-        $this->assertEquals('ISO-8859-1', $engine->getCharset(), '->setCharset() changes the default charset to use');
+        $this->assertEquals('ISO-8859-1', $engine->getCharset(), 'EngineInterface::setCharset() changes the default charset to use');
+        $this->assertEquals('ISO-8859-1', $helper->getCharset(), 'EngineInterface::setCharset() changes the default charset of helper');
     }
 
     public function testGlobalVariables()

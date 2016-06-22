@@ -12,39 +12,39 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * AbstractFactory is the base class for all classes inheriting from
- * AbstractAuthenticationListener
+ * AbstractAuthenticationListener.
  *
+ * @author Fabien Potencier <fabien@symfony.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 abstract class AbstractFactory implements SecurityFactoryInterface
 {
     protected $options = array(
-        'check_path'                     => '/login_check',
-        'use_forward'                    => false,
+        'check_path' => '/login_check',
+        'use_forward' => false,
+        'require_previous_session' => true,
     );
 
     protected $defaultSuccessHandlerOptions = array(
         'always_use_default_target_path' => false,
-        'default_target_path'            => '/',
-        'login_path'                     => '/login',
-        'target_path_parameter'          => '_target_path',
-        'use_referer'                    => false,
+        'default_target_path' => '/',
+        'login_path' => '/login',
+        'target_path_parameter' => '_target_path',
+        'use_referer' => false,
     );
 
     protected $defaultFailureHandlerOptions = array(
-        'failure_path'                   => null,
-        'failure_forward'                => false,
-        'login_path'                     => '/login',
-        'failure_path_parameter'         => '_failure_path',
-        'require_previous_session'       => true,
+        'failure_path' => null,
+        'failure_forward' => false,
+        'login_path' => '/login',
+        'failure_path_parameter' => '_failure_path',
     );
 
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
@@ -146,7 +146,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      *
      * @param array $config
      *
-     * @return Boolean Whether a possibly configured RememberMeServices should be set for this listener
+     * @return bool Whether a possibly configured RememberMeServices should be set for this listener
      */
     protected function isRememberMeAware($config)
     {
@@ -170,30 +170,47 @@ abstract class AbstractFactory implements SecurityFactoryInterface
 
     protected function createAuthenticationSuccessHandler($container, $id, $config)
     {
+        $successHandlerId = $this->getSuccessHandlerId($id);
+        $options = array_intersect_key($config, $this->defaultSuccessHandlerOptions);
+
         if (isset($config['success_handler'])) {
-            return $config['success_handler'];
+            $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.custom_success_handler'));
+            $successHandler->replaceArgument(0, new Reference($config['success_handler']));
+            $successHandler->replaceArgument(1, $options);
+            $successHandler->replaceArgument(2, $id);
+        } else {
+            $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.success_handler'));
+            $successHandler->addMethodCall('setOptions', array($options));
+            $successHandler->addMethodCall('setProviderKey', array($id));
         }
-
-        $successHandlerId = 'security.authentication.success_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
-
-        $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.success_handler'));
-        $successHandler->replaceArgument(1, array_intersect_key($config, $this->defaultSuccessHandlerOptions));
-        $successHandler->addMethodCall('setProviderKey', array($id));
 
         return $successHandlerId;
     }
 
     protected function createAuthenticationFailureHandler($container, $id, $config)
     {
+        $id = $this->getFailureHandlerId($id);
+        $options = array_intersect_key($config, $this->defaultFailureHandlerOptions);
+
         if (isset($config['failure_handler'])) {
-            return $config['failure_handler'];
+            $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.custom_failure_handler'));
+            $failureHandler->replaceArgument(0, new Reference($config['failure_handler']));
+            $failureHandler->replaceArgument(1, $options);
+        } else {
+            $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.failure_handler'));
+            $failureHandler->addMethodCall('setOptions', array($options));
         }
 
-        $id = 'security.authentication.failure_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
-
-        $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.failure_handler'));
-        $failureHandler->replaceArgument(2, array_intersect_key($config, $this->defaultFailureHandlerOptions));
-
         return $id;
+    }
+
+    protected function getSuccessHandlerId($id)
+    {
+        return 'security.authentication.success_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
+    }
+
+    protected function getFailureHandlerId($id)
+    {
+        return 'security.authentication.failure_handler.'.$id.'.'.str_replace('-', '_', $this->getKey());
     }
 }

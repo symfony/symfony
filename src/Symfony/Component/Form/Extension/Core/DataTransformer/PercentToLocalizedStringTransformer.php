@@ -33,22 +33,22 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
 
     private $type;
 
-    private $precision;
+    private $scale;
 
     /**
      * Constructor.
      *
      * @see self::$types for a list of supported types
      *
-     * @param integer $precision The precision
-     * @param string  $type      One of the supported types
+     * @param int    $scale The scale
+     * @param string $type  One of the supported types
      *
      * @throws UnexpectedTypeException if the given value of type is unknown
      */
-    public function __construct($precision = null, $type = null)
+    public function __construct($scale = null, $type = null)
     {
-        if (null === $precision) {
-            $precision = 0;
+        if (null === $scale) {
+            $scale = 0;
         }
 
         if (null === $type) {
@@ -60,18 +60,18 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         $this->type = $type;
-        $this->precision = $precision;
+        $this->scale = $scale;
     }
 
     /**
      * Transforms between a normalized format (integer or float) into a percentage value.
      *
-     * @param number $value Normalized value
+     * @param int|float $value Normalized value
      *
-     * @return number Percentage value
+     * @return string Percentage value
      *
-     * @throws UnexpectedTypeException if the given value is not numeric
-     * @throws TransformationFailedException if the value could not be transformed
+     * @throws TransformationFailedException If the given value is not numeric or
+     *                                       if the value could not be transformed.
      */
     public function transform($value)
     {
@@ -80,7 +80,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
         }
 
         if (!is_numeric($value)) {
-            throw new UnexpectedTypeException($value, 'numeric');
+            throw new TransformationFailedException('Expected a numeric.');
         }
 
         if (self::FRACTIONAL == $this->type) {
@@ -101,21 +101,21 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms between a percentage value into a normalized format (integer or float).
      *
-     * @param number $value Percentage value.
+     * @param string $value Percentage value.
      *
-     * @return number Normalized value.
+     * @return int|float Normalized value.
      *
-     * @throws UnexpectedTypeException if the given value is not a string
-     * @throws TransformationFailedException if the value could not be transformed
+     * @throws TransformationFailedException If the given value is not a string or
+     *                                       if the value could not be transformed.
      */
     public function reverseTransform($value)
     {
         if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new TransformationFailedException('Expected a string.');
         }
 
         if ('' === $value) {
-            return null;
+            return;
         }
 
         $formatter = $this->getNumberFormatter();
@@ -134,7 +134,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Returns a preconfigured \NumberFormatter instance
+     * Returns a preconfigured \NumberFormatter instance.
      *
      * @return \NumberFormatter
      */
@@ -142,7 +142,7 @@ class PercentToLocalizedStringTransformer implements DataTransformerInterface
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
 
-        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->precision);
+        $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
 
         return $formatter;
     }

@@ -53,7 +53,7 @@ class CodeExtensionTest extends \PHPUnit_Framework_TestCase
             array('F\Q\N\Foo::Method', '<abbr title="F\Q\N\Foo">Foo</abbr>::Method()'),
             array('Bare::Method', '<abbr title="Bare">Bare</abbr>::Method()'),
             array('Closure', '<abbr title="Closure">Closure</abbr>'),
-            array('Method', '<abbr title="Method">Method</abbr>()')
+            array('Method', '<abbr title="Method">Method</abbr>()'),
         );
     }
 

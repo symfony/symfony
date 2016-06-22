@@ -21,7 +21,7 @@ ruby: |
 test: Leading Document Separator
 todo: true
 brief: >
-    You can explicity give an opening
+    You can explicitly give an opening
     document separator to your YAML stream.
 yaml: |
     ---

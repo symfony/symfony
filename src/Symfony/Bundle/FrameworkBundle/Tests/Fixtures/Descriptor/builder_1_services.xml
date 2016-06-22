@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+  <alias id="alias_1" service="service_1" public="true"/>
+  <alias id="alias_2" service="service_2" public="false"/>
+  <definition id="definition_1" class="Full\Qualified\Class1" public="true" synthetic="false" lazy="true" shared="true" abstract="true" autowired="false" file="">
+    <factory class="Full\Qualified\FactoryClass" method="get"/>
+  </definition>
+  <definition id="definition_2" class="Full\Qualified\Class2" public="false" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" file="/path/to/file">
+    <factory service="factory.service" method="get"/>
+    <calls>
+      <call method="setMailer"/>
+    </calls>
+    <tags>
+      <tag name="tag1">
+        <parameter name="attr1">val1</parameter>
+        <parameter name="attr2">val2</parameter>
+      </tag>
+      <tag name="tag1">
+        <parameter name="attr3">val3</parameter>
+      </tag>
+      <tag name="tag2"/>
+    </tags>
+  </definition>
+  <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerBuilder"/>
+</container>

@@ -49,7 +49,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->registerExtension(new HtmlExtension($translator));
         $document = new \DOMDocument();
         $document->strictErrorChecking = false;
-        libxml_use_internal_errors(true);
+        $internalErrors = libxml_use_internal_errors(true);
         $document->loadHTMLFile(__DIR__.'/Fixtures/ids.html');
         $document = simplexml_import_dom($document);
         $elements = $document->xpath($translator->cssToXPath($css));
@@ -59,6 +59,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 $this->assertTrue(in_array($element->attributes()->id, $elementsId));
             }
         }
+        libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
     }
 
     /** @dataProvider getHtmlShakespearTestData */
@@ -72,7 +74,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $document = simplexml_import_dom($document);
         $bodies = $document->xpath('//body');
         $elements = $bodies[0]->xpath($translator->cssToXPath($css));
-        $this->assertEquals($count, count($elements));
+        $this->assertCount($count, $elements);
     }
 
     public function getXpathLiteralTestData()
@@ -88,12 +90,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function getCssToXPathTestData()
     {
         return array(
-            array('*', "*"),
-            array('e', "e"),
-            array('*|e', "e"),
-            array('e|f', "e:f"),
-            array('e[foo]', "e[@foo]"),
-            array('e[foo|bar]', "e[@foo:bar]"),
+            array('*', '*'),
+            array('e', 'e'),
+            array('*|e', 'e'),
+            array('e|f', 'e:f'),
+            array('e[foo]', 'e[@foo]'),
+            array('e[foo|bar]', 'e[@foo:bar]'),
             array('e[foo="bar"]', "e[@foo = 'bar']"),
             array('e[foo~="bar"]', "e[@foo and contains(concat(' ', normalize-space(@foo), ' '), ' bar ')]"),
             array('e[foo^="bar"]', "e[@foo and starts-with(@foo, 'bar')]"),
@@ -101,32 +103,31 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('e[foo*="bar"]', "e[@foo and contains(@foo, 'bar')]"),
             array('e[hreflang|="en"]', "e[@hreflang and (@hreflang = 'en' or starts-with(@hreflang, 'en-'))]"),
             array('e:nth-child(1)', "*/*[name() = 'e' and (position() = 1)]"),
-            array('e:nth-last-child(1)', "*/*[name() = 'e' and (position() = last() - 1)]"),
-            array('e:nth-last-child(2n+2)', "*/*[name() = 'e' and ((position() +2) mod -2 = 0 and position() < (last() -2))]"),
-            array('e:nth-of-type(1)', "*/e[position() = 1]"),
-            array('e:nth-last-of-type(1)', "*/e[position() = last() - 1]"),
-            array('e:nth-last-of-type(1)', "*/e[position() = last() - 1]"),
-            array('div e:nth-last-of-type(1) .aclass', "div/descendant-or-self::*/e[position() = last() - 1]/descendant-or-self::*/*[@class and contains(concat(' ', normalize-space(@class), ' '), ' aclass ')]"),
+            array('e:nth-last-child(1)', "*/*[name() = 'e' and (position() = last() - 0)]"),
+            array('e:nth-last-child(2n+2)', "*/*[name() = 'e' and (last() - position() - 1 >= 0 and (last() - position() - 1) mod 2 = 0)]"),
+            array('e:nth-of-type(1)', '*/e[position() = 1]'),
+            array('e:nth-last-of-type(1)', '*/e[position() = last() - 0]'),
+            array('div e:nth-last-of-type(1) .aclass', "div/descendant-or-self::*/e[position() = last() - 0]/descendant-or-self::*/*[@class and contains(concat(' ', normalize-space(@class), ' '), ' aclass ')]"),
             array('e:first-child', "*/*[name() = 'e' and (position() = 1)]"),
             array('e:last-child', "*/*[name() = 'e' and (position() = last())]"),
-            array('e:first-of-type', "*/e[position() = 1]"),
-            array('e:last-of-type', "*/e[position() = last()]"),
+            array('e:first-of-type', '*/e[position() = 1]'),
+            array('e:last-of-type', '*/e[position() = last()]'),
             array('e:only-child', "*/*[name() = 'e' and (last() = 1)]"),
-            array('e:only-of-type', "e[last() = 1]"),
-            array('e:empty', "e[not(*) and not(string-length())]"),
-            array('e:EmPTY', "e[not(*) and not(string-length())]"),
-            array('e:root', "e[not(parent::*)]"),
-            array('e:hover', "e[0]"),
+            array('e:only-of-type', 'e[last() = 1]'),
+            array('e:empty', 'e[not(*) and not(string-length())]'),
+            array('e:EmPTY', 'e[not(*) and not(string-length())]'),
+            array('e:root', 'e[not(parent::*)]'),
+            array('e:hover', 'e[0]'),
             array('e:contains("foo")', "e[contains(string(.), 'foo')]"),
             array('e:ConTains(foo)', "e[contains(string(.), 'foo')]"),
             array('e.warning', "e[@class and contains(concat(' ', normalize-space(@class), ' '), ' warning ')]"),
             array('e#myid', "e[@id = 'myid']"),
-            array('e:not(:nth-child(odd))', "e[not((position() -1) mod 2 = 0 and position() >= 1)]"),
-            array('e:nOT(*)', "e[0]"),
-            array('e f', "e/descendant-or-self::*/f"),
-            array('e > f', "e/f"),
+            array('e:not(:nth-child(odd))', 'e[not(position() - 1 >= 0 and (position() - 1) mod 2 = 0)]'),
+            array('e:nOT(*)', 'e[0]'),
+            array('e f', 'e/descendant-or-self::*/f'),
+            array('e > f', 'e/f'),
             array('e + f', "e/following-sibling::*[name() = 'f' and (position() = 1)]"),
-            array('e ~ f', "e/following-sibling::f"),
+            array('e ~ f', 'e/following-sibling::f'),
             array('div#container p', "div[@id = 'container']/descendant-or-self::*/p"),
         );
     }
@@ -188,17 +189,32 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('li:nth-child(+2n+1)', array('first-li', 'third-li', 'fifth-li', 'seventh-li')),
             array('li:nth-child(odd)', array('first-li', 'third-li', 'fifth-li', 'seventh-li')),
             array('li:nth-child(2n+4)', array('fourth-li', 'sixth-li')),
-            // FIXME: I'm not 100% sure this is right:
             array('li:nth-child(3n+1)', array('first-li', 'fourth-li', 'seventh-li')),
-            array('li:nth-last-child(0)', array('seventh-li')),
+            array('li:nth-child(n)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
+            array('li:nth-child(n-1)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
+            array('li:nth-child(n+1)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
+            array('li:nth-child(n+3)', array('third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
+            array('li:nth-child(-n)', array()),
+            array('li:nth-child(-n-1)', array()),
+            array('li:nth-child(-n+1)', array('first-li')),
+            array('li:nth-child(-n+3)', array('first-li', 'second-li', 'third-li')),
+            array('li:nth-last-child(0)', array()),
             array('li:nth-last-child(2n)', array('second-li', 'fourth-li', 'sixth-li')),
             array('li:nth-last-child(even)', array('second-li', 'fourth-li', 'sixth-li')),
-            array('li:nth-last-child(2n+2)', array('second-li', 'fourth-li')),
+            array('li:nth-last-child(2n+2)', array('second-li', 'fourth-li', 'sixth-li')),
+            array('li:nth-last-child(n)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
+            array('li:nth-last-child(n-1)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
+            array('li:nth-last-child(n-3)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
+            array('li:nth-last-child(n+1)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li', 'sixth-li', 'seventh-li')),
+            array('li:nth-last-child(n+3)', array('first-li', 'second-li', 'third-li', 'fourth-li', 'fifth-li')),
+            array('li:nth-last-child(-n)', array()),
+            array('li:nth-last-child(-n-1)', array()),
+            array('li:nth-last-child(-n+1)', array('seventh-li')),
+            array('li:nth-last-child(-n+3)', array('fifth-li', 'sixth-li', 'seventh-li')),
             array('ol:first-of-type', array('first-ol')),
-            array('ol:nth-child(1)', array()),
+            array('ol:nth-child(1)', array('first-ol')),
             array('ol:nth-of-type(2)', array('second-ol')),
-            // FIXME: like above (1) or (2)?
-            array('ol:nth-last-of-type(1)', array('first-ol')),
+            array('ol:nth-last-of-type(1)', array('second-ol')),
             array('span:only-child', array('foobar-span')),
             array('li div:only-child', array('li-div')),
             array('div *:only-child', array('li-div', 'foobar-span')),

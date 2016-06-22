@@ -23,7 +23,7 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
     private $repeatedPass;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {

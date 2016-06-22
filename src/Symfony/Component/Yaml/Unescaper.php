@@ -2,6 +2,7 @@
 
 /*
  * This file is part of the Symfony package.
+ *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -10,21 +11,22 @@
 
 namespace Symfony\Component\Yaml;
 
+use Symfony\Component\Yaml\Exception\ParseException;
+
 /**
  * Unescaper encapsulates unescaping rules for single and double-quoted
  * YAML strings.
  *
  * @author Matthew Lewinski <matthew@lewinski.org>
+ *
+ * @internal
  */
 class Unescaper
 {
-    // Parser and Inline assume UTF-8 encoding, so escaped Unicode characters
-    // must be converted to that encoding.
-    const ENCODING = 'UTF-8';
-
-    // Regex fragment that matches an escaped character in a double quoted
-    // string.
-    const REGEX_ESCAPED_CHARACTER = "\\\\([0abt\tnvfre \\\"\\/\\\\N_LP]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})";
+    /**
+     * Regex fragment that matches an escaped character in a double quoted string.
+     */
+    const REGEX_ESCAPED_CHARACTER = '\\\\(x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|.)';
 
     /**
      * Unescapes a single quoted string.
@@ -47,9 +49,8 @@ class Unescaper
      */
     public function unescapeDoubleQuotedString($value)
     {
-        $self = $this;
-        $callback = function($match) use ($self) {
-            return $self->unescapeCharacter($match[0]);
+        $callback = function ($match) {
+            return $this->unescapeCharacter($match[0]);
         };
 
         // evaluate the string
@@ -57,15 +58,15 @@ class Unescaper
     }
 
     /**
-     * Unescapes a character that was found in a double-quoted string
+     * Unescapes a character that was found in a double-quoted string.
      *
      * @param string $value An escaped character
      *
      * @return string The unescaped character
      */
-    public function unescapeCharacter($value)
+    private function unescapeCharacter($value)
     {
-        switch ($value{1}) {
+        switch ($value[1]) {
             case '0':
                 return "\x0";
             case 'a':
@@ -79,13 +80,13 @@ class Unescaper
             case 'n':
                 return "\n";
             case 'v':
-                return "\xb";
+                return "\xB";
             case 'f':
-                return "\xc";
+                return "\xC";
             case 'r':
-                return "\xd";
+                return "\r";
             case 'e':
-                return "\x1b";
+                return "\x1B";
             case ' ':
                 return ' ';
             case '"':
@@ -96,50 +97,46 @@ class Unescaper
                 return '\\';
             case 'N':
                 // U+0085 NEXT LINE
-                return $this->convertEncoding("\x00\x85", self::ENCODING, 'UCS-2BE');
+                return "\xC2\x85";
             case '_':
                 // U+00A0 NO-BREAK SPACE
-                return $this->convertEncoding("\x00\xA0", self::ENCODING, 'UCS-2BE');
+                return "\xC2\xA0";
             case 'L':
                 // U+2028 LINE SEPARATOR
-                return $this->convertEncoding("\x20\x28", self::ENCODING, 'UCS-2BE');
+                return "\xE2\x80\xA8";
             case 'P':
                 // U+2029 PARAGRAPH SEPARATOR
-                return $this->convertEncoding("\x20\x29", self::ENCODING, 'UCS-2BE');
+                return "\xE2\x80\xA9";
             case 'x':
-                $char = pack('n', hexdec(substr($value, 2, 2)));
-
-                return $this->convertEncoding($char, self::ENCODING, 'UCS-2BE');
+                return self::utf8chr(hexdec(substr($value, 2, 2)));
             case 'u':
-                $char = pack('n', hexdec(substr($value, 2, 4)));
-
-                return $this->convertEncoding($char, self::ENCODING, 'UCS-2BE');
+                return self::utf8chr(hexdec(substr($value, 2, 4)));
             case 'U':
-                $char = pack('N', hexdec(substr($value, 2, 8)));
-
-                return $this->convertEncoding($char, self::ENCODING, 'UCS-4BE');
+                return self::utf8chr(hexdec(substr($value, 2, 8)));
+            default:
+                throw new ParseException(sprintf('Found unknown escape character "%s".', $value));
         }
     }
 
     /**
-     * Convert a string from one encoding to another.
+     * Get the UTF-8 character for the given code point.
      *
-     * @param string $value The string to convert
-     * @param string $to    The input encoding
-     * @param string $from  The output encoding
+     * @param int $c The unicode code point
      *
-     * @return string The string with the new encoding
-     *
-     * @throws RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     * @return string The corresponding UTF-8 character
      */
-    private function convertEncoding($value, $to, $from)
+    private static function utf8chr($c)
     {
-        if (function_exists('mb_convert_encoding')) {
-            return mb_convert_encoding($value, $to, $from);
-        } elseif (function_exists('iconv')) {
-            return iconv($from, $to, $value);
+        if (0x80 > $c %= 0x200000) {
+            return chr($c);
+        }
+        if (0x800 > $c) {
+            return chr(0xC0 | $c >> 6).chr(0x80 | $c & 0x3F);
+        }
+        if (0x10000 > $c) {
+            return chr(0xE0 | $c >> 12).chr(0x80 | $c >> 6 & 0x3F).chr(0x80 | $c & 0x3F);
         }
 
-        throw new RuntimeException('No suitable convert encoding function (install the iconv or mbstring extension).');
+        return chr(0xF0 | $c >> 18).chr(0x80 | $c >> 12 & 0x3F).chr(0x80 | $c >> 6 & 0x3F).chr(0x80 | $c & 0x3F);
     }
 }

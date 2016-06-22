@@ -27,16 +27,11 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
         $this->dispatcher = new EventDispatcher();
         $listener = new ResponseListener('UTF-8');
         $this->dispatcher->addListener(KernelEvents::RESPONSE, array($listener, 'onKernelResponse'));
 
         $this->kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-
     }
 
     protected function tearDown()

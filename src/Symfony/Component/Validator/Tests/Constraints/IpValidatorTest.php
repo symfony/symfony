@@ -13,39 +13,27 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Ip;
 use Symfony\Component\Validator\Constraints\IpValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class IpValidatorTest extends \PHPUnit_Framework_TestCase
+class IpValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new IpValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new IpValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Ip());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Ip());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -61,7 +49,7 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidValidatorVersion()
     {
-        $ip = new Ip(array(
+        new Ip(array(
             'version' => 666,
         ));
     }
@@ -71,12 +59,11 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIpsV4($ip)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($ip, new Ip(array(
             'version' => Ip::V4,
         )));
+
+        $this->assertNoViolation();
     }
 
     public function getValidIpsV4()
@@ -98,12 +85,11 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIpsV6($ip)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($ip, new Ip(array(
             'version' => Ip::V6,
         )));
+
+        $this->assertNoViolation();
     }
 
     public function getValidIpsV6()
@@ -136,12 +122,11 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidIpsAll($ip)
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($ip, new Ip(array(
             'version' => Ip::ALL,
         )));
+
+        $this->assertNoViolation();
     }
 
     public function getValidIpsAll()
@@ -159,13 +144,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidIpsV4()
@@ -193,13 +177,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidPrivateIpsV4()
@@ -221,13 +204,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidReservedIpsV4()
@@ -249,13 +231,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidPublicIpsV4()
@@ -273,13 +254,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidIpsV6()
@@ -311,13 +291,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidPrivateIpsV6()
@@ -339,13 +318,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidReservedIpsV6()
@@ -366,13 +344,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidPublicIpsV6()
@@ -390,13 +367,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidIpsAll()
@@ -414,13 +390,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidPrivateIpsAll()
@@ -438,13 +413,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidReservedIpsAll()
@@ -462,13 +436,12 @@ class IpValidatorTest extends \PHPUnit_Framework_TestCase
             'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $ip,
-            ));
-
         $this->validator->validate($ip, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$ip.'"')
+            ->setCode(Ip::INVALID_IP_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidPublicIpsAll()

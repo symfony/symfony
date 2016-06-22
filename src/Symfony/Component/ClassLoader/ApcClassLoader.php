@@ -15,13 +15,21 @@ namespace Symfony\Component\ClassLoader;
  * ApcClassLoader implements a wrapping autoloader cached in APC for PHP 5.3.
  *
  * It expects an object implementing a findFile method to find the file. This
- * allow using it as a wrapper around the other loaders of the component (the
- * ClassLoader and the UniversalClassLoader for instance) but also around any
- * other autoloader following this convention (the Composer one for instance)
+ * allows using it as a wrapper around the other loaders of the component (the
+ * ClassLoader for instance) but also around any other autoloaders following
+ * this convention (the Composer one for instance).
+ *
+ *     // with a Symfony autoloader
+ *     use Symfony\Component\ClassLoader\ClassLoader;
  *
  *     $loader = new ClassLoader();
+ *     $loader->addPrefix('Symfony\Component', __DIR__.'/component');
+ *     $loader->addPrefix('Symfony',           __DIR__.'/framework');
  *
- *     // register classes with namespaces
+ *     // or with a Composer autoloader
+ *     use Composer\Autoload\ClassLoader;
+ *
+ *     $loader = new ClassLoader();
  *     $loader->add('Symfony\Component', __DIR__.'/component');
  *     $loader->add('Symfony',           __DIR__.'/framework');
  *
@@ -36,36 +44,31 @@ namespace Symfony\Component\ClassLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
- *
- * @api
  */
 class ApcClassLoader
 {
     private $prefix;
 
     /**
-     * The class loader object being decorated.
+     * A class loader object that implements the findFile() method.
      *
-     * @var \Symfony\Component\ClassLoader\ClassLoader
-     *   A class loader object that implements the findFile() method.
+     * @var object
      */
     protected $decorated;
 
     /**
      * Constructor.
      *
-     * @param string $prefix      The APC namespace prefix to use.
-     * @param object $decorated   A class loader object that implements the findFile() method.
+     * @param string $prefix    The APC namespace prefix to use.
+     * @param object $decorated A class loader object that implements the findFile() method.
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     *
-     * @api
      */
     public function __construct($prefix, $decorated)
     {
-        if (!extension_loaded('apc')) {
-            throw new \RuntimeException('Unable to use ApcClassLoader as APC is not enabled.');
+        if (!function_exists('apcu_fetch')) {
+            throw new \RuntimeException('Unable to use ApcClassLoader as APC is not installed.');
         }
 
         if (!method_exists($decorated, 'findFile')) {
@@ -79,7 +82,7 @@ class ApcClassLoader
     /**
      * Registers this instance as an autoloader.
      *
-     * @param Boolean $prepend Whether to prepend the autoloader or not
+     * @param bool $prepend Whether to prepend the autoloader or not
      */
     public function register($prepend = false)
     {
@@ -99,7 +102,7 @@ class ApcClassLoader
      *
      * @param string $class The name of the class
      *
-     * @return Boolean|null True, if loaded
+     * @return bool|null True, if loaded
      */
     public function loadClass($class)
     {
@@ -119,8 +122,10 @@ class ApcClassLoader
      */
     public function findFile($class)
     {
-        if (false === $file = apc_fetch($this->prefix.$class)) {
-            apc_store($this->prefix.$class, $file = $this->decorated->findFile($class));
+        $file = apcu_fetch($this->prefix.$class, $success);
+
+        if (!$success) {
+            apcu_store($this->prefix.$class, $file = $this->decorated->findFile($class) ?: null);
         }
 
         return $file;
@@ -133,5 +138,4 @@ class ApcClassLoader
     {
         return call_user_func_array(array($this->decorated, $method), $args);
     }
-
 }

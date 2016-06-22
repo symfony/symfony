@@ -12,18 +12,32 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Locale\Locale;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LocaleType extends AbstractType
+class LocaleType extends AbstractType implements ChoiceLoaderInterface
 {
+    /**
+     * Locale loaded choice list.
+     *
+     * The choices are lazy loaded and generated from the Intl component.
+     *
+     * {@link \Symfony\Component\Intl\Intl::getLocaleBundle()}.
+     *
+     * @var ArrayChoiceList
+     */
+    private $choiceList;
+
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'choices' => Locale::getDisplayLocales(\Locale::getDefault()),
+            'choice_loader' => $this,
+            'choice_translation_domain' => false,
         ));
     }
 
@@ -32,14 +46,62 @@ class LocaleType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return __NAMESPACE__.'\ChoiceType';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'locale';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadChoiceList($value = null)
+    {
+        if (null !== $this->choiceList) {
+            return $this->choiceList;
+        }
+
+        return $this->choiceList = new ArrayChoiceList(array_flip(Intl::getLocaleBundle()->getLocaleNames()), $value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadChoicesForValues(array $values, $value = null)
+    {
+        // Optimize
+        if (empty($values)) {
+            return array();
+        }
+
+        // If no callable is set, values are the same as choices
+        if (null === $value) {
+            return $values;
+        }
+
+        return $this->loadChoiceList($value)->getChoicesForValues($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadValuesForChoices(array $choices, $value = null)
+    {
+        // Optimize
+        if (empty($choices)) {
+            return array();
+        }
+
+        // If no callable is set, choices are the same as values
+        if (null === $value) {
+            return $choices;
+        }
+
+        return $this->loadChoiceList($value)->getValuesForChoices($choices);
     }
 }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\CssSelector\Tests\Handler;
+namespace Symfony\Component\CssSelector\Tests\Parser\Handler;
 
 use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
@@ -43,7 +43,9 @@ abstract class AbstractHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     abstract public function getHandleValueTestData();
+
     abstract public function getDontHandleValueTestData();
+
     abstract protected function generateHandler();
 
     protected function assertStreamEmpty(TokenStream $stream)

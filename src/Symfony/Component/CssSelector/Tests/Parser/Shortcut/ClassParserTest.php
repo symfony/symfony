@@ -24,7 +24,7 @@ class ClassParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new ClassParser();
         $selectors = $parser->parse($source);
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
@@ -34,7 +34,11 @@ class ClassParserTest extends \PHPUnit_Framework_TestCase
     public function getParseTestData()
     {
         return array(
-            array('.class', 'Class[Element[*].class]'),
+            array('.testclass', 'Class[Element[*].testclass]'),
+            array('testel.testclass', 'Class[Element[testel].testclass]'),
+            array('testns|.testclass', 'Class[Element[testns|*].testclass]'),
+            array('testns|*.testclass', 'Class[Element[testns|*].testclass]'),
+            array('testns|testel.testclass', 'Class[Element[testns|testel].testclass]'),
         );
     }
 }

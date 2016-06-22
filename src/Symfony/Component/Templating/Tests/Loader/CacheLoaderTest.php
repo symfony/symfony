@@ -14,7 +14,6 @@ namespace Symfony\Component\Templating\Tests\Loader;
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Loader\CacheLoader;
 use Symfony\Component\Templating\Storage\StringStorage;
-use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\Templating\TemplateReference;
 
@@ -22,22 +21,34 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(new TemplateNameParser()), sys_get_temp_dir());
+        $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), sys_get_temp_dir());
         $this->assertTrue($loader->getLoader() === $varLoader, '__construct() takes a template loader as its first argument');
         $this->assertEquals(sys_get_temp_dir(), $loader->getDir(), '__construct() takes a directory where to store the cache as its second argument');
     }
 
     public function testLoad()
     {
-        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.rand(111111, 999999);
+        $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.mt_rand(111111, 999999);
         mkdir($dir, 0777, true);
-        $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(new TemplateNameParser()), $dir);
-        $loader->setDebugger($debugger = new \Symfony\Component\Templating\Tests\Fixtures\ProjectTemplateDebugger());
+
+        $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), $dir);
         $this->assertFalse($loader->load(new TemplateReference('foo', 'php')), '->load() returns false if the embed loader is not able to load the template');
+
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger
+            ->expects($this->once())
+            ->method('debug')
+            ->with('Storing template in cache.', array('name' => 'index'));
+        $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
-        $this->assertTrue($debugger->hasMessage('Storing template'), '->load() logs a "Storing template" message if the template is found');
+
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger
+            ->expects($this->once())
+            ->method('debug')
+            ->with('Fetching template from cache.', array('name' => 'index'));
+        $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
-        $this->assertTrue($debugger->hasMessage('Fetching template'), '->load() logs a "Storing template" message if the template is fetched from cache');
     }
 }
 

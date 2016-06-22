@@ -11,10 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Fragment;
 
-if (!defined('ENT_SUBSTITUTE')) {
-    define('ENT_SUBSTITUTE', 8);
-}
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\EngineInterface;
@@ -68,7 +64,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     /**
      * Checks if a templating engine has been set.
      *
-     * @return Boolean true if the templating engine has been set, false otherwise
+     * @return bool true if the templating engine has been set, false otherwise
      */
     public function hasTemplating()
     {
@@ -91,7 +87,8 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
                 throw new \LogicException('You must use a proper URI when using the Hinclude rendering strategy or set a URL signer.');
             }
 
-            $uri = $this->signer->sign($this->generateFragmentUri($uri, $request));
+            // we need to sign the absolute URI, but want to return the path only.
+            $uri = substr($this->signer->sign($this->generateFragmentUri($uri, $request, true)), strlen($request->getSchemeAndHttpHost()));
         }
 
         // We need to replace ampersands in the URI with the encoded form in order to return valid html/xml content.
@@ -110,11 +107,12 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
         $renderedAttributes = '';
         if (count($attributes) > 0) {
-            foreach($attributes as $attribute => $value) {
+            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
+            foreach ($attributes as $attribute => $value) {
                 $renderedAttributes .= sprintf(
                     ' %s="%s"',
-                    htmlspecialchars($attribute, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset, false),
-                    htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, $this->charset, false)
+                    htmlspecialchars($attribute, $flags, $this->charset, false),
+                    htmlspecialchars($value, $flags, $this->charset, false)
                 );
             }
         }
@@ -125,12 +123,16 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
     /**
      * @param string $template
      *
-     * @return boolean
+     * @return bool
      */
     private function templateExists($template)
     {
         if ($this->templating instanceof EngineInterface) {
-            return $this->templating->exists($template);
+            try {
+                return $this->templating->exists($template);
+            } catch (\InvalidArgumentException $e) {
+                return false;
+            }
         }
 
         $loader = $this->templating->getLoader();

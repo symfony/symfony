@@ -12,22 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Config\FileLocator;
 
 class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Config\Loader\Loader')) {
-            $this->markTestSkipped('The "Config" component is not available');
-        }
-    }
-
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\PhpFileLoader::supports
-     */
     public function testSupports()
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
@@ -36,9 +25,6 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
     }
 
-    /**
-     * @covers Symfony\Component\DependencyInjection\Loader\PhpFileLoader::load
-     */
     public function testLoad()
     {
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());

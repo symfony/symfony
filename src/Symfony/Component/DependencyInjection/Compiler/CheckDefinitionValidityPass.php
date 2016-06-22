@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -24,7 +23,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  *
  * - non synthetic, non abstract services always have a class set
  * - synthetic services are always public
- * - synthetic services are always of non-prototype scope
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -42,28 +40,13 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $id => $definition) {
             // synthetic service is public
             if ($definition->isSynthetic() && !$definition->isPublic()) {
-                throw new RuntimeException(sprintf(
-                    'A synthetic service ("%s") must be public.',
-                    $id
-                ));
-            }
-
-            // synthetic service has non-prototype scope
-            if ($definition->isSynthetic() && ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope()) {
-                throw new RuntimeException(sprintf(
-                    'A synthetic service ("%s") cannot be of scope "prototype".',
-                    $id
-                ));
+                throw new RuntimeException(sprintf('A synthetic service ("%s") must be public.', $id));
             }
 
             // non-synthetic, non-abstract service has class
             if (!$definition->isAbstract() && !$definition->isSynthetic() && !$definition->getClass()) {
-                if ($definition->getFactoryClass() || $definition->getFactoryService()) {
-                    throw new RuntimeException(sprintf(
-                        'Please add the class to service "%s" even if it is constructed by a factory '
-                       .'since we might need to add method calls based on compile-time checks.',
-                       $id
-                    ));
+                if ($definition->getFactory()) {
+                    throw new RuntimeException(sprintf('Please add the class to service "%s" even if it is constructed by a factory since we might need to add method calls based on compile-time checks.', $id));
                 }
 
                 throw new RuntimeException(sprintf(
@@ -73,6 +56,17 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                    .'please add abstract=true, otherwise specify a class to get rid of this error.',
                    $id
                 ));
+            }
+
+            // tag attribute values must be scalars
+            foreach ($definition->getTags() as $name => $tags) {
+                foreach ($tags as $attributes) {
+                    foreach ($attributes as $attribute => $value) {
+                        if (!is_scalar($value) && null !== $value) {
+                            throw new RuntimeException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s".', $id, $name, $attribute));
+                        }
+                    }
+                }
             }
         }
     }

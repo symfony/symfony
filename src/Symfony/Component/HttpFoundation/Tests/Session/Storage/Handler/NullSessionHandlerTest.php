@@ -21,8 +21,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
  * @author Drak <drak@zikula.org>
  *
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
-class NullSessionStorageTest extends \PHPUnit_Framework_TestCase
+class NullSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function testSaveHandlers()
     {

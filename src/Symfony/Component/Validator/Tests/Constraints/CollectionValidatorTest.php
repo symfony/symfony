@@ -11,58 +11,45 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use Symfony\Component\Validator\ExecutionContext;
-use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Constraints\Collection\Required;
-use Symfony\Component\Validator\Constraints\Collection\Optional;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\CollectionValidator;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
+abstract class CollectionValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new CollectionValidator();
-        $this->validator->initialize($this->context);
-
-        $this->context->expects($this->any())
-            ->method('getGroup')
-            ->will($this->returnValue('MyGroup'));
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new CollectionValidator();
     }
 
     abstract protected function prepareTestData(array $contents);
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
-
         $this->validator->validate(null, new Collection(array('fields' => array(
             'foo' => new Range(array('min' => 4)),
         ))));
+
+        $this->assertNoViolation();
     }
 
     public function testFieldsAsDefaultOption()
     {
+        $constraint = new Range(array('min' => 4));
+
         $data = $this->prepareTestData(array('foo' => 'foobar'));
 
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
+        $this->expectValidateValueAt(0, '[foo]', $data['foo'], array($constraint));
 
         $this->validator->validate($data, new Collection(array(
-            'foo' => new Range(array('min' => 4)),
+            'foo' => $constraint,
         )));
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -83,18 +70,14 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 3,
             'bar' => 5,
         );
-        $i = 1;
+
+        $i = 0;
 
         foreach ($array as $key => $value) {
-            $this->context->expects($this->at($i++))
-                ->method('validateValue')
-                ->with($value, $constraint, '['.$key.']', 'MyGroup');
+            $this->expectValidateValueAt($i++, '['.$key.']', $value, array($constraint));
         }
 
         $data = $this->prepareTestData($array);
-
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
@@ -102,6 +85,8 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
                 'bar' => $constraint,
             ),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testWalkMultipleConstraints()
@@ -115,48 +100,49 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => 3,
             'bar' => 5,
         );
-        $i = 1;
+
+        $i = 0;
 
         foreach ($array as $key => $value) {
-            foreach ($constraints as $constraint) {
-                $this->context->expects($this->at($i++))
-                    ->method('validateValue')
-                    ->with($value, $constraint, '['.$key.']', 'MyGroup');
-            }
+            $this->expectValidateValueAt($i++, '['.$key.']', $value, $constraints);
         }
 
         $data = $this->prepareTestData($array);
-
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
                 'foo' => $constraints,
                 'bar' => $constraints,
-            )
+            ),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testExtraFieldsDisallowed()
     {
+        $constraint = new Range(array('min' => 4));
+
         $data = $this->prepareTestData(array(
             'foo' => 5,
             'baz' => 6,
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolationAt')
-            ->with('[baz]', 'myMessage', array(
-                '{{ field }}' => 'baz'
-            ));
+        $this->expectValidateValueAt(0, '[foo]', $data['foo'], array($constraint));
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
-                'foo' => new Range(array('min' => 4)),
+                'foo' => $constraint,
             ),
             'extraFieldsMessage' => 'myMessage',
         )));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ field }}', '"baz"')
+            ->atPath('property.path[baz]')
+            ->setInvalidValue(6)
+            ->setCode(Collection::NO_SUCH_FIELD_ERROR)
+            ->assertRaised();
     }
 
     // bug fix
@@ -166,16 +152,17 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => null,
         ));
 
-        $constraint = new Collection(array(
+        $constraint = new Range(array('min' => 4));
+
+        $this->expectValidateValueAt(0, '[foo]', $data['foo'], array($constraint));
+
+        $this->validator->validate($data, new Collection(array(
             'fields' => array(
-                'foo' => new Range(array('min' => 4)),
+                'foo' => $constraint,
             ),
-        ));
+        )));
 
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
-
-        $this->validator->validate($data, $constraint);
+        $this->assertNoViolation();
     }
 
     public function testExtraFieldsAllowed()
@@ -185,54 +172,55 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'bar' => 6,
         ));
 
-        $constraint = new Collection(array(
+        $constraint = new Range(array('min' => 4));
+
+        $this->expectValidateValueAt(0, '[foo]', $data['foo'], array($constraint));
+
+        $this->validator->validate($data, new Collection(array(
             'fields' => array(
-                'foo' => new Range(array('min' => 4)),
+                'foo' => $constraint,
             ),
             'allowExtraFields' => true,
-        ));
+        )));
 
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
-
-        $this->validator->validate($data, $constraint);
+        $this->assertNoViolation();
     }
 
     public function testMissingFieldsDisallowed()
     {
         $data = $this->prepareTestData(array());
 
-        $constraint = new Collection(array(
+        $constraint = new Range(array('min' => 4));
+
+        $this->validator->validate($data, new Collection(array(
             'fields' => array(
-                'foo' => new Range(array('min' => 4)),
+                'foo' => $constraint,
             ),
             'missingFieldsMessage' => 'myMessage',
-        ));
+        )));
 
-        $this->context->expects($this->once())
-            ->method('addViolationAt')
-            ->with('[foo]', 'myMessage', array(
-                '{{ field }}' => 'foo',
-            ));
-
-        $this->validator->validate($data, $constraint);
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ field }}', '"foo"')
+            ->atPath('property.path[foo]')
+            ->setInvalidValue(null)
+            ->setCode(Collection::MISSING_FIELD_ERROR)
+            ->assertRaised();
     }
 
     public function testMissingFieldsAllowed()
     {
         $data = $this->prepareTestData(array());
 
-        $constraint = new Collection(array(
+        $constraint = new Range(array('min' => 4));
+
+        $this->validator->validate($data, new Collection(array(
             'fields' => array(
-                'foo' => new Range(array('min' => 4)),
+                'foo' => $constraint,
             ),
             'allowMissingFields' => true,
-        ));
+        )));
 
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
-
-        $this->validator->validate($data, $constraint);
+        $this->assertNoViolation();
     }
 
     public function testOptionalFieldPresent()
@@ -241,24 +229,22 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => null,
         ));
 
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
-
         $this->validator->validate($data, new Collection(array(
             'foo' => new Optional(),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testOptionalFieldNotPresent()
     {
         $data = $this->prepareTestData(array());
 
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
-
         $this->validator->validate($data, new Collection(array(
             'foo' => new Optional(),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testOptionalFieldSingleConstraint()
@@ -269,18 +255,15 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Range(array('min' => 4));
 
-        $this->context->expects($this->once())
-            ->method('validateValue')
-            ->with($array['foo'], $constraint, '[foo]', 'MyGroup');
-
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
+        $this->expectValidateValueAt(0, '[foo]', $array['foo'], array($constraint));
 
         $data = $this->prepareTestData($array);
 
         $this->validator->validate($data, new Collection(array(
             'foo' => new Optional($constraint),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testOptionalFieldMultipleConstraints()
@@ -293,22 +276,16 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             new NotNull(),
             new Range(array('min' => 4)),
         );
-        $i = 1;
 
-        foreach ($constraints as $constraint) {
-            $this->context->expects($this->at($i++))
-                ->method('validateValue')
-                ->with($array['foo'], $constraint, '[foo]', 'MyGroup');
-        }
-
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
+        $this->expectValidateValueAt(0, '[foo]', $array['foo'], $constraints);
 
         $data = $this->prepareTestData($array);
 
         $this->validator->validate($data, new Collection(array(
             'foo' => new Optional($constraints),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testRequiredFieldPresent()
@@ -317,23 +294,16 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             'foo' => null,
         ));
 
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
-
         $this->validator->validate($data, new Collection(array(
             'foo' => new Required(),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testRequiredFieldNotPresent()
     {
         $data = $this->prepareTestData(array());
-
-        $this->context->expects($this->once())
-            ->method('addViolationAt')
-            ->with('[foo]', 'myMessage', array(
-                '{{ field }}' => 'foo',
-            ));
 
         $this->validator->validate($data, new Collection(array(
             'fields' => array(
@@ -341,6 +311,13 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             ),
             'missingFieldsMessage' => 'myMessage',
         )));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ field }}', '"foo"')
+            ->atPath('property.path[foo]')
+            ->setInvalidValue(null)
+            ->setCode(Collection::MISSING_FIELD_ERROR)
+            ->assertRaised();
     }
 
     public function testRequiredFieldSingleConstraint()
@@ -351,18 +328,15 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
 
         $constraint = new Range(array('min' => 4));
 
-        $this->context->expects($this->once())
-            ->method('validateValue')
-            ->with($array['foo'], $constraint, '[foo]', 'MyGroup');
-
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
+        $this->expectValidateValueAt(0, '[foo]', $array['foo'], array($constraint));
 
         $data = $this->prepareTestData($array);
 
         $this->validator->validate($data, new Collection(array(
             'foo' => new Required($constraint),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testRequiredFieldMultipleConstraints()
@@ -375,38 +349,36 @@ abstract class CollectionValidatorTest extends \PHPUnit_Framework_TestCase
             new NotNull(),
             new Range(array('min' => 4)),
         );
-        $i = 1;
 
-        foreach ($constraints as $constraint) {
-            $this->context->expects($this->at($i++))
-                ->method('validateValue')
-                ->with($array['foo'], $constraint, '[foo]', 'MyGroup');
-        }
-
-        $this->context->expects($this->never())
-            ->method('addViolationAt');
+        $this->expectValidateValueAt(0, '[foo]', $array['foo'], $constraints);
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($array, new Collection(array(
+        $this->validator->validate($data, new Collection(array(
             'foo' => new Required($constraints),
         )));
+
+        $this->assertNoViolation();
     }
 
     public function testObjectShouldBeLeftUnchanged()
     {
         $value = new \ArrayObject(array(
-            'foo' => 3
+            'foo' => 3,
         ));
+
+        $constraint = new Range(array('min' => 2));
+
+        $this->expectValidateValueAt(0, '[foo]', $value['foo'], array($constraint));
 
         $this->validator->validate($value, new Collection(array(
             'fields' => array(
-                'foo' => new Range(array('min' => 2)),
-            )
+                'foo' => $constraint,
+            ),
         )));
 
         $this->assertEquals(array(
-            'foo' => 3
+            'foo' => 3,
         ), (array) $value);
     }
 }

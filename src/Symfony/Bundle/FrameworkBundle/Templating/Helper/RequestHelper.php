@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * RequestHelper provides access to the current request parameters.
@@ -21,16 +21,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RequestHelper extends Helper
 {
-    protected $request;
+    protected $requestStack;
 
-    /**
-     * Constructor.
-     *
-     * @param Request $request A Request instance
-     */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -41,27 +36,34 @@ class RequestHelper extends Helper
      *
      * @return mixed
      *
-     * @see Symfony\Component\HttpFoundation\Request::get()
+     * @see Request::get()
      */
     public function getParameter($key, $default = null)
     {
-        return $this->request->get($key, $default);
+        return $this->getRequest()->get($key, $default);
     }
 
     /**
-     * Returns the locale
+     * Returns the locale.
      *
      * @return string
      */
     public function getLocale()
     {
-        return $this->request->getLocale();
+        return $this->getRequest()->getLocale();
+    }
+
+    private function getRequest()
+    {
+        if (!$this->requestStack->getCurrentRequest()) {
+            throw new \LogicException('A Request must be available.');
+        }
+
+        return $this->requestStack->getCurrentRequest();
     }
 
     /**
-     * Returns the canonical name of this helper.
-     *
-     * @return string The canonical name
+     * {@inheritdoc}
      */
     public function getName()
     {

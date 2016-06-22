@@ -11,44 +11,12 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Translation\Exception\InvalidResourceException;
-use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Symfony\Component\Config\Resource\FileResource;
-
 /**
  * @copyright Copyright (c) 2010, Union of RAD http://union-of-rad.org (http://lithify.me/)
  * @copyright Copyright (c) 2012, Clemens Tolboom
  */
-class PoFileLoader extends ArrayLoader implements LoaderInterface
+class PoFileLoader extends FileLoader
 {
-    public function load($resource, $locale, $domain = 'messages')
-    {
-        if (!stream_is_local($resource)) {
-            throw new InvalidResourceException(sprintf('This is not a local file "%s".', $resource));
-        }
-
-        if (!file_exists($resource)) {
-            throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
-        }
-
-        $messages = $this->parse($resource);
-
-        // empty file
-        if (null === $messages) {
-            $messages = array();
-        }
-
-        // not an array
-        if (!is_array($messages)) {
-            throw new InvalidResourceException(sprintf('The file "%s" must contain a valid po file.', $resource));
-        }
-
-        $catalogue = parent::load($messages, $locale, $domain);
-        $catalogue->addResource(new FileResource($resource));
-
-        return $catalogue;
-    }
-
     /**
      * Parses portable object (PO) format.
      *
@@ -90,11 +58,9 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
      *
      * Items with an empty id are ignored.
      *
-     * @param resource $resource
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    private function parse($resource)
+    protected function loadResource($resource)
     {
         $stream = fopen($resource, 'r');
 
@@ -105,14 +71,20 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
 
         $messages = array();
         $item = $defaults;
+        $flags = array();
 
         while ($line = fgets($stream)) {
             $line = trim($line);
 
             if ($line === '') {
                 // Whitespace indicated current item is done
-                $this->addMessage($messages, $item);
+                if (!in_array('fuzzy', $flags)) {
+                    $this->addMessage($messages, $item);
+                }
                 $item = $defaults;
+                $flags = array();
+            } elseif (substr($line, 0, 2) === '#,') {
+                $flags = array_map('trim', explode(',', substr($line, 2)));
             } elseif (substr($line, 0, 7) === 'msgid "') {
                 // We start a new msg so save previous
                 // TODO: this fails when comments or contexts are added
@@ -134,19 +106,20 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                 $item['ids']['plural'] = substr($line, 14, -1);
             } elseif (substr($line, 0, 7) === 'msgstr[') {
                 $size = strpos($line, ']');
-                $item['translated'][(integer) substr($line, 7, 1)] = substr($line, $size + 3, -1);
+                $item['translated'][(int) substr($line, 7, 1)] = substr($line, $size + 3, -1);
             }
-
         }
         // save last item
-        $this->addMessage($messages, $item);
+        if (!in_array('fuzzy', $flags)) {
+            $this->addMessage($messages, $item);
+        }
         fclose($stream);
 
         return $messages;
     }
 
     /**
-     * Save a translation item to the messeages.
+     * Save a translation item to the messages.
      *
      * A .po file could contain by error missing plural indexes. We need to
      * fix these before saving them.
@@ -157,7 +130,7 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
     private function addMessage(array &$messages, array $item)
     {
         if (is_array($item['translated'])) {
-            $messages[$item['ids']['singular']] = stripslashes($item['translated'][0]);
+            $messages[stripcslashes($item['ids']['singular'])] = stripcslashes($item['translated'][0]);
             if (isset($item['ids']['plural'])) {
                 $plurals = $item['translated'];
                 // PO are by definition indexed so sort by index.
@@ -166,13 +139,13 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
                 end($plurals);
                 $count = key($plurals);
                 // Fill missing spots with '-'.
-                $empties = array_fill(0, $count+1, '-');
+                $empties = array_fill(0, $count + 1, '-');
                 $plurals += $empties;
                 ksort($plurals);
-                $messages[$item['ids']['plural']] = stripcslashes(implode('|', $plurals));
+                $messages[stripcslashes($item['ids']['plural'])] = stripcslashes(implode('|', $plurals));
             }
         } elseif (!empty($item['ids']['singular'])) {
-              $messages[$item['ids']['singular']] = stripslashes($item['translated']);
+            $messages[stripcslashes($item['ids']['singular'])] = stripcslashes($item['translated']);
         }
     }
 }

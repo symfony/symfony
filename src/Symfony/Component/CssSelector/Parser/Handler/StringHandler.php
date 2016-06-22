@@ -22,10 +22,12 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\TokenizerPatterns;
 /**
  * CSS selector comment handler.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class StringHandler implements HandlerInterface
 {
@@ -64,7 +66,7 @@ class StringHandler implements HandlerInterface
         $match = $reader->findPattern($this->patterns->getQuotedStringPattern($quote));
 
         if (!$match) {
-            throw new InternalErrorException('Should have found at least an empty match at '.$reader->getPosition().'.');
+            throw new InternalErrorException(sprintf('Should have found at least an empty match at %s.', $reader->getPosition()));
         }
 
         // check unclosed strings

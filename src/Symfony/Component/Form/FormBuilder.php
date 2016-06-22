@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Exception\BadMethodCallException;
-use Symfony\Component\Form\Exception\Exception;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -26,7 +26,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
     /**
      * The children of the form builder.
      *
-     * @var array
+     * @var FormBuilderInterface[]
      */
     private $children = array();
 
@@ -36,13 +36,6 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      * @var array
      */
     private $unresolvedChildren = array();
-
-    /**
-     * The parent of this builder.
-     *
-     * @var FormBuilder
-     */
-    private $parent;
 
     /**
      * Creates a new form builder.
@@ -69,8 +62,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        if ($child instanceof self) {
-            $child->setParent($this);
+        if ($child instanceof FormBuilderInterface) {
             $this->children[$child->getName()] = $child;
 
             // In case an unresolved child with the same name exists
@@ -80,7 +72,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (!is_string($child) && !is_int($child)) {
-            throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormBuilder');
+            throw new UnexpectedTypeException($child, 'string, integer or Symfony\Component\Form\FormBuilderInterface');
         }
 
         if (null !== $type && !is_string($type) && !$type instanceof FormTypeInterface) {
@@ -90,7 +82,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         // Add to "children" to maintain order
         $this->children[$child] = null;
         $this->unresolvedChildren[$child] = array(
-            'type'    => $type,
+            'type' => $type,
             'options' => $options,
         );
 
@@ -107,14 +99,14 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         }
 
         if (null === $type && null === $this->getDataClass()) {
-            $type = 'text';
+            $type = 'Symfony\Component\Form\Extension\Core\Type\TextType';
         }
 
         if (null !== $type) {
-            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options, $this);
+            return $this->getFormFactory()->createNamedBuilder($name, $type, null, $options);
         }
 
-        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options, $this);
+        return $this->getFormFactory()->createBuilderForProperty($this->getDataClass(), $name, null, $options);
     }
 
     /**
@@ -134,7 +126,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             return $this->children[$name];
         }
 
-        throw new Exception(sprintf('The child with the name "%s" does not exist.', $name));
+        throw new InvalidArgumentException(sprintf('The child with the name "%s" does not exist.', $name));
     }
 
     /**
@@ -146,14 +138,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        unset($this->unresolvedChildren[$name]);
-
-        if (array_key_exists($name, $this->children)) {
-            if ($this->children[$name] instanceof self) {
-                $this->children[$name]->setParent(null);
-            }
-            unset($this->children[$name]);
-        }
+        unset($this->unresolvedChildren[$name], $this->children[$name]);
 
         return $this;
     }
@@ -209,9 +194,9 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      */
     public function getFormConfig()
     {
+        /** @var $config self */
         $config = parent::getFormConfig();
 
-        $config->parent = null;
         $config->children = array();
         $config->unresolvedChildren = array();
 
@@ -232,7 +217,13 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
         $form = new Form($this->getFormConfig());
 
         foreach ($this->children as $child) {
-            $form->add($child->getForm());
+            // Automatic initialization is only supported on root forms
+            $form->add($child->setAutoInitialize(false)->getForm());
+        }
+
+        if ($this->getAutoInitialize()) {
+            // Automatically initialize the form if it is configured so
+            $form->initialize();
         }
 
         return $form;
@@ -240,44 +231,8 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
 
     /**
      * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return $this->parent;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setParent(FormBuilderInterface $parent = null)
-    {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        $this->parent = $parent;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasParent()
-    {
-        if ($this->locked) {
-            throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
-        }
-
-        return null !== $this->parent;
-    }
-
-    /**
-     * {@inheritdoc}
+     *
+     * @return FormBuilderInterface[]
      */
     public function getIterator()
     {
@@ -285,13 +240,13 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
             throw new BadMethodCallException('FormBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
-        return new \ArrayIterator($this->children);
+        return new \ArrayIterator($this->all());
     }
 
     /**
      * Converts an unresolved child into a {@link FormBuilder} instance.
      *
-     * @param  string $name The name of the unresolved child.
+     * @param string $name The name of the unresolved child.
      *
      * @return FormBuilder The created instance.
      */

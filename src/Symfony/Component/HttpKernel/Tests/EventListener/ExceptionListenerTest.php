@@ -20,23 +20,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
- * ExceptionListenerTest
+ * ExceptionListenerTest.
  *
  * @author Robert Schönthal <seroscho@googlemail.com>
+ *
+ * @group time-sensitive
  */
 class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\EventDispatcher\EventDispatcher')) {
-            $this->markTestSkipped('The "EventDispatcher" component is not available');
-        }
-
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testConstruct()
     {
         $logger = new TestLogger();
@@ -56,8 +47,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleWithoutLogger($event, $event2)
     {
-        // store the current error_log, and disable it temporarily
-        $errorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
+        $this->iniSet('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
         $l = new ExceptionListener('foo');
         $l->onKernelException($event);
@@ -66,12 +56,11 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 
         try {
             $l->onKernelException($event2);
-        } catch (\Exception $e) {
-            $this->assertSame('foo', $e->getMessage());
+            $this->fail('RuntimeException expected');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('bar', $e->getMessage());
+            $this->assertSame('foo', $e->getPrevious()->getMessage());
         }
-
-        // restore the old error_log
-        ini_set('error_log', $errorLog);
     }
 
     /**
@@ -88,8 +77,10 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 
         try {
             $l->onKernelException($event2);
-        } catch (\Exception $e) {
-            $this->assertSame('foo', $e->getMessage());
+            $this->fail('RuntimeException expected');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('bar', $e->getMessage());
+            $this->assertSame('foo', $e->getPrevious()->getMessage());
         }
 
         $this->assertEquals(3, $logger->countErrors());
@@ -108,8 +99,27 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $event2 = new GetResponseForExceptionEvent(new TestKernelThatThrowsException(), $request, 'foo', $exception);
 
         return array(
-            array($event, $event2)
+            array($event, $event2),
         );
+    }
+
+    public function testSubRequestFormat()
+    {
+        $listener = new ExceptionListener('foo', $this->getMock('Psr\Log\LoggerInterface'));
+
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
+            return new Response($request->getRequestFormat());
+        }));
+
+        $request = Request::create('/');
+        $request->setRequestFormat('xml');
+
+        $event = new GetResponseForExceptionEvent($kernel, $request, 'foo', new \Exception('foo'));
+        $listener->onKernelException($event);
+
+        $response = $event->getResponse();
+        $this->assertEquals('xml', $response->getContent());
     }
 }
 
@@ -133,6 +143,6 @@ class TestKernelThatThrowsException implements HttpKernelInterface
 {
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        throw new \Exception('bar');
+        throw new \RuntimeException('bar');
     }
 }

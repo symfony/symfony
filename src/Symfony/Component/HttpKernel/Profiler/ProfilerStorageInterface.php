@@ -35,7 +35,7 @@ interface ProfilerStorageInterface
     /**
      * Reads data associated with the given token.
      *
-     * The method returns false if the token does not exists in the storage.
+     * The method returns false if the token does not exist in the storage.
      *
      * @param string $token A token
      *
@@ -48,7 +48,7 @@ interface ProfilerStorageInterface
      *
      * @param Profile $profile A Profile instance
      *
-     * @return Boolean Write operation successful
+     * @return bool Write operation successful
      */
     public function write(Profile $profile);
 

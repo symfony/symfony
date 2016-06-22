@@ -1,0 +1,25 @@
+{
+    "Version": "2.1.13.23",
+    "Names": {
+        "CAD": [
+            "CAD",
+            "dólar canadiense"
+        ],
+        "EUR": [
+            "EUR",
+            "euro"
+        ],
+        "THB": [
+            "THB",
+            "bat"
+        ],
+        "USD": [
+            "USD",
+            "dólar estadounidense"
+        ],
+        "VND": [
+            "VND",
+            "dong"
+        ]
+    }
+}

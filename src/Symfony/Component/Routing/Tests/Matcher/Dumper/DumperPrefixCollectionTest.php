@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
 use Symfony\Component\Routing\Route;
@@ -11,7 +20,7 @@ class DumperPrefixCollectionTest extends \PHPUnit_Framework_TestCase
 {
     public function testAddPrefixRoute()
     {
-        $coll = new DumperPrefixCollection;
+        $coll = new DumperPrefixCollection();
         $coll->setPrefix('');
 
         $route = new DumperRoute('bar', new Route('/foo/bar'));
@@ -57,7 +66,7 @@ EOF;
 
     public function testMergeSlashNodes()
     {
-        $coll = new DumperPrefixCollection;
+        $coll = new DumperPrefixCollection();
         $coll->setPrefix('');
 
         $route = new DumperRoute('bar', new Route('/foo/bar'));

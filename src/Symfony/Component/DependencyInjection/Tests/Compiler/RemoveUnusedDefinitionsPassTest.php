@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
-use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
 use Symfony\Component\DependencyInjection\Definition;
@@ -79,6 +78,31 @@ class RemoveUnusedDefinitionsPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->hasDefinition('foo'));
         $this->assertTrue($container->hasDefinition('bar'));
+    }
+
+    public function testProcessWontRemovePrivateFactory()
+    {
+        $container = new ContainerBuilder();
+
+        $container
+            ->register('foo', 'stdClass')
+            ->setFactory(array('stdClass', 'getInstance'))
+            ->setPublic(false);
+
+        $container
+            ->register('bar', 'stdClass')
+            ->setFactory(array(new Reference('foo'), 'getInstance'))
+            ->setPublic(false);
+
+        $container
+            ->register('foobar')
+            ->addArgument(new Reference('bar'));
+
+        $this->process($container);
+
+        $this->assertTrue($container->hasDefinition('foo'));
+        $this->assertTrue($container->hasDefinition('bar'));
+        $this->assertTrue($container->hasDefinition('foobar'));
     }
 
     protected function process(ContainerBuilder $container)

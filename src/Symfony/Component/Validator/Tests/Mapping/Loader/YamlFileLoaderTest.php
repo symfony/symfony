@@ -12,10 +12,12 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Range;
-use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
@@ -23,13 +25,6 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
-            $this->markTestSkipped('The "Yaml" component is not available');
-        }
-    }
-
     public function testLoadClassMetadataReturnsFalseIfEmpty()
     {
         $loader = new YamlFileLoader(__DIR__.'/empty-mapping.yml');
@@ -39,13 +34,39 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider provideInvalidYamlFiles
      * @expectedException \InvalidArgumentException
      */
-    public function testLoadClassMetadataThrowsExceptionIfNotAnArray()
+    public function testInvalidYamlFiles($path)
+    {
+        $loader = new YamlFileLoader(__DIR__.'/'.$path);
+        $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
+
+        $loader->loadClassMetadata($metadata);
+    }
+
+    public function provideInvalidYamlFiles()
+    {
+        return array(
+            array('nonvalid-mapping.yml'),
+            array('bad-format.yml'),
+        );
+    }
+
+    /**
+     * @see https://github.com/symfony/symfony/pull/12158
+     */
+    public function testDoNotModifyStateIfExceptionIsThrown()
     {
         $loader = new YamlFileLoader(__DIR__.'/nonvalid-mapping.yml');
         $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
-        $loader->loadClassMetadata($metadata);
+        try {
+            $loader->loadClassMetadata($metadata);
+        } catch (\InvalidArgumentException $e) {
+            // Call again. Again an exception should be thrown
+            $this->setExpectedException('\InvalidArgumentException');
+            $loader->loadClassMetadata($metadata);
+        }
     }
 
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
@@ -75,6 +96,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $expected->setGroupSequence(array('Foo', 'Entity'));
         $expected->addConstraint(new ConstraintA());
         $expected->addConstraint(new ConstraintB());
+        $expected->addConstraint(new Callback('validateMe'));
+        $expected->addConstraint(new Callback('validateMeStatic'));
+        $expected->addConstraint(new Callback(array('Symfony\Component\Validator\Tests\Fixtures\CallbackClass', 'callback')));
         $expected->addPropertyConstraint('firstName', new NotNull());
         $expected->addPropertyConstraint('firstName', new Range(array('min' => 3)));
         $expected->addPropertyConstraint('firstName', new Choice(array('A', 'B')));
@@ -89,6 +113,8 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             'choices' => array('A', 'B'),
         )));
         $expected->addGetterConstraint('lastName', new NotNull());
+        $expected->addGetterConstraint('valid', new IsTrue());
+        $expected->addGetterConstraint('permissions', new IsTrue());
 
         $this->assertEquals($expected, $metadata);
     }

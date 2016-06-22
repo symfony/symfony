@@ -23,22 +23,22 @@ class StopwatchPeriod
     private $memory;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param integer $start The relative time of the start of the period
-     * @param integer $end   The relative time of the end of the period
+     * @param int $start The relative time of the start of the period (in milliseconds)
+     * @param int $end   The relative time of the end of the period (in milliseconds)
      */
     public function __construct($start, $end)
     {
-        $this->start = (integer) $start;
-        $this->end = (integer) $end;
+        $this->start = (int) $start;
+        $this->end = (int) $end;
         $this->memory = memory_get_usage(true);
     }
 
     /**
      * Gets the relative time of the start of the period.
      *
-     * @return integer The time (in milliseconds)
+     * @return int The time (in milliseconds)
      */
     public function getStartTime()
     {
@@ -48,7 +48,7 @@ class StopwatchPeriod
     /**
      * Gets the relative time of the end of the period.
      *
-     * @return integer The time (in milliseconds)
+     * @return int The time (in milliseconds)
      */
     public function getEndTime()
     {
@@ -58,7 +58,7 @@ class StopwatchPeriod
     /**
      * Gets the time spent in this period.
      *
-     * @return integer The period duration (in milliseconds)
+     * @return int The period duration (in milliseconds)
      */
     public function getDuration()
     {
@@ -68,7 +68,7 @@ class StopwatchPeriod
     /**
      * Gets the memory usage.
      *
-     * @return integer The memory usage (in bytes)
+     * @return int The memory usage (in bytes)
      */
     public function getMemory()
     {

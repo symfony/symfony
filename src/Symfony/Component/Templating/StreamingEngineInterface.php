@@ -23,8 +23,8 @@ interface StreamingEngineInterface
      *
      * The implementation should output the content directly to the client.
      *
-     * @param mixed $name       A template name or a TemplateReferenceInterface instance
-     * @param array $parameters An array of parameters to pass to the template
+     * @param string|TemplateReferenceInterface $name       A template name or a TemplateReferenceInterface instance
+     * @param array                             $parameters An array of parameters to pass to the template
      *
      * @throws \RuntimeException if the template cannot be rendered
      * @throws \LogicException   if the template cannot be streamed

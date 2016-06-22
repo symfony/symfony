@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Checks your services for circular references
+ * Checks your services for circular references.
  *
  * References from method calls are ignored since we might be able to resolve
  * these references depending on the order in which services are called.
@@ -26,8 +26,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class CheckCircularReferencesPass implements CompilerPassInterface
 {
-    private $currentId;
     private $currentPath;
+    private $checkedNodes;
 
     /**
      * Checks the ContainerBuilder object for circular references.
@@ -38,8 +38,8 @@ class CheckCircularReferencesPass implements CompilerPassInterface
     {
         $graph = $container->getCompiler()->getServiceReferenceGraph();
 
+        $this->checkedNodes = array();
         foreach ($graph->getNodes() as $id => $node) {
-            $this->currentId = $id;
             $this->currentPath = array($id);
 
             $this->checkOutEdges($node->getOutEdges());
@@ -57,14 +57,21 @@ class CheckCircularReferencesPass implements CompilerPassInterface
     {
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
-            $this->currentPath[] = $id = $node->getId();
+            $id = $node->getId();
 
-            if ($this->currentId === $id) {
-                throw new ServiceCircularReferenceException($this->currentId, $this->currentPath);
+            if (empty($this->checkedNodes[$id])) {
+                $searchKey = array_search($id, $this->currentPath);
+                $this->currentPath[] = $id;
+
+                if (false !== $searchKey) {
+                    throw new ServiceCircularReferenceException($id, array_slice($this->currentPath, $searchKey));
+                }
+
+                $this->checkOutEdges($node->getOutEdges());
+
+                $this->checkedNodes[$id] = true;
+                array_pop($this->currentPath);
             }
-
-            $this->checkOutEdges($node->getOutEdges());
-            array_pop($this->currentPath);
         }
     }
 }

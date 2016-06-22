@@ -25,30 +25,16 @@ class PrototypedArrayNode extends ArrayNode
 {
     protected $prototype;
     protected $keyAttribute;
-    protected $removeKeyAttribute;
-    protected $minNumberOfElements;
-    protected $defaultValue;
+    protected $removeKeyAttribute = false;
+    protected $minNumberOfElements = 0;
+    protected $defaultValue = array();
     protected $defaultChildren;
-
-    /**
-     * Constructor.
-     *
-     * @param string        $name   The Node's name
-     * @param NodeInterface $parent The node parent
-     */
-    public function __construct($name, NodeInterface $parent = null)
-    {
-        parent::__construct($name, $parent);
-
-        $this->minNumberOfElements = 0;
-        $this->defaultValue = array();
-    }
 
     /**
      * Sets the minimum number of elements that a prototype based node must
      * contain. By default this is zero, meaning no elements.
      *
-     * @param integer $number
+     * @param int $number
      */
     public function setMinNumberOfElements($number)
     {
@@ -76,8 +62,8 @@ class PrototypedArrayNode extends ArrayNode
      * If you'd like "'id' => 'my_name'" to still be present in the resulting
      * array, then you can set the second argument of this method to false.
      *
-     * @param string  $attribute The name of the attribute which value is to be used as a key
-     * @param Boolean $remove    Whether or not to remove the key
+     * @param string $attribute The name of the attribute which value is to be used as a key
+     * @param bool   $remove    Whether or not to remove the key
      */
     public function setKeyAttribute($attribute, $remove = true)
     {
@@ -114,7 +100,7 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Checks if the node has a default value.
      *
-     * @return Boolean
+     * @return bool
      */
     public function hasDefaultValue()
     {
@@ -124,14 +110,14 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Adds default children when none are set.
      *
-     * @param integer|string|array|null $children The number of children|The child name|The children names to be added
+     * @param int|string|array|null $children The number of children|The child name|The children names to be added
      */
     public function setAddChildrenIfNoneSet($children = array('defaults'))
     {
         if (null === $children) {
             $this->defaultChildren = array('defaults');
         } else {
-            $this->defaultChildren = is_integer($children) && $children > 0 ? range(1, $children) : (array) $children;
+            $this->defaultChildren = is_int($children) && $children > 0 ? range(1, $children) : (array) $children;
         }
     }
 
@@ -169,7 +155,7 @@ class PrototypedArrayNode extends ArrayNode
     }
 
     /**
-     * Retrieves the prototype
+     * Retrieves the prototype.
      *
      * @return PrototypeNodeInterface The prototype
      */
@@ -211,7 +197,7 @@ class PrototypedArrayNode extends ArrayNode
             $this->prototype->setName($k);
             try {
                 $value[$k] = $this->prototype->finalize($v);
-            } catch (UnsetKeyException $unset) {
+            } catch (UnsetKeyException $e) {
                 unset($value[$k]);
             }
         }
@@ -245,7 +231,7 @@ class PrototypedArrayNode extends ArrayNode
 
         $value = $this->remapXml($value);
 
-        $isAssoc = array_keys($value) !== range(0, count($value) -1);
+        $isAssoc = array_keys($value) !== range(0, count($value) - 1);
         $normalized = array();
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && is_array($v)) {
@@ -323,7 +309,7 @@ class PrototypedArrayNode extends ArrayNode
             if (!array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {
                     $ex = new InvalidConfigurationException(sprintf(
-                        'You are not allowed to define new elements for path "%s". ' .
+                        'You are not allowed to define new elements for path "%s". '.
                         'Please define all elements for this path in one config file.',
                         $this->getPath()
                     ));

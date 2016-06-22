@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Exception\Exception;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * Renders a form into HTML using a rendering engine.
@@ -29,9 +30,9 @@ class FormRenderer implements FormRendererInterface
     private $engine;
 
     /**
-     * @var CsrfProviderInterface
+     * @var CsrfTokenManagerInterface
      */
-    private $csrfProvider;
+    private $csrfTokenManager;
 
     /**
      * @var array
@@ -48,10 +49,16 @@ class FormRenderer implements FormRendererInterface
      */
     private $variableStack = array();
 
-    public function __construct(FormRendererEngineInterface $engine, CsrfProviderInterface $csrfProvider = null)
+    /**
+     * Constructor.
+     *
+     * @param FormRendererEngineInterface    $engine
+     * @param CsrfTokenManagerInterface|null $csrfTokenManager
+     */
+    public function __construct(FormRendererEngineInterface $engine, CsrfTokenManagerInterface $csrfTokenManager = null)
     {
         $this->engine = $engine;
-        $this->csrfProvider = $csrfProvider;
+        $this->csrfTokenManager = $csrfTokenManager;
     }
 
     /**
@@ -73,13 +80,13 @@ class FormRenderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderCsrfToken($intention)
+    public function renderCsrfToken($tokenId)
     {
-        if (null === $this->csrfProvider) {
-            throw new \BadMethodCallException('CSRF token can only be generated if a CsrfProviderInterface is injected in the constructor.');
+        if (null === $this->csrfTokenManager) {
+            throw new BadMethodCallException('CSRF tokens can only be generated if a CsrfTokenManagerInterface is injected in FormRenderer::__construct().');
         }
 
-        return $this->csrfProvider->generateCsrfToken($intention);
+        return $this->csrfTokenManager->getToken($tokenId)->getValue();
     }
 
     /**
@@ -87,17 +94,29 @@ class FormRenderer implements FormRendererInterface
      */
     public function renderBlock(FormView $view, $blockName, array $variables = array())
     {
-        if (0 == count($this->variableStack)) {
-            throw new Exception('This method should only be called while rendering a form element.');
-        }
-
-        $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
-        $scopeVariables = end($this->variableStack[$viewCacheKey]);
-
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
         if (!$resource) {
-            throw new Exception(sprintf('No block "%s" found while rendering the form.', $blockName));
+            throw new LogicException(sprintf('No block "%s" found while rendering the form.', $blockName));
+        }
+
+        $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
+
+        // The variables are cached globally for a view (instead of for the
+        // current suffix)
+        if (!isset($this->variableStack[$viewCacheKey])) {
+            $this->variableStack[$viewCacheKey] = array();
+
+            // The default variable scope contains all view variables, merged with
+            // the variables passed explicitly to the helper
+            $scopeVariables = $view->vars;
+
+            $varInit = true;
+        } else {
+            // Reuse the current scope and merge it with the explicitly passed variables
+            $scopeVariables = end($this->variableStack[$viewCacheKey]);
+
+            $varInit = false;
         }
 
         // Merge the passed with the existing attributes
@@ -121,6 +140,10 @@ class FormRenderer implements FormRendererInterface
 
         // Clear the stack
         array_pop($this->variableStack[$viewCacheKey]);
+
+        if ($varInit) {
+            unset($this->variableStack[$viewCacheKey]);
+        }
 
         return $html;
     }
@@ -191,6 +214,8 @@ class FormRenderer implements FormRendererInterface
         // The variables are cached globally for a view (instead of for the
         // current suffix)
         if (!isset($this->variableStack[$viewCacheKey])) {
+            $this->variableStack[$viewCacheKey] = array();
+
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
             $scopeVariables = $view->vars;
@@ -217,7 +242,7 @@ class FormRenderer implements FormRendererInterface
 
         // Escape if no resource exists for this block
         if (!$resource) {
-            throw new Exception(sprintf(
+            throw new LogicException(sprintf(
                 'Unable to render the form as none of the following blocks exist: "%s".',
                 implode('", "', array_reverse($blockNameHierarchy))
             ));
@@ -260,8 +285,7 @@ class FormRenderer implements FormRendererInterface
         // Clear the caches if they were filled for the first time within
         // this function call
         if ($hierarchyInit) {
-            unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey]);
-            unset($this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
+            unset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey], $this->hierarchyLevelMap[$viewAndSuffixCacheKey]);
         }
 
         if ($varInit) {

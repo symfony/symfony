@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,7 +29,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     private $currentId;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
@@ -48,21 +47,7 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
         $this->formatter = $this->compiler->getLoggingFormatter();
         $this->graph = $this->compiler->getServiceReferenceGraph();
 
-        foreach ($container->getDefinitions() as $id => $definition) {
-            $this->currentId = $id;
-
-            $definition->setArguments(
-                $this->inlineArguments($container, $definition->getArguments())
-            );
-
-            $definition->setMethodCalls(
-                $this->inlineArguments($container, $definition->getMethodCalls())
-            );
-
-            $definition->setProperties(
-                $this->inlineArguments($container, $definition->getProperties())
-            );
-        }
+        $container->setDefinitions($this->inlineArguments($container, $container->getDefinitions(), true));
     }
 
     /**
@@ -70,12 +55,16 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
      *
      * @param ContainerBuilder $container The ContainerBuilder
      * @param array            $arguments An array of arguments
+     * @param bool             $isRoot    If we are processing the root definitions or not
      *
      * @return array
      */
-    private function inlineArguments(ContainerBuilder $container, array $arguments)
+    private function inlineArguments(ContainerBuilder $container, array $arguments, $isRoot = false)
     {
         foreach ($arguments as $k => $argument) {
+            if ($isRoot) {
+                $this->currentId = $k;
+            }
             if (is_array($argument)) {
                 $arguments[$k] = $this->inlineArguments($container, $argument);
             } elseif ($argument instanceof Reference) {
@@ -83,10 +72,10 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                     continue;
                 }
 
-                if ($this->isInlineableDefinition($container, $id, $definition = $container->getDefinition($id))) {
+                if ($this->isInlineableDefinition($id, $definition = $container->getDefinition($id))) {
                     $this->compiler->addLogMessage($this->formatter->formatInlineService($this, $id, $this->currentId));
 
-                    if (ContainerInterface::SCOPE_PROTOTYPE !== $definition->getScope()) {
+                    if ($definition->isShared()) {
                         $arguments[$k] = $definition;
                     } else {
                         $arguments[$k] = clone $definition;
@@ -96,6 +85,12 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
                 $argument->setArguments($this->inlineArguments($container, $argument->getArguments()));
                 $argument->setMethodCalls($this->inlineArguments($container, $argument->getMethodCalls()));
                 $argument->setProperties($this->inlineArguments($container, $argument->getProperties()));
+
+                $configurator = $this->inlineArguments($container, array($argument->getConfigurator()));
+                $argument->setConfigurator($configurator[0]);
+
+                $factory = $this->inlineArguments($container, array($argument->getFactory()));
+                $argument->setFactory($factory[0]);
             }
         }
 
@@ -105,24 +100,27 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
     /**
      * Checks if the definition is inlineable.
      *
-     * @param ContainerBuilder $container
-     * @param string           $id
-     * @param Definition       $definition
+     * @param string     $id
+     * @param Definition $definition
      *
-     * @return Boolean If the definition is inlineable
+     * @return bool If the definition is inlineable
      */
-    private function isInlineableDefinition(ContainerBuilder $container, $id, Definition $definition)
+    private function isInlineableDefinition($id, Definition $definition)
     {
-        if (ContainerInterface::SCOPE_PROTOTYPE === $definition->getScope()) {
+        if (!$definition->isShared()) {
             return true;
         }
 
-        if ($definition->isPublic()) {
+        if ($definition->isPublic() || $definition->isLazy()) {
             return false;
         }
 
         if (!$this->graph->hasNode($id)) {
             return true;
+        }
+
+        if ($this->currentId == $id) {
+            return false;
         }
 
         $ids = array();
@@ -134,6 +132,10 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             return false;
         }
 
-        return $container->getDefinition(reset($ids))->getScope() === $definition->getScope();
+        if (count($ids) > 1 && is_array($factory = $definition->getFactory()) && ($factory[0] instanceof Reference || $factory[0] instanceof Definition)) {
+            return false;
+        }
+
+        return true;
     }
 }

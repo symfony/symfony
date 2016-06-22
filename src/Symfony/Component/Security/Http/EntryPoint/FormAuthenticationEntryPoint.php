@@ -13,7 +13,6 @@ namespace Symfony\Component\Security\Http\EntryPoint;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -30,19 +29,19 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     private $httpUtils;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param HttpKernelInterface $kernel
      * @param HttpUtils           $httpUtils  An HttpUtils instance
      * @param string              $loginPath  The path to the login form
-     * @param Boolean             $useForward Whether to forward or redirect to the login form
+     * @param bool                $useForward Whether to forward or redirect to the login form
      */
     public function __construct(HttpKernelInterface $kernel, HttpUtils $httpUtils, $loginPath, $useForward = false)
     {
         $this->httpKernel = $kernel;
         $this->httpUtils = $httpUtils;
         $this->loginPath = $loginPath;
-        $this->useForward = (Boolean) $useForward;
+        $this->useForward = (bool) $useForward;
     }
 
     /**

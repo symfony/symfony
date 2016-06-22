@@ -11,13 +11,16 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
-class SubRequestController extends ContainerAware
+class SubRequestController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     public function indexAction()
     {
         $handler = $this->container->get('fragment.handler');
@@ -27,10 +30,10 @@ class SubRequestController extends ContainerAware
 
         // simulates a failure during the rendering of a fragment...
         // should render fr/json
-        $content  = $handler->render($errorUrl, 'inline', array('alt' => $altUrl));
+        $content = $handler->render($errorUrl, 'inline', array('alt' => $altUrl));
 
         // ...to check that the FragmentListener still references the right Request
-        // when rendering another fragment after the error occured
+        // when rendering another fragment after the error occurred
         // should render en/html instead of fr/json
         $content .= $handler->render(new ControllerReference('TestBundle:SubRequest:fragment'));
 
@@ -45,7 +48,6 @@ class SubRequestController extends ContainerAware
 
         // The RouterListener is also tested as if it does not keep the right
         // Request in the context, a 301 would be generated
-
         return new Response($content);
     }
 

@@ -1,28 +1,26 @@
 Usage:
- help [--xml] [command_name]
+  list [options] [--] [<namespace>]
 
 Arguments:
- command               The command to execute
- command_name          The command name (default: "help")
+  namespace            The namespace name
 
 Options:
- --xml                 To output help as XML
- --help (-h)           Display this help message.
- --quiet (-q)          Do not output any message.
- --verbose (-v)        Increase verbosity of messages.
- --version (-V)        Display this application version.
- --ansi                Force ANSI output.
- --no-ansi             Disable ANSI output.
- --no-interaction (-n) Do not ask any interactive question.
+      --raw            To output raw command list
+      --format=FORMAT  The output format (txt, xml, json, or md) [default: "txt"]
 
 Help:
- The help command displays help for a given command:
+ The list command lists all commands:
  
-   php app/console help list
+   php app/console list
  
- You can also output the help as XML by using the --xml option:
+ You can also display the commands for a specific namespace:
  
-   php app/console help --xml list
+   php app/console list test
  
- To display the list of available commands, please use the list command.
-
+ You can also output the information in other formats by using the --format option:
+ 
+   php app/console list --format=xml
+ 
+ It's also possible to get raw list of commands (useful for embedding command runner):
+ 
+   php app/console list --raw

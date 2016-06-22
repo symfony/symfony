@@ -18,10 +18,13 @@ use Symfony\Component\Validator\Constraint;
  */
 class Form extends Constraint
 {
-    /**
-     * Violation code marking an invalid form.
-     */
-    const ERR_INVALID = 1;
+    const NOT_SYNCHRONIZED_ERROR = 1;
+    const NO_SUCH_FIELD_ERROR = 2;
+
+    protected static $errorNames = array(
+        self::NOT_SYNCHRONIZED_ERROR => 'NOT_SYNCHRONIZED_ERROR',
+        self::NO_SUCH_FIELD_ERROR => 'NO_SUCH_FIELD_ERROR',
+    );
 
     /**
      * {@inheritdoc}

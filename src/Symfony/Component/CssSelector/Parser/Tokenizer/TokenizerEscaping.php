@@ -14,10 +14,12 @@ namespace Symfony\Component\CssSelector\Parser\Tokenizer;
 /**
  * CSS selector tokenizer escaping applier.
  *
- * This component is a port of the Python cssselector library,
+ * This component is a port of the Python cssselect library,
  * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
  */
 class TokenizerEscaping
 {
@@ -65,14 +67,18 @@ class TokenizerEscaping
      */
     private function replaceUnicodeSequences($value)
     {
-        return preg_replace_callback($this->patterns->getUnicodeEscapePattern(), function (array $match) {
-            $code = $match[1];
+        return preg_replace_callback($this->patterns->getUnicodeEscapePattern(), function ($match) {
+            $c = hexdec($match[1]);
 
-            if (bin2hex($code) > 0xFFFD) {
-                $code = '\\FFFD';
+            if (0x80 > $c %= 0x200000) {
+                return chr($c);
             }
-
-            return mb_convert_encoding(pack('H*', $code), 'UTF-8', 'UCS-2BE');
+            if (0x800 > $c) {
+                return chr(0xC0 | $c >> 6).chr(0x80 | $c & 0x3F);
+            }
+            if (0x10000 > $c) {
+                return chr(0xE0 | $c >> 12).chr(0x80 | $c >> 6 & 0x3F).chr(0x80 | $c & 0x3F);
+            }
         }, $value);
     }
 }

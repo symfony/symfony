@@ -1,0 +1,40 @@
+{
+    "route_1": {
+        "path": "\/hello\/{name}",
+        "pathRegex": "#^\/hello(?:\/(?P<name>[a-z]+))?$#s",
+        "host": "localhost",
+        "hostRegex": "#^localhost$#si",
+        "scheme": "http|https",
+        "method": "GET|HEAD",
+        "class": "Symfony\\Component\\Routing\\Route",
+        "defaults": {
+            "name": "Joseph"
+        },
+        "requirements": {
+            "name": "[a-z]+"
+        },
+        "options": {
+            "compiler_class": "Symfony\\Component\\Routing\\RouteCompiler",
+            "opt1": "val1",
+            "opt2": "val2"
+        }
+    },
+    "route_2": {
+        "path": "\/name\/add",
+        "pathRegex": "#^\/name\/add$#s",
+        "host": "localhost",
+        "hostRegex": "#^localhost$#si",
+        "scheme": "http|https",
+        "method": "PUT|POST",
+        "class": "Symfony\\Component\\Routing\\Route",
+        "defaults": [
+
+        ],
+        "requirements": "NO CUSTOM",
+        "options": {
+            "compiler_class": "Symfony\\Component\\Routing\\RouteCompiler",
+            "opt1": "val1",
+            "opt2": "val2"
+        }
+    }
+}

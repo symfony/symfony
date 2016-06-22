@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\Validator\ViolationMapper;
 
+use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -40,14 +41,14 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     private $pathAsString = '';
 
     /**
-     * @var integer
+     * @var int
      */
     private $length = 0;
 
     /**
      * Creates a new violation path from a string.
      *
-     * @param string $violationPath The property path of a {@link ConstraintViolation}
+     * @param string $violationPath The property path of a {@link \Symfony\Component\Validator\ConstraintViolation}
      *                              object.
      */
     public function __construct($violationPath)
@@ -69,9 +70,17 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
                         break;
                     }
 
-                    $this->elements[] = $elements[$i];
-                    $this->isIndex[] = true;
-                    $this->mapsForm[] = true;
+                    // All the following index items (regardless if .children is
+                    // explicitly used) are children and grand-children
+                    for (; $i < $l && $path->isIndex($i); ++$i) {
+                        $this->elements[] = $elements[$i];
+                        $this->isIndex[] = true;
+                        $this->mapsForm[] = true;
+                    }
+
+                    // Rewind the pointer as the last element above didn't match
+                    // (even if the pointer was moved forward)
+                    --$i;
                 } elseif ('data' === $elements[$i] && $path->isProperty($i)) {
                     // Skip element "data"
                     ++$i;
@@ -126,7 +135,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function getParent()
     {
         if ($this->length <= 1) {
-            return null;
+            return;
         }
 
         $parent = clone $this;
@@ -155,7 +164,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function getElement($index)
     {
         if (!isset($this->elements[$index])) {
-            throw new \OutOfBoundsException('The index '.$index.' is not within the violation path');
+            throw new OutOfBoundsException(sprintf('The index %s is not within the violation path', $index));
         }
 
         return $this->elements[$index];
@@ -167,7 +176,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function isProperty($index)
     {
         if (!isset($this->isIndex[$index])) {
-            throw new \OutOfBoundsException('The index '.$index.' is not within the violation path');
+            throw new OutOfBoundsException(sprintf('The index %s is not within the violation path', $index));
         }
 
         return !$this->isIndex[$index];
@@ -179,7 +188,7 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
     public function isIndex($index)
     {
         if (!isset($this->isIndex[$index])) {
-            throw new \OutOfBoundsException('The index '.$index.' is not within the violation path');
+            throw new OutOfBoundsException(sprintf('The index %s is not within the violation path', $index));
         }
 
         return $this->isIndex[$index];
@@ -197,23 +206,23 @@ class ViolationPath implements \IteratorAggregate, PropertyPathInterface
      * In this example, "address" and "office" map to forms, while
      * "street does not.
      *
-     * @param  integer $index The element index.
+     * @param int $index The element index.
      *
-     * @return Boolean Whether the element maps to a form.
+     * @return bool Whether the element maps to a form.
      *
-     * @throws \OutOfBoundsException If the offset is invalid.
+     * @throws OutOfBoundsException If the offset is invalid.
      */
     public function mapsForm($index)
     {
         if (!isset($this->mapsForm[$index])) {
-            throw new \OutOfBoundsException('The index '.$index.' is not within the violation path');
+            throw new OutOfBoundsException(sprintf('The index %s is not within the violation path', $index));
         }
 
         return $this->mapsForm[$index];
     }
 
     /**
-     * Returns a new iterator for this path
+     * Returns a new iterator for this path.
      *
      * @return ViolationPathIterator
      */

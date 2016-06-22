@@ -30,7 +30,13 @@ class IpUtilsTest extends \PHPUnit_Framework_TestCase
             array(true, '192.168.1.1', '192.168.1.1/1'),
             array(true, '192.168.1.1', '192.168.1.0/24'),
             array(false, '192.168.1.1', '1.2.3.4/1'),
-            array(false, '192.168.1.1', '192.168.1/33'),
+            array(false, '192.168.1.1', '192.168.1.1/33'), // invalid subnet
+            array(true, '192.168.1.1', array('1.2.3.4/1', '192.168.1.0/24')),
+            array(true, '192.168.1.1', array('192.168.1.0/24', '1.2.3.4/1')),
+            array(false, '192.168.1.1', array('1.2.3.4/1', '4.3.2.1/1')),
+            array(true, '1.2.3.4', '0.0.0.0/0'),
+            array(true, '1.2.3.4', '192.168.1.0/0'),
+            array(false, '1.2.3.4', '256.256.256/0'), // invalid CIDR notation
         );
     }
 
@@ -54,11 +60,17 @@ class IpUtilsTest extends \PHPUnit_Framework_TestCase
             array(false, '2a01:198:603:0:396e:4789:8e99:890f', '::1'),
             array(true, '0:0:0:0:0:0:0:1', '::1'),
             array(false, '0:0:603:0:396e:4789:8e99:0001', '::1'),
+            array(true, '2a01:198:603:0:396e:4789:8e99:890f', array('::1', '2a01:198:603:0::/65')),
+            array(true, '2a01:198:603:0:396e:4789:8e99:890f', array('2a01:198:603:0::/65', '::1')),
+            array(false, '2a01:198:603:0:396e:4789:8e99:890f', array('::1', '1a01:198:603:0::/65')),
+            array(false, '}__test|O:21:&quot;JDatabaseDriverMysqli&quot;:3:{s:2', '::1'),
+            array(false, '2a01:198:603:0:396e:4789:8e99:890f', 'unknown'),
         );
     }
 
     /**
      * @expectedException \RuntimeException
+     * @requires extension sockets
      */
     public function testAnIpv6WithOptionDisabledIpv6()
     {

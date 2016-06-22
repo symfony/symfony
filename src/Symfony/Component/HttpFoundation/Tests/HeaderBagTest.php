@@ -15,9 +15,6 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 class HeaderBagTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Symfony\Component\HttpFoundation\HeaderBag::__construct
-     */
     public function testConstructor()
     {
         $bag = new HeaderBag(array('foo' => 'bar'));
@@ -40,7 +37,7 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new HeaderBag(array('foo' => 'bar'));
         $keys = $bag->keys();
-        $this->assertEquals("foo", $keys[0]);
+        $this->assertEquals('foo', $keys[0]);
     }
 
     public function testGetDate()
@@ -67,9 +64,6 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('#a', $bag->getCacheControlDirective('public'));
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\HeaderBag::all
-     */
     public function testAll()
     {
         $bag = new HeaderBag(array('foo' => 'bar'));
@@ -79,9 +73,6 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => array('BAR')), $bag->all(), '->all() gets all the input key are lower case');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\HeaderBag::replace
-     */
     public function testReplace()
     {
         $bag = new HeaderBag(array('foo' => 'bar'));
@@ -91,24 +82,21 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($bag->has('foo'), '->replace() overrides previously set the input');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\HeaderBag::get
-     */
     public function testGet()
     {
         $bag = new HeaderBag(array('foo' => 'bar', 'fuzz' => 'bizz'));
-        $this->assertEquals( 'bar', $bag->get('foo'), '->get return current value');
-        $this->assertEquals( 'bar', $bag->get('FoO'), '->get key in case insensitive');
-        $this->assertEquals( array('bar'), $bag->get('foo', 'nope', false), '->get return the value as array');
+        $this->assertEquals('bar', $bag->get('foo'), '->get return current value');
+        $this->assertEquals('bar', $bag->get('FoO'), '->get key in case insensitive');
+        $this->assertEquals(array('bar'), $bag->get('foo', 'nope', false), '->get return the value as array');
 
         // defaults
         $this->assertNull($bag->get('none'), '->get unknown values returns null');
-        $this->assertEquals( 'default', $bag->get('none', 'default'), '->get unknown values returns default');
-        $this->assertEquals( array('default'), $bag->get('none', 'default', false), '->get unknown values returns default as array');
+        $this->assertEquals('default', $bag->get('none', 'default'), '->get unknown values returns default');
+        $this->assertEquals(array('default'), $bag->get('none', 'default', false), '->get unknown values returns default as array');
 
         $bag->set('foo', 'bor', false);
-        $this->assertEquals( 'bar', $bag->get('foo'), '->get return first value');
-        $this->assertEquals( array('bar', 'bor'), $bag->get('foo', 'nope', false), '->get return all values as array');
+        $this->assertEquals('bar', $bag->get('foo'), '->get return first value');
+        $this->assertEquals(array('bar', 'bor'), $bag->get('foo', 'nope', false), '->get return all values as array');
     }
 
     public function testSetAssociativeArray()
@@ -119,22 +107,19 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('value'), $bag->get('foo', 'nope', false), 'assoc indices of multi-valued headers are ignored');
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\HeaderBag::contains
-     */
     public function testContains()
     {
         $bag = new HeaderBag(array('foo' => 'bar', 'fuzz' => 'bizz'));
-        $this->assertTrue(  $bag->contains('foo', 'bar'), '->contains first value');
-        $this->assertTrue(  $bag->contains('fuzz', 'bizz'), '->contains second value');
-        $this->assertFalse(  $bag->contains('nope', 'nope'), '->contains unknown value');
-        $this->assertFalse(  $bag->contains('foo', 'nope'), '->contains unknown value');
+        $this->assertTrue($bag->contains('foo', 'bar'), '->contains first value');
+        $this->assertTrue($bag->contains('fuzz', 'bizz'), '->contains second value');
+        $this->assertFalse($bag->contains('nope', 'nope'), '->contains unknown value');
+        $this->assertFalse($bag->contains('foo', 'nope'), '->contains unknown value');
 
         // Multiple values
         $bag->set('foo', 'bor', false);
-        $this->assertTrue(  $bag->contains('foo', 'bar'), '->contains first value');
-        $this->assertTrue(  $bag->contains('foo', 'bor'), '->contains second value');
-        $this->assertFalse(  $bag->contains('foo', 'nope'), '->contains unknown value');
+        $this->assertTrue($bag->contains('foo', 'bar'), '->contains first value');
+        $this->assertTrue($bag->contains('foo', 'bor'), '->contains second value');
+        $this->assertFalse($bag->contains('foo', 'nope'), '->contains unknown value');
     }
 
     public function testCacheControlDirectiveAccessors()
@@ -186,29 +171,23 @@ class HeaderBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(10, $bag->getCacheControlDirective('max-age'));
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\HeaderBag::getIterator
-     */
     public function testGetIterator()
     {
-        $headers   = array('foo' => 'bar', 'hello' => 'world', 'third' => 'charm');
+        $headers = array('foo' => 'bar', 'hello' => 'world', 'third' => 'charm');
         $headerBag = new HeaderBag($headers);
 
         $i = 0;
         foreach ($headerBag as $key => $val) {
-            $i++;
+            ++$i;
             $this->assertEquals(array($headers[$key]), $val);
         }
 
         $this->assertEquals(count($headers), $i);
     }
 
-    /**
-     * @covers Symfony\Component\HttpFoundation\HeaderBag::count
-     */
     public function testCount()
     {
-        $headers   = array('foo' => 'bar', 'HELLO' => 'WORLD');
+        $headers = array('foo' => 'bar', 'HELLO' => 'WORLD');
         $headerBag = new HeaderBag($headers);
 
         $this->assertEquals(count($headers), count($headerBag));

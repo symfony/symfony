@@ -47,7 +47,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
@@ -60,7 +60,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse($source);
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var SelectorNode $selector */
         $selector = $selectors[0];
@@ -72,7 +72,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
@@ -84,7 +84,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $parser = new Parser();
         $selectors = $parser->parse(sprintf(':nth-child(%s)', $series));
-        $this->assertEquals(1, count($selectors));
+        $this->assertCount(1, $selectors);
 
         /** @var FunctionNode $function */
         $function = $selectors[0]->getTree();
@@ -133,6 +133,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             array('div#foobar', array('Hash[Element[div]#foobar]')),
             array('div:not(div.foo)', array('Negation[Element[div]:not(Class[Element[div].foo])]')),
             array('td ~ th', array('CombinedSelector[Element[td] ~ Element[th]]')),
+            array('.foo[data-bar][data-baz=0]', array("Attribute[Attribute[Class[Element[*].foo][data-bar]][data-baz = '0']]")),
         );
     }
 

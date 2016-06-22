@@ -31,7 +31,7 @@ interface EntityLoaderInterface
      * @param string $identifier The identifier field of the object. This method
      *                           is not applicable for fields with multiple
      *                           identifiers.
-     * @param array $values The values of the identifiers.
+     * @param array  $values     The values of the identifiers.
      *
      * @return array The entities.
      */

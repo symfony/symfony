@@ -20,14 +20,11 @@ use Doctrine\DBAL\Schema\Schema;
  */
 final class DbalSessionHandlerSchema extends Schema
 {
-    private $tableName;
-
     public function __construct($tableName = 'sessions')
     {
         parent::__construct();
 
-        $this->tableName = $tableName;
-        $this->addSessionTable();
+        $this->addSessionTable($tableName);
     }
 
     public function addToSchema(Schema $schema)
@@ -37,9 +34,9 @@ final class DbalSessionHandlerSchema extends Schema
         }
     }
 
-    private function addSessionTable()
+    private function addSessionTable($tableName)
     {
-        $table = $this->createTable($this->tableName);
+        $table = $this->createTable($tableName);
         $table->addColumn('sess_id', 'string');
         $table->addColumn('sess_data', 'text')->setNotNull(true);
         $table->addColumn('sess_time', 'integer')->setNotNull(true)->setUnsigned(true);

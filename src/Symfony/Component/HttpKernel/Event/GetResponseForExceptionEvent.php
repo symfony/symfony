@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Allows to create a response for a thrown exception
+ * Allows to create a response for a thrown exception.
  *
  * Call setResponse() to set the response that will be returned for the
  * current request. The propagation of this event is stopped as soon as a
@@ -26,13 +26,12 @@ use Symfony\Component\HttpFoundation\Request;
  * event.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
- *
- * @api
  */
 class GetResponseForExceptionEvent extends GetResponseEvent
 {
     /**
-     * The exception object
+     * The exception object.
+     *
      * @var \Exception
      */
     private $exception;
@@ -45,11 +44,9 @@ class GetResponseForExceptionEvent extends GetResponseEvent
     }
 
     /**
-     * Returns the thrown exception
+     * Returns the thrown exception.
      *
-     * @return \Exception  The thrown exception
-     *
-     * @api
+     * @return \Exception The thrown exception
      */
     public function getException()
     {
@@ -57,13 +54,11 @@ class GetResponseForExceptionEvent extends GetResponseEvent
     }
 
     /**
-     * Replaces the thrown exception
+     * Replaces the thrown exception.
      *
      * This exception will be thrown if no response is set in the event.
      *
      * @param \Exception $exception The thrown exception
-     *
-     * @api
      */
     public function setException(\Exception $exception)
     {

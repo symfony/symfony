@@ -13,39 +13,27 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LengthValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class LengthValidatorTest extends \PHPUnit_Framework_TestCase
+class LengthValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new LengthValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new LengthValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Length(6));
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Length(6));
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -61,12 +49,12 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(12),
             array('12'),
-            array('üü', true),
-            array('éé', true),
+            array('üü'),
+            array('éé'),
             array(123),
             array('123'),
-            array('üüü', true),
-            array('ééé', true),
+            array('üüü'),
+            array('ééé'),
         );
     }
 
@@ -75,16 +63,8 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(1234),
             array('1234'),
-            array('üüüü', true),
-            array('éééé', true),
-        );
-    }
-
-    public function getNotFourCharacters()
-    {
-        return array_merge(
-            $this->getThreeOrLessCharacters(),
-            $this->getFiveOrMoreCharacters()
+            array('üüüü'),
+            array('éééé'),
         );
     }
 
@@ -93,134 +73,168 @@ class LengthValidatorTest extends \PHPUnit_Framework_TestCase
         return array(
             array(12345),
             array('12345'),
-            array('üüüüü', true),
-            array('ééééé', true),
+            array('üüüüü'),
+            array('ééééé'),
             array(123456),
             array('123456'),
-            array('üüüüüü', true),
-            array('éééééé', true),
+            array('üüüüüü'),
+            array('éééééé'),
+        );
+    }
+
+    public function getOneCharset()
+    {
+        return array(
+            array('é', 'utf8', true),
+            array("\xE9", 'CP1252', true),
+            array("\xE9", 'XXX', false),
+            array("\xE9", 'utf8', false),
         );
     }
 
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testValidValuesMin($value, $mbOnly = false)
+    public function testValidValuesMin($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Length(array('min' => 5));
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testValidValuesMax($value, $mbOnly = false)
+    public function testValidValuesMax($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Length(array('max' => 3));
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
      * @dataProvider getFourCharacters
      */
-    public function testValidValuesExact($value, $mbOnly = false)
+    public function testValidValuesExact($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $constraint = new Length(4);
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
      * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesMin($value, $mbOnly = false)
+    public function testInvalidValuesMin($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array(
             'min' => 4,
-            'minMessage' => 'myMessage'
+            'minMessage' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', $this->identicalTo(array(
-                '{{ value }}' => (string) $value,
-                '{{ limit }}' => 4,
-            )), $this->identicalTo($value), 4);
-
         $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->setCode(Length::TOO_SHORT_ERROR)
+            ->assertRaised();
     }
 
     /**
      * @dataProvider getFiveOrMoreCharacters
      */
-    public function testInvalidValuesMax($value, $mbOnly = false)
+    public function testInvalidValuesMax($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array(
             'max' => 4,
-            'maxMessage' => 'myMessage'
+            'maxMessage' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', $this->identicalTo(array(
-                '{{ value }}' => (string) $value,
-                '{{ limit }}' => 4,
-            )), $this->identicalTo($value), 4);
-
         $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->setCode(Length::TOO_LONG_ERROR)
+            ->assertRaised();
     }
 
     /**
-     * @dataProvider getNotFourCharacters
+     * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesExact($value, $mbOnly = false)
+    public function testInvalidValuesExactLessThanFour($value)
     {
-        if ($mbOnly && !function_exists('mb_strlen')) {
-            $this->markTestSkipped('mb_strlen does not exist');
-        }
-
         $constraint = new Length(array(
             'min' => 4,
             'max' => 4,
-            'exactMessage' => 'myMessage'
+            'exactMessage' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', $this->identicalTo(array(
-                '{{ value }}' => (string) $value,
-                '{{ limit }}' => 4,
-            )), $this->identicalTo($value), 4);
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->setCode(Length::TOO_SHORT_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getFiveOrMoreCharacters
+     */
+    public function testInvalidValuesExactMoreThanFour($value)
+    {
+        $constraint = new Length(array(
+            'min' => 4,
+            'max' => 4,
+            'exactMessage' => 'myMessage',
+        ));
 
         $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->setCode(Length::TOO_LONG_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getOneCharset
+     */
+    public function testOneCharset($value, $charset, $isValid)
+    {
+        $constraint = new Length(array(
+            'min' => 1,
+            'max' => 1,
+            'charset' => $charset,
+            'charsetMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($value, $constraint);
+
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation('myMessage')
+                ->setParameter('{{ value }}', '"'.$value.'"')
+                ->setParameter('{{ charset }}', $charset)
+                ->setInvalidValue($value)
+                ->setCode(Length::INVALID_CHARACTERS_ERROR)
+                ->assertRaised();
+        }
     }
 
     public function testConstraintGetDefaultOption()

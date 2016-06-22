@@ -21,7 +21,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransf
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTransformer;
 use Symfony\Component\Form\ReversedTransformer;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class DateType extends AbstractType
@@ -35,6 +35,11 @@ class DateType extends AbstractType
         \IntlDateFormatter::LONG,
         \IntlDateFormatter::MEDIUM,
         \IntlDateFormatter::SHORT,
+    );
+
+    private static $widgets = array(
+        'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+        'choice' => 'Symfony\Component\Form\Extension\Core\Type\ChoiceType',
     );
 
     /**
@@ -73,20 +78,29 @@ class DateType extends AbstractType
                 \Locale::getDefault(),
                 $dateFormat,
                 $timeFormat,
-                'UTC',
+                null,
                 $calendar,
                 $pattern
             );
+
+            // new \IntlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/bug.php?id=66323
+            if (!$formatter) {
+                throw new InvalidOptionsException(intl_get_error_message(), intl_get_error_code());
+            }
+
             $formatter->setLenient(false);
 
             if ('choice' === $options['widget']) {
                 // Only pass a subset of the options to children
                 $yearOptions['choices'] = $this->formatTimestamps($formatter, '/y+/', $this->listYears($options['years']));
-                $yearOptions['empty_value'] = $options['empty_value']['year'];
+                $yearOptions['placeholder'] = $options['placeholder']['year'];
+                $yearOptions['choice_translation_domain'] = $options['choice_translation_domain']['year'];
                 $monthOptions['choices'] = $this->formatTimestamps($formatter, '/[M|L]+/', $this->listMonths($options['months']));
-                $monthOptions['empty_value'] = $options['empty_value']['month'];
+                $monthOptions['placeholder'] = $options['placeholder']['month'];
+                $monthOptions['choice_translation_domain'] = $options['choice_translation_domain']['month'];
                 $dayOptions['choices'] = $this->formatTimestamps($formatter, '/d+/', $this->listDays($options['days']));
-                $dayOptions['empty_value'] = $options['empty_value']['day'];
+                $dayOptions['placeholder'] = $options['placeholder']['day'];
+                $dayOptions['choice_translation_domain'] = $options['choice_translation_domain']['day'];
             }
 
             // Append generic carry-along options
@@ -95,9 +109,9 @@ class DateType extends AbstractType
             }
 
             $builder
-                ->add('year', $options['widget'], $yearOptions)
-                ->add('month', $options['widget'], $monthOptions)
-                ->add('day', $options['widget'], $dayOptions)
+                ->add('year', self::$widgets[$options['widget']], $yearOptions)
+                ->add('month', self::$widgets[$options['widget']], $monthOptions)
+                ->add('day', self::$widgets[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
                     $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
                 ))
@@ -130,7 +144,8 @@ class DateType extends AbstractType
         // Change the input to a HTML5 date input if
         //  * the widget is set to "single_text"
         //  * the format matches the one expected by HTML5
-        if ('single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
+        //  * the html5 is set to true
+        if ($options['html5'] && 'single_text' === $options['widget'] && self::HTML5_FORMAT === $options['format']) {
             $view->vars['type'] = 'date';
         }
 
@@ -139,12 +154,16 @@ class DateType extends AbstractType
 
             // remove special characters unless the format was explicitly specified
             if (!is_string($options['format'])) {
+                // remove quoted strings first
+                $pattern = preg_replace('/\'[^\']+\'/', '', $pattern);
+
+                // remove remaining special chars
                 $pattern = preg_replace('/[^yMd]+/', '', $pattern);
             }
 
             // set right order with respect to locale (e.g.: de_DE=dd.MM.yy; en_US=M/d/yy)
             // lookup various formats at http://userguide.icu-project.org/formatparse/datetime
-            if (preg_match('/^([yMd]+).+([yMd]+).+([yMd]+)$/', $pattern)) {
+            if (preg_match('/^([yMd]+)[^yMd]*([yMd]+)[^yMd]*([yMd]+)$/', $pattern)) {
                 $pattern = preg_replace(array('/y+/', '/M+/', '/d+/'), array('{{ year }}', '{{ month }}', '{{ day }}'), $pattern);
             } else {
                 // default fallback
@@ -158,99 +177,103 @@ class DateType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $compound = function (Options $options) {
-            return $options['widget'] !== 'single_text';
+            return 'single_text' !== $options['widget'];
         };
 
-        $emptyValue = $emptyValueDefault = function (Options $options) {
+        $placeholderDefault = function (Options $options) {
             return $options['required'] ? null : '';
         };
 
-        $emptyValueNormalizer = function (Options $options, $emptyValue) use ($emptyValueDefault) {
-            if (is_array($emptyValue)) {
-                $default = $emptyValueDefault($options);
+        $placeholderNormalizer = function (Options $options, $placeholder) use ($placeholderDefault) {
+            if (is_array($placeholder)) {
+                $default = $placeholderDefault($options);
 
                 return array_merge(
                     array('year' => $default, 'month' => $default, 'day' => $default),
-                    $emptyValue
+                    $placeholder
                 );
             }
 
             return array(
-                'year' => $emptyValue,
-                'month' => $emptyValue,
-                'day' => $emptyValue
+                'year' => $placeholder,
+                'month' => $placeholder,
+                'day' => $placeholder,
+            );
+        };
+
+        $choiceTranslationDomainNormalizer = function (Options $options, $choiceTranslationDomain) {
+            if (is_array($choiceTranslationDomain)) {
+                $default = false;
+
+                return array_replace(
+                    array('year' => $default, 'month' => $default, 'day' => $default),
+                    $choiceTranslationDomain
+                );
+            };
+
+            return array(
+                'year' => $choiceTranslationDomain,
+                'month' => $choiceTranslationDomain,
+                'day' => $choiceTranslationDomain,
             );
         };
 
         $format = function (Options $options) {
-            return $options['widget'] === 'single_text' ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
-        };
-
-        // BC until Symfony 2.3
-        $modelTimezone = function (Options $options) {
-            return $options['data_timezone'];
-        };
-
-        // BC until Symfony 2.3
-        $viewTimezone = function (Options $options) {
-            return $options['user_timezone'];
+            return 'single_text' === $options['widget'] ? DateType::HTML5_FORMAT : DateType::DEFAULT_FORMAT;
         };
 
         $resolver->setDefaults(array(
-            'years'          => range(date('Y') - 5, date('Y') + 5),
-            'months'         => range(1, 12),
-            'days'           => range(1, 31),
-            'widget'         => 'choice',
-            'input'          => 'datetime',
-            'format'         => $format,
-            'model_timezone' => $modelTimezone,
-            'view_timezone'  => $viewTimezone,
-            // Deprecated timezone options
-            'data_timezone'  => null,
-            'user_timezone'  => null,
-            'empty_value'    => $emptyValue,
+            'years' => range(date('Y') - 5, date('Y') + 5),
+            'months' => range(1, 12),
+            'days' => range(1, 31),
+            'widget' => 'choice',
+            'input' => 'datetime',
+            'format' => $format,
+            'model_timezone' => null,
+            'view_timezone' => null,
+            'placeholder' => $placeholderDefault,
+            'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
-            'by_reference'   => false,
+            'by_reference' => false,
             'error_bubbling' => false,
             // If initialized with a \DateTime object, FormType initializes
             // this option to "\DateTime". Since the internal, normalized
             // representation is not \DateTime, but an array, we need to unset
             // this option.
-            'data_class'     => null,
-            'compound'       => $compound,
+            'data_class' => null,
+            'compound' => $compound,
+            'choice_translation_domain' => false,
         ));
 
-        $resolver->setNormalizers(array(
-            'empty_value' => $emptyValueNormalizer,
+        $resolver->setNormalizer('placeholder', $placeholderNormalizer);
+        $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
+
+        $resolver->setAllowedValues('input', array(
+            'datetime',
+            'string',
+            'timestamp',
+            'array',
+        ));
+        $resolver->setAllowedValues('widget', array(
+            'single_text',
+            'text',
+            'choice',
         ));
 
-        $resolver->setAllowedValues(array(
-            'input'     => array(
-                'datetime',
-                'string',
-                'timestamp',
-                'array',
-            ),
-            'widget'    => array(
-                'single_text',
-                'text',
-                'choice',
-            ),
-        ));
-
-        $resolver->setAllowedTypes(array(
-            'format' => array('int', 'string'),
-        ));
+        $resolver->setAllowedTypes('format', array('int', 'string'));
+        $resolver->setAllowedTypes('years', 'array');
+        $resolver->setAllowedTypes('months', 'array');
+        $resolver->setAllowedTypes('days', 'array');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'date';
     }
@@ -259,18 +282,15 @@ class DateType extends AbstractType
     {
         $pattern = $formatter->getPattern();
         $timezone = $formatter->getTimezoneId();
+        $formattedTimestamps = array();
 
-        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
-            $formatter->setTimeZone(\DateTimeZone::UTC);
-        } else {
-            $formatter->setTimeZoneId(\DateTimeZone::UTC);
-        }
+        $formatter->setTimeZone('UTC');
 
         if (preg_match($regex, $pattern, $matches)) {
             $formatter->setPattern($matches[0]);
 
-            foreach ($timestamps as $key => $timestamp) {
-                $timestamps[$key] = $formatter->format($timestamp);
+            foreach ($timestamps as $timestamp => $choice) {
+                $formattedTimestamps[$formatter->format($timestamp)] = $choice;
             }
 
             // I'd like to clone the formatter above, but then we get a
@@ -278,13 +298,9 @@ class DateType extends AbstractType
             $formatter->setPattern($pattern);
         }
 
-        if (version_compare(\PHP_VERSION, '5.5.0-dev', '>=')) {
-            $formatter->setTimeZone($timezone);
-        } else {
-            $formatter->setTimeZoneId($timezone);
-        }
+        $formatter->setTimeZone($timezone);
 
-        return $timestamps;
+        return $formattedTimestamps;
     }
 
     private function listYears(array $years)
@@ -292,7 +308,9 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($years as $year) {
-            $result[$year] = gmmktime(0, 0, 0, 6, 15, $year);
+            if (false !== $y = gmmktime(0, 0, 0, 6, 15, $year)) {
+                $result[$y] = $year;
+            }
         }
 
         return $result;
@@ -303,7 +321,7 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($months as $month) {
-            $result[$month] = gmmktime(0, 0, 0, $month, 15);
+            $result[gmmktime(0, 0, 0, $month, 15)] = $month;
         }
 
         return $result;
@@ -314,7 +332,7 @@ class DateType extends AbstractType
         $result = array();
 
         foreach ($days as $day) {
-            $result[$day] = gmmktime(0, 0, 0, 5, $day);
+            $result[gmmktime(0, 0, 0, 5, $day)] = $day;
         }
 
         return $result;

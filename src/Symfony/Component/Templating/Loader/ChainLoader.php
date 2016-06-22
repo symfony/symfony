@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Templating\Loader;
 
-use Symfony\Component\Templating\Storage;
+use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
@@ -21,7 +21,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  */
 class ChainLoader extends Loader
 {
-    protected $loaders;
+    protected $loaders = array();
 
     /**
      * Constructor.
@@ -30,7 +30,6 @@ class ChainLoader extends Loader
      */
     public function __construct(array $loaders = array())
     {
-        $this->loaders = array();
         foreach ($loaders as $loader) {
             $this->addLoader($loader);
         }
@@ -51,7 +50,7 @@ class ChainLoader extends Loader
      *
      * @param TemplateReferenceInterface $template A template
      *
-     * @return Storage|Boolean false if the template cannot be loaded, a Storage instance otherwise
+     * @return Storage|bool false if the template cannot be loaded, a Storage instance otherwise
      */
     public function load(TemplateReferenceInterface $template)
     {
@@ -68,14 +67,14 @@ class ChainLoader extends Loader
      * Returns true if the template is still fresh.
      *
      * @param TemplateReferenceInterface $template A template
-     * @param integer                    $time     The last modification time of the cached template (timestamp)
+     * @param int                        $time     The last modification time of the cached template (timestamp)
      *
-     * @return Boolean
+     * @return bool
      */
     public function isFresh(TemplateReferenceInterface $template, $time)
     {
         foreach ($this->loaders as $loader) {
-            return $loader->isFresh($template);
+            return $loader->isFresh($template, $time);
         }
 
         return false;

@@ -1,9 +1,24 @@
 CHANGELOG
 =========
 
+3.0.0
+-----
+
+ * removed deprecated classes
+
+2.8.0
+-----
+
+ * deprecated adapters and related classes
+
+2.5.0
+-----
+ * added support for GLOB_BRACE in the paths passed to Finder::in()
+
 2.3.0
 -----
 
+ * added a way to ignore unreadable directories (via Finder::ignoreUnreadableDirs())
  * unified the way subfolders that are not executable are handled by always throwing an AccessDeniedException exception
 
 2.2.0

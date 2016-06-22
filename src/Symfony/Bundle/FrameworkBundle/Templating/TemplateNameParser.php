@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
-use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Templating\TemplateNameParser as BaseTemplateNameParser;
 
 /**
  * TemplateNameParser converts template names from the short notation
@@ -22,10 +22,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class TemplateNameParser implements TemplateNameParserInterface
+class TemplateNameParser extends BaseTemplateNameParser
 {
     protected $kernel;
-    protected $cache;
+    protected $cache = array();
 
     /**
      * Constructor.
@@ -35,7 +35,6 @@ class TemplateNameParser implements TemplateNameParserInterface
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->cache = array();
     }
 
     /**
@@ -50,25 +49,17 @@ class TemplateNameParser implements TemplateNameParserInterface
         }
 
         // normalize name
-        $name = str_replace(':/', ':', preg_replace('#/{2,}#', '/', strtr($name, '\\', '/')));
+        $name = str_replace(':/', ':', preg_replace('#/{2,}#', '/', str_replace('\\', '/', $name)));
 
         if (false !== strpos($name, '..')) {
             throw new \RuntimeException(sprintf('Template name "%s" contains invalid characters.', $name));
         }
 
-        $parts = explode(':', $name);
-        if (3 !== count($parts)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
+        if ($this->isAbsolutePath($name) || !preg_match('/^(?:([^:]*):([^:]*):)?(.+)\.([^\.]+)\.([^\.]+)$/', $name, $matches) || 0 === strpos($name, '@')) {
+            return parent::parse($name);
         }
 
-        $elements = explode('.', $parts[2]);
-        if (3 > count($elements)) {
-            throw new \InvalidArgumentException(sprintf('Template name "%s" is not valid (format is "bundle:section:template.format.engine").', $name));
-        }
-        $engine = array_pop($elements);
-        $format = array_pop($elements);
-
-        $template = new TemplateReference($parts[0], $parts[1], implode('.', $elements), $format, $engine);
+        $template = new TemplateReference($matches[1], $matches[2], $matches[3], $matches[4], $matches[5]);
 
         if ($template->get('bundle')) {
             try {
@@ -79,5 +70,16 @@ class TemplateNameParser implements TemplateNameParserInterface
         }
 
         return $this->cache[$name] = $template;
+    }
+
+    private function isAbsolutePath($file)
+    {
+        $isAbsolute = (bool) preg_match('#^(?:/|[a-zA-Z]:)#', $file);
+
+        if ($isAbsolute) {
+            @trigger_error('Absolute template path support is deprecated since Symfony 3.1 and will be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
+        return $isAbsolute;
     }
 }

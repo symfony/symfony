@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * added support for PTY mode
+ * added the convenience method "mustRun"
+ * deprecation: Process::setStdin() is deprecated in favor of Process::setInput()
+ * deprecation: Process::getStdin() is deprecated in favor of Process::getInput()
+ * deprecation: Process::setInput() and ProcessBuilder::setInput() do not accept non-scalar types
+
+2.4.0
+-----
+
+ * added the ability to define an idle timeout
+
+2.3.0
+-----
+
+ * added ProcessUtils::escapeArgument() to fix the bug in escapeshellarg() function on Windows
+ * added Process::signal()
+ * added Process::getPid()
+ * added support for a TTY mode
+
 2.2.0
 -----
 

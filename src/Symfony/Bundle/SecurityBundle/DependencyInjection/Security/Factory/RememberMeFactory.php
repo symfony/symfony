@@ -35,7 +35,8 @@ class RememberMeFactory implements SecurityFactoryInterface
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
         $container
             ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
-            ->addArgument($config['key'])
+            ->replaceArgument(0, new Reference('security.user_checker.'.$id))
+            ->addArgument($config['secret'])
             ->addArgument($id)
         ;
 
@@ -56,12 +57,12 @@ class RememberMeFactory implements SecurityFactoryInterface
         }
 
         $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
-        $rememberMeServices->replaceArgument(1, $config['key']);
+        $rememberMeServices->replaceArgument(1, $config['secret']);
         $rememberMeServices->replaceArgument(2, $id);
 
         if (isset($config['token_provider'])) {
             $rememberMeServices->addMethodCall('setTokenProvider', array(
-                new Reference($config['token_provider'])
+                new Reference($config['token_provider']),
             ));
         }
 
@@ -102,6 +103,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         $listenerId = 'security.authentication.listener.rememberme.'.$id;
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
+        $listener->replaceArgument(5, $config['catch_exceptions']);
 
         return array($authProviderId, $listenerId, $defaultEntryPoint);
     }
@@ -118,18 +120,21 @@ class RememberMeFactory implements SecurityFactoryInterface
 
     public function addConfiguration(NodeDefinition $node)
     {
-        $node->fixXmlConfig('user_provider');
-        $builder = $node->children();
+        $builder = $node
+            ->fixXmlConfig('user_provider')
+            ->children()
+        ;
 
         $builder
-            ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+            ->scalarNode('secret')->isRequired()->cannotBeEmpty()->end()
             ->scalarNode('token_provider')->end()
             ->arrayNode('user_providers')
                 ->beforeNormalization()
-                    ->ifString()->then(function($v) { return array($v); })
+                    ->ifString()->then(function ($v) { return array($v); })
                 ->end()
                 ->prototype('scalar')->end()
             ->end()
+            ->scalarNode('catch_exceptions')->defaultTrue()->end()
         ;
 
         foreach ($this->options as $name => $value) {

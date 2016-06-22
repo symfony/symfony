@@ -43,6 +43,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
             '.git',
             'foo',
             'toto',
+            'toto/.git',
             '.foo',
         );
 
@@ -55,7 +56,7 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
 
 class InnerTypeIterator extends \ArrayIterator
 {
-   public function current()
+    public function current()
     {
         return new \SplFileInfo(parent::current());
     }

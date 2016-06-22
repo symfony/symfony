@@ -74,7 +74,7 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      * @param FormView $view      The form view for finding the applying themes.
      * @param string   $blockName The name of the block to load.
      *
-     * @return Boolean True if the resource could be loaded, false otherwise.
+     * @return bool True if the resource could be loaded, false otherwise.
      */
     protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName)
     {
@@ -167,6 +167,8 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
         // theme is a reference and we don't want to change it.
         $currentTheme = $theme;
 
+        $context = $this->environment->mergeGlobals(array());
+
         // The do loop takes care of template inheritance.
         // Add blocks from all templates in the inheritance tree, but avoid
         // overriding blocks already set.
@@ -178,6 +180,6 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
                     $this->resources[$cacheKey][$block] = $blockData;
                 }
             }
-        } while (false !== $currentTheme = $currentTheme->getParent(array()));
+        } while (false !== $currentTheme = $currentTheme->getParent($context));
     }
 }

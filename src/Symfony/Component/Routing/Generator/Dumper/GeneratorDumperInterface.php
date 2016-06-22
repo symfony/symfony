@@ -17,8 +17,6 @@ use Symfony\Component\Routing\RouteCollection;
  * GeneratorDumperInterface is the interface that all generator dumper classes must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface GeneratorDumperInterface
 {

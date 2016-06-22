@@ -11,16 +11,23 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 
 class ProfilerPassTest extends \PHPUnit_Framework_TestCase
 {
+    private $profilerDefinition;
+
+    protected function setUp()
+    {
+        $this->profilerDefinition = new Definition('ProfilerClass');
+    }
+
     /**
      * Tests that collectors that specify a template but no "id" will throw
-     * an exception (both are needed if the template is specified). Thus,
-     * a fully-valid tag looks something like this:
+     * an exception (both are needed if the template is specified).
+     *
+     * Thus, a fully-valid tag looks something like this:
      *
      *     <tag name="data_collector" template="YourBundle:Collector:templatename" id="your_collector_name" />
      */
@@ -31,10 +38,7 @@ class ProfilerPassTest extends \PHPUnit_Framework_TestCase
             'my_collector_service' => array(0 => array('template' => 'foo')),
         );
 
-        $builder = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $builder->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue($services));
+        $builder = $this->createContainerMock($services);
 
         $this->setExpectedException('InvalidArgumentException');
 
@@ -49,16 +53,11 @@ class ProfilerPassTest extends \PHPUnit_Framework_TestCase
             'my_collector_service' => array(0 => array('template' => 'foo', 'id' => 'my_collector')),
         );
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $container->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->will($this->returnValue($services));
+        $container = $this->createContainerMock($services);
 
         // fake the getDefinition() to return a Profiler definition
-        $definition = new Definition('ProfilerClass');
         $container->expects($this->atLeastOnce())
-            ->method('getDefinition')
-            ->will($this->returnValue($definition));
+            ->method('getDefinition');
 
         // assert that the data_collector.templates parameter should be set
         $container->expects($this->once())
@@ -69,8 +68,28 @@ class ProfilerPassTest extends \PHPUnit_Framework_TestCase
         $profilerPass->process($container);
 
         // grab the method calls off of the "profiler" definition
-        $methodCalls = $definition->getMethodCalls();
+        $methodCalls = $this->profilerDefinition->getMethodCalls();
         $this->assertCount(1, $methodCalls);
         $this->assertEquals('add', $methodCalls[0][0]); // grab the method part of the first call
+    }
+
+    private function createContainerMock($services)
+    {
+        $container = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('hasDefinition', 'getDefinition', 'findTaggedServiceIds', 'setParameter')
+        );
+        $container->expects($this->any())
+            ->method('hasDefinition')
+            ->with($this->equalTo('profiler'))
+            ->will($this->returnValue(true));
+        $container->expects($this->any())
+            ->method('getDefinition')
+            ->will($this->returnValue($this->profilerDefinition));
+        $container->expects($this->atLeastOnce())
+            ->method('findTaggedServiceIds')
+            ->will($this->returnValue($services));
+
+        return $container;
     }
 }

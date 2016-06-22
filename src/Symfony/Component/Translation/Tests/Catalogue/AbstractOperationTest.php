@@ -9,13 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Translation\Test\Catalogue;
+namespace Symfony\Component\Translation\Tests\Catalogue;
 
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
-abstract class AbstractOperationTest extends TestCase
+abstract class AbstractOperationTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetEmptyDomains()
     {

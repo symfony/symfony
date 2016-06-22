@@ -17,13 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MemoryDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        if (!class_exists('Symfony\Component\HttpFoundation\Request')) {
-            $this->markTestSkipped('The "HttpFoundation" component is not available');
-        }
-    }
-
     public function testCollect()
     {
         $collector = new MemoryDataCollector();
@@ -56,6 +49,7 @@ class MemoryDataCollectorTest extends \PHPUnit_Framework_TestCase
             array('010', 8),
             array('+0x10 k', 16 * 1024),
             array('1g', 1024 * 1024 * 1024),
+            array('1G', 1024 * 1024 * 1024),
             array('-1', -1),
             array('0', 0),
             array('2mk', 2048), // the unit must be the last char, so in this case 'k', not 'm'

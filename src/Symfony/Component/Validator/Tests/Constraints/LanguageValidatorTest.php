@@ -11,43 +11,30 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Language;
 use Symfony\Component\Validator\Constraints\LanguageValidator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class LanguageValidatorTest extends LocalizedTestCase
+class LanguageValidatorTest extends ConstraintValidatorTestCase
 {
-    protected $context;
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        parent::setUp();
-
-        $this->context = $this->getMock('Symfony\Component\Validator\ExecutionContext', array(), array(), '', false);
-        $this->validator = new LanguageValidator();
-        $this->validator->initialize($this->context);
-    }
-
-    protected function tearDown()
-    {
-        $this->context = null;
-        $this->validator = null;
+        return new LanguageValidator();
     }
 
     public function testNullIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate(null, new Language());
+
+        $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', new Language());
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -63,14 +50,9 @@ class LanguageValidatorTest extends LocalizedTestCase
      */
     public function testValidLanguages($language)
     {
-        if (!class_exists('Symfony\Component\Locale\Locale')) {
-            $this->markTestSkipped('The "Locale" component is not available');
-        }
-
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate($language, new Language());
+
+        $this->assertNoViolation();
     }
 
     public function getValidLanguages()
@@ -87,21 +69,16 @@ class LanguageValidatorTest extends LocalizedTestCase
      */
     public function testInvalidLanguages($language)
     {
-        if (!class_exists('Symfony\Component\Locale\Locale')) {
-            $this->markTestSkipped('The "Locale" component is not available');
-        }
-
         $constraint = new Language(array(
-            'message' => 'myMessage'
+            'message' => 'myMessage',
         ));
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('myMessage', array(
-                '{{ value }}' => $language,
-            ));
-
         $this->validator->validate($language, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$language.'"')
+            ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
+            ->assertRaised();
     }
 
     public function getInvalidLanguages()
@@ -110,5 +87,19 @@ class LanguageValidatorTest extends LocalizedTestCase
             array('EN'),
             array('foobar'),
         );
+    }
+
+    public function testValidateUsingCountrySpecificLocale()
+    {
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('fr_FR');
+        $existingLanguage = 'en';
+
+        $this->validator->validate($existingLanguage, new Language(array(
+            'message' => 'aMessage',
+        )));
+
+        $this->assertNoViolation();
     }
 }

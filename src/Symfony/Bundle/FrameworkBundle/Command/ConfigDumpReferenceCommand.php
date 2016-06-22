@@ -11,18 +11,22 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
-use Symfony\Component\Config\Definition\ReferenceDumper;
+use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
+use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * A console command for dumping available configuration reference
+ * A console command for dumping available configuration reference.
  *
  * @author Kevin Bond <kevinbond@gmail.com>
+ * @author Wouter J <waldio.webdesign@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class ConfigDumpReferenceCommand extends ContainerDebugCommand
+class ConfigDumpReferenceCommand extends AbstractConfigCommand
 {
     /**
      * {@inheritdoc}
@@ -32,21 +36,25 @@ class ConfigDumpReferenceCommand extends ContainerDebugCommand
         $this
             ->setName('config:dump-reference')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::REQUIRED, 'The Bundle or extension alias')
+                new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (yaml or xml)', 'yaml'),
             ))
-            ->setDescription('Dumps default configuration for an extension')
-            ->setHelp(<<<EOF
-The <info>%command.name%</info> command dumps the default configuration for an extension/bundle.
+            ->setDescription('Dumps the default configuration for an extension')
+            ->setHelp(<<<'EOF'
+The <info>%command.name%</info> command dumps the default configuration for an
+extension/bundle.
 
-The extension alias or bundle name can be used:
-
-Example:
+Either the extension alias or bundle name can be used:
 
   <info>php %command.full_name% framework</info>
-
-or
-
   <info>php %command.full_name% FrameworkBundle</info>
+
+With the <info>--format</info> option specifies the format of the configuration,
+this is either <comment>yaml</comment> or <comment>xml</comment>.
+When the option is not provided, <comment>yaml</comment> is used.
+
+  <info>php %command.full_name% FrameworkBundle --format=xml</info>
+
 EOF
             )
         ;
@@ -59,59 +67,41 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $bundles = $this->getContainer()->get('kernel')->getBundles();
-        $containerBuilder = $this->getContainerBuilder();
+        $io = new SymfonyStyle($input, $output);
 
-        $name = $input->getArgument('name');
+        if (null === $name = $input->getArgument('name')) {
+            $this->listBundles($io);
+            $io->comment('Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)');
 
-        $extension = null;
+            return;
+        }
 
-        if (preg_match('/Bundle$/', $name)) {
-            // input is bundle name
+        $extension = $this->findExtension($name);
 
-            if (isset($bundles[$name])) {
-                $extension = $bundles[$name]->getContainerExtension();
-            }
+        $configuration = $extension->getConfiguration(array(), $this->getContainerBuilder());
 
-            if (!$extension) {
-                throw new \LogicException('No extensions with configuration available for "'.$name.'"');
-            }
+        $this->validateConfiguration($extension, $configuration);
 
-            $message = 'Default configuration for "'.$name.'"';
+        if ($name === $extension->getAlias()) {
+            $message = sprintf('Default configuration for extension with alias: "%s"', $name);
         } else {
-            foreach ($bundles as $bundle) {
-                $extension = $bundle->getContainerExtension();
-
-                if ($extension && $extension->getAlias() === $name) {
-                    break;
-                }
-
-                $extension = null;
-            }
-
-            if (!$extension) {
-                throw new \LogicException('No extension with alias "'.$name.'" is enabled');
-            }
-
-            $message = 'Default configuration for extension with alias: "'.$name.'"';
+            $message = sprintf('Default configuration for "%s"', $name);
         }
 
-        $configuration = $extension->getConfiguration(array(), $containerBuilder);
-
-        if (!$configuration) {
-            throw new \LogicException('The extension with alias "'.$extension->getAlias().
-                    '" does not have it\'s getConfiguration() method setup');
+        switch ($input->getOption('format')) {
+            case 'yaml':
+                $io->writeln(sprintf('# %s', $message));
+                $dumper = new YamlReferenceDumper();
+                break;
+            case 'xml':
+                $io->writeln(sprintf('<!-- %s -->', $message));
+                $dumper = new XmlReferenceDumper();
+                break;
+            default:
+                $io->writeln($message);
+                throw new \InvalidArgumentException('Only the yaml and xml formats are supported.');
         }
 
-        if (!$configuration instanceof ConfigurationInterface) {
-            throw new \LogicException(
-                'Configuration class "'.get_class($configuration).
-                '" should implement ConfigurationInterface in order to be dumpable');
-        }
-
-        $output->writeln($message);
-
-        $dumper = new ReferenceDumper();
-        $output->writeln($dumper->dump($configuration));
+        $io->writeln($dumper->dump($configuration, $extension->getNamespace()));
     }
 }

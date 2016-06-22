@@ -14,15 +14,16 @@ namespace Symfony\Component\Form\Extension\Core\EventListener;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Util\StringUtil;
 
 /**
- * Trims string data
+ * Trims string data.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class TrimListener implements EventSubscriberInterface
 {
-    public function preBind(FormEvent $event)
+    public function preSubmit(FormEvent $event)
     {
         $data = $event->getData();
 
@@ -30,15 +31,11 @@ class TrimListener implements EventSubscriberInterface
             return;
         }
 
-        if (null !== $result = @preg_replace('/^[\pZ\p{Cc}]+|[\pZ\p{Cc}]+$/u', '', $data)) {
-            $event->setData($result);
-        } else {
-            $event->setData(trim($data));
-        }
+        $event->setData(StringUtil::trim($data));
     }
 
     public static function getSubscribedEvents()
     {
-        return array(FormEvents::PRE_BIND => 'preBind');
+        return array(FormEvents::PRE_SUBMIT => 'preSubmit');
     }
 }

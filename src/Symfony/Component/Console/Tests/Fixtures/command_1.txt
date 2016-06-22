@@ -1,0 +1,7 @@
+<comment>Usage:</comment>
+  descriptor:command1
+  alias1
+  alias2
+
+<comment>Help:</comment>
+ command 1 help

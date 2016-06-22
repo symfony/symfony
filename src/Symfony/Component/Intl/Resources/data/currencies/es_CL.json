@@ -1,0 +1,13 @@
+{
+    "Version": "2.1.13.23",
+    "Names": {
+        "CLP": [
+            "$",
+            "peso chileno"
+        ],
+        "USD": [
+            "US$",
+            "dólar estadounidense"
+        ]
+    }
+}

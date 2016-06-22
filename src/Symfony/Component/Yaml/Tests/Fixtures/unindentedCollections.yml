@@ -60,3 +60,23 @@ yaml: |
         foo: bar
 php: |
     array('collection' => array('key' => array('a', 'b', 'c'), 'foo' => 'bar'))
+---
+test: Shortcut Key after unindented collection
+brief: >
+    Key/value after unindented collection
+yaml: |
+    collection:
+    - key: foo
+      foo: bar
+php: |
+    array('collection' => array(array('key' => 'foo', 'foo' => 'bar')))
+---
+test: Shortcut Key after unindented collection with custom spaces
+brief: >
+    Key/value after unindented collection
+yaml: |
+    collection:
+    -  key: foo
+       foo: bar
+php: |
+    array('collection' => array(array('key' => 'foo', 'foo' => 'bar')))

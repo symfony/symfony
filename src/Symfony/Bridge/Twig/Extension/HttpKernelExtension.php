@@ -36,21 +36,21 @@ class HttpKernelExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'render'     => new \Twig_Function_Method($this, 'renderFragment', array('is_safe' => array('html'))),
-            'render_*'   => new \Twig_Function_Method($this, 'renderFragmentStrategy', array('is_safe' => array('html'))),
-            'controller' => new \Twig_Function_Method($this, 'controller'),
+            new \Twig_SimpleFunction('render', array($this, 'renderFragment'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('render_*', array($this, 'renderFragmentStrategy'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('controller', array($this, 'controller')),
         );
     }
 
     /**
      * Renders a fragment.
      *
-     * @param string $uri     A URI
-     * @param array  $options An array of options
+     * @param string|ControllerReference $uri     A URI as a string or a ControllerReference instance
+     * @param array                      $options An array of options
      *
      * @return string The fragment content
      *
-     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     * @see FragmentHandler::render()
      */
     public function renderFragment($uri, $options = array())
     {
@@ -63,13 +63,13 @@ class HttpKernelExtension extends \Twig_Extension
     /**
      * Renders a fragment.
      *
-     * @param string $strategy A strategy name
-     * @param string $uri      A URI
-     * @param array  $options  An array of options
+     * @param string                     $strategy A strategy name
+     * @param string|ControllerReference $uri      A URI as a string or a ControllerReference instance
+     * @param array                      $options  An array of options
      *
      * @return string The fragment content
      *
-     * @see Symfony\Component\HttpKernel\Fragment\FragmentHandler::render()
+     * @see FragmentHandler::render()
      */
     public function renderFragmentStrategy($strategy, $uri, $options = array())
     {
@@ -81,6 +81,9 @@ class HttpKernelExtension extends \Twig_Extension
         return new ControllerReference($controller, $attributes, $query);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'http_kernel';

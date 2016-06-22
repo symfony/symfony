@@ -12,7 +12,7 @@
 namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * Transforms between a Boolean and a string.
@@ -23,7 +23,8 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 class BooleanToStringTransformer implements DataTransformerInterface
 {
     /**
-     * The value emitted upon transform if the input is true
+     * The value emitted upon transform if the input is true.
+     *
      * @var string
      */
     private $trueValue;
@@ -41,23 +42,23 @@ class BooleanToStringTransformer implements DataTransformerInterface
     /**
      * Transforms a Boolean into a string.
      *
-     * @param Boolean $value Boolean value.
+     * @param bool $value Boolean value.
      *
      * @return string String value.
      *
-     * @throws UnexpectedTypeException if the given value is not a Boolean
+     * @throws TransformationFailedException If the given value is not a Boolean.
      */
     public function transform($value)
     {
         if (null === $value) {
-            return null;
+            return;
         }
 
         if (!is_bool($value)) {
-            throw new UnexpectedTypeException($value, 'Boolean');
+            throw new TransformationFailedException('Expected a Boolean.');
         }
 
-        return true === $value ? $this->trueValue : null;
+        return $value ? $this->trueValue : null;
     }
 
     /**
@@ -65,9 +66,9 @@ class BooleanToStringTransformer implements DataTransformerInterface
      *
      * @param string $value String value.
      *
-     * @return Boolean Boolean value.
+     * @return bool Boolean value.
      *
-     * @throws UnexpectedTypeException if the given value is not a string
+     * @throws TransformationFailedException If the given value is not a string.
      */
     public function reverseTransform($value)
     {
@@ -76,10 +77,9 @@ class BooleanToStringTransformer implements DataTransformerInterface
         }
 
         if (!is_string($value)) {
-            throw new UnexpectedTypeException($value, 'string');
+            throw new TransformationFailedException('Expected a string.');
         }
 
         return true;
     }
-
 }

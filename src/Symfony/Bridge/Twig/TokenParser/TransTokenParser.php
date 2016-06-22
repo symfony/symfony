@@ -25,7 +25,7 @@ class TransTokenParser extends \Twig_TokenParser
      *
      * @param \Twig_Token $token A Twig_Token instance
      *
-     * @return \Twig_NodeInterface A Twig_NodeInterface instance
+     * @return \Twig_Node A Twig_Node instance
      *
      * @throws \Twig_Error_Syntax
      */
@@ -53,9 +53,9 @@ class TransTokenParser extends \Twig_TokenParser
             if ($stream->test('into')) {
                 // {% trans into "fr" %}
                 $stream->next();
-                $locale =  $this->parser->getExpressionParser()->parseExpression();
+                $locale = $this->parser->getExpressionParser()->parseExpression();
             } elseif (!$stream->test(\Twig_Token::BLOCK_END_TYPE)) {
-                throw new \Twig_Error_Syntax('Unexpected token. Twig was looking for the "with" or "from" keyword.');
+                throw new \Twig_Error_Syntax('Unexpected token. Twig was looking for the "with", "from", or "into" keyword.', $stream->getCurrent()->getLine(), $stream->getFilename());
             }
         }
 
@@ -64,7 +64,7 @@ class TransTokenParser extends \Twig_TokenParser
         $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
 
         if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
-            throw new \Twig_Error_Syntax('A message inside a trans tag must be a simple text');
+            throw new \Twig_Error_Syntax('A message inside a trans tag must be a simple text.', $body->getLine(), $stream->getFilename());
         }
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);

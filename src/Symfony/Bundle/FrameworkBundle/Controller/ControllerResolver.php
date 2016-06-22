@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Controller;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 /**
@@ -49,7 +48,7 @@ class ControllerResolver extends BaseControllerResolver
      *
      * @return mixed A PHP callable
      *
-     * @throws \LogicException When the name could not be parsed
+     * @throws \LogicException           When the name could not be parsed
      * @throws \InvalidArgumentException When the controller class does not exist
      */
     protected function createController($controller)
@@ -64,22 +63,31 @@ class ControllerResolver extends BaseControllerResolver
                 list($service, $method) = explode(':', $controller, 2);
 
                 return array($this->container->get($service), $method);
+            } elseif ($this->container->has($controller) && method_exists($service = $this->container->get($controller), '__invoke')) {
+                return $service;
             } else {
                 throw new \LogicException(sprintf('Unable to parse the controller name "%s".', $controller));
             }
         }
 
-        list($class, $method) = explode('::', $controller, 2);
+        return parent::createController($controller);
+    }
 
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+    /**
+     * {@inheritdoc}
+     */
+    protected function instantiateController($class)
+    {
+        if ($this->container->has($class)) {
+            return $this->container->get($class);
         }
 
-        $controller = new $class();
+        $controller = parent::instantiateController($class);
+
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
         }
 
-        return array($controller, $method);
+        return $controller;
     }
 }

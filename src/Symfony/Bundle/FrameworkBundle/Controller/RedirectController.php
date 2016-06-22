@@ -11,9 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -21,8 +24,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RedirectController extends ContainerAware
+class RedirectController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * Redirects to another route with the given name.
      *
@@ -32,19 +37,29 @@ class RedirectController extends ContainerAware
      * In case the route name is empty, the status code will be 404 when permanent is false
      * and 410 otherwise.
      *
-     * @param string  $route     The route name to redirect to
-     * @param Boolean $permanent Whether the redirection is permanent
+     * @param Request    $request          The request instance
+     * @param string     $route            The route name to redirect to
+     * @param bool       $permanent        Whether the redirection is permanent
+     * @param bool|array $ignoreAttributes Whether to ignore attributes or an array of attributes to ignore
      *
      * @return Response A Response instance
+     *
+     * @throws HttpException In case the route name is empty
      */
-    public function redirectAction($route, $permanent = false)
+    public function redirectAction(Request $request, $route, $permanent = false, $ignoreAttributes = false)
     {
         if ('' == $route) {
-            return new Response(null, $permanent ? 410 : 404);
+            throw new HttpException($permanent ? 410 : 404);
         }
 
-        $attributes = $this->container->get('request')->attributes->get('_route_params');
-        unset($attributes['route'], $attributes['permanent']);
+        $attributes = array();
+        if (false === $ignoreAttributes || is_array($ignoreAttributes)) {
+            $attributes = $request->attributes->get('_route_params');
+            unset($attributes['route'], $attributes['permanent'], $attributes['ignoreAttributes']);
+            if ($ignoreAttributes) {
+                $attributes = array_diff_key($attributes, array_flip($ignoreAttributes));
+            }
+        }
 
         return new RedirectResponse($this->container->get('router')->generate($route, $attributes, UrlGeneratorInterface::ABSOLUTE_URL), $permanent ? 301 : 302);
     }
@@ -58,18 +73,21 @@ class RedirectController extends ContainerAware
      * In case the path is empty, the status code will be 404 when permanent is false
      * and 410 otherwise.
      *
-     * @param string       $path      The absolute path or URL to redirect to
-     * @param Boolean      $permanent Whether the redirect is permanent or not
-     * @param string|null  $scheme    The URL scheme (null to keep the current one)
-     * @param integer|null $httpPort  The HTTP port (null to keep the current one for the same scheme or the configured port in the container)
-     * @param integer|null $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
+     * @param Request     $request   The request instance
+     * @param string      $path      The absolute path or URL to redirect to
+     * @param bool        $permanent Whether the redirect is permanent or not
+     * @param string|null $scheme    The URL scheme (null to keep the current one)
+     * @param int|null    $httpPort  The HTTP port (null to keep the current one for the same scheme or the configured port in the container)
+     * @param int|null    $httpsPort The HTTPS port (null to keep the current one for the same scheme or the configured port in the container)
      *
      * @return Response A Response instance
+     *
+     * @throws HttpException In case the path is empty
      */
-    public function urlRedirectAction($path, $permanent = false, $scheme = null, $httpPort = null, $httpsPort = null)
+    public function urlRedirectAction(Request $request, $path, $permanent = false, $scheme = null, $httpPort = null, $httpsPort = null)
     {
         if ('' == $path) {
-            return new Response(null, $permanent ? 410 : 404);
+            throw new HttpException($permanent ? 410 : 404);
         }
 
         $statusCode = $permanent ? 301 : 302;
@@ -79,14 +97,17 @@ class RedirectController extends ContainerAware
             return new RedirectResponse($path, $statusCode);
         }
 
-        $request = $this->container->get('request');
         if (null === $scheme) {
             $scheme = $request->getScheme();
         }
 
         $qs = $request->getQueryString();
         if ($qs) {
-            $qs = '?'.$qs;
+            if (strpos($path, '?') === false) {
+                $qs = '?'.$qs;
+            } else {
+                $qs = '&'.$qs;
+            }
         }
 
         $port = '';

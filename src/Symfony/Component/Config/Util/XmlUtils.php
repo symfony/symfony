@@ -22,7 +22,7 @@ namespace Symfony\Component\Config\Util;
 class XmlUtils
 {
     /**
-     * This class should not be instantiated
+     * This class should not be instantiated.
      */
     private function __construct()
     {
@@ -31,8 +31,8 @@ class XmlUtils
     /**
      * Loads an XML file.
      *
-     * @param string $file                      An XML file path
-     * @param string|callable $schemaOrCallable An XSD schema file path or callable
+     * @param string               $file             An XML file path
+     * @param string|callable|null $schemaOrCallable An XSD schema file path, a callable, or null to disable validation
      *
      * @return \DOMDocument
      *
@@ -40,13 +40,18 @@ class XmlUtils
      */
     public static function loadFile($file, $schemaOrCallable = null)
     {
+        $content = @file_get_contents($file);
+        if ('' === trim($content)) {
+            throw new \InvalidArgumentException(sprintf('File %s does not contain valid XML, it is empty.', $file));
+        }
+
         $internalErrors = libxml_use_internal_errors(true);
         $disableEntities = libxml_disable_entity_loader(true);
         libxml_clear_errors();
 
         $dom = new \DOMDocument();
         $dom->validateOnParse = true;
-        if (!$dom->loadXML(file_get_contents($file), LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
+        if (!$dom->loadXML($content, LIBXML_NONET | (defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0))) {
             libxml_disable_entity_loader($disableEntities);
 
             throw new \InvalidArgumentException(implode("\n", static::getXmlErrors($internalErrors)));
@@ -75,7 +80,8 @@ class XmlUtils
                     $valid = false;
                 }
             } elseif (!is_array($schemaOrCallable) && is_file((string) $schemaOrCallable)) {
-                $valid = @$dom->schemaValidate($schemaOrCallable);
+                $schemaSource = file_get_contents((string) $schemaOrCallable);
+                $valid = @$dom->schemaValidateSource($schemaSource);
             } else {
                 libxml_use_internal_errors($internalErrors);
 
@@ -89,9 +95,10 @@ class XmlUtils
                 }
                 throw new \InvalidArgumentException(implode("\n", $messages), 0, $e);
             }
-
-            libxml_use_internal_errors($internalErrors);
         }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors($internalErrors);
 
         return $dom;
     }
@@ -112,7 +119,7 @@ class XmlUtils
      *  * The nested-tags are converted to keys (<foo><foo>bar</foo></foo>)
      *
      * @param \DomElement $element     A \DomElement instance
-     * @param Boolean     $checkPrefix Check prefix in an element or an attribute name
+     * @param bool        $checkPrefix Check prefix in an element or an attribute name
      *
      * @return array A PHP array
      */
@@ -132,7 +139,7 @@ class XmlUtils
         $nodeValue = false;
         foreach ($element->childNodes as $node) {
             if ($node instanceof \DOMText) {
-                if (trim($node->nodeValue)) {
+                if ('' !== trim($node->nodeValue)) {
                     $nodeValue = trim($node->nodeValue);
                     $empty = false;
                 }
@@ -168,7 +175,7 @@ class XmlUtils
     }
 
     /**
-     * Converts an xml value to a php type.
+     * Converts an xml value to a PHP type.
      *
      * @param mixed $value
      *
@@ -181,20 +188,29 @@ class XmlUtils
 
         switch (true) {
             case 'null' === $lowercaseValue:
-                return null;
+                return;
             case ctype_digit($value):
                 $raw = $value;
-                $cast = intval($value);
+                $cast = (int) $value;
 
-                return '0' == $value[0] ? octdec($value) : (((string) $raw == (string) $cast) ? $cast : $raw);
+                return '0' == $value[0] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
+            case isset($value[1]) && '-' === $value[0] && ctype_digit(substr($value, 1)):
+                $raw = $value;
+                $cast = (int) $value;
+
+                return '0' == $value[1] ? octdec($value) : (((string) $raw === (string) $cast) ? $cast : $raw);
             case 'true' === $lowercaseValue:
                 return true;
             case 'false' === $lowercaseValue:
                 return false;
+            case isset($value[1]) && '0b' == $value[0].$value[1]:
+                return bindec($value);
             case is_numeric($value):
-                return '0x' == $value[0].$value[1] ? hexdec($value) : floatval($value);
-            case preg_match('/^(-|\+)?[0-9,]+(\.[0-9]+)?$/', $value):
-                return floatval(str_replace(',', '', $value));
+                return '0x' === $value[0].$value[1] ? hexdec($value) : (float) $value;
+            case preg_match('/^0x[0-9a-f]++$/i', $value):
+                return hexdec($value);
+            case preg_match('/^(-|\+)?[0-9]+(\.[0-9]+)?$/', $value):
+                return (float) $value;
             default:
                 return $value;
         }
@@ -208,7 +224,7 @@ class XmlUtils
                 LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
                 $error->code,
                 trim($error->message),
-                $error->file ? $error->file : 'n/a',
+                $error->file ?: 'n/a',
                 $error->line,
                 $error->column
             );

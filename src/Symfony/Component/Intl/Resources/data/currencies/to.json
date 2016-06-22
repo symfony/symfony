@@ -1,0 +1,41 @@
+{
+    "Version": "2.1.12.94",
+    "Names": {
+        "AUD": [
+            "AUD$",
+            "AUD"
+        ],
+        "FJD": [
+            "FJD",
+            "FJD"
+        ],
+        "NZD": [
+            "NZD$",
+            "NZD"
+        ],
+        "PGK": [
+            "PGK",
+            "PGK"
+        ],
+        "SBD": [
+            "SBD",
+            "SBD"
+        ],
+        "TOP": [
+            "T$",
+            "Paʻanga fakatonga"
+        ],
+        "VUV": [
+            "VUV",
+            "VUV"
+        ],
+        "WST": [
+            "WST",
+            "Tala fakahaʻamoa"
+        ],
+        "XPF": [
+            "CFPF",
+            "XPF"
+        ]
+    }
+}

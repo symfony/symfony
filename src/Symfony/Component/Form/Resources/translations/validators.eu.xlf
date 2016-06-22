@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid.</source>
-                <target>CSFR tokena ez da egokia.</target>
+                <target>CSRF tokena ez da egokia.</target>
             </trans-unit>
         </body>
     </file>

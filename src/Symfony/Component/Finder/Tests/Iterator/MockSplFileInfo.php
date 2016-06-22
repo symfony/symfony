@@ -14,13 +14,13 @@ namespace Symfony\Component\Finder\Tests\Iterator;
 class MockSplFileInfo extends \SplFileInfo
 {
     const   TYPE_DIRECTORY = 1;
-    const   TYPE_FILE      = 2;
-    const   TYPE_UNKNOWN   = 3;
+    const   TYPE_FILE = 2;
+    const   TYPE_UNKNOWN = 3;
 
-    private $contents         = null;
-    private $mode             = null;
-    private $type             = null;
-    private $relativePath     = null;
+    private $contents = null;
+    private $mode = null;
+    private $type = null;
+    private $relativePath = null;
     private $relativePathname = null;
 
     public function __construct($param)
@@ -29,11 +29,11 @@ class MockSplFileInfo extends \SplFileInfo
             parent::__construct($param);
         } elseif (is_array($param)) {
             $defaults = array(
-              'name'             => 'file.txt',
-              'contents'         => null,
-              'mode'             => null,
-              'type'             => null,
-              'relativePath'     => null,
+              'name' => 'file.txt',
+              'contents' => null,
+              'mode' => null,
+              'type' => null,
+              'relativePath' => null,
               'relativePathname' => null,
             );
             $defaults = array_merge($defaults, $param);
@@ -50,17 +50,17 @@ class MockSplFileInfo extends \SplFileInfo
 
     public function isFile()
     {
-        if ($this->type === null) {
-            return preg_match('/file/', $this->getFilename());
-        };
+        if (null === $this->type) {
+            return false !== strpos($this->getFilename(), 'file');
+        }
 
         return self::TYPE_FILE === $this->type;
     }
 
     public function isDir()
     {
-        if ($this->type === null) {
-            return preg_match('/directory/', $this->getFilename());
+        if (null === $this->type) {
+            return false !== strpos($this->getFilename(), 'directory');
         }
 
         return self::TYPE_DIRECTORY === $this->type;
@@ -68,7 +68,7 @@ class MockSplFileInfo extends \SplFileInfo
 
     public function isReadable()
     {
-        if ($this->mode === null) {
+        if (null === $this->mode) {
             return preg_match('/r\+/', $this->getFilename());
         }
 

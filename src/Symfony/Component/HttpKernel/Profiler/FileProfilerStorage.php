@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Symfony package.
  *
@@ -40,15 +41,15 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
         $this->folder = substr($dsn, 5);
 
-        if (!is_dir($this->folder)) {
-            mkdir($this->folder, 0777, true);
+        if (!is_dir($this->folder) && false === @mkdir($this->folder, 0777, true) && !is_dir($this->folder)) {
+            throw new \RuntimeException(sprintf('Unable to create the storage directory (%s).', $this->folder));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method, $start = null, $end = null)
+    public function find($ip, $url, $limit, $method, $start = null, $end = null, $statusCode = null)
     {
         $file = $this->getIndexFilename();
 
@@ -60,24 +61,17 @@ class FileProfilerStorage implements ProfilerStorageInterface
         fseek($file, 0, SEEK_END);
 
         $result = array();
-
-        for (;$limit > 0; $limit--) {
-            $line = $this->readLineFromFile($file);
-
-            if (null === $line) {
-                break;
-            }
-
-            list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent) = str_getcsv($line);
-
+        while (count($result) < $limit && $line = $this->readLineFromFile($file)) {
+            $values = str_getcsv($line);
+            list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent, $csvStatusCode) = $values;
             $csvTime = (int) $csvTime;
 
-            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method)) {
+            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method) || $statusCode && false === strpos($csvStatusCode, $statusCode)) {
                 continue;
             }
 
             if (!empty($start) && $csvTime < $start) {
-               continue;
+                continue;
             }
 
             if (!empty($end) && $csvTime > $end) {
@@ -85,12 +79,13 @@ class FileProfilerStorage implements ProfilerStorageInterface
             }
 
             $result[$csvToken] = array(
-                'token'  => $csvToken,
-                'ip'     => $csvIp,
+                'token' => $csvToken,
+                'ip' => $csvIp,
                 'method' => $csvMethod,
-                'url'    => $csvUrl,
-                'time'   => $csvTime,
+                'url' => $csvUrl,
+                'time' => $csvTime,
                 'parent' => $csvParent,
+                'status_code' => $csvStatusCode,
             );
         }
 
@@ -123,7 +118,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     public function read($token)
     {
         if (!$token || !file_exists($file = $this->getFilename($token))) {
-            return null;
+            return;
         }
 
         return $this->createProfileFromData($token, unserialize(file_get_contents($file)));
@@ -131,6 +126,8 @@ class FileProfilerStorage implements ProfilerStorageInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \RuntimeException
      */
     public function write(Profile $profile)
     {
@@ -140,21 +137,22 @@ class FileProfilerStorage implements ProfilerStorageInterface
         if (!$profileIndexed) {
             // Create directory
             $dir = dirname($file);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0777, true);
+            if (!is_dir($dir) && false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new \RuntimeException(sprintf('Unable to create the storage directory (%s).', $dir));
             }
         }
 
         // Store profile
         $data = array(
-            'token'    => $profile->getToken(),
-            'parent'   => $profile->getParentToken(),
+            'token' => $profile->getToken(),
+            'parent' => $profile->getParentToken(),
             'children' => array_map(function ($p) { return $p->getToken(); }, $profile->getChildren()),
-            'data'     => $profile->getCollectors(),
-            'ip'       => $profile->getIp(),
-            'method'   => $profile->getMethod(),
-            'url'      => $profile->getUrl(),
-            'time'     => $profile->getTime(),
+            'data' => $profile->getCollectors(),
+            'ip' => $profile->getIp(),
+            'method' => $profile->getMethod(),
+            'url' => $profile->getUrl(),
+            'time' => $profile->getTime(),
+            'status_code' => $profile->getStatusCode(),
         );
 
         if (false === file_put_contents($file, serialize($data))) {
@@ -174,6 +172,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getUrl(),
                 $profile->getTime(),
                 $profile->getParentToken(),
+                $profile->getStatusCode(),
             ));
             fclose($file);
         }
@@ -222,7 +221,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $position = ftell($file);
 
         if (0 === $position) {
-            return null;
+            return;
         }
 
         while (true) {
@@ -261,6 +260,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $profile->setMethod($data['method']);
         $profile->setUrl($data['url']);
         $profile->setTime($data['time']);
+        $profile->setStatusCode($data['status_code']);
         $profile->setCollectors($data['data']);
 
         if (!$parent && $data['parent']) {

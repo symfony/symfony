@@ -1,0 +1,217 @@
+{
+    "Version": "2.1.7.39",
+    "Names": {
+        "AED": [
+            "AED",
+            "Idiramu ryo muri Leta Zunze Ubumwe z’Abarabu"
+        ],
+        "AOA": [
+            "AOA",
+            "Ikwanza ryo muri Angola"
+        ],
+        "AUD": [
+            "A$",
+            "Idolari ryo muri Ositaraliya"
+        ],
+        "BHD": [
+            "BHD",
+            "Idinari ry’iribahireyini"
+        ],
+        "BIF": [
+            "FBu",
+            "Ifaranga ry’Uburundi"
+        ],
+        "BWP": [
+            "BWP",
+            "Ipula ryo muri Botswana"
+        ],
+        "CAD": [
+            "CA$",
+            "Idolari rya Kanada"
+        ],
+        "CDF": [
+            "CDF",
+            "Ifaranga rya Kongo"
+        ],
+        "CHF": [
+            "CHF",
+            "Ifaranga ry’Ubusuwisi"
+        ],
+        "CNY": [
+            "CN¥",
+            "Iyuwani ryo mu Bushinwa"
+        ],
+        "CVE": [
+            "CVE",
+            "Irikaboveridiyano ryo muri Esikudo"
+        ],
+        "DJF": [
+            "DJF",
+            "Ifaranga ryo muri Jibuti"
+        ],
+        "DZD": [
+            "DZD",
+            "Idinari ryo muri Alijeriya"
+        ],
+        "EGP": [
+            "EGP",
+            "Ipawundi rya Misiri"
+        ],
+        "ERN": [
+            "ERN",
+            "Irinakufa ryo muri Eritereya"
+        ],
+        "ETB": [
+            "ETB",
+            "Ibiri ryo muri Etiyopiya"
+        ],
+        "EUR": [
+            "€",
+            "Iyero"
+        ],
+        "GBP": [
+            "£",
+            "Ipawundi ryo mu Bwongereza"
+        ],
+        "GHC": [
+            "GHC",
+            "Icedi ryo muri Gana"
+        ],
+        "GMD": [
+            "GMD",
+            "Idalasi ryo muri Gambiya"
+        ],
+        "GNS": [
+            "GNS",
+            "Ifaranga ryo muri Gineya"
+        ],
+        "INR": [
+            "₹",
+            "Irupiya ryo mu Buhindi"
+        ],
+        "JPY": [
+            "JP¥",
+            "Iyeni ry’Ubuyapani"
+        ],
+        "KES": [
+            "KES",
+            "Ishilingi rya Kenya"
+        ],
+        "KMF": [
+            "KMF",
+            "Ifaranga rya Komore"
+        ],
+        "LRD": [
+            "LRD",
+            "Idolari rya Liberiya"
+        ],
+        "LSL": [
+            "LSL",
+            "Iloti ryo muro Lesoto"
+        ],
+        "LYD": [
+            "LYD",
+            "Idinari rya Libiya"
+        ],
+        "MAD": [
+            "MAD",
+            "Idiramu ryo muri Maroke"
+        ],
+        "MGA": [
+            "MGA",
+            "Iriyari ryo muri Madagasikari"
+        ],
+        "MRO": [
+            "MRO",
+            "Ugwiya ryo muri Moritaniya"
+        ],
+        "MUR": [
+            "MUR",
+            "Irupiya ryo mu birwa bya Morise"
+        ],
+        "MWK": [
+            "MWK",
+            "Ikwaca ryo muri Malawi"
+        ],
+        "MZM": [
+            "MZM",
+            "Irimetikali ryo muri Mozambike"
+        ],
+        "NAD": [
+            "NAD",
+            "Idolari rya Namibiya"
+        ],
+        "NGN": [
+            "NGN",
+            "Inayira ryo muri Nijeriya"
+        ],
+        "RWF": [
+            "RWF",
+            "Ifaranga ry’u Rwanda"
+        ],
+        "SAR": [
+            "SAR",
+            "Iriyari ryo muri Arabiya Sawudite"
+        ],
+        "SCR": [
+            "SCR",
+            "Irupiya ryo mu birwa bya Sayisheli"
+        ],
+        "SDG": [
+            "SDG",
+            "Ipawundi rya Sudani"
+        ],
+        "SHP": [
+            "SHP",
+            "Ipawundi rya Sente Helena"
+        ],
+        "SLL": [
+            "SLL",
+            "Ilewone"
+        ],
+        "SOS": [
+            "SOS",
+            "Ishilingi ryo muri Somaliya"
+        ],
+        "STD": [
+            "STD",
+            "Idobura ryo muri Sawotome na Perensipe"
+        ],
+        "SZL": [
+            "SZL",
+            "Ililangeni"
+        ],
+        "TND": [
+            "TND",
+            "Idinari ryo muri Tuniziya"
+        ],
+        "TZS": [
+            "TZS",
+            "Ishilingi rya Tanzaniya"
+        ],
+        "UGX": [
+            "UGX",
+            "Ishilingi ry’Ubugande"
+        ],
+        "USD": [
+            "US$",
+            "Idolari ry’abanyamerika"
+        ],
+        "ZAR": [
+            "ZAR",
+            "Irandi ryo muri Afurika y’Epfo"
+        ],
+        "ZMK": [
+            "ZMK",
+            "Ikwaca ryo muri Zambiya (1968–2012)"
+        ],
+        "ZMW": [
+            "ZMW",
+            "Ikwaca ryo muri Zambiya"
+        ],
+        "ZWD": [
+            "ZWD",
+            "Idolari ryo muri Zimbabwe"
+        ]
+    }
+}

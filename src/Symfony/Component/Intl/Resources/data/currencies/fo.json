@@ -1,0 +1,25 @@
+{
+    "Version": "2.1.12.27",
+    "Names": {
+        "DKK": [
+            "kr",
+            "donsk króna"
+        ],
+        "EUR": [
+            "€",
+            "euro"
+        ],
+        "ISK": [
+            "ISK",
+            "íslendsk króna"
+        ],
+        "NOK": [
+            "NOK",
+            "norsk króna"
+        ],
+        "SEK": [
+            "SEK",
+            "svensk króna"
+        ]
+    }
+}

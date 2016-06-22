@@ -18,40 +18,17 @@ use Symfony\Component\Translation\MessageCatalogue;
  *
  * @author Stealth35
  */
-class IcuResFileDumper implements DumperInterface
+class IcuResFileDumper extends FileDumper
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function dump(MessageCatalogue $messages, $options = array())
-    {
-        if (!array_key_exists('path', $options)) {
-            throw new \InvalidArgumentException('The file dumper need a path options.');
-        }
-
-        // save a file for each domain
-        foreach ($messages->getDomains() as $domain) {
-            $file = $messages->getLocale().'.'.$this->getExtension();
-            $path = $options['path'].'/'.$domain.'/';
-
-            if (!file_exists($path)) {
-                mkdir($path);
-            }
-
-            // backup
-            if (file_exists($path.$file)) {
-                copy($path.$file, $path.$file.'~');
-            }
-
-            // save file
-            file_put_contents($path.$file, $this->format($messages, $domain));
-        }
-    }
+    protected $relativePathTemplate = '%domain%/%locale%.%extension%';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function format(MessageCatalogue $messages, $domain = 'messages')
+    public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array())
     {
         $data = $indexes = $resources = '';
 
@@ -102,11 +79,7 @@ class IcuResFileDumper implements DumperInterface
             1, 4, 0, 0              // Unicode version
         );
 
-        $output = $header
-               .$root
-               .$data;
-
-        return $output;
+        return $header.$root.$data;
     }
 
     private function writePadding($data)
@@ -120,13 +93,11 @@ class IcuResFileDumper implements DumperInterface
 
     private function getPosition($data)
     {
-        $position = (strlen($data) + 28) / 4;
-
-        return $position;
+        return (strlen($data) + 28) / 4;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function getExtension()
     {

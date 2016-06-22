@@ -14,7 +14,7 @@ namespace Symfony\Component\Templating;
 /**
  * EngineInterface is the interface each engine must implement.
  *
- * All methods relies on a template name. A template name is a
+ * All methods rely on a template name. A template name is a
  * "logical" name for the template, and as such it does not refer to
  * a path on the filesystem (in fact, the template can be stored
  * anywhere, like in a database).
@@ -23,48 +23,42 @@ namespace Symfony\Component\Templating;
  * TemplateReferenceInterface, a TemplateNameParserInterface should be used to
  * convert the name to a TemplateReferenceInterface instance.
  *
- * Each template loader use the logical template name to look for
+ * Each template loader uses the logical template name to look for
  * the template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @api
  */
 interface EngineInterface
 {
     /**
      * Renders a template.
      *
-     * @param mixed $name       A template name or a TemplateReferenceInterface instance
-     * @param array $parameters An array of parameters to pass to the template
+     * @param string|TemplateReferenceInterface $name       A template name or a TemplateReferenceInterface instance
+     * @param array                             $parameters An array of parameters to pass to the template
      *
      * @return string The evaluated template as a string
      *
      * @throws \RuntimeException if the template cannot be rendered
-     *
-     * @api
      */
     public function render($name, array $parameters = array());
 
     /**
      * Returns true if the template exists.
      *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
+     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean true if the template exists, false otherwise
+     * @return bool true if the template exists, false otherwise
      *
-     * @api
+     * @throws \RuntimeException if the engine cannot handle the template name
      */
     public function exists($name);
 
     /**
      * Returns true if this class is able to render the given template.
      *
-     * @param mixed $name A template name or a TemplateReferenceInterface instance
+     * @param string|TemplateReferenceInterface $name A template name or a TemplateReferenceInterface instance
      *
-     * @return Boolean true if this class supports the given template, false otherwise
-     *
-     * @api
+     * @return bool true if this class supports the given template, false otherwise
      */
     public function supports($name);
 }

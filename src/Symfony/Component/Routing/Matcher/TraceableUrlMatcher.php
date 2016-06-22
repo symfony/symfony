@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Matcher\UrlMatcher;
 
 /**
  * TraceableUrlMatcher helps debug path info matching by tracing the match.
@@ -25,7 +25,7 @@ class TraceableUrlMatcher extends UrlMatcher
 {
     const ROUTE_DOES_NOT_MATCH = 0;
     const ROUTE_ALMOST_MATCHES = 1;
-    const ROUTE_MATCHES        = 2;
+    const ROUTE_MATCHES = 2;
 
     protected $traces;
 
@@ -39,6 +39,15 @@ class TraceableUrlMatcher extends UrlMatcher
         }
 
         return $this->traces;
+    }
+
+    public function getTracesForRequest(Request $request)
+    {
+        $this->request = $request;
+        $traces = $this->getTraces($request->getPathInfo());
+        $this->request = null;
+
+        return $traces;
     }
 
     protected function matchCollection($pathinfo, RouteCollection $routes)
@@ -75,29 +84,40 @@ class TraceableUrlMatcher extends UrlMatcher
             if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
                 $this->addTrace(sprintf('Host "%s" does not match the requirement ("%s")', $this->context->getHost(), $route->getHost()), self::ROUTE_ALMOST_MATCHES, $name, $route);
 
-                return true;
+                continue;
             }
 
             // check HTTP method requirement
-            if ($req = $route->getRequirement('_method')) {
+            if ($requiredMethods = $route->getMethods()) {
                 // HEAD and GET are equivalent as per RFC
                 if ('HEAD' === $method = $this->context->getMethod()) {
                     $method = 'GET';
                 }
 
-                if (!in_array($method, $req = explode('|', strtoupper($req)))) {
-                    $this->allow = array_merge($this->allow, $req);
+                if (!in_array($method, $requiredMethods)) {
+                    $this->allow = array_merge($this->allow, $requiredMethods);
 
-                    $this->addTrace(sprintf('Method "%s" does not match the requirement ("%s")', $this->context->getMethod(), implode(', ', $req)), self::ROUTE_ALMOST_MATCHES, $name, $route);
+                    $this->addTrace(sprintf('Method "%s" does not match any of the required methods (%s)', $this->context->getMethod(), implode(', ', $requiredMethods)), self::ROUTE_ALMOST_MATCHES, $name, $route);
+
+                    continue;
+                }
+            }
+
+            // check condition
+            if ($condition = $route->getCondition()) {
+                if (!$this->getExpressionLanguage()->evaluate($condition, array('context' => $this->context, 'request' => $this->request))) {
+                    $this->addTrace(sprintf('Condition "%s" does not evaluate to "true"', $condition), self::ROUTE_ALMOST_MATCHES, $name, $route);
 
                     continue;
                 }
             }
 
             // check HTTP scheme requirement
-            if ($scheme = $route->getRequirement('_scheme')) {
-                if ($this->context->getScheme() !== $scheme) {
-                    $this->addTrace(sprintf('Scheme "%s" does not match the requirement ("%s"); the user will be redirected', $this->context->getScheme(), $scheme), self::ROUTE_ALMOST_MATCHES, $name, $route);
+            if ($requiredSchemes = $route->getSchemes()) {
+                $scheme = $this->context->getScheme();
+
+                if (!$route->hasScheme($scheme)) {
+                    $this->addTrace(sprintf('Scheme "%s" does not match any of the required schemes (%s); the user will be redirected to first required scheme', $scheme, implode(', ', $requiredSchemes)), self::ROUTE_ALMOST_MATCHES, $name, $route);
 
                     return true;
                 }
@@ -112,10 +132,10 @@ class TraceableUrlMatcher extends UrlMatcher
     private function addTrace($log, $level = self::ROUTE_DOES_NOT_MATCH, $name = null, $route = null)
     {
         $this->traces[] = array(
-            'log'   => $log,
-            'name'  => $name,
+            'log' => $log,
+            'name' => $name,
             'level' => $level,
-            'path'  => null !== $route ? $route->getPath() : null,
+            'path' => null !== $route ? $route->getPath() : null,
         );
     }
 }

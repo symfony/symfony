@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Bridge\Doctrine\Tests\Form;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
@@ -50,7 +59,7 @@ class DoctrineOrmTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $classMetadata->expects($this->once())->method('hasField')->with('field')->will($this->returnValue(false));
         $classMetadata->expects($this->once())->method('isAssociationWithSingleJoinColumn')->with('field')->will($this->returnValue(true));
 
-        $mapping = array('joinColumns' => array(array('nullable'=>true)));
+        $mapping = array('joinColumns' => array(array('nullable' => true)));
         $classMetadata->expects($this->once())->method('getAssociationMapping')->with('field')->will($this->returnValue($mapping));
 
         $return[] = array($classMetadata, new ValueGuess(false, Guess::HIGH_CONFIDENCE));
@@ -60,7 +69,7 @@ class DoctrineOrmTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $classMetadata->expects($this->once())->method('hasField')->with('field')->will($this->returnValue(false));
         $classMetadata->expects($this->once())->method('isAssociationWithSingleJoinColumn')->with('field')->will($this->returnValue(true));
 
-        $mapping = array('joinColumns' => array(array('nullable'=>false)));
+        $mapping = array('joinColumns' => array(array('nullable' => false)));
         $classMetadata->expects($this->once())->method('getAssociationMapping')->with('field')->will($this->returnValue($mapping));
 
         $return[] = array($classMetadata, new ValueGuess(true, Guess::HIGH_CONFIDENCE));
@@ -85,5 +94,4 @@ class DoctrineOrmTypeGuesserTest extends \PHPUnit_Framework_TestCase
 
         return new DoctrineOrmTypeGuesser($registry);
     }
-
 }

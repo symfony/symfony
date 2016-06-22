@@ -13,23 +13,23 @@ namespace Symfony\Component\Form\Extension\Core\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Passes a value through multiple value transformers
+ * Passes a value through multiple value transformers.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class DataTransformerChain implements DataTransformerInterface
 {
     /**
-     * The value transformers
-     * @var array
+     * The value transformers.
+     *
+     * @var DataTransformerInterface[]
      */
     protected $transformers;
 
     /**
-     * Uses the given value transformers to transform values
+     * Uses the given value transformers to transform values.
      *
      * @param array $transformers
      */
@@ -39,7 +39,7 @@ class DataTransformerChain implements DataTransformerInterface
     }
 
     /**
-     * Passes the value through the transform() method of all nested transformers
+     * Passes the value through the transform() method of all nested transformers.
      *
      * The transformers receive the value in the same order as they were passed
      * to the constructor. Each transformer receives the result of the previous
@@ -51,7 +51,6 @@ class DataTransformerChain implements DataTransformerInterface
      * @return mixed The transformed value
      *
      * @throws TransformationFailedException
-     * @throws UnexpectedTypeException
      */
     public function transform($value)
     {
@@ -64,7 +63,7 @@ class DataTransformerChain implements DataTransformerInterface
 
     /**
      * Passes the value through the reverseTransform() method of all nested
-     * transformers
+     * transformers.
      *
      * The transformers receive the value in the reverse order as they were passed
      * to the constructor. Each transformer receives the result of the previous
@@ -76,7 +75,6 @@ class DataTransformerChain implements DataTransformerInterface
      * @return mixed The reverse-transformed value
      *
      * @throws TransformationFailedException
-     * @throws UnexpectedTypeException
      */
     public function reverseTransform($value)
     {
@@ -85,5 +83,13 @@ class DataTransformerChain implements DataTransformerInterface
         }
 
         return $value;
+    }
+
+    /**
+     * @return DataTransformerInterface[]
+     */
+    public function getTransformers()
+    {
+        return $this->transformers;
     }
 }

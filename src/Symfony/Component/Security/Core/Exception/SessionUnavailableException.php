@@ -26,7 +26,7 @@ namespace Symfony\Component\Security\Core\Exception;
 class SessionUnavailableException extends AuthenticationException
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMessageKey()
     {

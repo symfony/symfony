@@ -67,8 +67,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
         // Unset instead of resetting to an empty array, in order to allow
         // implementations (like TwigRendererEngine) to check whether $cacheKey
         // is set at all.
-        unset($this->resources[$cacheKey]);
-        unset($this->resourceHierarchyLevels[$cacheKey]);
+        unset($this->resources[$cacheKey], $this->resourceHierarchyLevels[$cacheKey]);
     }
 
     /**
@@ -131,7 +130,7 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      * @param FormView $view      The form view for finding the applying themes.
      * @param string   $blockName The name of the block to load.
      *
-     * @return Boolean True if the resource could be loaded, false otherwise.
+     * @return bool True if the resource could be loaded, false otherwise.
      */
     abstract protected function loadResourceForBlockName($cacheKey, FormView $view, $blockName);
 
@@ -146,10 +145,10 @@ abstract class AbstractRendererEngine implements FormRendererEngineInterface
      *                                     themes.
      * @param array    $blockNameHierarchy The block hierarchy, with the most
      *                                     specific block name at the end.
-     * @param integer  $hierarchyLevel     The level in the block hierarchy that
+     * @param int      $hierarchyLevel     The level in the block hierarchy that
      *                                     should be loaded.
      *
-     * @return Boolean True if the resource could be loaded, false otherwise.
+     * @return bool True if the resource could be loaded, false otherwise.
      */
     private function loadResourceForBlockNameHierarchy($cacheKey, FormView $view, array $blockNameHierarchy, $hierarchyLevel)
     {

@@ -11,39 +11,15 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-
 /**
  * @Annotation
+ * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  *
- * @api
+ * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class All extends Constraint
+class All extends Composite
 {
     public $constraints = array();
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
-
-        if (!is_array($this->constraints)) {
-            $this->constraints = array($this->constraints);
-        }
-
-        foreach ($this->constraints as $constraint) {
-            if (!$constraint instanceof Constraint) {
-                throw new ConstraintDefinitionException('The value '.$constraint.' is not an instance of Constraint in constraint '.__CLASS__);
-            }
-
-            if ($constraint instanceof Valid) {
-                throw new ConstraintDefinitionException('The constraint Valid cannot be nested inside constraint '.__CLASS__.'. You can only declare the Valid constraint directly on a field or method.');
-            }
-        }
-    }
 
     public function getDefaultOption()
     {
@@ -53,5 +29,10 @@ class All extends Constraint
     public function getRequiredOptions()
     {
         return array('constraints');
+    }
+
+    protected function getCompositeOption()
+    {
+        return 'constraints';
     }
 }

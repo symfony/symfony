@@ -1,11 +1,8 @@
 
+                                                                
+  [Symfony\Component\Console\Exception\InvalidOptionException]  
+  The "--foo" option does not exist.                            
+                                                                
 
-                                      
-  [InvalidArgumentException]          
-  The "--foo" option does not exist.  
-                                      
-
-
-list [--xml] [--raw] [namespace]
-
+list [--raw] [--format FORMAT] [--] [<namespace>]
 

@@ -1,0 +1,13 @@
+{
+    "Version": "2.1.11.70",
+    "Names": {
+        "BYR": [
+            "BYR",
+            "Weissrussischer Rubel"
+        ],
+        "CHF": [
+            "CHF",
+            "Schweizer Franken"
+        ]
+    }
+}

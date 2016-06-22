@@ -1,0 +1,70 @@
+{
+    "definitions": {
+        "definition_1": {
+            "class": "Full\\Qualified\\Class1",
+            "public": true,
+            "synthetic": false,
+            "lazy": true,
+            "shared": true,
+            "abstract": true,
+            "file": null,
+            "factory_class": "Full\\Qualified\\FactoryClass",
+            "factory_method": "get",
+            "tags": [
+
+            ],
+            "autowire": false,
+            "autowiring_types": []
+        },
+        "definition_2": {
+            "class": "Full\\Qualified\\Class2",
+            "public": false,
+            "synthetic": true,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "file": "\/path\/to\/file",
+            "factory_service": "factory.service",
+            "factory_method": "get",
+            "tags": [
+                {
+                    "name": "tag1",
+                    "parameters": {
+                        "attr1": "val1",
+                        "attr2": "val2"
+                    }
+                },
+                {
+                    "name": "tag1",
+                    "parameters": {
+                        "attr3": "val3"
+                    }
+                },
+                {
+                    "name": "tag2",
+                    "parameters": [
+
+                    ]
+                }
+            ],
+            "calls": [
+                "setMailer"
+            ],
+            "autowire": false,
+            "autowiring_types": []
+        }
+    },
+    "aliases": {
+        "alias_1": {
+            "service": "service_1",
+            "public": true
+        },
+        "alias_2": {
+            "service": "service_2",
+            "public": false
+        }
+    },
+    "services": {
+        "service_container": "Symfony\\Component\\DependencyInjection\\ContainerBuilder"
+    }
+}

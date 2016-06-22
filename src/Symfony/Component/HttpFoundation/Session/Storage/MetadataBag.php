@@ -39,24 +39,30 @@ class MetadataBag implements SessionBagInterface
     /**
      * @var array
      */
-    protected $meta = array();
+    protected $meta = array(self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0);
 
     /**
      * Unix timestamp.
      *
-     * @var integer
+     * @var int
      */
     private $lastUsed;
 
     /**
+     * @var int
+     */
+    private $updateThreshold;
+
+    /**
      * Constructor.
      *
-     * @param string $storageKey The key used to store bag in the session.
+     * @param string $storageKey      The key used to store bag in the session.
+     * @param int    $updateThreshold The time to wait between two UPDATED updates
      */
-    public function __construct($storageKey = '_sf2_meta')
+    public function __construct($storageKey = '_sf2_meta', $updateThreshold = 0)
     {
         $this->storageKey = $storageKey;
-        $this->meta = array(self::CREATED => 0, self::UPDATED => 0, self::LIFETIME => 0);
+        $this->updateThreshold = $updateThreshold;
     }
 
     /**
@@ -68,7 +74,11 @@ class MetadataBag implements SessionBagInterface
 
         if (isset($array[self::CREATED])) {
             $this->lastUsed = $this->meta[self::UPDATED];
-            $this->meta[self::UPDATED] = time();
+
+            $timeStamp = time();
+            if ($timeStamp - $array[self::UPDATED] >= $this->updateThreshold) {
+                $this->meta[self::UPDATED] = $timeStamp;
+            }
         } else {
             $this->stampCreated();
         }
@@ -77,7 +87,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Gets the lifetime that the session cookie was set with.
      *
-     * @return integer
+     * @return int
      */
     public function getLifetime()
     {
@@ -87,10 +97,10 @@ class MetadataBag implements SessionBagInterface
     /**
      * Stamps a new session's metadata.
      *
-     * @param integer $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                          will leave the system settings unchanged, 0 sets the cookie
-     *                          to expire with browser session. Time is in seconds, and is
-     *                          not a Unix timestamp.
+     * @param int $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                      will leave the system settings unchanged, 0 sets the cookie
+     *                      to expire with browser session. Time is in seconds, and is
+     *                      not a Unix timestamp.
      */
     public function stampNew($lifetime = null)
     {
@@ -108,7 +118,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Gets the created timestamp metadata.
      *
-     * @return integer Unix timestamp
+     * @return int Unix timestamp
      */
     public function getCreated()
     {
@@ -118,7 +128,7 @@ class MetadataBag implements SessionBagInterface
     /**
      * Gets the last used metadata.
      *
-     * @return integer Unix timestamp
+     * @return int Unix timestamp
      */
     public function getLastUsed()
     {

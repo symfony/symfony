@@ -2,25 +2,51 @@
 
 /*
  * This file is part of the Symfony package.
-*
-* (c) Fabien Potencier <fabien@symfony.com>
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\Compiler;
+namespace Symfony\Bridge\Doctrine\Tests\DependencyInjection\CompilerPass;
 
 use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionOnAbstractTaggedSubscriber()
     {
-        if (!class_exists('Symfony\Component\DependencyInjection\Container')) {
-            $this->markTestSkipped('The "DependencyInjection" component is not available');
-        }
+        $container = $this->createBuilder();
+
+        $abstractDefinition = new Definition('stdClass');
+        $abstractDefinition->setAbstract(true);
+        $abstractDefinition->addTag('doctrine.event_subscriber');
+
+        $container->setDefinition('a', $abstractDefinition);
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testExceptionOnAbstractTaggedListener()
+    {
+        $container = $this->createBuilder();
+
+        $abstractDefinition = new Definition('stdClass');
+        $abstractDefinition->setAbstract(true);
+        $abstractDefinition->addTag('doctrine.event_listener', array('event' => 'test'));
+
+        $container->setDefinition('a', $abstractDefinition);
+
+        $this->process($container);
     }
 
     public function testProcessEventListenersWithPriorities()
@@ -106,7 +132,22 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
         ;
 
         $this->process($container);
-        $this->assertEquals(array('c', 'd', 'e', 'b', 'a'), $this->getServiceOrder($container, 'addEventSubscriber'));
+        $serviceOrder = $this->getServiceOrder($container, 'addEventSubscriber');
+        $unordered = array_splice($serviceOrder, 0, 3);
+        sort($unordered);
+        $this->assertEquals(array('c', 'd', 'e'), $unordered);
+        $this->assertEquals(array('b', 'a'), $serviceOrder);
+    }
+
+    public function testProcessNoTaggedServices()
+    {
+        $container = $this->createBuilder(true);
+
+        $this->process($container);
+
+        $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls());
+
+        $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
     }
 
     private function process(ContainerBuilder $container)
@@ -118,8 +159,7 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
     private function getServiceOrder(ContainerBuilder $container, $method)
     {
         $order = array();
-        foreach ($container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls() as $call) {
-            list($name, $arguments) = $call;
+        foreach ($container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls() as list($name, $arguments)) {
             if ($method !== $name) {
                 continue;
             }

@@ -23,7 +23,11 @@ class ApacheRequest extends Request
      */
     protected function prepareRequestUri()
     {
-        return $this->server->get('REQUEST_URI');
+        $requestUri = $this->server->get('REQUEST_URI');
+        $parsedRequest = parse_url($requestUri);
+        // Make sure to return only path.
+        // Proxies can set REQUEST_URI to contain host and path.
+        return $parsedRequest['path'];
     }
 
     /**

@@ -42,9 +42,9 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTest
         $this->request = Request::create('http://localhost', $method, $data, array(), $files);
     }
 
-    protected function getRequestHandler()
+    protected function getRequestHandler($translator = null)
     {
-        return new HttpFoundationRequestHandler($this->serverParams);
+        return new HttpFoundationRequestHandler($this->serverParams, $translator);
     }
 
     protected function getMockFile($suffix = '')

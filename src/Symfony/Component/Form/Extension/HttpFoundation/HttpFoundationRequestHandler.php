@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\Form\Util\ServerParams;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * A request processor using the {@link Request} class of the HttpFoundation
@@ -32,11 +33,23 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
     private $serverParams;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var null|string
+     */
+    private $translationDomain;
+
+    /**
      * {@inheritdoc}
      */
-    public function __construct(ServerParams $serverParams = null)
+    public function __construct(ServerParams $serverParams = null, TranslatorInterface $translator = null, $translationDomain = null)
     {
         $this->serverParams = $serverParams ?: new ServerParams();
+        $this->translator = $translator;
+        $this->translationDomain = $translationDomain;
     }
 
     /**
@@ -80,8 +93,14 @@ class HttpFoundationRequestHandler implements RequestHandlerInterface
                 // Submit the form, but don't clear the default values
                 $form->submit(null, false);
 
+                $errorMessage = $form->getConfig()->getOption('post_max_size_message');
+
+                if (null !== $this->translator) {
+                    $errorMessage = $this->translator->trans($errorMessage, array(), $this->translationDomain);
+                }
+
                 $form->addError(new FormError(
-                    $form->getConfig()->getOption('post_max_size_message'),
+                    $errorMessage,
                     null,
                     array('{{ max }}' => $this->serverParams->getNormalizedIniPostMaxSize())
                 ));

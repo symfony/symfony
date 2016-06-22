@@ -18,6 +18,15 @@ DependencyInjection
 
  * Using unsupported options to configure service aliases raises an exception.
 
+ * Setting or unsetting a private service with the `Container::set()` method is
+   no longer supported. Only public services can be set or unset.
+
+ * Checking the existence of a private service with the `Container::has()`
+   method is no longer supported and will return `false`.
+
+ * Requesting a private service with the `Container::get()` method is no longer
+   supported.
+
 Form
 ----
 

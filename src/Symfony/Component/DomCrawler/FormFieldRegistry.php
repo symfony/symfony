@@ -26,8 +26,6 @@ class FormFieldRegistry
      * Adds a field to the registry.
      *
      * @param FormField $field The field
-     *
-     * @throws \InvalidArgumentException when the name is malformed
      */
     public function add(FormField $field)
     {
@@ -52,8 +50,6 @@ class FormFieldRegistry
      * Removes a field and its children from the registry.
      *
      * @param string $name The fully qualified name of the base field
-     *
-     * @throws \InvalidArgumentException when the name is malformed
      */
     public function remove($name)
     {
@@ -76,7 +72,6 @@ class FormFieldRegistry
      *
      * @return mixed The value of the field
      *
-     * @throws \InvalidArgumentException when the name is malformed
      * @throws \InvalidArgumentException if the field does not exist
      */
     public function &get($name)
@@ -118,7 +113,6 @@ class FormFieldRegistry
      * @param string $name  The fully qualified name of the field
      * @param mixed  $value The value
      *
-     * @throws \InvalidArgumentException when the name is malformed
      * @throws \InvalidArgumentException if the field does not exist
      */
     public function set($name, $value)
@@ -199,8 +193,6 @@ class FormFieldRegistry
      * @param string $name The name of the field
      *
      * @return string[] The list of segments
-     *
-     * @throws \InvalidArgumentException when the name is malformed
      */
     private function getSegments($name)
     {
@@ -218,6 +210,6 @@ class FormFieldRegistry
             return $segments;
         }
 
-        return [$name];
+        return array($name);
     }
 }

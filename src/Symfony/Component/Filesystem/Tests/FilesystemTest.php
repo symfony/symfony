@@ -295,90 +295,123 @@ class FilesystemTest extends FilesystemTestCase
         }
     }
 
-    public function testRemoveCleansFilesAndDirectoriesIteratively()
+    public function provideExistingSubPaths()
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
-
+        $workspace = $this->createWorkspace();
+        $basePath = $workspace.DIRECTORY_SEPARATOR.'directory';
         mkdir($basePath);
-        mkdir($basePath.'dir');
-        touch($basePath.'file');
+        mkdir($basePath.DIRECTORY_SEPARATOR.'1');
+        touch($basePath.DIRECTORY_SEPARATOR.'2');
+        mkdir($basePath.DIRECTORY_SEPARATOR.'3');
+        touch($basePath.DIRECTORY_SEPARATOR.'4');
+
+        return array(
+            array($basePath.DIRECTORY_SEPARATOR.'1'),
+            array(new StringishObject($basePath.DIRECTORY_SEPARATOR.'2')),
+            array($basePath.DIRECTORY_SEPARATOR.'3'),
+            array(new StringishObject($basePath.DIRECTORY_SEPARATOR.'4')),
+        );
+    }
+
+    /**
+     * @dataProvider provideExistingSubPaths
+     */
+    public function testRemoveCleansFilesAndDirectoriesIteratively($path)
+    {
+        $basePath = dirname($path);
 
         $this->filesystem->remove($basePath);
 
         $this->assertFileNotExists($basePath);
     }
 
-    public function testRemoveCleansArrayOfFilesAndDirectories()
+    public function provideExistingIterablePaths()
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-
-        mkdir($basePath.'dir');
-        touch($basePath.'file');
-
+        $workspace = $this->createWorkspace();
         $files = array(
-            $basePath.'dir', $basePath.'file',
+            $workspace.DIRECTORY_SEPARATOR.'1', new StringishObject($workspace.DIRECTORY_SEPARATOR.'2'), $workspace.DIRECTORY_SEPARATOR.'3', new StringishObject($workspace.DIRECTORY_SEPARATOR.'4'),
         );
 
-        $this->filesystem->remove($files);
+        mkdir($workspace.DIRECTORY_SEPARATOR.'1');
+        touch($workspace.DIRECTORY_SEPARATOR.'2');
+        mkdir($workspace.DIRECTORY_SEPARATOR.'3');
+        touch($workspace.DIRECTORY_SEPARATOR.'4');
 
-        $this->assertFileNotExists($basePath.'dir');
-        $this->assertFileNotExists($basePath.'file');
+        return array(
+            array($files),
+            array(new \ArrayObject($files)),
+        );
     }
 
-    public function testRemoveCleansTraversableObjectOfFilesAndDirectories()
+    /**
+     * @dataProvider provideExistingIterablePaths
+     */
+    public function testRemoveCleansIterableOfFilesAndDirectories($files)
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-
-        mkdir($basePath.'dir');
-        touch($basePath.'file');
-
-        $files = new \ArrayObject(array(
-            $basePath.'dir', $basePath.'file',
-        ));
-
         $this->filesystem->remove($files);
 
-        $this->assertFileNotExists($basePath.'dir');
-        $this->assertFileNotExists($basePath.'file');
+        foreach ($files as $file) {
+            $this->assertFileNotExists((string) $file);
+        }
     }
 
-    public function testRemoveIgnoresNonExistingFiles()
+    public function providePartialExistingIterablePaths()
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-
-        mkdir($basePath.'dir');
-
+        $workspace = $this->createWorkspace();
         $files = array(
-            $basePath.'dir', $basePath.'file',
+            $workspace.DIRECTORY_SEPARATOR.'1', new StringishObject($workspace.DIRECTORY_SEPARATOR.'2'), $workspace.DIRECTORY_SEPARATOR.'3', new StringishObject($workspace.DIRECTORY_SEPARATOR.'4'),
+        );
+        $exists = array(
+            $workspace.DIRECTORY_SEPARATOR.'2', $workspace.DIRECTORY_SEPARATOR.'3',
+        );
+        $rest = array(
+            $workspace.DIRECTORY_SEPARATOR.'1', $workspace.DIRECTORY_SEPARATOR.'4',
         );
 
-        $this->filesystem->remove($files);
+        touch($workspace.DIRECTORY_SEPARATOR.'2');
+        mkdir($workspace.DIRECTORY_SEPARATOR.'3');
 
-        $this->assertFileNotExists($basePath.'dir');
+        return array(
+            array($files, $exists, $rest),
+            array(new \ArrayObject($files), $exists, $rest),
+        );
     }
 
-    public function testRemoveCleansInvalidLinks()
+    /**
+     * @dataProvider providePartialExistingIterablePaths
+     */
+    public function testRemoveIgnoresNonExistingFiles($files, array $exists)
+    {
+        $this->filesystem->remove($files);
+
+        foreach ($exists as $file) {
+            $this->assertFileNotExists((string) $file);
+        }
+    }
+
+    /**
+     * @dataProvider providePaths
+     */
+    public function testRemoveCleansInvalidLinks($basePath)
     {
         $this->markAsSkippedIfSymlinkIsMissing();
 
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
-
         mkdir($basePath);
-        mkdir($basePath.'dir');
+        mkdir($basePath.DIRECTORY_SEPARATOR.'dir');
         // create symlink to nonexistent file
-        @symlink($basePath.'file', $basePath.'file-link');
+        @symlink($basePath.DIRECTORY_SEPARATOR.'file', $basePath.DIRECTORY_SEPARATOR.'file-link');
 
         // create symlink to dir using trailing forward slash
-        $this->filesystem->symlink($basePath.'dir/', $basePath.'dir-link');
-        $this->assertTrue(is_dir($basePath.'dir-link'));
+        $this->filesystem->symlink($basePath.DIRECTORY_SEPARATOR.'dir/', $basePath.DIRECTORY_SEPARATOR.'dir-link');
+        $this->assertTrue(is_dir($basePath.DIRECTORY_SEPARATOR.'dir-link'));
 
         // create symlink to nonexistent dir
-        rmdir($basePath.'dir');
-        $this->assertFalse('\\' === DIRECTORY_SEPARATOR ? @readlink($basePath.'dir-link') : is_dir($basePath.'dir-link'));
+        rmdir($basePath.DIRECTORY_SEPARATOR.'dir');
+        $this->assertFalse('\\' === DIRECTORY_SEPARATOR ? @readlink($basePath.DIRECTORY_SEPARATOR.'dir-link') : is_dir($basePath.DIRECTORY_SEPARATOR.'dir-link'));
 
         $this->filesystem->remove($basePath);
 
-        $this->assertFileNotExists($basePath);
+        $this->assertFileNotExists((string) $basePath);
     }
 
     public function testFilesExists()

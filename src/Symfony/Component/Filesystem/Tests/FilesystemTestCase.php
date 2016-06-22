@@ -98,7 +98,7 @@ class FilesystemTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function createWorkspace()
     {
-        $workspace = sys_get_temp_dir().'/'.microtime(true).'.'.mt_rand();
+        $workspace = sys_get_temp_dir().DIRECTORY_SEPARATOR.microtime(true).'.'.mt_rand();
         mkdir($workspace, 0777, true);
         $this->workspacesToRemove[] = $workspace;
 

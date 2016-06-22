@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by MisatoTremor at 2016-03-11T12:40:18Z
+
+For the upcoming hack day and if you find the time to review this for any issues I should fix, a short notice about that would be nice.
+
+---------------------------------------------------------------------------
+
+by MisatoTremor at 2016-03-13T17:48:06Z
+
+Type alias removed and rebased.
+
+@xabbuh Sorry for being late...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T16:57:07Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-17T00:58:36Z
+
+Apart some very minor comments, this PR looks awesome!
+
+---------------------------------------------------------------------------
+
+by MisatoTremor at 2016-06-17T09:25:54Z
+
+@HeahDude Thanks for your comments. Some of these stem from the fact that this PR was originally based on 2.7. I have updated it accordingly for 3.1+ now.
+
+The in-linings would break the soft limit, so I left them out.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-17T09:28:54Z
+
+Can you inline even if it breaks the soft limit? We are not following any limits for line length.
+
+---------------------------------------------------------------------------
+
+by MisatoTremor at 2016-06-17T10:15:39Z
+
+@fabpot OK, done :)
+
+---------------------------------------------------------------------------
+
+by MisatoTremor at 2016-06-18T11:29:50Z
+
+@xabbuh I did this in sync with the existing classes, i.e. ``DateTimeToArrayTransformer``. Should I really change it only for this one (now)?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T14:30:02Z
+
+@MisatoTremor Let's do the change for this one for now.
+
+---------------------------------------------------------------------------
+
+by MisatoTremor at 2016-06-21T14:41:06Z
+
+@fabpot Done :)

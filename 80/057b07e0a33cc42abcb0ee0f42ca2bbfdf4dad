@@ -1,0 +1,42 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-05-31T15:33:53Z
+
+We recently introduced a [Maintenance guide](http://symfony.com/doc/current/contributing/code/maintenance.html) for contributions. It's so new that we're still adapting to it, so I'd like to ask something:
+
+* Does this contribution fit in the allowed *"Performance improvement"* category?
+* If yes, should we enforce this? *"[...] any such patches must come with numbers that show a significant improvement on real-world code [...]"*
+
+To me in this case it would be overkill ... but then perhaps we need to tweak the Maintenance guide.
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-06-01T10:35:16Z
+
+@javiereguiluz This fix is not a performance improvement, but a bug fix where the performance improvement was applied where it shouldn't be (i.e. when `choice_value` is set). I added a test for DoctrineChoiceLoader that tests the bug fix.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-01T10:41:16Z
+
+@webmozart thanks for the info. Everything is fine then!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-05T20:28:25Z
+
+Looks like not all tests pass with this change.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T05:52:14Z
+
+@webmozart Can you have a look at the failing tests?
+
+---------------------------------------------------------------------------
+
+by webmozart at 2016-06-22T09:25:52Z
+
+Fixed

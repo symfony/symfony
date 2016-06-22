@@ -608,6 +608,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             // fatal error.
 
             $object->$property = $value;
+        } elseif (self::ACCESS_TYPE_NOT_FOUND === $access[self::ACCESS_TYPE]) {
+            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s".', $property));
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]}($value);
         } else {

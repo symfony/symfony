@@ -198,18 +198,18 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertEquals(file_get_contents($sourceFilePath), file_get_contents($targetFilePath));
     }
 
-    public function provideSubDirectoryPaths()
+    public function provideSubPaths()
     {
         $workspace = $this->createWorkspace();
 
         return array(
-            array($workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR.'sub_directory'),
-            array(new StringishObject($workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR.'sub_directory')),
+            array($workspace.DIRECTORY_SEPARATOR.'1'.DIRECTORY_SEPARATOR.'2'),
+            array(new StringishObject($workspace.DIRECTORY_SEPARATOR.'1'.DIRECTORY_SEPARATOR.'2')),
         );
     }
 
     /**
-     * @dataProvider provideSubDirectoryPaths
+     * @dataProvider provideSubPaths
      */
     public function testMkdirCreatesDirectoriesRecursively($directory)
     {
@@ -218,7 +218,7 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertTrue(is_dir($directory));
     }
 
-    public function provideDirectoryCollectionPaths()
+    public function provideIterablePaths()
     {
         $workspace = $this->createWorkspace();
         $files = array(
@@ -232,7 +232,7 @@ class FilesystemTest extends FilesystemTestCase
     }
 
     /**
-     * @dataProvider provideDirectoryCollectionPaths
+     * @dataProvider provideIterablePaths
      */
     public function testMkdirCreatesDirectoriesFromIterable($directories)
     {
@@ -264,51 +264,35 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->mkdir($dir);
     }
 
-    public function testTouchCreatesEmptyFile()
+    /**
+     * @dataProvider providePaths
+     */
+    public function testTouchCreatesEmptyFile($file)
     {
-        $file = $this->workspace.DIRECTORY_SEPARATOR.'1';
-
         $this->filesystem->touch($file);
 
-        $this->assertFileExists($file);
+        $this->assertFileExists((string) $file);
     }
 
     /**
+     * @dataProvider provideSubPaths
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
-    public function testTouchFails()
+    public function testTouchFails($file)
     {
-        $file = $this->workspace.DIRECTORY_SEPARATOR.'1'.DIRECTORY_SEPARATOR.'2';
-
         $this->filesystem->touch($file);
     }
 
-    public function testTouchCreatesEmptyFilesFromArray()
+    /**
+     * @dataProvider provideIterablePaths
+     */
+    public function testTouchCreatesEmptyFilesFromIterable($files)
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-        $files = array(
-            $basePath.'1', $basePath.'2', $basePath.'3',
-        );
-
         $this->filesystem->touch($files);
 
-        $this->assertFileExists($basePath.'1');
-        $this->assertFileExists($basePath.'2');
-        $this->assertFileExists($basePath.'3');
-    }
-
-    public function testTouchCreatesEmptyFilesFromTraversableObject()
-    {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-        $files = new \ArrayObject(array(
-            $basePath.'1', $basePath.'2', $basePath.'3',
-        ));
-
-        $this->filesystem->touch($files);
-
-        $this->assertFileExists($basePath.'1');
-        $this->assertFileExists($basePath.'2');
-        $this->assertFileExists($basePath.'3');
+        foreach ($files as $file) {
+            $this->assertFileExists((string) $file);
+        }
     }
 
     public function testRemoveCleansFilesAndDirectoriesIteratively()

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by DavidBadura at 2016-06-15T10:49:37Z
+
+comments addressed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T05:39:57Z
+
+It seems weird to create an extension for this, but  I think I like this implementation more than the one in #18543, just because it is less intrusive as a bug fix for 2.7.
+
+👍
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-22T11:59:09Z
+
+👍

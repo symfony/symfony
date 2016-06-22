@@ -28,6 +28,9 @@ class Cookie
     private $raw;
     private $sameSite;
 
+    const SAMESITE_LAX = 'lax';
+    const SAMESITE_STRICT = 'strict';
+
     /**
      * Constructor.
      *
@@ -73,6 +76,11 @@ class Cookie
         $this->secure = (bool) $secure;
         $this->httpOnly = (bool) $httpOnly;
         $this->raw = (bool) $raw;
+
+        if (!in_array($sameSite, [self::SAMESITE_LAX, self::SAMESITE_STRICT, null])) {
+            throw new \InvalidArgumentException('The sameSite parameter is not valid.');
+        }
+
         $this->sameSite = $sameSite;
     }
 

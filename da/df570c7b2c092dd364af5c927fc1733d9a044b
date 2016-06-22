@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-19T10:35:35Z
+
+👍  (needs some tests).
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-20T08:06:41Z
+
+Will add the test later today 👍 thanks for working on it.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-21T11:56:04Z
+
+Tests added 👍
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-21T16:54:44Z
+
+@sstok Your test fails on appveyor, the output is different than the expected one.
+I recently faced this issue.
+
+Your test expects: "What is your favorite superhero? [Spiderman]" but the output is:
+![](http://image.prntscr.com/image/8a99d186eaac4903b2e116980d71a46c.png)
+
+It's because the SymfonyQuestionHelper decorates the output, disable it and tests should pass:
+```diff
+- return new StreamOutput(fopen('php://memory', 'r+', false));
++ $output = new StreamOutput(fopen('php://memory', 'r+', false));
++ $output->setDecorated(false);
++
++ return $output;
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-21T21:56:15Z
+
+Btw specifying defaults as `"1,2"` is that to reflect user input, format-wise? I.e. why not
+`array('1', '2')`?
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-22T06:05:07Z
+
+@ro0NL That would be a new feature, this pr is about fixing the SymfonyQuestionHelper 👍
+
+@chalasr Thanks for the tip 👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-22T07:25:05Z
+
+@sstok understand, just wondered
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-22T09:23:34Z
+
+Squashed and rebased.

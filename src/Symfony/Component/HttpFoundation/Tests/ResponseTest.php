@@ -33,7 +33,7 @@ class ResponseTest extends ResponseTestCase
         $response = new Response();
         $response = explode("\r\n", $response);
         $this->assertEquals('HTTP/1.0 200 OK', $response[0]);
-        $this->assertEquals('Cache-Control: no-cache', $response[1]);
+        $this->assertEquals('Cache-Control: no-cache, private', $response[1]);
     }
 
     public function testClone()

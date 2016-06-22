@@ -281,7 +281,7 @@ class ResponseHeaderBag extends HeaderBag
     protected function computeCacheControlValue()
     {
         if (!$this->cacheControl && !$this->has('ETag') && !$this->has('Last-Modified') && !$this->has('Expires')) {
-            return 'no-cache';
+            return 'no-cache, private';
         }
 
         if (!$this->cacheControl) {

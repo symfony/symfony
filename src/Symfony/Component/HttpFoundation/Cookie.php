@@ -26,7 +26,7 @@ class Cookie
     protected $secure;
     protected $httpOnly;
     private $raw;
-    protected $sameSite;
+    private $sameSite;
 
     /**
      * Constructor.
@@ -39,11 +39,11 @@ class Cookie
      * @param bool                          $secure   Whether the cookie should only be transmitted over a secure HTTPS connection from the client
      * @param bool                          $httpOnly Whether the cookie will be made accessible only through the HTTP protocol
      * @param bool                          $raw      Whether the cookie value should be sent with no url encoding
-     * @param bool|string                   $sameSite Whether the cookie will be available for cross-site requests
+     * @param bool|null                   $sameSite Whether the cookie will be available for cross-site requests
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true, $raw = false, $sameSite = false)
+    public function __construct($name, $value = null, $expire = 0, $path = '/', $domain = null, $secure = false, $httpOnly = true, $raw = false, $sameSite = null)
     {
         // from PHP source code
         if (preg_match("/[=,; \t\r\n\013\014]/", $name)) {
@@ -111,7 +111,7 @@ class Cookie
             $str .= '; httponly';
         }
 
-        if (false !== $this->hasSameSite()) {
+        if (null !== $this->getSameSite()) {
             $str .= '; samesite='.$this->getSameSite();
         }
 
@@ -211,20 +211,10 @@ class Cookie
     /**
      * Gets the SameSite attribute.
      *
-     * @return string|bool
+     * @return string|null
      */
     public function getSameSite()
     {
         return $this->sameSite;
-    }
-
-    /**
-     * Checks if the cookie value should be sent with a SameSite attribute.
-     *
-     * @return bool
-     */
-    public function hasSameSite()
-    {
-        return $this->sameSite !== false;
     }
 }

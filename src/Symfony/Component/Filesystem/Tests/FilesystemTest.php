@@ -201,10 +201,11 @@ class FilesystemTest extends FilesystemTestCase
     public function provideSubPaths()
     {
         $workspace = $this->createWorkspace();
+        $basePath = $workspace.DIRECTORY_SEPARATOR.'directory';
 
         return array(
-            array($workspace.DIRECTORY_SEPARATOR.'1'.DIRECTORY_SEPARATOR.'2'),
-            array(new StringishObject($workspace.DIRECTORY_SEPARATOR.'1'.DIRECTORY_SEPARATOR.'2')),
+            array($basePath.DIRECTORY_SEPARATOR.'1', $basePath),
+            array(new StringishObject($basePath.DIRECTORY_SEPARATOR.'2'), new StringishObject($basePath)),
         );
     }
 
@@ -306,23 +307,21 @@ class FilesystemTest extends FilesystemTestCase
         touch($basePath.DIRECTORY_SEPARATOR.'4');
 
         return array(
-            array($basePath.DIRECTORY_SEPARATOR.'1'),
-            array(new StringishObject($basePath.DIRECTORY_SEPARATOR.'2')),
-            array($basePath.DIRECTORY_SEPARATOR.'3'),
-            array(new StringishObject($basePath.DIRECTORY_SEPARATOR.'4')),
+            array($basePath.DIRECTORY_SEPARATOR.'1', $basePath),
+            array(new StringishObject($basePath.DIRECTORY_SEPARATOR.'2'), new StringishObject($basePath)),
+            array($basePath.DIRECTORY_SEPARATOR.'3', $basePath),
+            array(new StringishObject($basePath.DIRECTORY_SEPARATOR.'4'), new StringishObject($basePath)),
         );
     }
 
     /**
      * @dataProvider provideExistingSubPaths
      */
-    public function testRemoveCleansFilesAndDirectoriesIteratively($path)
+    public function testRemoveCleansFilesAndDirectoriesIteratively($path, $basePath)
     {
-        $basePath = dirname($path);
-
         $this->filesystem->remove($basePath);
 
-        $this->assertFileNotExists($basePath);
+        $this->assertFileNotExists((string) $basePath);
     }
 
     public function provideExistingIterablePaths()
@@ -414,28 +413,23 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileNotExists((string) $basePath);
     }
 
-    public function testFilesExists()
+    /**
+     * @dataProvider provideExistingSubPaths
+     */
+    public function testFilesExists($path)
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
-
-        mkdir($basePath);
-        touch($basePath.'file1');
-        mkdir($basePath.'folder');
-
-        $this->assertTrue($this->filesystem->exists($basePath.'file1'));
-        $this->assertTrue($this->filesystem->exists($basePath.'folder'));
+        $this->assertTrue($this->filesystem->exists($path));
     }
 
     /**
+     * @dataProvider providePaths
      * @expectedException \Symfony\Component\Filesystem\Exception\IOException
      */
-    public function testFilesExistsFails()
+    public function testFilesExistsFailsWithLongPathNames($basePath)
     {
         if ('\\' !== DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Test covers edge case on Windows only.');
         }
-
-        $basePath = $this->workspace.'\\directory\\';
 
         $oldPath = getcwd();
         mkdir($basePath);
@@ -445,54 +439,50 @@ class FilesystemTest extends FilesystemTestCase
         exec('TYPE NUL >>'.$file); // equivalent of touch, we can not use the php touch() here because it suffers from the same limitation
         $this->longPathNamesWindows[] = $path; // save this so we can clean up later
         chdir($oldPath);
+
+        if ($basePath instanceof StringishObject) {
+            $path = new StringishObject($path);
+        }
         $this->filesystem->exists($path);
     }
 
-    public function testFilesExistsTraversableObjectOfFilesAndDirectories()
+    /**
+     * @dataProvider provideExistingIterablePaths
+     */
+    public function testFilesExistsWithIterableOfExistingFilesAndDirectories($files)
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-
-        mkdir($basePath.'dir');
-        touch($basePath.'file');
-
-        $files = new \ArrayObject(array(
-            $basePath.'dir', $basePath.'file',
-        ));
-
         $this->assertTrue($this->filesystem->exists($files));
     }
 
-    public function testFilesNotExistsTraversableObjectOfFilesAndDirectories()
+    /**
+     * @dataProvider providePartialExistingIterablePaths
+     */
+    public function testFilesNotExistsWithIterableOfPartialExistingFilesAndDirectories($files)
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR;
-
-        mkdir($basePath.'dir');
-        touch($basePath.'file');
-        touch($basePath.'file2');
-
-        $files = new \ArrayObject(array(
-            $basePath.'dir', $basePath.'file', $basePath.'file2',
-        ));
-
-        unlink($basePath.'file');
-
         $this->assertFalse($this->filesystem->exists($files));
     }
 
-    public function testInvalidFileNotExists()
+    /**
+     * @dataProvider providePaths
+     */
+    public function testInvalidFileNotExists($basePath)
     {
-        $basePath = $this->workspace.DIRECTORY_SEPARATOR.'directory'.DIRECTORY_SEPARATOR;
-
-        $this->assertFalse($this->filesystem->exists($basePath.time()));
+        if ($basePath instanceof StringishObject) {
+            $basePath = new StringishObject($basePath.DIRECTORY_SEPARATOR.time());
+        } else {
+            $basePath = $basePath.DIRECTORY_SEPARATOR.time();
+        }
+        $this->assertFalse($this->filesystem->exists($basePath));
     }
 
-    public function testChmodChangesFileMode()
+    /**
+     * @dataProvider provideSubPaths
+     */
+    public function testChmodChangesFileMode($file, $dir)
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
         mkdir($dir);
-        $file = $dir.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
         $this->filesystem->chmod($file, 0400);
@@ -500,25 +490,31 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFilePermissions(753, $dir);
         $this->assertFilePermissions(400, $file);
+
+        // prevent existing parent directory from this test in subsequent datasets
+        $this->filesystem->remove($dir);
     }
 
-    public function testChmodWrongMod()
+    /**
+     * @dataProvider providePaths
+     */
+    public function testChmodWrongMod($dir)
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        $dir = $this->workspace.DIRECTORY_SEPARATOR.'file';
         touch($dir);
 
         $this->filesystem->chmod($dir, 'Wrongmode');
     }
 
-    public function testChmodRecursive()
+    /**
+     * @dataProvider provideSubPaths
+     */
+    public function testChmodRecursive($file, $dir)
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
         mkdir($dir);
-        $file = $dir.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
         $this->filesystem->chmod($file, 0400, 0000, true);
@@ -526,59 +522,44 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->assertFilePermissions(753, $dir);
         $this->assertFilePermissions(753, $file);
+
+        // prevent existing parent directory from this test in subsequent datasets
+        $this->filesystem->remove($dir);
     }
 
-    public function testChmodAppliesUmask()
+    /**
+     * @dataProvider providePaths
+     */
+    public function testChmodAppliesUmask($file)
     {
         $this->markAsSkippedIfChmodIsMissing();
 
-        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
         $this->filesystem->chmod($file, 0770, 0022);
         $this->assertFilePermissions(750, $file);
     }
 
-    public function testChmodChangesModeOfArrayOfFiles()
+    /**
+     * @dataProvider provideExistingIterablePaths
+     */
+    public function testChmodChangesModeOfIterableOfFiles($files)
     {
         $this->markAsSkippedIfChmodIsMissing();
-
-        $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
-        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
-        $files = array($directory, $file);
-
-        mkdir($directory);
-        touch($file);
 
         $this->filesystem->chmod($files, 0753);
 
-        $this->assertFilePermissions(753, $file);
-        $this->assertFilePermissions(753, $directory);
+        foreach ($files as $file) {
+            $this->assertFilePermissions(753, $file);
+        }
     }
 
-    public function testChmodChangesModeOfTraversableFileObject()
+    /**
+     * @dataProvider provideSubPaths
+     */
+    public function testChmodChangesZeroModeOnSubdirectoriesOnRecursive($subdirectory, $directory)
     {
         $this->markAsSkippedIfChmodIsMissing();
-
-        $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
-        $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
-        $files = new \ArrayObject(array($directory, $file));
-
-        mkdir($directory);
-        touch($file);
-
-        $this->filesystem->chmod($files, 0753);
-
-        $this->assertFilePermissions(753, $file);
-        $this->assertFilePermissions(753, $directory);
-    }
-
-    public function testChmodChangesZeroModeOnSubdirectoriesOnRecursive()
-    {
-        $this->markAsSkippedIfChmodIsMissing();
-
-        $directory = $this->workspace.DIRECTORY_SEPARATOR.'directory';
-        $subdirectory = $directory.DIRECTORY_SEPARATOR.'subdirectory';
 
         mkdir($directory);
         mkdir($subdirectory);
@@ -587,6 +568,9 @@ class FilesystemTest extends FilesystemTestCase
         $this->filesystem->chmod($directory, 0753, 0000, true);
 
         $this->assertFilePermissions(753, $subdirectory);
+
+        // prevent existing parent directory from this test in subsequent datasets
+        $this->filesystem->remove($directory);
     }
 
     public function testChown()

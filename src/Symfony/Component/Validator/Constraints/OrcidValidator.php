@@ -44,10 +44,9 @@ class OrcidValidator extends ConstraintValidator
         $value = (string) $value;
         $canonical = $value;
 
-
         // http://orcid.org/0000-0001-5000-0007
         // ORCIDs are sometimes expressed as URIs
-        if (substr($canonical, 0, 17) === "http://orcid.org/") {
+        if (substr($canonical, 0, 17) === 'http://orcid.org/') {
             $canonical = substr($canonical, 17);
         }
 
@@ -125,7 +124,7 @@ class OrcidValidator extends ConstraintValidator
         $givenCheckDigit = ($canonical{15} === 'x' || $canonical{15} === 'X') ? 10 : (int) $canonical{15};
 
         $sum = 0;
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 15; ++$i) {
             $sum = ($sum + $canonical{$i}) * 2;
         }
         $remainder = $sum % 11;
@@ -137,6 +136,5 @@ class OrcidValidator extends ConstraintValidator
                 ->setCode(Orcid::CHECKSUM_FAILED_ERROR)
                 ->addViolation();
         }
-
     }
 }

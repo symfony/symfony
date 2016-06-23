@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Workflow;
 
 /**
  * FrameworkExtension.
@@ -38,6 +39,7 @@ use Symfony\Component\Validator\Validation;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jeremy Mikola <jmikola@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
 class FrameworkExtension extends Extension
 {
@@ -129,6 +131,7 @@ class FrameworkExtension extends Extension
         $this->registerTranslatorConfiguration($config['translator'], $container);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerCacheConfiguration($config['cache'], $container);
+        $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
@@ -343,6 +346,54 @@ class FrameworkExtension extends Extension
 
         if (!$config['collect']) {
             $container->getDefinition('profiler')->addMethodCall('disable', array());
+        }
+    }
+
+    /**
+     * Loads the workflow configuration.
+     *
+     * @param array            $workflows A workflow configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerWorkflowConfiguration(array $workflows, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$workflows) {
+            return;
+        }
+
+        $loader->load('workflow.xml');
+
+        $registryDefinition = $container->getDefinition('workflow.registry');
+
+        foreach ($workflows as $name => $workflow) {
+            $definitionDefinition = new Definition(Workflow\Definition::class);
+            $definitionDefinition->addMethodCall('addPlaces', array($workflow['places']));
+            foreach ($workflow['transitions'] as $transitionName => $transition) {
+                $definitionDefinition->addMethodCall('addTransition', array(new Definition(Workflow\Transition::class, array($transitionName, $transition['from'], $transition['to']))));
+            }
+
+            if (isset($workflow['marking_store']['type'])) {
+                $markingStoreDefinition = new DefinitionDecorator('workflow.marking_store.'.$workflow['marking_store']['type']);
+                foreach ($workflow['marking_store']['arguments'] as $argument) {
+                    $markingStoreDefinition->addArgument($argument);
+                }
+            } else {
+                $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
+            }
+
+            $workflowDefinition = new DefinitionDecorator('workflow.abstract');
+            $workflowDefinition->replaceArgument(0, $definitionDefinition);
+            $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
+            $workflowDefinition->replaceArgument(3, $name);
+
+            $workflowId = 'workflow.'.$name;
+
+            $container->setDefinition($workflowId, $workflowDefinition);
+
+            foreach ($workflow['supports'] as $supportedClass) {
+                $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $supportedClass));
+            }
         }
     }
 

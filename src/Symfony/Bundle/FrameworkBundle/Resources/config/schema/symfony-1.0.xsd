@@ -26,6 +26,7 @@
             <xsd:element name="serializer" type="serializer" minOccurs="0" maxOccurs="1" />
             <xsd:element name="property-info" type="property_info" minOccurs="0" maxOccurs="1" />
             <xsd:element name="cache" type="cache" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="workflows" type="workflows" minOccurs="0" maxOccurs="1" />
         </xsd:all>
 
         <xsd:attribute name="http-method-override" type="xsd:boolean" />
@@ -223,5 +224,43 @@
         <xsd:attribute name="default-lifetime" type="xsd:integer" />
         <xsd:attribute name="provider" type="xsd:string" />
         <xsd:attribute name="clearer" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="workflows">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="workflow" type="workflow" />
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="workflow">
+        <xsd:sequence>
+            <xsd:element name="marking-store" type="marking_store" />
+            <xsd:element name="supports" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="places" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="transitions" type="transitions" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="marking_store">
+        <xsd:sequence>
+            <xsd:element name="type" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="arguments" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="service" type="xsd:string" minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="transitions">
+        <xsd:sequence>
+            <xsd:element name="transition" type="transition" />
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="transition">
+        <xsd:sequence>
+            <xsd:element name="from" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="to" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
     </xsd:complexType>
 </xsd:schema>

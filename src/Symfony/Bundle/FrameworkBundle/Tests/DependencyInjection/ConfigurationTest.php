@@ -273,6 +273,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'directory' => '%kernel.cache_dir%/pools',
                 'default_redis_provider' => 'redis://localhost',
             ),
+            'workflows' => array(),
         );
     }
 }

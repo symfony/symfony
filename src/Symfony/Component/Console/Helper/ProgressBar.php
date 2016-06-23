@@ -43,6 +43,7 @@ class ProgressBar
     private $formatLineCount;
     private $messages = array();
     private $overwrite = true;
+    private $firstRun = true;
 
     private static $formatters;
     private static $formats;
@@ -522,19 +523,23 @@ class ProgressBar
     private function overwrite($message)
     {
         if ($this->overwrite) {
-            // Move the cursor to the beginning of the line
-            $this->output->write("\x0D");
+            if (!$this->isFirstRun()) {
+                // Move the cursor to the beginning of the line
+                $this->output->write("\x0D");
 
-            // Erase the line
-            $this->output->write("\x1B[2K");
+                // Erase the line
+                $this->output->write("\x1B[2K");
 
-            // Erase previous lines
-            if ($this->formatLineCount > 0) {
-                $this->output->write(str_repeat("\x1B[1A\x1B[2K", $this->formatLineCount));
+                // Erase previous lines
+                if ($this->formatLineCount > 0) {
+                    $this->output->write(str_repeat("\x1B[1A\x1B[2K", $this->formatLineCount));
+                }
             }
         } elseif ($this->step > 0) {
             $this->output->writeln('');
         }
+
+        $this->setFirstRun(false);
 
         $this->output->write($message);
     }
@@ -626,5 +631,15 @@ class ProgressBar
             'debug' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
             'debug_nomax' => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
         );
+    }
+
+    private function isFirstRun()
+    {
+        return $this->firstRun;
+    }
+
+    private function setFirstRun($firstRun)
+    {
+        $this->firstRun = (bool) $firstRun;
     }
 }

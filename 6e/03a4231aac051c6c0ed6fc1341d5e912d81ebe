@@ -1,0 +1,145 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-24T06:30:05Z
+
+I was reading http://symfony.com/doc/current/components/dependency_injection/parameters.html#constants-as-parameters and felt sad about the note for yaml support.
+
+Is this PR acceptable? Does this need a flag? Or to be reversible (which does not seem doable)?
+
+There is no sense to handle such case with the dumper imho (unless it is passed as a string?? but what would be the use case?).
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-04-24T09:30:04Z
+
+I'm -1 for such horrible hacks. YAML is not a suitable format to handle metada like describing a thing is a constant.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-24T09:35:19Z
+
+Usually I would agree with @hhamon and I had the same feeling when reading the headline of this PR. But on the other hand @fabpot always wanted to have the Yaml component to support the things we need for Symfony (i.e. being able to configure the framework) instead of supporting the full YAML specs. Now, this is something that is supported by other configuration formats (i.e. PHP and XML), but which isn't supported for the YAML config format. Thus, I am :+1: for closing the gap.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-24T14:58:05Z
+
+I would be really happy to see this implemented. I prefer yaml over xml by a lot for non-public packages, but not having constants is a big limitation to yaml :(
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-25T13:11:44Z
+
+Ok, comments addressed, tests are green :)
+
+I guess the failure on low depth will have to wait for master to point on 3.2.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-29T08:23:04Z
+
+Supporting PHP constants would be nice but the proposed syntax `!php/const:PHP_INT_MAX` is not intuitive and looks ugly. Can we have another nicer syntax?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-29T08:31:44Z
+
+@dunglas suggestions are welcome! It actually matches the object syntax `!php/object`, so I thought it would be both consistent and easy to learn. Have you something else in mind?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-29T08:35:54Z
+
+Could be like float or binary `!! constant PHP_INT_MAX`.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-29T08:46:33Z
+
+> Could be like float or binary !! constant PHP_INT_MAX.
+
+no it cannot. ``!!float`` is part of the Yaml standard. custom tags must star with a single ``!``, not 2
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-29T14:44:13Z
+
+Ok, so why not `!constant PHP_INT_MAX`? Although I'm not against the current syntax.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-29T15:02:05Z
+
+I would not change the tag name. The `php:` part acts like a Namespace here which reduces the risk to conflict with custom tags from other libraries.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-29T16:11:53Z
+
+@xabbuh it makes perfectly sense but `!constant PHP_INT_MAX` is really nicer.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-29T16:14:17Z
+
+I'm against adding something that does not follow the YAML specification.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-29T16:22:53Z
+
+If I understand correctly the spec, both proposals are valid: http://www.yaml.org/spec/1.2/spec.html#id2782728
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T07:16:17Z
+
+@HeahDude Can you finish this PR?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-15T07:23:19Z
+
+Yes! With option 2 from my comment above?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-15T07:44:56Z
+
+Comments addressed. Waiting for tests to be green, needs review, thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T07:47:30Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-16T05:05:54Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-17T09:55:30Z
+
+Updated.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-17T09:56:07Z
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T05:57:48Z
+
+👍 (failures not related)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T05:56:11Z
+
+@HeahDude Can you take @xabbuh comments into account?

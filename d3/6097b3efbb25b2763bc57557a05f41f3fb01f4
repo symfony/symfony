@@ -1,0 +1,835 @@
+---------------------------------------------------------------------------
+
+by webmozart at 2014-09-08T17:09:39Z
+
+Hi @lyrixx, thank you for your PR! Before I review the code in detail, I'd like to know why you don't propose your changes to [yohang/Finite](/yohang/Finite)? Their code and docs look useful so far, and I'd rather see an existing project improved than starting completely new efforts.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-08T17:22:18Z
+
+@webmozart Actually, I did not start this work (as you can see in the commit history). But I think he did not PR finite because the initial design was flawed. So a full rewrite was needed. Then, adding this kind of component to symfony will give more visibility and a community support than in a standalone library (as good as it can be). Finally, as sate on symfony.com `Symfony is a set of reusable PHP components` and this kind of component deserve much more visibility. I see too much people implementing kind of state machine, instead of using a real one, just because they did not know this problematic exists and there are solutions.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-08T17:36:50Z
+
+@lyrixx i agree that it needs visibility. However, I would like to know the thoughts of @winzou https://github.com/winzou/state-machine (more official imo than finite lib) since his has reached a good level. Sylius already uses this successfully and several other projects (though still a simple SM). Going to a petri net implementation (this other is not but related http://github.com/vespolina/workflow) cc/ @iampersistent could be very good, but the state of this component is not that right now and there seems to be a big gap. reference workflowpatterns.com. Other than that :+1: to learn of a good colored petri net attempt!
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-08T18:29:57Z
+
+@cordoval https://github.com/winzou/state-machine suffers from the same architecture flaw than Finite: the state machine is built around the object, so you cannot make it a service. If you have several objects which need to follow the workflow, you need to instantiate a separate state machine for each of them.
+
+Note that when I'm saying architecture flaw, it does not mean it is entirely bad. But it does not fit in a DI context. It depends of the architecture of your projects (putting the state machine in the object itself can look the right way when using active record with propel for instance: http://williamdurand.fr/StateMachineBehavior/)
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-08T18:37:37Z
+
+i see, so the idea is to freeze things into the container as well. I am getting the gist of it now. Agree :+1:
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2014-09-08T18:38:07Z
+
+@lyrixx In the sample code in the PR you have a typo with $foor where you meant $foo. And also the variable $order should be renamed to $foo or $foo/$foor should be renamed to $order.
+
+---------------------------------------------------------------------------
+
+by trompette at 2014-09-08T18:56:23Z
+
+I contributed a small component for a project we did at Alter Way: https://github.com/alterway/component-workflow. I'm not sure if it is possible, but some ideas could be shared.
+
+---------------------------------------------------------------------------
+
+by florianv at 2014-09-08T18:58:38Z
+
+For information, I created a basic Petrinet library some time ago https://github.com/florianv/petrinet.
+
+---------------------------------------------------------------------------
+
+by cordoval at 2014-09-08T19:03:35Z
+
+@florianv it is very good! very! :+1: thanks!
+
+---------------------------------------------------------------------------
+
+by shoomyth at 2014-09-08T19:05:38Z
+
+Could anyone provide some real-world use-cases where this component can be used?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-08T19:12:38Z
+
+@lyrixx regarding the Graphviz dumping, I think the current implementation is wrong according to what the code implements.
+Your dumped graph is using edges to represent transitions. This would work fine for a state machine. However, the petri net represented by your Workflow is *not* a state machine: a transition can have several input places and several output places (``getFroms`` and ``getTos`` are returning arrays). The consequence is that you are current duplicating transitions in the graph. Switching to a representation of a petri net where both states (places in term of petri net) and transitions are nodes (represented differently) might more accurate
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2014-09-08T19:26:59Z
+
+Assured me, this contribution is subject to a vote to be merged in Symfony? I feel that it is already acquired and it seems a bit fast:  is there a real interest in making an official component rather than a library with his Symfony bundle ?
+
+State machine is ** not ** a common problem of web application imo.
+
+---------------------------------------------------------------------------
+
+by florianv at 2014-09-08T20:32:17Z
+
+@cordoval Thanks! Colored Petrinets are much more powerful but quite complex specially when there are arc expressions, conditions and guards.
+
+---------------------------------------------------------------------------
+
+by Nicofuma at 2014-09-09T07:04:50Z
+
+@mickaelandrieu simple state machine is a very common problem for any application (especially when it's multi user) even it's not always seen. Sometimes it could be a little overkill to use a real state machine to do the work (e.g. with some small and simple workflows) but I think that it depends of the overhead introduced and anyway it's much cleaner and maintainable to use a real state machine if it's possible to describe/look at the workflow without having to get deep into the code.
+
+---------------------------------------------------------------------------
+
+by gnugat at 2014-09-09T07:40:14Z
+
+A stateless state machine service seems great!
+The name sounds a bit non informative though: why wouldn't it be StateMachine or PetriNet?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2014-09-09T08:13:06Z
+
+@gnugat I think the name is right because it allows to grow in the future. Take a look for example at [Windows Worflow Foundation](http://msdn.microsoft.com/en-us/library/dd489437(v=vs.110).aspx) component. They called it "Workflow" because this way they can define `Sequence`, `Flowchart` and `StateMachine`. If the idea is to improve this component in the future, we cannot call it `StateMachine` or `PetriNet`.
+
+---------------------------------------------------------------------------
+
+by gnugat at 2014-09-09T12:11:05Z
+
+@javiereguiluz thanks for the explanation :) .
+I see that `Workflow` is coupled to `Definition`, so the stateless service would be `Registry`?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2014-09-09T12:29:16Z
+
+@gnugat Registry, Workflow and Definition are stateless.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-09-09T15:05:52Z
+
+@gnugat the state of your state machine is in ``$object`` (which can be what you want), not in Definition
+
+---------------------------------------------------------------------------
+
+by liuggio at 2014-09-10T19:51:07Z
+
+My 2Cs
+I'm very sensible to this argument I have pushed a lot the use of the state machine.
+
+Starting from the name Workflow is not really appropiate, the finite state machine is not a workflow, they are 2 different concepts.
+
+About the API of the state machine:
+
+1. The "from state" should be an array: `$fooDefinition->addTransition(new Transition('process', ['new', 'reopened'], 'pending'));`
+eg. you can execute the `pay` transition  if the `cart` is in (open or reopened)
+
+2. The `execute the transition if...` could be done using the Expression language.
+
+3. The important things in the Finite State Machine are the transitions, another function to add to the API could be the list of the transitions that could be executed from the current state.
+
+---------------------------------------------------------------------------
+
+by hacfi at 2014-12-30T01:49:57Z
+
+Any news on this? Would be willing to help if time is the only issue here.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-01T16:48:55Z
+
+Hi guys. I worked on this component. It's not a Workflow net implementation (it's a preti net, with more specifications). But I did not implemented everything like the arc weight and so the ability to set more than one token in a place. I fail to see a valid use case in PHP application.
+
+I let 2 FIXME in the code, but the biggest part is here.
+
+And I also update the PR Description to be able to quicky play with it.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T08:54:40Z
+
+I fixed remaining `FIXME`. I also build a small demo app but I can not share it right now because I will use it for the Symfony Live Paris on Thursday. I worked like a charm ;)
+
+![screenshot6](https://cloud.githubusercontent.com/assets/408368/14243521/507bf5c4-fa56-11e5-838f-d232eb89b050.png)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-04T12:58:34Z
+
+Wow! That looks terrific! Is there any start of documentation for that component ? I can't wait to read some :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T13:10:22Z
+
+> Wow! That looks terrific! Is there any start of documentation for that component ? I can't wait to read some :)
+
+@HeahDude: Not yet. I'm a very bad redactor :/ But I'm going to present this component during the SymfonyLive Paris 2016 on Thursday. And I'm going to open source a small SF2 application that use it after my talk.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T13:26:46Z
+
+I fixed the first bunch of comments ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-04T13:44:15Z
+
+@lyrixx I think this is too late for inclusion in 3.1 though (as we are in feature freeze)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T13:47:07Z
+
+> I think this is too late for inclusion in 3.1 though (as we are in feature freeze)
+
+Yes I think so :(
+
+But the component will be require-able with a symfony 2.X or 3.X thanks to the subtree split.
+
+I'm working on a better integration with the FrameworkBundle (semantic config, auto-wiring).
+And I may create a standalone bundle to offer an easy integration for older symfony (like @nicolas-grekas has done with the VarDumperBundle)
+
+---------------------------------------------------------------------------
+
+by liuggio at 2016-04-04T14:47:18Z
+
+The Finite State Machine is a good practice, BUT I'm :-1: about creating a component.
+
+What do you think (instead of using an external dependency inside the domain)
+to enrich the model moving the Domain Entity with explicit states with explicit methods,
+is so easy to implement using value objects, and there's a lot papers about it.
+
+So ... few simple testable methods instead of complex configuration that hide the states..
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T14:59:24Z
+
+@liuggio this component is not a finite state machine, so it is useless to answer your question.
+
+---------------------------------------------------------------------------
+
+by liuggio at 2016-04-04T15:15:18Z
+
+@lyrixx I hope you can find time to read what I wrote, I think is adequate.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T16:10:21Z
+
+Yes, I hear you.
+
+But I think I already give my arguments in [the PR description](https://github.com/symfony/symfony/pull/11882) and in [this comment](https://github.com/symfony/symfony/pull/11882#issuecomment-54854864).
+
+---
+
+So let's summary all arguments *once for all*:
+
+* **Symfony is a set of reusable PHP components**. So any component that help end user to write better and simpler code is good to take (Of course only if the use case is valid and "mainstream").
+* Workflow Engines exist in many other frameworks (JAVA, .NET, Django, Rails ... ).
+* **Utility of Workflow Engine is real**. PetriNet appears in 1962 and it is still used in the industry thanks to a proven model. Moreover there are plenty of State Machine or PetriNet implementations on Packagist. And for some quite high number of downloads (200K for finite). So clearly, there is a need.
+* **It brings much more visibility to the Workflow Engine** into the Symfony Community and even the PHP Community.
+* **Adding it to Symfony will also enhance the quality / test / documentation** of the component thanks to the contributors community (thanks everyone !!). It will also benefit from the tooling of Symfony: scheduled releases, subtree splits, security patches etc.
+* **Too many people (like me) are writing again and again the same boiler code to implement some Sate Machine**. But frankly, for me, it's boring to write it again and again. Internal implementation might contains bugs where Symfony implementation should not (I hope ;)). It's always boring to add a new state with an internal implementation.
+* This component is not a state machine. As you can see in my previous screenshot, **it's an implementation of the Workflow Net** (An extension of PetriNet). So it means a subject can be in different places. (i.e.: different states at the same time). So it allow you, among other things, to parallelize actions.
+* **This component implements a Guard system**. For instance, with very very few lines of code, you can block a transition if the user doesn’t have​ the role `ROLE_FOOBAR` (this is an example...). Or anything else you can imagine.
+* **This component fire many events that you can listen to**. To build, for example, an audit log/trail of the state of your subjects
+* About "domain" code: If you prefer to keep all the logic inside your entity you don't have to use this component. And if you don't use it, it's not an issue. Symfony will not become slower because of a new component. Everything is loaded only when you are using it.
+* About "domain" code (part 2): If you put all the logic inside an entity, It will become some spaghetti code because you will need to inject many services to your entity to be able to know if you can apply a transition or not. And this is not the responsibility of an Entity. But I don't want to argue more on this topic because I know many people like to put all there code into their Entites. And I really don't want to debate on this topic here.
+* This component is able to **dump the workflow as a graphviz representation**.
+
+---------------------------------------------------------------------------
+
+by liuggio at 2016-04-04T16:16:45Z
+
+> About "domain" code (part 2): If you put all the logic inside an entity, It will become some spaghetti code
+
+it's called Domain Driven design not spaghetti code.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-04T19:58:36Z
+
+I just pushed some code to integrate the component and the Full Stack Framework.
+
+Now, you can use:
+```yaml
+framework:
+    workflows:
+        my_workflow:
+            marking_store:
+                type: property_accessor
+            supports:
+                - Some\Class
+            places:
+                - first
+                - last
+            transitions:
+                go:
+                    from:
+                        - first
+                    to:
+                        - last
+```
+
+and a new service `workflow.my_workflown` ; and some goodness in twig ;)
+
+---------------------------------------------------------------------------
+
+by Oliboy50 at 2016-04-04T20:52:25Z
+
+I don't think this component can be merged until phpdoc isn't set everywhere.
+
+---------------------------------------------------------------------------
+
+by zemd at 2016-04-05T08:20:27Z
+
+it looks very interesting, but lacks a real life examples. when can you share your test app?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2016-04-05T10:44:35Z
+
+@lyrixx sounds good to me, also this is the first time you take time to realy explain the advantages of this component: thanks for that! You do a great job on this implementation, can't wait to use it in PrestaShop core :+1:
+
+I only have a comment:
+
+> And if you don't use it, it's not an issue. Symfony will not become slower because of a new component. Everything is loaded only when you are using it.
+
+I'm clearly interested on this field (as you may know ^^), can you provide a blackfire profile for it ?
+
+Because when I was part of the BackBee project, after removing all "useless" dependencies we have noticed better performances (we didnt used blackfire).
+
+Mickaël
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-05T11:01:20Z
+
+> Because when I was part of the BackBee project, after removing all "useless" dependencies we have noticed better performances (we didnt used blackfire).
+
+were they loaded ?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2016-04-05T11:17:05Z
+
+@stof nope, they weren't. I can't explain why but there is an overall. This overall is minimal thanks to the `--optimize` option of composer but still exists.
+
+Let's discuss this outside this thread (the BackBee case) but some day, I would like a probe from guys that said adding non used dependencies in a project doesnt have any impact.
+
+Thank you.
+
+---------------------------------------------------------------------------
+
+by gnugat at 2016-04-05T11:44:21Z
+
+> @mickaelandrieu
+> > @lyrixx
+> > And if you don't use it, it's not an issue. Symfony will not become slower because of a new component. Everything is loaded only when you are using it.
+>
+> I'm clearly interested on this field (as you may know ^^), can you provide a blackfire profile for it ?
+>
+> Because when I was part of the BackBee project, after removing all "useless" dependencies we have noticed better performances (we didnt used blackfire).
+
+I can provide you with some answers :) .
+
+## Autoloading (itself) overhead - negligible
+
+There is a small overhead for each element in a `autoload` section (in all `composer.json` found for your project), but it's negligible: [See comparison profiling graph](https://blackfire.io/profiles/compare/70bcfad5-1028-4b80-8ef5-05d116f0f7be/graph).
+
+> **Note**: Please ignore the execution time (from `0.5ms` to `1.3ms`), as it depends on the computer capacity and the profiling was done on an 8 years old laptop (a [HP Compaq 8510p](http://www.cnet.com/products/hp-compaq-8510p-15-4-core-2-duo-t7700-vista-business-2-gb-ram-120-gb-hdd-series/specs/)).
+> We should really be looking on the diff percentage: `+144%` (so ~`x2.5`), for 34 more dependencies. I think you'll agree it's not much.
+
+The above profiling has been done on a PHP application that consist of one line: `require __DIR__.'/vendor/autoload.php';`, with a `composer.json` file and running `composer install -o --no-dev`. The first graph was done with an empty `composer.json`, and the second one was done with a `composer.json` requiring 34 individual Symfony components.
+
+As we can see, `ClassLoader#setPsr4()` is called 34 times more, which is to be expected.
+
+> **Note**: Interestingly `strlen` is also called 34 times more, but since it consists of a function call to read a property it's safe to say that it's negligible.
+
+Using the `symfony/symfony` meta package instead of all its individual components can be regarded as a micro optimization: it does improve things, but not by much.
+
+## Autoloaded dependencies overhead - it depends
+
+Funily enough, just because you don't use directly a dependency doesn't mean it's not used: [See Standard Edition VS Empty Editon VS MicroFrameworkBundle benchmarks](http://gnugat.github.io/micro-framework-bundle/doc/03-benchmark.html).
+
+By having a look at [the first](https://blackfire.io/profiles/compare/2067da45-4605-4f33-beb2-c37a2a9a9740/graph) and [the second](https://blackfire.io/profiles/compare/8097ec35-dd77-4829-9fbc-ac7168231cc9/graph) comparison graphs, we can see that autoloading is quite a big performance eater. By having a closer look, we realize its main caller is `Container#get`, which is mainly called by `ContainerAwareEventDispatcher`.
+
+And that's why adding "unused" dependencies can actually impact performances. Using the Standard Edition without unregistering bundles we don't need will impact performances.
+
+## What about Workflow?
+
+Well, adding Workflow to your project and not using it won't impact significantly your performances. Adding Workflow to the `symfony/symfony` meta package and not using it won't impact your performances at all. Adding Workflow to `FrameworkBundle` will not have any impact on performances if it doesn't add event listeners.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-05T12:47:06Z
+
+Hi @gnugat;
+
+Even if it's out of topic, I'm going to try to answer you to (I hope) close this
+debate once for all.
+
+> We should really be looking on the diff percentage: +144% (so ~x2.5), for 34
+> more dependencies. I think you'll agree it's not much.
+
+First, I don't know why you said "It's not so much". Because `+144%` is huge!
+But you have to put number in perspective.
+
+Basically, your application does nothing. So it's obvious to me that the
+percentage delta means nothing in this case. For example, if you put a
+`sleep(10)` in your code, then the percentage delta will be almost equal to 0.
+Does it means it has no impact? No. But it's better to understand number. Here,
+the absolute delta is `+805 µs`, so it's less than `1ms`. More over, even if we
+are trying very hard to reduce the overhead of the Blackfire PHP probe when the
+probe profiles a script, the overhead exists. So in real life the autoload
+overhead will be much smaller than `1ms`.
+
+So yes indeed, having more file in the `vendor/` directory has an impact. But we
+are talking here of something that add less than `1ms` for 1763 new
+files (Symfony code base ` find src/ -name '*.php' ! -path "*/vendor/*"  ! -path '*/Tests/*' | wc -l`).
+So for real world application it represents something less than 1%.
+
+Now let's come back the Workflow component: It adds 17 classes. So if it's
+linear and we are using 1ms for 1763 files (which is really high number), it
+will add `0,009` ms. I guess we all agree here to say it's almost nothing.
+
+And finally, We can talk about the footprint of the new integration between the
+workflow component and the framework bundle: If you have no workflow registred,
+it's exactly the same thing in production. You can easily see it in the diff of
+the [FrameworkExtension](https://github.com/symfony/symfony/pull/11882/files
+#diff-0e793081ceb720201745c982a568903fR351).
+
+So, adding this component to Symfony or any other component will add less than
+`0,009ms` (and this on the basis of values from a 8 year old computer and high
+number due to enabled profiling). I guess it's inferior to `1µs` (micro, not
+milli !) in the real world.
+
+**So yes, Adding a new component in Symfony (or elsewhere) has not impact on
+performance** (as soon as you follow some best practices, do not make me say
+what I did not say ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-05T13:01:34Z
+
+Hi @Oliboy50
+
+> it looks very interesting, but lacks a real life examples. when can you share your test app?
+
+Yes, see [this comment](https://github.com/symfony/symfony/pull/11882#issuecomment-205290533)
+
+---------------------------------------------------------------------------
+
+by gnugat at 2016-04-05T14:46:18Z
+
+The number of files in a package **does not** impact composer autoloading (at least when using the `-o` option), it's the number of `autoload` configurations that does (e.g. in `composer.json`, each elements in the `psr-4` array from the `autoload` section). You can check it by having a look at `vendor/autoload.php` and `vendor/composer/autoload_real.php` in your projects to see how it actually works.
+
+The overhead of composer autoloading increased by +144% when we added +34 composer packages, which means that the overhead of adding a single composer package (e.g. `symfony/workflow`) would be much lower (around +20%, as we can see in [this other test which only adds one dependency](https://blackfire.io/profiles/compare/e0778bf9-33e7-4c27-b525-f3979921cc52/graph)). As @lyrixx pointed out this number is only relative to composer autoloading, not to the application's performances: that's what I mean by "it's not much".
+
+---------------------------------------------------------------------------
+
+by mdwheele at 2016-04-05T23:06:02Z
+
+@lyrixx I really appreciate the work here. I am at a point in a current project of mine where I'm looking to replace a partial WF-net implementation with a third-party component rather than continue my implementation to completion. I would rather send that effort to open-source anything, if possible.
+
+In order to fulfill workflow client application and application invocation APIs to implement work item brokering (or *resource in-basket*, as it is commonly referred), I need to be able to know when a transition has become enabled; thus signaling a task is available for work. It seems with the current implementation, I do have "on.enter" events and could check for myself whether or not impacting transitions are enabled, but it would be very slick (in my opinion) if this were just another event that I could subscribe to.
+
+Would you consider adding an additional event for when transitions become enabled before features for `symfony/workflow` are frozen? I completely understand if you want to limit scope as there looks to be a good bit of work ahead of you already in documentation.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-06T12:59:17Z
+
+Hello @mdwheele
+
+Thanks for your comment.
+
+So, I will rephrase your comment, just to be sure we are talking about the same thing.
+
+You want a new event, that will occurs after the transition, to inform you the new available transitions ?
+
+If so, you can already achieve this by youserlf: You listen all transitions, and you call `$this->workflow->getAvailableTransitions()`.
+
+---------------------------------------------------------------------------
+
+by mdwheele at 2016-04-06T14:47:29Z
+
+> You want a new event, that will occurs after the transition, to inform you the new available transitions ?
+
+That's correct. I understand I could listen for fire events and call `$this->workflow->getAvailableTransitions()` (though I would have expected to find that feature by `getEnabledTransitions()`). I would then need to maintain a thicker abstraction between this Component and a sub-system responsible for delegating work items (enabled transitions) to resources. That abstraction would then be forced to be responsible for listening for fire events, querying available transitions and publishing diffs in that state to subscribers in a "work item brokering" domain. For that reason, it is useful (to at least me) to have the event API be a little more verbose even if there are work-arounds to query the component statefully.
+
+Also, I don't mean to interrupt and can hold this until everything is merged if that is preferable. I understand this PR is about working out last-issues with merging into the framework.
+
+If you'd rather me take this discussion somewhere else, point me there! :smile:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-06T15:28:32Z
+
+Actually, your use case seems good and I think I can implement that directly in the core. Right now I have to polish everything, but I keep your feature in mind.
+
+And about `getAvailableTransitions` vs `getEnabledTransitions` it's a very fair point. I may renamed it too.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-10T08:47:37Z
+
+@mickaelandrieu @gnugat I don't want to hijack the thread but since there are some discussions already about the overhead introduced in the autoloader by non-used classes, here is my would-like-to-be-definitive-answer to this "overhead" non-sense: https://github.com/composer/composer/pull/5172
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2016-04-10T13:50:38Z
+
+@nicolas-grekas thank you, as always, you're great! :+1:
+
+---------------------------------------------------------------------------
+
+by gnugat at 2016-04-10T16:01:42Z
+
+@nicolas-grekas: I now realize that I might not have been talking about the same overhead as you both. My profilings were aimed at the ClassLoader initialization, which happens even if no classes are actually loaded. Your PR seems to target the actual class loading, which happens for each class needed to be loaded.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-10T17:41:32Z
+
+@gnugat I guess you should read my PR again then...
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-11T09:57:09Z
+
+Hello.
+
+I open sourced my little demo app:
+
+* code: https://github.com/lyrixx/SFLive-Paris2016-Workflow
+* demo: http://symfony-workflow-demo.herokuapp.com/show/1
+* slide (in French, for the SymfonyLive Paris 2016 ; I might translate them): https://speakerdeck.com/lyrixx/le-reveil-du-workflow
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-13T08:34:34Z
+
+Hello @mdwheele ; I implemented your feature request ;)
+
+---------------------------------------------------------------------------
+
+by StephenOTT at 2016-04-13T23:09:47Z
+
+Has anyone looked at what OroPlatform / OroBAP is doing with workflow/state machine?
+https://github.com/orocrm/platform/tree/master/src/Oro/Bundle/WorkflowBundle
+Two examples:
+![screen shot 2016-04-13 at 7 09 07 pm](https://cloud.githubusercontent.com/assets/1994838/14512234/4591da64-01ab-11e6-98bf-fb9e73441c7e.png)
+![screen shot 2016-04-13 at 7 08 34 pm](https://cloud.githubusercontent.com/assets/1994838/14512233/4591990a-01ab-11e6-959a-03eb0bcd1681.png)
+
+---------------------------------------------------------------------------
+
+by StephenOTT at 2016-04-13T23:13:12Z
+
+I have gone through the writeup for this PR a few times and I am little confused based on the back and forth.  The goal is to create a workflow around state machine or to create workflow independent of state machine?
+
+Guess what i am asking is are you creating a structured order to state machine or are you creating flowchart workflow?
+I love wiki's explanation and diagram: https://en.wikipedia.org/wiki/State_diagram#State_diagrams_versus_flowcharts
+Are you trying to do A or B?
+![statechart_vs_flowchart-1](https://cloud.githubusercontent.com/assets/1994838/14512297/c2e6f332-01ab-11e6-8a6c-0a134005f037.png)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-14T08:46:59Z
+
+Hello @StephenOTT
+
+> . The goal is to create a workflow around state machine or to create workflow independent of state machine?
+
+The goal is to implement something to manage object states. And Actually, it's an implementation of ["workflow net"](http://martinfowler.workflowpatterns.com/documentation/documents/vanderaalst98application.pdf) ; So it's not a (finite) state machine.
+
+> Guess what i am asking is are you creating a structured order to state machine or are you creating flowchart workflow?
+
+Because it's not a state machine, I cannot answer this question with accurateness. But basically, in order to move an object in the workflow, you have to call some code (`apply($subject, $transitionName)`). And nothing is automatic. I mean a transition enabled is not automatically fired. Everything should be explicit
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2016-04-26T13:17:25Z
+
+Hi @lyrixx,
+
+First thank you very much for that nice component.
+Before it goes gold, I have a few suggestion that I'd like your input on and that I would happily implement.
+
+By toying a little bit with the code, I realised that some classes like Definition and Transition were lacking some doc blocks and while I was adding those I noticed that the Places are not an object but only a string.
+
+This seemed odd to me and I wanted to know what you though about making Place an object and then adding those docblocks ?
+
+Regards
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-26T13:27:52Z
+
+Hello @mikeSimonson
+
+Thanks for your feedback.
+
+I'm not against your change, but what would be the benefit of using a class instead of a string?
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2016-04-26T13:47:02Z
+
+@lyrixx It makes a lot of the code that use those concept much more expressive.
+Likewise the return type (docblock) of a bunch of method becomes less confusing ( I am getting back a Place not a string that might or might not represent a Place) etc.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-04-28T10:28:52Z
+
+Just found a petrinet library on github, started 4 days ago :laughing:
+https://github.com/ziguss/petrinet
+
+Maybe someone can compare? @ziguss are you already aware of this symfony component?
+
+---------------------------------------------------------------------------
+
+by VaN-dev at 2016-04-29T08:01:29Z
+
+If I understand how this component works, a marking has to own all the "froms" places of a transition for this transition to be relevant ?
+
+For example, I have this transition :
+```
+transitions:
+    review:
+        from:
+            - draft
+            - discarded
+        to:
+            - reviewed
+```
+
+If I want to apply this "review" transition to an entity, this entity has to be in both "draft" AND "discarded" states ? Or is there some kind of "OR" feature (without having to duplicate this transition for every "from" possible) ? If I refer to the Workflow class, OR is not possible right now :
+```
+foreach ($transition->getFroms() as $place) {
+    if (!$marking->has($place)) {
+        return false;
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-29T08:42:58Z
+
+Hello @VaN-dev
+
+> If I want to apply this "review" transition to an entity, this entity has to be in both "draft" AND "discarded" states ?
+
+yes, indeed.
+
+> Or is there some kind of "OR" feature (without having to duplicate this transition for every "from" possible) ?
+
+No, you have to create several transition for every from
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2016-05-01T08:25:54Z
+
+@lyrixx Here is the PR that we talked about https://github.com/lyrixx/symfony/pull/8
+
+Any comments ? Thanks
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2016-05-09T19:50:07Z
+
+@lyrixx ping
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-05-10T09:33:40Z
+
+Hello @mikeSimonson
+
+I was on holidays, that's why I did not reply you as fast as you expected.
+
+Anyway Thanks for your works ;
+
+Some feedback on your work:
+
+* I don't like PHPDoc, but because you already added it and I don't like wasting work, I'm going to cherry-pick them
+* you added code like `Place::fromNames` but this is dead code (only used in tests classe).
+* I still don't understand why a `Place` object is better than a simple string ; now the code is harder to write and lead to WTF (ex: why do you have twice `place(a)`:
+![screenshot1](https://cloud.githubusercontent.com/assets/408368/15141955/fd7866f0-16a2-11e6-808c-577d2fd93427.png)
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2016-05-10T12:10:08Z
+
+Hi,
+
+I hope you had nice holidays.
+
+> I don't like PHPDoc, but because you already added it and I don't like wasting work, I'm going to cherry-pick them
+
+The phpdoc is there because for code that is pre php7 it allow the ide to provide contextual information.
+
+> you added code like Place::fromNames but this is dead code (only used in tests classe).
+
+The  ```Place::fromNames``` is there so that when you need to create a lot of Place from an array of string you have a handy shortcut to do it. I planned to add xml configuration (again for autocomplete and autocheck) where it would be useful.
+
+> I still don't understand why a Place object is better than a simple string ; now the code is harder to write :
+
+The Place object is useful because it convey meaning in the context of a Petry net implementation. You are not returning a string, you return a Place. It is much more easier to understand the code when you pass around object that have a meaning in the context of the Petry net then when you pass a string and it's anyone guess what the string will represent this time.
+Thanks to that you also get for free type checking and autocomplete in the ide, but type checking and contextual information are really the biggest benefit.
+It also make little sense to use an object for the transition and then a string for a place. Then why not using array everywhere? => because it's harder to understand and debug.
+
+> and lead to WTF (ex: why do you have twice place(a)
+
+I just wanted to verify in the test here that it wasn't going to cause a problem with two different instances of the same Place.
+
+I also changed the Transition and Definition so that you cannot instantiate invalid object ( aka required parameter to have a valid object are in the constructor ).
+
+Regards
+
+---------------------------------------------------------------------------
+
+by jeromeWeb at 2016-05-10T14:12:46Z
+
+Hi,
+Is there a targeted version of symfony for this component ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-05-10T14:41:25Z
+
+Hello @jeromeWeb
+
+> Is there a targeted version of symfony for this component ?
+
+Yes, it's 3.2
+
+---------------------------------------------------------------------------
+
+by jeromeWeb at 2016-05-10T14:46:55Z
+
+@lyrixx, ok cool !
+
+( Version 2.2 I was thinking something like ... 😕 ❓ missed ! )
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2016-05-10T16:42:47Z
+
+Hello @lyrixx,
+
+Pending 3.2, do you plan to release a bundle?
+
+---------------------------------------------------------------------------
+
+by mikeSimonson at 2016-05-11T13:37:20Z
+
+@lyrixx If you want a better explanation of my PR you can ask @stof to review it maybe you know him.
+
+---------------------------------------------------------------------------
+
+by StephenOTT at 2016-05-14T03:49:42Z
+
+@lyrixx have you thought about how this could be used to control Page Flow of Symfony Forms? (Such as wizards, or complex multi-page interactions).
+
+Also, is there support for transitioning to previous "places".  Would this just be a reversed transition?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-05-18T13:35:42Z
+
+@mikeSimonson I integrated your work in this PR. I also squashed yours commits and reverted few things. I'm gonna comment in your PR to not pollute this thread.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-01T07:40:45Z
+
+`LICENSE`, `README.md` and `CHANGELOG.md` are missing. Except minor comments I left, 👍 for me.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-06-15T17:16:49Z
+
+@fabpot Hello !
+
+I worked a bit on this PR:
+
+* I reverted the introduction of the `Place` class + fixed tests
+* I fixed pending comments
+* I updated https://github.com/lyrixx/SFLive-Paris2016-Workflow
+* I updated http://symfony-workflow-demo.herokuapp.com
+* I played a bit with it.
+
+It's almost ready, but it needs another full review.
+And I let all PHPDoc added by @mikeSimonson. IMHO, there are too many,
+but as there are now here ... But I will be so happy to remove them, just tell me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T15:23:57Z
+
+@lyrixx Please, remove any phpdocs that are not useful or do not bring any value.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-06-16T16:22:21Z
+
+@fabpot done ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-06-20T08:51:18Z
+
+@javiereguiluz Thanks for the review. I addressed your comments.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-22T14:50:16Z
+
+@fabpot could you enable the LongArraySyntaxFixer contrib fixer on fabbot.io for the Symfony repo, so that enforcing consistent usage of the long array syntax is done by the tool rather than by the reviewers ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T14:52:35Z
+
+It has been enabled yesterday
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T14:53:53Z
+
+ah, no, I enabled it on Symfony, but I forgot to deploy the same on fabbot.io. Fixed now
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-22T14:58:12Z
+
+@fabpot can you re-trigger the inspection for this PR as it contains many usages of the short array syntax ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T15:03:59Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-06-22T15:19:11Z
+
+I think I have fixed all reported issues.

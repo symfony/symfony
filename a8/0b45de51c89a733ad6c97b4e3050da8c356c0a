@@ -1,0 +1,372 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-15T18:18:25Z
+
+We would also need to find a way to represent other datatypes in xml like `integer`, `float` and `boolean`. Only supporting array without the other datatypes would be arbitrary.
+Also possibly DateTime etc.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-15T18:40:28Z
+
+@Tobion Do you think that both array types and different scalar types should be done in the same pull request?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-15T22:35:11Z
+
+Yes because if we don't find a solution for all of them, I'd argue it's not worth implementing only one part.
+Then we could just say, xml only supports flat structure with strings.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-16T08:12:07Z
+
+I don't fully agree. Even if you were not able to use integer, float or boolean values natively in XML, you would at least be able to retain the array structure. Scalar types can be casted in the controller. Achieving the same with arrays is not always that easy (at least with nested arrays).
+
+But I also don't think that it is too hard adding support for the other data types. So I will look into this tonight.
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-16T08:34:28Z
+
+@Tobion the XML loading in Symfony already converts values to boolean or number types when they look like that in the DI component. However, this is not applied in the routing loader (and applying it could be considered a BC break btw).
+
+However, this way to represent arrays looks good (a bit painful if you want to represent lists as you have to map the keys explicitly though)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-16T09:58:48Z
+
+> @Tobion the XML loading in Symfony already converts values to boolean or number types when they look like that in the DI component. However, this is not applied in the routing loader (and applying it could be considered a BC break btw).
+
+@stof I thought about adding an optional ``type`` attribute to the ``default`` element. If present, the content will be casted accordingly. Otherwise it is treated as a string. This way we can maintain backward compatibility.
+
+> However, this way to represent arrays looks good (a bit painful if you want to represent lists as you have to map the keys explicitly though)
+
+We can make the ``key`` attribute optional. This should work and shouldn't cause any BC issue. What do you think?
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-16T10:13:42Z
+
+> We can make the key attribute optional. This should work and shouldn't cause any BC issue. What do you think?
+
+The problem is that the first level needs a string key name. Otherwise you would have numeric defaults which won't work (because they get removed since preg_match also adds them).
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-16T10:15:30Z
+
+> I thought about adding an optional type attribute to the default element. If present, the content will be casted accordingly.
+
+This will not support XSD validation with types, can it? So you could add a string within a `type=integer` and XSD cannot raise an error.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-16T10:30:15Z
+
+> The problem is that the first level needs a string key name. Otherwise you would have numeric defaults which won't work (because they get removed since preg_match also adds them).
+
+Should be possible to validate that in the XSD.
+
+> This will not support XSD validation with types, can it? So you could add a string within a type=integer and XSD cannot raise an error.
+
+No, unfortunately not. If we want that, we'll have to use different XML elements for each data type I guess.
+
+Another possibility I see is to introduce a new attribute like ``infer-type`` which defaults to ``false``. When this is set to true, the loader can try to infer the data type from the actual value instead of simply assuming a string value.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-16T19:39:42Z
+
+I think a solution that fully supports the mentioned data types both in the XML schema and in PHP and which is backward compatible requires some more work.
+
+What I would suggest for the moment, is creating a new ``defaults`` (the name may need to be discussed) element on the same level as the current ``default`` elements. Inside it we would nest ``collection``, ``string``, ``double``, ``integer`` and ``boolean`` elements. Keys can be defined the same way as before with the ``key`` attribute. To allow numerical indices, this attribute would be optional on all but the top level of the tree.
+
+An example configuration may then look like this:
+```xml
+<defaults>
+  <string key="foo">bar</string>
+  <collection key="list">
+    <boolean>true</boolean>
+    <boolean>false</boolean>
+    <collection>
+      <string key="foobar">hash value</string>
+    </collection>
+  </collection>
+  <integer key="baz">10</integer>
+</defaults>
+```
+
+The process defaults would then be equal to this array:
+
+```php
+$defaults = array(
+    'foo' => 'bar',
+    'list' => array(
+        true,
+        false,
+        array('foobar' => 'hash value'),
+    ),
+    'baz' => 10,
+);
+```
+
+The already existing ``default`` element would be kept with the current behaviour for backward compatibility reasons.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-07-17T10:21:14Z
+
+@xabbuh using a single ``<defaults>`` instead of multiple ``default`` elements would be totally inconsistent with the way other places look in Symfony XML files. for me, it is a -1.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-17T10:55:20Z
+
+Staying with multiple ``default`` elements would mean something like this (the ``attribute`` should then be forbidden on the top level default child elements):
+
+```xml
+<default key="foo">
+  <string>bar</string>
+</default>
+<default key="list">
+  <collection>
+    <boolean>true</boolean>
+    <boolean>false</boolean>
+    <collection>
+      <string key="foobar">hash value</string>
+    </collection>
+  </collection>
+</default>
+<default key="baz">
+  <integer>10</integer>
+</default>
+```
+
+For backward compatibility,
+
+```xml
+<default key="foo">
+  <string>bar</string>
+</default>
+```
+
+and
+
+```xml
+<default key="foo">bar</default>
+```
+
+would be equivalent.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-17T18:44:41Z
+
+The last proposal was also what I had in mind. But I would propose to distinguish between arrays (as data structure, not PHPs implementation) and maps/associative arrays. So you can validate in XSD that elements inside maps require a `key` and inside arrays must not have a key.
+Otherwise you could mix elements with key and without inside collections which is possible in PHP but rather magical in general and not needed here. This would also prevent accidential user errors.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-17T19:04:12Z
+
+That's a good point since mixing list and maps also isn't possible with YAML. So, we can simply use a ``list`` and a ``map`` element.
+
+If we agree on this, I will update the pull request to match this structure.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-17T19:52:27Z
+
+Yeah I agree with `list` and `map`. In php the list will still be an array that allows random access, so is not really a list. But that can be considered implementation detail and semantically people usually want to express a list a values in XML when not using an associative array/map.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-18T21:32:39Z
+
+I updated the code to support the several data types.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-19T07:11:22Z
+
+I just noticed that the new ``parseDefaultNode()`` method was capable to properly parse nodes with a namespace prefix. I fixed that and modified the already existing ``testLoadWithNamespacePrefix()`` to cover this too.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-20T15:14:53Z
+
+Can you please add a note about this in the routing changelog. Then I'm :+1: to merge this.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-20T16:31:18Z
+
+Of course, done.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-20T16:45:00Z
+
+It's not there.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-20T16:47:56Z
+
+Sorry, I forgot to push.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-20T17:24:12Z
+
+:+1:  now lets hear the other deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-20T17:31:05Z
+
+@Tobion Thanks for your support!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T09:37:21Z
+
+We already have support for different types in the service container... but the implementation is quite different. I think that being consistent between the two components is a good idea. The service container XML loader uses `Symfony\Component\Config\Util\XmlUtils` to parse complex data structure.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-25T12:23:39Z
+
+@fabpot My opinion:
+1. the xml config parsing is magic (auto-convert types)
+2. AFAIK it does not all allow many things, like a string with null: `'null'`.
+3. it does not support xsd validation because you cannot explicitly type things
+4. introducing the same in routing would be a BC break because defaults would be casted automatically now
+
+I agree it would be nice to have the same logic everywhere, but I feel the better version is this one here. So I'd rather have the feature we implemented here inside the config component generalized.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-07-25T12:27:38Z
+
+@Tobion I understand your points. But let's be pragmatic here, we are talking about very rare cases. Nobody ever had this need. Using a default value as an array is a hack in the first place anyway. Using anything besides strings is also a hack (I know that null/booleans can have special meaning here.)
+
+So I'm :-1:.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-25T12:35:26Z
+
+Then we need to validate defaults, so other loaders only allow plain strings as well. Like YAML or plain PHP.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-07-25T12:36:32Z
+
+It's probably gonna be a bc break for many.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-07-25T14:25:40Z
+
+I'm not sure if nobody ever had the need because they didn't have the need or if it's just because they didn't know that the defaults could be used in such a way (we are just changing documentation towards adding notices on the usage of the defaults). Also, the current solution is rather inconsistent since you can do more things in the YAML and PHP loaders.
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-07-25T19:09:23Z
+
+Using an array as default-value is used by Sylius for controller reusing, by using the route defaults as a configuration. So removing support would be a big BC break.
+
+---------------------------------------------------------------------------
+
+by sstok at 2014-08-09T12:42:23Z
+
+What is the status of this PR?
+
+---------------------------------------------------------------------------
+
+by stof at 2014-08-12T17:10:30Z
+
+does this syntax allow to put a ``null`` value inside a list or a map ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2014-08-12T21:14:46Z
+
+@stof List and maps can now be null.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-06T22:38:36Z
+
+@fabpot considering all other loaders except xml already "supported" array defaults, we have two ways to deal with this
+1. "remove" array default support in the other loaders, which will probably be a bc break for some
+2. add support for array defaults in xml to be consistent and merge this PR
+
+I'd vote for 2. because its not a bc break and it should not be a problem in php to support arrays. we deprecated apache dumper where it would probably be tedious to support arrays. so thats not a problem. also the xml loader already explicitly supported `null`, so also supporting other scalars like `int` makes sense. fabien, what do you prefer?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2014-10-07T15:26:45Z
+
+The support for non-string values in other formats was not a conscious decision; it just happens to work because there is no restrictions in place. So, I'm still against this change.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-07T16:48:07Z
+
+Well actually it was, at least for null: https://github.com/symfony/symfony/pull/7635
+
+---------------------------------------------------------------------------
+
+by Tobion at 2014-10-08T20:46:53Z
+
+And according to [RequestContext::setParameter](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Routing/RequestContext.php#L307) a parameter can be `mixed`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T06:55:25Z
+
+Re-reading this old PR, I still thing that defaults should only be strings or null. When parsing a path, you can only get back strings anyway, so allowing defaults to be something else seems wrong to me. I'm in favor of deprecating the possibility to use any other kind of value.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-22T09:27:09Z
+
+One point of routing is that you can change URIs without chaning the code to parse/generate them. Since array params can be used for query strings, at one point it would also make sense to allow arrays in the path. For example, URI templates standard supports that by expanding arrays to comma-separated values.
+So removing non-string defaults would be a step in the wrong direction IMO.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-22T09:34:40Z
+
+Also with the introduction of scalar type hints, what if a controller parameter is typehinted to `int` for example? I guess this will be cast implicitly at the moment. But with strict types, it would cause an error. So in theory either the router itself could cast params (for example based on the requirement) or the code that calls the controller. So then route params would need to be non-strings as well.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T11:12:47Z
+
+ok, you're right. Let's finish this one then.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-22T11:16:41Z
+
+@Tobion strict types are irrelevant here, because the strict mode for arguments is determined by the calling code, not by the file declaring the controller, and the Kernel class (which is calling the controller) is not in strict mode
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-22T11:34:46Z
+
+@stof I know. But who says Symfony 4 will not add scalar type hints in certain places and maybe strict types?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-23T12:50:19Z
+
+rebased here, if I don't miss anything all comments made so far have already been addressed

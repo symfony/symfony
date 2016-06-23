@@ -28,6 +28,8 @@ use Symfony\Component\Yaml\Parser;
 class LintCommand extends Command
 {
     private $parser;
+    private $format;
+    private $displayCorrectFiles;
 
     /**
      * {@inheritdoc}
@@ -65,13 +67,15 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
         $filename = $input->getArgument('filename');
+        $this->format = $input->getOption('format');
+        $this->displayCorrectFiles = $output->isVerbose();
 
         if (!$filename) {
             if (!$stdin = $this->getStdin()) {
                 throw new \RuntimeException('Please provide a filename or pipe file content to STDIN.');
             }
 
-            return $this->display($input, $output, $io, array($this->validate($stdin)));
+            return $this->display($io, array($this->validate($stdin)));
         }
 
         if (!$this->isReadable($filename)) {
@@ -83,7 +87,7 @@ EOF
             $filesInfo[] = $this->validate(file_get_contents($file), $file);
         }
 
-        return $this->display($input, $output, $io, $filesInfo);
+        return $this->display($io, $filesInfo);
     }
 
     private function validate($content, $file = null)
@@ -97,29 +101,29 @@ EOF
         return array('file' => $file, 'valid' => true);
     }
 
-    private function display(InputInterface $input, OutputInterface $output, SymfonyStyle $io, $files)
+    private function display(SymfonyStyle $io, array $files)
     {
-        switch ($input->getOption('format')) {
+        switch ($this->format) {
             case 'txt':
-                return $this->displayTxt($output, $io, $files);
+                return $this->displayTxt($io, $files);
             case 'json':
                 return $this->displayJson($io, $files);
             default:
-                throw new \InvalidArgumentException(sprintf('The format "%s" is not supported.', $input->getOption('format')));
+                throw new \InvalidArgumentException(sprintf('The format "%s" is not supported.', $this->format));
         }
     }
 
-    private function displayTxt(OutputInterface $output, SymfonyStyle $io, $filesInfo)
+    private function displayTxt(SymfonyStyle $io, array $filesInfo)
     {
         $countFiles = count($filesInfo);
         $erroredFiles = 0;
 
         foreach ($filesInfo as $info) {
-            if ($info['valid'] && $output->isVerbose()) {
+            if ($info['valid'] && $this->displayCorrectFiles) {
                 $io->comment('<info>OK</info>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
             } elseif (!$info['valid']) {
                 ++$erroredFiles;
-                $io->text(sprintf('<error> ERROR </error> in %s', $info['file']));
+                $io->text('<error> ERROR </error>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
                 $io->text(sprintf('<error> >> %s</error>', $info['message']));
             }
         }
@@ -133,7 +137,7 @@ EOF
         return min($erroredFiles, 1);
     }
 
-    private function displayJson(OutputInterface $output, $filesInfo)
+    private function displayJson(SymfonyStyle $io, array $filesInfo)
     {
         $errors = 0;
 
@@ -144,7 +148,7 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT));
+        $io->writeln(json_encode($filesInfo, JSON_PRETTY_PRINT));
 
         return min($errors, 1);
     }

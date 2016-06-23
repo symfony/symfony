@@ -1,0 +1,207 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-07T13:18:17Z
+
+About the proposed method name: `->setAutoLock(true);`  I don't think it's bad, but maybe we can improve it.
+
+My concern: the "auto-lock" feature is an "implementation detail". What you really want is to prevent concurrent command executions. You don't care about the lock at all.
+
+If you agree, the hard part will be to find a good name for this.
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-04-07T13:54:59Z
+
+@javiereguiluz I do agree with you, I wasn't really satisfied with the naming ... what about "safe lock", "thread safe" ... ? Or setParallelizable ?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-07T14:13:05Z
+
+The only problem with this locking strategy is that it only works if your command is limited to 1 run per application instance. If I would deploy 2 applications which both run the command, it could cause issues.
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-04-07T14:27:52Z
+
+@iltar That's true (though the problem also occurs before this PR). What would you suggest ? Introduce some kind of interface with various strategies ? If that's the case that may be a good idea to create a new "locking" component.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-07T14:30:20Z
+
+@iltar @geoffrey-brier I think that'd a reasonable limitation of this feature.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-07T14:31:33Z
+
+If it's extendable, it's really nice (I think I've suggested this in the original feature but not sure).
+
+It's already a nice to have feature as is though.
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-04-07T14:35:52Z
+
+@javiereguiluz I think it would be reasonable too (may be be nice to enhance it later though).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-04-28T10:52:59Z
+
+ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-04-28T11:50:08Z
+
+* I like the idea
+* I agree with @javiereguiluz comments
+* But I don't really like the implementation. I think we should stick to what is described in the blog post. The diff will be smaller, and the code easier to understand
+* Should we add a note about the limitation (1 server) ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-14T06:23:03Z
+
+@geoffrey-brier Do you have some time to finish this PR by taking comments into account? Thanks.
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-06-14T07:33:23Z
+
+@fabpot Sure no problem but I'm not sure to understand correctly.
+
+Should I add another method ? What about the naming ?
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-06-14T10:05:35Z
+
+@fabpot @javiereguiluz @iltar I've completely reworked the PR.
+
+Now you would do something like this:
+
+```php
+class MyCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+         // By default it would throw a RuntimeException if the command is locked
+         $this->lock();
+        // Your code
+        // The lock release is still optionnal
+         $this->release();
+    }
+}
+```
+
+You can also pass a boolean to the `lock` method so that it doesn't throw any exception.
+
+```php
+class MyCommand extends Command
+{
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+         // Silently return
+         if ($this->lock(true)) {
+             return;
+         }
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T06:39:15Z
+
+@lyrixx Can you have a look at this new version?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T06:47:44Z
+
+What about making it a trait (`LockableCommandTrait`) instead of "hardcoded" in the `Command` class? I think it would be better.
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-06-15T07:55:51Z
+
+@fabpot I like the idea of turning it into a trait, this way it could be used anywhere not only in the Console component.
+
+---------------------------------------------------------------------------
+
+by 1ed at 2016-06-15T08:15:10Z
+
+@geoffrey-brier I think we should keep the scope limited to commands. If I'm right the purpose of this PR to make locking command execution like a breeze. Ideally only importing the trait should be enough to lock a command by providing sensible defaults (but if it possible I would like to control some aspects of the lock like if it's blocking or not or change the directory where we put the lock file).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T20:31:37Z
+
+Indeed, I was talking about a trait for console commands.
+
+Can you make the changes?
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-06-22T17:23:24Z
+
+Did the changes, I tried to take into account everyone's opinion.
+
+Here is what it looks like
+
+```php
+class MyCommand extends Command
+{
+    use LockableTrait;
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+         // You have control over the lock name
+         if (!$this->lock($this->getName())) {
+             // Here you can handle locking errors
+         }
+        // Your code
+        // The lock release is still optionnal
+         $this->release();
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-06-23T09:32:56Z
+
+Fixed everything
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-23T09:35:22Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-06-23T09:45:22Z
+
+@geoffrey-brier Could you update the PR description to have something that match the new implementation? Thanks.
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-06-23T11:36:21Z
+
+@lyrixx Done & tests are green :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-23T11:41:47Z
+
+@geoffrey-brier Looks good. Can you add a new item in the component CHANGELOG to mention this new feature for 3.2?
+
+---------------------------------------------------------------------------
+
+by geoffrey-brier at 2016-06-23T11:43:17Z
+
+@fabpot Done

@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * allowed to prioritize compiler passes by introducing a third argument to `PassConfig::addPass()`, to `Compiler::addPass` and to `ContainerBuilder::addCompilerPass()`
+ * added support for PHP constants in YAML configuration files
 
 3.0.0
 -----

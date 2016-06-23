@@ -39,11 +39,15 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
      * Whatever value you return here will be passed to getUser() and checkCredentials()
      *
      * For example, for a form login, you might:
-     *
-     *      return array(
-     *          'username' => $request->request->get('_username'),
-     *          'password' => $request->request->get('_password'),
-     *      );
+     * 
+     *      if ($request->request->has('_username')) {
+     *          return array(
+     *              'username' => $request->request->get('_username'),
+     *              'password' => $request->request->get('_password'),
+     *          );
+     *      } else {
+     *          return;
+     *      }
      *
      * Or for an API token that's on a header, you might use:
      *

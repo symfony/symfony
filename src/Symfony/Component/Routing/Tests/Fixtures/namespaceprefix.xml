@@ -10,7 +10,7 @@
         <r2:requirement xmlns:r2="http://symfony.com/schema/routing" key="_locale">en|fr|de</r2:requirement>
         <r:option key="compiler_class">RouteCompiler</r:option>
         <r:default key="page">
-            <r3:integer xmlns:r3="http://symfony.com/schema/routing">1</r3:integer>
+            <r3:int xmlns:r3="http://symfony.com/schema/routing">1</r3:int>
         </r:default>
     </r:route>
 </r:routes>

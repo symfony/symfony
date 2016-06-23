@@ -10,8 +10,8 @@
         </default>
         <default key="list">
             <list>
-                <boolean xsi:nil="true" />
-                <integer xsi:nil="true" />
+                <bool xsi:nil="true" />
+                <int xsi:nil="true" />
                 <float xsi:nil="1" />
                 <string xsi:nil="true" />
                 <list xsi:nil="true" />

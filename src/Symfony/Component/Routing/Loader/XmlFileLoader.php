@@ -261,9 +261,9 @@ class XmlFileLoader extends FileLoader
             return $this->parseDefaultNode($child, $path);
         }
 
-        // If the default element doesn't contain a nested "boolean", "integer",
-        // "float", "string", "list" or "map" element, the element contents will
-        // be treated as the string value of the associated default option.
+        // If the default element doesn't contain a nested "bool", "int", "float",
+        // "string", "list", or "map" element, the element contents will be treated
+        // as the string value of the associated default option.
         return trim($element->textContent);
     }
 
@@ -284,9 +284,9 @@ class XmlFileLoader extends FileLoader
         }
 
         switch ($node->localName) {
-            case 'boolean':
+            case 'bool':
                 return 'true' === trim($node->nodeValue) || '1' === trim($node->nodeValue);
-            case 'integer':
+            case 'int':
                 return (int) trim($node->nodeValue);
             case 'float':
                 return (float) trim($node->nodeValue);
@@ -325,7 +325,7 @@ class XmlFileLoader extends FileLoader
 
                 return $map;
             default:
-                throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "boolean", "integer", "float", "string", "list" or "map".', $node->localName, $path));
+                throw new \InvalidArgumentException(sprintf('Unknown tag "%s" used in file "%s". Expected "bool", "int", "float", "string", "list", or "map".', $node->localName, $path));
         }
     }
 

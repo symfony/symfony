@@ -11,8 +11,8 @@
         <default key="values">
             <map>
                 <list key="list">
-                    <boolean>true</boolean>
-                    <integer>1</integer>
+                    <bool>true</bool>
+                    <int>1</int>
                     <float>3.5</float>
                     <string>foo</string>
                 </list>

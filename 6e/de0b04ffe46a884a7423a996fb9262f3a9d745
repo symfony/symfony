@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-22T13:11:14Z
+
+Of course, the FrameworkBundle test fails because the `Yaml\Command\LintCommand` cannot be found in the Yaml component. Should I remove the test or is there something to do?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-06-22T13:33:31Z
+
+> Of course, the FrameworkBundle test fails because the Yaml\Command\LintCommand cannot be found in the Yaml component. Should I remove the test or is there something to do?
+
+What about adding it to `require-dev` ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-22T13:35:32Z
+
+Not sure to understand. The Yaml component is already required by the FrameworkBundle. The problem is that the command that it is looking for is provided by this PR.
+
+(Sorry for closing, mistake)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-06-22T13:38:28Z
+
+> Not sure to understand. The Yaml component is already required by the FrameworkBundle. The problem is that the command that it is looking for is provided by this PR.
+
+Oh again, I read too fast, nevermind my comment.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-06-22T13:43:02Z
+
+`YamlLintCommans` => `YamlLintCommand` in your last commit subject (just in case the commit message somehow survives a squash)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-06-22T13:53:55Z
+
+> Of course, the FrameworkBundle test fails because the Yaml\Command\LintCommand cannot be found in the Yaml component. Should I remove the test or is there something to do?
+
+Link for the lazy : https://travis-ci.org/symfony/symfony/jobs/139483789#L2371
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-22T14:20:07Z
+
+For now I removed the FrameworkBundle `YamlLintCommandTest` and kept the Yaml `LintCommandTest`, if someone knows a trick for that, please let me know.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-22T14:31:32Z
+
+@chalasr what is needed is to update the requirement of the component, to force FrameworkBundle to use symfony/yaml 3.2+ (older versions will not have the command, even after merging)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-22T20:26:15Z
+
+@stof I applied your suggestions,  thank you.
+
+Now tests pass.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-23T11:37:29Z
+
+I made the changes. Re-added the @BundleName/ feature and a test for.

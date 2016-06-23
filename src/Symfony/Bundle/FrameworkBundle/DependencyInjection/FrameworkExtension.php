@@ -140,11 +140,11 @@ class FrameworkExtension extends Extension
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
         $this->registerPropertyAccessConfiguration($config['property_access'], $container);
 
-        if (isset($config['serializer'])) {
+        if ($this->isConfigEnabled($container, $config['serializer'])) {
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
-        if (isset($config['property_info'])) {
+        if ($this->isConfigEnabled($container, $config['property_info'])) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
@@ -956,10 +956,6 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
-        }
-
         if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
             // Run after serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.data_uri', DataUriNormalizer::class);
@@ -1075,10 +1071,6 @@ class FrameworkExtension extends Extension
      */
     private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (!$this->isConfigEnabled($container, $config)) {
-            return;
-        }
-
         $loader->load('property_info.xml');
 
         if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {

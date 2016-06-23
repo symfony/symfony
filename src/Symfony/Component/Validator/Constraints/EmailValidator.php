@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Egulias\EmailValidator\Validation\EmailValidation;
+use Egulias\EmailValidator\Validation\RFCValidation;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\RuntimeException;
@@ -61,7 +63,14 @@ class EmailValidator extends ConstraintValidator
 
             $strictValidator = new \Egulias\EmailValidator\EmailValidator();
 
-            if (!$strictValidator->isValid($value, false, true)) {
+            if (interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, new RFCValidation())) {
+                $this->context->buildViolation($constraint->message)
+                    ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Email::INVALID_FORMAT_ERROR)
+                    ->addViolation();
+
+                return;
+            } elseif (!interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, false, true)) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Email::INVALID_FORMAT_ERROR)

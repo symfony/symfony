@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-21T16:56:18Z
+
+Tests need to pass of course, and new tests added to cover the behavior.
+(note that I have no opinion yet on the behavior you're suggesting).
+
+---------------------------------------------------------------------------
+
+by rquadling at 2016-06-21T17:03:10Z
+
+I just realised I've submitted to separate PRs as I was editing online. Silly me.
+
+I'll do it properly and get rid of #19134 and #19135. But that'll have to be tomorrow.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-21T17:20:03Z
+
+@rquadling you should get rid of only one of them, and update the other PR to contain all changes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T19:47:18Z
+
+I've closed #19135. You can do the change directly in this PR now. No need to create yet another one.

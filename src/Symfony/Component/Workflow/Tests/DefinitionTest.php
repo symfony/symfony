@@ -22,8 +22,8 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddPlacesInvalidArgument()
     {
-        $places = ['a"', 'e"'];
-        $definiton = new Definition($places);
+        $places = array('a"', 'e"');
+        $definition = new Definition($places);
     }
 
     public function testSetInitialPlace()

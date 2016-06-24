@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-06-23T19:47:02Z
+
+Shouldn't this simply increase the minimum dependency?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-23T19:50:12Z
+
+@iltar Of courses, I thought about it like it was in `require-dev`, thanks for noticing :)

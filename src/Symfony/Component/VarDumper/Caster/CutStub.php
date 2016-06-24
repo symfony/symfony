@@ -30,13 +30,11 @@ class CutStub extends Stub
                 $this->class = get_class($value);
                 $this->cut = -1;
                 break;
-
             case 'array':
                 $this->type = self::TYPE_ARRAY;
                 $this->class = self::ARRAY_ASSOC;
                 $this->cut = $this->value = count($value);
                 break;
-
             case 'resource':
             case 'unknown type':
                 $this->type = self::TYPE_RESOURCE;
@@ -44,7 +42,6 @@ class CutStub extends Stub
                 $this->class = @get_resource_type($value);
                 $this->cut = -1;
                 break;
-
             case 'string':
                 $this->type = self::TYPE_STRING;
                 $this->class = preg_match('//u', $value) ? self::STRING_UTF8 : self::STRING_BINARY;

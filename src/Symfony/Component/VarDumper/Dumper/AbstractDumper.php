@@ -206,12 +206,10 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
                 case $s[$i] < "\x80":
                     $s[$j] = $s[$i];
                     break;
-
                 case $s[$i] < "\xC0":
                     $s[$j] = "\xC2";
                     $s[++$j] = $s[$i];
                     break;
-
                 default:
                     $s[$j] = "\xC3";
                     $s[++$j] = chr(ord($s[$i]) - 64);

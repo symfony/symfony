@@ -120,7 +120,6 @@ class CliDumper extends AbstractDumper
             case 'integer':
                 $style = 'num';
                 break;
-
             case 'double':
                 $style = 'num';
 
@@ -136,15 +135,12 @@ class CliDumper extends AbstractDumper
                         break;
                 }
                 break;
-
             case 'NULL':
                 $value = 'null';
                 break;
-
             case 'boolean':
                 $value = $value ? 'true' : 'false';
                 break;
-
             default:
                 $attr['value'] = isset($value[0]) && !preg_match('//u', $value) ? $this->utf8Encode($value) : $value;
                 $value = isset($type[0]) && !preg_match('//u', $type) ? $this->utf8Encode($type) : $type;
@@ -324,7 +320,6 @@ class CliDumper extends AbstractDumper
                         $this->line .= $bin.'"'.$this->style($style, $key).'" => ';
                     }
                     break;
-
                 case Cursor::HASH_RESOURCE:
                     $key = "\0~\0".$key;
                     // No break;
@@ -436,7 +431,6 @@ class CliDumper extends AbstractDumper
                         case '--color=force':
                         case '--color=always':
                             return static::$defaultColors = true;
-
                         case '--no-ansi':
                         case '--color=no':
                         case '--color=none':

@@ -102,20 +102,16 @@ class XmlReferenceDumper
                             case 'Symfony\Component\Config\Definition\ScalarNode':
                                 $prototypeValue = 'scalar value';
                                 break;
-
                             case 'Symfony\Component\Config\Definition\FloatNode':
                             case 'Symfony\Component\Config\Definition\IntegerNode':
                                 $prototypeValue = 'numeric value';
                                 break;
-
                             case 'Symfony\Component\Config\Definition\BooleanNode':
                                 $prototypeValue = 'true|false';
                                 break;
-
                             case 'Symfony\Component\Config\Definition\EnumNode':
                                 $prototypeValue = implode('|', array_map('json_encode', $prototype->getValues()));
                                 break;
-
                             default:
                                 $prototypeValue = 'value';
                         }

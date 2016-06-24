@@ -58,15 +58,12 @@ class TableHelper extends Helper
             case self::LAYOUT_BORDERLESS:
                 $this->table->setStyle('borderless');
                 break;
-
             case self::LAYOUT_COMPACT:
                 $this->table->setStyle('compact');
                 break;
-
             case self::LAYOUT_DEFAULT:
                 $this->table->setStyle('default');
                 break;
-
             default:
                 throw new \InvalidArgumentException(sprintf('Invalid table layout "%s".', $layout));
         }

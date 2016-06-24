@@ -108,12 +108,10 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
             switch ($result) {
                 case VoterInterface::ACCESS_GRANTED:
                     return true;
-
                 case VoterInterface::ACCESS_DENIED:
                     ++$deny;
 
                     break;
-
                 default:
                     break;
             }
@@ -153,12 +151,10 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                     ++$grant;
 
                     break;
-
                 case VoterInterface::ACCESS_DENIED:
                     ++$deny;
 
                     break;
-
                 default:
                     ++$abstain;
 
@@ -199,10 +195,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                         ++$grant;
 
                         break;
-
                     case VoterInterface::ACCESS_DENIED:
                         return false;
-
                     default:
                         break;
                 }

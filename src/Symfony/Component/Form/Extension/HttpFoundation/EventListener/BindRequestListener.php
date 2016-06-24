@@ -58,7 +58,6 @@ class BindRequestListener implements EventSubscriberInterface
                     : $request->query->get($name, $default);
 
                 break;
-
             default:
                 if ('' === $name) {
                     // Form bound without name

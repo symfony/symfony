@@ -174,7 +174,6 @@ class Data
                 case Stub::TYPE_STRING:
                     $dumper->dumpString($cursor, $item->value, Stub::STRING_BINARY === $item->class, $cut);
                     break;
-
                 case Stub::TYPE_ARRAY:
                     $item = clone $item;
                     $item->type = $item->class;
@@ -191,7 +190,6 @@ class Data
                     }
                     $dumper->leaveHash($cursor, $item->type, $item->class, $withChildren, $cut);
                     break;
-
                 default:
                     throw new \RuntimeException(sprintf('Unexpected Stub type: %s', $item->type));
             }

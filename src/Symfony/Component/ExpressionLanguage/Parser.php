@@ -183,15 +183,12 @@ class Parser
                     case 'true':
                     case 'TRUE':
                         return new Node\ConstantNode(true);
-
                     case 'false':
                     case 'FALSE':
                         return new Node\ConstantNode(false);
-
                     case 'null':
                     case 'NULL':
                         return new Node\ConstantNode(null);
-
                     default:
                         if ('(' === $this->stream->current->value) {
                             if (false === isset($this->functions[$token->value])) {
@@ -214,13 +211,11 @@ class Parser
                         }
                 }
                 break;
-
             case Token::NUMBER_TYPE:
             case Token::STRING_TYPE:
                 $this->stream->next();
 
                 return new Node\ConstantNode($token->value);
-
             default:
                 if ($token->test(Token::PUNCTUATION_TYPE, '[')) {
                     $node = $this->parseArrayExpression();

@@ -110,10 +110,8 @@ class VarCloner extends AbstractCloner
                             $stub->value = iconv_substr($v, 0, $maxString, 'UTF-8');
                         }
                         break;
-
                     case 'integer':
                         break;
-
                     case 'array':
                         if ($v) {
                             $stub = $arrayRefs[$len] = new Stub();
@@ -139,7 +137,6 @@ class VarCloner extends AbstractCloner
                             $stub->value = $zval['array_count'] ?: count($a);
                         }
                         break;
-
                     case 'object':
                         if (empty($objRefs[$h = $zval['object_handle'] ?: ($hashMask ^ hexdec(substr(spl_object_hash($v), $hashOffset, PHP_INT_SIZE)))])) {
                             $stub = new Stub();
@@ -175,7 +172,6 @@ class VarCloner extends AbstractCloner
                             $a = null;
                         }
                         break;
-
                     case 'resource':
                     case 'unknown type':
                         if (empty($resRefs[$h = (int) $v])) {

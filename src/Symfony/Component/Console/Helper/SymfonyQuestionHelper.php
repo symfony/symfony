@@ -60,12 +60,10 @@ class SymfonyQuestionHelper extends QuestionHelper
                 $text = sprintf(' <info>%s</info>:', $text);
 
                 break;
-
             case $question instanceof ConfirmationQuestion:
                 $text = sprintf(' <info>%s (yes/no)</info> [<comment>%s</comment>]:', $text, $default ? 'yes' : 'no');
 
                 break;
-
             case $question instanceof ChoiceQuestion && $question->isMultiSelect():
                 $choices = $question->getChoices();
                 $default = explode(',', $default);
@@ -77,13 +75,11 @@ class SymfonyQuestionHelper extends QuestionHelper
                 $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, implode(', ', $default));
 
                 break;
-
             case $question instanceof ChoiceQuestion:
                 $choices = $question->getChoices();
                 $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $choices[$default]);
 
                 break;
-
             default:
                 $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $default);
         }

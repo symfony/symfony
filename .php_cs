@@ -31,5 +31,7 @@ return Symfony\CS\Config\Config::create()
             ->notPath('src/Symfony/Bundle/FrameworkBundle/Tests/Templating/Helper/Resources/Custom/_name_entry_label.html.php')
             // explicit heredoc test
             ->notPath('src/Symfony/Bundle/FrameworkBundle/Tests/Fixtures/Resources/views/translation.html.php')
+            // fixture test
+            ->notPath('src/Symfony/Component/Debug/Resources/ext/tests/003.phpt')
     )
 ;

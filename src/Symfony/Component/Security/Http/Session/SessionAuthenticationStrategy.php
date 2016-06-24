@@ -45,7 +45,6 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
         switch ($this->strategy) {
             case self::NONE:
                 return;
-
             case self::MIGRATE:
                 // Destroying the old session is broken in php 5.4.0 - 5.4.10
                 // See php bug #63379
@@ -53,12 +52,10 @@ class SessionAuthenticationStrategy implements SessionAuthenticationStrategyInte
                 $request->getSession()->migrate($destroy);
 
                 return;
-
             case self::INVALIDATE:
                 $request->getSession()->invalidate();
 
                 return;
-
             default:
                 throw new \RuntimeException(sprintf('Invalid session authentication strategy "%s"', $this->strategy));
         }

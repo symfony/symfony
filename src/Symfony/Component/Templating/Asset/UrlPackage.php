@@ -75,10 +75,8 @@ class UrlPackage extends Package
         switch ($count = count($this->baseUrls)) {
             case 0:
                 return '';
-
             case 1:
                 return $this->baseUrls[0];
-
             default:
                 return $this->baseUrls[fmod(hexdec(substr(hash('sha256', $path), 0, 10)), $count)];
         }

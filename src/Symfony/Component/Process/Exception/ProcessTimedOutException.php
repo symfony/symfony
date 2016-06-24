@@ -58,10 +58,8 @@ class ProcessTimedOutException extends RuntimeException
         switch ($this->timeoutType) {
             case self::TYPE_GENERAL:
                 return $this->process->getTimeout();
-
             case self::TYPE_IDLE:
                 return $this->process->getIdleTimeout();
-
             default:
                 throw new \LogicException(sprintf('Unknown timeout type "%d".', $this->timeoutType));
         }

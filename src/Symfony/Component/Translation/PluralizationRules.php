@@ -72,7 +72,6 @@ class PluralizationRules
             case 'zh':
                 return 0;
                 break;
-
             case 'af':
             case 'bn':
             case 'bg':
@@ -124,7 +123,6 @@ class PluralizationRules
             case 'ur':
             case 'zu':
                 return ($number == 1) ? 0 : 1;
-
             case 'am':
             case 'bh':
             case 'fil':
@@ -139,7 +137,6 @@ class PluralizationRules
             case 'ti':
             case 'wa':
                 return (($number == 0) || ($number == 1)) ? 0 : 1;
-
             case 'be':
             case 'bs':
             case 'hr':
@@ -147,41 +144,29 @@ class PluralizationRules
             case 'sr':
             case 'uk':
                 return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
-
             case 'cs':
             case 'sk':
                 return ($number == 1) ? 0 : ((($number >= 2) && ($number <= 4)) ? 1 : 2);
-
             case 'ga':
                 return ($number == 1) ? 0 : (($number == 2) ? 1 : 2);
-
             case 'lt':
                 return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
-
             case 'sl':
                 return ($number % 100 == 1) ? 0 : (($number % 100 == 2) ? 1 : ((($number % 100 == 3) || ($number % 100 == 4)) ? 2 : 3));
-
             case 'mk':
                 return ($number % 10 == 1) ? 0 : 1;
-
             case 'mt':
                 return ($number == 1) ? 0 : ((($number == 0) || (($number % 100 > 1) && ($number % 100 < 11))) ? 1 : ((($number % 100 > 10) && ($number % 100 < 20)) ? 2 : 3));
-
             case 'lv':
                 return ($number == 0) ? 0 : ((($number % 10 == 1) && ($number % 100 != 11)) ? 1 : 2);
-
             case 'pl':
                 return ($number == 1) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 12) || ($number % 100 > 14))) ? 1 : 2);
-
             case 'cy':
                 return ($number == 1) ? 0 : (($number == 2) ? 1 : ((($number == 8) || ($number == 11)) ? 2 : 3));
-
             case 'ro':
                 return ($number == 1) ? 0 : ((($number == 0) || (($number % 100 > 0) && ($number % 100 < 20))) ? 1 : 2);
-
             case 'ar':
                 return ($number == 0) ? 0 : (($number == 1) ? 1 : (($number == 2) ? 2 : ((($number % 100 >= 3) && ($number % 100 <= 10)) ? 3 : ((($number % 100 >= 11) && ($number % 100 <= 99)) ? 4 : 5))));
-
             default:
                 return 0;
         }

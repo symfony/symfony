@@ -98,7 +98,6 @@ class FunctionExtension extends AbstractExtension
         }
 
         return $xpath->addCondition(implode(' and ', $conditions));
-
         // todo: handle an+b, odd, even
         // an+b means every-a, plus b, e.g., 2n+1 means odd
         // 0n+b means b

@@ -18,7 +18,7 @@ use Symfony\Component\Filesystem\LockHandler;
 /**
  * Basic lock feature for commands.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Geoffrey Brier <geoffrey.brier@gmail.com>
  */
 trait LockableTrait
 {

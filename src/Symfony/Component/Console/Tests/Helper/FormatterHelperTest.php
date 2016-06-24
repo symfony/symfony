@@ -109,6 +109,14 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('test!', $formatter->truncate($message, 4, '!'));
     }
 
+    public function testTruncatingMessageWithInvalidEncoding()
+    {
+        $formatter = new FormatterHelper();
+        $message = str_repeat(chr(-1), 4);
+
+        $this->assertSame(str_repeat(chr(-1), 2).'!', $formatter->truncate($message, 2, '!'));
+    }
+
     public function testTruncatingWithLongerLengthThanMessageWithSuffix()
     {
         $formatter = new FormatterHelper();

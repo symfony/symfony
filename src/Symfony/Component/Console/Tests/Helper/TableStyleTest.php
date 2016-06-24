@@ -16,12 +16,22 @@ use Symfony\Component\Console\Helper\TableStyle;
 class TableStyleTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException        \InvalidArgumentException
+     * @expectedException        \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid padding type. Expected one of (STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH).
      */
     public function testSetPadTypeWithInvalidType()
     {
         $style = new TableStyle();
         $style->setPadType('TEST');
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\LogicException
+     * @expectedExceptionMessage The padding char must not be empty.
+     */
+    public function testSetPaddingCharWithInvalidType()
+    {
+        $style = new TableStyle();
+        $style->setPaddingChar(null);
     }
 }

@@ -38,6 +38,15 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         $this->assertDescription($expectedDescription, $definition);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Object of type "stdClass" is not describable.
+     */
+    public function testDescribeCommandInvalidObjects()
+    {
+        $this->assertDescription(null, new \stdClass());
+    }
+
     /** @dataProvider getDescribeCommandTestData */
     public function testDescribeCommand(Command $command, $expectedDescription)
     {

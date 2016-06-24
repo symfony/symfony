@@ -7,6 +7,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * @group tty
@@ -22,7 +23,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
         $heroes = array('Superman', 'Batman', 'Spiderman');
 
-        $inputStream = $this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n");
+        $inputStream = $this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\ny\n");
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '2');
         $question->setMaxAttempts(1);
@@ -71,6 +72,34 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
         $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
         $this->assertOutputContains('What is your favorite superhero? [Superman, Batman]', $output);
+
+        $question = new ConfirmationQuestion('Do you like superheroes ?');
+        $this->assertTrue($questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
+        $this->assertOutputContains('Do you like superheroes ? (yes/no)', $output);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Console\Exception\LogicException
+     * @expectedExceptionMessage A value is required.
+     */
+    public function testAskWithInvalidValidatorThrowsLogicException()
+    {
+        $questionHelper = new SymfonyQuestionHelper();
+
+        $helperSet = new HelperSet(array(new FormatterHelper()));
+        $questionHelper->setHelperSet($helperSet);
+
+        $heroes = array('Superman', 'Batman', 'Spiderman');
+
+        $inputStream = $this->getInputStream("\n1\n");
+
+        $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '2');
+        $question->setMaxAttempts(1);
+        $question->setValidator(function () {
+            return '';
+        });
+
+        $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question);
     }
 
     protected function getInputStream($input)

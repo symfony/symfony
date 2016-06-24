@@ -57,4 +57,15 @@ class StreamOutputTest extends \PHPUnit_Framework_TestCase
         rewind($output->getStream());
         $this->assertEquals('foo'.PHP_EOL, stream_get_contents($output->getStream()), '->doWrite() writes to the stream');
     }
+
+    /**
+     * @expectedException \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Unable to write output.
+     */
+    public function testDoWriteThrowsRuntimeException()
+    {
+        $output = new StreamOutput($this->stream);
+        fclose($this->stream);
+        $output->writeln('foo');
+    }
 }

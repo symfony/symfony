@@ -523,7 +523,7 @@ class ProgressBar
     private function overwrite($message)
     {
         if ($this->overwrite) {
-            if (!$this->isFirstRun()) {
+            if (!$this->firstRun) {
                 // Move the cursor to the beginning of the line
                 $this->output->write("\x0D");
 
@@ -539,7 +539,7 @@ class ProgressBar
             $this->output->writeln('');
         }
 
-        $this->setFirstRun(false);
+        $this->firstRun = false;
 
         $this->output->write($message);
     }
@@ -631,15 +631,5 @@ class ProgressBar
             'debug' => ' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%',
             'debug_nomax' => ' %current% [%bar%] %elapsed:6s% %memory:6s%',
         );
-    }
-
-    private function isFirstRun()
-    {
-        return $this->firstRun;
-    }
-
-    private function setFirstRun($firstRun)
-    {
-        $this->firstRun = (bool) $firstRun;
     }
 }

@@ -217,10 +217,13 @@ class SymfonyStyle extends OutputStyle
      */
     public function table(array $headers, array $rows)
     {
+        $style = clone Table::getStyleDefinition('symfony-style-guide');
+        $style->setCellHeaderFormat('<info>%s</info>');
+
         $table = new Table($this);
         $table->setHeaders($headers);
         $table->setRows($rows);
-        $table->setStyle((clone Table::getStyleDefinition('symfony-style-guide'))->setCellHeaderFormat('<info>%s</info>'));
+        $table->setStyle($style);
 
         $table->render();
         $this->newLine();

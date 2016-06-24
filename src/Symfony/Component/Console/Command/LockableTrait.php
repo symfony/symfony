@@ -22,14 +22,14 @@ use Symfony\Component\Filesystem\LockHandler;
  */
 trait LockableTrait
 {
-    protected $lockHandler;
+    private $lockHandler;
 
     /**
      * Locks a command.
      *
      * @return bool
      */
-    protected function lock($name = null, $blocking = false)
+    private function lock($name = null, $blocking = false)
     {
         if (!class_exists(LockHandler::class)) {
             throw new RuntimeException('To enable the locking feature you must install the symfony/filesystem component.');
@@ -53,7 +53,7 @@ trait LockableTrait
     /**
      * Releases the command lock if there is one.
      */
-    protected function release()
+    private function release()
     {
         if ($this->lockHandler) {
             $this->lockHandler->release();

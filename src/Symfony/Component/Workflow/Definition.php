@@ -65,7 +65,7 @@ class Definition
     public function addPlace($place)
     {
         if (!preg_match('{^[\w\d_-]+$}', $place)) {
-            throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $name));
+            throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $place));
         }
 
         if (!count($this->places)) {

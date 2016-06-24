@@ -17,6 +17,15 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('a', $definition->getInitialPlace());
     }
 
+    /**
+     * @expectedException Symfony\Component\Workflow\Exception\InvalidArgumentException
+     */
+    public function testAddPlacesInvalidArgument()
+    {
+        $places = ['a"', 'e"'];
+        $definiton = new Definition($places);
+    }
+
     public function testSetInitialPlace()
     {
         $places = range('a', 'e');

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-06-23T17:37:12Z
+
+The fact that it does not change the Configuration class looks weird to me
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-23T17:53:14Z
+
+@stof ``canBeEnabled`` is used in the ``Configuration`` so it's ok. In fact it's possible that this was broken, i'll run some checks.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-23T17:58:55Z
+
+@stof ok in fact the ``$this->isConfigEnabled()`` is inside the ``register*`` functions.
+Anyway this still looks inconsistent to me, imo we should move this checks to the main function, wdyt?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-23T18:32:38Z
+
+At least, I would now remove the second call to the `isConfigEnabled()` method inside `registerSerializerConfiguration()` and `registerPropertyInfoConfiguration()`.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-23T20:23:06Z
+
+done @xabbuh
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-23T21:23:25Z
+
+:+1: LGTM

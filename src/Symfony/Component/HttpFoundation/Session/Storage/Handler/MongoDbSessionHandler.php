@@ -61,8 +61,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      * If you use such an index, you can drop `gc_probability` to 0 since
      * no garbage-collection is required.
      *
-     * @param \Mongo|\MongoClient|\MongoDB\Client   $mongo A MongoDB\Client, MongoClient or Mongo instance
-     * @param array                                 $options An associative array of field options
+     * @param \Mongo|\MongoClient|\MongoDB\Client $mongo A MongoDB\Client, MongoClient or Mongo instance
+     * @param array                               $options An associative array of field options
      *
      * @throws \InvalidArgumentException When MongoClient or Mongo instance not provided
      * @throws \InvalidArgumentException When "database" or "collection" not provided
@@ -216,7 +216,8 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      * Create a date object using the class appropriate for the current mongo connection
      *
      * Return an instance of a MongoDate or \MongoDB\BSON\UTCDateTime
-     * @param integer $seconds An integer representing UTC seconds since Jan 1 1970.  Defaults to now.
+     *
+     * @param int $seconds An integer representing UTC seconds since Jan 1 1970.  Defaults to now.
      */
     private function createDateTime($seconds = null)
     {

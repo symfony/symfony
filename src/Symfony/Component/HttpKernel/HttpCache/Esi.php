@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Esi
+class Esi implements SurrogateInterface
 {
     private $contentTypes;
     private $phpEscapeMap = array(
@@ -45,14 +45,19 @@ class Esi
         $this->contentTypes = $contentTypes;
     }
 
+    public function getName()
+    {
+        return 'esi';
+    }
+
     /**
      * Returns a new cache strategy instance.
      *
-     * @return EsiResponseCacheStrategyInterface A EsiResponseCacheStrategyInterface instance
+     * @return ResponseCacheStrategyInterface A ResponseCacheStrategyInterface instance
      */
     public function createCacheStrategy()
     {
-        return new EsiResponseCacheStrategy();
+        return new ResponseCacheStrategy();
     }
 
     /**
@@ -62,7 +67,7 @@ class Esi
      *
      * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
      */
-    public function hasSurrogateEsiCapability(Request $request)
+    public function hasSurrogateCapability(Request $request)
     {
         if (null === $value = $request->headers->get('Surrogate-Capability')) {
             return false;
@@ -72,16 +77,46 @@ class Esi
     }
 
     /**
+     * Checks that at least one surrogate has ESI/1.0 capability.
+     *
+     * @param Request $request A Request instance
+     *
+     * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
+     *
+     * @deprecated since version 2.6, to be removed in 3.0. Use hasSurrogateCapability() instead
+     */
+    public function hasSurrogateEsiCapability(Request $request)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the hasSurrogateCapability() method instead.', E_USER_DEPRECATED);
+
+        return $this->hasSurrogateCapability($request);
+    }
+
+    /**
      * Adds ESI/1.0 capability to the given Request.
      *
      * @param Request $request A Request instance
      */
-    public function addSurrogateEsiCapability(Request $request)
+    public function addSurrogateCapability(Request $request)
     {
         $current = $request->headers->get('Surrogate-Capability');
         $new = 'symfony2="ESI/1.0"';
 
         $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
+    }
+
+    /**
+     * Adds ESI/1.0 capability to the given Request.
+     *
+     * @param Request $request A Request instance
+     *
+     * @deprecated since version 2.6, to be removed in 3.0. Use addSurrogateCapability() instead
+     */
+    public function addSurrogateEsiCapability(Request $request)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the addSurrogateCapability() method instead.', E_USER_DEPRECATED);
+
+        $this->addSurrogateCapability($request);
     }
 
     /**
@@ -105,13 +140,29 @@ class Esi
      *
      * @return bool true if the Response needs to be parsed, false otherwise
      */
-    public function needsEsiParsing(Response $response)
+    public function needsParsing(Response $response)
     {
         if (!$control = $response->headers->get('Surrogate-Control')) {
             return false;
         }
 
         return (bool) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
+    }
+
+    /**
+     * Checks that the Response needs to be parsed for ESI tags.
+     *
+     * @param Response $response A Response instance
+     *
+     * @return bool true if the Response needs to be parsed, false otherwise
+     *
+     * @deprecated since version 2.6, to be removed in 3.0. Use needsParsing() instead
+     */
+    public function needsEsiParsing(Response $response)
+    {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the needsParsing() method instead.', E_USER_DEPRECATED);
+
+        return $this->needsParsing($response);
     }
 
     /**
@@ -149,7 +200,6 @@ class Esi
      */
     public function process(Request $request, Response $response)
     {
-        $this->request = $request;
         $type = $response->headers->get('Content-Type');
         if (empty($type)) {
             $type = 'text/html';
@@ -180,7 +230,7 @@ class Esi
                 throw new \RuntimeException('Unable to process an ESI tag without a "src" attribute.');
             }
 
-            $chunks[$i] = sprintf('<?php echo $this->esi->handle($this, %s, %s, %s) ?>'."\n",
+            $chunks[$i] = sprintf('<?php echo $this->surrogate->handle($this, %s, %s, %s) ?>'."\n",
                 var_export($options['src'], true),
                 var_export(isset($options['alt']) ? $options['alt'] : '', true),
                 isset($options['onerror']) && 'continue' === $options['onerror'] ? 'true' : 'false'

@@ -16,10 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/http-kernel": "~2.2",
+        "php": ">=5.3.9",
+        "symfony/http-kernel": "~2.4",
         "symfony/routing": "~2.2",
-        "symfony/twig-bridge": "~2.2"
+        "symfony/twig-bridge": "~2.7"
     },
     "require-dev": {
         "symfony/config": "~2.2",
@@ -28,16 +28,15 @@
         "symfony/stopwatch": "~2.2"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },
+        "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
     },
-    "target-dir": "Symfony/Bundle/WebProfilerBundle",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

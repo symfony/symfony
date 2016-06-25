@@ -442,6 +442,28 @@ EOF;
         $this->assertEquals(array('foo' => null, 'bar' => 1), $this->parser->parse($input), '->parse() does not parse objects');
     }
 
+    public function testObjectForMapEnabledWithMapping()
+    {
+        $yaml = <<<EOF
+foo:
+    fiz: [cat]
+EOF;
+        $result = $this->parser->parse($yaml, false, false, true);
+
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertInstanceOf('stdClass', $result->foo);
+        $this->assertEquals(array('cat'), $result->foo->fiz);
+    }
+
+    public function testObjectForMapEnabledWithInlineMapping()
+    {
+        $result = $this->parser->parse('{ "foo": "bar", "fiz": "cat" }', false, false, true);
+
+        $this->assertInstanceOf('stdClass', $result);
+        $this->assertEquals('bar', $result->foo);
+        $this->assertEquals('cat', $result->fiz);
+    }
+
     /**
      * @dataProvider invalidDumpedObjectProvider
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
@@ -585,6 +607,25 @@ EOT;
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function testSequenceFollowedByCommentEmbeddedInMapping()
+    {
+        $yaml = <<<EOT
+a:
+    b:
+        - c
+# comment
+    d: e
+EOT;
+        $expected = array(
+            'a' => array(
+                'b' => array('c'),
+                'd' => 'e',
+            ),
+        );
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      */
@@ -596,6 +637,63 @@ yaml:
   hash: me
 EOF
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage missing colon
+     */
+    public function testScalarInSequence()
+    {
+        Yaml::parse(<<<EOF
+foo:
+    - bar
+"missing colon"
+    foo: bar
+EOF
+        );
+    }
+
+    /**
+     * > It is an error for two equal keys to appear in the same mapping node.
+     * > In such a case the YAML processor may continue, ignoring the second
+     * > `key: value` pair and issuing an appropriate warning. This strategy
+     * > preserves a consistent information model for one-pass and random access
+     * > applications.
+     *
+     * @see http://yaml.org/spec/1.2/spec.html#id2759572
+     * @see http://yaml.org/spec/1.1/#id932806
+     */
+    public function testMappingDuplicateKeyBlock()
+    {
+        $input = <<<EOD
+parent:
+    child: first
+    child: duplicate
+parent:
+    child: duplicate
+    child: duplicate
+EOD;
+        $expected = array(
+            'parent' => array(
+                'child' => 'first',
+            ),
+        );
+        $this->assertSame($expected, Yaml::parse($input));
+    }
+
+    public function testMappingDuplicateKeyFlow()
+    {
+        $input = <<<EOD
+parent: { child: first, child: duplicate }
+parent: { child: duplicate, child: duplicate }
+EOD;
+        $expected = array(
+            'parent' => array(
+                'child' => 'first',
+            ),
+        );
+        $this->assertSame($expected, Yaml::parse($input));
     }
 
     public function testEmptyValue()
@@ -959,6 +1057,74 @@ EOT
                 ,
             ),
             $this->parser->parse($yaml)
+        );
+    }
+
+    /**
+     * @param $lineNumber
+     * @param $yaml
+     * @dataProvider parserThrowsExceptionWithCorrectLineNumberProvider
+     */
+    public function testParserThrowsExceptionWithCorrectLineNumber($lineNumber, $yaml)
+    {
+        $this->setExpectedException(
+            '\Symfony\Component\Yaml\Exception\ParseException',
+            sprintf('Unexpected characters near "," at line %d (near "bar: "123",").', $lineNumber)
+        );
+
+        $this->parser->parse($yaml);
+    }
+
+    public function parserThrowsExceptionWithCorrectLineNumberProvider()
+    {
+        return array(
+            array(
+                4,
+                <<<YAML
+foo:
+    -
+        # bar
+        bar: "123",
+YAML
+            ),
+            array(
+                5,
+                <<<YAML
+foo:
+    -
+        # bar
+        # bar
+        bar: "123",
+YAML
+            ),
+            array(
+                8,
+                <<<YAML
+foo:
+    -
+        # foobar
+        baz: 123
+bar:
+    -
+        # bar
+        bar: "123",
+YAML
+            ),
+            array(
+                10,
+                <<<YAML
+foo:
+    -
+        # foobar
+        # foobar
+        baz: 123
+bar:
+    -
+        # bar
+        # bar
+        bar: "123",
+YAML
+            ),
         );
     }
 }

@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class Compiler
 {
     private $passConfig;
-    private $log;
+    private $log = array();
     private $loggingFormatter;
     private $serviceReferenceGraph;
 
@@ -30,7 +30,6 @@ class Compiler
         $this->passConfig = new PassConfig();
         $this->serviceReferenceGraph = new ServiceReferenceGraph();
         $this->loggingFormatter = new LoggingFormatter();
-        $this->log = array();
     }
 
     /**

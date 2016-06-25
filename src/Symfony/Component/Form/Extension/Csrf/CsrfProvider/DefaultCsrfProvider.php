@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Extension\Csrf\CsrfProvider;
 
 use Symfony\Component\Security\Core\Util\StringUtils;
 
+@trigger_error('The '.__NAMESPACE__.'\DefaultCsrfProvider is deprecated since version 2.4 and will be removed in version 3.0. Use the \Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage class instead.', E_USER_DEPRECATED);
+
 /**
  * Default implementation of CsrfProviderInterface.
  *
@@ -20,6 +22,11 @@ use Symfony\Component\Security\Core\Util\StringUtils;
  * user-defined secret value to secure the CSRF token.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.4, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Security\Csrf\CsrfTokenManager} in
+ *             combination with {@link \Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage}
+ *             instead.
  */
 class DefaultCsrfProvider implements CsrfProviderInterface
 {

@@ -17,6 +17,9 @@ use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
 class JsonEncoderTest extends \PHPUnit_Framework_TestCase
 {
+    private $encoder;
+    private $serializer;
+
     protected function setUp()
     {
         $this->encoder = new JsonEncoder();

@@ -132,6 +132,20 @@ class FlattenExceptionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @requires PHP 7.0
+     */
+    public function testPreviousError()
+    {
+        $exception = new \Exception('test', 123, new \ParseError('Oh noes!', 42));
+
+        $flattened = FlattenException::create($exception)->getPrevious();
+
+        $this->assertEquals($flattened->getMessage(), 'Parse error: Oh noes!', 'The message is copied from the original exception.');
+        $this->assertEquals($flattened->getCode(), 42, 'The code is copied from the original exception.');
+        $this->assertEquals($flattened->getClass(), 'Symfony\Component\Debug\Exception\FatalThrowableError', 'The class is set to the class of the original exception');
+    }
+
+    /**
      * @dataProvider flattenDataProvider
      */
     public function testLine(\Exception $exception)

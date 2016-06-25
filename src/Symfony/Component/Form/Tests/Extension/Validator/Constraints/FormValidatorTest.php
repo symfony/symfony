@@ -21,6 +21,7 @@ use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -52,6 +53,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         );
 
         parent::setUp();
+    }
+
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
     }
 
     protected function createValidator()
@@ -128,6 +134,8 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $object = new \stdClass();
         $form = new FormBuilder('name', '\stdClass', $this->dispatcher, $this->factory);
         $form = $form->setData($object)->getForm();
+
+        $this->expectValidateAt(0, 'data', $object, 'Default');
 
         $this->validator->validate($form, new Form());
 
@@ -233,7 +241,8 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
-            ->setCode(Form::ERR_INVALID)
+            ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -267,7 +276,8 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', 'foo')
             ->setParameter('{{ foo }}', 'bar')
             ->setInvalidValue('foo')
-            ->setCode(Form::ERR_INVALID)
+            ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -300,7 +310,8 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
             ->setInvalidValue('foo')
-            ->setCode(Form::ERR_INVALID)
+            ->setCode(Form::NOT_SYNCHRONIZED_ERROR)
+            ->setCause($form->getTransformationFailure())
             ->assertRaised();
     }
 
@@ -556,7 +567,30 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('Extra!')
             ->setParameter('{{ extra_fields }}', 'foo')
             ->setInvalidValue(array('foo' => 'bar'))
+            ->setCode(Form::NO_SUCH_FIELD_ERROR)
             ->assertRaised();
+    }
+
+    public function testNoViolationIfAllowExtraData()
+    {
+        $context = $this->getMockExecutionContext();
+
+        $form = $this
+            ->getBuilder('parent', null, array('allow_extra_fields' => true))
+            ->setCompound(true)
+            ->setDataMapper($this->getDataMapper())
+            ->add($this->getBuilder('child'))
+            ->getForm();
+
+        $form->submit(array('foo' => 'bar'));
+
+        $context->expects($this->never())
+            ->method('addViolation');
+        $context->expects($this->never())
+            ->method('addViolationAt');
+
+        $this->validator->initialize($context);
+        $this->validator->validate($form, new Form());
     }
 
     /**
@@ -567,6 +601,24 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
     public function getValidationGroups(FormInterface $form)
     {
         return array('group1', 'group2');
+    }
+
+    private function getMockExecutionContext()
+    {
+        $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
+        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $contextualValidator = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+
+        $validator->expects($this->any())
+            ->method('inContext')
+            ->with($context)
+            ->will($this->returnValue($contextualValidator));
+
+        $context->expects($this->any())
+            ->method('getValidator')
+            ->will($this->returnValue($validator));
+
+        return $context;
     }
 
     /**

@@ -45,7 +45,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      * @param LoggerInterface       $logger
      * @param SecureRandomInterface $secureRandom
      */
-    public function __construct(array $userProviders, $key, $providerKey, array $options = array(), LoggerInterface $logger = null, SecureRandomInterface $secureRandom)
+    public function __construct(array $userProviders, $key, $providerKey, array $options, LoggerInterface $logger = null, SecureRandomInterface $secureRandom)
     {
         parent::__construct($userProviders, $key, $providerKey, $options, $logger);
 
@@ -99,7 +99,6 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        $series = $persistentToken->getSeries();
         $tokenValue = base64_encode($this->secureRandom->nextBytes(64));
         $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
         $request->attributes->set(self::COOKIE_ATTR_NAME,

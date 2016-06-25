@@ -43,11 +43,11 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testToString()
+    public function testGetPath()
     {
         $cache = new ConfigCache($this->cacheFile, true);
 
-        $this->assertSame($this->cacheFile, (string) $cache);
+        $this->assertSame($this->cacheFile, $cache->getPath());
     }
 
     public function testCacheIsNotFreshIfFileDoesNotExist()

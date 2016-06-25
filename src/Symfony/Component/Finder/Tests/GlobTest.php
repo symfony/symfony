@@ -19,5 +19,7 @@ class GlobTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals('#^(?=[^\.])\#$#', Glob::toRegex('#'));
         $this->assertEquals('#^\.[^/]*$#', Glob::toRegex('.*'));
+        $this->assertEquals('^\.[^/]*$', Glob::toRegex('.*', true, true, ''));
+        $this->assertEquals('/^\.[^/]*$/', Glob::toRegex('.*', true, true, '/'));
     }
 }

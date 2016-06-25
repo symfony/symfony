@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 /**
  * @author Premi Giorgio <giosh94mhz@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @group legacy
  */
 class UnloadedEntityChoiceListSingleAssociationToIntIdTest extends AbstractEntityChoiceListSingleAssociationToIntIdTest
 {

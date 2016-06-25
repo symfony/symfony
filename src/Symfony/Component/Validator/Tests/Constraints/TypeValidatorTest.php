@@ -13,10 +13,16 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
+use Symfony\Component\Validator\Validation;
 
 class TypeValidatorTest extends AbstractConstraintValidatorTest
 {
     protected static $file;
+
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
 
     protected function createValidator()
     {

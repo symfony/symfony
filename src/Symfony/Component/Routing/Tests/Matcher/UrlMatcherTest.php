@@ -26,13 +26,13 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo', new Route('/foo'));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
-        $matcher->match('/foo');
+        $this->assertInternalType('array', $matcher->match('/foo'));
     }
 
     public function testMethodNotAllowed()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_method' => 'post')));
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('post')));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
 
@@ -47,17 +47,17 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     public function testHeadAllowedWhenRequirementContainsGet()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_method' => 'get')));
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('get')));
 
         $matcher = new UrlMatcher($coll, new RequestContext('', 'head'));
-        $matcher->match('/foo');
+        $this->assertInternalType('array', $matcher->match('/foo'));
     }
 
     public function testMethodNotAllowedAggregatesAllowedMethods()
     {
         $coll = new RouteCollection();
-        $coll->add('foo1', new Route('/foo', array(), array('_method' => 'post')));
-        $coll->add('foo2', new Route('/foo', array(), array('_method' => 'put|delete')));
+        $coll->add('foo1', new Route('/foo', array(), array(), array(), '', array(), array('post')));
+        $coll->add('foo2', new Route('/foo', array(), array(), array(), '', array(), array('put', 'delete')));
 
         $matcher = new UrlMatcher($coll, new RequestContext());
 
@@ -90,7 +90,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         // test that route "method" is ignored if no method is given in the context
         $collection = new RouteCollection();
-        $collection->add('foo', new Route('/foo', array(), array('_method' => 'GET|head')));
+        $collection->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('get', 'head')));
         $matcher = new UrlMatcher($collection, new RequestContext());
         $this->assertInternalType('array', $matcher->match('/foo'));
 
@@ -318,7 +318,20 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     public function testSchemeRequirement()
     {
         $coll = new RouteCollection();
-        $coll->add('foo', new Route('/foo', array(), array('_scheme' => 'https')));
+        $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
+        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher->match('/foo');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
+     */
+    public function testCondition()
+    {
+        $coll = new RouteCollection();
+        $route = new Route('/foo');
+        $route->setCondition('context.getMethod() == "POST"');
+        $coll->add('foo', $route);
         $matcher = new UrlMatcher($coll, new RequestContext());
         $matcher->match('/foo');
     }

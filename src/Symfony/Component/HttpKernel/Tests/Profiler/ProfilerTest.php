@@ -26,14 +26,15 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
         $request->query->set('foo', 'bar');
-        $response = new Response();
+        $response = new Response('', 204);
         $collector = new RequestDataCollector();
 
         $profiler = new Profiler($this->storage);
         $profiler->add($collector);
         $profile = $profiler->collect($request, $response);
 
-        $profile = $profiler->loadProfile($profile->getToken());
+        $this->assertSame(204, $profile->getStatusCode());
+        $this->assertSame('GET', $profile->getMethod());
         $this->assertEquals(array('foo' => 'bar'), $profiler->get('request')->getRequestQuery()->all());
     }
 

@@ -16,6 +16,6 @@ namespace Symfony\Component\Serializer\Exception;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class InvalidArgumentException extends \InvalidArgumentException implements Exception
+class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }

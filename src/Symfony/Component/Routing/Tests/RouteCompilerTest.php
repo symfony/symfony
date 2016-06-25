@@ -160,7 +160,7 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                     array('variable', '.', '[^/]++', '_format'),
                     array('variable', '/', '[^/\.]++', 'bar'),
                     array('text', '/foo'),
-                ), 
+                ),
             ),
         );
     }

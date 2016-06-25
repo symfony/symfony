@@ -132,7 +132,10 @@ class FlashBagTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetIterator()
+    /**
+     * @group legacy
+     */
+    public function testLegacyGetIterator()
     {
         $flashes = array('hello' => 'world', 'beep' => 'boop', 'notice' => 'nope');
         foreach ($flashes as $key => $val) {

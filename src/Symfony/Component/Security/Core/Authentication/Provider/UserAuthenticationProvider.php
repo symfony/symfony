@@ -70,7 +70,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $user = $this->retrieveUser($username, $token);
         } catch (UsernameNotFoundException $e) {
             if ($this->hideUserNotFoundExceptions) {
-                throw new BadCredentialsException('Bad credentials', 0, $e);
+                throw new BadCredentialsException('Bad credentials.', 0, $e);
             }
             $e->setUsername($username);
 
@@ -87,7 +87,7 @@ abstract class UserAuthenticationProvider implements AuthenticationProviderInter
             $this->userChecker->checkPostAuth($user);
         } catch (BadCredentialsException $e) {
             if ($this->hideUserNotFoundExceptions) {
-                throw new BadCredentialsException('Bad credentials', 0, $e);
+                throw new BadCredentialsException('Bad credentials.', 0, $e);
             }
 
             throw $e;

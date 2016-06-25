@@ -175,7 +175,7 @@
                 <target>画像の高さが小さすぎます({{ height }}ピクセル)。{{ min_height }}ピクセル以上にしてください。</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>ユーザーの現在のパスワードでなければなりません。</target>
             </trans-unit>
             <trans-unit id="48">

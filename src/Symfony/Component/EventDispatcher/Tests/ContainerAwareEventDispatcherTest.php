@@ -17,8 +17,15 @@ use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ContainerAwareEventDispatcherTest extends \PHPUnit_Framework_TestCase
+class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
 {
+    protected function createEventDispatcher()
+    {
+        $container = new Container();
+
+        return new ContainerAwareEventDispatcher($container);
+    }
+
     public function testAddAListenerService()
     {
         $event = new Event();

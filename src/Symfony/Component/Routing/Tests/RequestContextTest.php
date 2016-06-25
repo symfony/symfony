@@ -140,4 +140,20 @@ class RequestContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(123, $requestContext->getHttpPort());
         $this->assertSame(456, $requestContext->getHttpsPort());
     }
+
+    public function testFluentInterface()
+    {
+        $requestContext = new RequestContext();
+
+        $this->assertSame($requestContext, $requestContext->setBaseUrl('/app.php'));
+        $this->assertSame($requestContext, $requestContext->setPathInfo('/index'));
+        $this->assertSame($requestContext, $requestContext->setMethod('POST'));
+        $this->assertSame($requestContext, $requestContext->setScheme('https'));
+        $this->assertSame($requestContext, $requestContext->setHost('example.com'));
+        $this->assertSame($requestContext, $requestContext->setQueryString('foo=bar'));
+        $this->assertSame($requestContext, $requestContext->setHttpPort(80));
+        $this->assertSame($requestContext, $requestContext->setHttpsPort(443));
+        $this->assertSame($requestContext, $requestContext->setParameters(array()));
+        $this->assertSame($requestContext, $requestContext->setParameter('foo', 'bar'));
+    }
 }

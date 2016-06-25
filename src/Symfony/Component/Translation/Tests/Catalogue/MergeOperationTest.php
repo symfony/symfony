@@ -53,6 +53,29 @@ class MergeOperationTest extends AbstractOperationTest
         );
     }
 
+    public function testGetResultWithMetadata()
+    {
+        $leftCatalogue = new MessageCatalogue('en', array('messages' => array('a' => 'old_a', 'b' => 'old_b')));
+        $leftCatalogue->setMetadata('a', 'foo', 'messages');
+        $leftCatalogue->setMetadata('b', 'bar', 'messages');
+        $rightCatalogue = new MessageCatalogue('en', array('messages' => array('b' => 'new_b', 'c' => 'new_c')));
+        $rightCatalogue->setMetadata('b', 'baz', 'messages');
+        $rightCatalogue->setMetadata('c', 'qux', 'messages');
+
+        $mergedCatalogue = new MessageCatalogue('en', array('messages' => array('a' => 'old_a', 'b' => 'old_b', 'c' => 'new_c')));
+        $mergedCatalogue->setMetadata('a', 'foo', 'messages');
+        $mergedCatalogue->setMetadata('b', 'bar', 'messages');
+        $mergedCatalogue->setMetadata('c', 'qux', 'messages');
+
+        $this->assertEquals(
+            $mergedCatalogue,
+            $this->createOperation(
+                $leftCatalogue,
+                $rightCatalogue
+            )->getResult()
+        );
+    }
+
     protected function createOperation(MessageCatalogueInterface $source, MessageCatalogueInterface $target)
     {
         return new MergeOperation($source, $target);

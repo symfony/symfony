@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Input;
 
 use Symfony\Component\Console\Descriptor\TextDescriptor;
 use Symfony\Component\Console\Descriptor\XmlDescriptor;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 /**
  * A InputDefinition represents a set of valid command line arguments and options.
@@ -360,22 +361,50 @@ class InputDefinition
     /**
      * Gets the synopsis.
      *
+     * @param bool $short Whether to return the short version (with options folded) or not
+     *
      * @return string The synopsis
      */
-    public function getSynopsis()
+    public function getSynopsis($short = false)
     {
         $elements = array();
-        foreach ($this->getOptions() as $option) {
-            $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
-            $elements[] = sprintf('['.($option->isValueRequired() ? '%s--%s="..."' : ($option->isValueOptional() ? '%s--%s[="..."]' : '%s--%s')).']', $shortcut, $option->getName());
+
+        if ($short && $this->getOptions()) {
+            $elements[] = '[options]';
+        } elseif (!$short) {
+            foreach ($this->getOptions() as $option) {
+                $value = '';
+                if ($option->acceptValue()) {
+                    $value = sprintf(
+                        ' %s%s%s',
+                        $option->isValueOptional() ? '[' : '',
+                        strtoupper($option->getName()),
+                        $option->isValueOptional() ? ']' : ''
+                    );
+                }
+
+                $shortcut = $option->getShortcut() ? sprintf('-%s|', $option->getShortcut()) : '';
+                $elements[] = sprintf('[%s--%s%s]', $shortcut, $option->getName(), $value);
+            }
+        }
+
+        if (count($elements) && $this->getArguments()) {
+            $elements[] = '[--]';
         }
 
         foreach ($this->getArguments() as $argument) {
-            $elements[] = sprintf($argument->isRequired() ? '%s' : '[%s]', $argument->getName().($argument->isArray() ? '1' : ''));
+            $element = '<'.$argument->getName().'>';
+            if (!$argument->isRequired()) {
+                $element = '['.$element.']';
+            } elseif ($argument->isArray()) {
+                $element = $element.' ('.$element.')';
+            }
 
             if ($argument->isArray()) {
-                $elements[] = sprintf('... [%sN]', $argument->getName());
+                $element .= '...';
             }
+
+            $elements[] = $element;
         }
 
         return implode(' ', $elements);
@@ -386,13 +415,17 @@ class InputDefinition
      *
      * @return string A string representing the InputDefinition
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     * @deprecated since version 2.3, to be removed in 3.0.
      */
     public function asText()
     {
-        $descriptor = new TextDescriptor();
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
 
-        return $descriptor->describe($this);
+        $descriptor = new TextDescriptor();
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+        $descriptor->describe($output, $this, array('raw_output' => true));
+
+        return $output->fetch();
     }
 
     /**
@@ -402,12 +435,21 @@ class InputDefinition
      *
      * @return string|\DOMDocument An XML string representing the InputDefinition
      *
-     * @deprecated Deprecated since version 2.3, to be removed in 3.0.
+     * @deprecated since version 2.3, to be removed in 3.0.
      */
     public function asXml($asDom = false)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.3 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         $descriptor = new XmlDescriptor();
 
-        return $descriptor->describe($this, array('as_dom' => $asDom));
+        if ($asDom) {
+            return $descriptor->getInputDefinitionDocument($this);
+        }
+
+        $output = new BufferedOutput();
+        $descriptor->describe($output, $this);
+
+        return $output->fetch();
     }
 }

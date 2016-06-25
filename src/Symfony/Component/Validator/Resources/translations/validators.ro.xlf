@@ -175,7 +175,7 @@
                 <target>Înălțimea imaginii este prea mică ({{ height }}px). Înălțimea minimă permisă este de {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Această valoare trebuie să fie parola curentă a utilizatorului.</target>
             </trans-unit>
             <trans-unit id="48">

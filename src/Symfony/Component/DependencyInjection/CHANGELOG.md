@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * deprecated synchronized services
+
+2.6.0
+-----
+
+ * added new factory syntax and deprecated the old one
+
+2.5.0
+-----
+
+* added DecoratorServicePass and a way to override a service definition (Definition::setDecoratedService())
+* deprecated SimpleXMLElement class.
+
+2.4.0
+-----
+
+ * added support for expressions in service definitions
+ * added ContainerAwareTrait to add default container aware behavior to a class
+
 2.2.0
 -----
 

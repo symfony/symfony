@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
+@trigger_error('The '.__NAMESPACE__.'\ExecutionContext class is deprecated since version 2.5 and will be removed in 3.0. Use the Symfony\Component\Validator\Context\ExecutionContext class instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -20,6 +22,9 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
+ *             Use {@link Context\ExecutionContext} instead.
  */
 class ExecutionContext implements ExecutionContextInterface
 {
@@ -87,13 +92,13 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
+    public function addViolation($message, array $params = array(), $invalidValue = null, $plural = null, $code = null)
     {
-        if (null === $pluralization) {
+        if (null === $plural) {
             $translatedMessage = $this->translator->trans($message, $params, $this->translationDomain);
         } else {
             try {
-                $translatedMessage = $this->translator->transChoice($message, $pluralization, $params, $this->translationDomain);
+                $translatedMessage = $this->translator->transChoice($message, $plural, $params, $this->translationDomain);
             } catch (\InvalidArgumentException $e) {
                 $translatedMessage = $this->translator->trans($message, $params, $this->translationDomain);
             }
@@ -107,7 +112,7 @@ class ExecutionContext implements ExecutionContextInterface
             $this->propertyPath,
             // check using func_num_args() to allow passing null values
             func_num_args() >= 3 ? $invalidValue : $this->value,
-            $pluralization,
+            $plural,
             $code
         ));
     }
@@ -115,19 +120,19 @@ class ExecutionContext implements ExecutionContextInterface
     /**
      * {@inheritdoc}
      */
-    public function addViolationAt($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null)
+    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null)
     {
         $this->globalContext->getViolations()->add(new ConstraintViolation(
-            null === $pluralization
-                ? $this->translator->trans($message, $params, $this->translationDomain)
-                : $this->translator->transChoice($message, $pluralization, $params, $this->translationDomain),
+            null === $plural
+                ? $this->translator->trans($message, $parameters, $this->translationDomain)
+                : $this->translator->transChoice($message, $plural, $parameters, $this->translationDomain),
             $message,
-            $params,
+            $parameters,
             $this->globalContext->getRoot(),
             $this->getPropertyPath($subPath),
             // check using func_num_args() to allow passing null values
             func_num_args() >= 4 ? $invalidValue : $this->value,
-            $pluralization,
+            $plural,
             $code
         ));
     }

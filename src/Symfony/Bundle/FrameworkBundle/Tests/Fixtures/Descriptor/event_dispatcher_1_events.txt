@@ -1,0 +1,16 @@
+<info>[event_dispatcher]</info> Registered listeners by event
+
+<info>[Event]</info> event1
++-------+-------------------+
+| Order | Callable          |
++-------+-------------------+
+| #1    | global_function() |
+| #2    | \Closure()        |
++-------+-------------------+
+
+<info>[Event]</info> event2
++-------+-----------------------------------------------------------------------------------+
+| Order | Callable                                                                          |
++-------+-----------------------------------------------------------------------------------+
+| #1    | Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\CallableClass::__invoke() |
++-------+-----------------------------------------------------------------------------------+

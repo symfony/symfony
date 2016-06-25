@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Variable;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class PhpDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,25 +33,10 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container = new ContainerBuilder());
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer')), '->dump() takes a class and a base_class options');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump')), '->dump() takes a class and a base_class options');
 
         $container = new ContainerBuilder();
         new PhpDumper($container);
-    }
-
-    public function testDumpFrozenContainerWithNoParameter()
-    {
-        $container = new ContainerBuilder();
-        $container->setResourceTracking(false);
-        $container->register('foo', 'stdClass');
-
-        $container->compile();
-
-        $dumper = new PhpDumper($container);
-
-        $dumpedString = $dumper->dump();
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services11.php', $dumpedString, '->dump() does not add getDefaultParameters() method call if container have no parameters.');
-        $this->assertNotRegExp("/function getDefaultParameters\(/", $dumpedString, '->dump() does not add getDefaultParameters() method definition.');
     }
 
     public function testDumpOptimizationString()
@@ -114,6 +100,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(array('foo' => new Definition('stdClass'))),
+            array(array('foo' => new Expression('service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")'))),
             array(array('foo' => new Reference('foo'))),
             array(array('foo' => new Variable('foo'))),
         );
@@ -151,6 +138,24 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
+     */
+    public function testLegacySynchronizedServices()
+    {
+        $container = include self::$fixturesPath.'/containers/container20.php';
+        $dumper = new PhpDumper($container);
+        $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services20.php')), $dumper->dump(), '->dump() dumps services');
+    }
+
+    public function testServicesWithAnonymousFactories()
+    {
+        $container = include self::$fixturesPath.'/containers/container19.php';
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
+    }
+
+    /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Service id "bar$" cannot be converted to a valid PHP method name.
      */
@@ -160,6 +165,31 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->register('bar$', 'FooClass');
         $dumper = new PhpDumper($container);
         $dumper->dump();
+    }
+
+    /**
+     * @dataProvider provideInvalidFactories
+     * @expectedException Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Cannot dump definition
+     */
+    public function testInvalidFactories($factory)
+    {
+        $container = new ContainerBuilder();
+        $def = new Definition('stdClass');
+        $def->setFactory($factory);
+        $container->setDefinition('bar', $def);
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+    }
+
+    public function provideInvalidFactories()
+    {
+        return array(
+            array(array('', 'method')),
+            array(array('class', '')),
+            array(array('...', 'method')),
+            array(array('class', '...')),
+        );
     }
 
     public function testAliases()

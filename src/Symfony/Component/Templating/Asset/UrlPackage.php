@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating\Asset;
 
+@trigger_error('The Symfony\Component\Templating\Asset\UrlPackage is deprecated since version 2.7 and will be removed in 3.0. Use the Asset component instead.', E_USER_DEPRECATED);
+
 /**
  * The URL packages adds a version and a base URL to asset URLs.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @deprecated since 2.7, will be removed in 3.0. Use the Asset component instead.
  */
 class UrlPackage extends Package
 {
@@ -41,13 +45,16 @@ class UrlPackage extends Package
         }
     }
 
-    public function getUrl($path)
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrl($path, $version = null)
     {
         if (false !== strpos($path, '://') || 0 === strpos($path, '//')) {
             return $path;
         }
 
-        $url = $this->applyVersion($path);
+        $url = $this->applyVersion($path, $version);
 
         if ($url && '/' != $url[0]) {
             $url = '/'.$url;
@@ -73,7 +80,7 @@ class UrlPackage extends Package
                 return $this->baseUrls[0];
 
             default:
-                return $this->baseUrls[fmod(hexdec(substr(md5($path), 0, 10)), $count)];
+                return $this->baseUrls[fmod(hexdec(substr(hash('sha256', $path), 0, 10)), $count)];
         }
     }
 }

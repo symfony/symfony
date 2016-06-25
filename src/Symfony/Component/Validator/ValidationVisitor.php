@@ -11,15 +11,19 @@
 
 namespace Symfony\Component\Validator;
 
+@trigger_error('The '.__NAMESPACE__.'\ValidationVisitor class is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Default implementation of {@link ValidationVisitorInterface} and
  * {@link GlobalExecutionContextInterface}.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
  */
 class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionContextInterface
 {

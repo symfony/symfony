@@ -1,0 +1,99 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set time = collector.templatecount ? '%0.0f ms'|format(collector.time) : 'n/a' %}
+    {% set icon %}
+        <svg width="15pt" height="22pt" viewBox="0 0 21 28" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#3f4040" d=" M 1.12 4.11 C 7.37 3.95 13.63 3.95 19.88 4.11 C 20.12 10.37 20.13 16.63 19.88 22.89 C 13.63 23.05 7.37 23.05 1.12 22.89 C 0.87 16.63 0.88 10.37 1.12 4.11 Z" />
+            <path fill="#dddddd" d=" M 1.87 4.87 C 7.62 4.64 13.38 4.64 19.13 4.87 C 19.36 10.62 19.36 16.38 19.13 22.13 C 13.38 22.36 7.62 22.36 1.87 22.13 C 1.64 16.38 1.64 10.62 1.87 4.87 Z" />
+            <path fill="#3f4040" d=" M 3.99 7.05 C 8.33 6.95 12.67 6.95 17.01 7.05 C 17.01 7.77 17.01 9.23 17.01 9.95 C 12.67 10.05 8.33 10.05 3.99 9.95 C 3.99 9.23 3.99 7.77 3.99 7.05 Z" />
+            <path fill="#3f4040" d=" M 4.00 11.99 C 4.75 11.99 6.25 11.99 6.99 11.99 C 6.99 14.66 6.99 17.34 7.00 20.01 C 6.25 20.01 4.75 20.01 4.00 20.01 C 4.01 17.34 4.01 14.66 4.00 11.99 Z" />
+            <path fill="#3f4040" d=" M 8.99 11.99 C 11.66 12.01 14.33 12.01 17.01 11.99 C 16.99 14.66 16.99 17.34 17.01 20.01 C 14.34 19.99 11.67 19.99 9.00 20.01 C 9.01 17.33 9.01 14.66 8.99 11.99 Z" />
+        </svg>
+        <span class="sf-toolbar-status">{{ time }}</span>
+    {% endset %}
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Render Time</b>
+            <span>{{ time }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Template Calls</b>
+            <span>{{ collector.templatecount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Block Calls</b>
+            <span>{{ collector.blockcount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Macro Calls</b>
+            <span>{{ collector.macrocount }}</span>
+        </div>
+    {% endset %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon">
+        <svg width="17pt" height="24pt" viewBox="0 0 21 28" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#3f4040" d=" M 1.12 4.11 C 7.37 3.95 13.63 3.95 19.88 4.11 C 20.12 10.37 20.13 16.63 19.88 22.89 C 13.63 23.05 7.37 23.05 1.12 22.89 C 0.87 16.63 0.88 10.37 1.12 4.11 Z" />
+            <path fill="#dddddd" d=" M 1.87 4.87 C 7.62 4.64 13.38 4.64 19.13 4.87 C 19.36 10.62 19.36 16.38 19.13 22.13 C 13.38 22.36 7.62 22.36 1.87 22.13 C 1.64 16.38 1.64 10.62 1.87 4.87 Z" />
+            <path fill="#3f4040" d=" M 3.99 7.05 C 8.33 6.95 12.67 6.95 17.01 7.05 C 17.01 7.77 17.01 9.23 17.01 9.95 C 12.67 10.05 8.33 10.05 3.99 9.95 C 3.99 9.23 3.99 7.77 3.99 7.05 Z" />
+            <path fill="#3f4040" d=" M 4.00 11.99 C 4.75 11.99 6.25 11.99 6.99 11.99 C 6.99 14.66 6.99 17.34 7.00 20.01 C 6.25 20.01 4.75 20.01 4.00 20.01 C 4.01 17.34 4.01 14.66 4.00 11.99 Z" />
+            <path fill="#3f4040" d=" M 8.99 11.99 C 11.66 12.01 14.33 12.01 17.01 11.99 C 16.99 14.66 16.99 17.34 17.01 20.01 C 14.34 19.99 11.67 19.99 9.00 20.01 C 9.01 17.33 9.01 14.66 8.99 11.99 Z" />
+        </svg>
+    </span>
+    <strong>Twig</strong>
+    <span class="count">
+        <span>{{ collector.templatecount }}</span>
+        <span>{{ '%0.0f ms'|format(collector.time) }}</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    {% if collector.templatecount %}
+        <h2>Twig Stats</h2>
+
+        <table>
+            <tr>
+                <th>Total Render Time<br /><small>including sub-requests rendering time</small></th>
+                <td><pre>{{ '%0.0f ms'|format(collector.time) }}</pre></td>
+            </tr>
+            <tr>
+                <th scope="col" style="width: 30%">Template Calls</th>
+                <td scope="col" style="width: 60%"><pre>{{ collector.templatecount }}</pre></td>
+            </tr>
+            <tr>
+                <th>Block Calls</th>
+                <td><pre>{{ collector.blockcount }}</pre></td>
+            </tr>
+            <tr>
+                <th>Macro Calls</th>
+                <td><pre>{{ collector.macrocount }}</pre></td>
+            </tr>
+        </table>
+
+        <h2>Rendered Templates</h2>
+
+        <table>
+            <tr>
+                <th scope="col">Template Name</th>
+                <th scope="col">Render Count</th>
+            </tr>
+            {% for template, count in collector.templates %}
+                <tr>
+                    <td><code>{{ template }}</code></td>
+                    <td><pre>{{ count }}</pre></td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <h2>Rendering Call Graph</h2>
+
+        {{ collector.htmlcallgraph }}
+    {% else %}
+        <p><em>No Twig templates were rendered for this request.</em></p>
+    {% endif %}
+{% endblock %}

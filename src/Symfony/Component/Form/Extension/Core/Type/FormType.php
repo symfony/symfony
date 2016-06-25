@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -91,13 +91,14 @@ class FormType extends BaseType
             'value' => $form->getViewData(),
             'data' => $form->getNormData(),
             'required' => $form->isRequired(),
-            'max_length' => $options['max_length'],
-            'pattern' => $options['pattern'],
+            'max_length' => isset($options['attr']['maxlength']) ? $options['attr']['maxlength'] : null, // Deprecated
+            'pattern' => isset($options['attr']['pattern']) ? $options['attr']['pattern'] : null, // Deprecated
             'size' => null,
             'label_attr' => $options['label_attr'],
             'compound' => $form->getConfig()->getCompound(),
             'method' => $form->getConfig()->getMethod(),
             'action' => $form->getConfig()->getAction(),
+            'submitted' => $form->isSubmitted(),
         ));
     }
 
@@ -121,9 +122,9 @@ class FormType extends BaseType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::setDefaultOptions($resolver);
+        parent::configureOptions($resolver);
 
         // Derive "data_class" option from passed "data" object
         $dataClass = function (Options $options) {
@@ -154,8 +155,8 @@ class FormType extends BaseType
         // BC with old "virtual" option
         $inheritData = function (Options $options) {
             if (null !== $options['virtual']) {
-                // Uncomment this as soon as the deprecation note should be shown
-                // trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
+                @trigger_error('The form option "virtual" is deprecated since version 2.3 and will be removed in 3.0. Use "inherit_data" instead.', E_USER_DEPRECATED);
+
                 return $options['virtual'];
             }
 
@@ -164,9 +165,25 @@ class FormType extends BaseType
 
         // If data is given, the form is locked to that data
         // (independent of its value)
-        $resolver->setOptional(array(
+        $resolver->setDefined(array(
             'data',
         ));
+
+        // BC clause for the "max_length" and "pattern" option
+        // Add these values to the "attr" option instead
+        $defaultAttr = function (Options $options) {
+            $attributes = array();
+
+            if (null !== $options['max_length']) {
+                $attributes['maxlength'] = $options['max_length'];
+            }
+
+            if (null !== $options['pattern']) {
+                $attributes['pattern'] = $options['pattern'];
+            }
+
+            return $attributes;
+        };
 
         $resolver->setDefaults(array(
             'data_class' => $dataClass,
@@ -188,12 +205,11 @@ class FormType extends BaseType
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action' => '',
+            'attr' => $defaultAttr,
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
         ));
 
-        $resolver->setAllowedTypes(array(
-            'label_attr' => 'array',
-        ));
+        $resolver->setAllowedTypes('label_attr', 'array');
     }
 
     /**

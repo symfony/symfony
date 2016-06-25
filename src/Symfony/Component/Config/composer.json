@@ -16,20 +16,22 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.3.9",
         "symfony/filesystem": "~2.3"
     },
+    "suggest": {
+        "symfony/yaml": "To use the yaml reference dumper"
+    },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Config\\": "" },
+        "psr-4": { "Symfony\\Component\\Config\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
     },
-    "target-dir": "Symfony/Component/Config",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

@@ -23,6 +23,7 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
     {
         $kernel = new KernelForTest('test', true);
         $c = new ConfigDataCollector();
+        $c->setCacheVersionInfo(false);
         $c->setKernel($kernel);
         $c->collect(new Request(), new Response());
 

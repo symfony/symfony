@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+2.5.0
+-----
+
+ * added Debug\TraceableEventDispatcher (originally in HttpKernel)
+ * changed Debug\TraceableEventDispatcherInterface to extend EventDispatcherInterface
+ * added RegisterListenersPass (originally in HttpKernel)
+
 2.1.0
 -----
 

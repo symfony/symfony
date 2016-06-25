@@ -41,7 +41,7 @@ class Reference
      */
     public function __toString()
     {
-        return (string) $this->id;
+        return $this->id;
     }
 
     /**

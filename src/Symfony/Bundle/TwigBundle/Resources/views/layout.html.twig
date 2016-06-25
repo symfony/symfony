@@ -4,8 +4,8 @@
         <meta charset="{{ _charset }}" />
         <meta name="robots" content="noindex,nofollow" />
         <title>{% block title %}{% endblock %}</title>
-        <link href="{{ asset('bundles/framework/css/structure.css') }}" rel="stylesheet" />
-        <link href="{{ asset('bundles/framework/css/body.css') }}" rel="stylesheet" />
+        <link href="{{ absolute_url(asset('bundles/framework/css/structure.css')) }}" rel="stylesheet" />
+        <link href="{{ absolute_url(asset('bundles/framework/css/body.css')) }}" rel="stylesheet" />
         {% block head %}{% endblock %}
     </head>
     <body>

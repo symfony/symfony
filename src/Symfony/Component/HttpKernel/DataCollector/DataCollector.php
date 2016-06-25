@@ -11,16 +11,24 @@
 
 namespace Symfony\Component\HttpKernel\DataCollector;
 
+use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
+
 /**
  * DataCollector.
  *
  * Children of this class must store the collected data in the data property.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Bernhard Schussek <bschussek@symfony.com>
  */
 abstract class DataCollector implements DataCollectorInterface, \Serializable
 {
-    protected $data;
+    protected $data = array();
+
+    /**
+     * @var ValueExporter
+     */
+    private $valueExporter;
 
     public function serialize()
     {
@@ -41,46 +49,10 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     protected function varToString($var)
     {
-        if (is_object($var)) {
-            return sprintf('Object(%s)', get_class($var));
+        if (null === $this->valueExporter) {
+            $this->valueExporter = new ValueExporter();
         }
 
-        if ($var instanceof \__PHP_Incomplete_Class) {
-            return sprintf('__PHP_Incomplete_Class(%s)', $this->getClassNameFromIncomplete($var));
-        }
-
-        if (is_array($var)) {
-            $a = array();
-            foreach ($var as $k => $v) {
-                $a[] = sprintf('%s => %s', $k, $this->varToString($v));
-            }
-
-            return sprintf('Array(%s)', implode(', ', $a));
-        }
-
-        if (is_resource($var)) {
-            return sprintf('Resource(%s#%d)', get_resource_type($var), $var);
-        }
-
-        if (null === $var) {
-            return 'null';
-        }
-
-        if (false === $var) {
-            return 'false';
-        }
-
-        if (true === $var) {
-            return 'true';
-        }
-
-        return (string) $var;
-    }
-
-    private function getClassNameFromIncomplete(\__PHP_Incomplete_Class $var)
-    {
-        $array = new \ArrayObject($var);
-
-        return $array['__PHP_Incomplete_Class_Name'];
+        return $this->valueExporter->exportValue($var);
     }
 }

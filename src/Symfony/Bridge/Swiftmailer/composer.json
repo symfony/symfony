@@ -16,23 +16,22 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.3.9",
         "swiftmailer/swiftmailer": ">=4.2.0,<6.0-dev"
     },
     "suggest": {
         "symfony/http-kernel": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Swiftmailer\\": "" },
+        "psr-4": { "Symfony\\Bridge\\Swiftmailer\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
     },
-    "target-dir": "Symfony/Bridge/Swiftmailer",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

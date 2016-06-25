@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+2.7.0
+-----
+
+ * added DoctrineChoiceLoader
+ * deprecated EntityChoiceList
+ * deprecated passing a query builder closure to ORMQueryBuilderLoader
+ * deprecated $manager and $em arguments of ORMQueryBuilderLoader
+ * added optional arguments $propertyAccessor and $choiceListFactory to DoctrineOrmExtension constructor
+ * deprecated "loader" and "property" options of DoctrineType
+
+2.4.0
+-----
+
+ * deprecated DoctrineOrmTestCase class
+
 2.2.0
 -----
 

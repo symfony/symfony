@@ -1,0 +1,9 @@
+[
+    {
+        "type": "function",
+        "name": "global_function"
+    },
+    {
+        "type": "closure"
+    }
+]

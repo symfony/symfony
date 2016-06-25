@@ -80,32 +80,41 @@ namespace Symfony\Component\Validator;
  * validator otherwise would not reach.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
+ *             Use {@link Context\ExecutionContextInterface} instead.
  */
 interface ExecutionContextInterface
 {
     /**
      * Adds a violation at the current node of the validation graph.
      *
-     * @param string   $message       The error message.
-     * @param array    $params        The parameters substituted in the error message.
-     * @param mixed    $invalidValue  The invalid, validated value.
-     * @param int|null $pluralization The number to use to pluralize of the message.
-     * @param int|null $code          The violation code.
+     * Note: the parameters $invalidValue, $plural and $code are deprecated since version 2.5 and will be removed in 3.0.
+     *
+     * @param string   $message      The error message
+     * @param array    $params       The parameters substituted in the error message
+     * @param mixed    $invalidValue The invalid, validated value
+     * @param int|null $plural       The number to use to pluralize of the message
+     * @param int|null $code         The violation code
      */
-    public function addViolation($message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null);
+    public function addViolation($message, array $params = array(), $invalidValue = null, $plural = null, $code = null);
 
     /**
      * Adds a violation at the validation graph node with the given property
      * path relative to the current property path.
      *
-     * @param string   $subPath       The relative property path for the violation.
-     * @param string   $message       The error message.
-     * @param array    $params        The parameters substituted in the error message.
-     * @param mixed    $invalidValue  The invalid, validated value.
-     * @param int|null $pluralization The number to use to pluralize of the message.
-     * @param int|null $code          The violation code.
+     * @param string   $subPath      The relative property path for the violation
+     * @param string   $message      The error message
+     * @param array    $parameters   The parameters substituted in the error message
+     * @param mixed    $invalidValue The invalid, validated value
+     * @param int|null $plural       The number to use to pluralize of the message
+     * @param int|null $code         The violation code
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use {@link Context\ExecutionContextInterface::buildViolation()}
+     *             instead.
      */
-    public function addViolationAt($subPath, $message, array $params = array(), $invalidValue = null, $pluralization = null, $code = null);
+    public function addViolationAt($subPath, $message, array $parameters = array(), $invalidValue = null, $plural = null, $code = null);
 
     /**
      * Validates the given value within the scope of the current validation.
@@ -145,6 +154,10 @@ interface ExecutionContextInterface
      *                                       or an instance of <tt>\Traversable</tt>.
      * @param bool                 $deep     Whether to traverse the value recursively if
      *                                       it is a collection of collections.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use {@link Context\ExecutionContextInterface::getValidator()}
+     *             instead.
      */
     public function validate($value, $subPath = '', $groups = null, $traverse = false, $deep = false);
 
@@ -174,6 +187,10 @@ interface ExecutionContextInterface
      * @param null|string|string[]    $groups      The groups to validate in. If you don't pass any
      *                                             groups here, the current group of the context
      *                                             will be used.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use {@link Context\ExecutionContextInterface::getValidator()}
+     *             instead.
      */
     public function validateValue($value, $constraints, $subPath = '', $groups = null);
 
@@ -229,6 +246,12 @@ interface ExecutionContextInterface
      * Returns the used metadata factory.
      *
      * @return MetadataFactoryInterface The metadata factory.
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
+     *             Use {@link Context\ExecutionContextInterface::getValidator()}
+     *             instead and call
+     *             {@link Validator\ValidatorInterface::getMetadataFor()} or
+     *             {@link Validator\ValidatorInterface::hasMetadataFor()} there.
      */
     public function getMetadataFactory();
 

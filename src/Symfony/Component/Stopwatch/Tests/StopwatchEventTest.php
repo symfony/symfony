@@ -78,10 +78,28 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
         $event->start();
         usleep(100000);
         $event->stop();
+        usleep(50000);
         $event->start();
         usleep(100000);
         $event->stop();
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
+    }
+
+    public function testDurationBeforeStop()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $event->start();
+        usleep(200000);
+        $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
+
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $event->start();
+        usleep(100000);
+        $event->stop();
+        usleep(50000);
+        $event->start();
+        usleep(100000);
+        $this->assertEquals(100, $event->getDuration(), null, self::DELTA);
     }
 
     /**
@@ -141,5 +159,17 @@ class StopwatchEventTest extends \PHPUnit_Framework_TestCase
     public function testInvalidOriginThrowsAnException()
     {
         new StopwatchEvent('abc');
+    }
+
+    public function testHumanRepresentation()
+    {
+        $event = new StopwatchEvent(microtime(true) * 1000);
+        $this->assertEquals('default: 0.00 MiB - 0 ms', (string) $event);
+        $event->start();
+        $event->stop();
+        $this->assertEquals(1, preg_match('/default: [0-9\.]+ MiB - [0-9]+ ms/', (string) $event));
+
+        $event = new StopwatchEvent(microtime(true) * 1000, 'foo');
+        $this->assertEquals('foo: 0.00 MiB - 0 ms', (string) $event);
     }
 }

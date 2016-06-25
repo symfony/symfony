@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
-use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
-use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
-use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
+use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 
 class MemberMetadataTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +35,10 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
         $this->metadata = null;
     }
 
-    public function testAddValidSetsMemberToCascaded()
+    /**
+     * @group legacy
+     */
+    public function testLegacyAddValidSetsMemberToCascaded()
     {
         $result = $this->metadata->addConstraint(new Valid());
 
@@ -44,7 +47,10 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->metadata->isCascaded());
     }
 
-    public function testAddOtherConstraintDoesNotSetMemberToCascaded()
+    /**
+     * @group legacy
+     */
+    public function testLegacyAddOtherConstraintDoesNotSetMemberToCascaded()
     {
         $result = $this->metadata->addConstraint($constraint = new ConstraintA());
 
@@ -72,16 +78,19 @@ class MemberMetadataTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeCollectionCascaded()
     {
-        $this->metadata->addConstraint(new Valid(array('traverse' => true, 'deep' => false)));
+        $this->metadata->addConstraint(new Valid(array('traverse' => true)));
 
         $metadata = unserialize(serialize($this->metadata));
 
         $this->assertEquals($this->metadata, $metadata);
     }
 
-    public function testSerializeCollectionCascadedDeeply()
+    /**
+     * @group legacy
+     */
+    public function testLegacySerializeCollectionCascadedDeeply()
     {
-        $this->metadata->addConstraint(new Valid(array('traverse' => true, 'deep' => true)));
+        $this->metadata->addConstraint(new Valid(array('traverse' => true)));
 
         $metadata = unserialize(serialize($this->metadata));
 

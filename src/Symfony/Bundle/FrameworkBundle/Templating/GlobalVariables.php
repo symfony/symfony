@@ -12,12 +12,12 @@
 namespace Symfony\Bundle\FrameworkBundle\Templating;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
- * GlobalVariables is the entry point for Symfony global variables in Twig templates.
+ * GlobalVariables is the entry point for Symfony global variables in PHP templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -36,10 +36,14 @@ class GlobalVariables
     /**
      * Returns the security context service.
      *
+     * @deprecated since version 2.6, to be removed in 3.0.
+     *
      * @return SecurityContext|null The security context
      */
     public function getSecurity()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+
         if ($this->container->has('security.context')) {
             return $this->container->get('security.context');
         }
@@ -54,11 +58,13 @@ class GlobalVariables
      */
     public function getUser()
     {
-        if (!$security = $this->getSecurity()) {
+        if (!$this->container->has('security.token_storage')) {
             return;
         }
 
-        if (!$token = $security->getToken()) {
+        $tokenStorage = $this->container->get('security.token_storage');
+
+        if (!$token = $tokenStorage->getToken()) {
             return;
         }
 
@@ -77,8 +83,8 @@ class GlobalVariables
      */
     public function getRequest()
     {
-        if ($this->container->has('request') && $request = $this->container->get('request')) {
-            return $request;
+        if ($this->container->has('request_stack')) {
+            return $this->container->get('request_stack')->getCurrentRequest();
         }
     }
 

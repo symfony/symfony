@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
+use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Config\Util\XmlUtils;
 
 /**
  * Loads validation metadata from an XML file.
@@ -25,9 +25,9 @@ class XmlFileLoader extends FileLoader
     /**
      * The XML nodes of the mapping file.
      *
-     * @var \SimpleXMLElement[]
+     * @var \SimpleXMLElement[]|null
      */
-    protected $classes = null;
+    protected $classes;
 
     /**
      * {@inheritdoc}

@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
-use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\MappingException;
 
 /**
  * Base loader for validation metadata.
@@ -35,7 +35,7 @@ abstract class AbstractLoader implements LoaderInterface
     /**
      * @var array
      */
-    protected $namespaces;
+    protected $namespaces = array();
 
     /**
      * Adds a namespace alias.

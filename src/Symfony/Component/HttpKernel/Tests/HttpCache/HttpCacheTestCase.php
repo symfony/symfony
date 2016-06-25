@@ -28,6 +28,7 @@ class HttpCacheTestCase extends \PHPUnit_Framework_TestCase
     protected $responses;
     protected $catch;
     protected $esi;
+    protected $store;
 
     protected function setUp()
     {

@@ -14,12 +14,18 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EmailValidator;
+use Symfony\Component\Validator\Validation;
 
 /**
  * @group dns-sensitive
  */
 class EmailValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new EmailValidator(false);
@@ -79,6 +85,7 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$email.'"')
+            ->setCode(Email::INVALID_FORMAT_ERROR)
             ->assertRaised();
     }
 
@@ -88,7 +95,17 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('example'),
             array('example@'),
             array('example@localhost'),
+            array('foo@example.com bar'),
         );
+    }
+
+    public function testStrict()
+    {
+        $constraint = new Email(array('strict' => true));
+
+        $this->validator->validate('example@localhost', $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -111,6 +128,7 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
         } else {
             $this->buildViolation('myMessage')
                 ->setParameter('{{ value }}', '"foo@example.com"')
+                ->setCode($violation)
                 ->assertRaised();
         }
     }
@@ -119,11 +137,11 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
     {
         return array(
             array('MX', false),
-            array('MX', true),
+            array('MX', Email::MX_CHECK_FAILED_ERROR),
             array('A', false),
-            array('A', true),
+            array('A', Email::HOST_CHECK_FAILED_ERROR),
             array('AAAA', false),
-            array('AAAA', true),
+            array('AAAA', Email::HOST_CHECK_FAILED_ERROR),
         );
     }
 

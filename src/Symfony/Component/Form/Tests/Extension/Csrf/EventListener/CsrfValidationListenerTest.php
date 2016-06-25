@@ -19,13 +19,14 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
 {
     protected $dispatcher;
     protected $factory;
-    protected $csrfProvider;
+    protected $tokenManager;
+    protected $form;
 
     protected function setUp()
     {
         $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->csrfProvider = $this->getMock('Symfony\Component\Form\Extension\Csrf\CsrfProvider\CsrfProviderInterface');
+        $this->tokenManager = $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface');
         $this->form = $this->getBuilder('post')
             ->setDataMapper($this->getDataMapper())
             ->getForm();
@@ -35,7 +36,7 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->dispatcher = null;
         $this->factory = null;
-        $this->csrfProvider = null;
+        $this->tokenManager = null;
         $this->form = null;
     }
 
@@ -65,7 +66,7 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
         $data = 'XP4HUzmHPi';
         $event = new FormEvent($this->form, $data);
 
-        $validation = new CsrfValidationListener('csrf', $this->csrfProvider, 'unknown', 'Invalid.');
+        $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Invalid.');
         $validation->preSubmit($event);
 
         // Validate accordingly

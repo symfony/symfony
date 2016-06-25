@@ -102,4 +102,18 @@ final class KernelEvents
      * @var string
      */
     const TERMINATE = 'kernel.terminate';
+
+    /**
+     * The FINISH_REQUEST event occurs when a response was generated for a request.
+     *
+     * This event allows you to reset the global and environmental state of
+     * the application, when it was changed during the request.
+     * The event listener method receives a
+     * Symfony\Component\HttpKernel\Event\FinishRequestEvent instance.
+     *
+     * @Event
+     *
+     * @var string
+     */
+    const FINISH_REQUEST = 'kernel.finish_request';
 }

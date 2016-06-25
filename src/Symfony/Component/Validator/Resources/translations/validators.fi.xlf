@@ -175,7 +175,7 @@
                 <target>Kuva on liian matala ({{ height }}px). Korkeuden tulisi olla vähintään {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Tämän arvon tulisi olla käyttäjän tämänhetkinen salasana.</target>
             </trans-unit>
             <trans-unit id="48">

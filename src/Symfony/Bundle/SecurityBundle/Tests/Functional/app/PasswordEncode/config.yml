@@ -1,0 +1,27 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+        Custom\Class\Bcrypt\User:
+            algorithm: bcrypt
+            cost:      10
+        Custom\Class\Pbkdf2\User:
+            algorithm: pbkdf2
+            hash_algorithm:       sha512
+            encode_as_base64:     true
+            iterations:           1000
+        Custom\Class\Test\User: test
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
+                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
+
+    firewalls:
+        test:
+            pattern:  ^/
+            security: false

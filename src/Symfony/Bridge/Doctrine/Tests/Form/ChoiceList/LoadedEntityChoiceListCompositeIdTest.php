@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Tests\Form\ChoiceList;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ * @group legacy
  */
 class LoadedEntityChoiceListCompositeIdTest extends AbstractEntityChoiceListCompositeIdTest
 {

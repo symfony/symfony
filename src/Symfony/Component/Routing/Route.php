@@ -60,6 +60,11 @@ class Route implements \Serializable
     private $compiled;
 
     /**
+     * @var string
+     */
+    private $condition = '';
+
+    /**
      * Constructor.
      *
      * Available options:
@@ -73,8 +78,9 @@ class Route implements \Serializable
      * @param string       $host         The host pattern to match
      * @param string|array $schemes      A required URI scheme or an array of restricted schemes
      * @param string|array $methods      A required HTTP method or an array of restricted methods
+     * @param string       $condition    A condition that should evaluate to true for the route to match
      */
-    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array())
+    public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '')
     {
         $this->setPath($path);
         $this->setDefaults($defaults);
@@ -89,6 +95,7 @@ class Route implements \Serializable
         if ($methods) {
             $this->setMethods($methods);
         }
+        $this->setCondition($condition);
     }
 
     /**
@@ -104,6 +111,7 @@ class Route implements \Serializable
             'options' => $this->options,
             'schemes' => $this->schemes,
             'methods' => $this->methods,
+            'condition' => $this->condition,
             'compiled' => $this->compiled,
         ));
     }
@@ -121,6 +129,10 @@ class Route implements \Serializable
         $this->options = $data['options'];
         $this->schemes = $data['schemes'];
         $this->methods = $data['methods'];
+
+        if (isset($data['condition'])) {
+            $this->condition = $data['condition'];
+        }
         if (isset($data['compiled'])) {
             $this->compiled = $data['compiled'];
         }
@@ -131,10 +143,12 @@ class Route implements \Serializable
      *
      * @return string The pattern
      *
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use getPath instead.
+     * @deprecated since version 2.2, to be removed in 3.0. Use getPath instead.
      */
     public function getPattern()
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Use the getPath() method instead.', E_USER_DEPRECATED);
+
         return $this->path;
     }
 
@@ -147,10 +161,12 @@ class Route implements \Serializable
      *
      * @return Route The current Route instance
      *
-     * @deprecated Deprecated in 2.2, to be removed in 3.0. Use setPath instead.
+     * @deprecated since version 2.2, to be removed in 3.0. Use setPath instead.
      */
     public function setPattern($pattern)
     {
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.2 and will be removed in 3.0. Use the setPath() method instead.', E_USER_DEPRECATED);
+
         return $this->setPath($pattern);
     }
 
@@ -524,6 +540,12 @@ class Route implements \Serializable
      */
     public function getRequirement($key)
     {
+        if ('_scheme' === $key) {
+            @trigger_error('The "_scheme" requirement is deprecated since version 2.2 and will be removed in 3.0. Use getSchemes() instead.', E_USER_DEPRECATED);
+        } elseif ('_method' === $key) {
+            @trigger_error('The "_method" requirement is deprecated since version 2.2 and will be removed in 3.0. Use getMethods() instead.', E_USER_DEPRECATED);
+        }
+
         return isset($this->requirements[$key]) ? $this->requirements[$key] : null;
     }
 
@@ -550,6 +572,33 @@ class Route implements \Serializable
     public function setRequirement($key, $regex)
     {
         $this->requirements[$key] = $this->sanitizeRequirement($key, $regex);
+        $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
+     * Returns the condition.
+     *
+     * @return string The condition
+     */
+    public function getCondition()
+    {
+        return $this->condition;
+    }
+
+    /**
+     * Sets the condition.
+     *
+     * This method implements a fluent interface.
+     *
+     * @param string $condition The condition
+     *
+     * @return Route The current Route instance
+     */
+    public function setCondition($condition)
+    {
+        $this->condition = (string) $condition;
         $this->compiled = null;
 
         return $this;
@@ -596,8 +645,12 @@ class Route implements \Serializable
 
         // this is to keep BC and will be removed in a future version
         if ('_scheme' === $key) {
+            @trigger_error('The "_scheme" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the setSchemes() method instead.', E_USER_DEPRECATED);
+
             $this->setSchemes(explode('|', $regex));
         } elseif ('_method' === $key) {
+            @trigger_error('The "_method" requirement is deprecated since version 2.2 and will be removed in 3.0. Use the setMethods() method instead.', E_USER_DEPRECATED);
+
             $this->setMethods(explode('|', $regex));
         }
 

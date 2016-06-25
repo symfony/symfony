@@ -12,13 +12,12 @@
     <services>
         <service id="templating.helper.logout_url" class="%templating.helper.logout_url.class%">
             <tag name="templating.helper" alias="logout_url" />
-            <argument type="service" id="service_container" />
-            <argument type="service" id="router" />
+            <argument type="service" id="security.logout_url_generator" />
         </service>
 
         <service id="templating.helper.security" class="%templating.helper.security.class%">
             <tag name="templating.helper" alias="security" />
-            <argument type="service" id="security.context" on-invalid="ignore" />
+            <argument type="service" id="security.authorization_checker" on-invalid="ignore" />
         </service>
     </services>
 </container>

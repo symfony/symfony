@@ -26,6 +26,9 @@ namespace Symfony\Component\Validator;
  * </ul>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
+ *             Use {@link Context\ExecutionContextInterface} instead.
  */
 interface GlobalExecutionContextInterface
 {

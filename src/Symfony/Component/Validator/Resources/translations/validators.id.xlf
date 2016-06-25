@@ -175,7 +175,7 @@
                 <target>Tinggi gambar terlalu kecil ({{ height }}px). Ukuran tinggi minimum yang diharapkan adalah {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Nilai ini harus kata sandi pengguna saat ini.</target>
             </trans-unit>
             <trans-unit id="48">

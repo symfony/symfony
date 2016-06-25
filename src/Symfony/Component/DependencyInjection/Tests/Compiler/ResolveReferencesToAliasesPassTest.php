@@ -67,6 +67,30 @@ class ResolveReferencesToAliasesPassTest extends \PHPUnit_Framework_TestCase
         $container->register('factory', 'Factory');
         $container->setAlias('factory_alias', new Alias('factory'));
         $foo = new Definition();
+        $foo->setFactory(array(new Reference('factory_alias'), 'createFoo'));
+        $container->setDefinition('foo', $foo);
+        $bar = new Definition();
+        $bar->setFactory(array('Factory', 'createFoo'));
+        $container->setDefinition('bar', $bar);
+
+        $this->process($container);
+
+        $resolvedFooFactory = $container->getDefinition('foo')->getFactory();
+        $resolvedBarFactory = $container->getDefinition('bar')->getFactory();
+
+        $this->assertSame('factory', (string) $resolvedFooFactory[0]);
+        $this->assertSame('Factory', (string) $resolvedBarFactory[0]);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testResolveFactoryService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('factory', 'Factory');
+        $container->setAlias('factory_alias', new Alias('factory'));
+        $foo = new Definition();
         $foo->setFactoryService('factory_alias');
         $foo->setFactoryMethod('createFoo');
         $container->setDefinition('foo', $foo);

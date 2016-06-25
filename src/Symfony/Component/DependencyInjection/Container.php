@@ -65,13 +65,13 @@ class Container implements IntrospectableContainerInterface
      */
     protected $parameterBag;
 
-    protected $services;
-    protected $methodMap;
-    protected $aliases;
-    protected $scopes;
-    protected $scopeChildren;
-    protected $scopedServices;
-    protected $scopeStacks;
+    protected $services = array();
+    protected $methodMap = array();
+    protected $aliases = array();
+    protected $scopes = array();
+    protected $scopeChildren = array();
+    protected $scopedServices = array();
+    protected $scopeStacks = array();
     protected $loading = array();
 
     private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
@@ -81,14 +81,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
-        $this->parameterBag = null === $parameterBag ? new ParameterBag() : $parameterBag;
-
-        $this->services = array();
-        $this->aliases = array();
-        $this->scopes = array();
-        $this->scopeChildren = array();
-        $this->scopedServices = array();
-        $this->scopeStacks = array();
+        $this->parameterBag = $parameterBag ?: new ParameterBag();
     }
 
     /**
@@ -208,11 +201,11 @@ class Container implements IntrospectableContainerInterface
             $this->$method();
         }
 
-        if (self::SCOPE_CONTAINER !== $scope && null === $service) {
-            unset($this->scopedServices[$scope][$id]);
-        }
-
         if (null === $service) {
+            if (self::SCOPE_CONTAINER !== $scope) {
+                unset($this->scopedServices[$scope][$id]);
+            }
+
             unset($this->services[$id]);
         }
     }
@@ -440,20 +433,25 @@ class Container implements IntrospectableContainerInterface
         // the global service map
         $services = array($this->services, $this->scopedServices[$name]);
         unset($this->scopedServices[$name]);
-        foreach ($this->scopeChildren[$name] as $child) {
-            if (!isset($this->scopedServices[$child])) {
-                continue;
-            }
 
-            $services[] = $this->scopedServices[$child];
-            unset($this->scopedServices[$child]);
+        foreach ($this->scopeChildren[$name] as $child) {
+            if (isset($this->scopedServices[$child])) {
+                $services[] = $this->scopedServices[$child];
+                unset($this->scopedServices[$child]);
+            }
         }
+
+        // update global map
         $this->services = call_user_func_array('array_diff_key', $services);
 
         // check if we need to restore services of a previous scope of this type
         if (isset($this->scopeStacks[$name]) && count($this->scopeStacks[$name]) > 0) {
             $services = $this->scopeStacks[$name]->pop();
             $this->scopedServices += $services;
+
+            if ($this->scopeStacks[$name]->isEmpty()) {
+                unset($this->scopeStacks[$name]);
+            }
 
             foreach ($services as $array) {
                 foreach ($array as $id => $service) {

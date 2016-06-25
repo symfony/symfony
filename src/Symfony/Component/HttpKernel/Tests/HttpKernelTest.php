@@ -57,18 +57,23 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $response->getContent());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testHandleWhenControllerThrowsAnExceptionAndCatchIsTrueWithANonHandlingListener()
     {
+        $exception = new \RuntimeException();
+
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(KernelEvents::EXCEPTION, function ($event) {
             // should set a response, but does not
         });
 
-        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { throw new \RuntimeException('foo'); }));
-        $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () use ($exception) { throw $exception; }));
+
+        try {
+            $kernel->handle(new Request(), HttpKernelInterface::MASTER_REQUEST, true);
+            $this->fail('LogicException expected');
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
     }
 
     public function testHandleExceptionWithARedirectionResponse()
@@ -250,6 +255,20 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($kernel, $capturedKernel);
         $this->assertEquals($request, $capturedRequest);
         $this->assertEquals($response, $capturedResponse);
+    }
+
+    public function testVerifyRequestStackPushPopDuringHandle()
+    {
+        $request = new Request();
+
+        $stack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack', array('push', 'pop'));
+        $stack->expects($this->at(0))->method('push')->with($this->equalTo($request));
+        $stack->expects($this->at(1))->method('pop');
+
+        $dispatcher = new EventDispatcher();
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(), $stack);
+
+        $kernel->handle($request, HttpKernelInterface::MASTER_REQUEST);
     }
 
     protected function getResolver($controller = null)

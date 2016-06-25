@@ -200,25 +200,17 @@ class IntlDateFormatter
     {
         // intl allows timestamps to be passed as arrays - we don't
         if (is_array($timestamp)) {
-            $message = PHP_VERSION_ID >= 50304 ?
-                'Only integer Unix timestamps and DateTime objects are supported' :
-                'Only integer Unix timestamps are supported';
+            $message = 'Only integer Unix timestamps and DateTime objects are supported';
 
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'timestamp', $timestamp, $message);
         }
 
         // behave like the intl extension
         $argumentError = null;
-        if (!is_int($timestamp)) {
-            if (!$timestamp instanceof \DateTime) {
-                if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
-                    $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
-                } elseif (PHP_VERSION_ID >= 50304) {
-                    $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
-                }
-            }
-            if (PHP_VERSION_ID < 50304 && null === $argumentError) {
-                $argumentError = 'datefmt_format: takes either an array  or an integer timestamp value ';
+        if (!is_int($timestamp) && !$timestamp instanceof \DateTime) {
+            $argumentError = 'datefmt_format: takes either an array or an integer timestamp value or a DateTime object';
+            if (PHP_VERSION_ID >= 50500 || (extension_loaded('intl') && method_exists('IntlDateFormatter', 'setTimeZone'))) {
+                $argumentError = sprintf('datefmt_format: string \'%s\' is not numeric, which would be required for it to be a valid date', $timestamp);
             }
         }
 
@@ -230,8 +222,7 @@ class IntlDateFormatter
             return false;
         }
 
-        // As of PHP 5.3.4, IntlDateFormatter::format() accepts DateTime instances
-        if (PHP_VERSION_ID >= 50304 && $timestamp instanceof \DateTime) {
+        if ($timestamp instanceof \DateTime) {
             $timestamp = $timestamp->getTimestamp();
         }
 

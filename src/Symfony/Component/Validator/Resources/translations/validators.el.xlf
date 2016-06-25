@@ -175,7 +175,7 @@
                 <target>Το ύψος της εικόνας είναι πολύ μικρό ({{ height }}px). Το ελάχιστο επιτρεπτό ύψος είναι {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
-                <source>This value should be the user current password.</source>
+                <source>This value should be the user's current password.</source>
                 <target>Αυτή η τιμή θα έπρεπε να είναι ο τρέχων κωδικός.</target>
             </trans-unit>
             <trans-unit id="48">

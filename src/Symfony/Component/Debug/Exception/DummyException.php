@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Debug\Exception;
 
+@trigger_error('The '.__NAMESPACE__.'\DummyException class is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
+
 /**
- * Used to stop execution of a PHP script after handling a fatal error.
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
  */
 class DummyException extends \ErrorException
 {

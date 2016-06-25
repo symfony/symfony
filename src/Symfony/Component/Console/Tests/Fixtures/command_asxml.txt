@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <command id="namespace:name" name="namespace:name">
-  <usage>namespace:name</usage>
+  <usages>
+    <usage>namespace:name</usage>
+    <usage>name</usage>
+  </usages>
   <description>description</description>
   <help>help</help>
-  <aliases>
-    <alias>name</alias>
-  </aliases>
-  <arguments>
-    <argument name="command" is_required="1" is_array="0">
-      <description>The command to execute</description>
-      <defaults/>
-    </argument>
-  </arguments>
+  <arguments/>
   <options>
     <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
       <description>Display this help message</description>

@@ -68,7 +68,7 @@ class File extends \SplFileInfo
      * mime_content_type() and the system binary "file" (in this order), depending on
      * which of those are available.
      *
-     * @return string|null The guessed mime type (i.e. "application/pdf")
+     * @return string|null The guessed mime type (e.g. "application/pdf")
      *
      * @see MimeTypeGuesser
      */
@@ -77,18 +77,6 @@ class File extends \SplFileInfo
         $guesser = MimeTypeGuesser::getInstance();
 
         return $guesser->guess($this->getPathname());
-    }
-
-    /**
-     * Returns the extension of the file.
-     *
-     * \SplFileInfo::getExtension() is not available before PHP 5.3.6
-     *
-     * @return string The extension
-     */
-    public function getExtension()
-    {
-        return pathinfo($this->getBasename(), PATHINFO_EXTENSION);
     }
 
     /**

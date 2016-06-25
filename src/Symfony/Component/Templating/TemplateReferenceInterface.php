@@ -33,7 +33,7 @@ interface TemplateReferenceInterface
      *
      * @return TemplateReferenceInterface The TemplateReferenceInterface instance
      *
-     * @throws \InvalidArgumentException if the parameter is not defined
+     * @throws \InvalidArgumentException if the parameter name is not supported
      */
     public function set($name, $value);
 
@@ -44,7 +44,7 @@ interface TemplateReferenceInterface
      *
      * @return string The parameter value
      *
-     * @throws \InvalidArgumentException if the parameter is not defined
+     * @throws \InvalidArgumentException if the parameter name is not supported
      */
     public function get($name);
 
@@ -65,4 +65,13 @@ interface TemplateReferenceInterface
      * @return string The template name
      */
     public function getLogicalName();
+
+    /**
+     * Returns the string representation as shortcut for getLogicalName().
+     *
+     * Alias of getLogicalName().
+     *
+     * @return string The template name
+     */
+    public function __toString();
 }

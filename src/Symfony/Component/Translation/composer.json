@@ -16,28 +16,32 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/config": "~2.3,>=2.3.12",
-        "symfony/intl": "~2.3",
-        "symfony/yaml": "~2.2"
+        "symfony/config": "~2.7",
+        "symfony/intl": "~2.4",
+        "symfony/yaml": "~2.2",
+        "psr/log": "~1.0"
+    },
+    "conflict": {
+        "symfony/config": "<2.7"
     },
     "suggest": {
         "symfony/config": "",
-        "symfony/yaml": ""
+        "symfony/yaml": "",
+        "psr/log": "To use logging capability in translator"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Translation\\": "" },
+        "psr-4": { "Symfony\\Component\\Translation\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
     },
-    "target-dir": "Symfony/Component/Translation",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

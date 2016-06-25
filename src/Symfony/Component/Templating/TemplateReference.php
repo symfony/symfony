@@ -28,20 +28,16 @@ class TemplateReference implements TemplateReferenceInterface
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function __toString()
     {
         return $this->getLogicalName();
     }
 
     /**
-     * Sets a template parameter.
-     *
-     * @param string $name  The parameter name
-     * @param string $value The parameter value
-     *
-     * @return TemplateReferenceInterface The TemplateReferenceInterface instance
-     *
-     * @throws \InvalidArgumentException if the parameter is not defined
+     * {@inheritdoc}
      */
     public function set($name, $value)
     {
@@ -55,13 +51,7 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * Gets a template parameter.
-     *
-     * @param string $name The parameter name
-     *
-     * @return string The parameter value
-     *
-     * @throws \InvalidArgumentException if the parameter is not defined
+     * {@inheritdoc}
      */
     public function get($name)
     {
@@ -73,9 +63,7 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * Gets the template parameters.
-     *
-     * @return array An array of parameters
+     * {@inheritdoc}
      */
     public function all()
     {
@@ -83,11 +71,7 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * Returns the path to the template.
-     *
-     * By default, it just returns the template name.
-     *
-     * @return string A path to the template or a resource
+     * {@inheritdoc}
      */
     public function getPath()
     {
@@ -95,11 +79,7 @@ class TemplateReference implements TemplateReferenceInterface
     }
 
     /**
-     * Returns the "logical" template name.
-     *
-     * The template name acts as a unique identifier for the template.
-     *
-     * @return string The template name
+     * {@inheritdoc}
      */
     public function getLogicalName()
     {

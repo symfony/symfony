@@ -25,6 +25,9 @@ namespace Symfony\Component\Form\Extension\Core\ChoiceList;
  *              in the HTML "value" attribute.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.7, to be removed in 3.0.
+ *             Use {@link \Symfony\Component\Form\ChoiceList\ChoiceListInterface} instead.
  */
 interface ChoiceListInterface
 {
@@ -138,6 +141,8 @@ interface ChoiceListInterface
      *                       array are ignored
      *
      * @return array An array of indices with ascending, 0-based numeric keys
+     *
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForChoices(array $choices);
 
@@ -156,6 +161,8 @@ interface ChoiceListInterface
      *                      this array are ignored
      *
      * @return array An array of indices with ascending, 0-based numeric keys
+     *
+     * @deprecated since version 2.4, to be removed in 3.0.
      */
     public function getIndicesForValues(array $values);
 }

@@ -11,18 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\EventListener;
 
+use Symfony\Component\HttpKernel\EventListener\SessionListener as BaseSessionListener;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Sets the session in the request.
  *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
-class SessionListener implements EventSubscriberInterface
+class SessionListener extends BaseSessionListener
 {
     /**
      * @var ContainerInterface
@@ -34,24 +31,12 @@ class SessionListener implements EventSubscriberInterface
         $this->container = $container;
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    protected function getSession()
     {
-        if (HttpKernelInterface::MASTER_REQUEST !== $event->getRequestType()) {
+        if (!$this->container->has('session')) {
             return;
         }
 
-        $request = $event->getRequest();
-        if (!$this->container->has('session') || $request->hasSession()) {
-            return;
-        }
-
-        $request->setSession($this->container->get('session'));
-    }
-
-    public static function getSubscribedEvents()
-    {
-        return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 128),
-        );
+        return $this->container->get('session');
     }
 }

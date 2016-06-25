@@ -35,6 +35,10 @@ class StringInput extends ArgvInput
      */
     public function __construct($input, InputDefinition $definition = null)
     {
+        if ($definition) {
+            @trigger_error('The $definition argument of the '.__METHOD__.' method is deprecated and will be removed in 3.0. Set this parameter with the bind() method instead.', E_USER_DEPRECATED);
+        }
+
         parent::__construct(array(), null);
 
         $this->setTokens($this->tokenize($input));
@@ -68,9 +72,7 @@ class StringInput extends ArgvInput
                 $tokens[] = stripcslashes($match[1]);
             } else {
                 // should never happen
-                // @codeCoverageIgnoreStart
                 throw new \InvalidArgumentException(sprintf('Unable to parse input near "... %s ..."', substr($input, $cursor, 10)));
-                // @codeCoverageIgnoreEnd
             }
 
             $cursor += strlen($match[0]);

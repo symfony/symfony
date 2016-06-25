@@ -24,12 +24,12 @@ class Scope
     /**
      * @var array
      */
-    private $data;
+    private $data = array();
 
     /**
      * @var bool
      */
-    private $left;
+    private $left = false;
 
     /**
      * @param Scope $parent
@@ -37,8 +37,6 @@ class Scope
     public function __construct(Scope $parent = null)
     {
         $this->parent = $parent;
-        $this->left = false;
-        $this->data = array();
     }
 
     /**
@@ -69,9 +67,9 @@ class Scope
      * @param string $key
      * @param mixed  $value
      *
-     * @throws \LogicException
-     *
      * @return Scope Current scope
+     *
+     * @throws \LogicException
      */
     public function set($key, $value)
     {

@@ -30,6 +30,10 @@ class MemcacheSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        if (defined('HHVM_VERSION')) {
+            $this->markTestSkipped('PHPUnit_MockObject cannot mock the Memcache class on HHVM. See https://github.com/sebastianbergmann/phpunit-mock-objects/pull/289');
+        }
+
         parent::setUp();
         $this->memcache = $this->getMock('Memcache');
         $this->storage = new MemcacheSessionHandler(
@@ -122,5 +126,13 @@ class MemcacheSessionHandlerTest extends \PHPUnit_Framework_TestCase
             array(array('prefix' => 'session', 'expiretime' => 200), true),
             array(array('expiretime' => 100, 'foo' => 'bar'), false),
         );
+    }
+
+    public function testGetConnection()
+    {
+        $method = new \ReflectionMethod($this->storage, 'getMemcache');
+        $method->setAccessible(true);
+
+        $this->assertInstanceOf('\Memcache', $method->invoke($this->storage));
     }
 }

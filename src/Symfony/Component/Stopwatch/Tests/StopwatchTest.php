@@ -31,6 +31,7 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $this->assertEquals('cat', $event->getCategory());
+        $this->assertSame($event, $stopwatch->getEvent('foo'));
     }
 
     public function testIsStarted()
@@ -78,6 +79,15 @@ class StopwatchTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\Component\Stopwatch\StopwatchEvent', $event);
         $this->assertEquals(200, $event->getDuration(), null, self::DELTA);
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testUnknownEvent()
+    {
+        $stopwatch = new Stopwatch();
+        $stopwatch->getEvent('foo');
     }
 
     /**

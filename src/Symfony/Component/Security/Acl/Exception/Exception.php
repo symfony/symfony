@@ -16,6 +16,6 @@ namespace Symfony\Component\Security\Acl\Exception;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Exception extends \Exception
+class Exception extends \RuntimeException
 {
 }

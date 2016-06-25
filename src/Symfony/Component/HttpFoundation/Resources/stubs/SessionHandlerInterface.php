@@ -12,6 +12,14 @@
 /**
  * SessionHandlerInterface for PHP < 5.4.
  *
+ * The order in which these methods are invoked by PHP are:
+ * 1. open [session_start]
+ * 2. read
+ * 3. gc [optional depending on probability settings: gc_probability / gc_divisor]
+ * 4. destroy [optional when session_regenerate_id(true) is used]
+ * 5. write [session_write_close] or destroy [session_destroy]
+ * 6. close
+ *
  * Extensive documentation can be found at php.net, see links:
  *
  * @see http://php.net/sessionhandlerinterface
@@ -19,6 +27,7 @@
  * @see http://php.net/session-set-save-handler
  *
  * @author Drak <drak@zikula.org>
+ * @author Tobias Schultze <http://tobion.de>
  */
 interface SessionHandlerInterface
 {
@@ -56,6 +65,9 @@ interface SessionHandlerInterface
 
     /**
      * Writes the session data to the storage.
+     *
+     * Care, the session ID passed to write() can be different from the one previously
+     * received in read() when the session ID changed due to session_regenerate_id().
      *
      * @see http://php.net/sessionhandlerinterface.write
      *

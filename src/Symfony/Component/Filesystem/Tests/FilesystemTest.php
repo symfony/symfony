@@ -11,61 +11,11 @@
 
 namespace Symfony\Component\Filesystem\Tests;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 /**
  * Test class for Filesystem.
  */
-class FilesystemTest extends \PHPUnit_Framework_TestCase
+class FilesystemTest extends FilesystemTestCase
 {
-    private $umask;
-    private $longPathNamesWindows = array();
-
-    /**
-     * @var string
-     */
-    private $workspace = null;
-
-    /**
-     * @var \Symfony\Component\Filesystem\Filesystem
-     */
-    private $filesystem = null;
-
-    private static $symlinkOnWindows = null;
-
-    public static function setUpBeforeClass()
-    {
-        if ('\\' === DIRECTORY_SEPARATOR && null === self::$symlinkOnWindows) {
-            $target = tempnam(sys_get_temp_dir(), 'sl');
-            $link = sys_get_temp_dir().'/sl'.microtime(true).mt_rand();
-            self::$symlinkOnWindows = @symlink($target, $link) && is_link($link);
-            @unlink($link);
-            unlink($target);
-        }
-    }
-
-    protected function setUp()
-    {
-        $this->umask = umask(0);
-        $this->filesystem = new Filesystem();
-        $this->workspace = sys_get_temp_dir().'/'.microtime(true).'.'.mt_rand();
-        mkdir($this->workspace, 0777, true);
-        $this->workspace = realpath($this->workspace);
-    }
-
-    protected function tearDown()
-    {
-        if (!empty($this->longPathNamesWindows)) {
-            foreach ($this->longPathNamesWindows as $path) {
-                exec('DEL '.$path);
-            }
-            $this->longPathNamesWindows = array();
-        }
-
-        $this->filesystem->remove($this->workspace);
-        umask($this->umask);
-    }
-
     public function testCopyCreatesNewFile()
     {
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
@@ -86,6 +36,27 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     {
         $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
         $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCopyUnreadableFileFails()
+    {
+        // skip test on Windows; PHP can't easily set file as unreadable on Windows
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot run on Windows.');
+        }
+
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+
+        file_put_contents($sourceFilePath, 'SOURCE FILE');
+
+        // make sure target cannot be read
+        $this->filesystem->chmod($sourceFilePath, 0222);
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
     }
@@ -141,6 +112,33 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists($targetFilePath);
         $this->assertEquals('SOURCE FILE', file_get_contents($targetFilePath));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Filesystem\Exception\IOException
+     */
+    public function testCopyWithOverrideWithReadOnlyTargetFails()
+    {
+        // skip test on Windows; PHP can't easily set file as unwritable on Windows
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot run on Windows.');
+        }
+
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
+
+        file_put_contents($sourceFilePath, 'SOURCE FILE');
+        file_put_contents($targetFilePath, 'TARGET FILE');
+
+        // make sure both files have the same modification time
+        $modificationTime = time() - 1000;
+        touch($sourceFilePath, $modificationTime);
+        touch($targetFilePath, $modificationTime);
+
+        // make sure target is read-only
+        $this->filesystem->chmod($targetFilePath, 0444);
+
+        $this->filesystem->copy($sourceFilePath, $targetFilePath, true);
     }
 
     public function testCopyCreatesTargetDirectoryIfItDoesNotExist()
@@ -440,8 +438,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->chmod($file, 0400);
         $this->filesystem->chmod($dir, 0753);
 
-        $this->assertEquals(753, $this->getFilePermissions($dir));
-        $this->assertEquals(400, $this->getFilePermissions($file));
+        $this->assertFilePermissions(753, $dir);
+        $this->assertFilePermissions(400, $file);
     }
 
     public function testChmodWrongMod()
@@ -466,8 +464,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->filesystem->chmod($file, 0400, 0000, true);
         $this->filesystem->chmod($dir, 0753, 0000, true);
 
-        $this->assertEquals(753, $this->getFilePermissions($dir));
-        $this->assertEquals(753, $this->getFilePermissions($file));
+        $this->assertFilePermissions(753, $dir);
+        $this->assertFilePermissions(753, $file);
     }
 
     public function testChmodAppliesUmask()
@@ -478,7 +476,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         touch($file);
 
         $this->filesystem->chmod($file, 0770, 0022);
-        $this->assertEquals(750, $this->getFilePermissions($file));
+        $this->assertFilePermissions(750, $file);
     }
 
     public function testChmodChangesModeOfArrayOfFiles()
@@ -494,8 +492,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->chmod($files, 0753);
 
-        $this->assertEquals(753, $this->getFilePermissions($file));
-        $this->assertEquals(753, $this->getFilePermissions($directory));
+        $this->assertFilePermissions(753, $file);
+        $this->assertFilePermissions(753, $directory);
     }
 
     public function testChmodChangesModeOfTraversableFileObject()
@@ -511,8 +509,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->chmod($files, 0753);
 
-        $this->assertEquals(753, $this->getFilePermissions($file));
-        $this->assertEquals(753, $this->getFilePermissions($directory));
+        $this->assertFilePermissions(753, $file);
+        $this->assertFilePermissions(753, $directory);
     }
 
     public function testChmodChangesZeroModeOnSubdirectoriesOnRecursive()
@@ -528,7 +526,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         $this->filesystem->chmod($directory, 0753, 0000, true);
 
-        $this->assertEquals(753, $this->getFilePermissions($subdirectory));
+        $this->assertFilePermissions(753, $subdirectory);
     }
 
     public function testChown()
@@ -716,16 +714,21 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
     public function testSymlink()
     {
-        $this->markAsSkippedIfSymlinkIsMissing();
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Windows does not support creating "broken" symlinks');
+        }
 
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         $link = $this->workspace.DIRECTORY_SEPARATOR.'link';
 
-        touch($file);
-
+        // $file does not exists right now: creating "broken" links is a wanted feature
         $this->filesystem->symlink($file, $link);
 
         $this->assertTrue(is_link($link));
+
+        // Create the linked file AFTER creating the link
+        touch($file);
+
         $this->assertEquals($file, readlink($link));
     }
 
@@ -995,6 +998,19 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
     {
         $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
 
+        $this->filesystem->dumpFile($filename, 'bar');
+
+        $this->assertFileExists($filename);
+        $this->assertSame('bar', file_get_contents($filename));
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testDumpFileAndSetPermissions()
+    {
+        $filename = $this->workspace.DIRECTORY_SEPARATOR.'foo'.DIRECTORY_SEPARATOR.'baz.txt';
+
         $this->filesystem->dumpFile($filename, 'bar', 0753);
 
         $this->assertFileExists($filename);
@@ -1002,7 +1018,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         // skip mode check on Windows
         if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->assertEquals(753, $this->getFilePermissions($filename));
+            $this->assertFilePermissions(753, $filename);
         }
     }
 
@@ -1017,7 +1033,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
 
         // skip mode check on Windows
         if ('\\' !== DIRECTORY_SEPARATOR) {
-            $this->assertEquals(600, $this->getFilePermissions($filename));
+            $this->assertFilePermissions(600, $filename);
         }
     }
 
@@ -1032,66 +1048,18 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('bar', file_get_contents($filename));
     }
 
-    /**
-     * Returns file permissions as three digits (i.e. 755).
-     *
-     * @param string $filePath
-     *
-     * @return int
-     */
-    private function getFilePermissions($filePath)
+    public function testCopyShouldKeepExecutionPermission()
     {
-        return (int) substr(sprintf('%o', fileperms($filePath)), -3);
-    }
+        $this->markAsSkippedIfChmodIsMissing();
 
-    private function getFileOwner($filepath)
-    {
-        $this->markAsSkippedIfPosixIsMissing();
+        $sourceFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.DIRECTORY_SEPARATOR.'copy_target_file';
 
-        $infos = stat($filepath);
-        if ($datas = posix_getpwuid($infos['uid'])) {
-            return $datas['name'];
-        }
-    }
+        file_put_contents($sourceFilePath, 'SOURCE FILE');
+        chmod($sourceFilePath, 0745);
 
-    private function getFileGroup($filepath)
-    {
-        $this->markAsSkippedIfPosixIsMissing();
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
-        $infos = stat($filepath);
-        if ($datas = posix_getgrgid($infos['gid'])) {
-            return $datas['name'];
-        }
-
-        $this->markTestSkipped('Unable to retrieve file group name');
-    }
-
-    /**
-     * @param bool $relative Whether support for relative symlinks is required
-     */
-    private function markAsSkippedIfSymlinkIsMissing($relative = false)
-    {
-        if (false === self::$symlinkOnWindows) {
-            $this->markTestSkipped('symlink requires "Create symbolic links" privilege on Windows');
-        }
-
-        // https://bugs.php.net/bug.php?id=69473
-        if ($relative && '\\' === DIRECTORY_SEPARATOR && 1 === PHP_ZTS) {
-            $this->markTestSkipped('symlink does not support relative paths on thread safe Windows PHP versions');
-        }
-    }
-
-    private function markAsSkippedIfChmodIsMissing()
-    {
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->markTestSkipped('chmod is not supported on Windows');
-        }
-    }
-
-    private function markAsSkippedIfPosixIsMissing()
-    {
-        if (!function_exists('posix_isatty')) {
-            $this->markTestSkipped('POSIX is not supported');
-        }
+        $this->assertFilePermissions(767, $targetFilePath);
     }
 }

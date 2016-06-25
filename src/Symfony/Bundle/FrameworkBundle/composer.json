@@ -16,51 +16,56 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/dependency-injection": "~2.3",
-        "symfony/config": "~2.3,>=2.3.12",
-        "symfony/event-dispatcher": "~2.1",
+        "php": ">=5.3.9",
+        "symfony/asset": "~2.7",
+        "symfony/dependency-injection": "~2.6,>=2.6.2",
+        "symfony/config": "~2.4",
+        "symfony/event-dispatcher": "~2.5",
         "symfony/finder": "~2.0,>=2.0.5",
-        "symfony/http-foundation": "~2.3,>=2.3.19",
-        "symfony/http-kernel": "~2.3,>=2.3.22",
+        "symfony/http-foundation": "~2.4.9|~2.5,>=2.5.4",
+        "symfony/http-kernel": "~2.7",
         "symfony/filesystem": "~2.3",
-        "symfony/routing": "~2.3",
+        "symfony/routing": "~2.6,>2.6.4",
+        "symfony/security-core": "~2.6.13|~2.7.9|~2.8",
+        "symfony/security-csrf": "~2.6",
         "symfony/stopwatch": "~2.3",
         "symfony/templating": "~2.1",
-        "symfony/translation": "~2.3,>=2.3.19",
-        "doctrine/common": "~2.2"
+        "symfony/translation": "~2.7",
+        "doctrine/annotations": "~1.0"
     },
     "require-dev": {
-        "symfony/browser-kit": "~2.3",
-        "symfony/console": "~2.3",
+        "symfony/browser-kit": "~2.4",
+        "symfony/console": "~2.7",
         "symfony/css-selector": "~2.0,>=2.0.5",
         "symfony/dom-crawler": "~2.0,>=2.0.5",
         "symfony/intl": "~2.3",
-        "symfony/security": "~2.3",
-        "symfony/form": "~2.3.31",
+        "symfony/security": "~2.6",
+        "symfony/form": "~2.7,>=2.7.2",
         "symfony/class-loader": "~2.1",
+        "symfony/expression-language": "~2.6",
         "symfony/process": "~2.0,>=2.0.5",
-        "symfony/validator": "~2.1",
+        "symfony/validator": "~2.5",
         "symfony/yaml": "~2.0,>=2.0.5"
     },
     "suggest": {
         "symfony/console": "For using the console commands",
         "symfony/form": "For using forms",
-        "symfony/validator": "For using validation",
         "symfony/serializer": "For using the serializer service",
-        "symfony/process": "For using the server:run command"
+        "symfony/validator": "For using validation",
+        "symfony/yaml": "For using the debug:config and lint:yaml commands",
+        "symfony/process": "For using the server:run, server:start, server:stop, and server:status commands",
+        "doctrine/cache": "For using alternative cache drivers"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bundle\\FrameworkBundle\\": "" },
+        "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
     },
-    "target-dir": "Symfony/Bundle/FrameworkBundle",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

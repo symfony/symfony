@@ -211,4 +211,14 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(count($parameters), count($bag));
     }
+
+    public function testGetBoolean()
+    {
+        $parameters = array('string_true' => 'true', 'string_false' => 'false');
+        $bag = new ParameterBag($parameters);
+
+        $this->assertTrue($bag->getBoolean('string_true'), '->getBoolean() gets the string true as boolean true');
+        $this->assertFalse($bag->getBoolean('string_false'), '->getBoolean() gets the string false as boolean false');
+        $this->assertFalse($bag->getBoolean('unknown'), '->getBoolean() returns false if a parameter is not defined');
+    }
 }

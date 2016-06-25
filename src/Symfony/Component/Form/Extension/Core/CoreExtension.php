@@ -12,7 +12,12 @@
 namespace Symfony\Component\Form\Extension\Core;
 
 use Symfony\Component\Form\AbstractExtension;
+use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
+use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
+use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Represents the main form extension, which loads the core functionality.
@@ -21,13 +26,29 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class CoreExtension extends AbstractExtension
 {
+    /**
+     * @var PropertyAccessorInterface
+     */
+    private $propertyAccessor;
+
+    /**
+     * @var ChoiceListFactoryInterface
+     */
+    private $choiceListFactory;
+
+    public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
+    {
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->choiceListFactory = $choiceListFactory ?: new CachingFactoryDecorator(new PropertyAccessDecorator(new DefaultChoiceListFactory(), $this->propertyAccessor));
+    }
+
     protected function loadTypes()
     {
         return array(
-            new Type\FormType(PropertyAccess::createPropertyAccessor()),
+            new Type\FormType($this->propertyAccessor),
             new Type\BirthdayType(),
             new Type\CheckboxType(),
-            new Type\ChoiceType(),
+            new Type\ChoiceType($this->choiceListFactory),
             new Type\CollectionType(),
             new Type\CountryType(),
             new Type\DateType(),

@@ -33,6 +33,7 @@ class BinaryFileResponse extends Response
     protected $file;
     protected $offset;
     protected $maxlen;
+    protected $deleteFileAfterSend = false;
 
     /**
      * Constructor.
@@ -304,6 +305,10 @@ class BinaryFileResponse extends Response
         fclose($out);
         fclose($file);
 
+        if ($this->deleteFileAfterSend) {
+            unlink($this->file->getPathname());
+        }
+
         return $this;
     }
 
@@ -335,5 +340,20 @@ class BinaryFileResponse extends Response
     public static function trustXSendfileTypeHeader()
     {
         self::$trustXSendfileTypeHeader = true;
+    }
+
+    /**
+     * If this is set to true, the file will be unlinked after the request is send
+     * Note: If the X-Sendfile header is used, the deleteFileAfterSend setting will not be used.
+     *
+     * @param bool $shouldDelete
+     *
+     * @return BinaryFileResponse
+     */
+    public function deleteFileAfterSend($shouldDelete)
+    {
+        $this->deleteFileAfterSend = $shouldDelete;
+
+        return $this;
     }
 }

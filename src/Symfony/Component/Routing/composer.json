@@ -2,7 +2,7 @@
     "name": "symfony/routing",
     "type": "library",
     "description": "Symfony Routing Component",
-    "keywords": [],
+    "keywords": ["routing", "router", "URL", "URI"],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -16,31 +16,37 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/config": "~2.2",
+        "symfony/config": "~2.7",
         "symfony/http-foundation": "~2.3",
         "symfony/yaml": "~2.0,>=2.0.5",
+        "symfony/expression-language": "~2.4",
+        "doctrine/annotations": "~1.0",
         "doctrine/common": "~2.2",
         "psr/log": "~1.0"
     },
+    "conflict": {
+        "symfony/config": "<2.7"
+    },
     "suggest": {
-        "symfony/config": "",
-        "symfony/yaml": "",
-        "doctrine/common": ""
+        "symfony/http-foundation": "For using a Symfony Request object",
+        "symfony/config": "For using the all-in-one router or any loader",
+        "symfony/yaml": "For using the YAML loader",
+        "symfony/expression-language": "For using expression matching",
+        "doctrine/annotations": "For using the annotation loader"
     },
     "autoload": {
-        "psr-0": { "Symfony\\Component\\Routing\\": "" },
+        "psr-4": { "Symfony\\Component\\Routing\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
     },
-    "target-dir": "Symfony/Component/Routing",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

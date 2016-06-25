@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\LengthValidator;
+use Symfony\Component\Validator\Validation;
 
 class LengthValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new LengthValidator();
@@ -64,14 +70,6 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             array('1234'),
             array('üüüü'),
             array('éééé'),
-        );
-    }
-
-    public function getNotFourCharacters()
-    {
-        return array_merge(
-            $this->getThreeOrLessCharacters(),
-            $this->getFiveOrMoreCharacters()
         );
     }
 
@@ -152,6 +150,7 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_SHORT_ERROR)
             ->assertRaised();
     }
 
@@ -172,13 +171,14 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_LONG_ERROR)
             ->assertRaised();
     }
 
     /**
-     * @dataProvider getNotFourCharacters
+     * @dataProvider getThreeOrLessCharacters
      */
-    public function testInvalidValuesExact($value)
+    public function testInvalidValuesExactLessThanFour($value)
     {
         $constraint = new Length(array(
             'min' => 4,
@@ -193,6 +193,29 @@ class LengthValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ limit }}', 4)
             ->setInvalidValue($value)
             ->setPlural(4)
+            ->setCode(Length::TOO_SHORT_ERROR)
+            ->assertRaised();
+    }
+
+    /**
+     * @dataProvider getFiveOrMoreCharacters
+     */
+    public function testInvalidValuesExactMoreThanFour($value)
+    {
+        $constraint = new Length(array(
+            'min' => 4,
+            'max' => 4,
+            'exactMessage' => 'myMessage',
+        ));
+
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ limit }}', 4)
+            ->setInvalidValue($value)
+            ->setPlural(4)
+            ->setCode(Length::TOO_LONG_ERROR)
             ->assertRaised();
     }
 

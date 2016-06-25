@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * RequestHelper provides access to the current request parameters.
@@ -22,15 +23,25 @@ use Symfony\Component\HttpFoundation\Request;
 class RequestHelper extends Helper
 {
     protected $request;
+    protected $requestStack;
 
     /**
      * Constructor.
      *
-     * @param Request $request A Request instance
+     * @param Request|RequestStack $requestStack A RequestStack instance or a Request instance
+     *
+     * @deprecated since version 2.5, passing a Request instance is deprecated and support for it will be removed in 3.0.
      */
-    public function __construct(Request $request)
+    public function __construct($requestStack)
     {
-        $this->request = $request;
+        if ($requestStack instanceof Request) {
+            @trigger_error('Since version 2.5, passing a Request instance into the '.__METHOD__.' is deprecated and support for it will be removed in 3.0. Inject a Symfony\Component\HttpFoundation\RequestStack instance instead.', E_USER_DEPRECATED);
+            $this->request = $requestStack;
+        } elseif ($requestStack instanceof RequestStack) {
+            $this->requestStack = $requestStack;
+        } else {
+            throw new \InvalidArgumentException('RequestHelper only accepts a Request or a RequestStack instance.');
+        }
     }
 
     /**
@@ -45,7 +56,7 @@ class RequestHelper extends Helper
      */
     public function getParameter($key, $default = null)
     {
-        return $this->request->get($key, $default);
+        return $this->getRequest()->get($key, $default);
     }
 
     /**
@@ -55,7 +66,20 @@ class RequestHelper extends Helper
      */
     public function getLocale()
     {
-        return $this->request->getLocale();
+        return $this->getRequest()->getLocale();
+    }
+
+    private function getRequest()
+    {
+        if ($this->requestStack) {
+            if (!$this->requestStack->getCurrentRequest()) {
+                throw new \LogicException('A Request must be available.');
+            }
+
+            return $this->requestStack->getCurrentRequest();
+        }
+
+        return $this->request;
     }
 
     /**

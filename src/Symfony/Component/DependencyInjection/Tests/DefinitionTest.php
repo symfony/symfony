@@ -24,28 +24,15 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo'), $def->getArguments(), '__construct() takes an optional array of arguments as its second argument');
     }
 
-    public function testSetGetFactoryClass()
+    public function testSetGetFactory()
     {
         $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryClass());
-        $this->assertSame($def, $def->setFactoryClass('stdClass2'), '->setFactoryClass() implements a fluent interface.');
-        $this->assertEquals('stdClass2', $def->getFactoryClass(), '->getFactoryClass() returns current class to construct this service.');
-    }
 
-    public function testSetGetFactoryMethod()
-    {
-        $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryMethod());
-        $this->assertSame($def, $def->setFactoryMethod('foo'), '->setFactoryMethod() implements a fluent interface');
-        $this->assertEquals('foo', $def->getFactoryMethod(), '->getFactoryMethod() returns the factory method name');
-    }
+        $this->assertSame($def, $def->setFactory('foo'), '->setFactory() implements a fluent interface');
+        $this->assertEquals('foo', $def->getFactory(), '->getFactory() returns the factory');
 
-    public function testSetGetFactoryService()
-    {
-        $def = new Definition('stdClass');
-        $this->assertNull($def->getFactoryService());
-        $this->assertSame($def, $def->setFactoryService('foo.bar'), '->setFactoryService() implements a fluent interface.');
-        $this->assertEquals('foo.bar', $def->getFactoryService(), '->getFactoryService() returns current service to construct this service.');
+        $def->setFactory('Foo::bar');
+        $this->assertEquals(array('Foo', 'bar'), $def->getFactory(), '->setFactory() converts string static method call to the array');
     }
 
     public function testSetGetClass()
@@ -53,6 +40,26 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setClass('foo'), '->setClass() implements a fluent interface');
         $this->assertEquals('foo', $def->getClass(), '->getClass() returns the class name');
+    }
+
+    public function testSetGetDecoratedService()
+    {
+        $def = new Definition('stdClass');
+        $this->assertNull($def->getDecoratedService());
+        $def->setDecoratedService('foo', 'foo.renamed');
+        $this->assertEquals(array('foo', 'foo.renamed'), $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
+        $def = new Definition('stdClass');
+        $def->setDecoratedService('foo');
+        $this->assertEquals(array('foo', null), $def->getDecoratedService());
+        $def->setDecoratedService(null);
+        $this->assertNull($def->getDecoratedService());
+
+        $def = new Definition('stdClass');
+        $this->setExpectedException('InvalidArgumentException', 'The decorated service inner name for "foo" must be different than the service name itself.');
+        $def->setDecoratedService('foo', 'foo');
     }
 
     public function testArguments()
@@ -118,7 +125,10 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->isSynthetic(), '->isSynthetic() returns true if the service is synthetic.');
     }
 
-    public function testSetIsSynchronized()
+    /**
+     * @group legacy
+     */
+    public function testLegacySetIsSynchronized()
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isSynchronized(), '->isSynchronized() returns false by default');

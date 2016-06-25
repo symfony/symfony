@@ -55,7 +55,15 @@ class TwigExtension extends Extension
 
         $container->setParameter('twig.exception_listener.controller', $config['exception_controller']);
 
-        $container->setParameter('twig.form.resources', $config['form']['resources']);
+        $container->setParameter('twig.form.resources', $config['form_themes']);
+
+        $envConfiguratorDefinition = $container->getDefinition('twig.configurator.environment');
+        $envConfiguratorDefinition->replaceArgument(0, $config['date']['format']);
+        $envConfiguratorDefinition->replaceArgument(1, $config['date']['interval_format']);
+        $envConfiguratorDefinition->replaceArgument(2, $config['date']['timezone']);
+        $envConfiguratorDefinition->replaceArgument(3, $config['number_format']['decimals']);
+        $envConfiguratorDefinition->replaceArgument(4, $config['number_format']['decimal_point']);
+        $envConfiguratorDefinition->replaceArgument(5, $config['number_format']['thousands_separator']);
 
         $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.filesystem');
 
@@ -101,19 +109,12 @@ class TwigExtension extends Extension
             $config['extensions']
         );
 
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.xml');
-
-            $container->setDefinition('templating.engine.twig', $container->findDefinition('debug.templating.engine.twig'));
-            $container->setAlias('debug.templating.engine.twig', 'templating.engine.twig');
-        }
-
         if (isset($config['autoescape_service']) && isset($config['autoescape_service_method'])) {
             $config['autoescape'] = array(new Reference($config['autoescape_service']), $config['autoescape_service_method']);
         }
         unset($config['autoescape_service'], $config['autoescape_service_method']);
 
-        $container->setParameter('twig.options', $config);
+        $container->getDefinition('twig')->replaceArgument(1, $config);
 
         $this->addClassesToCompile(array(
             'Twig_Environment',

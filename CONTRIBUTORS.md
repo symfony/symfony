@@ -39,8 +39,8 @@ Symfony is the result of the work of many people who made the code better
  - Maxime Steinhausser (ogizanagi)
  - Alexandre Salomé (alexandresalome)
  - William Durand (couac)
- - ornicar
  - Jules Pietri (heah)
+ - ornicar
  - stealth35 ‏ (stealth35)
  - Alexander Mols (asm89)
  - Francis Besset (francisbesset)
@@ -65,9 +65,9 @@ Symfony is the result of the work of many people who made the code better
  - Dariusz Górecki (canni)
  - Arnout Boks (aboks)
  - Iltar van der Berg (kjarli)
+ - Charles Sarrazin (csarrazi)
  - Ener-Getick (energetick)
  - Douglas Greenshields (shieldo)
- - Charles Sarrazin (csarrazi)
  - Lee McDermott
  - Brandon Turner
  - Luis Cordova (cordoval)
@@ -187,6 +187,7 @@ Symfony is the result of the work of many people who made the code better
  - Loïc Faugeron
  - Jannik Zschiesche (apfelbox)
  - Marco Pivetta (ocramius)
+ - Teoh Han Hui (teohhanhui)
  - julien pauli (jpauli)
  - Michael Lee (zerustech)
  - Lorenz Schori
@@ -213,6 +214,7 @@ Symfony is the result of the work of many people who made the code better
  - Pierre-Yves LEBECQ (pylebecq)
  - Daniel Espendiller
  - Jakub Kucharovic (jkucharovic)
+ - Robin Chalas (chalas_r)
  - Eugene Leonovich (rybakit)
  - Filippo Tessarotto
  - Joseph Rouff (rouffj)
@@ -275,7 +277,6 @@ Symfony is the result of the work of many people who made the code better
  - janschoenherr
  - Thomas Schulz (king2500)
  - Berny Cantos (xphere81)
- - Teoh Han Hui (teohhanhui)
  - Ricard Clau (ricardclau)
  - Mark Challoner (markchalloner)
  - Gregor Harlan (gharlan)
@@ -310,7 +311,6 @@ Symfony is the result of the work of many people who made the code better
  - Philipp Kräutli (pkraeutli)
  - Kirill chEbba Chebunin (chebba)
  - Greg Thornton (xdissent)
- - Robin Chalas (chalas_r)
  - Costin Bereveanu (schniper)
  - Loïc Chardonnet (gnusat)
  - Marek Kalnik (marekkalnik)
@@ -1414,6 +1414,7 @@ Symfony is the result of the work of many people who made the code better
  - Damon Jones (damon__jones)
  - David Badura (davidbadura)
  - Daniel Londero (dlondero)
+ - Sebastian Landwehr (dword123)
  - Adel ELHAIBA (eadel)
  - Damián Nohales (eagleoneraptor)
  - Elliot Anderson (elliot)

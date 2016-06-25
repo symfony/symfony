@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:framework="http://symfony.com/schema/dic/symfony"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/symfony http://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
+
+    <framework:config>
+        <framework:templating assets-version="SomeVersionScheme" assets-version-format="%%s?version=%%s">
+            <framework:engine>php</framework:engine>
+            <framework:assets-base-url>http://cdn.example.com</framework:assets-base-url>
+            <framework:package name="images" version="1.0.0">
+                <framework:base-url>http://images1.example.com</framework:base-url>
+                <framework:base-url>http://images2.example.com</framework:base-url>
+            </framework:package>
+            <framework:package name="foo" version="1.0.0" version-format="%%s-%%s" />
+            <framework:package name="bar">
+                <framework:base-url>https://bar2.example.com</framework:base-url>
+            </framework:package>
+            <framework:package name="bar_null_version" version="">
+                <framework:base-url>https://bar3.example.com</framework:base-url>
+            </framework:package>
+        </framework:templating>
+    </framework:config>
+</container>

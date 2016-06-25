@@ -49,7 +49,7 @@ class RouteCollection implements \IteratorAggregate, \Countable
      *
      * @see all()
      *
-     * @return \ArrayIterator An \ArrayIterator object for iterating over routes
+     * @return \ArrayIterator|Route[] An \ArrayIterator object for iterating over routes
      */
     public function getIterator()
     {
@@ -166,6 +166,20 @@ class RouteCollection implements \IteratorAggregate, \Countable
             $route->setHost($pattern);
             $route->addDefaults($defaults);
             $route->addRequirements($requirements);
+        }
+    }
+
+    /**
+     * Sets a condition on all routes.
+     *
+     * Existing conditions will be overridden.
+     *
+     * @param string $condition The condition
+     */
+    public function setCondition($condition)
+    {
+        foreach ($this->routes as $route) {
+            $route->setCondition($condition);
         }
     }
 

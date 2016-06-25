@@ -40,6 +40,18 @@ class TranslationWriter
     }
 
     /**
+     * Disables dumper backup.
+     */
+    public function disableBackup()
+    {
+        foreach ($this->dumpers as $dumper) {
+            if (method_exists($dumper, 'setBackup')) {
+                $dumper->setBackup(false);
+            }
+        }
+    }
+
+    /**
      * Obtains the list of supported formats.
      *
      * @return array

@@ -49,21 +49,30 @@ class XliffFileLoader implements LoaderInterface
             }
 
             $source = isset($attributes['resname']) && $attributes['resname'] ? $attributes['resname'] : $translation->source;
-            $target = (string) (isset($translation->target) ? $translation->target : $source);
-
             // If the xlf file has another encoding specified, try to convert it because
             // simple_xml will always return utf-8 encoded values
-            if ('UTF-8' !== $encoding && !empty($encoding)) {
-                if (function_exists('mb_convert_encoding')) {
-                    $target = mb_convert_encoding($target, $encoding, 'UTF-8');
-                } elseif (function_exists('iconv')) {
-                    $target = iconv('UTF-8', $encoding, $target);
-                } else {
-                    throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
-                }
-            }
+            $target = $this->utf8ToCharset((string) (isset($translation->target) ? $translation->target : $source), $encoding);
 
             $catalogue->set((string) $source, $target, $domain);
+
+            if (isset($translation->note)) {
+                $notes = array();
+                foreach ($translation->note as $xmlNote) {
+                    $noteAttributes = $xmlNote->attributes();
+                    $note = array('content' => $this->utf8ToCharset((string) $xmlNote, $encoding));
+                    if (isset($noteAttributes['priority'])) {
+                        $note['priority'] = (int) $noteAttributes['priority'];
+                    }
+
+                    if (isset($noteAttributes['from'])) {
+                        $note['from'] = (string) $noteAttributes['from'];
+                    }
+
+                    $notes[] = $note;
+                }
+
+                $catalogue->setMetadata((string) $source, array('notes' => $notes), $domain);
+            }
         }
 
         if (class_exists('Symfony\Component\Config\Resource\FileResource')) {
@@ -74,14 +83,38 @@ class XliffFileLoader implements LoaderInterface
     }
 
     /**
+     * Convert a UTF8 string to the specified encoding.
+     *
+     * @param string $content  String to decode
+     * @param string $encoding Target encoding
+     *
+     * @return string
+     */
+    private function utf8ToCharset($content, $encoding = null)
+    {
+        if ('UTF-8' !== $encoding && !empty($encoding)) {
+            if (function_exists('mb_convert_encoding')) {
+                return mb_convert_encoding($content, $encoding, 'UTF-8');
+            }
+
+            if (function_exists('iconv')) {
+                return iconv('UTF-8', $encoding, $content);
+            }
+
+            throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+        }
+
+        return $content;
+    }
+
+    /**
      * Validates and parses the given file into a SimpleXMLElement.
      *
      * @param string $file
      *
-     * @throws \RuntimeException
-     *
      * @return \SimpleXMLElement
      *
+     * @throws \RuntimeException
      * @throws InvalidResourceException
      */
     private function parseFile($file)
@@ -109,9 +142,15 @@ class XliffFileLoader implements LoaderInterface
         $source = file_get_contents(__DIR__.'/schema/dic/xliff-core/xliff-core-1.2-strict.xsd');
         $source = str_replace('http://www.w3.org/2001/xml.xsd', $location, $source);
 
+        $disableEntities = libxml_disable_entity_loader(false);
+
         if (!@$dom->schemaValidateSource($source)) {
+            libxml_disable_entity_loader($disableEntities);
+
             throw new InvalidResourceException(sprintf('Invalid resource provided: "%s"; Errors: %s', $file, implode("\n", $this->getXmlErrors($internalErrors))));
         }
+
+        libxml_disable_entity_loader($disableEntities);
 
         $dom->normalizeDocument();
 

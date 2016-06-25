@@ -139,6 +139,17 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
         $this->assertEquals(array('b', 'a'), $serviceOrder);
     }
 
+    public function testProcessNoTaggedServices()
+    {
+        $container = $this->createBuilder(true);
+
+        $this->process($container);
+
+        $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls());
+
+        $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
+    }
+
     private function process(ContainerBuilder $container)
     {
         $pass = new RegisterEventListenersAndSubscribersPass('doctrine.connections', 'doctrine.dbal.%s_connection.event_manager', 'doctrine');

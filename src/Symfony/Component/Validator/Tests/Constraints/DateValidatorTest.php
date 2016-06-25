@@ -13,9 +13,15 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateValidator;
+use Symfony\Component\Validator\Validation;
 
 class DateValidatorTest extends AbstractConstraintValidatorTest
 {
+    protected function getApiVersion()
+    {
+        return Validation::API_VERSION_2_5;
+    }
+
     protected function createValidator()
     {
         return new DateValidator();
@@ -72,7 +78,7 @@ class DateValidatorTest extends AbstractConstraintValidatorTest
     /**
      * @dataProvider getInvalidDates
      */
-    public function testInvalidDates($date)
+    public function testInvalidDates($date, $code)
     {
         $constraint = new Date(array(
             'message' => 'myMessage',
@@ -82,18 +88,19 @@ class DateValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$date.'"')
+            ->setCode($code)
             ->assertRaised();
     }
 
     public function getInvalidDates()
     {
         return array(
-            array('foobar'),
-            array('foobar 2010-13-01'),
-            array('2010-13-01 foobar'),
-            array('2010-13-01'),
-            array('2010-04-32'),
-            array('2010-02-29'),
+            array('foobar', Date::INVALID_FORMAT_ERROR),
+            array('foobar 2010-13-01', Date::INVALID_FORMAT_ERROR),
+            array('2010-13-01 foobar', Date::INVALID_FORMAT_ERROR),
+            array('2010-13-01', Date::INVALID_DATE_ERROR),
+            array('2010-04-32', Date::INVALID_DATE_ERROR),
+            array('2010-02-29', Date::INVALID_DATE_ERROR),
         );
     }
 }

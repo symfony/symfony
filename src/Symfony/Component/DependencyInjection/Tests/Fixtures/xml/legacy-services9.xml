@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+  <parameters>
+    <parameter key="baz_class">BazClass</parameter>
+    <parameter key="foo">bar</parameter>
+  </parameters>
+  <services>
+    <service id="foo" class="Bar\FooClass" factory-method="getInstance" factory-class="Bar\FooClass">
+      <tag name="foo" foo="foo"/>
+      <tag name="foo" bar="bar"/>
+      <argument>foo</argument>
+      <argument type="service" id="foo.baz"/>
+      <argument type="collection">
+        <argument key="%foo%">foo is %foo%</argument>
+        <argument key="foobar">%foo%</argument>
+      </argument>
+      <argument>true</argument>
+      <argument type="service" id="service_container"/>
+      <property name="foo">bar</property>
+      <property name="moo" type="service" id="foo.baz"/>
+      <property name="qux" type="collection">
+        <property key="%foo%">foo is %foo%</property>
+        <property key="foobar">%foo%</property>
+      </property>
+      <call method="setBar">
+        <argument type="service" id="bar"/>
+      </call>
+      <call method="initialize"/>
+      <configurator function="sc_configure"/>
+    </service>
+    <service id="foo.baz" class="%baz_class%" factory-method="getInstance" factory-class="%baz_class%">
+      <configurator class="%baz_class%" method="configureStatic1"/>
+    </service>
+    <service id="factory_service" class="Bar" factory-method="getInstance" factory-service="foo.baz"/>
+  </services>
+</container>

@@ -21,12 +21,22 @@ use Symfony\Component\Validator\Constraint;
  */
 class Choice extends Constraint
 {
+    const NO_SUCH_CHOICE_ERROR = 1;
+    const TOO_FEW_ERROR = 2;
+    const TOO_MANY_ERROR = 3;
+
+    protected static $errorNames = array(
+        self::NO_SUCH_CHOICE_ERROR => 'NO_SUCH_CHOICE_ERROR',
+        self::TOO_FEW_ERROR => 'TOO_FEW_ERROR',
+        self::TOO_MANY_ERROR => 'TOO_MANY_ERROR',
+    );
+
     public $choices;
     public $callback;
     public $multiple = false;
     public $strict = false;
-    public $min = null;
-    public $max = null;
+    public $min;
+    public $max;
     public $message = 'The value you selected is not a valid choice.';
     public $multipleMessage = 'One or more of the given values is invalid.';
     public $minMessage = 'You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.';

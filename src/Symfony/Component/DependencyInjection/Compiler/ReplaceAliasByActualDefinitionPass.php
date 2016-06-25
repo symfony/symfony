@@ -71,12 +71,14 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
             $container->removeDefinition($targetId);
             $replacements[$targetId] = $definitionId;
         }
+
         // Now replace target instances in all definitions
         foreach ($container->getDefinitions() as $definitionId => $definition) {
             $definition->setArguments($this->updateArgumentReferences($replacements, $definitionId, $definition->getArguments()));
             $definition->setMethodCalls($this->updateArgumentReferences($replacements, $definitionId, $definition->getMethodCalls()));
             $definition->setProperties($this->updateArgumentReferences($replacements, $definitionId, $definition->getProperties()));
-            $definition->setFactoryService($this->updateFactoryReferenceId($replacements, $definition->getFactoryService()));
+            $definition->setFactoryService($this->updateFactoryReferenceId($replacements, $definition->getFactoryService(false)), false);
+            $definition->setFactory($this->updateFactoryReference($replacements, $definition->getFactory()));
         }
     }
 
@@ -129,5 +131,14 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
         }
 
         return isset($replacements[$referenceId]) ? $replacements[$referenceId] : $referenceId;
+    }
+
+    private function updateFactoryReference(array $replacements, $factory)
+    {
+        if (is_array($factory) && $factory[0] instanceof Reference && isset($replacements[$referenceId = (string) $factory[0]])) {
+            $factory[0] = new Reference($replacements[$referenceId], $factory[0]->getInvalidBehavior());
+        }
+
+        return $factory;
     }
 }

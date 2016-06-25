@@ -27,6 +27,13 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     protected $httpUtils;
     protected $options;
     protected $providerKey;
+    protected $defaultOptions = array(
+        'always_use_default_target_path' => false,
+        'default_target_path' => '/',
+        'login_path' => '/login',
+        'target_path_parameter' => '_target_path',
+        'use_referer' => false,
+    );
 
     /**
      * Constructor.
@@ -34,17 +41,10 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
      * @param HttpUtils $httpUtils
      * @param array     $options   Options for processing a successful authentication attempt.
      */
-    public function __construct(HttpUtils $httpUtils, array $options)
+    public function __construct(HttpUtils $httpUtils, array $options = array())
     {
         $this->httpUtils = $httpUtils;
-
-        $this->options = array_merge(array(
-            'always_use_default_target_path' => false,
-            'default_target_path' => '/',
-            'login_path' => '/login',
-            'target_path_parameter' => '_target_path',
-            'use_referer' => false,
-        ), $options);
+        $this->setOptions($options);
     }
 
     /**
@@ -53,6 +53,26 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
     {
         return $this->httpUtils->createRedirectResponse($request, $this->determineTargetUrl($request));
+    }
+
+    /**
+     * Gets the options.
+     *
+     * @return array An array of options
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * Sets the options.
+     *
+     * @param array $options An array of options
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array_merge($this->defaultOptions, $options);
     }
 
     /**

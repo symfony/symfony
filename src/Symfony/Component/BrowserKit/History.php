@@ -22,14 +22,6 @@ class History
     protected $position = -1;
 
     /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        $this->clear();
-    }
-
-    /**
      * Clears the history.
      */
     public function clear()

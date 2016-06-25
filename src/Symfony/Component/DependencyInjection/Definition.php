@@ -23,39 +23,60 @@ class Definition
 {
     private $class;
     private $file;
+    private $factory;
     private $factoryClass;
     private $factoryMethod;
     private $factoryService;
-    private $scope;
-    private $properties;
-    private $calls;
+    private $scope = ContainerInterface::SCOPE_CONTAINER;
+    private $properties = array();
+    private $calls = array();
     private $configurator;
-    private $tags;
-    private $public;
-    private $synthetic;
-    private $abstract;
-    private $synchronized;
-    private $lazy;
+    private $tags = array();
+    private $public = true;
+    private $synthetic = false;
+    private $abstract = false;
+    private $synchronized = false;
+    private $lazy = false;
+    private $decoratedService;
 
     protected $arguments;
 
     /**
-     * @param string $class     The service class
-     * @param array  $arguments An array of arguments to pass to the service constructor
+     * @param string|null $class     The service class
+     * @param array       $arguments An array of arguments to pass to the service constructor
      */
     public function __construct($class = null, array $arguments = array())
     {
         $this->class = $class;
         $this->arguments = $arguments;
-        $this->calls = array();
-        $this->scope = ContainerInterface::SCOPE_CONTAINER;
-        $this->tags = array();
-        $this->public = true;
-        $this->synthetic = false;
-        $this->synchronized = false;
-        $this->lazy = false;
-        $this->abstract = false;
-        $this->properties = array();
+    }
+
+    /**
+     * Sets a factory.
+     *
+     * @param string|array $factory A PHP function or an array containing a class/Reference and a method to call
+     *
+     * @return Definition The current instance
+     */
+    public function setFactory($factory)
+    {
+        if (is_string($factory) && strpos($factory, '::') !== false) {
+            $factory = explode('::', $factory, 2);
+        }
+
+        $this->factory = $factory;
+
+        return $this;
+    }
+
+    /**
+     * Gets the factory.
+     *
+     * @return string|array The PHP function or an array containing a class/Reference and a method to call
+     */
+    public function getFactory()
+    {
+        return $this->factory;
     }
 
     /**
@@ -65,9 +86,13 @@ class Definition
      * @param string $factoryClass The factory class name
      *
      * @return Definition The current instance
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryClass($factoryClass)
     {
+        @trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryClass), E_USER_DEPRECATED);
+
         $this->factoryClass = $factoryClass;
 
         return $this;
@@ -76,10 +101,16 @@ class Definition
     /**
      * Gets the factory class.
      *
-     * @return string The factory class name
+     * @return string|null The factory class name
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryClass()
+    public function getFactoryClass($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->factoryClass;
     }
 
@@ -89,21 +120,66 @@ class Definition
      * @param string $factoryMethod The factory method name
      *
      * @return Definition The current instance
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
     public function setFactoryMethod($factoryMethod)
     {
+        @trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryMethod), E_USER_DEPRECATED);
+
         $this->factoryMethod = $factoryMethod;
 
         return $this;
     }
 
     /**
+     * Sets the service that this service is decorating.
+     *
+     * @param null|string $id        The decorated service id, use null to remove decoration
+     * @param null|string $renamedId The new decorated service id
+     *
+     * @return Definition The current instance
+     *
+     * @throws InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
+     */
+    public function setDecoratedService($id, $renamedId = null)
+    {
+        if ($renamedId && $id == $renamedId) {
+            throw new \InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
+        }
+
+        if (null === $id) {
+            $this->decoratedService = null;
+        } else {
+            $this->decoratedService = array($id, $renamedId);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets the service that decorates this service.
+     *
+     * @return null|array An array composed of the decorated service id and the new id for it, null if no service is decorated
+     */
+    public function getDecoratedService()
+    {
+        return $this->decoratedService;
+    }
+
+    /**
      * Gets the factory method.
      *
-     * @return string The factory method name
+     * @return string|null The factory method name
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryMethod()
+    public function getFactoryMethod($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->factoryMethod;
     }
 
@@ -113,9 +189,15 @@ class Definition
      * @param string $factoryService The factory service id
      *
      * @return Definition The current instance
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function setFactoryService($factoryService)
+    public function setFactoryService($factoryService, $triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error(sprintf('%s(%s) is deprecated since version 2.6 and will be removed in 3.0. Use Definition::setFactory() instead.', __METHOD__, $factoryService), E_USER_DEPRECATED);
+        }
+
         $this->factoryService = $factoryService;
 
         return $this;
@@ -124,10 +206,16 @@ class Definition
     /**
      * Gets the factory service id.
      *
-     * @return string The factory service id
+     * @return string|null The factory service id
+     *
+     * @deprecated since version 2.6, to be removed in 3.0.
      */
-    public function getFactoryService()
+    public function getFactoryService($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->factoryService;
     }
 
@@ -148,7 +236,7 @@ class Definition
     /**
      * Gets the service class.
      *
-     * @return string The service class
+     * @return string|null The service class
      */
     public function getClass()
     {
@@ -441,7 +529,7 @@ class Definition
     /**
      * Gets the file to require before creating the service.
      *
-     * @return string The full pathname to include
+     * @return string|null The full pathname to include
      */
     public function getFile()
     {
@@ -502,9 +590,15 @@ class Definition
      * @param bool $boolean
      *
      * @return Definition The current instance
+     *
+     * @deprecated since version 2.7, will be removed in 3.0.
      */
-    public function setSynchronized($boolean)
+    public function setSynchronized($boolean, $triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         $this->synchronized = (bool) $boolean;
 
         return $this;
@@ -514,9 +608,15 @@ class Definition
      * Whether this service is synchronized.
      *
      * @return bool
+     *
+     * @deprecated since version 2.7, will be removed in 3.0.
      */
-    public function isSynchronized()
+    public function isSynchronized($triggerDeprecationError = true)
     {
+        if ($triggerDeprecationError) {
+            @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0.', E_USER_DEPRECATED);
+        }
+
         return $this->synchronized;
     }
 
@@ -613,7 +713,7 @@ class Definition
     /**
      * Gets the configurator to call after the service is fully initialized.
      *
-     * @return callable The PHP callable to call
+     * @return callable|null The PHP callable to call
      */
     public function getConfigurator()
     {

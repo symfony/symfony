@@ -42,7 +42,7 @@ namespace Symfony\Component\Security\Acl\Permission;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class MaskBuilder
+class MaskBuilder extends AbstractMaskBuilder
 {
     const MASK_VIEW = 1;           // 1 << 0
     const MASK_CREATE = 2;         // 1 << 1
@@ -66,56 +66,6 @@ class MaskBuilder
     const ALL_OFF = '................................';
     const OFF = '.';
     const ON = '*';
-
-    private $mask;
-
-    /**
-     * Constructor.
-     *
-     * @param int $mask optional; defaults to 0
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function __construct($mask = 0)
-    {
-        if (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be an integer.');
-        }
-
-        $this->mask = $mask;
-    }
-
-    /**
-     * Adds a mask to the permission.
-     *
-     * @param mixed $mask
-     *
-     * @return MaskBuilder
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function add($mask)
-    {
-        if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
-            $mask = constant($name);
-        } elseif (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be an integer.');
-        }
-
-        $this->mask |= $mask;
-
-        return $this;
-    }
-
-    /**
-     * Returns the mask of this permission.
-     *
-     * @return int
-     */
-    public function get()
-    {
-        return $this->mask;
-    }
 
     /**
      * Returns a human-readable representation of the permission.
@@ -142,48 +92,14 @@ class MaskBuilder
     }
 
     /**
-     * Removes a mask from the permission.
-     *
-     * @param mixed $mask
-     *
-     * @return MaskBuilder
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function remove($mask)
-    {
-        if (is_string($mask) && defined($name = 'static::MASK_'.strtoupper($mask))) {
-            $mask = constant($name);
-        } elseif (!is_int($mask)) {
-            throw new \InvalidArgumentException('$mask must be an integer.');
-        }
-
-        $this->mask &= ~$mask;
-
-        return $this;
-    }
-
-    /**
-     * Resets the PermissionBuilder.
-     *
-     * @return MaskBuilder
-     */
-    public function reset()
-    {
-        $this->mask = 0;
-
-        return $this;
-    }
-
-    /**
      * Returns the code for the passed mask.
      *
      * @param int $mask
      *
+     * @return string
+     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
-     *
-     * @return string
      */
     public static function getCode($mask)
     {
@@ -193,19 +109,43 @@ class MaskBuilder
 
         $reflection = new \ReflectionClass(get_called_class());
         foreach ($reflection->getConstants() as $name => $cMask) {
-            if (0 !== strpos($name, 'MASK_')) {
+            if (0 !== strpos($name, 'MASK_') || $mask !== $cMask) {
                 continue;
             }
 
-            if ($mask === $cMask) {
-                if (!defined($cName = 'static::CODE_'.substr($name, 5))) {
-                    throw new \RuntimeException('There was no code defined for this mask.');
-                }
-
-                return constant($cName);
+            if (!defined($cName = 'static::CODE_'.substr($name, 5))) {
+                throw new \RuntimeException('There was no code defined for this mask.');
             }
+
+            return constant($cName);
         }
 
         throw new \InvalidArgumentException(sprintf('The mask "%d" is not supported.', $mask));
+    }
+
+    /**
+     * Returns the mask for the passed code.
+     *
+     * @param mixed $code
+     *
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function resolveMask($code)
+    {
+        if (is_string($code)) {
+            if (!defined($name = sprintf('static::MASK_%s', strtoupper($code)))) {
+                throw new \InvalidArgumentException(sprintf('The code "%s" is not supported', $code));
+            }
+
+            return constant($name);
+        }
+
+        if (!is_int($code)) {
+            throw new \InvalidArgumentException('$code must be an integer.');
+        }
+
+        return $code;
     }
 }

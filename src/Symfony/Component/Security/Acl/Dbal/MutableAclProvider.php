@@ -51,7 +51,8 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     public function createAcl(ObjectIdentityInterface $oid)
     {
         if (false !== $this->retrieveObjectIdentityPrimaryKey($oid)) {
-            throw new AclAlreadyExistsException(sprintf('%s is already associated with an ACL.', $oid));
+            $objectName = method_exists($oid, '__toString') ? $oid : get_class($oid);
+            throw new AclAlreadyExistsException(sprintf('%s is already associated with an ACL.', $objectName));
         }
 
         $this->connection->beginTransaction();
@@ -106,6 +107,19 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         if (null !== $this->cache) {
             $this->cache->evictFromCacheByIdentity($oid);
         }
+    }
+
+    /**
+     * Deletes the security identity from the database.
+     * ACL entries have the CASCADE option on their foreign key so they will also get deleted.
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function deleteSecurityIdentity(SecurityIdentityInterface $sid)
+    {
+        $this->connection->executeQuery($this->getDeleteSecurityIdentityIdSql($sid));
     }
 
     /**
@@ -352,6 +366,17 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     }
 
     /**
+     * Updates a user security identity when the user's username changes.
+     *
+     * @param UserSecurityIdentity $usid
+     * @param string               $oldUsername
+     */
+    public function updateUserSecurityIdentity(UserSecurityIdentity $usid, $oldUsername)
+    {
+        $this->connection->executeQuery($this->getUpdateUserSecurityIdentitySql($usid, $oldUsername));
+    }
+
+    /**
      * Constructs the SQL for deleting access control entries.
      *
      * @param int $oidPK
@@ -529,9 +554,9 @@ QUERY;
      *
      * @param SecurityIdentityInterface $sid
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getInsertSecurityIdentitySql(SecurityIdentityInterface $sid)
     {
@@ -601,9 +626,9 @@ QUERY;
      *
      * @param SecurityIdentityInterface $sid
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
@@ -626,14 +651,31 @@ QUERY;
     }
 
     /**
+     * Constructs the SQL to delete a security identity.
+     *
+     * @param SecurityIdentityInterface $sid
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getDeleteSecurityIdentityIdSql(SecurityIdentityInterface $sid)
+    {
+        $select = $this->getSelectSecurityIdentityIdSql($sid);
+        $delete = preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
+
+        return $delete;
+    }
+
+    /**
      * Constructs the SQL for updating an object identity.
      *
      * @param int   $pk
      * @param array $changes
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getUpdateObjectIdentitySql($pk, array $changes)
     {
@@ -650,14 +692,40 @@ QUERY;
     }
 
     /**
+     * Constructs the SQL for updating a user security identity.
+     *
+     * @param UserSecurityIdentity $usid
+     * @param string               $oldUsername
+     *
+     * @return string
+     */
+    protected function getUpdateUserSecurityIdentitySql(UserSecurityIdentity $usid, $oldUsername)
+    {
+        if ($usid->getUsername() == $oldUsername) {
+            throw new \InvalidArgumentException('There are no changes.');
+        }
+
+        $oldIdentifier = $usid->getClass().'-'.$oldUsername;
+        $newIdentifier = $usid->getClass().'-'.$usid->getUsername();
+
+        return sprintf(
+            'UPDATE %s SET identifier = %s WHERE identifier = %s AND username = %s',
+            $this->options['sid_table_name'],
+            $this->connection->quote($newIdentifier),
+            $this->connection->quote($oldIdentifier),
+            $this->connection->getDatabasePlatform()->convertBooleans(true)
+        );
+    }
+
+    /**
      * Constructs the SQL for updating an ACE.
      *
      * @param int   $pk
      * @param array $sets
      *
-     * @throws \InvalidArgumentException
-     *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getUpdateAccessControlEntrySql($pk, array $sets)
     {

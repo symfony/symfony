@@ -16,17 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.3.9",
         "doctrine/common": "~2.4"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.2",
-        "symfony/dependency-injection": "~2.0,>=2.0.5",
-        "symfony/form": "~2.3,>=2.3.8",
+        "symfony/dependency-injection": "~2.2",
+        "symfony/form": "~2.7.12|~2.8.5",
         "symfony/http-kernel": "~2.2",
         "symfony/property-access": "~2.3",
         "symfony/security": "~2.2",
-        "symfony/validator": "~2.3.0,>=2.3.20",
+        "symfony/expression-language": "~2.2",
+        "symfony/validator": "~2.5,>=2.5.5",
         "symfony/translation": "~2.0,>=2.0.5",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
@@ -40,16 +41,15 @@
         "doctrine/orm": ""
     },
     "autoload": {
-        "psr-0": { "Symfony\\Bridge\\Doctrine\\": "" },
+        "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]
     },
-    "target-dir": "Symfony/Bridge/Doctrine",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.3-dev"
+            "dev-master": "2.7-dev"
         }
     }
 }

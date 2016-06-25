@@ -64,7 +64,7 @@ class AclVoter implements VoterInterface
 
             if (null === $object) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
+                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s.', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
                 }
 
                 return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
@@ -79,7 +79,7 @@ class AclVoter implements VoterInterface
                 $oid = $object;
             } elseif (null === $oid = $this->objectIdentityRetrievalStrategy->getObjectIdentity($object)) {
                 if (null !== $this->logger) {
-                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
+                    $this->logger->debug(sprintf('Object identity unavailable. Voting to %s.', $this->allowIfObjectIdentityUnavailable ? 'grant access' : 'abstain'));
                 }
 
                 return $this->allowIfObjectIdentityUnavailable ? self::ACCESS_GRANTED : self::ACCESS_ABSTAIN;
@@ -96,13 +96,13 @@ class AclVoter implements VoterInterface
 
                 if (null === $field && $acl->isGranted($masks, $sids, false)) {
                     if (null !== $this->logger) {
-                        $this->logger->debug('ACL found, permission granted. Voting to grant access');
+                        $this->logger->debug('ACL found, permission granted. Voting to grant access.');
                     }
 
                     return self::ACCESS_GRANTED;
                 } elseif (null !== $field && $acl->isFieldGranted($field, $masks, $sids, false)) {
                     if (null !== $this->logger) {
-                        $this->logger->debug('ACL found, permission granted. Voting to grant access');
+                        $this->logger->debug('ACL found, permission granted. Voting to grant access.');
                     }
 
                     return self::ACCESS_GRANTED;

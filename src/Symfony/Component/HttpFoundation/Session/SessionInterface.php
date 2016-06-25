@@ -141,7 +141,7 @@ interface SessionInterface
      *
      * @param string $name
      *
-     * @return mixed The removed value
+     * @return mixed The removed value or null when it does not exist
      */
     public function remove($name);
 

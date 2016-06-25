@@ -20,6 +20,7 @@ class ORMQueryBuilderLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @group legacy
      */
     public function testItOnlyWorksWithQueryBuilderOrClosure()
     {

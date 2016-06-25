@@ -8,6 +8,7 @@ function sc_configure($instance)
 class BarClass
 {
     protected $baz;
+    public $foo = 'foo';
 
     public function setBaz(BazClass $baz)
     {

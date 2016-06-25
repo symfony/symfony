@@ -27,6 +27,10 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
      */
     protected $engine;
 
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
     protected function getExtensions()
     {
         // should be moved to the Form component once absolute file paths are supported
@@ -44,7 +48,7 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
         ));
 
         return array_merge(parent::getExtensions(), array(
-            new TemplatingExtension($this->engine, $this->csrfProvider, array(
+            new TemplatingExtension($this->engine, $this->csrfTokenManager, array(
                 'FrameworkBundle:Form',
                 'FrameworkBundle:FormTable',
             )),
@@ -110,5 +114,40 @@ class FormHelperTableLayoutTest extends AbstractTableLayoutTest
     protected function setTheme(FormView $view, array $themes)
     {
         $this->engine->get('form')->setTheme($view, $themes);
+    }
+
+    public function testRange()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testRangeWithMinMaxValues()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testLabelWithoutTranslationOnButton()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testSingleChoiceWithPlaceholderWithoutTranslation()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testButtonlabelWithoutTranslation()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
+    }
+
+    public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
+    {
+        // No-op for forward compatibility with AbstractLayoutTest 2.8
     }
 }

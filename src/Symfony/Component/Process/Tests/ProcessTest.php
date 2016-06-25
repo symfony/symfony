@@ -12,10 +12,11 @@
 namespace Symfony\Component\Process\Tests;
 
 use Symfony\Component\Process\Exception\LogicException;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Exception\RuntimeException;
-use Symfony\Component\Process\ProcessPipes;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Pipes\PipesInterface;
+use Symfony\Component\Process\Process;
 
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
@@ -53,6 +54,9 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testThatProcessDoesNotThrowWarningDuringRun()
     {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test is transient on Windows');
+        }
         @trigger_error('Test Error', E_USER_NOTICE);
         $process = $this->getProcess(self::$phpBin." -r 'sleep(3)'");
         $process->run();
@@ -118,9 +122,9 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         // has terminated so the internal pipes array is already empty. normally
         // the call to start() will not read any data as the process will not have
         // generated output, but this is non-deterministic so we must count it as
-        // a possibility.  therefore we need 2 * ProcessPipes::CHUNK_SIZE plus
+        // a possibility.  therefore we need 2 * PipesInterface::CHUNK_SIZE plus
         // another byte which will never be read.
-        $expectedOutputSize = ProcessPipes::CHUNK_SIZE * 2 + 2;
+        $expectedOutputSize = PipesInterface::CHUNK_SIZE * 2 + 2;
 
         $code = sprintf('echo str_repeat(\'*\', %d);', $expectedOutputSize);
         $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
@@ -179,7 +183,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $expectedLength = (1024 * $size) + 1;
 
         $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
-        $p->setStdin($expected);
+        $p->setInput($expected);
         $p->run();
 
         $this->assertEquals($expectedLength, strlen($p->getOutput()));
@@ -187,15 +191,55 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\LogicException
-     * @expectedExceptionMessage STDIN can not be set while the process is running.
+     * @dataProvider pipesCodeProvider
      */
-    public function testSetStdinWhileRunningThrowsAnException()
+    public function testSetStreamAsInput($code, $size)
+    {
+        $expected = str_repeat(str_repeat('*', 1024), $size).'!';
+        $expectedLength = (1024 * $size) + 1;
+
+        $stream = fopen('php://temporary', 'w+');
+        fwrite($stream, $expected);
+        rewind($stream);
+
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg($code)));
+        $p->setInput($stream);
+        $p->run();
+
+        fclose($stream);
+
+        $this->assertEquals($expectedLength, strlen($p->getOutput()));
+        $this->assertEquals($expectedLength, strlen($p->getErrorOutput()));
+    }
+
+    public function testLiveStreamAsInput()
+    {
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, 'hello');
+        rewind($stream);
+
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('stream_copy_to_stream(STDIN, STDOUT);')));
+        $p->setInput($stream);
+        $p->start(function ($type, $data) use ($stream) {
+            if ('hello' === $data) {
+                fclose($stream);
+            }
+        });
+        $p->wait();
+
+        $this->assertSame('hello', $p->getOutput());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     * @expectedExceptionMessage Input can not be set while the process is running.
+     */
+    public function testSetInputWhileRunningThrowsAnException()
     {
         $process = $this->getProcess(self::$phpBin.' -r "sleep(30);"');
         $process->start();
         try {
-            $process->setStdin('foobar');
+            $process->setInput('foobar');
             $process->stop();
             $this->fail('A LogicException should have been raised.');
         } catch (LogicException $e) {
@@ -206,42 +250,57 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provideInvalidStdinValues
+     * @dataProvider provideInvalidInputValues
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Process\Process::setStdin only accepts strings.
+     * @expectedExceptionMessage Symfony\Component\Process\Process::setInput only accepts strings or stream resources.
      */
-    public function testInvalidStdin($value)
+    public function testInvalidInput($value)
     {
         $process = $this->getProcess('foo');
-        $process->setStdin($value);
+        $process->setInput($value);
     }
 
-    public function provideInvalidStdinValues()
+    public function provideInvalidInputValues()
     {
         return array(
             array(array()),
             array(new NonStringifiable()),
-            array(fopen('php://temporary', 'w')),
         );
     }
 
     /**
-     * @dataProvider provideStdinValues
+     * @dataProvider provideInputValues
      */
-    public function testValidStdin($expected, $value)
+    public function testValidInput($expected, $value)
     {
         $process = $this->getProcess('foo');
-        $process->setStdin($value);
-        $this->assertSame($expected, $process->getStdin());
+        $process->setInput($value);
+        $this->assertSame($expected, $process->getInput());
     }
 
-    public function provideStdinValues()
+    public function provideInputValues()
     {
         return array(
             array(null, null),
             array('24.5', 24.5),
             array('input data', 'input data'),
-            // to maintain BC, supposed to be removed in 3.0
+        );
+    }
+
+    /**
+     * @dataProvider provideLegacyInputValues
+     * @group legacy
+     */
+    public function testLegacyValidInput($expected, $value)
+    {
+        $process = $this->getProcess(self::$phpBin.' -v');
+        $process->setInput($value);
+        $this->assertSame($expected, $process->getInput());
+    }
+
+    public function provideLegacyInputValues()
+    {
+        return array(
             array('stringifiable', new Stringifiable()),
         );
     }
@@ -290,6 +349,15 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, preg_match_all('/ERROR/', $p->getErrorOutput(), $matches));
     }
 
+    public function testFlushErrorOutput()
+    {
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\'php://stderr\', \'ERROR\'); $n++; }')));
+
+        $p->run();
+        $p->clearErrorOutput();
+        $this->assertEmpty($p->getErrorOutput());
+    }
+
     /**
      * @dataProvider provideIncrementalOutput
      */
@@ -332,6 +400,15 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         $p->run();
         $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
+    }
+
+    public function testFlushOutput()
+    {
+        $p = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('$n=0;while ($n<3) {echo \' foo \';$n++;}')));
+
+        $p->run();
+        $p->clearOutput();
+        $this->assertEmpty($p->getOutput());
     }
 
     public function testZeroAsOutput()
@@ -411,6 +488,49 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
         $process = $this->getProcess('');
         $this->assertNull($process->getExitCodeText());
+    }
+
+    public function testPTYCommand()
+    {
+        if (!Process::isPtySupported()) {
+            $this->markTestSkipped('PTY is not supported on this operating system.');
+        }
+
+        $process = $this->getProcess('echo "foo"');
+        $process->setPty(true);
+        $process->run();
+
+        $this->assertSame(Process::STATUS_TERMINATED, $process->getStatus());
+        $this->assertEquals("foo\r\n", $process->getOutput());
+    }
+
+    public function testMustRun()
+    {
+        $this->skipIfNotEnhancedSigchild();
+
+        $process = $this->getProcess('echo foo');
+
+        $this->assertSame($process, $process->mustRun());
+        $this->assertEquals('foo'.PHP_EOL, $process->getOutput());
+    }
+
+    public function testSuccessfulMustRunHasCorrectExitCode()
+    {
+        $this->skipIfNotEnhancedSigchild();
+
+        $process = $this->getProcess('echo foo')->mustRun();
+        $this->assertEquals(0, $process->getExitCode());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     */
+    public function testMustRunThrowsException()
+    {
+        $this->skipIfNotEnhancedSigchild();
+
+        $process = $this->getProcess('exit 1');
+        $process->mustRun();
     }
 
     public function testExitCodeText()
@@ -612,8 +732,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage The process timed-out.
+     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
+     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
      */
     public function testRunProcessWithTimeout()
     {
@@ -645,8 +765,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage The process timed-out.
+     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
+     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
      */
     public function testCheckTimeoutOnStartedProcess()
     {
@@ -661,8 +781,8 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
                 $process->checkTimeout();
                 usleep(100000);
             }
-            $this->fail('A RuntimeException should have been raised');
-        } catch (RuntimeException $e) {
+            $this->fail('A ProcessTimedOutException should have been raised');
+        } catch (ProcessTimedOutException $e) {
         }
 
         $this->assertLessThan(15, microtime(true) - $start);
@@ -670,21 +790,62 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         throw $e;
     }
 
+    public function testIdleTimeout()
+    {
+        $process = $this->getProcess(self::$phpBin.' -r "sleep(34);"');
+        $process->setTimeout(60);
+        $process->setIdleTimeout(0.1);
+
+        try {
+            $process->run();
+
+            $this->fail('A timeout exception was expected.');
+        } catch (ProcessTimedOutException $e) {
+            $this->assertTrue($e->isIdleTimeout());
+            $this->assertFalse($e->isGeneralTimeout());
+            $this->assertEquals(0.1, $e->getExceededTimeout());
+        }
+    }
+
+    public function testIdleTimeoutNotExceededWhenOutputIsSent()
+    {
+        $process = $this->getProcess(sprintf('%s -r %s', self::$phpBin, escapeshellarg('while (true) {echo \'foo \'; usleep(1000);}')));
+        $process->setTimeout(1);
+        $process->start();
+
+        while (false === strpos($process->getOutput(), 'foo')) {
+            usleep(1000);
+        }
+
+        $process->setIdleTimeout(0.5);
+
+        try {
+            $process->wait();
+            $this->fail('A timeout exception was expected.');
+        } catch (ProcessTimedOutException $e) {
+            $this->assertTrue($e->isGeneralTimeout(), 'A general timeout is expected.');
+            $this->assertFalse($e->isIdleTimeout(), 'No idle timeout is expected.');
+            $this->assertEquals(1, $e->getExceededTimeout());
+        }
+    }
+
     /**
-     * @expectedException Symfony\Component\Process\Exception\RuntimeException
-     * @expectedExceptionMessage The process timed-out.
+     * @expectedException \Symfony\Component\Process\Exception\ProcessTimedOutException
+     * @expectedExceptionMessage exceeded the timeout of 0.1 seconds.
      */
     public function testStartAfterATimeout()
     {
         $process = $this->getProcess(self::$phpBin.' -r "sleep(35);"');
         $process->setTimeout(0.1);
+
         try {
             $process->run();
-            $this->fail('A RuntimeException should have been raised.');
-        } catch (RuntimeException $e) {
+            $this->fail('A ProcessTimedOutException should have been raised.');
+        } catch (ProcessTimedOutException $e) {
         }
         $this->assertFalse($process->isRunning());
         $process->start();
+        $this->assertTrue($process->isRunning());
         $process->stop(0);
 
         throw $e;
@@ -840,6 +1001,124 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testDisableOutputDisablesTheOutput()
+    {
+        $p = $this->getProcess('foo');
+        $this->assertFalse($p->isOutputDisabled());
+        $p->disableOutput();
+        $this->assertTrue($p->isOutputDisabled());
+        $p->enableOutput();
+        $this->assertFalse($p->isOutputDisabled());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage Disabling output while the process is running is not possible.
+     */
+    public function testDisableOutputWhileRunningThrowsException()
+    {
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(39);"');
+        $p->start();
+        $p->disableOutput();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\RuntimeException
+     * @expectedExceptionMessage Enabling output while the process is running is not possible.
+     */
+    public function testEnableOutputWhileRunningThrowsException()
+    {
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(40);"');
+        $p->disableOutput();
+        $p->start();
+        $p->enableOutput();
+    }
+
+    public function testEnableOrDisableOutputAfterRunDoesNotThrowException()
+    {
+        $p = $this->getProcess('echo foo');
+        $p->disableOutput();
+        $p->run();
+        $p->enableOutput();
+        $p->disableOutput();
+        $this->assertTrue($p->isOutputDisabled());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     * @expectedExceptionMessage Output can not be disabled while an idle timeout is set.
+     */
+    public function testDisableOutputWhileIdleTimeoutIsSet()
+    {
+        $process = $this->getProcess('foo');
+        $process->setIdleTimeout(1);
+        $process->disableOutput();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     * @expectedExceptionMessage timeout can not be set while the output is disabled.
+     */
+    public function testSetIdleTimeoutWhileOutputIsDisabled()
+    {
+        $process = $this->getProcess('foo');
+        $process->disableOutput();
+        $process->setIdleTimeout(1);
+    }
+
+    public function testSetNullIdleTimeoutWhileOutputIsDisabled()
+    {
+        $process = $this->getProcess('foo');
+        $process->disableOutput();
+        $this->assertSame($process, $process->setIdleTimeout(null));
+    }
+
+    /**
+     * @dataProvider provideStartMethods
+     */
+    public function testStartWithACallbackAndDisabledOutput($startMethod, $exception, $exceptionMessage)
+    {
+        $p = $this->getProcess('foo');
+        $p->disableOutput();
+        $this->setExpectedException($exception, $exceptionMessage);
+        if ('mustRun' === $startMethod) {
+            $this->skipIfNotEnhancedSigchild();
+        }
+        $p->{$startMethod}(function () {});
+    }
+
+    public function provideStartMethods()
+    {
+        return array(
+            array('start', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
+            array('run', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
+            array('mustRun', 'Symfony\Component\Process\Exception\LogicException', 'Output has been disabled, enable it to allow the use of a callback.'),
+        );
+    }
+
+    /**
+     * @dataProvider provideOutputFetchingMethods
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
+     * @expectedExceptionMessage Output has been disabled.
+     */
+    public function testGetOutputWhileDisabled($fetchMethod)
+    {
+        $p = $this->getProcess(self::$phpBin.' -r "sleep(41);"');
+        $p->disableOutput();
+        $p->start();
+        $p->{$fetchMethod}();
+    }
+
+    public function provideOutputFetchingMethods()
+    {
+        return array(
+            array('getOutput'),
+            array('getIncrementalOutput'),
+            array('getErrorOutput'),
+            array('getIncrementalErrorOutput'),
+        );
+    }
+
     public function testStopTerminatesProcessCleanly()
     {
         $process = $this->getProcess(self::$phpBin.' -r "echo 123; sleep(42);"');
@@ -902,18 +1181,45 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $commandline
-     * @param null   $cwd
-     * @param array  $env
-     * @param null   $stdin
-     * @param int    $timeout
-     * @param array  $options
+     * @dataProvider provideVariousIncrementals
+     */
+    public function testIncrementalOutputDoesNotRequireAnotherCall($stream, $method)
+    {
+        $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('$n = 0; while ($n < 3) { file_put_contents(\''.$stream.'\', $n, 1); $n++; usleep(1000); }'), null, null, null, null);
+        $process->start();
+        $result = '';
+        $limit = microtime(true) + 3;
+        $expected = '012';
+
+        while ($result !== $expected && microtime(true) < $limit) {
+            $result .= $process->$method();
+        }
+
+        $this->assertSame($expected, $result);
+        $process->stop();
+    }
+
+    public function provideVariousIncrementals()
+    {
+        return array(
+            array('php://stdout', 'getIncrementalOutput'),
+            array('php://stderr', 'getIncrementalErrorOutput'),
+        );
+    }
+
+    /**
+     * @param string      $commandline
+     * @param null|string $cwd
+     * @param null|array  $env
+     * @param null|string $input
+     * @param int         $timeout
+     * @param array       $options
      *
      * @return Process
      */
-    private function getProcess($commandline, $cwd = null, array $env = null, $stdin = null, $timeout = 60, array $options = array())
+    private function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array())
     {
-        $process = new Process($commandline, $cwd, $env, $stdin, $timeout, $options);
+        $process = new Process($commandline, $cwd, $env, $input, $timeout, $options);
 
         if (false !== $enhance = getenv('ENHANCE_SIGCHLD')) {
             try {

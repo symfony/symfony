@@ -41,6 +41,9 @@ namespace Symfony\Component\Validator;
  * again.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @deprecated since version 2.5, to be removed in 3.0.
+ *             Use {@link Mapping\MetadataInterface} instead.
  */
 interface MetadataInterface
 {
@@ -50,19 +53,21 @@ interface MetadataInterface
      * Calls {@link ValidationVisitorInterface::visit} and then forwards the
      * <tt>accept()</tt>-call to all property metadata instances.
      *
-     * @param ValidationVisitorInterface $visitor      The visitor implementing the validation logic.
-     * @param mixed                      $value        The value to validate.
-     * @param string|string[]            $group        The validation group to validate in.
-     * @param string                     $propertyPath The current property path in the validation graph.
+     * @param ValidationVisitorInterface $visitor      The visitor implementing the validation logic
+     * @param mixed                      $value        The value to validate
+     * @param string|string[]            $group        The validation group to validate in
+     * @param string                     $propertyPath The current property path in the validation graph
+     *
+     * @deprecated since version 2.5, to be removed in 3.0.
      */
     public function accept(ValidationVisitorInterface $visitor, $value, $group, $propertyPath);
 
     /**
      * Returns all constraints for a given validation group.
      *
-     * @param string $group The validation group.
+     * @param string $group The validation group
      *
-     * @return Constraint[] A list of constraint instances.
+     * @return Constraint[] A list of constraint instances
      */
     public function findConstraints($group);
 }

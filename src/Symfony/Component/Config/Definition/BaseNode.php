@@ -25,11 +25,11 @@ abstract class BaseNode implements NodeInterface
 {
     protected $name;
     protected $parent;
-    protected $normalizationClosures;
-    protected $finalValidationClosures;
-    protected $allowOverwrite;
-    protected $required;
-    protected $equivalentValues;
+    protected $normalizationClosures = array();
+    protected $finalValidationClosures = array();
+    protected $allowOverwrite = true;
+    protected $required = false;
+    protected $equivalentValues = array();
     protected $attributes = array();
 
     /**
@@ -48,11 +48,6 @@ abstract class BaseNode implements NodeInterface
 
         $this->name = $name;
         $this->parent = $parent;
-        $this->normalizationClosures = array();
-        $this->finalValidationClosures = array();
-        $this->allowOverwrite = true;
-        $this->required = false;
-        $this->equivalentValues = array();
     }
 
     public function setAttribute($key, $value)
@@ -279,6 +274,16 @@ abstract class BaseNode implements NodeInterface
     protected function preNormalize($value)
     {
         return $value;
+    }
+
+    /**
+     * Returns parent node for this node.
+     *
+     * @return NodeInterface|null
+     */
+    public function getParent()
+    {
+        return $this->parent;
     }
 
     /**

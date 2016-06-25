@@ -120,7 +120,16 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
 
         $bag->clearCookie('foo');
 
-        $this->assertContains('Set-Cookie: foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; path=/; httponly', explode("\r\n", $bag->__toString()));
+        $this->assertRegExp('#^Set-Cookie: foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; path=/; httponly#m', $bag->__toString());
+    }
+
+    public function testClearCookieSecureNotHttpOnly()
+    {
+        $bag = new ResponseHeaderBag(array());
+
+        $bag->clearCookie('foo', '/', null, true, false);
+
+        $this->assertRegExp('#^Set-Cookie: foo=deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; path=/; secure#m', $bag->__toString());
     }
 
     public function testReplace()

@@ -280,6 +280,14 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->in(__DIR__.'/Fixtures/A/a*');
     }
 
+    public function testInWithGlobBrace()
+    {
+        $finder = $this->buildFinder();
+        $finder->in(array(__DIR__.'/Fixtures/{A,copy/A}/B/C'))->getIterator();
+
+        $this->assertIterator($this->toAbsoluteFixtures(array('A/B/C/abc.dat', 'copy/A/B/C/abc.dat.copy')), $finder);
+    }
+
     /**
      * @expectedException \LogicException
      */

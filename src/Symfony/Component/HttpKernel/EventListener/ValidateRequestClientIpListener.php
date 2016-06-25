@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class ValidateRequestClientIpListener implements EventSubscriberInterface
 {
     /**
-     * Performs the validation
+     * Performs the validation.
      *
      * @param GetResponseEvent $event
      */
@@ -38,10 +38,9 @@ class ValidateRequestClientIpListener implements EventSubscriberInterface
                 // This will throw an exception if the headers are inconsistent.
                 $event->getRequest()->getClientIps();
             } catch (ConflictingHeadersException $e) {
-                throw new HttpException(400, "The request headers contain conflicting information regarding the origin of this request.", $e);
+                throw new HttpException(400, 'The request headers contain conflicting information regarding the origin of this request.', $e);
             }
         }
-
     }
 
     /**

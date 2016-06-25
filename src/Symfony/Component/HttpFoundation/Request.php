@@ -827,7 +827,9 @@ class Request
 
         if ($hasTrustedForwardedHeader && $hasTrustedClientIpHeader && $forwardedClientIps !== $xForwardedForClientIps) {
             throw new ConflictingHeadersException('The request has both a trusted Forwarded header and a trusted Client IP header, conflicting with each other with regards to the originating IP addresses of the request. This is the result of a misconfiguration. You should either configure your proxy only to send one of these headers, or configure Symfony to distrust one of them.');
-        } elseif (!$hasTrustedForwardedHeader && !$hasTrustedClientIpHeader) {
+        }
+
+        if (!$hasTrustedForwardedHeader && !$hasTrustedClientIpHeader) {
             return $this->normalizeAndFilterClientIps(array(), $ip);
         }
 
@@ -1923,7 +1925,7 @@ class Request
         return self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR'), self::$trustedProxies);
     }
 
-    private function normalizeAndFilterClientIps($clientIps, $ip)
+    private function normalizeAndFilterClientIps(array $clientIps, $ip)
     {
         $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
         $firstTrustedIp = null;
@@ -1944,7 +1946,7 @@ class Request
                 unset($clientIps[$key]);
 
                 // Fallback to this when the client IP falls into the range of trusted proxies
-                if (null ===  $firstTrustedIp) {
+                if (null === $firstTrustedIp) {
                     $firstTrustedIp = $clientIp;
                 }
             }

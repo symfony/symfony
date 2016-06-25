@@ -2,9 +2,6 @@
   namespace:name
   name
 
-<comment>Arguments:</comment>
-  <info>command</info>               The command to execute
-
 <comment>Options:</comment>
   <info>-h, --help</info>            Display this help message
   <info>-q, --quiet</info>           Do not output any message

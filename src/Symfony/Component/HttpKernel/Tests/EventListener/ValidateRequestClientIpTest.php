@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class ValidateRequestClientIpTest extends \PHPUnit_Framework_TestCase
 {
-    public function testListenerThrowsOnInconsistentRequests()
+    public function testListenerThrowsOnInconsistentMasterRequests()
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
@@ -31,13 +31,13 @@ class ValidateRequestClientIpTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException(new ConflictingHeadersException()));
 
         $dispatcher->addListener(KernelEvents::REQUEST, array($listener, 'onKernelRequest'));
-        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST);
+        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->setExpectedException('Symfony\Component\HttpKernel\Exception\HttpException');
         $dispatcher->dispatch(KernelEvents::REQUEST, $event);
     }
 
-    public function testListenerDoesNothingOnConsistenRequests()
+    public function testListenerDoesNothingOnConsistentRequests()
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
@@ -45,6 +45,20 @@ class ValidateRequestClientIpTest extends \PHPUnit_Framework_TestCase
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->method('getClientIps')
             ->willReturn(array('127.0.0.1'));
+
+        $dispatcher->addListener(KernelEvents::REQUEST, array($listener, 'onKernelRequest'));
+        $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
+        $dispatcher->dispatch(KernelEvents::REQUEST, $event);
+    }
+
+    public function testListenerDoesNothingOnSubrequests()
+    {
+        $dispatcher = new EventDispatcher();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $listener = new ValidateRequestClientIpListener();
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request->method('getClientIps')
+            ->will($this->throwException(new ConflictingHeadersException()));
 
         $dispatcher->addListener(KernelEvents::REQUEST, array($listener, 'onKernelRequest'));
         $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST);

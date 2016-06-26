@@ -138,12 +138,13 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     {
         $expiry = $this->createDateTime(time() + (int) ini_get('session.gc_maxlifetime'));
 
+        $fields = array(
+            $this->options['time_field'] => $this->createDateTime(),
+            $this->options['expiry_field'] => $expiry,
+        );
+
         if ($this->mongo instanceof \MongoDB\Client) {
-            $fields = array(
-                $this->options['data_field'] => new \MongoDB\BSON\Binary($data, \MongoDB\BSON\Binary::TYPE_OLD_BINARY),
-                $this->options['time_field'] => $this->createDateTime(),
-                $this->options['expiry_field'] => $expiry,
-            );
+            $fields[$this->options['data_field']] = new \MongoDB\BSON\Binary($data, \MongoDB\BSON\Binary::TYPE_OLD_BINARY);
 
             $this->getCollection()->updateOne(
                 array($this->options['id_field'] => $sessionId),
@@ -151,11 +152,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
                 array('upsert' => true)
             );
         } else {
-            $fields = array(
-                $this->options['data_field'] => new \MongoBinData($data, \MongoBinData::BYTE_ARRAY),
-                $this->options['time_field'] => $this->createDateTime(),
-                $this->options['expiry_field'] => $expiry,
-            );
+            $fields[$this->options['data_field']] = new \MongoBinData($data, \MongoBinData::BYTE_ARRAY);
 
             $this->getCollection()->update(
                 array($this->options['id_field'] => $sessionId),

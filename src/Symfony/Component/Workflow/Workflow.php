@@ -59,10 +59,6 @@ class Workflow
     {
         $marking = $this->markingStore->getMarking($subject);
 
-        if (!$marking instanceof Marking) {
-            throw new LogicException(sprintf('The value returned by the MarkingStore is not an instance of "%s" for workflow "%s".', Marking::class, $this->name));
-        }
-
         // check if the subject is already in the workflow
         if (!$marking->getPlaces()) {
             if (!$this->definition->getInitialPlace()) {
@@ -134,7 +130,6 @@ class Workflow
         // We can shortcut the getMarking method in order to boost performance,
         // since the "can" method already checks the Marking state
         $marking = $this->markingStore->getMarking($subject);
-
         $transition = $this->definition->getTransitions()[$transitionName];
 
         $this->leave($subject, $transition, $marking);

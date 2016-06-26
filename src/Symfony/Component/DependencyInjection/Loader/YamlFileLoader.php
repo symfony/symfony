@@ -223,16 +223,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['factory'])) {
-            if (is_string($service['factory'])) {
-                if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {
-                    $parts = explode(':', $service['factory']);
-                    $definition->setFactory(array($this->resolveServices('@'.$parts[0]), $parts[1]));
-                } else {
-                    $definition->setFactory($service['factory']);
-                }
-            } else {
-                $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
-            }
+            $definition->setFactory($this->parseCallable($service['factory'], 'factory', $id, $file));
         }
 
         if (isset($service['file'])) {
@@ -248,11 +239,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['configurator'])) {
-            if (is_string($service['configurator'])) {
-                $definition->setConfigurator($service['configurator']);
-            } else {
-                $definition->setConfigurator(array($this->resolveServices($service['configurator'][0]), $service['configurator'][1]));
-            }
+            $definition->setConfigurator($this->parseCallable($service['configurator'], 'configurator', $id, $file));
         }
 
         if (isset($service['calls'])) {
@@ -337,6 +324,45 @@ class YamlFileLoader extends FileLoader
         }
 
         $this->container->setDefinition($id, $definition);
+    }
+
+    /**
+     * Parses a callable.
+     *
+     * @param string|array $callable  A callable
+     * @param string       $parameter A parameter (e.g. 'factory' or 'configurator')
+     * @param string       $id        A service identifier
+     * @param string       $file      A parsed file
+     *
+     * @throws InvalidArgumentException When errors are occuried
+     *
+     * @return string|array A parsed callable
+     */
+    private function parseCallable($callable, $parameter, $id, $file)
+    {
+        if (is_string($callable)) {
+            if ('' !== $callable && '@' === $callable[0]) {
+                throw new InvalidArgumentException(sprintf('The value of the "%s" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $parameter, $id, $callable, substr($callable, 1)));
+            }
+
+            if (false !== strpos($callable, ':') && false === strpos($callable, '::')) {
+                $parts = explode(':', $callable);
+
+                return array($this->resolveServices('@'.$parts[0]), $parts[1]);
+            }
+
+            return $callable;
+        }
+
+        if (is_array($callable)) {
+            if (isset($callable[0]) && isset($callable[1])) {
+                return array($this->resolveServices($callable[0]), $callable[1]);
+            }
+
+            throw new InvalidArgumentException(sprintf('Parameter "%s" must contain an array with two elements for service "%s" in %s. Check your YAML syntax.', $parameter, $id, $file));
+        }
+
+        throw new InvalidArgumentException(sprintf('Parameter "%s" must be a string or an array for service "%s" in %s. Check your YAML syntax.', $parameter, $id, $file));
     }
 
     /**

@@ -21,9 +21,7 @@ use Symfony\Component\Workflow\Exception\LogicException;
 class Definition
 {
     private $places = array();
-
     private $transitions = array();
-
     private $initialPlace;
 
     /**
@@ -68,7 +66,7 @@ class Definition
             throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $place));
         }
 
-        if (!count($this->places)) {
+        if (!$this->places) {
             $this->initialPlace = $place;
         }
 

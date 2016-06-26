@@ -20,9 +20,7 @@ use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 class Transition
 {
     private $name;
-
     private $froms;
-
     private $tos;
 
     /**

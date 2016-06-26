@@ -109,7 +109,6 @@ class Workflow
         }
 
         $transition = $transitions[$transitionName];
-
         $marking = $this->getMarking($subject);
 
         return $this->doCan($subject, $marking, $transition);
@@ -161,7 +160,6 @@ class Workflow
     public function getEnabledTransitions($subject)
     {
         $enabled = array();
-
         $marking = $this->getMarking($subject);
 
         foreach ($this->definition->getTransitions() as $transition) {

@@ -23,7 +23,6 @@ use Symfony\Component\Workflow\Marking;
 class PropertyAccessorMarkingStore implements MarkingStoreInterface
 {
     private $property;
-
     private $propertyAccessor;
 
     /**

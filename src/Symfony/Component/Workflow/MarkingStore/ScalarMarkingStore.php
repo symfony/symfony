@@ -23,7 +23,6 @@ use Symfony\Component\Workflow\Marking;
 class ScalarMarkingStore implements MarkingStoreInterface, UniqueTransitionOutputInterface
 {
     private $property;
-
     private $propertyAccessor;
 
     /**

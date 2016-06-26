@@ -44,7 +44,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      * @expectedExceptionMessage At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.
      */
     public function testGetWithMultipleMatch()

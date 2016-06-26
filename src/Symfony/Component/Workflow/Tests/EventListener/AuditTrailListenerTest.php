@@ -34,9 +34,9 @@ class AuditTrailListenerTest extends \PHPUnit_Framework_TestCase
         $workflow->apply($object, 't1');
 
         $expected = array(
-            'leaving "a" for subject of class "stdClass"',
-            'transition "t1" for subject of class "stdClass"',
-            'entering "b" for subject of class "stdClass"',
+            'Leaving "a" for subject of class "stdClass".',
+            'Transition "t1" for subject of class "stdClass".',
+            'Entering "b" for subject of class "stdClass".',
         );
 
         $this->assertSame($expected, $logger->logs);

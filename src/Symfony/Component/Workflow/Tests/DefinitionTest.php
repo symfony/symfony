@@ -28,7 +28,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Place "d" cannot be the initial place as it does not exist.
      */
     public function testSetInitialPlaceAndPlaceIsNotDefined()
@@ -50,7 +50,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Place "c" referenced in transition "name" does not exist.
      */
     public function testAddTransitionAndFromPlaceIsNotDefined()
@@ -61,7 +61,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Place "c" referenced in transition "name" does not exist.
      */
     public function testAddTransitionAndToPlaceIsNotDefined()

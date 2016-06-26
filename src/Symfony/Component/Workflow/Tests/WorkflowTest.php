@@ -6,7 +6,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore;
 use Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore;
 use Symfony\Component\Workflow\Transition;
@@ -15,7 +14,7 @@ use Symfony\Component\Workflow\Workflow;
 class WorkflowTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage The marking store (Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore) of workflow "unnamed" can not store many places. But the transition "t1" has too many output (2). Only one is accepted.
      */
     public function testConstructorWithUniqueTransitionOutputInterfaceAndComplexWorkflow()
@@ -35,20 +34,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".
-     */
-    public function testGetMarkingWithInvalidStoreReturn()
-    {
-        $subject = new \stdClass();
-        $subject->marking = null;
-        $workflow = new Workflow(new Definition(), $this->getMock(MarkingStoreInterface::class));
-
-        $workflow->getMarking($subject);
-    }
-
-    /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage The Marking is empty and there is no initial place for workflow "unnamed".
      */
     public function testGetMarkingWithEmptyDefinition()
@@ -61,7 +47,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Place "nope" is not valid for workflow "unnamed".
      */
     public function testGetMarkingWithImpossiblePlace()
@@ -104,7 +90,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Transition "foobar" does not exist for workflow "unnamed".
      */
     public function testCanWithUnexistingTransition()
@@ -141,7 +127,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\LogicException
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage Unable to apply transition "t2" for workflow "unnamed".
      */
     public function testApplyWithImpossibleTransition()

@@ -7,7 +7,7 @@ use Symfony\Component\Workflow\Transition;
 class TransitionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      * @expectedExceptionMessage The transition "foo.bar" contains invalid characters.
      */
     public function testValidateName()

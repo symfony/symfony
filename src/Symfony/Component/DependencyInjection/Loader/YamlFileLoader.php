@@ -341,6 +341,10 @@ class YamlFileLoader extends FileLoader
     private function parseCallable($callable, $parameter, $id, $file)
     {
         if (is_string($callable)) {
+            if ('' !== $callable && '@' === $callable[0]) {
+                throw new InvalidArgumentException(sprintf('The value of the "%s" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $parameter, $id, $callable, substr($callable, 1)));
+            }
+
             if (false !== strpos($callable, ':') && false === strpos($callable, '::')) {
                 $parts = explode(':', $callable);
 

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-25T04:52:05Z
+
+I'm :-0: on this one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-25T07:03:20Z
+
+LGTM, after removing the blank lines also
+
+---------------------------------------------------------------------------
+
+by phansys at 2016-06-25T16:32:18Z
+
+I've updated the fixer behavior for line breaks.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-26T08:12:37Z
+
+I thought this was a CS rule already :grinning: (makes sense to me at least), ie i changed it for the workflow component just now #19187 (The blank lines that is)
+
+@nicolas-grekas that is part of the rule then too right?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-26T17:46:37Z
+
+👍

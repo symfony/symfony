@@ -348,7 +348,9 @@ class YamlFileLoader extends FileLoader
             }
 
             return $callable;
-        } elseif (is_array($callable)) {
+        }
+
+        if (is_array($callable)) {
             if (isset($callable[0]) && isset($callable[1])) {
                 return array($this->resolveServices($callable[0]), $callable[1]);
             }

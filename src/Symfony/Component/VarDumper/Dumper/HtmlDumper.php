@@ -294,11 +294,11 @@ return function (root, x) {
             x = 1;
             if ('sf-dump' != elt.parentNode.className) {
                 x += elt.parentNode.getAttribute('data-depth')/1;
-                if (x > options.maxDepth) {
-                    toggle(a);
-                }
             }
             elt.setAttribute('data-depth', x);
+            if (x > options.maxDepth) {
+                toggle(a);
+            }
         } else if ('sf-dump-ref' == elt.className && (a = elt.getAttribute('href'))) {
             a = a.substr(1);
             elt.className += ' '+a;

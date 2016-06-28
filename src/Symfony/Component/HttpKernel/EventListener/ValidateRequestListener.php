@@ -14,8 +14,7 @@ namespace Symfony\Component\HttpKernel\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -24,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Magnus Nordlander <magnus@fervo.se>
  */
-class ValidateRequestClientIpListener implements EventSubscriberInterface
+class ValidateRequestListener implements EventSubscriberInterface
 {
     /**
      * Performs the validation.
@@ -33,12 +32,12 @@ class ValidateRequestClientIpListener implements EventSubscriberInterface
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if ($event->getRequestType() == HttpKernelInterface::MASTER_REQUEST) {
+        if ($event->isMasterRequest()) {
             try {
                 // This will throw an exception if the headers are inconsistent.
                 $event->getRequest()->getClientIps();
             } catch (ConflictingHeadersException $e) {
-                throw new HttpException(400, 'The request headers contain conflicting information regarding the origin of this request.', $e);
+                throw new BadRequestHttpException('The request headers contain conflicting information regarding the origin of this request.', $e);
             }
         }
     }

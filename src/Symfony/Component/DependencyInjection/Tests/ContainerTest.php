@@ -692,7 +692,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
 class ProjectServiceContainer extends Container
 {
-    public $__bar, $__foo_bar, $__foo_baz;
+    public $__bar;
+    public $__foo_bar;
+    public $__foo_baz;
     public $synchronized;
 
     public function __construct()

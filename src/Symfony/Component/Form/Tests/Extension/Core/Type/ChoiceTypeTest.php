@@ -683,6 +683,66 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
+    public function testSubmitSingleChoiceWithEmptyData()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => false,
+            'choices' => array('test'),
+            'choices_as_values' => true,
+            'empty_data' => 'test',
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame('test', $form->getData());
+    }
+
+    public function testSubmitMultipleChoiceWithEmptyData()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => true,
+            'expanded' => false,
+            'choices' => array('test'),
+            'choices_as_values' => true,
+            'empty_data' => array('test'),
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame(array('test'), $form->getData());
+    }
+
+    public function testSubmitSingleChoiceExpandedWithEmptyData()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => false,
+            'expanded' => true,
+            'choices' => array('test'),
+            'choices_as_values' => true,
+            'empty_data' => 'test',
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame('test', $form->getData());
+    }
+
+    public function testSubmitMultipleChoiceExpandedWithEmptyData()
+    {
+        $form = $this->factory->create('choice', null, array(
+            'multiple' => true,
+            'expanded' => true,
+            'choices' => array('test'),
+            'choices_as_values' => true,
+            'empty_data' => array('test'),
+        ));
+
+        $form->submit(null);
+
+        $this->assertSame(array('test'), $form->getData());
+    }
+
     /**
      * @group legacy
      */

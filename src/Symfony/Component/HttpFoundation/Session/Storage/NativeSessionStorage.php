@@ -91,6 +91,8 @@ class NativeSessionStorage implements SessionStorageInterface
      * upload_progress.min-freq, "1"
      * url_rewriter.tags, "a=href,area=href,frame=src,form=,fieldset="
      *
+     * register_shutdown, true. Should session_register_shutdown() be called? (This is not a Session option)
+     *
      * @param array                                                            $options Session configuration options.
      * @param AbstractProxy|NativeSessionHandler|\SessionHandlerInterface|null $handler
      * @param MetadataBag                                                      $metaBag MetadataBag.
@@ -100,7 +102,10 @@ class NativeSessionStorage implements SessionStorageInterface
         session_cache_limiter(''); // disable by default because it's managed by HeaderBag (if used)
         ini_set('session.use_cookies', 1);
 
-        session_register_shutdown();
+        if (!isset($options['register_shutdown']) || $options['register_shutdown']) {
+            session_register_shutdown();
+        }
+        unset($options['register_shutdown']);
 
         $this->setMetadataBag($metaBag);
         $this->setOptions($options);

@@ -594,7 +594,7 @@ class Configuration implements ConfigurationInterface
                     ->info('annotation configuration')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('cache')->defaultValue('file')->end()
+                        ->scalarNode('cache')->defaultValue('php_array')->end()
                         ->scalarNode('file_cache_dir')->defaultValue('%kernel.cache_dir%/annotations')->end()
                         ->booleanNode('debug')->defaultValue($this->debug)->end()
                     ->end()

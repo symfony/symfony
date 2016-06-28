@@ -169,6 +169,14 @@ class FrameworkExtension extends Extension
             $definition->replaceArgument(1, null);
         }
 
+        $this->addAnnotatedClassesToCompile(array(
+            '**Bundle\\Controller\\',
+            '**Bundle\\Entity\\',
+
+            // Added explicitly so that we don't rely on the class map being dumped to make it work
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+        ));
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Config\\ConfigCache',
             'Symfony\\Component\\Config\\FileLocator',
@@ -906,8 +914,22 @@ class FrameworkExtension extends Extension
         $loader->load('annotations.xml');
 
         if ('none' !== $config['cache']) {
-            if ('file' === $config['cache']) {
+            $cacheService = $config['cache'];
+
+            if ('php_array' === $config['cache']) {
+                $cacheService = 'annotations.cache';
+
+                // Enable warmer only if PHP array is used for cache
+                $definition = $container->findDefinition('annotations.cache_warmer');
+                $definition->addTag('kernel.cache_warmer');
+
+                $this->addClassesToCompile(array(
+                    'Symfony\Component\Cache\Adapter\PhpArrayAdapter',
+                    'Symfony\Component\Cache\DoctrineProvider',
+                ));
+            } elseif ('file' === $config['cache']) {
                 $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
+
                 if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
                     throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
                 }
@@ -916,11 +938,13 @@ class FrameworkExtension extends Extension
                     ->getDefinition('annotations.filesystem_cache')
                     ->replaceArgument(0, $cacheDir)
                 ;
+
+                $cacheService = 'annotations.filesystem_cache';
             }
 
             $container
                 ->getDefinition('annotations.cached_reader')
-                ->replaceArgument(1, new Reference('file' !== $config['cache'] ? $config['cache'] : 'annotations.filesystem_cache'))
+                ->replaceArgument(1, new Reference($cacheService))
                 ->replaceArgument(2, $config['debug'])
                 ->addAutowiringType(Reader::class)
             ;
@@ -1130,10 +1154,8 @@ class FrameworkExtension extends Extension
         }
 
         $this->addClassesToCompile(array(
-            'Psr\Cache\CacheItemInterface',
-            'Psr\Cache\CacheItemPoolInterface',
-            'Symfony\Component\Cache\Adapter\AdapterInterface',
-            'Symfony\Component\Cache\Adapter\AbstractAdapter',
+            'Symfony\Component\Cache\Adapter\ApcuAdapter',
+            'Symfony\Component\Cache\Adapter\FilesystemAdapter',
             'Symfony\Component\Cache\CacheItem',
         ));
     }

@@ -214,7 +214,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'cache' => 'validator.mapping.cache.symfony',
             ),
             'annotations' => array(
-                'cache' => 'file',
+                'cache' => 'php_array',
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
                 'debug' => true,
             ),

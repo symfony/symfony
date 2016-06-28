@@ -691,7 +691,6 @@ class Table
             ->setHorizontalBorderChar('-')
             ->setVerticalBorderChar(' ')
             ->setCrossingChar(' ')
-            ->setCellHeaderFormat('%s')
         ;
 
         return array(

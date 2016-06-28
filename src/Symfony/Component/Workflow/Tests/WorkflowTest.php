@@ -35,6 +35,19 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\LogicException
+     * @expectedExceptionMessage The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".
+     */
+    public function testGetMarkingWithInvalidStoreReturn()
+    {
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow(new Definition(), $this->getMock(MarkingStoreInterface::class));
+
+        $workflow->getMarking($subject);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage The Marking is empty and there is no initial place for workflow "unnamed".
      */
     public function testGetMarkingWithEmptyDefinition()

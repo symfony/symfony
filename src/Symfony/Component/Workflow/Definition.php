@@ -66,7 +66,7 @@ class Definition
             throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $place));
         }
 
-        if (!$this->places) {
+        if (!count($this->places)) {
             $this->initialPlace = $place;
         }
 

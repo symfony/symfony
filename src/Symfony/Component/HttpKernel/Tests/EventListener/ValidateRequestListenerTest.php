@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -24,7 +25,7 @@ class ValidateRequestListenerTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $listener = new ValidateRequestClientIpListener();
+        $listener = new ValidateRequestListener();
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->method('getClientIps')
             ->will($this->throwException(new ConflictingHeadersException()));
@@ -32,7 +33,7 @@ class ValidateRequestListenerTest extends \PHPUnit_Framework_TestCase
         $dispatcher->addListener(KernelEvents::REQUEST, array($listener, 'onKernelRequest'));
         $event = new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST);
 
-        $this->setExpectedException('Symfony\Component\HttpKernel\Exception\HttpException');
+        $this->setExpectedException('Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
         $dispatcher->dispatch(KernelEvents::REQUEST, $event);
     }
 
@@ -40,7 +41,7 @@ class ValidateRequestListenerTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $listener = new ValidateRequestClientIpListener();
+        $listener = new ValidateRequestListener();
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->method('getClientIps')
             ->willReturn(array('127.0.0.1'));
@@ -54,7 +55,7 @@ class ValidateRequestListenerTest extends \PHPUnit_Framework_TestCase
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-        $listener = new ValidateRequestClientIpListener();
+        $listener = new ValidateRequestListener();
         $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request->method('getClientIps')
             ->will($this->throwException(new ConflictingHeadersException()));

@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-25T11:44:10Z
+
+I did the changes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-26T14:36:07Z
+
+I suggest renaming this adapter to Php7Adapter (ans use the OpcacheAdapter name in #18894)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-26T15:15:57Z
+
+I did the changes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-26T16:08:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-26T16:09:28Z
+
+Btw I looked at this umask issue and it happens that Symfony considers this as an ops issue that Symfony should not deal with. Let's remove it from this PR.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-27T19:48:51Z
+
+I did the changes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-29T09:19:49Z
+
+I renamed #18894 back to PhpFilesAdapter, and I now think this one should be renamed PhpArrayAdapter. Easier to understand, more explicit complementarity.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-29T17:14:20Z
+
+I updated this
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-30T09:19:12Z
+
+Calling for votes @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-06-14T15:14:57Z
+
+I updated this
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-06-14T18:46:52Z
+
+I fixed a problem with HHVM
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-22T12:05:37Z
+
+@tgalopin Can you take comments into account? Looks like we are almost there :)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-06-27T12:07:04Z
+
+I did some benchmarks to check the PHP 5.6 support in this PR.
+
+I used three Docker containers with only PHP/HHVM installed, on the same host. I used Apache Benchmark with 1000 requests at a concurrency of 100 (`ab -n 1000 -c 100`).
+
+The results are the following:
+
+| Engine    	| Context              	  	| Time per request 	|
+| -----------		| ------------------------		| ------------------		|
+| PHP 5.6   	| Empty array            	| 0.953 ms/req     	|
+| PHP 5.6   	| Array with 15 000 keys 	| 4.671 ms/req     	|
+| PHP 7.0   	| Empty array            	| 0.688 ms/req     	|
+| PHP 7.0   	| Array with 15 000 keys 	| 0.709 ms/req     	|
+| HHVM 3.12 	| Empty array            	| 0.869 ms/req     	|
+| HHVM 3.12 	| Array with 15 000 keys 	| 0.875 ms/req     	|
+
+This seems to indicate that having an array filled with data in PHP 5.6 is significantly slower than having an empty array. Therefore, I removed the PHP 5.6 support for this PhpArrayAdapter in the `create` factory method (and I added the HHVM support).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-27T12:26:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-27T13:25:59Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-06-28T08:08:35Z
+
+I did the changes.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-06-28T09:48:42Z
+
+I did the change

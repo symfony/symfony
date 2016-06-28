@@ -246,8 +246,6 @@ class Form extends Link implements \ArrayAccess
      * Removes a field from the form.
      *
      * @param string $name The field name
-     *
-     * @throws \InvalidArgumentException when the name is malformed
      */
     public function remove($name)
     {

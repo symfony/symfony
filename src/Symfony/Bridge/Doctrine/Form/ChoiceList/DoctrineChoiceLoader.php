@@ -110,9 +110,10 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
 
         // Optimize performance for single-field identifiers. We already
         // know that the IDs are used as values
+        $optimize = null === $value || is_array($value) && $value[0] === $this->idReader;
 
         // Attention: This optimization does not check choices for existence
-        if (!$this->choiceList && $this->idReader->isSingleId()) {
+        if ($optimize && !$this->choiceList && $this->idReader->isSingleId()) {
             $values = array();
 
             // Maintain order and indices of the given objects

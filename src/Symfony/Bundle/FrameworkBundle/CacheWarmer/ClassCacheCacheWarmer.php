@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\ClassMatcherInterface;
 
 /**
  * Generates the Class Cache (classes.php) file.
@@ -21,6 +22,13 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
  */
 class ClassCacheCacheWarmer implements CacheWarmerInterface
 {
+    private $classMatcher;
+
+    public function __construct(ClassMatcherInterface $classMatcher = null)
+    {
+        $this->classMatcher = $classMatcher;
+    }
+
     /**
      * Warms up the cache.
      *
@@ -38,7 +46,14 @@ class ClassCacheCacheWarmer implements CacheWarmerInterface
             return;
         }
 
-        ClassCollectionLoader::load(include($classmap), $cacheDir, 'classes', false);
+        $classesToCompile = include $classmap;
+
+        if ($this->classMatcher) {
+            $declaredClasses = array_keys(ClassCollectionLoader::getComposerClassMap());
+            $classesToCompile = $this->classMatcher->match($declaredClasses, $classesToCompile);
+        }
+
+        ClassCollectionLoader::load($classesToCompile, $cacheDir, 'classes', false);
     }
 
     /**

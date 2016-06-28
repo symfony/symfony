@@ -18,11 +18,14 @@
 
         <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" />
 
+        <service id="kernel.class_cache.matcher" class="Symfony\Component\HttpKernel\CacheWarmer\ClassMatcher" public="false" />
+
         <service id="cache_warmer" class="Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate">
             <argument type="collection" />
         </service>
 
         <service id="kernel.class_cache.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassCacheCacheWarmer">
+            <argument type="service" id="kernel.class_cache.matcher" />
             <tag name="kernel.cache_warmer" />
         </service>
 

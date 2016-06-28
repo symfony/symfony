@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\ClassLoader;
 
+use Composer\Autoload\ClassLoader;
+use Symfony\Component\Debug\DebugClassLoader;
+
 /**
  * ClassCollectionLoader.
  *
@@ -21,6 +24,32 @@ class ClassCollectionLoader
     private static $loaded;
     private static $seen;
     private static $useTokenizer = true;
+
+    /**
+     * Return the Composer class map.
+     *
+     * @return array
+     */
+    public static function getComposerClassMap()
+    {
+        $classes = array();
+
+        foreach (spl_autoload_functions() as $function) {
+            if (!is_array($function)) {
+                continue;
+            }
+
+            if ($function[0] instanceof DebugClassLoader) {
+                $function = $function[0]->getClassLoader();
+            }
+
+            if (is_array($function) && $function[0] instanceof ClassLoader) {
+                $classes += $function[0]->getClassMap();
+            }
+        }
+
+        return $classes;
+    }
 
     /**
      * Loads a list of classes and caches them in one big file.

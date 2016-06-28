@@ -169,6 +169,14 @@ class FrameworkExtension extends Extension
             $definition->replaceArgument(1, null);
         }
 
+        $this->addAnnotatedClassesToCompile(array(
+            '**Bundle\\Controller\\',
+            '**Bundle\\Entity\\',
+
+            // Added explicitly so that we dont rely on the class map being dumped to make it work
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+        ));
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Config\\FileLocator',
 
@@ -194,8 +202,7 @@ class FrameworkExtension extends Extension
 
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
-            // Cannot be included because annotations will parse the big compiled class file
-            // 'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
         ));
     }
 

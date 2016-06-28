@@ -215,6 +215,13 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'), '->registerTemplatingConfiguration() registers the global hinclude.js template');
     }
 
+    public function testTemplatingCanBeDisabled()
+    {
+        $container = $this->createContainerFromFile('templating_disabled');
+
+        $this->assertFalse($container->hasParameter('templating.engines'), '"templating.engines" container parameter is not registered when templating is disabled.');
+    }
+
     public function testAssets()
     {
         $container = $this->createContainerFromFile('assets');

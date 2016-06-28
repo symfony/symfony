@@ -143,23 +143,22 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
             $this->options['expiry_field'] => $expiry,
         );
 
+        $options = array('upsert' => true);
+
         if ($this->mongo instanceof \MongoDB\Client) {
             $fields[$this->options['data_field']] = new \MongoDB\BSON\Binary($data, \MongoDB\BSON\Binary::TYPE_OLD_BINARY);
-
-            $this->getCollection()->updateOne(
-                array($this->options['id_field'] => $sessionId),
-                array('$set' => $fields),
-                array('upsert' => true)
-            );
         } else {
             $fields[$this->options['data_field']] = new \MongoBinData($data, \MongoBinData::BYTE_ARRAY);
-
-            $this->getCollection()->update(
-                array($this->options['id_field'] => $sessionId),
-                array('$set' => $fields),
-                array('upsert' => true, 'multiple' => false)
-            );
+            $options['multiple'] = false;
         }
+
+        $methodName = ($this->mongo instanceof \MongoDB\Client) ? 'updateOne' : 'update';
+
+        $this->getCollection()->$methodName(
+            array($this->options['id_field'] => $sessionId),
+            array('$set' => $fields),
+            $options
+        );
 
         return true;
     }

@@ -169,6 +169,14 @@ class FrameworkExtension extends Extension
             $definition->replaceArgument(1, null);
         }
 
+        $this->addAnnotatedClassesToCompile(array(
+            '**Bundle\\Controller\\',
+            '**Bundle\\Entity\\',
+
+            // Added explicitly so that we don't rely on the class map being dumped to make it work
+            'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+        ));
+
         $this->addClassesToCompile(array(
             'Symfony\\Component\\Config\\ConfigCache',
             'Symfony\\Component\\Config\\FileLocator',

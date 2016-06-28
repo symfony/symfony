@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-09T11:07:42Z
+
+@nicolas-grekas  Can you finish this one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T20:12:31Z
+
+@nicolas-grekas What's the status of this one?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-17T17:48:51Z
+
+I'm on it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-25T16:24:13Z
+
+I finally managed to finish this one.
+
+@MGDSoft FYI, I removed the initDepth/maxDepth distinction: it felt strange when playing with the UI. I kept only your initDepth behavior, renamed as maxDepth.
+
+See this fiddle to try the resulting behavior (maxDepth=2):
+https://jsfiddle.net/Lz08fgct/
+
+Status: needs review

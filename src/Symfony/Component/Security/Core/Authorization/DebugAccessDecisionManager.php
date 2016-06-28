@@ -26,7 +26,7 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
 {
     private $manager;
     private $strategy;
-    private $voters;
+    private $voters = array();
     private $decisionLog = array();
 
     public function __construct(AccessDecisionManagerInterface $manager)

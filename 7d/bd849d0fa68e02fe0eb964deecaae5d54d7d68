@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-02-18T13:35:02Z
+
+This one misses its `form` label :)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-04-09T13:25:48Z
+
+@webmozart Can you have a look at this one please ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-25T14:55:07Z
+
+__@symfony/deciders__ this bug is still present and is very annoying, this PR allows to use `empty_data` option with expanded choice type (and sub types) whether it's multiple or not.
+
+Could you please review?

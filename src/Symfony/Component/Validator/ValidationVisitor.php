@@ -70,12 +70,12 @@ class ValidationVisitor implements ValidationVisitorInterface, GlobalExecutionCo
     /**
      * Creates a new validation visitor.
      *
-     * @param mixed                               $root               The value passed to the validator.
-     * @param MetadataFactoryInterface            $metadataFactory    The factory for obtaining metadata instances.
-     * @param ConstraintValidatorFactoryInterface $validatorFactory   The factory for creating constraint validators.
-     * @param TranslatorInterface                 $translator         The translator for translating violation messages.
-     * @param string|null                         $translationDomain  The domain of the translation messages.
-     * @param ObjectInitializerInterface[]        $objectInitializers The initializers for preparing objects before validation.
+     * @param mixed                               $root               The value passed to the validator
+     * @param MetadataFactoryInterface            $metadataFactory    The factory for obtaining metadata instances
+     * @param ConstraintValidatorFactoryInterface $validatorFactory   The factory for creating constraint validators
+     * @param TranslatorInterface                 $translator         The translator for translating violation messages
+     * @param string|null                         $translationDomain  The domain of the translation messages
+     * @param ObjectInitializerInterface[]        $objectInitializers The initializers for preparing objects before validation
      *
      * @throws UnexpectedTypeException If any of the object initializers is not an instance of ObjectInitializerInterface
      */

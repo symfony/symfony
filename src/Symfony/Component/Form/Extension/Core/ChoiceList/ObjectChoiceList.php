@@ -88,7 +88,7 @@ class ObjectChoiceList extends ChoiceList
      * @param string                    $valuePath        A property path pointing to the property used
      *                                                    for the choice values. If not given, integers
      *                                                    are generated instead.
-     * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths.
+     * @param PropertyAccessorInterface $propertyAccessor The reflection graph for reading property paths
      */
     public function __construct($choices, $labelPath = null, array $preferredChoices = array(), $groupPath = null, $valuePath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -105,9 +105,9 @@ class ObjectChoiceList extends ChoiceList
      *
      * Safe to be called multiple times. The list is cleared on every call.
      *
-     * @param array|\Traversable $choices          The choices to write into the list.
-     * @param array              $labels           Ignored.
-     * @param array              $preferredChoices The choices to display with priority.
+     * @param array|\Traversable $choices          The choices to write into the list
+     * @param array              $labels           Ignored
+     * @param array              $preferredChoices The choices to display with priority
      *
      * @throws InvalidArgumentException When passing a hierarchy of choices and using
      *                                  the "groupPath" option at the same time.
@@ -238,7 +238,7 @@ class ObjectChoiceList extends ChoiceList
      *
      * @param mixed $choice The choice to create a value for
      *
-     * @return int|string A unique value without character limitations.
+     * @return int|string A unique value without character limitations
      */
     protected function createValue($choice)
     {

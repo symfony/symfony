@@ -18,9 +18,9 @@ if (!function_exists('intl_is_failure')) {
      *
      * @author Bernhard Schussek <bschussek@gmail.com>
      *
-     * @param int $errorCode The error code returned by intl_get_error_code().
+     * @param int $errorCode The error code returned by intl_get_error_code()
      *
-     * @return bool Whether the error code indicates an error.
+     * @return bool Whether the error code indicates an error
      *
      * @see IntlGlobals::isFailure()
      */
@@ -65,9 +65,9 @@ if (!function_exists('intl_is_failure')) {
      * Stub implementation for the {@link intl_error_name()} function of the intl
      * extension.
      *
-     * @param int $errorCode The error code.
+     * @param int $errorCode The error code
      *
-     * @return string The name of the error code constant.
+     * @return string The name of the error code constant
      *
      * @see IntlGlobals::getErrorName()
      */

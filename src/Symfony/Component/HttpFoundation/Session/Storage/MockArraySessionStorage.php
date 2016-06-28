@@ -66,7 +66,7 @@ class MockArraySessionStorage implements SessionStorageInterface
      * Constructor.
      *
      * @param string      $name    Session name
-     * @param MetadataBag $metaBag MetadataBag instance.
+     * @param MetadataBag $metaBag MetadataBag instance
      */
     public function __construct($name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {

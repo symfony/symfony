@@ -218,7 +218,7 @@ class ArrayChoiceList implements ChoiceListInterface
      * Checks whether the given choices can be cast to strings without
      * generating duplicates.
      *
-     * @param array      $choices The choices.
+     * @param array      $choices The choices
      * @param array|null $cache   The cache for previously checked entries. Internal
      *
      * @return bool Returns true if the choices can be cast to strings and

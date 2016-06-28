@@ -53,7 +53,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
-     * @return array Localized date.
+     * @return array Localized date
      *
      * @throws TransformationFailedException If the given value is not an
      *                                       instance of \DateTime or \DateTimeInterface

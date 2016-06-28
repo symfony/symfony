@@ -72,7 +72,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
      *
      * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
-     * @return string|array Localized date string/array.
+     * @return string|array Localized date string/array
      *
      * @throws TransformationFailedException If the given value is not an instance
      *                                       of \DateTime or \DateTimeInterface or

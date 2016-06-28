@@ -419,9 +419,9 @@ class ChoiceType extends AbstractType
     /**
      * Adds the sub fields for an expanded choice field.
      *
-     * @param FormBuilderInterface $builder     The form builder.
-     * @param array                $choiceViews The choice view objects.
-     * @param array                $options     The build options.
+     * @param FormBuilderInterface $builder     The form builder
+     * @param array                $choiceViews The choice view objects
+     * @param array                $options     The build options
      */
     private function addSubForms(FormBuilderInterface $builder, array $choiceViews, array $options)
     {
@@ -490,12 +490,12 @@ class ChoiceType extends AbstractType
      * are lost. Store them in a utility array that is used from the
      * "choice_label" closure by default.
      *
-     * @param array|\Traversable $choices      The choice labels indexed by choices.
+     * @param array|\Traversable $choices      The choice labels indexed by choices
      * @param object             $choiceLabels The object that receives the choice labels
      *                                         indexed by generated keys.
-     * @param int                $nextKey      The next generated key.
+     * @param int                $nextKey      The next generated key
      *
-     * @return array The choices in a normalized array with labels replaced by generated keys.
+     * @return array The choices in a normalized array with labels replaced by generated keys
      *
      * @internal Public only to be accessible from closures on PHP 5.3. Don't
      *           use this method as it may be removed without notice and will be in 3.0.

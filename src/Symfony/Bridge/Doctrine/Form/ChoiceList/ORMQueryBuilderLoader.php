@@ -43,8 +43,8 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
      *                                            deprecated and will not be
      *                                            supported anymore as of
      *                                            Symfony 3.0.
-     * @param ObjectManager         $manager      Deprecated.
-     * @param string                $class        Deprecated.
+     * @param ObjectManager         $manager      Deprecated
+     * @param string                $class        Deprecated
      *
      * @throws UnexpectedTypeException
      */

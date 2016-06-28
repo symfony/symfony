@@ -18,7 +18,7 @@ use Symfony\Component\Debug\Exception\ContextErrorException;
 class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var int Error reporting level before running tests.
+     * @var int Error reporting level before running tests
      */
     private $errorReporting;
 

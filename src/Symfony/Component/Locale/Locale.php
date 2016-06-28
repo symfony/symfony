@@ -180,7 +180,7 @@ class Locale extends \Locale
     /**
      * Returns the fallback locale for a given locale, if any.
      *
-     * @param string $locale The locale to find the fallback for.
+     * @param string $locale The locale to find the fallback for
      *
      * @return string|null The fallback locale, or null if no parent exists
      */

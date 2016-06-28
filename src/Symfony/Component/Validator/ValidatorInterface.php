@@ -32,9 +32,9 @@ interface ValidatorInterface
      * disabled in Symfony 3.0.
      *
      * @param mixed      $value    The value to validate
-     * @param array|null $groups   The validation groups to validate.
-     * @param bool       $traverse Whether to traverse the value if it is traversable.
-     * @param bool       $deep     Whether to traverse nested traversable values recursively.
+     * @param array|null $groups   The validation groups to validate
+     * @param bool       $traverse Whether to traverse the value if it is traversable
+     * @param bool       $deep     Whether to traverse nested traversable values recursively
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
@@ -47,9 +47,9 @@ interface ValidatorInterface
      * The accepted values depend on the {@link MetadataFactoryInterface}
      * implementation.
      *
-     * @param mixed      $containingValue The value containing the property.
-     * @param string     $property        The name of the property to validate.
-     * @param array|null $groups          The validation groups to validate.
+     * @param mixed      $containingValue The value containing the property
+     * @param string     $property        The name of the property to validate
+     * @param array|null $groups          The validation groups to validate
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
@@ -62,11 +62,11 @@ interface ValidatorInterface
      * The accepted values depend on the {@link MetadataFactoryInterface}
      * implementation.
      *
-     * @param mixed      $containingValue The value containing the property.
+     * @param mixed      $containingValue The value containing the property
      * @param string     $property        The name of the property to validate
      * @param string     $value           The value to validate against the
      *                                    constraints of the property.
-     * @param array|null $groups          The validation groups to validate.
+     * @param array|null $groups          The validation groups to validate
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
@@ -76,9 +76,9 @@ interface ValidatorInterface
     /**
      * Validates a value against a constraint or a list of constraints.
      *
-     * @param mixed                   $value       The value to validate.
-     * @param Constraint|Constraint[] $constraints The constraint(s) to validate against.
-     * @param array|null              $groups      The validation groups to validate.
+     * @param mixed                   $value       The value to validate
+     * @param Constraint|Constraint[] $constraints The constraint(s) to validate against
+     * @param array|null              $groups      The validation groups to validate
      *
      * @return ConstraintViolationListInterface A list of constraint violations. If the
      *                                          list is empty, validation succeeded.
@@ -92,7 +92,7 @@ interface ValidatorInterface
     /**
      * Returns the factory for metadata instances.
      *
-     * @return MetadataFactoryInterface The metadata factory.
+     * @return MetadataFactoryInterface The metadata factory
      *
      * @deprecated since version 2.5, to be removed in 3.0.
      *             Use {@link Validator\ValidatorInterface::getMetadataFor()} or

@@ -252,6 +252,23 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     }
 
     /**
+     * Returns the method to use to construct an object. This method must be either
+     * the object constructor or static.
+     *
+     * @param array            $data
+     * @param string           $class
+     * @param array            $context
+     * @param \ReflectionClass $reflectionClass
+     * @param array|bool       $allowedAttributes
+     *
+     * @return \ReflectionMethod|null
+     */
+    protected function getConstructor(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    {
+        return $reflectionClass->getConstructor();
+    }
+
+    /**
      * Instantiates an object using constructor parameters when needed.
      *
      * This method also allows to denormalize data into an existing object if
@@ -282,7 +299,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
             return $object;
         }
 
-        $constructor = $reflectionClass->getConstructor();
+        $constructor = $this->getConstructor($data, $class, $context, $reflectionClass, $allowedAttributes);
         if ($constructor) {
             $constructorParameters = $constructor->getParameters();
 
@@ -318,7 +335,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 }
             }
 
-            return $reflectionClass->newInstanceArgs($params);
+            if ($constructor->isConstructor()) {
+                return $reflectionClass->newInstanceArgs($params);
+            } else {
+                return $constructor->invokeArgs(null, $params);
+            }
         }
 
         return new $class();

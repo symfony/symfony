@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-27T05:44:57Z
+
+I'm against adding `@throws` params except on interfaces when the contract is defined. They aren't that useful and are a nightmare to maintain especially if you start listing all possible exceptions including the ones coming from called code. And if you are not listing all of them, then it's not that useful anymore.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-27T07:24:50Z
+
+@fabpot  do you find the custom SPL exceptions useful anyway? `Symfony\..\LogicException` vs. `\LogicException`. For type/domain checking i would be perfectly fine with the latter. Ie. imo custom exceptions only make sense when providing granularity; `InvalidSomethingException` for logic and `SomethingNotFoundException` for runtime.
+
+Btw;
+>  including the ones coming from called code
+
+`@throws` is only used for throws directly from that method ;-)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-06-27T07:52:39Z
+
+@ro0NL custom exceptions made easier global catching. It's done like that in every other components.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-27T08:41:13Z
+
+Thats not the point ;-) A exception pointer interface per component is just fine, but do we need custom 1on1 _SPL_ exceptions all the time, ie. an `InvalidArgumentException` per component. Or sometimes yes, sometimes no.
+
+I see no added value in globally catching logic errors (ie programmers faults), however currently logic is thrown where its not necessarily a programmers fault. Anyway, totally out-of-scope, and guess also not something were gonna agree on :-)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-28T16:40:41Z
+
+Reverted the the `count` and `instanceof` changes as it seems very opinionated, which i didnt expected to be honest... from my pov the latter was _the_ most important change code-wise.
+
+Anyway, if this decision was rational, i guess its good to go :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-28T16:53:15Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-06-28T19:45:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-28T20:18:57Z
+
+:+1: :)

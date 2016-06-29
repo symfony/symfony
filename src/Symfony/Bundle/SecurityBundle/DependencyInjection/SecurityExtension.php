@@ -65,6 +65,7 @@ class SecurityExtension extends Extension
         $loader->load('templating_twig.xml');
         $loader->load('collectors.xml');
         $loader->load('guard.xml');
+        $loader->load('security_debug.xml');
 
         if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
             $container->removeDefinition('security.expression_language');

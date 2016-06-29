@@ -56,6 +56,5 @@ class SecurityBundle extends Bundle
         $extension->addUserProviderFactory(new InMemoryFactory());
         $extension->addUserProviderFactory(new LdapFactory());
         $container->addCompilerPass(new AddSecurityVotersPass());
-        $container->addCompilerPass(new AddDebugAccessDecisionManagerPass());
     }
 }

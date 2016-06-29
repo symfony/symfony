@@ -590,7 +590,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'multiple' => false,
             'expanded' => false,
             'choices' => array('test'),
-            'choices_as_values' => true,
             'empty_data' => 'test',
         ));
 
@@ -605,7 +604,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'multiple' => true,
             'expanded' => false,
             'choices' => array('test'),
-            'choices_as_values' => true,
             'empty_data' => array('test'),
         ));
 
@@ -620,7 +618,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'multiple' => false,
             'expanded' => true,
             'choices' => array('test'),
-            'choices_as_values' => true,
             'empty_data' => 'test',
         ));
 
@@ -635,7 +632,6 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'multiple' => true,
             'expanded' => true,
             'choices' => array('test'),
-            'choices_as_values' => true,
             'empty_data' => array('test'),
         ));
 

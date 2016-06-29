@@ -24,7 +24,7 @@ interface TaggedCacheItemInterface extends CacheItemInterface
     /**
      * Adds a tag to a cache item.
      *
-     * @param string|string[] $tags A tag or array of tags.
+     * @param string|string[] $tags A tag or array of tags
      *
      * @return static
      *

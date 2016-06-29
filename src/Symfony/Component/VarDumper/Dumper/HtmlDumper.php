@@ -84,7 +84,7 @@ class HtmlDumper extends CliDumper
     /**
      * Configures display options.
      *
-     * @param array $displayOptions A map of display options to customize the behavior.
+     * @param array $displayOptions A map of display options to customize the behavior
      */
     public function setDisplayOptions(array $displayOptions)
     {

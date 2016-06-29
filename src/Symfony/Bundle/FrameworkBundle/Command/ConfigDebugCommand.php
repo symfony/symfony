@@ -120,7 +120,7 @@ EOF
     /**
      * Iterate over configuration until the last step of the given path.
      *
-     * @param array $config A bundle configuration.
+     * @param array $config A bundle configuration
      *
      * @throws LogicException If the configuration does not exist
      *

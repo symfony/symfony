@@ -23,9 +23,9 @@ interface TagAwareAdapterInterface extends AdapterInterface
     /**
      * Invalidates cached items using tags.
      *
-     * @param string|string[] $tags A tag or an array of tags to invalidate.
+     * @param string|string[] $tags A tag or an array of tags to invalidate
      *
-     * @return bool True on success.
+     * @return bool True on success
      *
      * @throws InvalidArgumentException When $tags is not valid.
      */

@@ -104,9 +104,9 @@ class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRunti
     /**
      * Makes a technical name human readable.
      *
-     * @param string $text The text to humanize.
+     * @param string $text The text to humanize
      *
-     * @return string The humanized text.
+     * @return string The humanized text
      */
     public function humanize($text)
     {
@@ -129,10 +129,10 @@ class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRunti
      * seems to be much more efficient at executing filters than at executing
      * methods of an object.
      *
-     * @param ChoiceView   $choice        The choice to check.
-     * @param string|array $selectedValue The selected value to compare.
+     * @param ChoiceView   $choice        The choice to check
+     * @param string|array $selectedValue The selected value to compare
      *
-     * @return bool Whether the choice is selected.
+     * @return bool Whether the choice is selected
      *
      * @see ChoiceView::isSelected()
      */

@@ -43,8 +43,8 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * Checks if the given class implements the NormalizableInterface.
      *
-     * @param mixed  $data   Data to normalize.
-     * @param string $format The format being (de-)serialized from or into.
+     * @param mixed  $data   Data to normalize
+     * @param string $format The format being (de-)serialized from or into
      *
      * @return bool
      */
@@ -56,9 +56,9 @@ class CustomNormalizer implements NormalizerInterface, DenormalizerInterface, Se
     /**
      * Checks if the given class implements the NormalizableInterface.
      *
-     * @param mixed  $data   Data to denormalize from.
-     * @param string $type   The class to which the data should be denormalized.
-     * @param string $format The format being deserialized from.
+     * @param mixed  $data   Data to denormalize from
+     * @param string $type   The class to which the data should be denormalized
+     * @param string $format The format being deserialized from
      *
      * @return bool
      */

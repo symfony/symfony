@@ -34,7 +34,7 @@ interface DumperInterface
      *
      * @param Definition $definition
      * @param string     $id         service identifier
-     * @param string     $methodName the method name to get the service, will be added to the interface in 4.0.
+     * @param string     $methodName the method name to get the service, will be added to the interface in 4.0
      *
      * @return string
      */

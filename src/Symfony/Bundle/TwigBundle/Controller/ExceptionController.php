@@ -28,7 +28,7 @@ class ExceptionController
     protected $twig;
 
     /**
-     * @var bool Show error (false) or exception (true) pages by default.
+     * @var bool Show error (false) or exception (true) pages by default
      */
     protected $debug;
 

@@ -29,7 +29,7 @@ class CssSelectorConverter
     private $translator;
 
     /**
-     * @param bool $html Whether HTML support should be enabled. Disable it for XML documents.
+     * @param bool $html Whether HTML support should be enabled. Disable it for XML documents
      */
     public function __construct($html = true)
     {
@@ -53,8 +53,8 @@ class CssSelectorConverter
      * Optionally, a prefix can be added to the resulting XPath
      * expression with the $prefix parameter.
      *
-     * @param string $cssExpr The CSS expression.
-     * @param string $prefix  An optional prefix for the XPath expression.
+     * @param string $cssExpr The CSS expression
+     * @param string $prefix  An optional prefix for the XPath expression
      *
      * @return string
      */

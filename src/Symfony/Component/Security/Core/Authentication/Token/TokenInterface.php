@@ -33,7 +33,7 @@ interface TokenInterface extends \Serializable
     /**
      * Returns the user roles.
      *
-     * @return RoleInterface[] An array of RoleInterface instances.
+     * @return RoleInterface[] An array of RoleInterface instances
      */
     public function getRoles();
 

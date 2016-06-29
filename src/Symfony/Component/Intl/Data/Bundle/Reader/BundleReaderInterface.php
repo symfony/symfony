@@ -23,8 +23,8 @@ interface BundleReaderInterface
     /**
      * Reads a resource bundle.
      *
-     * @param string $path   The path to the resource bundle.
-     * @param string $locale The locale to read.
+     * @param string $path   The path to the resource bundle
+     * @param string $locale The locale to read
      *
      * @return mixed Returns an array or {@link \ArrayAccess} instance for
      *               complex data, a scalar value otherwise.

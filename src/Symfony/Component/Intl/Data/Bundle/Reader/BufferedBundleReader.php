@@ -30,7 +30,7 @@ class BufferedBundleReader implements BundleReaderInterface
     /**
      * Buffers a given reader.
      *
-     * @param BundleReaderInterface $reader     The reader to buffer.
+     * @param BundleReaderInterface $reader     The reader to buffer
      * @param int                   $bufferSize The number of entries to store
      *                                          in the buffer.
      */

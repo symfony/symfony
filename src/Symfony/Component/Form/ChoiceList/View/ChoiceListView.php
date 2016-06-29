@@ -39,7 +39,7 @@ class ChoiceListView
     /**
      * Creates a new choice list view.
      *
-     * @param ChoiceGroupView[]|ChoiceView[] $choices          The choice views.
+     * @param ChoiceGroupView[]|ChoiceView[] $choices          The choice views
      * @param ChoiceGroupView[]|ChoiceView[] $preferredChoices The preferred
      *                                                         choice views.
      */

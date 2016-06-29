@@ -105,18 +105,18 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * The $aliasMap parameter can be used to define bundle namespace shortcuts like the
      * DoctrineBundle provides automatically for objects in the default Entity/Document folder.
      *
-     * @param Definition|Reference $driver                  Driver DI definition or reference.
-     * @param string[]             $namespaces              List of namespaces handled by $driver.
+     * @param Definition|Reference $driver                  Driver DI definition or reference
+     * @param string[]             $namespaces              List of namespaces handled by $driver
      * @param string[]             $managerParameters       List of container parameters that could
      *                                                      hold the manager name.
-     * @param string               $driverPattern           Pattern for the metadata driver service name.
+     * @param string               $driverPattern           Pattern for the metadata driver service name
      * @param string               $enabledParameter        Service container parameter that must be
      *                                                      present to enable the mapping. Set to false
      *                                                      to not do any check, optional.
-     * @param string               $configurationPattern    Pattern for the Configuration service name.
+     * @param string               $configurationPattern    Pattern for the Configuration service name
      * @param string               $registerAliasMethodName Name of Configuration class method to
      *                                                      register alias.
-     * @param string[]             $aliasMap                Map of alias to namespace.
+     * @param string[]             $aliasMap                Map of alias to namespace
      *
      * @since Support for bundle alias was added in Symfony 2.6
      */
@@ -218,7 +218,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      *
-     * @return string The name of the active manager.
+     * @return string The name of the active manager
      *
      * @throws InvalidArgumentException If none of the managerParameters is found in the container.
      */

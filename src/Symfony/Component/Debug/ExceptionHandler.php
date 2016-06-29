@@ -84,7 +84,7 @@ class ExceptionHandler
      *
      * @param string $format The format for links to source files
      *
-     * @return string The previous file link format.
+     * @return string The previous file link format
      */
     public function setFileLinkFormat($format)
     {

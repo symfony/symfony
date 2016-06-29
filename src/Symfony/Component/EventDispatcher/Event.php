@@ -37,7 +37,7 @@ class Event
      *
      * @see Event::stopPropagation()
      *
-     * @return bool Whether propagation was already stopped for this event.
+     * @return bool Whether propagation was already stopped for this event
      */
     public function isPropagationStopped()
     {

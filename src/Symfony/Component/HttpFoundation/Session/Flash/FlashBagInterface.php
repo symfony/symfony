@@ -39,8 +39,8 @@ interface FlashBagInterface extends SessionBagInterface
     /**
      * Gets flash messages for a given type.
      *
-     * @param string $type    Message category type.
-     * @param array  $default Default value if $type does not exist.
+     * @param string $type    Message category type
+     * @param array  $default Default value if $type does not exist
      *
      * @return array
      */
@@ -57,7 +57,7 @@ interface FlashBagInterface extends SessionBagInterface
      * Gets and clears flash from the stack.
      *
      * @param string $type
-     * @param array  $default Default value if $type does not exist.
+     * @param array  $default Default value if $type does not exist
      *
      * @return array
      */

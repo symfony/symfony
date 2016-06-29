@@ -30,7 +30,7 @@ class HelperSet implements \IteratorAggregate
     /**
      * Constructor.
      *
-     * @param Helper[] $helpers An array of helper.
+     * @param Helper[] $helpers An array of helper
      */
     public function __construct(array $helpers = array())
     {

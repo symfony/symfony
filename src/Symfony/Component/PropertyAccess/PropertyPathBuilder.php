@@ -44,10 +44,10 @@ class PropertyPathBuilder
     /**
      * Appends a (sub-) path to the current path.
      *
-     * @param PropertyPathInterface|string $path   The path to append.
+     * @param PropertyPathInterface|string $path   The path to append
      * @param int                          $offset The offset where the appended
      *                                             piece starts in $path.
-     * @param int                          $length The length of the appended piece.
+     * @param int                          $length The length of the appended piece
      *                                             If 0, the full path is appended.
      */
     public function append($path, $offset = 0, $length = 0)
@@ -110,12 +110,12 @@ class PropertyPathBuilder
     /**
      * Replaces a sub-path by a different (sub-) path.
      *
-     * @param int                          $offset     The offset at which to replace.
-     * @param int                          $length     The length of the piece to replace.
-     * @param PropertyPathInterface|string $path       The path to insert.
+     * @param int                          $offset     The offset at which to replace
+     * @param int                          $length     The length of the piece to replace
+     * @param PropertyPathInterface|string $path       The path to insert
      * @param int                          $pathOffset The offset where the inserted piece
      *                                                 starts in $path.
-     * @param int                          $pathLength The length of the inserted piece.
+     * @param int                          $pathLength The length of the inserted piece
      *                                                 If 0, the full path is inserted.
      *
      * @throws OutOfBoundsException If the offset is invalid
@@ -149,7 +149,7 @@ class PropertyPathBuilder
      * Replaces a property element by an index element.
      *
      * @param int    $offset The offset at which to replace
-     * @param string $name   The new name of the element. Optional.
+     * @param string $name   The new name of the element. Optional
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
@@ -170,7 +170,7 @@ class PropertyPathBuilder
      * Replaces an index element by a property element.
      *
      * @param int    $offset The offset at which to replace
-     * @param string $name   The new name of the element. Optional.
+     * @param string $name   The new name of the element. Optional
      *
      * @throws OutOfBoundsException If the offset is invalid
      */

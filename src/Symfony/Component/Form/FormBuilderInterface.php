@@ -27,7 +27,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @param string|null                     $type
      * @param array                           $options
      *
-     * @return FormBuilderInterface The builder object.
+     * @return FormBuilderInterface The builder object
      */
     public function add($child, $type = null, array $options = array());
 
@@ -38,7 +38,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      * @param string|null $type    The type of the form or null if name is a property
      * @param array       $options The options
      *
-     * @return FormBuilderInterface The created builder.
+     * @return FormBuilderInterface The created builder
      */
     public function create($name, $type = null, array $options = array());
 
@@ -58,7 +58,7 @@ interface FormBuilderInterface extends \Traversable, \Countable, FormConfigBuild
      *
      * @param string $name
      *
-     * @return FormBuilderInterface The builder object.
+     * @return FormBuilderInterface The builder object
      */
     public function remove($name);
 

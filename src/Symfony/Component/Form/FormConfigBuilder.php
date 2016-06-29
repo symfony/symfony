@@ -850,7 +850,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Validates whether the given variable is a valid form name.
      *
-     * @param string|int $name The tested form name.
+     * @param string|int $name The tested form name
      *
      * @throws UnexpectedTypeException  If the name is not a string or an integer.
      * @throws InvalidArgumentException If the name contains invalid characters.
@@ -879,9 +879,9 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      *   * contains only letters, digits, numbers, underscores ("_"),
      *     hyphens ("-") and colons (":")
      *
-     * @param string $name The tested form name.
+     * @param string $name The tested form name
      *
-     * @return bool Whether the name is valid.
+     * @return bool Whether the name is valid
      */
     public static function isValidName($name)
     {

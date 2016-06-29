@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -805,41 +806,34 @@ class Request
             return array($ip);
         }
 
-        if (self::$trustedHeaders[self::HEADER_FORWARDED] && $this->headers->has(self::$trustedHeaders[self::HEADER_FORWARDED])) {
+        $hasTrustedForwardedHeader = self::$trustedHeaders[self::HEADER_FORWARDED] && $this->headers->has(self::$trustedHeaders[self::HEADER_FORWARDED]);
+        $hasTrustedClientIpHeader = self::$trustedHeaders[self::HEADER_CLIENT_IP] && $this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP]);
+
+        if ($hasTrustedForwardedHeader) {
             $forwardedHeader = $this->headers->get(self::$trustedHeaders[self::HEADER_FORWARDED]);
             preg_match_all('{(for)=("?\[?)([a-z0-9\.:_\-/]*)}', $forwardedHeader, $matches);
-            $clientIps = $matches[3];
-        } elseif (self::$trustedHeaders[self::HEADER_CLIENT_IP] && $this->headers->has(self::$trustedHeaders[self::HEADER_CLIENT_IP])) {
-            $clientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
+            $forwardedClientIps = $matches[3];
+
+            $forwardedClientIps = $this->normalizeAndFilterClientIps($forwardedClientIps, $ip);
+            $clientIps = $forwardedClientIps;
         }
 
-        $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
-        $firstTrustedIp = null;
+        if ($hasTrustedClientIpHeader) {
+            $xForwardedForClientIps = array_map('trim', explode(',', $this->headers->get(self::$trustedHeaders[self::HEADER_CLIENT_IP])));
 
-        foreach ($clientIps as $key => $clientIp) {
-            // Remove port (unfortunately, it does happen)
-            if (preg_match('{((?:\d+\.){3}\d+)\:\d+}', $clientIp, $match)) {
-                $clientIps[$key] = $clientIp = $match[1];
-            }
-
-            if (!filter_var($clientIp, FILTER_VALIDATE_IP)) {
-                unset($clientIps[$key]);
-
-                continue;
-            }
-
-            if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
-                unset($clientIps[$key]);
-
-                // Fallback to this when the client IP falls into the range of trusted proxies
-                if (null ===  $firstTrustedIp) {
-                    $firstTrustedIp = $clientIp;
-                }
-            }
+            $xForwardedForClientIps = $this->normalizeAndFilterClientIps($xForwardedForClientIps, $ip);
+            $clientIps = $xForwardedForClientIps;
         }
 
-        // Now the IP chain contains only untrusted proxies and the client IP
-        return $clientIps ? array_reverse($clientIps) : array($firstTrustedIp);
+        if ($hasTrustedForwardedHeader && $hasTrustedClientIpHeader && $forwardedClientIps !== $xForwardedForClientIps) {
+            throw new ConflictingHeadersException('The request has both a trusted Forwarded header and a trusted Client IP header, conflicting with each other with regards to the originating IP addresses of the request. This is the result of a misconfiguration. You should either configure your proxy only to send one of these headers, or configure Symfony to distrust one of them.');
+        }
+
+        if (!$hasTrustedForwardedHeader && !$hasTrustedClientIpHeader) {
+            return $this->normalizeAndFilterClientIps(array(), $ip);
+        }
+
+        return $clientIps;
     }
 
     /**
@@ -1929,5 +1923,36 @@ class Request
     private function isFromTrustedProxy()
     {
         return self::$trustedProxies && IpUtils::checkIp($this->server->get('REMOTE_ADDR'), self::$trustedProxies);
+    }
+
+    private function normalizeAndFilterClientIps(array $clientIps, $ip)
+    {
+        $clientIps[] = $ip; // Complete the IP chain with the IP the request actually came from
+        $firstTrustedIp = null;
+
+        foreach ($clientIps as $key => $clientIp) {
+            // Remove port (unfortunately, it does happen)
+            if (preg_match('{((?:\d+\.){3}\d+)\:\d+}', $clientIp, $match)) {
+                $clientIps[$key] = $clientIp = $match[1];
+            }
+
+            if (!filter_var($clientIp, FILTER_VALIDATE_IP)) {
+                unset($clientIps[$key]);
+
+                continue;
+            }
+
+            if (IpUtils::checkIp($clientIp, self::$trustedProxies)) {
+                unset($clientIps[$key]);
+
+                // Fallback to this when the client IP falls into the range of trusted proxies
+                if (null === $firstTrustedIp) {
+                    $firstTrustedIp = $clientIp;
+                }
+            }
+        }
+
+        // Now the IP chain contains only untrusted proxies and the client IP
+        return $clientIps ? array_reverse($clientIps) : array($firstTrustedIp);
     }
 }

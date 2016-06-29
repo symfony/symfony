@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2016-06-22T20:30:21Z
+
+Looks like fabbot gives a false positive!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-23T05:39:16Z
+
+But tests are truly broken :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-23T05:43:51Z
+
+I would have implemented this feature in a different way by renaming internally private services so that their original name is not available from the container (this is what we are doing for anonymous services for instance).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-23T06:25:52Z
+
+I think it's a good idea to switch to generated ids in 4.0. For now I like this approach as it allows users to fix their applications more smoothly.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-23T07:38:02Z
+
+@xabbuh Fair enough, let's keep the current approach for now.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-06-23T09:19:02Z
+
+I'll update the code later today to reflect your comments.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-23T10:01:10Z
+
+@fabpot generated ids are a good idea for 4.0 indeed, but this cannot be done for deprecations. If we want to switch to generated ids already, we would have to build another feature to to store a mapping between shared private service ids and their generated ids, to retrieve them this way and trigger a deprecation, which would again look like this approach.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-06-23T20:07:02Z
+
+I don't understand why the tests suite fails on PHP 5.5 and HHVM. The failing test in the ProxyManager Bridge passes on my machine with PHP 5.5.36...
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-06-24T13:25:00Z
+
+The tests are missing for the ``ContainerBuilder`` :)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-06-24T16:41:35Z
+
+Thanks @Ener-Getick! I'm going to add some ;)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-06-27T11:07:10Z
+
+I guess it's now ready for another round of reviews if tests pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-27T11:24:07Z
+
+:+1: (fabbot fails on a fixture, unrelated)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-28T06:12:59Z
+
+Apart from my minor comment, 👍
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-06-28T07:17:24Z
+
+@fabpot fixed! CI is running ;)
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-06-28T07:45:35Z
+
+Good to go!

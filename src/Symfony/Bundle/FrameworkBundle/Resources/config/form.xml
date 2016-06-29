@@ -193,7 +193,7 @@
             <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\SubmitType" />
         </service>
         <service id="form.type_extension.upload.validator" class="Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension">
-            <tag name="form.type_extension" alias="form" />
+            <tag name="form.type_extension" extended-type="Symfony\Component\Form\Extension\Core\Type\FormType" />
             <argument type="service" id="translator"/>
             <argument type="string">%validator.translation_domain%</argument>
         </service>

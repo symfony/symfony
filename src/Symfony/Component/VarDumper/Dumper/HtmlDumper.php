@@ -78,7 +78,7 @@ class HtmlDumper extends CliDumper
     /**
      * Sets an HTML header that will be dumped once in the output stream.
      *
-     * @param string $header An HTML string.
+     * @param string $header An HTML string
      */
     public function setDumpHeader($header)
     {
@@ -88,8 +88,8 @@ class HtmlDumper extends CliDumper
     /**
      * Sets an HTML prefix and suffix that will encapse every single dump.
      *
-     * @param string $prefix The prepended HTML string.
-     * @param string $suffix The appended HTML string.
+     * @param string $prefix The prepended HTML string
+     * @param string $suffix The appended HTML string
      */
     public function setDumpBoundaries($prefix, $suffix)
     {

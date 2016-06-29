@@ -23,7 +23,7 @@ interface DataDumperInterface
     /**
      * Dumps a Data object.
      *
-     * @param Data $data A Data object.
+     * @param Data $data A Data object
      */
     public function dump(Data $data);
 }

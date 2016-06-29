@@ -37,7 +37,7 @@ class SvnCommit
     /**
      * Returns the revision of the commit.
      *
-     * @return string The revision of the commit.
+     * @return string The revision of the commit
      */
     public function getRevision()
     {
@@ -47,7 +47,7 @@ class SvnCommit
     /**
      * Returns the author of the commit.
      *
-     * @return string The author name.
+     * @return string The author name
      */
     public function getAuthor()
     {
@@ -57,7 +57,7 @@ class SvnCommit
     /**
      * Returns the date of the commit.
      *
-     * @return string The commit date.
+     * @return string The commit date
      */
     public function getDate()
     {

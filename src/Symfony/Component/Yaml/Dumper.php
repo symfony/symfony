@@ -40,7 +40,7 @@ class Dumper
     /**
      * Sets the indentation.
      *
-     * @param int $num The amount of spaces to use for indentation of nested nodes.
+     * @param int $num The amount of spaces to use for indentation of nested nodes
      */
     public function setIndentation($num)
     {

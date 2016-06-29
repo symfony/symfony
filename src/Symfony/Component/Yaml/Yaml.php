@@ -86,7 +86,7 @@ class Yaml
      *
      * @param array $array  PHP array
      * @param int   $inline The level where you switch to inline YAML
-     * @param int   $indent The amount of spaces to use for indentation of nested nodes.
+     * @param int   $indent The amount of spaces to use for indentation of nested nodes
      * @param int   $flags  A bit field of DUMP_* constants to customize the dumped YAML string
      *
      * @return string A YAML string representing the original PHP array

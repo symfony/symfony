@@ -105,7 +105,7 @@ class ConstraintViolation implements ConstraintViolationInterface
     /**
      * Converts the violation into a string for debugging purposes.
      *
-     * @return string The violation as string.
+     * @return string The violation as string
      */
     public function __toString()
     {

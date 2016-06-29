@@ -118,9 +118,9 @@ class FormValidator extends ConstraintValidator
     /**
      * Returns the validation groups of the given form.
      *
-     * @param FormInterface $form The form.
+     * @param FormInterface $form The form
      *
-     * @return array The validation groups.
+     * @return array The validation groups
      */
     private static function getValidationGroups(FormInterface $form)
     {
@@ -155,10 +155,10 @@ class FormValidator extends ConstraintValidator
     /**
      * Post-processes the validation groups option for a given form.
      *
-     * @param array|callable $groups The validation groups.
-     * @param FormInterface  $form   The validated form.
+     * @param array|callable $groups The validation groups
+     * @param FormInterface  $form   The validated form
      *
-     * @return array The validation groups.
+     * @return array The validation groups
      */
     private static function resolveValidationGroups($groups, FormInterface $form)
     {

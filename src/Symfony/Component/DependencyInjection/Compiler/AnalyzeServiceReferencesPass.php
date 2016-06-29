@@ -120,7 +120,7 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
     /**
      * Returns a service definition given the full name or an alias.
      *
-     * @param string $id A full id or alias for a service definition.
+     * @param string $id A full id or alias for a service definition
      *
      * @return Definition|null The definition related to the supplied id
      */

@@ -258,7 +258,7 @@ class Response
      *
      * @param Request $request A Request instance
      *
-     * @return Response The current response.
+     * @return Response The current response
      */
     public function prepare(Request $request)
     {

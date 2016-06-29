@@ -21,23 +21,23 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     /**
      * Adds a constraint violation to this list.
      *
-     * @param ConstraintViolationInterface $violation The violation to add.
+     * @param ConstraintViolationInterface $violation The violation to add
      */
     public function add(ConstraintViolationInterface $violation);
 
     /**
      * Merges an existing violation list into this list.
      *
-     * @param ConstraintViolationListInterface $otherList The list to merge.
+     * @param ConstraintViolationListInterface $otherList The list to merge
      */
     public function addAll(ConstraintViolationListInterface $otherList);
 
     /**
      * Returns the violation at a given offset.
      *
-     * @param int $offset The offset of the violation.
+     * @param int $offset The offset of the violation
      *
-     * @return ConstraintViolationInterface The violation.
+     * @return ConstraintViolationInterface The violation
      *
      * @throws \OutOfBoundsException If the offset does not exist.
      */
@@ -46,24 +46,24 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
     /**
      * Returns whether the given offset exists.
      *
-     * @param int $offset The violation offset.
+     * @param int $offset The violation offset
      *
-     * @return bool Whether the offset exists.
+     * @return bool Whether the offset exists
      */
     public function has($offset);
 
     /**
      * Sets a violation at a given offset.
      *
-     * @param int                          $offset    The violation offset.
-     * @param ConstraintViolationInterface $violation The violation.
+     * @param int                          $offset    The violation offset
+     * @param ConstraintViolationInterface $violation The violation
      */
     public function set($offset, ConstraintViolationInterface $violation);
 
     /**
      * Removes a violation at a given offset.
      *
-     * @param int $offset The offset to remove.
+     * @param int $offset The offset to remove
      */
     public function remove($offset);
 }

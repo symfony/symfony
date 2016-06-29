@@ -97,7 +97,7 @@ class InMemoryUserProvider implements UserProviderInterface
     /**
      * Returns the user by given username.
      *
-     * @param string $username The username.
+     * @param string $username The username
      *
      * @return User
      *

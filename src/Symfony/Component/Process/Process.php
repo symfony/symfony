@@ -658,7 +658,7 @@ class Process implements \IteratorAggregate
      * This method relies on the Unix exit code status standardization
      * and might not be relevant for other operating systems.
      *
-     * @return null|string A string representation for the exit status code, null if the Process is not terminated.
+     * @return null|string A string representation for the exit status code, null if the Process is not terminated
      *
      * @see http://tldp.org/LDP/abs/html/exitcodes.html
      * @see http://en.wikipedia.org/wiki/Unix_signal
@@ -946,7 +946,7 @@ class Process implements \IteratorAggregate
      *
      * @param int|float|null $timeout The timeout in seconds
      *
-     * @return self The current Process instance.
+     * @return self The current Process instance
      *
      * @throws LogicException           if the output is disabled
      * @throws InvalidArgumentException if the timeout is negative
@@ -1301,7 +1301,7 @@ class Process implements \IteratorAggregate
     /**
      * Updates the status of the process, reads pipes.
      *
-     * @param bool $blocking Whether to use a blocking read call.
+     * @param bool $blocking Whether to use a blocking read call
      */
     protected function updateStatus($blocking)
     {
@@ -1388,8 +1388,8 @@ class Process implements \IteratorAggregate
     /**
      * Reads pipes, executes callback.
      *
-     * @param bool $blocking Whether to use blocking calls or not.
-     * @param bool $close    Whether to close file handles or not.
+     * @param bool $blocking Whether to use blocking calls or not
+     * @param bool $close    Whether to close file handles or not
      */
     private function readPipes($blocking, $close)
     {
@@ -1515,7 +1515,7 @@ class Process implements \IteratorAggregate
     /**
      * Ensures the process is running or terminated, throws a LogicException if the process has a not started.
      *
-     * @param string $functionName The function name that was called.
+     * @param string $functionName The function name that was called
      *
      * @throws LogicException If the process has not run.
      */
@@ -1529,7 +1529,7 @@ class Process implements \IteratorAggregate
     /**
      * Ensures the process is terminated, throws a LogicException if the process has a status different than `terminated`.
      *
-     * @param string $functionName The function name that was called.
+     * @param string $functionName The function name that was called
      *
      * @throws LogicException If the process is not yet terminated.
      */

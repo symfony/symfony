@@ -511,7 +511,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     /**
      * Create a DOM document, taking serializer options into account.
      *
-     * @param array $context options that the encoder has access to.
+     * @param array $context options that the encoder has access to
      *
      * @return \DOMDocument
      */

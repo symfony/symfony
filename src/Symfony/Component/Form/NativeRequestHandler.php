@@ -132,7 +132,7 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * Returns the method used to submit the request to the server.
      *
-     * @return string The request method.
+     * @return string The request method
      */
     private static function getRequestMethod()
     {
@@ -200,9 +200,9 @@ class NativeRequestHandler implements RequestHandlerInterface
     /**
      * Sets empty uploaded files to NULL in the given uploaded files array.
      *
-     * @param mixed $data The file upload data.
+     * @param mixed $data The file upload data
      *
-     * @return array|null Returns the stripped upload data.
+     * @return array|null Returns the stripped upload data
      */
     private static function stripEmptyFiles($data)
     {

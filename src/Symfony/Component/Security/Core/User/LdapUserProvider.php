@@ -111,7 +111,7 @@ class LdapUserProvider implements UserProviderInterface
      *
      * @return User
      */
-    private function loadUser($username, Entry $entry)
+    protected function loadUser($username, Entry $entry)
     {
         $password = $this->getPassword($entry);
 

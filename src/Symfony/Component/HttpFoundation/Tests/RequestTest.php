@@ -923,6 +923,74 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException
+     * @dataProvider testGetClientIpsWithConflictingHeadersProvider
+     */
+    public function testGetClientIpsWithConflictingHeaders($httpForwarded, $httpXForwardedFor)
+    {
+        $request = new Request();
+
+        $server = array(
+            'REMOTE_ADDR' => '88.88.88.88',
+            'HTTP_FORWARDED' => $httpForwarded,
+            'HTTP_X_FORWARDED_FOR' => $httpXForwardedFor,
+        );
+
+        Request::setTrustedProxies(array('88.88.88.88'));
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $request->getClientIps();
+    }
+
+    public function testGetClientIpsWithConflictingHeadersProvider()
+    {
+        //        $httpForwarded                   $httpXForwardedFor
+        return array(
+            array('for=87.65.43.21',                 '192.0.2.60'),
+            array('for=87.65.43.21, for=192.0.2.60', '192.0.2.60'),
+            array('for=192.0.2.60',                  '192.0.2.60,87.65.43.21'),
+            array('for="::face", for=192.0.2.60',    '192.0.2.60,192.0.2.43'),
+            array('for=87.65.43.21, for=192.0.2.60', '192.0.2.60,87.65.43.21'),
+        );
+    }
+
+    /**
+     * @dataProvider testGetClientIpsWithAgreeingHeadersProvider
+     */
+    public function testGetClientIpsWithAgreeingHeaders($httpForwarded, $httpXForwardedFor)
+    {
+        $request = new Request();
+
+        $server = array(
+            'REMOTE_ADDR' => '88.88.88.88',
+            'HTTP_FORWARDED' => $httpForwarded,
+            'HTTP_X_FORWARDED_FOR' => $httpXForwardedFor,
+        );
+
+        Request::setTrustedProxies(array('88.88.88.88'));
+
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $request->getClientIps();
+
+        Request::setTrustedProxies(array());
+    }
+
+    public function testGetClientIpsWithAgreeingHeadersProvider()
+    {
+        //        $httpForwarded                               $httpXForwardedFor
+        return array(
+            array('for="192.0.2.60"',                          '192.0.2.60'),
+            array('for=192.0.2.60, for=87.65.43.21',           '192.0.2.60,87.65.43.21'),
+            array('for="[::face]", for=192.0.2.60',            '::face,192.0.2.60'),
+            array('for="192.0.2.60:80"',                       '192.0.2.60'),
+            array('for=192.0.2.60;proto=http;by=203.0.113.43', '192.0.2.60'),
+            array('for="[2001:db8:cafe::17]:4711"',            '2001:db8:cafe::17'),
+        );
+    }
+
     public function testGetContentWorksTwiceInDefaultMode()
     {
         $req = new Request();

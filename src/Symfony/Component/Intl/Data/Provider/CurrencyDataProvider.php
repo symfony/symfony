@@ -46,8 +46,8 @@ class CurrencyDataProvider
      * Creates a data provider that reads currency-related data from a
      * resource bundle.
      *
-     * @param string                     $path   The path to the resource bundle.
-     * @param BundleEntryReaderInterface $reader The reader for reading the resource bundle.
+     * @param string                     $path   The path to the resource bundle
+     * @param BundleEntryReaderInterface $reader The reader for reading the resource bundle
      */
     public function __construct($path, BundleEntryReaderInterface $reader)
     {

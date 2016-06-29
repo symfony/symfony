@@ -23,7 +23,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
      *
      * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
      *
-     * @return string The formatted date.
+     * @return string The formatted date
      *
      * @throws TransformationFailedException If the given value is not an
      *                                       instance of \DateTime or \DateTimeInterface

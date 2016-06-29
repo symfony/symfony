@@ -283,7 +283,7 @@ class Filesystem
     /**
      * Tells whether a file exists and is readable.
      *
-     * @param string $filename Path to the file.
+     * @param string $filename Path to the file
      *
      * @throws IOException When windows path is longer than 258 characters
      */
@@ -479,8 +479,8 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param string   $filename The file to be written to.
-     * @param string   $content  The data to write into the file.
+     * @param string   $filename The file to be written to
+     * @param string   $content  The data to write into the file
      * @param null|int $mode     The file mode (octal). If null, file permissions are not modified
      *                           Deprecated since version 2.3.12, to be removed in 3.0.
      *

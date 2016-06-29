@@ -23,7 +23,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Sets the parent form.
      *
-     * @param FormInterface|null $parent The parent form or null if it's the root.
+     * @param FormInterface|null $parent The parent form or null if it's the root
      *
      * @return FormInterface The form instance
      *
@@ -36,16 +36,16 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the parent form.
      *
-     * @return FormInterface|null The parent form or null if there is none.
+     * @return FormInterface|null The parent form or null if there is none
      */
     public function getParent();
 
     /**
      * Adds or replaces a child to the form.
      *
-     * @param FormInterface|string|int $child   The FormInterface instance or the name of the child.
-     * @param string|null              $type    The child's type, if a name was passed.
-     * @param array                    $options The child's options, if a name was passed.
+     * @param FormInterface|string|int $child   The FormInterface instance or the name of the child
+     * @param string|null              $type    The child's type, if a name was passed
+     * @param array                    $options The child's options, if a name was passed
      *
      * @return FormInterface The form instance
      *
@@ -132,7 +132,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the normalized data of the field.
      *
-     * @return mixed When the field is not submitted, the default data is returned.
+     * @return mixed When the field is not submitted, the default data is returned
      *               When the field is submitted, the normalized submitted data is
      *               returned if the field is valid, null otherwise.
      */
@@ -155,7 +155,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the form's configuration.
      *
-     * @return FormConfigInterface The configuration.
+     * @return FormConfigInterface The configuration
      */
     public function getConfig();
 
@@ -169,14 +169,14 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the name by which the form is identified in forms.
      *
-     * @return string The name of the form.
+     * @return string The name of the form
      */
     public function getName();
 
     /**
      * Returns the property path that the form is mapped to.
      *
-     * @return \Symfony\Component\PropertyAccess\PropertyPathInterface The property path.
+     * @return \Symfony\Component\PropertyAccess\PropertyPathInterface The property path
      */
     public function getPropertyPath();
 
@@ -251,7 +251,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * Should be called on the root form after constructing the tree.
      *
-     * @return FormInterface The form instance.
+     * @return FormInterface The form instance
      */
     public function initialize();
 
@@ -263,16 +263,16 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * {@link RequestHandlerInterface} instance, which determines whether to
      * submit the form or not.
      *
-     * @param mixed $request The request to handle.
+     * @param mixed $request The request to handle
      *
-     * @return FormInterface The form instance.
+     * @return FormInterface The form instance
      */
     public function handleRequest($request = null);
 
     /**
      * Submits data to the form, transforms and validates it.
      *
-     * @param null|string|array $submittedData The submitted data.
+     * @param null|string|array $submittedData The submitted data
      * @param bool              $clearMissing  Whether to set fields to NULL
      *                                         when they are missing in the
      *                                         submitted data.

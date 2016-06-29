@@ -37,9 +37,9 @@ interface BundleEntryReaderInterface extends BundleReaderInterface
      *
      *     $reader->readEntry('...', 'en', array('TopLevel', 'NestedLevel', 'Entry'));
      *
-     * @param string   $path     The path to the resource bundle.
-     * @param string   $locale   The locale to read.
-     * @param string[] $indices  The indices to read from the bundle.
+     * @param string   $path     The path to the resource bundle
+     * @param string   $locale   The locale to read
+     * @param string[] $indices  The indices to read from the bundle
      * @param bool     $fallback Whether to merge the value with the value from
      *                           the fallback locale (e.g. "en" for "en_GB").
      *                           Only applicable if the result is multivalued

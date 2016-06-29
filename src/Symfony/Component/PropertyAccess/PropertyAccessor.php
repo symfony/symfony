@@ -328,7 +328,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param int                   $lastIndex            The index up to which should be read
      * @param bool                  $ignoreInvalidIndices Whether to ignore invalid indices or throw an exception
      *
-     * @return array The values read in the path.
+     * @return array The values read in the path
      *
      * @throws UnexpectedTypeException If a value within the path is neither object nor array.
      * @throws NoSuchIndexException    If a non-existing index is accessed
@@ -444,7 +444,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Reads the a property from an object.
      *
      * @param array  $zval     The array containing the object to read from
-     * @param string $property The property to read.
+     * @param string $property The property to read
      *
      * @return array The array containing the value of the property
      *

@@ -62,7 +62,7 @@ interface FormTypeExtensionInterface
     /**
      * Overrides the default options from the extended type.
      *
-     * @param OptionsResolverInterface $resolver The resolver for the options.
+     * @param OptionsResolverInterface $resolver The resolver for the options
      *
      * @deprecated since version 2.7, to be removed in 3.0.
      *             Use the method configureOptions instead. This method will be

@@ -38,7 +38,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      *                                             validate. If none is given,
      *                                             "Default" is assumed
      *
-     * @return ConstraintViolationListInterface A list of constraint violations.
+     * @return ConstraintViolationListInterface A list of constraint violations
      *                                          If the list is empty, validation
      *                                          succeeded
      */
@@ -53,7 +53,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * @param array|null $groups       The validation groups to validate. If
      *                                 none is given, "Default" is assumed
      *
-     * @return ConstraintViolationListInterface A list of constraint violations.
+     * @return ConstraintViolationListInterface A list of constraint violations
      *                                          If the list is empty, validation
      *                                          succeeded
      */
@@ -70,7 +70,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * @param array|null    $groups        The validation groups to validate. If
      *                                     none is given, "Default" is assumed
      *
-     * @return ConstraintViolationListInterface A list of constraint violations.
+     * @return ConstraintViolationListInterface A list of constraint violations
      *                                          If the list is empty, validation
      *                                          succeeded
      */

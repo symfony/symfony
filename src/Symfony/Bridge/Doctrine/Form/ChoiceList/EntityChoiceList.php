@@ -109,7 +109,7 @@ class EntityChoiceList extends ObjectChoiceList
      * @param string                    $groupPath         A property path pointing to the property used
      *                                                     to group the choices. Only allowed if
      *                                                     the choices are given as flat array.
-     * @param PropertyAccessorInterface $propertyAccessor  The reflection graph for reading property paths.
+     * @param PropertyAccessorInterface $propertyAccessor  The reflection graph for reading property paths
      */
     public function __construct(ObjectManager $manager, $class, $labelPath = null, EntityLoaderInterface $entityLoader = null, $entities = null, array $preferredEntities = array(), $groupPath = null, PropertyAccessorInterface $propertyAccessor = null)
     {
@@ -410,7 +410,7 @@ class EntityChoiceList extends ObjectChoiceList
      *
      * @param mixed $entity The choice to create a value for
      *
-     * @return int|string A unique value without character limitations.
+     * @return int|string A unique value without character limitations
      */
     protected function createValue($entity)
     {

@@ -278,8 +278,8 @@ class PrototypedArrayNode extends ArrayNode
     /**
      * Merges values together.
      *
-     * @param mixed $leftSide  The left side to merge.
-     * @param mixed $rightSide The right side to merge.
+     * @param mixed $leftSide  The left side to merge
+     * @param mixed $rightSide The right side to merge
      *
      * @return mixed The merged values
      *

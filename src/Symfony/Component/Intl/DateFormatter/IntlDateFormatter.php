@@ -131,7 +131,7 @@ class IntlDateFormatter
     /**
      * Constructor.
      *
-     * @param string $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en").
+     * @param string $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      * @param int    $datetype Type of date formatting, one of the format type constants
      * @param int    $timetype Type of time formatting, one of the format type constants
      * @param mixed  $timezone Timezone identifier
@@ -165,11 +165,11 @@ class IntlDateFormatter
     /**
      * Static constructor.
      *
-     * @param string $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en").
+     * @param string $locale   The locale code. The only currently supported locale is "en" (or null using the default locale, i.e. "en")
      * @param int    $datetype Type of date formatting, one of the format type constants
      * @param int    $timetype Type of time formatting, one of the format type constants
      * @param string $timezone Timezone identifier
-     * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian.
+     * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian
      *                         One of the calendar constants.
      * @param string $pattern  Optional pattern to use when formatting
      *
@@ -192,7 +192,7 @@ class IntlDateFormatter
      * @param int|\DateTime $timestamp The timestamp to format. \DateTime objects
      *                                 are supported as of PHP 5.3.4.
      *
-     * @return string|bool The formatted value or false if formatting failed.
+     * @return string|bool The formatted value or false if formatting failed
      *
      * @see http://www.php.net/manual/en/intldateformatter.format.php
      *
@@ -395,7 +395,7 @@ class IntlDateFormatter
     /**
      * Returns whether the formatter is lenient.
      *
-     * @return bool Currently always returns false.
+     * @return bool Currently always returns false
      *
      * @see http://www.php.net/manual/en/intldateformatter.islenient.php
      *
@@ -410,7 +410,7 @@ class IntlDateFormatter
      * Not supported. Parse string to a field-based time value.
      *
      * @param string $value    String to convert to a time value
-     * @param int    $position Position at which to start the parsing in $value (zero-based).
+     * @param int    $position Position at which to start the parsing in $value (zero-based)
      *                         If no error occurs before $value is consumed, $parse_pos will
      *                         contain -1 otherwise it will contain the position at which parsing
      *                         ended. If $parse_pos > strlen($value), the parse fails immediately.
@@ -430,7 +430,7 @@ class IntlDateFormatter
      * Parse string to a timestamp value.
      *
      * @param string $value    String to convert to a time value
-     * @param int    $position Not supported. Position at which to start the parsing in $value (zero-based).
+     * @param int    $position Not supported. Position at which to start the parsing in $value (zero-based)
      *                         If no error occurs before $value is consumed, $parse_pos will
      *                         contain -1 otherwise it will contain the position at which parsing
      *                         ended. If $parse_pos > strlen($value), the parse fails immediately.
@@ -463,7 +463,7 @@ class IntlDateFormatter
     /**
      * Not supported. Set the formatter's calendar.
      *
-     * @param string $calendar The calendar to use. Default is IntlDateFormatter::GREGORIAN.
+     * @param string $calendar The calendar to use. Default is IntlDateFormatter::GREGORIAN
      *
      * @return bool true on success or false on failure
      *
@@ -526,7 +526,7 @@ class IntlDateFormatter
     /**
      * Set the formatter's timezone identifier.
      *
-     * @param string $timeZoneId The time zone ID string of the time zone to use.
+     * @param string $timeZoneId The time zone ID string of the time zone to use
      *                           If NULL or the empty string, the default time zone for the
      *                           runtime is used.
      *

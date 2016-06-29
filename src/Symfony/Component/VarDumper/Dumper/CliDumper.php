@@ -97,7 +97,7 @@ class CliDumper extends AbstractDumper
     /**
      * Configures styles.
      *
-     * @param array $styles A map of style names to style definitions.
+     * @param array $styles A map of style names to style definitions
      */
     public function setStyles(array $styles)
     {
@@ -280,9 +280,9 @@ class CliDumper extends AbstractDumper
     /**
      * Dumps an ellipsis for cut children.
      *
-     * @param Cursor $cursor   The Cursor position in the dump.
-     * @param bool   $hasChild When the dump of the hash has child item.
-     * @param int    $cut      The number of items the hash has been cut by.
+     * @param Cursor $cursor   The Cursor position in the dump
+     * @param bool   $hasChild When the dump of the hash has child item
+     * @param int    $cut      The number of items the hash has been cut by
      */
     protected function dumpEllipsis(Cursor $cursor, $hasChild, $cut)
     {
@@ -300,7 +300,7 @@ class CliDumper extends AbstractDumper
     /**
      * Dumps a key in a hash structure.
      *
-     * @param Cursor $cursor The Cursor position in the dump.
+     * @param Cursor $cursor The Cursor position in the dump
      */
     protected function dumpKey(Cursor $cursor)
     {
@@ -368,11 +368,11 @@ class CliDumper extends AbstractDumper
     /**
      * Decorates a value with some style.
      *
-     * @param string $style The type of style being applied.
-     * @param string $value The value being styled.
-     * @param array  $attr  Optional context information.
+     * @param string $style The type of style being applied
+     * @param string $value The value being styled
+     * @param array  $attr  Optional context information
      *
-     * @return string The value with style decoration.
+     * @return string The value with style decoration
      */
     protected function style($style, $value, $attr = array())
     {
@@ -412,7 +412,7 @@ class CliDumper extends AbstractDumper
     }
 
     /**
-     * @return bool Tells if the current output stream supports ANSI colors or not.
+     * @return bool Tells if the current output stream supports ANSI colors or not
      */
     protected function supportsColors()
     {

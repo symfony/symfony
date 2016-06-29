@@ -150,7 +150,7 @@ class SecurityDataCollector extends DataCollector
      * Checks if the data contains information about inherited roles. Still the inherited
      * roles can be an empty array.
      *
-     * @return bool true if the profile was contains inherited role information.
+     * @return bool true if the profile was contains inherited role information
      */
     public function supportsRoleHierarchy()
     {

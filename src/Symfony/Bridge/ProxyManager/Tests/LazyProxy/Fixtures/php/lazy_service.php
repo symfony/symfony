@@ -38,7 +38,7 @@ class LazyServiceProjectServiceContainer extends Container
      *
      * @param bool $lazyLoad whether to try lazy-loading the service with a proxy
      *
-     * @return stdClass A stdClass instance.
+     * @return stdClass A stdClass instance
      */
     public function getFooService($lazyLoad = true)
     {

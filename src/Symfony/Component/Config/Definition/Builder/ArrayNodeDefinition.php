@@ -178,7 +178,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * This method is applicable to prototype nodes only.
      *
      * @param string $name          The name of the key
-     * @param bool   $removeKeyItem Whether or not the key item should be removed.
+     * @param bool   $removeKeyItem Whether or not the key item should be removed
      *
      * @return ArrayNodeDefinition
      */

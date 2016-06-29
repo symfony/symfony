@@ -37,7 +37,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \stdClass A stdClass instance.
+     * @return \stdClass A stdClass instance
      */
     protected function getDependsOnRequestService()
     {
@@ -54,7 +54,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Request A Request instance.
+     * @return \Request A Request instance
      */
     protected function getRequestService()
     {

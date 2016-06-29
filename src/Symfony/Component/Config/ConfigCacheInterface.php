@@ -32,7 +32,7 @@ interface ConfigCacheInterface
      *
      * This check should take the metadata passed to the write() method into consideration.
      *
-     * @return bool Whether the cache is still fresh.
+     * @return bool Whether the cache is still fresh
      */
     public function isFresh();
 

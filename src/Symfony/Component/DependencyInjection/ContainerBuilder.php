@@ -354,7 +354,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns all Scope children.
      *
-     * @return array An array of scope children.
+     * @return array An array of scope children
      *
      * @deprecated since version 2.8, to be removed in 3.0.
      */
@@ -510,7 +510,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * parameter, the value will still be 'bar' as defined in the ContainerBuilder
      * constructor.
      *
-     * @param ContainerBuilder $container The ContainerBuilder instance to merge.
+     * @param ContainerBuilder $container The ContainerBuilder instance to merge
      *
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      */
@@ -1011,7 +1011,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param string $name The tag name
      *
-     * @return array An array of tags with the tagged service as key, holding a list of attribute arrays.
+     * @return array An array of tags with the tagged service as key, holding a list of attribute arrays
      */
     public function findTaggedServiceIds($name)
     {
@@ -1067,7 +1067,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Returns the Service Conditionals.
      *
-     * @param mixed $value An array of conditionals to return.
+     * @param mixed $value An array of conditionals to return
      *
      * @return array An array of Service conditionals
      */

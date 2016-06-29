@@ -137,7 +137,7 @@ class RedisMock
      * @param string $key
      * @param string $value
      *
-     * @return int Size of the value after the append.
+     * @return int Size of the value after the append
      */
     public function append($key, $value)
     {

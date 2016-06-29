@@ -23,14 +23,14 @@ use Symfony\Component\Intl\Exception\RuntimeException;
 class GenrbCompiler implements BundleCompilerInterface
 {
     /**
-     * @var string The path to the "genrb" executable.
+     * @var string The path to the "genrb" executable
      */
     private $genrb;
 
     /**
      * Creates a new compiler based on the "genrb" executable.
      *
-     * @param string $genrb   Optional. The path to the "genrb" executable.
+     * @param string $genrb   Optional. The path to the "genrb" executable
      * @param string $envVars Optional. Environment variables to be loaded when
      *                        running "genrb".
      *

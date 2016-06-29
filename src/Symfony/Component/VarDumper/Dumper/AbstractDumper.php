@@ -32,8 +32,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     private $charset;
 
     /**
-     * @param callable|resource|string|null $output  A line dumper callable, an opened stream or an output path, defaults to static::$defaultOutput.
-     * @param string                        $charset The default character encoding to use for non-UTF8 strings.
+     * @param callable|resource|string|null $output  A line dumper callable, an opened stream or an output path, defaults to static::$defaultOutput
+     * @param string                        $charset The default character encoding to use for non-UTF8 strings
      */
     public function __construct($output = null, $charset = null)
     {
@@ -49,9 +49,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Sets the output destination of the dumps.
      *
-     * @param callable|resource|string $output A line dumper callable, an opened stream or an output path.
+     * @param callable|resource|string $output A line dumper callable, an opened stream or an output path
      *
-     * @return callable|resource|string The previous output destination.
+     * @return callable|resource|string The previous output destination
      */
     public function setOutput($output)
     {
@@ -74,9 +74,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Sets the default character encoding to use for non-UTF8 strings.
      *
-     * @param string $charset The default character encoding to use for non-UTF8 strings.
+     * @param string $charset The default character encoding to use for non-UTF8 strings
      *
-     * @return string The previous charset.
+     * @return string The previous charset
      */
     public function setCharset($charset)
     {
@@ -93,9 +93,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Sets the indentation pad string.
      *
-     * @param string $pad A string the will be prepended to dumped lines, repeated by nesting level.
+     * @param string $pad A string the will be prepended to dumped lines, repeated by nesting level
      *
-     * @return string The indent pad.
+     * @return string The indent pad
      */
     public function setIndentPad($pad)
     {
@@ -108,8 +108,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Dumps a Data object.
      *
-     * @param Data                          $data   A Data object.
-     * @param callable|resource|string|null $output A line dumper callable, an opened stream or an output path.
+     * @param Data                          $data   A Data object
+     * @param callable|resource|string|null $output A line dumper callable, an opened stream or an output path
      */
     public function dump(Data $data, $output = null)
     {
@@ -136,7 +136,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Dumps the current line.
      *
-     * @param int $depth The recursive depth in the dumped structure for the line being dumped.
+     * @param int $depth The recursive depth in the dumped structure for the line being dumped
      */
     protected function dumpLine($depth)
     {
@@ -147,8 +147,8 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Generic line dumper callback.
      *
-     * @param string $line  The line to write.
-     * @param int    $depth The recursive depth in the dumped structure.
+     * @param string $line  The line to write
+     * @param int    $depth The recursive depth in the dumped structure
      */
     protected function echoLine($line, $depth, $indentPad)
     {
@@ -160,9 +160,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     /**
      * Converts a non-UTF-8 string to UTF-8.
      *
-     * @param string $s The non-UTF-8 string to convert.
+     * @param string $s The non-UTF-8 string to convert
      *
-     * @return string The string converted to UTF-8.
+     * @return string The string converted to UTF-8
      */
     protected function utf8Encode($s)
     {

@@ -26,7 +26,7 @@ interface EventDispatcherInterface
      * @param string $eventName The name of the event to dispatch. The name of
      *                          the event is the name of the method that is
      *                          invoked on listeners.
-     * @param Event  $event     The event to pass to the event handlers/listeners.
+     * @param Event  $event     The event to pass to the event handlers/listeners
      *                          If not supplied, an empty Event instance is created.
      *
      * @return Event
@@ -49,7 +49,7 @@ interface EventDispatcherInterface
      * The subscriber is asked for all the events he is
      * interested in and added as a listener for these events.
      *
-     * @param EventSubscriberInterface $subscriber The subscriber.
+     * @param EventSubscriberInterface $subscriber The subscriber
      */
     public function addSubscriber(EventSubscriberInterface $subscriber);
 

@@ -45,9 +45,9 @@ class ChoiceView
     /**
      * Creates a new ChoiceView.
      *
-     * @param mixed  $data  The original choice.
-     * @param string $value The view representation of the choice.
-     * @param string $label The label displayed to humans.
+     * @param mixed  $data  The original choice
+     * @param string $value The view representation of the choice
+     * @param string $label The label displayed to humans
      */
     public function __construct($data, $value, $label)
     {

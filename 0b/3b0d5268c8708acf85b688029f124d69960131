@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-16T05:58:44Z
+
+@javiereguiluz Can you move this PR forward? Or do you need some help?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-06-20T05:58:02Z
+
+@javiereguiluz Any update on this? A solution would be awesome.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-20T06:04:23Z
+
+@peterrehm I plan to finish this very soon.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-28T06:59:04Z
+
+I've updated this with a compiler pass, as @stof suggested.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-29T06:19:06Z
+
+Some tests are still failing. Given that a new Symfony 3.1 release is imminent, could someone please help me fix this? Thanks!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-29T07:35:26Z
+
+If passing the `security.access.decision_manager` instead of the `debug.security.access.decision_manager` to the collector maybe you can revert the compiler pass and keep the xml config.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-29T09:32:01Z
+
+I guess you now need to update the `SecurityBundle` `composer.json` to require `"symfony/security": "~3.1,>=3.1.2"`
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-29T10:02:25Z
+
+👍 LGTM now, remaining failures are unrelated.
+
+Status: Reviewed

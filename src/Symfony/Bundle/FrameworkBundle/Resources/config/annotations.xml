@@ -19,6 +19,22 @@
             <argument /><!-- Cache-Directory -->
         </service>
 
+        <service id="annotations.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\AnnotationsCacheWarmer" public="false">
+            <argument type="service" id="annotations.reader" />
+            <argument>%kernel.cache_dir%/annotations.php</argument>
+            <argument type="service" id="cache.annotations" />
+        </service>
+
+        <service id="annotations.cache" class="Symfony\Component\Cache\DoctrineProvider" public="false">
+            <argument type="service">
+                <service class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
+                    <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
+                    <argument>%kernel.cache_dir%/annotations.php</argument>
+                    <argument type="service" id="cache.annotations" />
+                </service>
+            </argument>
+        </service>
+
         <service id="annotation_reader" alias="annotations.reader" />
     </services>
 </container>

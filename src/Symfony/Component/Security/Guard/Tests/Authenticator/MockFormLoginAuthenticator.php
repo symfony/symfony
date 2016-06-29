@@ -10,6 +10,7 @@
  */
 
 namespace Symfony\Component\Security\Guard\Tests\Authenticator;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -25,23 +26,25 @@ class MockFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 
     /**
      * @param mixed $defaultSuccessRedirectUrl
+     *
      * @return MockFormLoginAuthenticator
      */
     public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl)
     {
         $this->defaultSuccessRedirectUrl = $defaultSuccessRedirectUrl;
-        
+
         return $this;
     }
 
     /**
      * @param mixed $loginUrl
+     *
      * @return MockFormLoginAuthenticator
      */
     public function setLoginUrl($loginUrl)
     {
         $this->loginUrl = $loginUrl;
-        
+
         return $this;
     }
 
@@ -66,7 +69,7 @@ class MockFormLoginAuthenticator extends AbstractFormLoginAuthenticator
      */
     public function getCredentials(Request $request)
     {
-        return "credentials";
+        return 'credentials';
     }
 
     /**

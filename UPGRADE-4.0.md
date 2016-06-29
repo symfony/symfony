@@ -77,11 +77,9 @@ FrameworkBundle
     - `"form.type.submit"`
     - `"form.type.reset"`
 
- * The service `serializer.mapping.cache.apc` has been removed; use
-   `serializer.mapping.cache.doctrine.apc` instead.
-
- * The `framework.serializer.cache` option has been removed. APCu should now
-   be automatically used when available so you can remove this configuration key.
+ * The `framework.serializer.cache` option and the service
+   `serializer.mapping.cache.apc` have been removed. APCu should now
+   be automatically used when available.
 
 HttpKernel
 ----------

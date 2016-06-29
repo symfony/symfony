@@ -88,13 +88,9 @@ FrameworkBundle
     - `"form.type.submit"`
     - `"form.type.reset"`
 
- * The service `serializer.mapping.cache.apc`  has been deprecated in favor of
-   `serializer.mapping.cache.doctrine.apc` to be consistent with the validator
-   cache service. If you are using `serializer.mapping.cache.apc`, use
-   `serializer.mapping.cache.doctrine.apc` instead.
-
- * The `framework.serializer.cache` option has been deprecated. APCu should now
-   be automatically used when available so you can remove this configuration key.
+ * The `framework.serializer.cache` option and the service
+   `serializer.mapping.cache.apc` have been deprecated. APCu should now be
+   automatically used when available.
 
 HttpKernel
 ----------

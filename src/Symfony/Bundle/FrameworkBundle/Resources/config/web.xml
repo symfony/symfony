@@ -46,5 +46,9 @@
             <argument type="service" id="request_stack" />
             <tag name="kernel.event_subscriber" />
         </service>
+
+        <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener">
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 </container>

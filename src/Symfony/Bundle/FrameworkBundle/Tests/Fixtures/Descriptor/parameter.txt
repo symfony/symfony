@@ -1,5 +1,5 @@
  --------------- --------- 
-  [32mParameter[39m       [32mValue[39m    
+ [32m Parameter     [39m [32m Value   [39m 
  --------------- --------- 
   database_name   symfony  
  --------------- --------- 

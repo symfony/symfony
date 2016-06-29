@@ -19,12 +19,11 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Input\StreamableInputInterface;
 
 /**
  * @group tty
  */
-class QuestionHelperTest extends \PHPUnit_Framework_TestCase
+class QuestionHelperTest extends AbstractQuestionHelperTest
 {
     public function testAskChoice()
     {
@@ -765,22 +764,6 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $mock->expects($this->any())
             ->method('isInteractive')
             ->will($this->returnValue($interactive));
-
-        return $mock;
-    }
-
-    protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
-    {
-        $mock = $this->getMock(StreamableInputInterface::class);
-        $mock->expects($this->any())
-            ->method('isInteractive')
-            ->will($this->returnValue($interactive));
-
-        if ($stream) {
-            $mock->expects($this->any())
-                ->method('getStream')
-                ->willReturn($stream);
-        }
 
         return $mock;
     }

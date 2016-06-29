@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-05-05T11:53:00Z
+
+@fabpot: I have now updated the PR to throw exceptions instead, and to not do so when both the Forwarded and X-Forwarded-For header agree with each other.
+
+I am a bit worried about the fact that the very commonly used `getClientIp` method now throws exceptions when users previously did not expect it to, though. I mean, the request is inconsistent, so clearly we need to do something, but this can happen when the user least expects it to. Should I perhaps "validate" the request early on in the request lifecycle, to make sure that if we're going to throw, we throw early?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-05-13T15:06:26Z
+
+@magnusnordlander I agree with you that we should bail out as early as possible and consistently.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-05-13T19:09:38Z
+
+I'll give some consideration to where to put this validation, and have an updated PR ready tomorrow (also fixing the other two things, of course).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-19T08:06:07Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T07:14:20Z
+
+@magnusnordlander Do you have time in the next few days to update this PR?
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-06-22T12:30:57Z
+
+I'll have time this Friday.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-06-25T10:40:18Z
+
+So, the code is updated. The remaining build error is because the composer.json of HttpKernel and FrameworkBundle needs to be updated to require the version of HttpFoundation and HttpKernel respectively, that this is released in. I don't know how to handle that without actually making a release. Any help there?
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-06-27T09:52:31Z
+
+Ping @fabpot
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-28T14:18:18Z
+
+👍

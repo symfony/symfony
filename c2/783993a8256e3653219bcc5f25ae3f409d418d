@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-26T11:46:06Z
+
+@chalasr this is really nice! I was afraid that the fix for this would be more complicated.
+
+My only request would be to add some tests for this edge case. Thanks!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-26T11:50:42Z
+
+For me also big :+1: this is really clever!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-26T12:29:55Z
+
+Btw, i also discussed this with @chalasr a bit in #19172, but are there any downsides to not support/fix this directly in `block()`? Ie. why not allow users to mix&match inline styles with the outer `$style`.
+
+Currently if the user passes a already formatted string to block (like comment did previous) it still can fail from a cutting pov where formatting works just fine.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-26T12:55:13Z
+
+@javiereguiluz Sure, I'll set the background to normal and add some tests.
+
+@ro0NL I would like to open a specific discussion about allowing or not nested formatting in `block()` in order to don't talk about multiple subjects here and keep things clear, wdyt? Then open a PR for, depending on the result of the discussion.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-26T15:58:31Z
+
+I made the change, added a test and adapted the FrameworkBundle ones when needed.
+
+My guess is that the 2 failed travis builds are due to that the console dependency of the FrameworkBundle doesn't contain the fix provided by this PR  and so cannot pass because the expected output is the old one  (I looked at the output of the failed assertion, it is the old one). After merge on the branches corresponding to the required versions, it should pass as for appveyor, other php versions on travis, and my local.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-28T20:12:55Z
+
+@chalasr can you try this? Makes sense to me.. =/
+
+```diff
+diff --git a/src/Symfony/Component/Console/Style/SymfonyStyle.php b/src/Symfony/Component/Console/Style/SymfonyStyle.php
+index de03aa8..abc5df5 100644
+--- a/src/Symfony/Component/Console/Style/SymfonyStyle.php
++++ b/src/Symfony/Component/Console/Style/SymfonyStyle.php
+@@ -406,29 +406,25 @@ class SymfonyStyle extends OutputStyle
+
+             $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $prefix) - $indentLength, PHP_EOL, true)));
+
+-            // prefix each line with a number of spaces equivalent to the type length
+-            if (null !== $type) {
+-                foreach ($lines as &$line) {
+-                    $line = $lineIndentation === substr($line, 0, $indentLength) ? $line : $lineIndentation.$line;
+-                }
+-            }
+-
+             if (count($messages) > 1 && $key < count($messages) - 1) {
+                 $lines[] = '';
+             }
+         }
+
+-        if (null !== $type) {
+-            $lines[0] = substr_replace($lines[0], $typePrefix, 0, $indentLength);
+-        }
+-
++        $firstLineKey = 0;
+         if ($padding && $this->isDecorated()) {
+             array_unshift($lines, '');
+             $lines[] = '';
++            $firstLineKey = 1;
+         }
+
+-        foreach ($lines as &$line) {
+-            $line = sprintf('%s%s', $prefix, $line);
++        foreach ($lines as $key => &$line) {
++            if (null !== $type) {
++                // prefix first line with the type, otherwise a number of spaces equivalent to the type length
++                $line = $firstLineKey === $key ? $prefix.$typePrefix.$line : $prefix.$lineIndentation.$line;
++            } else {
++                $line = $prefix.$line;
++            }
+             $line .= str_repeat(' ', $this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $line));
+
+             if ($style) {
+```
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-28T22:06:04Z
+
+@ro0NL I took inspiration from your diff, one loop avoided! Thank you.
+
+I added some additional tests to prevent regressions due to the changes added here.
+Tests pass.
+(The failure on appveyor is unrelated, the travis build fails because the FrameworkBundle's Console dependency isn't in sync with this PR).

@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-27T12:13:01Z
+
+What about `@app.configurator:configure`? I would prefer keeping the `@` as a service indicator.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-27T12:25:06Z
+
+As far as I understand correctly, this continues #12008 that missed the "configurator" case?
+Could you add a few tests please?
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2016-06-27T12:27:27Z
+
+@ro0NL, I would prefer to use `@` too. But it will be a BC break.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-27T12:43:34Z
+
+I see. Maybe it's good to mention this is a generic format, ie i thought it was configurator specific at first, but it's also a notation we can use on factories.
+
+The BC is due the fact service id's allow for colons? Im not sure how intuitive this (new) format will be..., what about `@app.configurator->configure` =/ Anyway is this really better than
+`['@app.configurator', 'configure']` which is pretty short already imo. We gain 5 chars or so...
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2016-06-27T13:01:51Z
+
+@ro0NL, it is not a new format. It will be a BC break because some people already use short syntax for service factories in their code without using leading `@`.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-27T13:11:42Z
+
+@voronkovich I don't understand what you mean. ``app.configurator:configure`` does not work for a configurator today, because it is not a callable
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-27T13:13:04Z
+
+I'm :+1: for making the configurator configuration support the same short syntax than the factory one in Yaml. Being consistent is a good idea
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2016-06-27T13:23:24Z
+
+@nicolas-grekas, do we really need additional tests for this? We already have the tests for services factories: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Tests/Loader/YamlFileLoaderTest.php#L157
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-27T13:52:17Z
+
+@voronkovich if there is a new supported syntax, we need to have a test ensuring that we don't break this syntax by mistake
+
+---------------------------------------------------------------------------
+
+by voronkovich at 2016-06-27T16:30:42Z
+
+@stof, Thanks for the explanation! @nicolas-grekas, I've added the tests and fixed some errors.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-28T06:28:29Z
+
+:+1:

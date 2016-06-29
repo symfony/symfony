@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -125,7 +126,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
+        $this->assertEquals(array('internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -306,6 +307,58 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($class->isCloneable());
         $this->assertTrue($clone->isPrivate());
     }
+
+    /** @group legacy */
+    public function testUnsetInternalPrivateServiceIsDeprecated()
+    {
+        $deprecations = array(
+            'Unsetting the "internal" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.',
+        );
+
+        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
+            $c = new ProjectServiceContainer();
+            $c->set('internal', null);
+        });
+    }
+
+    /** @group legacy */
+    public function testChangeInternalPrivateServiceIsDeprecated()
+    {
+        $deprecations = array(
+            'Setting the "internal" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0. A new public service will be created instead.',
+        );
+
+        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
+            $c = new ProjectServiceContainer();
+            $c->set('internal', new \stdClass());
+        });
+    }
+
+    /** @group legacy */
+    public function testCheckExistenceOfAnInternalPrivateServiceIsDeprecated()
+    {
+        $deprecations = array(
+            'Checking for the existence of the "internal" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.',
+        );
+
+        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
+            $c = new ProjectServiceContainer();
+            $c->has('internal');
+        });
+    }
+
+    /** @group legacy */
+    public function testRequestAnInternalSharedPrivateServiceIsDeprecated()
+    {
+        $deprecations = array(
+            'Requesting the "internal" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.',
+        );
+
+        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
+            $c = new ProjectServiceContainer();
+            $c->get('internal');
+        });
+    }
 }
 
 class ProjectServiceContainer extends Container
@@ -313,6 +366,7 @@ class ProjectServiceContainer extends Container
     public $__bar;
     public $__foo_bar;
     public $__foo_baz;
+    public $__internal;
 
     public function __construct()
     {
@@ -321,7 +375,14 @@ class ProjectServiceContainer extends Container
         $this->__bar = new \stdClass();
         $this->__foo_bar = new \stdClass();
         $this->__foo_baz = new \stdClass();
+        $this->__internal = new \stdClass();
+        $this->privates = array('internal' => true);
         $this->aliases = array('alias' => 'bar');
+    }
+
+    protected function getInternalService()
+    {
+        return $this->__internal;
     }
 
     protected function getBarService()

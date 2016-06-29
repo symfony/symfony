@@ -804,6 +804,7 @@ EOF;
 EOF;
 
         $code .= $this->addMethodMap();
+        $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'
@@ -886,6 +887,36 @@ EOF;
         }
 
         return $code."        );\n";
+    }
+
+    /**
+     * Adds the privates property definition.
+     *
+     * @return string
+     */
+    private function addPrivateServices()
+    {
+        if (!$definitions = $this->container->getDefinitions()) {
+            return '';
+        }
+
+        $code = '';
+        ksort($definitions);
+        foreach ($definitions as $id => $definition) {
+            if (!$definition->isPublic()) {
+                $code .= '            '.var_export($id, true)." => true,\n";
+            }
+        }
+
+        if (empty($code)) {
+            return '';
+        }
+
+        $out = "        \$this->privates = array(\n";
+        $out .= $code;
+        $out .= "        );\n";
+
+        return $out;
     }
 
     /**

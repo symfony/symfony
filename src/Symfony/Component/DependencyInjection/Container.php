@@ -65,6 +65,7 @@ class Container implements ResettableContainerInterface
 
     protected $services = array();
     protected $methodMap = array();
+    protected $privates = array();
     protected $aliases = array();
     protected $loading = array();
 
@@ -176,6 +177,14 @@ class Container implements ResettableContainerInterface
         if (null === $service) {
             unset($this->services[$id]);
         }
+
+        if (isset($this->privates[$id])) {
+            if (null === $service) {
+                @trigger_error(sprintf('Unsetting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            } else {
+                @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0. A new public service will be created instead.', $id), E_USER_DEPRECATED);
+            }
+        }
     }
 
     /**
@@ -198,6 +207,10 @@ class Container implements ResettableContainerInterface
             if (--$i && $id !== $lcId = strtolower($id)) {
                 $id = $lcId;
             } else {
+                if (isset($this->privates[$id])) {
+                    @trigger_error(sprintf('Checking for the existence of the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+                }
+
                 return method_exists($this, 'get'.strtr($id, $this->underscoreMap).'Service');
             }
         }
@@ -267,6 +280,9 @@ class Container implements ResettableContainerInterface
                 }
 
                 return;
+            }
+            if (isset($this->privates[$id])) {
+                @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
 
             $this->loading[$id] = true;

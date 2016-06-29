@@ -479,11 +479,11 @@ class Filesystem
     /**
      * Creates a temporary file with support for custom stream wrappers.
      *
-     * @param string $dir    The directory where the temporary filename will be created.
-     * @param string $prefix The prefix of the generated temporary filename.
-     *                       Note: Windows uses only the first three characters of prefix.
+     * @param string $dir    The directory where the temporary filename will be created
+     * @param string $prefix The prefix of the generated temporary filename
+     *                       Note: Windows uses only the first three characters of prefix
      *
-     * @return string The new temporary filename (with path), or throw an exception on failure.
+     * @return string The new temporary filename (with path), or throw an exception on failure
      */
     public function tempnam($dir, $prefix)
     {
@@ -581,7 +581,7 @@ class Filesystem
     /**
      * Gets a 2-tuple of scheme (may be null) and hierarchical part of a filename (e.g. file:///tmp -> array(file, tmp)).
      *
-     * @param string $filename The filename to be parsed.
+     * @param string $filename The filename to be parsed
      *
      * @return array The filename scheme and hierarchical part
      */

@@ -27,7 +27,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
     private $isSkipped = array();
 
     /**
-     * @param array $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive).
+     * @param array $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive)
      */
     public function __construct(array $mockedNamespaces = array())
     {

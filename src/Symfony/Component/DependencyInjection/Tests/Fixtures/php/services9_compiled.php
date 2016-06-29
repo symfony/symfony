@@ -151,7 +151,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \stdClass A stdClass instance.
+     * @return \stdClass A stdClass instance
      *
      * @deprecated The "deprecated_service" service is deprecated. You should stop using it, as it will soon be removed.
      */

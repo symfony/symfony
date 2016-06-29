@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-28T06:21:34Z
+
+See failures :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-28T06:35:38Z
+
+tests fixed
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-06-28T07:22:41Z
+
+@fabpot
+Feel free to specify the requirements in https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/2020 (exactly https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/2020/files#diff-4e353d9e86349c0daec425c628ad5688R32 ), eg do we want to keep `?` at the end or not (I would keep them, as during removal the sentence should be adjusted as well)

@@ -99,7 +99,7 @@ final class CacheItem implements CacheItemInterface
     /**
      * Validates a cache key according to PSR-6.
      *
-     * @param string $key The key to validate.
+     * @param string $key The key to validate
      *
      * @throws InvalidArgumentException When $key is not valid.
      */

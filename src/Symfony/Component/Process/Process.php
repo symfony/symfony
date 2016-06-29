@@ -508,7 +508,7 @@ class Process implements \IteratorAggregate
     /**
      * Returns an iterator to the output of the process, with the output type as keys (Process::OUT/ERR).
      *
-     * @param int $flags A bit field of Process::ITER_* flags.
+     * @param int $flags A bit field of Process::ITER_* flags
      *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
@@ -1348,7 +1348,7 @@ class Process implements \IteratorAggregate
      * Reads pipes for the freshest output.
      *
      * @param string $caller   The name of the method that needs fresh outputs
-     * @param bool   $blocking Whether to use blocking calls or not.
+     * @param bool   $blocking Whether to use blocking calls or not
      *
      * @throws LogicException in case output has been disabled or process is not started
      */

@@ -62,7 +62,7 @@ class RedisAdapter extends AbstractAdapter
      *
      * @throws InvalidArgumentException When the DSN is invalid.
      *
-     * @return \Redis|\Predis\Client According to the "class" option.
+     * @return \Redis|\Predis\Client According to the "class" option
      */
     public static function createConnection($dsn, array $options = array())
     {

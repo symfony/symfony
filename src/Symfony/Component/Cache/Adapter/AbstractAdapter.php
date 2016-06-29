@@ -89,46 +89,46 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     /**
      * Fetches several cache items.
      *
-     * @param array $ids The cache identifiers to fetch.
+     * @param array $ids The cache identifiers to fetch
      *
-     * @return array|\Traversable The corresponding values found in the cache.
+     * @return array|\Traversable The corresponding values found in the cache
      */
     abstract protected function doFetch(array $ids);
 
     /**
      * Confirms if the cache contains specified cache item.
      *
-     * @param string $id The identifier for which to check existence.
+     * @param string $id The identifier for which to check existence
      *
-     * @return bool True if item exists in the cache, false otherwise.
+     * @return bool True if item exists in the cache, false otherwise
      */
     abstract protected function doHave($id);
 
     /**
      * Deletes all items in the pool.
      *
-     * @param string The prefix used for all identifiers managed by this pool.
+     * @param string The prefix used for all identifiers managed by this pool
      *
-     * @return bool True if the pool was successfully cleared, false otherwise.
+     * @return bool True if the pool was successfully cleared, false otherwise
      */
     abstract protected function doClear($namespace);
 
     /**
      * Removes multiple items from the pool.
      *
-     * @param array $ids An array of identifiers that should be removed from the pool.
+     * @param array $ids An array of identifiers that should be removed from the pool
      *
-     * @return bool True if the items were successfully removed, false otherwise.
+     * @return bool True if the items were successfully removed, false otherwise
      */
     abstract protected function doDelete(array $ids);
 
     /**
      * Persists several cache items immediately.
      *
-     * @param array $values   The values to cache, indexed by their cache identifier.
-     * @param int   $lifetime The lifetime of the cached values, 0 for persisting until manual cleaning.
+     * @param array $values   The values to cache, indexed by their cache identifier
+     * @param int   $lifetime The lifetime of the cached values, 0 for persisting until manual cleaning
      *
-     * @return array|bool The identifiers that failed to be cached or a boolean stating if caching succeeded or not.
+     * @return array|bool The identifiers that failed to be cached or a boolean stating if caching succeeded or not
      */
     abstract protected function doSave(array $values, $lifetime);
 

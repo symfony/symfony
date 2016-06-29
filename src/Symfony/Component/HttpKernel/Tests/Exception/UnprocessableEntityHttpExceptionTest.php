@@ -10,7 +10,7 @@ class UnprocessableEntityHttpExceptionTest extends HttpExceptionTest
      * Test that setting the headers using the setter function
      * is working as expected.
      *
-     * @param array $headers The headers to set.
+     * @param array $headers The headers to set
      *
      * @dataProvider headerDataProvider
      */

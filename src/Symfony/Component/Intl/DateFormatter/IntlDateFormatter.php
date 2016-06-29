@@ -189,7 +189,7 @@ class IntlDateFormatter
     /**
      * Format the date/time value (timestamp) as a string.
      *
-     * @param int|\DateTime $timestamp The timestamp to format.
+     * @param int|\DateTime $timestamp The timestamp to format
      *
      * @return string|bool The formatted value or false if formatting failed
      *

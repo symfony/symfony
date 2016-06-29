@@ -114,7 +114,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \stdClass A stdClass instance.
+     * @return \stdClass A stdClass instance
      */
     protected function getConfiguredServiceSimpleService()
     {
@@ -200,7 +200,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Bar A Bar instance.
+     * @return \Bar A Bar instance
      */
     protected function getFactoryServiceSimpleService()
     {
@@ -378,7 +378,7 @@ class ProjectServiceContainer extends Container
      * If you want to be able to request this service from the container directly,
      * make it public, otherwise you might end up with broken code.
      *
-     * @return \ConfClass A ConfClass instance.
+     * @return \ConfClass A ConfClass instance
      */
     protected function getConfiguratorServiceSimpleService()
     {
@@ -395,7 +395,7 @@ class ProjectServiceContainer extends Container
      * If you want to be able to request this service from the container directly,
      * make it public, otherwise you might end up with broken code.
      *
-     * @return \SimpleFactoryClass A SimpleFactoryClass instance.
+     * @return \SimpleFactoryClass A SimpleFactoryClass instance
      */
     protected function getFactorySimpleService()
     {

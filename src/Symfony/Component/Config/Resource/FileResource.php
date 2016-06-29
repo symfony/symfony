@@ -44,7 +44,7 @@ class FileResource implements SelfCheckingResourceInterface, \Serializable
     }
 
     /**
-     * @return string|false The canonicalized, absolute path to the resource or false if the resource does not exist.
+     * @return string|false The canonicalized, absolute path to the resource or false if the resource does not exist
      */
     public function getResource()
     {

@@ -21,9 +21,7 @@ use Symfony\Component\Workflow\Exception\LogicException;
 class Definition
 {
     private $places = array();
-
     private $transitions = array();
-
     private $initialPlace;
 
     /**

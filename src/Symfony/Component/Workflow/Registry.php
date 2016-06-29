@@ -23,19 +23,19 @@ class Registry
 
     /**
      * @param Workflow $workflow
-     * @param string   $classname
+     * @param string   $className
      */
-    public function add(Workflow $workflow, $classname)
+    public function add(Workflow $workflow, $className)
     {
-        $this->workflows[] = array($workflow, $classname);
+        $this->workflows[] = array($workflow, $className);
     }
 
     public function get($subject, $workflowName = null)
     {
         $matched = null;
 
-        foreach ($this->workflows as list($workflow, $classname)) {
-            if ($this->supports($workflow, $classname, $subject, $workflowName)) {
+        foreach ($this->workflows as list($workflow, $className)) {
+            if ($this->supports($workflow, $className, $subject, $workflowName)) {
                 if ($matched) {
                     throw new InvalidArgumentException('At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.');
                 }
@@ -50,9 +50,9 @@ class Registry
         return $matched;
     }
 
-    private function supports(Workflow $workflow, $classname, $subject, $name)
+    private function supports(Workflow $workflow, $className, $subject, $name)
     {
-        if (!$subject instanceof $classname) {
+        if (!$subject instanceof $className) {
             return false;
         }
 

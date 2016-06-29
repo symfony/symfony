@@ -30,19 +30,19 @@ class AuditTrailListener implements EventSubscriberInterface
     public function onLeave(Event $event)
     {
         foreach ($event->getTransition()->getFroms() as $place) {
-            $this->logger->info(sprintf('leaving "%s" for subject of class "%s"', $place, get_class($event->getSubject())));
+            $this->logger->info(sprintf('Leaving "%s" for subject of class "%s".', $place, get_class($event->getSubject())));
         }
     }
 
     public function onTransition(Event $event)
     {
-        $this->logger->info(sprintf('transition "%s" for subject of class "%s"', $event->getTransition()->getName(), get_class($event->getSubject())));
+        $this->logger->info(sprintf('Transition "%s" for subject of class "%s".', $event->getTransition()->getName(), get_class($event->getSubject())));
     }
 
     public function onEnter(Event $event)
     {
         foreach ($event->getTransition()->getTos() as $place) {
-            $this->logger->info(sprintf('entering "%s" for subject of class "%s"', $place, get_class($event->getSubject())));
+            $this->logger->info(sprintf('Entering "%s" for subject of class "%s".', $place, get_class($event->getSubject())));
         }
     }
 

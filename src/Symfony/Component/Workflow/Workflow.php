@@ -109,7 +109,6 @@ class Workflow
         }
 
         $transition = $transitions[$transitionName];
-
         $marking = $this->getMarking($subject);
 
         return $this->doCan($subject, $marking, $transition);
@@ -135,7 +134,6 @@ class Workflow
         // We can shortcut the getMarking method in order to boost performance,
         // since the "can" method already checks the Marking state
         $marking = $this->markingStore->getMarking($subject);
-
         $transition = $this->definition->getTransitions()[$transitionName];
 
         $this->leave($subject, $transition, $marking);
@@ -161,7 +159,6 @@ class Workflow
     public function getEnabledTransitions($subject)
     {
         $enabled = array();
-
         $marking = $this->getMarking($subject);
 
         foreach ($this->definition->getTransitions() as $transition) {

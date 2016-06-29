@@ -22,15 +22,13 @@ use Symfony\Component\Workflow\Transition;
 class Event extends BaseEvent
 {
     private $subject;
-
     private $marking;
-
     private $transition;
 
     /**
      * Event constructor.
      *
-     * @param mixed      $subject
+     * @param object     $subject
      * @param Marking    $marking
      * @param Transition $transition
      */

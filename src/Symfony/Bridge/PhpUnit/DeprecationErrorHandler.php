@@ -32,7 +32,7 @@ class DeprecationErrorHandler
      * - use a number to define the upper bound of allowed deprecations,
      *   making the test suite fail whenever more notices are trigerred.
      *
-     * @param int|string|false $mode The reporting mode. Defaults to not allowing any deprecations.
+     * @param int|string|false $mode The reporting mode, defaults to not allowing any deprecations
      */
     public static function register($mode = 0)
     {

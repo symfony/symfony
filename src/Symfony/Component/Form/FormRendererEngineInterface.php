@@ -21,7 +21,7 @@ interface FormRendererEngineInterface
     /**
      * Sets the theme(s) to be used for rendering a view and its children.
      *
-     * @param FormView $view   The view to assign the theme(s) to.
+     * @param FormView $view   The view to assign the theme(s) to
      * @param mixed    $themes The theme(s). The type of these themes
      *                         is open to the implementation.
      */
@@ -36,13 +36,13 @@ interface FormRendererEngineInterface
      * The type of the resource is decided by the implementation. The resource
      * is later passed to {@link renderBlock()} by the rendering algorithm.
      *
-     * @param FormView $view      The view for determining the used themes.
+     * @param FormView $view      The view for determining the used themes
      *                            First the themes attached directly to the
      *                            view with {@link setTheme()} are considered,
      *                            then the ones of its parent etc.
-     * @param string   $blockName The name of the block to render.
+     * @param string   $blockName The name of the block to render
      *
-     * @return mixed The renderer resource or false, if none was found.
+     * @return mixed The renderer resource or false, if none was found
      */
     public function getResourceForBlockName(FormView $view, $blockName);
 
@@ -70,7 +70,7 @@ interface FormRendererEngineInterface
      * The type of the resource is decided by the implementation. The resource
      * is later passed to {@link renderBlock()} by the rendering algorithm.
      *
-     * @param FormView $view               The view for determining the used themes.
+     * @param FormView $view               The view for determining the used themes
      *                                     First the themes  attached directly to
      *                                     the view with {@link setTheme()} are
      *                                     considered, then the ones of its parent etc.
@@ -80,7 +80,7 @@ interface FormRendererEngineInterface
      *                                     looking. Level 0 indicates the root block, i.e.
      *                                     the first element of $blockNameHierarchy.
      *
-     * @return mixed The renderer resource or false, if none was found.
+     * @return mixed The renderer resource or false, if none was found
      */
     public function getResourceForBlockNameHierarchy(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
 
@@ -110,7 +110,7 @@ interface FormRendererEngineInterface
      * The type of the resource is decided by the implementation. The resource
      * is later passed to {@link renderBlock()} by the rendering algorithm.
      *
-     * @param FormView $view               The view for determining the used themes.
+     * @param FormView $view               The view for determining the used themes
      *                                     First the themes  attached directly to
      *                                     the view with {@link setTheme()} are
      *                                     considered, then the ones of its parent etc.
@@ -120,7 +120,7 @@ interface FormRendererEngineInterface
      *                                     looking. Level 0 indicates the root block, i.e.
      *                                     the first element of $blockNameHierarchy.
      *
-     * @return int|bool The hierarchy level or false, if no resource was found.
+     * @return int|bool The hierarchy level or false, if no resource was found
      */
     public function getResourceHierarchyLevel(FormView $view, array $blockNameHierarchy, $hierarchyLevel);
 
@@ -131,12 +131,12 @@ interface FormRendererEngineInterface
      * or {@link getResourceForBlockHierarchy()}. The type of the resource is
      * decided by the implementation.
      *
-     * @param FormView $view      The view to render.
-     * @param mixed    $resource  The renderer resource.
-     * @param string   $blockName The name of the block to render.
-     * @param array    $variables The variables to pass to the template.
+     * @param FormView $view      The view to render
+     * @param mixed    $resource  The renderer resource
+     * @param string   $blockName The name of the block to render
+     * @param array    $variables The variables to pass to the template
      *
-     * @return string The HTML markup.
+     * @return string The HTML markup
      */
     public function renderBlock(FormView $view, $resource, $blockName, array $variables = array());
 }

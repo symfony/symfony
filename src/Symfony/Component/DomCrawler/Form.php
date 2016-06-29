@@ -85,7 +85,7 @@ class Form extends Link implements \ArrayAccess
      *
      * The returned array does not include file fields (@see getFiles).
      *
-     * @return array An array of field values.
+     * @return array An array of field values
      */
     public function getValues()
     {
@@ -106,7 +106,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets the file field values.
      *
-     * @return array An array of file field values.
+     * @return array An array of file field values
      */
     public function getFiles()
     {
@@ -135,7 +135,7 @@ class Form extends Link implements \ArrayAccess
      * This method converts fields with the array notation
      * (like foo[bar] to arrays) like PHP does.
      *
-     * @return array An array of field values.
+     * @return array An array of field values
      */
     public function getPhpValues()
     {
@@ -162,7 +162,7 @@ class Form extends Link implements \ArrayAccess
      * For a compound file field foo[bar] it will create foo[bar][name],
      * instead of foo[name][bar] which would be found in $_FILES.
      *
-     * @return array An array of file field values.
+     * @return array An array of file field values
      */
     public function getPhpFiles()
     {

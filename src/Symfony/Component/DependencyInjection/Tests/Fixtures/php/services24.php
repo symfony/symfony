@@ -34,7 +34,7 @@ class ProjectServiceContainer extends Container
      *
      * This service is autowired.
      *
-     * @return \Foo A Foo instance.
+     * @return \Foo A Foo instance
      */
     protected function getFooService()
     {

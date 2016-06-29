@@ -57,7 +57,7 @@ class IpUtils
      * @param string $requestIp IPv4 address to check
      * @param string $ip        IPv4 address or subnet in CIDR notation
      *
-     * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet.
+     * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet
      */
     public static function checkIp4($requestIp, $ip)
     {

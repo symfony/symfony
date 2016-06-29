@@ -21,14 +21,14 @@ interface FormRendererInterface
     /**
      * Returns the engine used by this renderer.
      *
-     * @return FormRendererEngineInterface The renderer engine.
+     * @return FormRendererEngineInterface The renderer engine
      */
     public function getEngine();
 
     /**
      * Sets the theme(s) to be used for rendering a view and its children.
      *
-     * @param FormView $view   The view to assign the theme(s) to.
+     * @param FormView $view   The view to assign the theme(s) to
      * @param mixed    $themes The theme(s). The type of these themes
      *                         is open to the implementation.
      */
@@ -37,9 +37,9 @@ interface FormRendererInterface
     /**
      * Renders a named block of the form theme.
      *
-     * @param FormView $view      The view for which to render the block.
-     * @param string   $blockName The name of the block.
-     * @param array    $variables The variables to pass to the template.
+     * @param FormView $view      The view for which to render the block
+     * @param string   $blockName The name of the block
+     * @param array    $variables The variables to pass to the template
      *
      * @return string The HTML markup
      */
@@ -55,9 +55,9 @@ interface FormRendererInterface
      * If this method is called recursively, the block search is continued
      * where a block was found before.
      *
-     * @param FormView $view            The view for which to render the block.
-     * @param string   $blockNameSuffix The suffix of the block name.
-     * @param array    $variables       The variables to pass to the template.
+     * @param FormView $view            The view for which to render the block
+     * @param string   $blockNameSuffix The suffix of the block name
+     * @param array    $variables       The variables to pass to the template
      *
      * @return string The HTML markup
      */
@@ -95,9 +95,9 @@ interface FormRendererInterface
      * of the resulting string is capitalized, while all other letters are
      * turned to lowercase.
      *
-     * @param string $text The text to humanize.
+     * @param string $text The text to humanize
      *
-     * @return string The humanized text.
+     * @return string The humanized text
      */
     public function humanize($text);
 }

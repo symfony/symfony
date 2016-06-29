@@ -40,7 +40,7 @@ abstract class AbstractDoctrineExtension extends Extension
     protected $drivers = array();
 
     /**
-     * @param array            $objectManager A configured object manager.
+     * @param array            $objectManager A configured object manager
      * @param ContainerBuilder $container     A ContainerBuilder instance
      *
      * @throws \InvalidArgumentException
@@ -300,8 +300,8 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a configured object manager metadata, query or result cache driver.
      *
-     * @param array            $objectManager A configured object manager.
-     * @param ContainerBuilder $container     A ContainerBuilder instance.
+     * @param array            $objectManager A configured object manager
+     * @param ContainerBuilder $container     A ContainerBuilder instance
      * @param string           $cacheName
      *
      * @throws \InvalidArgumentException In case of unknown driver type.
@@ -314,10 +314,10 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a cache driver.
      *
-     * @param string                                                  $cacheDriverServiceId The cache driver name.
-     * @param string                                                  $objectManagerName    The object manager name.
-     * @param array                                                   $cacheDriver          The cache driver mapping.
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container            The ContainerBuilder instance.
+     * @param string                                                  $cacheDriverServiceId The cache driver name
+     * @param string                                                  $objectManagerName    The object manager name
+     * @param array                                                   $cacheDriver          The cache driver mapping
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container            The ContainerBuilder instance
      *
      * @return string
      *
@@ -403,12 +403,12 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Returns a modified version of $managerConfigs.
      *
-     * The manager called $autoMappedManager will map all bundles that are not mepped by other managers.
+     * The manager called $autoMappedManager will map all bundles that are not mapped by other managers.
      *
      * @param array $managerConfigs
      * @param array $bundles
      *
-     * @return array The modified version of $managerConfigs.
+     * @return array The modified version of $managerConfigs
      */
     protected function fixManagersAutoMappings(array $managerConfigs, array $bundles)
     {

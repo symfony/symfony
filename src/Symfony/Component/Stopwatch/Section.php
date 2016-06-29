@@ -67,7 +67,7 @@ class Section
     /**
      * Creates or re-opens a child section.
      *
-     * @param string|null $id null to create a new section, the identifier to re-open an existing one.
+     * @param string|null $id null to create a new section, the identifier to re-open an existing one
      *
      * @return Section A child section
      */

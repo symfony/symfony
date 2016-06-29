@@ -93,7 +93,7 @@ class ArgvInput extends Input
     /**
      * Parses a short option.
      *
-     * @param string $token The current token.
+     * @param string $token The current token
      */
     private function parseShortOption($token)
     {

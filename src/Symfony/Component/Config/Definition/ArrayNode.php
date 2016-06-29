@@ -347,8 +347,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Merges values together.
      *
-     * @param mixed $leftSide  The left side to merge.
-     * @param mixed $rightSide The right side to merge.
+     * @param mixed $leftSide  The left side to merge
+     * @param mixed $rightSide The right side to merge
      *
      * @return mixed The merged values
      *

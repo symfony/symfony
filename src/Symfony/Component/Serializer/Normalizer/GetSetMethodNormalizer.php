@@ -164,7 +164,7 @@ class GetSetMethodNormalizer extends AbstractNormalizer
      *
      * @param \ReflectionMethod $method the method to check
      *
-     * @return bool whether the method is a getter or boolean getter.
+     * @return bool whether the method is a getter or boolean getter
      */
     private function isGetMethod(\ReflectionMethod $method)
     {

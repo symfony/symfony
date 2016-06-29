@@ -36,7 +36,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Bar\FooClass A Bar\FooClass instance.
+     * @return \Bar\FooClass A Bar\FooClass instance
      */
     protected function getServiceFromAnonymousFactoryService()
     {
@@ -49,7 +49,7 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Bar\FooClass A Bar\FooClass instance.
+     * @return \Bar\FooClass A Bar\FooClass instance
      */
     protected function getServiceWithMethodCallAndFactoryService()
     {

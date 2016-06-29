@@ -120,7 +120,7 @@ interface ExecutionContextInterface
      *
      * In other cases, null is returned.
      *
-     * @return object|null The currently validated object or null.
+     * @return object|null The currently validated object or null
      */
     public function getObject();
 

@@ -127,7 +127,7 @@ class FormLoginAuthenticatorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->requestWithSession->setSession($session);
 
-        $this->authenticator = new MockFormLoginAuthenticator();
+        $this->authenticator = new TestFormLoginAuthenticator();
         $this->authenticator
             ->setLoginUrl(self::LOGIN_URL)
             ->setDefaultSuccessRedirectUrl(self::DEFAULT_SUCCESS_URL)
@@ -141,7 +141,7 @@ class FormLoginAuthenticatorTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class MockFormLoginAuthenticator extends AbstractFormLoginAuthenticator
+class TestFormLoginAuthenticator extends AbstractFormLoginAuthenticator
 {
     private $loginUrl;
     private $defaultSuccessRedirectUrl;
@@ -149,7 +149,7 @@ class MockFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * @param mixed $defaultSuccessRedirectUrl
      *
-     * @return MockFormLoginAuthenticator
+     * @return TestFormLoginAuthenticator
      */
     public function setDefaultSuccessRedirectUrl($defaultSuccessRedirectUrl)
     {
@@ -161,7 +161,7 @@ class MockFormLoginAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * @param mixed $loginUrl
      *
-     * @return MockFormLoginAuthenticator
+     * @return TestFormLoginAuthenticator
      */
     public function setLoginUrl($loginUrl)
     {

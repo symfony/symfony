@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-30T09:24:05Z
+
+Not checked it fully, but i found -+ 34 violations. I.e. i guess there are more occurrences for this specific problem.
+
+Also the root namespace is still missing now.. this annoys editors ;-)
+
+@fabpot can you confirm these are false positives? Makes sense to test the namespaced exception is thrown... rather than some potential subclass.
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2016-06-30T09:29:05Z
+
+The FQCN is defined **without** a leading slash. The leading slash mearly indicates to escape to the global namespace. If your IDE doesn't understand that PHPUnit doesn't resolve thing in this way, then it's broken.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-30T09:44:37Z
+
+Understand.. im fine with both. But lets be consistent :)
+
+Still.. what if PHPunit _fixes_ this, how should it be then? Cause potentially there can be a class `Symfony\Component\Asset\Exception\LogicException` relative to some namespace. And we have to add use statements (with maybe aliases) everywhere. I.e. adding a root namespace would be explicit and less error prone perhaps?
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2016-06-30T09:46:17Z
+
+PHPUnit does do anything relative to a namespace. The fact that might be true is irrelevant.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-30T09:49:21Z
+
+Like i said my only concern is it requires a lot of refactoring whenever PHPunit implements this. Assuming its a valid usecase.. however i guess its not gonna happen because of this.
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2016-06-30T09:54:05Z
+
+> whenever PHPunit implements this
+
+I don't think PHPUnit will ever implement this.
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-06-30T10:02:14Z
+
+@ro0NL check this out: https://github.com/sebastianbergmann/phpunit/issues/1633
+for that, I really don't think PHPUnit will go that way, especially since it's somekinda dropping annotation in favor of `->expectException`
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-30T10:03:33Z
+
+Sorry.. i cant really play with it right now, but to clearify.. this works different then as opposed to `@throws`, `@return` etc.
+
+To sum up..
+- FQCN annotations from phpunit should be fully qualified (root namespace is optional, but pragmaticly prefered now for editors and is less error prone whener phpunit alters (IMHO))
+- FQCN annotations from phpdoc can be fully qualified (with root namespace) or partial (with use statement)
+
+For both i would like to see a fixer optimizing this to some consistent variant.
+
+edit: @keradus :+1:

@@ -7,6 +7,36 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.15 (2016-06-30)
+
+ * bug #19217 [HttpKernel] Inline ValidateRequestListener logic into HttpKernel (nicolas-grekas)
+ * bug #18688 [HttpFoundation] Warning when request has both Forwarded and X-Forwarded-For (magnusnordlander)
+ * bug #19173 [Console] Decouple SymfonyStyle from TableCell (ro0NL)
+ * bug #17822 [WIP]  [Form] fix `empty_data` option in expanded `ChoiceType` (HeahDude)
+ * bug #19134 Distinguish between first and subsequent progress bar displays (rquadling)
+ * bug #19061 [FORM] fix post_max_size_message translation (alt. 2) (David Badura)
+ * bug #19100 [Console] Fixed SymfonyQuestionHelper multi-choice with defaults (sstok)
+ * bug #18924 [DoctrineBridge] Don't use object IDs in DoctrineChoiceLoader when passing a value closure (webmozart)
+ * bug #19138 [DomCrawler] No more exception on field name with strange format (guiled, fabpot)
+ * bug #18935 [Form] Consider a violation even if the form is not submitted (egeloen)
+ * bug #19127 [Form] Add exception to FormRenderer about non-unique block names (enumag)
+ * bug #19118 [Process] Fix pipes cleaning on Windows (nicolas-grekas)
+ * bug #19128 Avoid phpunit 5.4 warnings on getMock (2.7+) (iltar)
+ * bug #19114 [HttpKernel] Dont close the reponse stream in debug (nicolas-grekas)
+ * bug #19101 [Session] fix PDO transaction aborted under PostgreSQL (Tobion)
+ * bug #18501 [HttpFoundation] changed MERGE queries (hjkl)
+ * bug #19062 [HttpFoundation] Fix UPSERT for PgSql >= 9.5 (nicolas-grekas)
+ * bug #18548 [Form] minor fixes in DateTime transformers (HeahDude)
+ * bug #18732 [PropertyAccess][DX] Enhance exception that say that some methods are missing if they don't (nykopol)
+ * bug #19048 [HttpFoundation] Use UPSERT for sessions stored in PgSql >= 9.5 (nicolas-grekas)
+ * bug #19038 Fix feature detection for IE (Alsciende)
+ * bug #18915 [DependencyInjection] force enabling the external XML entity loaders (xabbuh)
+ * bug #19020 [Form] Fixed collapsed choice attributes (HeahDude)
+ * bug #19028 [Yaml] properly count skipped comment lines (xabbuh)
+ * bug #17733 [Yaml] Fix wrong line number when comments are inserted in the middle of a block. (paradajozsef)
+ * bug #18911 Fixed singular of committee (peterrehm)
+ * bug #18971 Do not inject web debug toolbar on attachments (peterrehm)
+
 * 2.7.14 (2016-06-06)
 
  * bug #18908 [DependencyInjection] force enabling the external XML entity loaders (xabbuh)

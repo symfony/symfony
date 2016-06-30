@@ -127,6 +127,10 @@ class UniqueEntityValidator extends ConstraintValidator
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
         $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
 
+        if (is_object($invalidValue) && !method_exists($invalidValue, '__toString')) {
+            $invalidValue = sprintf('Object of class "%s" identified by "%s"', get_class($entity), implode(', ', $class->getIdentifierValues($entity)));
+        }
+
         $this->context->buildViolation($constraint->message)
             ->atPath($errorPath)
             ->setParameter('{{ value }}', $invalidValue)

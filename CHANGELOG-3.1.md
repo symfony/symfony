@@ -7,6 +7,36 @@ in 3.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.1.0...v3.1.1
 
+* 3.1.2 (2016-06-30)
+
+ * bug #19227 [DoctrineBridge] fixed default parameter value in UniqueEntityValidator (HeahDude)
+ * bug #18934 Fixed some issues of the AccessDecisionManager profiler (javiereguiluz)
+ * bug #19217 [HttpKernel] Inline ValidateRequestListener logic into HttpKernel (nicolas-grekas)
+ * bug #18688 [HttpFoundation] Warning when request has both Forwarded and X-Forwarded-For (magnusnordlander)
+ * bug #19173 [Console] Decouple SymfonyStyle from TableCell (ro0NL)
+ * bug #19204 [Security] Allow LDAP loadUser override (tucksaun)
+ * bug #19189 [Console] Fix formatting of SymfonyStyle::comment() (chalasr)
+ * bug #19211 [Form] fix post max size translation type extension for >= 2.8 (Tobion)
+ * bug #17822 [WIP]  [Form] fix `empty_data` option in expanded `ChoiceType` (HeahDude)
+ * bug #19159 [WebProfilerBundle] Added a conflict for Http-Kernel < 3.1 (HeahDude)
+ * bug #19134 Distinguish between first and subsequent progress bar displays (rquadling)
+ * bug #19061 [FORM] fix post_max_size_message translation (alt. 2) (David Badura)
+ * bug #19100 [Console] Fixed SymfonyQuestionHelper multi-choice with defaults (sstok)
+ * bug #18924 [DoctrineBridge] Don't use object IDs in DoctrineChoiceLoader when passing a value closure (webmozart)
+ * bug #19138 [DomCrawler] No more exception on field name with strange format (guiled, fabpot)
+ * bug #18935 [Form] Consider a violation even if the form is not submitted (egeloen)
+ * bug #19127 [Form] Add exception to FormRenderer about non-unique block names (enumag)
+ * bug #19118 [Process] Fix pipes cleaning on Windows (nicolas-grekas)
+ * bug #19128 Avoid phpunit 5.4 warnings on getMock (2.7+) (iltar)
+ * bug #19120 [FrameworkBundle] templating can be fully disabled (xabbuh)
+ * bug #19114 [HttpKernel] Dont close the reponse stream in debug (nicolas-grekas)
+ * bug #19101 [Session] fix PDO transaction aborted under PostgreSQL (Tobion)
+ * bug #18501 [HttpFoundation] changed MERGE queries (hjkl)
+ * bug #19081 [YAML] Fixed parsing problem with nested DateTime lists (jkphl, xabbuh)
+ * bug #19062 [HttpFoundation] Fix UPSERT for PgSql >= 9.5 (nicolas-grekas)
+ * bug #18548 [Form] minor fixes in DateTime transformers (HeahDude)
+ * bug #18732 [PropertyAccess][DX] Enhance exception that say that some methods are missing if they don't (nykopol)
+
 * 3.1.1 (2016-06-15)
 
  * bug #19048 [HttpFoundation] Use UPSERT for sessions stored in PgSql >= 9.5 (nicolas-grekas)

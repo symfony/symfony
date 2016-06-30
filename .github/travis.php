@@ -4,6 +4,7 @@ if (4 > $_SERVER['argc']) {
     echo "Usage: branch version dir1 dir2 ... dirN\n";
     exit(1);
 }
+chdir(dirname(__DIR__));
 
 $dirs = $_SERVER['argv'];
 array_shift($dirs);
@@ -30,15 +31,15 @@ foreach ($dirs as $dir) {
 
     $package->repositories = array(array(
         'type' => 'composer',
-        'url' => 'file://'.__DIR__.'/',
+        'url' => 'file://'.dirname(__DIR__).'/',
     ));
     $json = rtrim(json_encode(array('repositories' => $package->repositories), $flags), "\n}").','.substr($json, 1);
     file_put_contents($dir.'/composer.json', $json);
     passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
 
-    $package->version = $version.'.x-dev';
+    $package->version = $version.'.999';
     $package->dist['type'] = 'tar';
-    $package->dist['url'] = 'file://'.__DIR__."/$dir/package.tar";
+    $package->dist['url'] = 'file://'.dirname(__DIR__)."/$dir/package.tar";
 
     $packages[$package->name][$package->version] = $package;
 

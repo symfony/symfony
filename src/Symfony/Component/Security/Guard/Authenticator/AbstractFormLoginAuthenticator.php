@@ -73,13 +73,15 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+        $targetPath = null;
+
         // if the user hit a secure page and start() was called, this was
         // the URL they were on, and probably where you want to redirect to
         if ($request->getSession() instanceof SessionInterface) {
             $targetPath = $request->getSession()->get('_security.'.$providerKey.'.target_path');
         }
 
-        if (!isset($targetPath) || !$targetPath) {
+        if (!$targetPath) {
             $targetPath = $this->getDefaultSuccessRedirectUrl();
         }
 

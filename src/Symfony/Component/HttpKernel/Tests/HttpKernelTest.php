@@ -307,26 +307,19 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
      */
     public function testInconsistentClientIpsOnMasterRequests()
     {
-        $kernel = $this->getHttpKernel(new EventDispatcher());
         $request = new Request();
         $request->setTrustedProxies(array('1.1.1.1'));
         $request->server->set('REMOTE_ADDR', '1.1.1.1');
         $request->headers->set('FORWARDED', '2.2.2.2');
         $request->headers->set('X_FORWARDED_FOR', '3.3.3.3');
 
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(KernelEvents::REQUEST, function ($event) {
+            $event->getRequest()->getClientIp();
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher);
         $kernel->handle($request, $kernel::MASTER_REQUEST, false);
-    }
-
-    public function testInconsistentClientIpsOnSubRequests()
-    {
-        $kernel = $this->getHttpKernel(new EventDispatcher());
-        $request = new Request();
-        $request->setTrustedProxies(array('1.1.1.1'));
-        $request->server->set('REMOTE_ADDR', '1.1.1.1');
-        $request->headers->set('FORWARDED', '2.2.2.2');
-        $request->headers->set('X_FORWARDED_FOR', '3.3.3.3');
-
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $kernel->handle($request, $kernel::SUB_REQUEST, false));
     }
 
     private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, RequestStack $requestStack = null, array $arguments = array())

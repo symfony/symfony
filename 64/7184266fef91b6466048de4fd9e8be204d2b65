@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-06-29T10:02:54Z
+
+Can you please add a test covering the fix?
+
+---------------------------------------------------------------------------
+
+by pasdeloup at 2016-06-29T10:18:01Z
+
+Ok, I will add it.
+And I'm surprised to see current tests are not passing on Travis and I don't understand the errors. I'm not sure it's related to this PR, I will check.
+
+---------------------------------------------------------------------------
+
+by pasdeloup at 2016-06-29T14:23:23Z
+
+Ok tests added.
+And I rebased to get nicolas-grekas fix for fixtures so tests should pass now.
+
+---------------------------------------------------------------------------
+
+by pasdeloup at 2016-06-29T14:55:03Z
+
+AppVeyor is not passing :(
+but seems not related to this PR
+
+---------------------------------------------------------------------------
+
+by pasdeloup at 2016-06-29T15:56:12Z
+
+And now AppVeyor is passing, strange...

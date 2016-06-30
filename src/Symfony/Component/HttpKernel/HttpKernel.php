@@ -63,6 +63,9 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
         try {
             return $this->handleRaw($request, $type);
         } catch (\Exception $e) {
+            if ($e instanceof ConflictingHeadersException) {
+                $e = new BadRequestHttpException('The request headers contain conflicting information regarding the origin of this request.', $e);
+            }
             if (false === $catch) {
                 $this->finishRequest($request, $type);
 
@@ -115,13 +118,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
      */
     private function handleRaw(Request $request, $type = self::MASTER_REQUEST)
     {
-        if (self::MASTER_REQUEST === $type && $request::getTrustedProxies()) {
-            try {
-                $request->getClientIps();
-            } catch (ConflictingHeadersException $e) {
-                throw new BadRequestHttpException('The request headers contain conflicting information regarding the origin of this request.', $e);
-            }
-        }
         $this->requestStack->push($request);
 
         // request

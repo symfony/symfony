@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-29T15:15:43Z
+
+Confirmed by @nicolas-grekas that the remaining failure in `Validator`'s suite for `appveyor` is unrelated.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-29T18:39:56Z
+
+@nicolas-grekas Is that normal that tests pass in high depth in travis? Shouldn't the validator dependency in the doctrine bridge be updated?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-06-29T18:42:32Z
+
+Ok I got it, tests are not running on 3.1, so maybe we should add a conflict?

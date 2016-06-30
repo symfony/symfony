@@ -18,7 +18,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      */
     public function testAddPlacesInvalidArgument()
     {

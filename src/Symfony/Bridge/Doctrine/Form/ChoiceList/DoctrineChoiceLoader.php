@@ -75,6 +75,7 @@ class DoctrineChoiceLoader implements ChoiceLoaderInterface
             // form first to last argument as of 3.1
             $manager = $class;
             $class = $idReader;
+            $idReader = $objectLoader;
             $objectLoader = $factory;
         }
 

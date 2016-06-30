@@ -324,6 +324,13 @@ class TextDescriptor extends Descriptor
             }
         }
 
+        $injections = '-';
+        if (isset($options['injections']) && !empty($options['injections'])) {
+            $injections = implode(', ', $options['injections']);
+        }
+
+        $tableRows[] = array('Injected Into', $injections);
+
         $options['output']->table($tableHeaders, $tableRows);
     }
 

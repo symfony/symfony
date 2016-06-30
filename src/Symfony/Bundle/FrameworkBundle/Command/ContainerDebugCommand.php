@@ -20,6 +20,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * A console command for retrieving information about services.
@@ -106,7 +107,7 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $io, $object, $name);
-            $options = array('id' => $name);
+            $options = array('id' => $name, 'injections' => $this->findServiceIdsInjections($object, $name));
         } else {
             $options = array('show_private' => $input->getOption('show-private'));
         }
@@ -197,6 +198,29 @@ EOF
         $default = 1 === count($matchingServices) ? $matchingServices[0] : null;
 
         return $io->choice('Select one of the following services to display its information', $matchingServices, $default);
+    }
+
+    /**
+     * Find all services where the service $name has been injected.
+     *
+     * @param ContainerBuilder $builder
+     * @param string           $name
+     *
+     * @return array
+     */
+    private function findServiceIdsInjections(ContainerBuilder $builder, $name)
+    {
+        $injections = array();
+
+        foreach ($builder->getDefinitions() as $service => $definition) {
+            foreach ($definition->getArguments() as $argument) {
+                if ($argument instanceof Reference && (string) $argument === $name) {
+                    $injections[] = $service;
+                }
+            }
+        }
+
+        return $injections;
     }
 
     private function findServiceIdsContaining(ContainerBuilder $builder, $name)

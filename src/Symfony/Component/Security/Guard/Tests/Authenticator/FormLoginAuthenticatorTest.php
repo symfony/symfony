@@ -29,7 +29,7 @@ class FormLoginAuthenticatorTest extends \PHPUnit_Framework_TestCase
     const LOGIN_URL = 'http://login';
     const DEFAULT_SUCCESS_URL = 'http://defaultsuccess';
     const CUSTOM_SUCCESS_URL = 'http://customsuccess';
-    
+
     public function testAuthenticationFailureWithoutSession()
     {
         $failureResponse = $this->authenticator->onAuthenticationFailure($this->requestWithoutSession, new AuthenticationException());
@@ -61,7 +61,7 @@ class FormLoginAuthenticatorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\RedirectResponse', $redirectResponse);
         $this->assertEquals(self::DEFAULT_SUCCESS_URL, $redirectResponse->getTargetUrl());
     }
-    
+
     public function testAuthenticationSuccessWithSessionButEmpty()
     {
         $token = $this->getMockBuilder('Symfony\\Component\\Security\\Core\\Authentication\\Token\\TokenInterface')
@@ -92,7 +92,7 @@ class FormLoginAuthenticatorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Symfony\\Component\\HttpFoundation\\RedirectResponse', $redirectResponse);
         $this->assertEquals(self::CUSTOM_SUCCESS_URL, $redirectResponse->getTargetUrl());
-    }    
+    }
 
     public function testRememberMe()
     {

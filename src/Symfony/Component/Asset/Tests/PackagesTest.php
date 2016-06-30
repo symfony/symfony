@@ -55,7 +55,7 @@ class PackagesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Asset\Exception\LogicException
+     * @expectedException \Symfony\Component\Asset\Exception\LogicException
      */
     public function testNoDefaultPackage()
     {
@@ -64,7 +64,7 @@ class PackagesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Asset\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Asset\Exception\InvalidArgumentException
      */
     public function testUndefinedPackage()
     {

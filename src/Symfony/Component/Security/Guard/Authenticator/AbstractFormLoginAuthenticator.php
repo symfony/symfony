@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Guard\Authenticator;
 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,7 +53,10 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+        if ($request->getSession() instanceof SessionInterface) {
+            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+        }
+
         $url = $this->getLoginUrl();
 
         return new RedirectResponse($url);
@@ -69,9 +73,13 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+        $targetPath = null;
+
         // if the user hit a secure page and start() was called, this was
         // the URL they were on, and probably where you want to redirect to
-        $targetPath = $request->getSession()->get('_security.'.$providerKey.'.target_path');
+        if ($request->getSession() instanceof SessionInterface) {
+            $targetPath = $request->getSession()->get('_security.'.$providerKey.'.target_path');
+        }
 
         if (!$targetPath) {
             $targetPath = $this->getDefaultSuccessRedirectUrl();

@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
-use Predis\Connection\Aggregate\RedisCluster;
+use Predis\Connection\Aggregate\PredisCluster;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**

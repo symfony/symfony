@@ -410,9 +410,16 @@ class SymfonyStyle extends OutputStyle
             }
         }
 
+        $firstLineIndex = 0;
+        if ($padding && $this->isDecorated()) {
+            $firstLineIndex = 1;
+            array_unshift($lines, '');
+            $lines[] = '';
+        }
+
         foreach ($lines as $i => &$line) {
             if (null !== $type) {
-                $line = 0 === $i ? $type.$line : $lineIndentation.$line;
+                $line = $firstLineIndex === $i ? $type.$line : $lineIndentation.$line;
             }
 
             $line = $prefix.$line;
@@ -421,11 +428,6 @@ class SymfonyStyle extends OutputStyle
             if ($style) {
                 $line = sprintf('<%s>%s</>', $style, $line);
             }
-        }
-
-        if ($padding && $this->isDecorated()) {
-            array_unshift($lines, '');
-            $lines[] = '';
         }
 
         return $lines;

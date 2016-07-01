@@ -58,6 +58,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
     public function testCreateDeprecatedService()
     {
         ErrorAssert::assertDeprecationsAreTriggered('The "deprecated_foo" service is deprecated. You should stop using it, as it will soon be removed.', function () {

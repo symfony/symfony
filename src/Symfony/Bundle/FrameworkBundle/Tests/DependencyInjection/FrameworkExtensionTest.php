@@ -546,6 +546,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @group legacy
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
      */
     public function testDeprecatedSerializerCacheOption()
     {

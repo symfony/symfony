@@ -46,8 +46,8 @@ foreach ($dirs as $dir) {
     $versions = @file_get_contents('https://packagist.org/packages/'.$package->name.'.json') ?: '{"package":{"versions":[]}}';
     $versions = json_decode($versions);
 
-    foreach ($versions->package->versions as $version => $package) {
-        $packages[$package->name] += array($version => $package);
+    foreach ($versions->package->versions as $ver => $package) {
+        $packages[$package->name] += array($ver => $package);
     }
 }
 

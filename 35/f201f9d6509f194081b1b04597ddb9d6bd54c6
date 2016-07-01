@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-06-23T18:08:05Z
+
+I would stick to full names here. We already use ``map`` and ``list`` which are not names of PHP types either
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-24T05:14:17Z
+
+I also prefer the full names.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-24T06:28:20Z
+
+👍 I agree with @xabbuh here. `int` and `bool` are the only future-proof values according to PHP. If we use the same values in PHP and in this XML thing, people won't have to think what to use, so the learning curve will be lower.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-24T11:21:26Z
+
+:+1: since I tend to agree for the short version also because of PHP types
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-25T14:52:14Z
+
+Will this is not break for people that are already using this? It seems the XSD is updated, but no longer supports the other tags.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-06-25T14:59:24Z
+
+@sstok if you follow the linked PR you'll see that this feature was just merged before.
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-06-26T11:29:21Z
+
+Hihi 😄 I looked at the initial date, not the date of the merge 😊
+
+I'm 👍 on the full names, it's also what is used in the DependencyInjection XML schema.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-29T05:54:30Z
+
+So, there is no consensus. What do we do? I don't care that much, so this PR is 👍 for me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-01T05:30:22Z
+
+@xabbuh Can you finish this one so that we can merge it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-07-01T08:33:33Z
+
+@fabpot done

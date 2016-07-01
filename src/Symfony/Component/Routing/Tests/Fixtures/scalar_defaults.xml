@@ -10,22 +10,22 @@
         </default>
         <default key="slug" xsi:nil="true" />
         <default key="published">
-            <boolean>true</boolean>
+            <bool>true</bool>
         </default>
         <default key="page">
-            <integer>1</integer>
+            <int>1</int>
         </default>
         <default key="price">
             <float>3.5</float>
         </default>
         <default key="archived">
-            <boolean>false</boolean>
+            <bool>false</bool>
         </default>
         <default key="free">
-            <boolean>1</boolean>
+            <bool>1</bool>
         </default>
         <default key="locked">
-            <boolean>0</boolean>
+            <bool>0</bool>
         </default>
         <default key="foo" xsi:nil="true" />
         <default key="bar" xsi:nil="1" />

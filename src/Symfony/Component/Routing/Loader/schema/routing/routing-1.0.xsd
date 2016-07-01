@@ -56,8 +56,8 @@
 
   <xsd:complexType name="default" mixed="true">
     <xsd:choice minOccurs="0" maxOccurs="1">
-      <xsd:element name="boolean" type="xsd:boolean" />
-      <xsd:element name="integer" type="xsd:integer" />
+      <xsd:element name="bool" type="xsd:boolean" />
+      <xsd:element name="int" type="xsd:integer" />
       <xsd:element name="float" type="xsd:float" />
       <xsd:element name="string" type="xsd:string" />
       <xsd:element name="list" type="list" />
@@ -76,8 +76,8 @@
 
   <xsd:complexType name="list">
     <xsd:choice minOccurs="0" maxOccurs="unbounded">
-      <xsd:element name="boolean" nillable="true" type="xsd:boolean" />
-      <xsd:element name="integer" nillable="true" type="xsd:integer" />
+      <xsd:element name="bool" nillable="true" type="xsd:boolean" />
+      <xsd:element name="int" nillable="true" type="xsd:integer" />
       <xsd:element name="float" nillable="true" type="xsd:float" />
       <xsd:element name="string" nillable="true" type="xsd:string" />
       <xsd:element name="list" nillable="true" type="list" />
@@ -87,8 +87,8 @@
 
   <xsd:complexType name="map">
       <xsd:choice minOccurs="0" maxOccurs="unbounded">
-          <xsd:element name="boolean" nillable="true" type="map-boolean-entry" />
-          <xsd:element name="integer" nillable="true" type="map-integer-entry" />
+          <xsd:element name="bool" nillable="true" type="map-bool-entry" />
+          <xsd:element name="int" nillable="true" type="map-int-entry" />
           <xsd:element name="float" nillable="true" type="map-float-entry" />
           <xsd:element name="string" nillable="true" type="map-string-entry" />
           <xsd:element name="list" nillable="true" type="map-list-entry" />
@@ -96,7 +96,7 @@
       </xsd:choice>
   </xsd:complexType>
 
-  <xsd:complexType name="map-boolean-entry">
+  <xsd:complexType name="map-bool-entry">
     <xsd:simpleContent>
       <xsd:extension base="xsd:boolean">
         <xsd:attribute name="key" type="xsd:string" use="required" />
@@ -104,7 +104,7 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <xsd:complexType name="map-integer-entry">
+  <xsd:complexType name="map-int-entry">
     <xsd:simpleContent>
       <xsd:extension base="xsd:integer">
         <xsd:attribute name="key" type="xsd:string" use="required" />

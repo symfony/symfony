@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-06-28T15:57:06Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-28T16:26:29Z
+
+Updated
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-29T10:00:55Z
+
+Implementation details & discussion following @Ener-Getick [comments](https://github.com/symfony/symfony/pull/19203#discussion_r68850514):
+
+the `$container` property is of type `ContainerInterface` but this interface doesn't provide any mean to get access to proxy initializers used for lazy services instanciation. My stand in this PR is that it is fine in this very case to get over the public interfaces and use the protected properties directly: the bridge is a Symfony managed package so that we have all the required tests & ci to ensure we won't break anything in the long run.
+As far as custom container implementations are used into the wild, they should still be supported if they use the protected properties as expected. If this really exists (a custom incompatible container that generates LazyProxyInterfaces services), we can think later of new interfaces to allow what we're doing here but using public methods.
+
+Yet, I think it's just fine to do direct access. Let's be pragmatic.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-29T10:17:27Z
+
+@nicolas-grekas would be great to debug CI failures
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-29T10:21:30Z
+
+@stof see #19217 (btw, votes welcomed on both this and that PRs ;) )

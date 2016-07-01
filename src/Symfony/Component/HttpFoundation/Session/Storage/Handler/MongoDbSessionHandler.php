@@ -19,7 +19,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 class MongoDbSessionHandler implements \SessionHandlerInterface
 {
     /**
-     * @var \Mongo
+     * @var \Mongo|\MongoClient|\MongoDB\Client
      */
     private $mongo;
 
@@ -108,7 +108,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        $methodName = ($this->mongo instanceof \MongoDB\Client) ? 'deleteOne' : 'remove';
+        $methodName = $this->mongo instanceof \MongoDB\Client ? 'deleteOne' : 'remove';
 
         $this->getCollection()->$methodName(array(
             $this->options['id_field'] => $sessionId,
@@ -122,7 +122,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     public function gc($maxlifetime)
     {
-        $methodName = ($this->mongo instanceof \MongoDB\Client) ? 'deleteOne' : 'remove';
+        $methodName = $this->mongo instanceof \MongoDB\Client ? 'deleteOne' : 'remove';
 
         $this->getCollection()->$methodName(array(
             $this->options['expiry_field'] => array('$lt' => $this->createDateTime()),
@@ -152,7 +152,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
             $options['multiple'] = false;
         }
 
-        $methodName = ($this->mongo instanceof \MongoDB\Client) ? 'updateOne' : 'update';
+        $methodName = $this->mongo instanceof \MongoDB\Client ? 'updateOne' : 'update';
 
         $this->getCollection()->$methodName(
             array($this->options['id_field'] => $sessionId),
@@ -201,7 +201,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
     /**
      * Return a Mongo instance.
      *
-     * @return \Mongo
+     * @return \Mongo|\MongoClient|\MongoDB\Client
      */
     protected function getMongo()
     {
@@ -217,7 +217,7 @@ class MongoDbSessionHandler implements \SessionHandlerInterface
      */
     private function createDateTime($seconds = null)
     {
-        if (is_null($seconds)) {
+        if (null === $seconds) {
             $seconds = time();
         }
 

@@ -1,6 +1,12 @@
 UPGRADE FROM 3.1 to 3.2
 =======================
 
+FrameworkBundle
+---------------
+
+ * The `Controller::getUser()` method has been deprecated and will be removed in
+   Symfony 4.0; typehint the security user object in the action instead.
+
 DependencyInjection
 -------------------
 

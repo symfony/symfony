@@ -17,12 +17,13 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class LoginController implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    public function loginAction(Request $request)
+    public function loginAction(Request $request, UserInterface $user = null)
     {
         // get the login error if there is one
         if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
@@ -38,9 +39,9 @@ class LoginController implements ContainerAwareInterface
         ));
     }
 
-    public function afterLoginAction()
+    public function afterLoginAction(UserInterface $user)
     {
-        return $this->container->get('templating')->renderResponse('FormLoginBundle:Login:after_login.html.twig');
+        return $this->container->get('templating')->renderResponse('FormLoginBundle:Login:after_login.html.twig', array('user' => $user));
     }
 
     public function loginCheckAction()

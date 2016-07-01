@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * The `Controller::getUser()` method has been deprecated and will be removed in
+   Symfony 4.0; typehint the security user object in the action instead.
+
 3.1.0
 -----
 

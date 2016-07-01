@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * Added the `SecurityUserValueResolver` to inject the security users in actions via
+   `Symfony\Component\Security\Core\User\UserInterface` in the method signature.
+
 3.0.0
 -----
 

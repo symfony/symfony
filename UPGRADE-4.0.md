@@ -117,6 +117,9 @@ FrameworkBundle
  * The `framework.serializer.cache` option and the services
    `serializer.mapping.cache.apc` and `serializer.mapping.cache.doctrine.apc`
    have been removed. APCu should now be automatically used when available.
+   
+ * The `Controller::getUser()` method has been removed in favor of the ability
+   to typehint the security user object in the action.
 
 HttpKernel
 ----------

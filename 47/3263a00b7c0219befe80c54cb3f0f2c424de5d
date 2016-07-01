@@ -1,0 +1,170 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-12T08:16:56Z
+
+Build failures unrelated to this change. For 5.5 see #18512 and regarding HHVM, I have no idea what it's complaining about.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-04-12T08:25:10Z
+
+Yes, I think `controller_argument.value_resolver` is too long. What about using any of the alternatives @iltar proposed in https://github.com/symfony/symfony-docs/pull/6422#issuecomment-208454921?
+
+* `controller.value_resolver`
+* `controller.argument_value_resolver`
+* `controller.argument_value`
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-04-12T08:35:54Z
+
+`controller.argument_value_resolver` at least sounds better than `controller_argument.value_resolver` (it isn't shorter though). If people think it's too long, I think `argument.value_resolver` or `controller.argument_resolver` should be used (unless I'm wrong, Argumentresolver can be used for all classes and not just controllers, right?)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-12T08:39:37Z
+
+@WouterJ in theory it can be used for anything yes, you simply give it a callable and it will resolve. It's just called `$controller` and is Controller oriented (same for exception messages).
+
+`argument.value_resolver` seems like the best choice in that PoV.
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2016-04-12T09:06:56Z
+
+Isn't it a conflict with Doctrine ParamConverter? What happens if i have an User Entity that implements the Security UserInterface?
+
+```php
+/**
+ * @Route("/user/{user}")
+ */
+public function fooAction(User $user) {}
+```
+
+In Symfony <= 3.0 you get the User Entity based on the "user" Argument. But what i get with this change? The logged user? In this case we have a BC break.
+
+Btw. why you deprecate `Controller::getUser()` and force to use the typehint method? Like ParamConverter it is nice to have, but shouldn't be necessary. The base concept of a controller is to transform a request into a response.
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-04-12T09:09:29Z
+
+@DavidBadura this resolver have a lower priority that the `RequestValueResolver` that would fill the $user argument with the value resolved by the Doctrine ParamConvertor, so no BC break here.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-12T09:13:29Z
+
+@DavidBadura @jvasseur correct: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Resources/config/web.xml#L28
+
+I've done this on purpose for 100% BC reasons and the fact that this way you can define the values through attributes if you already have them. This is how the ControllerResolver used to do it as well.
+
+I've deprecated the controller method because it does exactly the same as this. The request variant was also deprecated and removed in 3.0. Imo this is a cleaner way of getting the User than calling a method and checking what the return was. Another issue I sometimes see coming by, is that people with `anon.` can't figure out why they get no user back. This way you can see that it's always an object and you can easily typehint which user object. This also gives proper auto-completion in IDEs.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-12T14:53:26Z
+
+Typehinting only the User class to get the current user is indeed confusing, as you might need to get a User based on the URL or the current logged-in user depending on the cases (and maybe even both in the same controller action)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-12T17:00:14Z
+
+@stof, that's only the case if you happen to use your Entity as security user object, which imo is a bad practice and is causing the confusion. Retrieving a security user (important to the security system) should imo _never_ be done via the url.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-12T18:13:14Z
+
+> that's only the case if you happen to use your Entity as security user object, which imo is a bad practice and is causing the confusion
+
+But this is the case in most almost all Symfony projects I know of (the other ones using some in memory providers for very basic setup), and probably in the vast majority of Symfony projects out there that I haven't reviewed as almost any tutorial does it too (and most people asking for support on the security system describe such setup too).
+So introducing a feature which would break the parameter resolution for at least 90% of projects out there is bad. You cannot just say "this should not be done this way".
+
+> Retrieving a security user (important to the security system) should imo never be done via the url.
+
+When the security user object is your entity, wanting a User object can mean 2 different things:
+- wanting the current user (which should come from the security context indeed, not from the URL)
+- wanting the user object based on the URL to display info about this user (and then you almost always need a security check to be sure that the current user can view the info about this user)
+
+I'm not talking about getting the current user based on a parameter in the URL. I'm talking about getting *any* User based on this parameter.
+For instance, on Github, you can look at the profile page of any user, not only about yourselves.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-12T19:07:16Z
+
+@stof so what are you recommending? Would this be a useless feature? I know I won't use it myself because the Token is enough for me (`getUsername()` > fetch actual user/client object and inject that). It seems like there's still animo for this feature though.
+
+If someone uses the `ParamConverter`, pretty much everything can collide with that, especially given the silent activation of the listener. The only "broken" thing would be that if it _does_ collide, the `ParamConverter` would get precedence over this feature.
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-04-12T19:15:12Z
+
+What about injecting the current user only when typehinting for `UserInterface`?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-13T05:58:27Z
+
+@WouterJ that could work, as that interface defines your security user. In that case should I un-deprecate the `getUser()` method?
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-04-13T07:15:30Z
+
+@iltar why, this is still a replacement for the getUser getter afaics?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-13T07:29:05Z
+
+In the end, yes. Conceptually it's a bit further away; Getting "my user which I know it is" or getting "a UserInterface". If it would be `@return UserInterface|null`, I'd say it matches 100%, but it has `@return mixed` at the moment. In the end there's no difference and the object will be the same.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-15T09:57:23Z
+
+Tag name is updated to `controller.argument_value_resolver`. Failure in appveyor is unreleated.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-04-18T06:42:32Z
+
+@xabbuh I've updated all deprecation notices to state the `UserInterface` instead, should be clear now what to do instead of `getUser()`.
+
+@fabpot was this feature still in time for 3.1?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T07:31:26Z
+
+It can be in 3.2 now (the changelogs should be updated).
+
+@stof Is it ok as is or do you still have concerns about this feature? (I must admit that I haven't re-read the whole thread)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-06-17T06:48:10Z
+
+PR is updated and passing
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T14:31:57Z
+
+ping @stof
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-01T05:36:40Z
+
+@iltar can you rebase this one? If @stof does not have any other concern, I'd like to merge it soon. Thanks.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-01T06:39:33Z
+
+@fabpot done

@@ -39,10 +39,10 @@ class Application extends BaseApplication
     {
         $this->kernel = $kernel;
 
-        parent::__construct('Symfony', Kernel::VERSION.' - '.$kernel->getName().'/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
+        parent::__construct('Symfony', Kernel::VERSION);
 
-        $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getEnvironment()));
-        $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
+        $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The environment name', $kernel->getEnvironment()));
+        $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode'));
     }
 
     /**
@@ -98,6 +98,14 @@ class Application extends BaseApplication
         $this->registerCommands();
 
         return parent::all($namespace);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLongVersion()
+    {
+        return parent::getLongVersion().sprintf(' (kernel: <comment>%s</>, env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getName(), $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
     protected function registerCommands()

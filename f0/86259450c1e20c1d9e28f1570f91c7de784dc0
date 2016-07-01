@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-06-26T15:59:08Z
+
+Could you please update the test according to this class ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-26T19:34:32Z
+
+This is a duplicate of #18788 right?
+
+---------------------------------------------------------------------------
+
+by omanizer at 2016-06-26T21:30:10Z
+
+@ro0NL This is a dup of that PR.  I should have looked harder as I didn't see that one when I created this one.  Happy to move things along on this one though if desired.
+
+@Simperfit I've updated the tests accordingly.
+
+---------------------------------------------------------------------------
+
+by omanizer at 2016-06-26T21:54:48Z
+
+Looks like some builds are not passing.  I hypothesize that it's due to this line:
+`@requires extension mongo or mongodb` not actually causing the test to be skipped when it may need to be.
+
+Has anyone done an "or" in a require statement before or does anyone know of a better way to accomplish this or any other thoughts?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-06-27T06:57:04Z
+
+@omanizer sure, just check the feedback from that one, looks like @fabpot wants to move on with this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-28T05:37:42Z
+
+As there is no feedback on #18788, @omanizer can you finish this one instead of closing it? You can also get some inspiration from the other PR if that makes sense for you.

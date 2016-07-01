@@ -314,6 +314,10 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertTrue($form->isValid());
     }
 
+    /**
+     * @group legacy
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
     public function testNotValidIfNotSubmitted()
     {
         ErrorAssert::assertDeprecationsAreTriggered(array('Call Form::isValid() with an unsubmitted form'), function () {

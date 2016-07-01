@@ -308,7 +308,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($clone->isPrivate());
     }
 
-    /** @group legacy */
+    /**
+     * @group legacy
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
     public function testUnsetInternalPrivateServiceIsDeprecated()
     {
         $deprecations = array(
@@ -321,7 +324,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         });
     }
 
-    /** @group legacy */
+    /**
+     * @group legacy
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
     public function testChangeInternalPrivateServiceIsDeprecated()
     {
         $deprecations = array(
@@ -334,7 +340,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         });
     }
 
-    /** @group legacy */
+    /**
+     * @group legacy
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
     public function testCheckExistenceOfAnInternalPrivateServiceIsDeprecated()
     {
         $deprecations = array(
@@ -347,7 +356,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         });
     }
 
-    /** @group legacy */
+    /**
+     * @group legacy
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
     public function testRequestAnInternalSharedPrivateServiceIsDeprecated()
     {
         $deprecations = array(

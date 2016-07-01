@@ -86,6 +86,7 @@ class TemplateNameParserTest extends TestCase
     /**
      * @group legacy
      * @dataProvider provideAbsolutePaths
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
      */
     public function testAbsolutePathsAreDeprecated($name, $logicalName, $path, $ref)
     {

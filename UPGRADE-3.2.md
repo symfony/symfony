@@ -29,6 +29,12 @@ Form
    }
    ```
 
+FrameworkBundle
+---------------
+
+  * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
+    be automatically used when available.
+
 Validator
 ---------
 

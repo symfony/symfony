@@ -928,6 +928,7 @@ EOF;
     /**
      * @group legacy
      * throw ParseException in Symfony 3.0
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
      */
     public function testColonInMappingValueException()
     {

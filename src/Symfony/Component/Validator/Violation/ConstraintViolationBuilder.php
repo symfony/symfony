@@ -199,7 +199,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
                     $this->message,
                     $this->plural,
                     $this->parameters,
-                    $this->translationDomain#
+                    $this->translationDomain
                 );
             } catch (\InvalidArgumentException $e) {
                 $translatedMessage = $this->translator->trans(

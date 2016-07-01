@@ -81,6 +81,10 @@ class UuidValidator extends ConstraintValidator
             return;
         }
 
+        if (!$constraint instanceof Uuid) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Uuid');
+        }
+
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }

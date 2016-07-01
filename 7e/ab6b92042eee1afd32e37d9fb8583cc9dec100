@@ -1,0 +1,413 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-01-31T07:48:57Z
+
+This feature is indeed a must have to better support the uses cases described in the linked issue.
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-01-31T13:01:00Z
+
+What if someone wants to use autowiring but only wants to use constructor autowire and not setter autowire? Or not for all methods (in that case setter autowiring should not be used).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-01-31T14:01:40Z
+
+@sstok If a `call` is explicitly defined for a method, the autowiring system will ignore this method.
+
+Supporting only constructor autowiring or both setter and constructor using a new flag in `Definition` should be possible but it looks overkill too me. If you have such edge case for a service, the clean way is just to not use autowiring at all for this service. What do you think?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-05T10:18:45Z
+
+@fabpot support for `function setDependencies(RouterInterface $router, Twig $twig)` style added.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-02-06T18:56:28Z
+
+@dunglas I love it! I just tried the code, here are the issues / concerns I found:
+
+1) The fact that would we start auto-wiring setters is a behavior change - it could be a BC break (setters are suddenly called that weren't before). Question: is this a BC break?
+
+2) If I create a setter with *no* arguments, the setter is called. I don't think it should: in this case, there's nothing to inject.
+
+3) If a setter *does* have an argument, but its optional and we can't autowire it, : I think we should do nothing, instead of calling the setter with `null`.
+
+4) If a setter *does* have an argument and it's *required*, but we can't auto-wire it (e.g. no type-hint), I think we should do nothing (don't call the method, but don't throw an exception - the user may manually add a `calls` for this).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-18T15:34:37Z
+
+@dunglas any feedback on @weaverryan comments?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-18T15:38:00Z
+
+They are all relevants, I need to find some time to work on this.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-18T15:42:34Z
+
+For the BC break, as @sstok has the same concern, I'll introduce a new `aurowireSetter` property in `Definition` that will be `false` by default and set it to `true` in action services created by DunglasActionBundle.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-02-18T15:52:20Z
+
+@dunglas That will fix BC, but I'm concerned about usability - e.g.:
+
+```yml
+services:
+    spring_weather_manager:
+        class: ...
+        autowire: true
+        autowire_setter: true
+```
+
+If it weren't for the BC problem, my opinion would be: always do setter injection - after all, if it causes you any issues, don't use it. For that reason, I'd prefer a global flag to turn this on/off that goes away in 4.0.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-02-18T15:56:07Z
+
+On the other hand, the BC break is very limited: it will only impact people using autowiring (just a few), having classes with setters for services (unlikely, because it wasn't supported in the first version of the autowiring system), and having a setter that broke the class when triggered (very very unlikely). Maybe can we say that this "BC break" is acceptable, as it's more an edge case than a BC break.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-02-18T16:01:18Z
+
+Honestly, I'm inclined to agree. This is a "magic" feature you're opting into, it's only 1 version it's been available, it won't affect many people, and if it causes an issue, it'll happen at build time (very easy to debug).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-02-18T16:27:23Z
+
+:+1: for the small BC break instead of yet another configuration setting.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-02-18T16:29:44Z
+
+I agree with you about accepting this small BC break (but we need to document it clearly in changelog files)
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-02-29T00:37:11Z
+
+Ok, so BC break is ok. This leaves items 2-4 https://github.com/symfony/symfony/pull/17608#issuecomment-180837991, when you have some time :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T12:49:28Z
+
+@dunglas Any idea when you will be able to finish this one?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-02T14:07:46Z
+
+Before the end of this week.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-03T14:15:10Z
+
+All issues fixed. Can you review @weaverryan?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-04T02:27:51Z
+
+Hi Dunglas!
+
+I need a few more days to get back a full report - I will make a very clear explanation of the functionality so that everyone is clear how it works (a few cases are almost subjective, so I want it to be clear to everyone).
+
+The only issue I've found is that if we cannot autowire because the type-hint is for a non-existent class, it simply doesn't call the method. That's different than the constructor where it throws an exception.
+
+Also, I think we (probably me, as I've had some recent PR's merged) may have introduced a bug into the master branch. I'm too short on time to look further right this moment, but I'm getting weird results if I type-hint something like `DataCollector` or `EventSusbcribterInterface`. These are items that should *not* be autowireable (as there are multiple services for them), but on master locally right now, they *are* autowiring - with *one* of the matching services. This does not happen on 3.0.1. If someone else can verify this, awesome. Otherwise, I'll look more soon.
+
+I think we're getting quite close to mastering the exact behavior we want. We need to get it right for 3.1, because whatever we end up with will probably stay with us due to BC.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-08T06:46:32Z
+
+@weaverryan
+
+> The only issue I've found is that if we cannot autowire because the type-hint is for a non-existent class, it simply doesn't call the method. That's different than the constructor where it throws an exception.
+
+It's intended. I consider that a setter injection is always used for optional dependencies (unlike constructor injection) and should never stop the class initialization by throwing an exception.
+Do you think this behavior should be changed?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-11T01:33:24Z
+
+@dunglas Can you merge in my PR to your fork? https://github.com/dunglas/symfony/pull/3 It helps add more examples so that we can clearly discuss some of the subjective details of the behavior.
+
+> Do you think this behavior should be changed?
+
+I'm not sure... but I have been wondering about this. When you merge my PR, I can put forth a clear argument and ask the deciders for their opinion. The current implementation is more "forgiving", but will cause more wtf (though, setter injection should be rare - mostly used by trait classes that are *made* for this).
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-11T06:39:49Z
+
+@weaverryan sorry I missed your PR. It's merged now!
+
+> (though, setter injection should be rare - mostly used by trait classes that are made for this)
+
+It was my intention: strict for constructors, lax for setters (because setters are usually optional deps).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-11T23:55:30Z
+
+@symfony/deciders can we merge this PR it's one of the last blocking for the new controller system.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-12T15:21:43Z
+
+This test case shows exactly how this feature works - so it is easy to decide if we like the way it works: https://github.com/symfony/symfony/pull/17608/files#diff-d124c3d39cd5f7c732fb3d3be7a8cb42R616
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-12T16:28:52Z
+
+@dunglas I discussed on IRC about the behavior. What do you think about:
+
+1) Only autowire setter functions with 1 argument (many of the edge cases involve what to do with multiple arguments, where only *some* are autowireable)
+
+2) Keep the same behavior as the constructor - i.e. throw an exception if a setter cannot be set (except for scalars, that would be the only difference: don't autowire scalar setters). If this causes an issue, the user can configure a "calls" or not use autowiring
+
+This would make the setter injection behavior almost identical to constructor injection - the only exception being that scalar setters aren't called (whereas they cause an exception for the constructor when non-optional). It cuts down on the edge cases.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-12T17:00:49Z
+
+My first implementation was doing exactly what you described in 1). But @fabpot asked for multi-argument support: https://github.com/symfony/symfony/pull/17608#discussion_r51356663
+I've no strong opinion about that, I never use multi-dependencies myself, but it doesn't hurt me as well.
+
+2) make sense only if if we go back to 1) IMO
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-17T22:12:19Z
+
+@dunglas I think we should move forward with only calling setters with *one* argument unless any @symfony/deciders disagree. In a nut-shell, *only* autowiring setters with exactly one argument eliminates many edge cases (e.g. what if you can autowire the first arg, but not the second?).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-18T06:02:16Z
+
+I never asked for supporting multi-args, I just made a comment about its support. Anyway, I think @weaverryan is right; this introduces too many edge cases and it's not worth supporting it. So, I propose to only autowrire methods with only one argument. Sorry for the confusion.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-19T08:40:31Z
+
+Changed to only support setter with 1 argument.
+
+There is only 1 difference with what @weaverryan described: if the setter has only 1 argument, it is always called (even for optional arguments and scalars). It makes the behavior coherent for setters and constructors and allows such constructs:
+
+```php
+class MyClass
+{
+    private $propertyAcessor;
+
+    public function setPropertyAccessor($propertyAccessor = null) // No typehint, optional
+    {
+        if (null === $propertyAccessor) $this->propertyAccessor = PropertyAccessor::createInstance();
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-03-20T21:29:12Z
+
+Status: Reviewed
+I'm impatient so see that merged :smile:
+
+Thank you for your work @dunglas.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-20T22:22:48Z
+
+I've played a bit with the last version of this PR. There is something I still want to change:
+
+> 2) Keep the same behavior as the constructor - i.e. throw an exception if a setter cannot be set (except for scalars, that would be the only difference: don't autowire scalar setters). If this causes an issue, the user can configure a "calls" or not use autowiring
+
+There are plenty of cases where setters cannot be autowired at all. For instance, it's not possible anymore to autowire any Symfony commands because of https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Command/Command.php#L276
+
+In this case, adding a manual "call" is not even possible.
+
+IMO, it will improve the DX to consider setter injection as always optional and simply ignore it if a problem occurs. What do you think @weaverryan?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-21T07:25:48Z
+
+Implemented what I described in the previous comment. The behavior is now:
+
+* Only setters with one argument are handled
+* If the setter cannot be called for any reason, it is silently ignored
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-22T01:23:36Z
+
+@dunglas
+
+> There is only 1 difference with what @weaverryan described: if the setter has only 1 argument, it is always called (even for optional arguments and scalars). It makes the behavior coherent for setters and constructors and allows such constructs
+
+Hmm, the code-block (https://github.com/symfony/symfony/pull/17608#issuecomment-198668353) looks like an anti-pattern to me. If someone gave me a class, I *realize* that the setters are not guaranteed to be called. But for me to need to call a setter with no args to *force* an initialization - that's not right. I don't feel *that* strong about this point, but I don't think your argument is valid. I would prefer to not call the setters unless we have something to set. Heck, in some cases, this could cause something to get *unset* by us: e.g. if a manual `calls` to some `configureABC` method sets a `foo` property, and then we call `setFoo()` with null.
+
+> There are plenty of cases where setters cannot be autowired at all. For instance, it's not possible anymore to autowire any Symfony commands because of https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Command/Command.php#L276
+
+But the `getCode()` method you linked to is type-hinted with `callable` - that's not a class, so we would not attempt to autowire/call this method under my definition - this is a "scalar" argument (well, I'm saying "scalar arguments", but I really mean non-class-type-hinted arguments). If we're skipping "scalar" args, why did this cause a problem?
+
+> IMO, it will improve the DX to consider setter injection as always optional and simply ignore it if a problem occurs. What do you think @weaverryan?
+
+I agree with this at least partially :). There are different reasons for failures, and they should behave differently
+
+A) scalar arg (ignore setter)
+B) type-hinted with non-existent class (ignore setter - probably necessary to support libraries that have setters for optional dependencies that are not installed)
+C) type-hinted with a class that has multiple matching service definitions (throw an exception! This is a problem: we shouldn't suddenly *not* call their setter).
+
+By looking at the code, I think you may be doing this already? I wrote all this because you said `If the setter cannot be called for any reason, it is silently ignored`... but now it looks like we may already agree :).
+
+Btw, I will try this PR in detail on Thursday. Hopefully all the discussion is done by then. I have feeling that you (@dunglas) and I might already agree on how it should work and that the code is already there - but I wasn't based on some of the comments!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-23T22:32:31Z
+
+@weaverryan
+
+> now it looks like we may already agree
+
+Yes! I've just pushed a last change, the code should now behave exactly the way you described in your last comment.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-24T23:11:08Z
+
+Yes, this now looks great! I added only some minor comments.
+
+This is now working as I expect it to. The most important thing for me was that if a setter autowires *today*, then it should *always* autowire, unless we actually make a change to *that* specific method. In other words, I don't want `setFoo` to be called, then *simply* by creating some other `Foo` service, it's suddenly (and silently) not called. I believe we've achieved that.
+
+For reviewers, the tests are very clear on the behavior: https://github.com/symfony/symfony/pull/17608/files#diff-d124c3d39cd5f7c732fb3d3be7a8cb42R624
+
+Thanks @dunglas!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-29T14:13:09Z
+
+Except if someone disagree, I'll close this one as #18193 will not be merged. IMO it's better to not promote setter injection if we haven't a valid use case.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-03-29T21:47:20Z
+
+@dunglas I disagree! :)
+
+I envisioned using setter autowiring for RAD, to very quickly have common dependencies injected *and* to get some helper methods. For example:
+
+1) I want to render a template from a service
+2) I use some `TwigTrait`, which contains a `setTwig(\Twig_Environment $twig`) method and also gives me a `render()` call for convenience.
+3) I call `$this->render()` from inside my service.
+
+As you mentioned in #18193 - this is *almost* as easily done by adding `Twig_Environment` as a constructor argument. But, that still requires a bit more know-how for beginners: just adding a trait and using a helper method (in fact, the *same* helper method you have available in your controller) is really appealing. Honestly, I'm not 100% convinced myself this is a good idea, but it would bring a Laravel-level of ease to using DI, but with true OO (no facades, static calls, etc). I also like that it brings consistency between the methods you use in a controller (`generateUrl()`) versus a service (`$this->router->generate()`).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-03-30T06:49:07Z
+
+@weaverryan It was exactly why I opened both PR in the first time. We agree here. It would be nice to get this merged before the feature freeze (and I'll be away from computer during 2 weeks starting Saturday). I've replied in https://github.com/symfony/symfony/pull/18193#issuecomment-203277516
+
+How can we move forward to merge this 2 PRs? Split the all-in-one trait in smaller traits?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-04-01T15:51:53Z
+
+I think this PR is ready. The question is: do we want it? It's opinionated (but so is autowiring in general, and it's opt-in). Some of the new autowiring features/uses (like those in DunglasActionBundle) are quite radical, and I think they need to be tested before considering moving further forward (in the core) in that direction. However, if this were merged, it allows more of these ideas to be tested out in the wild - like using traits e.g. `RouterTrait`) to automatically setter-inject services+shortcuts into your services.
+
+I'm :+1:, but I don't feel as confidently about this as I have other things in the past.
+
+@symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-05T11:23:08Z
+
+:+1: LGTM
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-18T19:09:33Z
+
+Rebased. Can be merged.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-07T14:12:08Z
+
+@symfony/deciders what do we do of this PR? Should I close it or merge it?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-01T06:02:23Z
+
+Re-read everything here. @weaverryan and @dunglas did a great job at defining exactly what we should do and what is out of scope. I agree with everything @weaverryan said and as this is what @dunglas implemented, I'm 👍 (I would not advocate its usage for everything but as this is an opt-in feature anyway, this looks good to me).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-01T06:02:32Z
+
+@dunglas Looks like it needs a rebase
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-01T08:41:59Z
+
+Rebased.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-01T08:42:58Z
+
+@dunglas I didn't notice but history is really ugly but as there are 2 contribs, gh won't be able to squash commits. Can you do that for me?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-01T08:56:09Z
+
+Should I merge all commits in 1 or should I keep the commit of @weaverryan?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-01T08:57:11Z
+
+I think you can merge everything into 1 commit as @weaverryan contrib is not huge.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-01T08:58:58Z
+
+Done.

@@ -124,7 +124,7 @@ EOF;
     }
 
     /**
-     * Generates PHP code representing the `getRoutes` method that implements the UrlGeneratorInterface.
+     * Generates PHP code representing the `hasRoute` method that implements the UrlGeneratorInterface.
      *
      * @return string PHP code
      */

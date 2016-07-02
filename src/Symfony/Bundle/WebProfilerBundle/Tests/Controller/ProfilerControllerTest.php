@@ -60,7 +60,7 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->exactly(2))
             ->method('loadProfile')
             ->will($this->returnCallback(function ($token) {
-                if ('found' == $token) {
+                if ('found' === $token) {
                     return new Profile($token);
                 }
             }))

@@ -226,7 +226,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
     public function testFollowLinks()
     {
-        if ('\\' == DIRECTORY_SEPARATOR) {
+        if ('\\' === DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('symlinks are not supported on Windows');
         }
 

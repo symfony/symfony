@@ -163,7 +163,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
                 // Oracle has a bug that will intermittently happen if you
                 // have only 1 bind on a CLOB field for 2 different statements
                 // (INSERT and UPDATE in this case)
-                if ('oracle' == $this->con->getDatabasePlatform()->getName()) {
+                if ('oracle' === $this->con->getDatabasePlatform()->getName()) {
                     $mergeStmt->bindParam(':data2', $encoded, \PDO::PARAM_STR);
                 }
 

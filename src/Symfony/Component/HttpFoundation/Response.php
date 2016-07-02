@@ -302,7 +302,7 @@ class Response
         }
 
         // Fix protocol
-        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
+        if ('HTTP/1.0' !== $request->server->get('SERVER_PROTOCOL')) {
             $this->setProtocolVersion('1.1');
         }
 
@@ -1170,7 +1170,7 @@ class Response
      */
     protected function ensureIEOverSSLCompatibility(Request $request)
     {
-        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) == 1 && true === $request->isSecure()) {
+        if (false !== stripos($this->headers->get('Content-Disposition'), 'attachment') && preg_match('/MSIE (.*?);/i', $request->server->get('HTTP_USER_AGENT'), $match) === 1 && true === $request->isSecure()) {
             if ((int) preg_replace('/(MSIE )(.*?);/', '$2', $match[0]) < 9) {
                 $this->headers->remove('Cache-Control');
             }

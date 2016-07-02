@@ -146,7 +146,7 @@ class PluralizationRules
             case 'ru':
             case 'sr':
             case 'uk':
-                return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
+                return (($number % 10 === 1) && ($number % 100 !== 11)) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
 
             case 'cs':
             case 'sk':
@@ -156,19 +156,19 @@ class PluralizationRules
                 return ($number == 1) ? 0 : (($number == 2) ? 1 : 2);
 
             case 'lt':
-                return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
+                return (($number % 10 === 1) && ($number % 100 !== 11)) ? 0 : ((($number % 10 >= 2) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
 
             case 'sl':
-                return ($number % 100 == 1) ? 0 : (($number % 100 == 2) ? 1 : ((($number % 100 == 3) || ($number % 100 == 4)) ? 2 : 3));
+                return ($number % 100 === 1) ? 0 : (($number % 100 === 2) ? 1 : ((($number % 100 === 3) || ($number % 100 === 4)) ? 2 : 3));
 
             case 'mk':
-                return ($number % 10 == 1) ? 0 : 1;
+                return ($number % 10 === 1) ? 0 : 1;
 
             case 'mt':
                 return ($number == 1) ? 0 : ((($number == 0) || (($number % 100 > 1) && ($number % 100 < 11))) ? 1 : ((($number % 100 > 10) && ($number % 100 < 20)) ? 2 : 3));
 
             case 'lv':
-                return ($number == 0) ? 0 : ((($number % 10 == 1) && ($number % 100 != 11)) ? 1 : 2);
+                return ($number == 0) ? 0 : ((($number % 10 === 1) && ($number % 100 !== 11)) ? 1 : 2);
 
             case 'pl':
                 return ($number == 1) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 12) || ($number % 100 > 14))) ? 1 : 2);

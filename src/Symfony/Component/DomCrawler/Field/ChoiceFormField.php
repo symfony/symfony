@@ -214,7 +214,7 @@ class ChoiceFormField extends FormField
         $this->options = array();
         $this->multiple = false;
 
-        if ('input' == $this->node->nodeName) {
+        if ('input' === $this->node->nodeName) {
             $this->type = strtolower($this->node->getAttribute('type'));
             $optionValue = $this->buildOptionValue($this->node);
             $this->options[] = $optionValue;

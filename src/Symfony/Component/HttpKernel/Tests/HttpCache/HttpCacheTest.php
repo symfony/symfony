@@ -902,11 +902,11 @@ class HttpCacheTest extends HttpCacheTestCase
     public function testInvalidatesCachedResponsesOnPost()
     {
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {
-            if ('GET' == $request->getMethod()) {
+            if ('GET' === $request->getMethod()) {
                 $response->setStatusCode(200);
                 $response->headers->set('Cache-Control', 'public, max-age=500');
                 $response->setContent('Hello World');
-            } elseif ('POST' == $request->getMethod()) {
+            } elseif ('POST' === $request->getMethod()) {
                 $response->setStatusCode(303);
                 $response->headers->set('Location', '/');
                 $response->headers->remove('Cache-Control');

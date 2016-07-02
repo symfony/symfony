@@ -250,7 +250,7 @@ class PrototypedArrayNode extends ArrayNode
                     }
 
                     // if only "value" is left
-                    if (1 == count($v) && isset($v['value'])) {
+                    if (1 === count($v) && isset($v['value'])) {
                         $v = $v['value'];
                     }
                 }

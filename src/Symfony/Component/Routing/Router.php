@@ -229,6 +229,14 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * {@inheritdoc}
      */
+    public function hasRoute($name)
+    {
+        return $this->getGenerator()->hasRoute($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
         return $this->getGenerator()->generate($name, $parameters, $referenceType);

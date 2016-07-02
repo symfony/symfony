@@ -68,6 +68,8 @@ class {$options['class']} extends {$options['base_class']}
     }
 
 {$this->generateGenerateMethod()}
+
+{$this->generateHasRouteMethod()}
 }
 
 EOF;
@@ -117,6 +119,21 @@ EOF;
         list($variables, $defaults, $requirements, $tokens, $hostTokens, $requiredSchemes) = self::$declaredRoutes[$name];
 
         return $this->doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, $requiredSchemes);
+    }
+EOF;
+    }
+
+    /**
+     * Generates PHP code representing the `getRoutes` method that implements the UrlGeneratorInterface.
+     *
+     * @return string PHP code
+     */
+    private function generateHasRouteMethod()
+    {
+        return <<<'EOF'
+    public function hasRoute($name)
+    {
+        return isset(self::$declaredRoutes[$name]);
     }
 EOF;
     }

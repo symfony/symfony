@@ -124,6 +124,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     /**
      * {@inheritdoc}
      */
+    public function hasRoute($name)
+    {
+        return isset($this->routes[$name]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
         if (null === $route = $this->routes->get($name)) {

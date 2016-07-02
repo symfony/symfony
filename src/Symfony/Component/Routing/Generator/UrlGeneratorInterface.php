@@ -83,4 +83,13 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
      *                                             it does not match the requirement
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH);
+
+    /**
+     * Returns whether a route with the given name exists.
+     *
+     * @param string $name The route name
+     *
+     * @return bool
+     */
+    public function hasRoute($name);
 }

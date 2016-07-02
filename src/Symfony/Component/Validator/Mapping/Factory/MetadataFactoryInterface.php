@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Validator\Mapping\Factory;
 
-use Symfony\Component\Validator\Exception;
+use Symfony\Component\Validator\Exception\NoSuchMetadataException;
+use Symfony\Component\Validator\Mapping\MetadataInterface;
 
 /**
  * Returns {@link \Symfony\Component\Validator\Mapping\MetadataInterface} instances for values.
@@ -29,7 +30,7 @@ interface MetadataFactoryInterface
      *
      * @return MetadataInterface The metadata for the value
      *
-     * @throws Exception\NoSuchMetadataException If no metadata exists for the given value
+     * @throws NoSuchMetadataException If no metadata exists for the given value
      */
     public function getMetadataFor($value);
 

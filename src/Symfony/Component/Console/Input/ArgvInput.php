@@ -78,7 +78,7 @@ class ArgvInput extends Input
         while (null !== $token = array_shift($this->parsed)) {
             if ($parseOptions && '' == $token) {
                 $this->parseArgument($token);
-            } elseif ($parseOptions && '--' == $token) {
+            } elseif ($parseOptions && '--' === $token) {
                 $parseOptions = false;
             } elseif ($parseOptions && 0 === strpos($token, '--')) {
                 $this->parseLongOption($token);

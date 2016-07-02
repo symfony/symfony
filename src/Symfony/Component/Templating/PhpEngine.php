@@ -445,7 +445,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  * @return string the escaped value
                  */
                 function ($value) {
-                    if ('UTF-8' != $this->getCharset()) {
+                    if ('UTF-8' !== $this->getCharset()) {
                         $value = iconv($this->getCharset(), 'UTF-8', $value);
                     }
 
@@ -467,7 +467,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                         throw new \InvalidArgumentException('The string to escape is not a valid UTF-8 string.');
                     }
 
-                    if ('UTF-8' != $this->getCharset()) {
+                    if ('UTF-8' !== $this->getCharset()) {
                         $value = iconv('UTF-8', $this->getCharset(), $value);
                     }
 

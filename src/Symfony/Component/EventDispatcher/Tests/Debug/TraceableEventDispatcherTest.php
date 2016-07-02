@@ -169,7 +169,7 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $loop = 1;
         $dispatcher->addListener('foo', $listener1 = function () use ($dispatcher, &$loop) {
             ++$loop;
-            if (2 == $loop) {
+            if (2 === $loop) {
                 $dispatcher->dispatch('foo');
             }
         });

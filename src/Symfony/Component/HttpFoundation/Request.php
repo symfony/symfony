@@ -1028,7 +1028,7 @@ class Request
         $scheme = $this->getScheme();
         $port = $this->getPort();
 
-        if (('http' == $scheme && $port == 80) || ('https' == $scheme && $port == 443)) {
+        if (('http' === $scheme && $port == 80) || ('https' === $scheme && $port == 443)) {
             return $this->getHost();
         }
 
@@ -1547,7 +1547,7 @@ class Request
      */
     public function isNoCache()
     {
-        return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' == $this->headers->get('Pragma');
+        return $this->headers->hasCacheControlDirective('no-cache') || 'no-cache' === $this->headers->get('Pragma');
     }
 
     /**
@@ -1679,7 +1679,7 @@ class Request
      */
     public function isXmlHttpRequest()
     {
-        return 'XMLHttpRequest' == $this->headers->get('X-Requested-With');
+        return 'XMLHttpRequest' === $this->headers->get('X-Requested-With');
     }
 
     /*
@@ -1761,7 +1761,7 @@ class Request
                 $seg = $segs[$index];
                 $baseUrl = '/'.$seg.$baseUrl;
                 ++$index;
-            } while ($last > $index && (false !== $pos = strpos($path, $baseUrl)) && 0 != $pos);
+            } while ($last > $index && strpos($path, $baseUrl));
         }
 
         // Does the baseUrl have anything in common with the request_uri?

@@ -388,7 +388,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 $expires = $expires->getTimestamp();
             } else {
                 $tmp = strtotime($expires);
-                if (false === $tmp || -1 == $tmp) {
+                if (false === $tmp || -1 === $tmp) {
                     throw new \InvalidArgumentException(sprintf('The "expires" cookie parameter is not valid (%s).', $expires));
                 }
                 $expires = $tmp;

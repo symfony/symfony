@@ -144,7 +144,7 @@ class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         // present a binary status field as a checkbox
         $transformer = new CallbackTransformer(
             function ($value) {
-                return 'checked' == $value;
+                return 'checked' === $value;
             },
             function ($value) {
                 return $value ? 'checked' : 'unchecked';

@@ -202,13 +202,13 @@ abstract class AbstractDoctrineExtension extends Extension
             if ($container->hasDefinition($mappingService)) {
                 $mappingDriverDef = $container->getDefinition($mappingService);
                 $args = $mappingDriverDef->getArguments();
-                if ($driverType == 'annotation') {
+                if ($driverType === 'annotation') {
                     $args[1] = array_merge(array_values($driverPaths), $args[1]);
                 } else {
                     $args[0] = array_merge(array_values($driverPaths), $args[0]);
                 }
                 $mappingDriverDef->setArguments($args);
-            } elseif ($driverType == 'annotation') {
+            } elseif ($driverType === 'annotation') {
                 $mappingDriverDef = new Definition('%'.$this->getObjectManagerElementName('metadata.'.$driverType.'.class%'), array(
                     new Reference($this->getObjectManagerElementName('metadata.annotation_reader')),
                     array_values($driverPaths),

@@ -33,9 +33,9 @@ class Hour2400Transformer extends HourTransformer
      */
     public function normalizeHour($hour, $marker = null)
     {
-        if ('AM' == $marker) {
+        if ('AM' === $marker) {
             $hour = 0;
-        } elseif ('PM' == $marker) {
+        } elseif ('PM' === $marker) {
             $hour = 12;
         }
 

@@ -34,7 +34,7 @@ class TypeValidator extends ConstraintValidator
         }
 
         $type = strtolower($constraint->type);
-        $type = $type == 'boolean' ? 'bool' : $constraint->type;
+        $type = $type === 'boolean' ? 'bool' : $constraint->type;
         $isFunction = 'is_'.$type;
         $ctypeFunction = 'ctype_'.$type;
 

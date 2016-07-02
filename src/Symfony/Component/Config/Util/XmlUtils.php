@@ -203,7 +203,7 @@ class XmlUtils
                 return true;
             case 'false' === $lowercaseValue:
                 return false;
-            case isset($value[1]) && '0b' == $value[0].$value[1]:
+            case isset($value[1]) && '0b' === $value[0].$value[1]:
                 return bindec($value);
             case is_numeric($value):
                 return '0x' === $value[0].$value[1] ? hexdec($value) : (float) $value;

@@ -77,7 +77,7 @@ abstract class Helper implements HelperInterface
                 if ((isset($timeFormats[$index + 1]) && $secs < $timeFormats[$index + 1][0])
                     || $index == count($timeFormats) - 1
                 ) {
-                    if (2 == count($format)) {
+                    if (2 === count($format)) {
                         return $format[1];
                     }
 

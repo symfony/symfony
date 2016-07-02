@@ -350,7 +350,7 @@ class Inline
         $output = substr($match[0], 1, strlen($match[0]) - 2);
 
         $unescaper = new Unescaper();
-        if ('"' == $scalar[$i]) {
+        if ('"' === $scalar[$i]) {
             $output = $unescaper->unescapeDoubleQuotedString($output);
         } else {
             $output = $unescaper->unescapeSingleQuotedString($output);

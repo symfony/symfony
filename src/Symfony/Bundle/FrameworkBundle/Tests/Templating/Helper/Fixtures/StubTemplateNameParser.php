@@ -30,7 +30,7 @@ class StubTemplateNameParser implements TemplateNameParserInterface
     {
         list($bundle, $controller, $template) = explode(':', $name, 3);
 
-        if ($template[0] == '_') {
+        if ($template[0] === '_') {
             $path = $this->rootTheme.'/Custom/'.$template;
         } elseif ($bundle === 'TestBundle') {
             $path = $this->rootTheme.'/'.$controller.'/'.$template;

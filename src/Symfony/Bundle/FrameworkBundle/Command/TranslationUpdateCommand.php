@@ -177,7 +177,7 @@ EOF
                 $extractedMessagesCount += $domainMessagesCount;
             }
 
-            if ($input->getOption('output-format') == 'xlf') {
+            if ($input->getOption('output-format') === 'xlf') {
                 $io->comment('Xliff output version is <info>1.2</info>');
             }
 

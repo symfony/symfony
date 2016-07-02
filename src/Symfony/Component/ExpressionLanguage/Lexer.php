@@ -36,7 +36,7 @@ class Lexer
         $end = strlen($expression);
 
         while ($cursor < $end) {
-            if (' ' == $expression[$cursor]) {
+            if (' ' === $expression[$cursor]) {
                 ++$cursor;
 
                 continue;

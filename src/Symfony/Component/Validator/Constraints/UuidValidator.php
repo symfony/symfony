@@ -232,20 +232,14 @@ class UuidValidator extends ConstraintValidator
                 if ($i !== $h) {
                     if ($this->context instanceof ExecutionContextInterface) {
                         $this->context->buildViolation($constraint->message)
-                             ->setParameter(
-                                 '{{ value }}',
-                                 $this->formatValue($value)
-                             )
-                             ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                             ->addViolation();
+                            ->setParameter('{{ value }}', $this->formatValue($value))
+                            ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                            ->addViolation();
                     } else {
                         $this->buildViolation($constraint->message)
-                              ->setParameter(
-                                  '{{ value }}',
-                                  $this->formatValue($value)
-                              )
-                              ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                              ->addViolation();
+                            ->setParameter('{{ value }}', $this->formatValue($value))
+                            ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                            ->addViolation();
                     }
 
                     return;

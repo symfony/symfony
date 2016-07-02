@@ -122,7 +122,11 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * {@inheritdoc}
+     * Returns whether a route with the given name exists.
+     *
+     * @param string $name The route name
+     *
+     * @return bool
      */
     public function hasRoute($name)
     {

@@ -91,7 +91,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz5
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ($this->context->getMethod() !== 'POST') {
+                if ($this->context->getMethod() != 'POST') {
                     $allow[] = 'POST';
                     goto not_baz5;
                 }
@@ -102,7 +102,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
 
             // baz.baz6
             if (preg_match('#^/test/(?P<foo>[^/]++)/$#s', $pathinfo, $matches)) {
-                if ($this->context->getMethod() !== 'PUT') {
+                if ($this->context->getMethod() != 'PUT') {
                     $allow[] = 'PUT';
                     goto not_bazbaz6;
                 }

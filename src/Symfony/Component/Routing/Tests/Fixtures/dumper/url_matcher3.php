@@ -41,7 +41,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
         }
 
         // with-condition
-        if ($pathinfo === '/with-condition' && ($context->getMethod() === 'GET')) {
+        if ($pathinfo === '/with-condition' && ($context->getMethod() == "GET")) {
             return array('_route' => 'with-condition');
         }
 

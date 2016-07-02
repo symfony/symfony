@@ -27,6 +27,10 @@ interface RouterInterface extends UrlMatcherInterface, UrlGeneratorInterface
      * Gets the RouteCollection instance associated with this Router.
      *
      * @return RouteCollection A RouteCollection instance
+     *
+     * @internal
+     *
+     * @deprecated Since Symfony 3.2, to be removed in 4.0.
      */
     public function getRouteCollection();
 }

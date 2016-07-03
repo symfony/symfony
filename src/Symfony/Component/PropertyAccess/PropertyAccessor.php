@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\PropertyAccess;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -24,6 +23,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
  * Default implementation of {@link PropertyAccessorInterface}.
@@ -168,7 +168,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @param CacheItemPoolInterface        $cacheItemPool
      * @param ClassMetadataFactoryInterface $classMetadataFactory
      */
-    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false, MetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct($magicCall = false, $throwExceptionOnInvalidIndex = false, CacheItemPoolInterface $cacheItemPool = null, MetadataFactoryInterface $classMetadataFactory = null)
     {
         $this->magicCall = $magicCall;
         $this->ignoreInvalidIndices = !$throwExceptionOnInvalidIndex;
@@ -555,6 +555,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         }
 
+        /** @var  $metadata */
         $metadata = null;
         $access = array();
 
@@ -563,7 +564,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $access[self::ACCESS_HAS_PROPERTY] = $hasProperty;
 
         if ($this->classMetadataFactory) {
-            $metadata = $this->classMetadataFactory->getMetadataFor($class)->getPropertiesMetadata();
+            $metadata = $this->classMetadataFactory->getMetadataFor($class)->getPropertyMetadataCollection();
             $metadata = isset($metadata[$property]) ? $metadata[$property] : null;
         }
 
@@ -754,7 +755,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         $done = false;
 
         if ($this->classMetadataFactory) {
-            $metadata = $this->classMetadataFactory->getMetadataFor($class)->getPropertiesMetadata();
+            $metadata = $this->classMetadataFactory->getMetadataFor($class)->getPropertyMetadataCollection();
             $metadata = isset($metadata[$property]) ? $metadata[$property] : null;
 
             if ($metadata) {
@@ -773,11 +774,11 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         if (!$done) {
             $camelized = $this->camelize($property);
-            $singulars = (array) Inflector::singularize($camelized);
+            $singulars = (array)Inflector::singularize($camelized);
 
             if ($traversable) {
                 $methods = $this->findAdderAndRemover($reflClass, $singulars);
-    
+
                 if (null !== $methods) {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_ADDER_AND_REMOVER;
                     $access[self::ACCESS_ADDER] = $methods[0];
@@ -786,7 +787,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             if (!isset($access[self::ACCESS_TYPE])) {
-                $setter = 'set'.$camelized;
+                $setter = 'set' . $camelized;
                 $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
 
                 if ($this->isMethodAccessible($reflClass, $setter, 1)) {
@@ -808,8 +809,8 @@ class PropertyAccessor implements PropertyAccessorInterface
                 } elseif (null !== $methods = $this->findAdderAndRemover($reflClass, $singulars)) {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
                     $access[self::ACCESS_NAME] = sprintf(
-                        'The property "%s" in class "%s" can be defined with the methods "%s()" but '.
-                        'the new value must be an array or an instance of \Traversable, '.
+                        'The property "%s" in class "%s" can be defined with the methods "%s()" but ' .
+                        'the new value must be an array or an instance of \Traversable, ' .
                         '"%s" given.',
                         $property,
                         $reflClass->name,
@@ -819,11 +820,11 @@ class PropertyAccessor implements PropertyAccessorInterface
                 } else {
                     $access[self::ACCESS_TYPE] = self::ACCESS_TYPE_NOT_FOUND;
                     $access[self::ACCESS_NAME] = sprintf(
-                        'Neither the property "%s" nor one of the methods %s"%s()", "%s()", '.
+                        'Neither the property "%s" nor one of the methods %s"%s()", "%s()", ' .
                         '"__set()" or "__call()" exist and have public access in class "%s".',
                         $property,
                         implode('', array_map(function ($singular) {
-                            return '"add'.$singular.'()"/"remove'.$singular.'()", ';
+                            return '"add' . $singular . '()"/"remove' . $singular . '()", ';
                         }, $singulars)),
                         $setter,
                         $getsetter,
@@ -831,6 +832,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     );
                 }
             }
+        }
 
         if (isset($item)) {
             $this->cacheItemPool->save($item->set($access));

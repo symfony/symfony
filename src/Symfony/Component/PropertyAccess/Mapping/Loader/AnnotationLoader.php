@@ -68,7 +68,6 @@ class AnnotationLoader implements LoaderInterface
 
         foreach ($reflectionClass->getMethods() as $method) {
             if ($method->getDeclaringClass()->name === $className) {
-
                 foreach ($this->reader->getMethodAnnotations($method) as $annotation) {
                     if ($annotation instanceof PropertyGetter) {
                         if (!isset($propertiesMetadata[$annotation->property])) {

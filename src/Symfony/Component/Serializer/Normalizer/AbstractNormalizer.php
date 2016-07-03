@@ -319,9 +319,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                         $params = array_merge($params, $data[$paramName]);
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                    $params[] = $data[$key];
-                    // don't run set for a parameter passed to the constructor
-                    unset($data[$key]);
+                    $parameterData = $data[$key];
+                    if (null !== $constructogrParameter->getClass()) {
+                        $parameterData = $this->serializer->denormalize($parameterData, $constructorParameter->getClass()->getName(), null, $context);
+                    }
+
+                    // Don't run set for a parameter passed to the constructor
+                    $params[] = $parameterData;
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {

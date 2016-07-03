@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Routing\Generator;
 
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RoutePresenceCheckableInterface;
 
 /**
  * UrlGenerator can generate a URL or a path for any route in the RouteCollection
@@ -25,7 +26,7 @@ use Psr\Log\LoggerInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface
+class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInterface, RoutePresenceCheckableInterface
 {
     /**
      * @var RouteCollection
@@ -122,11 +123,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     }
 
     /**
-     * Returns whether a route with the given name exists.
-     *
-     * @param string $name The route name
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasRoute($name)
     {

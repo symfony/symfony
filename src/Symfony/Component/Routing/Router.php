@@ -11,19 +11,20 @@
 
 namespace Symfony\Component\Routing;
 
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\ConfigCacheInterface;
-use Symfony\Component\Config\ConfigCacheFactoryInterface;
-use Symfony\Component\Config\ConfigCacheFactory;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Config\ConfigCacheFactory;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Config\ConfigCacheInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\ConfigurableRequirementsInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Generator\Dumper\GeneratorDumperInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
-use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\Routing\RoutePresenceCheckableInterface;
 
 /**
  * The Router class is an example of the integration of all pieces of the
@@ -31,7 +32,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Router implements RouterInterface, RequestMatcherInterface
+class Router implements RouterInterface, RequestMatcherInterface, RoutePresenceCheckableInterface
 {
     /**
      * @var UrlMatcherInterface|null
@@ -231,10 +232,16 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * @param string $name The route name
      *
+     * @throws \RuntimeException When an url generator does not implement the RoutePresenceCheckableInterface
+     *
      * @return bool
      */
     public function hasRoute($name)
     {
+        if (!$this->getGenerator() instanceof RoutePresenceCheckableInterface) {
+            throw new \RuntimeException('The current implementaion of an url generator does not support the RoutePresenceCheckableInterface.');
+        }
+
         return $this->getGenerator()->hasRoute($name);
     }
 

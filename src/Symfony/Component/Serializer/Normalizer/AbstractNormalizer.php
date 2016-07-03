@@ -347,6 +347,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
                 if ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
+
+                    continue;
                 }
 
                 throw new RuntimeException(

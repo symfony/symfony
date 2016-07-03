@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\PropertyAccess\Mapping\Loader\XmlFileLoader as PropertyAccessXmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
@@ -946,7 +947,7 @@ class FrameworkExtension extends Extension
             $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/property_access.xml')) {
-                $definition = new Definition(XmlFileLoader::class, array(realpath($file)));
+                $definition = new Definition(PropertyAccessXmlFileLoader::class, array(realpath($file)));
                 $definition->setPublic(false);
 
                 $serializerLoaders[] = $definition;
@@ -963,7 +964,7 @@ class FrameworkExtension extends Extension
 
             if (is_dir($dir = $dirname.'/Resources/config/property_access')) {
                 foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
-                    $definition = new Definition(XmlFileLoader::class, array($file->getRealpath()));
+                    $definition = new Definition(PropertyAccessXmlFileLoader::class, array($file->getRealpath()));
                     $definition->setPublic(false);
 
                     $serializerLoaders[] = $definition;

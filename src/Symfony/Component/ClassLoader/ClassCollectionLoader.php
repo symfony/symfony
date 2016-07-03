@@ -93,14 +93,41 @@ class ClassCollectionLoader
             $declared = array_merge(get_declared_classes(), get_declared_interfaces(), get_declared_traits());
         }
 
+        $files = self::inline($classes, $cache, $declared);
+
+        if ($autoReload) {
+            // save the resources
+            self::writeCacheFile($metadata, serialize(array(array_values($files), $classes)));
+        }
+    }
+
+    /**
+     * Generates a file where classes and their parents are inlined.
+     *
+     * @param array  $classes  An array of classes to load
+     * @param string $cache    The file where classes are inlined
+     * @param array  $excluded An array of classes that won't be inlined
+     *
+     * @return array The source map of inlined classes, with classes as keys and files as values
+     *
+     * @throws \RuntimeException When class can't be loaded
+     */
+    public static function inline($classes, $cache, array $excluded)
+    {
+        $declared = array();
+        foreach (self::getOrderedClasses($excluded) as $class) {
+            $declared[$class->getName()] = true;
+        }
+
         $files = array();
         $content = '';
         foreach (self::getOrderedClasses($classes) as $class) {
-            if (in_array($class->getName(), $declared)) {
+            if (isset($declared[$class->getName()])) {
                 continue;
             }
+            $declared[$class->getName()] = true;
 
-            $files[] = $class->getFileName();
+            $files[$class->getName()] = $class->getFileName();
 
             $c = preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($class->getFileName()));
 
@@ -116,15 +143,13 @@ class ClassCollectionLoader
         }
 
         // cache the core classes
+        $cacheDir = dirname($cache);
         if (!is_dir($cacheDir) && !@mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
             throw new \RuntimeException(sprintf('Class Collection Loader was not able to create directory "%s"', $cacheDir));
         }
         self::writeCacheFile($cache, '<?php '.$content);
 
-        if ($autoReload) {
-            // save the resources
-            self::writeCacheFile($metadata, serialize(array($files, $classes)));
-        }
+        return $files;
     }
 
     /**

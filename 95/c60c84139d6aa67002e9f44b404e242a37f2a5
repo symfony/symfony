@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-02T14:12:06Z
+
+Ref https://github.com/schmittjoh/JMSSecurityExtraBundle/issues/207#issuecomment-230101364
+
+---------------------------------------------------------------------------
+
+by WouterJ at 2016-07-02T14:20:18Z
+
+👍 This check makes much more sense imo
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-02T14:32:19Z
+
+Tests are failing :(
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-02T23:22:07Z
+
+Status: Needs Review

@@ -281,12 +281,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * @param array            $context
      * @param \ReflectionClass $reflectionClass
      * @param array|bool       $allowedAttributes
+     * @param string|null      $format
      *
      * @return object
      *
      * @throws RuntimeException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, $format = null)
     {
         if (
             isset($context[static::OBJECT_TO_POPULATE]) &&
@@ -320,12 +321,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                     $parameterData = $data[$key];
-                    if (null !== $constructogrParameter->getClass()) {
+                    if (null !== $constructorParameter->getClass()) {
                         $parameterData = $this->serializer->denormalize($parameterData, $constructorParameter->getClass()->getName(), null, $context);
                     }
 
                     // Don't run set for a parameter passed to the constructor
                     $params[] = $parameterData;
+                    unset($data[$key]);
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
                 } else {

@@ -157,6 +157,24 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
+    public function testConstructorWithObjectTypeHintDenormalize()
+    {
+        $data = [
+            'id' => 10,
+            'inner' => [
+                'foo' => 'oof',
+                'bar' => 'rab',
+            ],
+        ];
+
+        $obj = $this->normalizer->denormalize($data, DummyWithConstructorObject::class);
+        $this->assertInstanceOf(DummyWithConstructorObject::class, $obj);
+        $this->assertEquals(10, $obj->getId);
+        $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
+        $this->assertEquals('foo', $obj->getInner()->foo);
+        $this->assertEquals('bar', $obj->getInner()->bar);
+    }
+
     public function testGroupsNormalize()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -780,5 +798,27 @@ class FormatAndContextAwareNormalizer extends ObjectNormalizer
         }
 
         return false;
+    }
+}
+
+class DummyWithConstructorObject
+{
+    private $id;
+    private $inner;
+
+    public function __construct($id, ObjectInner $inner)
+    {
+        $this->id = $id;
+        $this->inner = $inner;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getInner()
+    {
+        return $this->inner;
     }
 }

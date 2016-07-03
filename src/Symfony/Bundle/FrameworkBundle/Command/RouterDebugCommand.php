@@ -56,6 +56,7 @@ class RouterDebugCommand extends ContainerAwareCommand
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
+                new InputOption('filter', null, InputOption::VALUE_REQUIRED, 'Filter the routes (text format only)'),
             ))
             ->setDescription('Displays current routes for an application')
             ->setHelp(<<<'EOF'
@@ -104,6 +105,7 @@ EOF
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
+                'filter' => $input->getOption('filter'),
                 'output' => $io,
             ));
         }

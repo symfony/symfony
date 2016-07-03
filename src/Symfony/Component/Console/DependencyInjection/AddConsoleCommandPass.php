@@ -44,7 +44,11 @@ class AddConsoleCommandPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must be a subclass of "%s".', $id, Command::class));
             }
 
-            $container->setAlias($serviceId = 'console.command.'.strtolower(str_replace('\\', '_', $class)), $id);
+            $serviceId = 'console.command.'.strtolower(str_replace('\\', '_', $class));
+            if ($container->hasAlias($serviceId)) {
+                $serviceId = $serviceId.'_'.$id;
+            }
+            $container->setAlias($serviceId, $id);
             $serviceIds[] = $definition->isPublic() ? $id : $serviceId;
         }
 

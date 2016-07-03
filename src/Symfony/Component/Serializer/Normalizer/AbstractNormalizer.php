@@ -269,6 +269,15 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     }
 
     /**
+     * @see instantiateComplexObject
+     * @deprecated Since 3.1, will be removed in 4.0. Use instantiateComplexObject instead.
+     */
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    {
+        return $this->instantiateComplexObject($data, $class, $context, $reflectionClass, $allowedAttributes);
+    }
+
+    /**
      * Instantiates an object using constructor parameters when needed.
      *
      * This method also allows to denormalize data into an existing object if
@@ -287,7 +296,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      *
      * @throws RuntimeException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, $format = null)
+    protected function instantiateComplexObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, $format = null)
     {
         if (
             isset($context[static::OBJECT_TO_POPULATE]) &&
@@ -319,33 +328,41 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
                         $params = array_merge($params, $data[$paramName]);
                     }
-                } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
+
+                    continue;
+                }
+
+                if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                     $parameterData = $data[$key];
                     if (null !== $constructorParameter->getClass()) {
-                        $parameterData = $this->serializer->denormalize($parameterData, $constructorParameter->getClass()->getName(), null, $context);
+                        $parameterData = $this->serializer->deserialize($parameterData, $constructorParameter->getClass()->getName(), null, $context);
                     }
 
                     // Don't run set for a parameter passed to the constructor
                     $params[] = $parameterData;
                     unset($data[$key]);
-                } elseif ($constructorParameter->isDefaultValueAvailable()) {
-                    $params[] = $constructorParameter->getDefaultValue();
-                } else {
-                    throw new RuntimeException(
-                        sprintf(
-                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
-                            $class,
-                            $constructorParameter->name
-                        )
-                    );
+
+                    continue;
                 }
+
+                if ($constructorParameter->isDefaultValueAvailable()) {
+                    $params[] = $constructorParameter->getDefaultValue();
+                }
+
+                throw new RuntimeException(
+                    sprintf(
+                        'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
+                        $class,
+                        $constructorParameter->name
+                    )
+                );
             }
 
             if ($constructor->isConstructor()) {
                 return $reflectionClass->newInstanceArgs($params);
-            } else {
-                return $constructor->invokeArgs(null, $params);
             }
+
+            return $constructor->invokeArgs(null, $params);
         }
 
         return new $class();

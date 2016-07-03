@@ -159,13 +159,13 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorWithObjectTypeHintDenormalize()
     {
-        $data = [
+        $data = array(
             'id' => 10,
-            'inner' => [
+            'inner' => array(
                 'foo' => 'oof',
                 'bar' => 'rab',
-            ],
-        ];
+            ),
+        );
 
         $obj = $this->normalizer->denormalize($data, DummyWithConstructorObject::class);
         $this->assertInstanceOf(DummyWithConstructorObject::class, $obj);

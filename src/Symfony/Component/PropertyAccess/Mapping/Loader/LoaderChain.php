@@ -27,9 +27,6 @@ use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
  */
 class LoaderChain implements LoaderInterface
 {
-    /**
-     * @var LoaderInterface[]
-     */
     private $loaders;
 
     /**

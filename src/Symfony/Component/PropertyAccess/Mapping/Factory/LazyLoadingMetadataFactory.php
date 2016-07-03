@@ -43,21 +43,21 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
      *
      * @var LoaderInterface|null
      */
-    protected $loader;
+    private $loader;
 
     /**
      * The cache for caching class metadata.
      *
      * @var CacheItemPoolInterface|null
      */
-    protected $cache;
+    private $cache;
 
     /**
      * The loaded metadata, indexed by class name.
      *
      * @var ClassMetadata[]
      */
-    protected $loadedClasses = array();
+    private $loadedClasses = array();
 
     /**
      * Creates a new metadata factory.

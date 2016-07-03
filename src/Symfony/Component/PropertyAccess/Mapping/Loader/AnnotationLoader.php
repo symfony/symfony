@@ -28,14 +28,8 @@ use Symfony\Component\PropertyAccess\Mapping\ClassMetadata;
  */
 class AnnotationLoader implements LoaderInterface
 {
-    /**
-     * @var Reader
-     */
     private $reader;
 
-    /**
-     * @param Reader $reader
-     */
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;

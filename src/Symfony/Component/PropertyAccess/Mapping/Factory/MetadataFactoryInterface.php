@@ -17,8 +17,6 @@ use Symfony\Component\PropertyAccess\Exception;
 /**
  * Returns {@link \Symfony\Component\PropertyAccess\Mapping\MetadataInterface} instances for values.
  *
- * @since  3.1
- *
  * @author Luis Ramón López <lrlopez@gmail.com>
  */
 interface MetadataFactoryInterface

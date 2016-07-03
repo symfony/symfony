@@ -25,6 +25,8 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\PropertyAccess\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
@@ -915,13 +917,6 @@ class FrameworkExtension extends Extension
         }
     }
 
-    /**
-     * Loads the PropertyAccess configuration.
-     *
-     * @param array            $config    A serializer configuration array
-     * @param ContainerBuilder $container A ContainerBuilder instance
-     * @param XmlFileLoader    $loader    An XmlFileLoader instance
-     */
     private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('property_access.xml');
@@ -937,7 +932,7 @@ class FrameworkExtension extends Extension
         $serializerLoaders = array();
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
             $annotationLoader = new Definition(
-                \Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader::class,
+                AnnotationLoader::class,
                 array(new Reference('annotation_reader'))
             );
             $annotationLoader->setPublic(false);
@@ -951,7 +946,7 @@ class FrameworkExtension extends Extension
             $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/property_access.xml')) {
-                $definition = new Definition(\Symfony\Component\PropertyAccess\Mapping\Loader\XmlFileLoader::class, array(realpath($file)));
+                $definition = new Definition(XmlFileLoader::class, array(realpath($file)));
                 $definition->setPublic(false);
 
                 $serializerLoaders[] = $definition;
@@ -959,7 +954,7 @@ class FrameworkExtension extends Extension
             }
 
             if (is_file($file = $dirname.'/Resources/config/property_access.yml')) {
-                $definition = new Definition(\Symfony\Component\PropertyAccess\Mapping\Loader\YamlFileLoader::class, array(realpath($file)));
+                $definition = new Definition(YamlFileLoader::class, array(realpath($file)));
                 $definition->setPublic(false);
 
                 $serializerLoaders[] = $definition;
@@ -968,13 +963,13 @@ class FrameworkExtension extends Extension
 
             if (is_dir($dir = $dirname.'/Resources/config/property_access')) {
                 foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
-                    $definition = new Definition(\Symfony\Component\PropertyAccess\Mapping\Loader\XmlFileLoader::class, array($file->getRealpath()));
+                    $definition = new Definition(XmlFileLoader::class, array($file->getRealpath()));
                     $definition->setPublic(false);
 
                     $serializerLoaders[] = $definition;
                 }
                 foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
-                    $definition = new Definition(\Symfony\Component\PropertyAccess\Mapping\Loader\YamlFileLoader::class, array($file->getRealpath()));
+                    $definition = new Definition(YamlFileLoader::class, array($file->getRealpath()));
                     $definition->setPublic(false);
 
                     $serializerLoaders[] = $definition;

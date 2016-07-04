@@ -14,8 +14,6 @@ namespace Symfony\Bridge\Doctrine\Tests\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @since  2.5.4
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @group  legacy
  */

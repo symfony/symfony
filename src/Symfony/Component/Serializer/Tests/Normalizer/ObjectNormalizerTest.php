@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\DenormalizerDecoratorSerializer;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -167,12 +168,16 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ),
         );
 
-        $obj = $this->normalizer->denormalize($data, DummyWithConstructorObject::class);
+        $normalizer = new ObjectNormalizer();
+        $serializer = new DenormalizerDecoratorSerializer($normalizer);
+        $normalizer->setSerializer($serializer);
+
+        $obj = $normalizer->denormalize($data, DummyWithConstructorObject::class);
         $this->assertInstanceOf(DummyWithConstructorObject::class, $obj);
-        $this->assertEquals(10, $obj->getId);
+        $this->assertEquals(10, $obj->getId());
         $this->assertInstanceOf(ObjectInner::class, $obj->getInner());
-        $this->assertEquals('foo', $obj->getInner()->foo);
-        $this->assertEquals('bar', $obj->getInner()->bar);
+        $this->assertEquals('oof', $obj->getInner()->foo);
+        $this->assertEquals('rab', $obj->getInner()->bar);
     }
 
     public function testGroupsNormalize()

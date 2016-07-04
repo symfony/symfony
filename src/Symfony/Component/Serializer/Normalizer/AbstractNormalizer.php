@@ -335,7 +335,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                 if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                     $parameterData = $data[$key];
                     if (null !== $constructorParameter->getClass()) {
-                        $parameterData = $this->serializer->deserialize($parameterData, $constructorParameter->getClass()->getName(), null, $context);
+                        $parameterData = $this->serializer->deserialize($parameterData, $constructorParameter->getClass()->getName(), $format, $context);
                     }
 
                     // Don't run set for a parameter passed to the constructor

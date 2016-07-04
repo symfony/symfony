@@ -105,11 +105,7 @@ class Application extends BaseApplication
      */
     public function getLongVersion()
     {
-        return parent::getLongVersion()
-            .sprintf(
-                ' (env: <comment>%s</comment>, debug: <comment>%s</comment>)',
-                $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false'
-            );
+        return parent::getLongVersion().sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
     protected function registerCommands()

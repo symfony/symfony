@@ -23,8 +23,6 @@ use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
 
 /**
- * @since  2.5
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase

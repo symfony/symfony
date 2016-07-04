@@ -23,8 +23,6 @@ use Symfony\Component\Validator\ValidatorInterface as LegacyValidatorInterface;
 /**
  * Verifies that a validator satisfies the API of Symfony < 2.5.
  *
- * @since  2.5
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @group legacy
  */

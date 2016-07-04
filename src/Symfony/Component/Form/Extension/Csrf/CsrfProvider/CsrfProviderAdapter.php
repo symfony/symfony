@@ -21,8 +21,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * Adapter for using old CSRF providers where the new {@link CsrfTokenManagerInterface}
  * is expected.
  *
- * @since  2.4
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @deprecated since version 2.4, to be removed in 3.0.

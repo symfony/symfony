@@ -21,10 +21,10 @@ class DenormalizerDecoratorSerializer implements SerializerInterface
         if (false === $normalizer instanceof NormalizerInterface && false === $normalizer instanceof DenormalizerInterface) {
             throw new \InvalidArgumentException();
         }
-        
+
         $this->normalizer = $normalizer;
     }
-    
+
     /**
      * {@inheritdoc}
      */

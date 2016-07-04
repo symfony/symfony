@@ -84,9 +84,9 @@ FrameworkBundle
 HttpKernel
 ----------
 
- * Possibility to pass objects as URI attributes to the ESI and SSI renderers
-   has been removed. The inline fragment renderer should be used with object
-   attributes.
+ * Possibility to pass non-scalar values as URI attributes to the ESI and SSI
+   renderers has been removed. The inline fragment renderer should be used with
+   non-scalar attributes.
 
  * The `ControllerResolver::getArguments()` method has been removed. If you
    have your own `ControllerResolverInterface` implementation, you should

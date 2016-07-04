@@ -31,9 +31,6 @@ class UserLoginType extends AbstractType
 {
     private $requestStack;
 
-    /**
-     * @param RequestStack $requestStack A RequestStack instance
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;

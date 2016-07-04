@@ -18,16 +18,6 @@ use Symfony\Component\Form\Test\TypeTestCase as TestCase;
  */
 class SubmitTypeTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('submit');
-
-        $this->assertSame('submit', $form->getConfig()->getType()->getName());
-    }
-
     public function testCreateSubmitButtonInstances()
     {
         $this->assertInstanceOf('Symfony\Component\Form\SubmitButton', $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType'));

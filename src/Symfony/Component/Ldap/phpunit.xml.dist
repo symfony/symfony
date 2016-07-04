@@ -8,6 +8,8 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
+        <env name="LDAP_HOST" value="127.0.0.1" />
+        <env name="LDAP_PORT" value="3389" />
     </php>
 
     <testsuites>

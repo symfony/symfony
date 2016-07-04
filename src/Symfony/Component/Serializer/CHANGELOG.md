@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+3.1.0
+-----
+
+ * added support for serializing objects that implement `JsonSerializable`
+ * added the `DenormalizerAwareTrait` and `NormalizerAwareTrait` traits to
+   support normalizer/denormalizer awareness
+ * added the `DenormalizerAwareInterface` and `NormalizerAwareInterface`
+   interfaces to support normalizer/denormalizer awareness
+ * added a PSR-6 compatible adapter for caching metadata
+ * added a `MaxDepth` option to limit the depth of the object graph when
+   serializing objects
+ * added support for serializing `SplFileInfo` objects
+ * added support for serializing objects that implement `DateTimeInterface`
+ * added `AbstractObjectNormalizer` as a base class for normalizers that deal
+   with objects
+ * added support to relation deserialization
+
 2.7.0
 -----
 

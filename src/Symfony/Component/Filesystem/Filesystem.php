@@ -330,14 +330,57 @@ class Filesystem
         }
 
         if (!$ok && true !== @symlink($originDir, $targetDir)) {
-            $report = error_get_last();
-            if (is_array($report)) {
-                if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {
-                    throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?', 0, null, $targetDir);
-                }
-            }
-            throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
+            $this->linkException($originDir, $targetDir, 'symbolic');
         }
+    }
+
+    /**
+     * Creates a hard link, or several hard links to a file.
+     *
+     * @param string          $originFile  The original file
+     * @param string|string[] $targetFiles The target file(s)
+     *
+     * @throws FileNotFoundException When original file is missing or not a file
+     * @throws IOException           When link fails, including if link already exists
+     */
+    public function hardlink($originFile, $targetFiles)
+    {
+        if (!$this->exists($originFile)) {
+            throw new FileNotFoundException(null, 0, null, $originFile);
+        }
+
+        if (!is_file($originFile)) {
+            throw new FileNotFoundException(sprintf('Origin file "%s" is not a file', $originFile));
+        }
+
+        foreach ($this->toIterator($targetFiles) as $targetFile) {
+            if (is_file($targetFile)) {
+                if (fileinode($originFile) === fileinode($targetFile)) {
+                    continue;
+                }
+                $this->remove($targetFile);
+            }
+
+            if (true !== @link($originFile, $targetFile)) {
+                $this->linkException($originFile, $targetFile, 'hard');
+            }
+        }
+    }
+
+    /**
+     * @param string $origin
+     * @param string $target
+     * @param string $linkType Name of the link type, typically 'symbolic' or 'hard'
+     */
+    private function linkException($origin, $target, $linkType)
+    {
+        $report = error_get_last();
+        if (is_array($report)) {
+            if ('\\' === DIRECTORY_SEPARATOR && false !== strpos($report['message'], 'error code(1314)')) {
+                throw new IOException(sprintf('Unable to create %s link due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?', $linkType), 0, null, $target);
+            }
+        }
+        throw new IOException(sprintf('Failed to create %s link from "%s" to "%s".', $linkType, $origin, $target), 0, null, $target);
     }
 
     /**
@@ -531,14 +574,12 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param string   $filename The file to be written to
-     * @param string   $content  The data to write into the file
-     * @param null|int $mode     The file mode (octal). If null, file permissions are not modified
-     *                           Deprecated since version 2.3.12, to be removed in 3.0.
+     * @param string $filename The file to be written to
+     * @param string $content  The data to write into the file
      *
      * @throws IOException If the file cannot be written to.
      */
-    public function dumpFile($filename, $content, $mode = 0666)
+    public function dumpFile($filename, $content)
     {
         $dir = dirname($filename);
 
@@ -548,19 +589,16 @@ class Filesystem
             throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
         }
 
+        // Will create a temp file with 0600 access rights
+        // when the filesystem supports chmod.
         $tmpFile = $this->tempnam($dir, basename($filename));
 
         if (false === @file_put_contents($tmpFile, $content)) {
             throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
         }
 
-        if (null !== $mode) {
-            if (func_num_args() > 2) {
-                @trigger_error('Support for modifying file permissions is deprecated since version 2.3.12 and will be removed in 3.0.', E_USER_DEPRECATED);
-            }
-
-            $this->chmod($tmpFile, $mode);
-        }
+        // Ignore for filesystems that do not support umask
+        @chmod($tmpFile, 0666);
         $this->rename($tmpFile, $filename, true);
     }
 

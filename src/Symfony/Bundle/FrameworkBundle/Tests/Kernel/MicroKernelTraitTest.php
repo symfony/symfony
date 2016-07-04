@@ -15,9 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MicroKernelTraitTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @requires PHP 5.4
-     */
     public function test()
     {
         $kernel = new ConcreteMicroKernel('test', true);

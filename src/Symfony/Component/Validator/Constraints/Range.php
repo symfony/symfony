@@ -26,24 +26,6 @@ class Range extends Constraint
     const TOO_HIGH_ERROR = '2d28afcb-e32e-45fb-a815-01c431a86a69';
     const TOO_LOW_ERROR = '76454e69-502c-46c5-9643-f447d837c4d5';
 
-    /**
-     * @deprecated Deprecated since version 2.8, to be removed in 3.0. Use
-     *             {@link INVALID_CHARACTERS_ERROR} instead.
-     */
-    const INVALID_VALUE_ERROR = self::INVALID_CHARACTERS_ERROR;
-
-    /**
-     * @deprecated Deprecated since version 2.8, to be removed in 3.0. Use
-     *             {@link TOO_HIGH_ERROR} instead.
-     */
-    const BEYOND_RANGE_ERROR = self::TOO_HIGH_ERROR;
-
-    /**
-     * @deprecated Deprecated since version 2.8, to be removed in 3.0. Use
-     *             {@link TOO_LOW_ERROR} instead.
-     */
-    const BELOW_RANGE_ERROR = self::TOO_LOW_ERROR;
-
     protected static $errorNames = array(
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
         self::TOO_HIGH_ERROR => 'TOO_HIGH_ERROR',

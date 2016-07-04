@@ -13,16 +13,6 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 class PasswordTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('password');
-
-        $this->assertSame('password', $form->getConfig()->getType()->getName());
-    }
-
     public function testEmptyIfNotSubmitted()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\PasswordType');

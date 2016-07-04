@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests;
 
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DefinitionTest extends \PHPUnit_Framework_TestCase
 {
@@ -117,29 +116,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isShared(), '->isShared() returns false if the instance must not be shared');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testPrototypeScopedDefinitionAreNotShared()
-    {
-        $def = new Definition('stdClass');
-        $def->setScope(ContainerInterface::SCOPE_PROTOTYPE);
-
-        $this->assertFalse($def->isShared());
-        $this->assertEquals(ContainerInterface::SCOPE_PROTOTYPE, $def->getScope());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSetGetScope()
-    {
-        $def = new Definition('stdClass');
-        $this->assertEquals('container', $def->getScope());
-        $this->assertSame($def, $def->setScope('foo'));
-        $this->assertEquals('foo', $def->getScope());
-    }
-
     public function testSetIsPublic()
     {
         $def = new Definition('stdClass');
@@ -154,17 +130,6 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isSynthetic(), '->isSynthetic() returns false by default');
         $this->assertSame($def, $def->setSynthetic(true), '->setSynthetic() implements a fluent interface');
         $this->assertTrue($def->isSynthetic(), '->isSynthetic() returns true if the service is synthetic.');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacySetIsSynchronized()
-    {
-        $def = new Definition('stdClass');
-        $this->assertFalse($def->isSynchronized(), '->isSynchronized() returns false by default');
-        $this->assertSame($def, $def->setSynchronized(true), '->setSynchronized() implements a fluent interface');
-        $this->assertTrue($def->isSynchronized(), '->isSynchronized() returns true if the service is synchronized.');
     }
 
     public function testSetIsLazy()

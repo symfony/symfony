@@ -84,18 +84,6 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($guess, $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyGuessRequired()
-    {
-        if (PHP_VERSION_ID >= 70000) {
-            $this->markTestSkipped('Cannot use a class called True on PHP 7 or higher.');
-        }
-        $true = 'Symfony\Component\Validator\Constraints\True';
-        $this->testGuessRequired(new $true(), new ValueGuess(true, Guess::HIGH_CONFIDENCE));
-    }
-
     public function testGuessRequiredReturnsFalseForUnmappedProperties()
     {
         $this->assertEquals(new ValueGuess(false, Guess::LOW_CONFIDENCE), $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));

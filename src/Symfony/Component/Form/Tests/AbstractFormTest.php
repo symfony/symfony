@@ -34,8 +34,6 @@ abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        // We need an actual dispatcher to use the deprecated
-        // bindRequest() method
         $this->dispatcher = new EventDispatcher();
         $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
         $this->form = $this->createForm();

@@ -24,16 +24,6 @@ class LanguageTypeTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('language');
-
-        $this->assertSame('language', $form->getConfig()->getType()->getName());
-    }
-
     public function testCountriesAreSelectable()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\LanguageType');

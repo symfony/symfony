@@ -73,38 +73,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function supportsAttribute($attribute)
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
-
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsAttribute($attribute)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsClass($class)
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.8 and will be removed in version 3.0.', E_USER_DEPRECATED);
-
-        foreach ($this->voters as $voter) {
-            if ($voter->supportsClass($class)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Grants access if any voter returns an affirmative response.
      *
      * If all voters abstained from voting, the decision will be based on the

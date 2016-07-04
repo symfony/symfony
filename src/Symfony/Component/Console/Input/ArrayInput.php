@@ -57,13 +57,17 @@ class ArrayInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function hasParameterOption($values)
+    public function hasParameterOption($values, $onlyParams = false)
     {
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
             if (!is_int($k)) {
                 $v = $k;
+            }
+
+            if ($onlyParams && $v === '--') {
+                return false;
             }
 
             if (in_array($v, $values)) {
@@ -77,11 +81,15 @@ class ArrayInput extends Input
     /**
      * {@inheritdoc}
      */
-    public function getParameterOption($values, $default = false)
+    public function getParameterOption($values, $default = false, $onlyParams = false)
     {
         $values = (array) $values;
 
         foreach ($this->parameters as $k => $v) {
+            if ($onlyParams && ($k === '--' || (is_int($k) && $v === '--'))) {
+                return false;
+            }
+
             if (is_int($k)) {
                 if (in_array($v, $values)) {
                     return true;
@@ -119,6 +127,9 @@ class ArrayInput extends Input
     protected function parse()
     {
         foreach ($this->parameters as $key => $value) {
+            if ($key === '--') {
+                return;
+            }
             if (0 === strpos($key, '--')) {
                 $this->addLongOption(substr($key, 2), $value);
             } elseif ('-' === $key[0]) {

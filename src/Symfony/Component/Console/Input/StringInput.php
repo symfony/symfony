@@ -30,24 +30,13 @@ class StringInput extends ArgvInput
     /**
      * Constructor.
      *
-     * @param string          $input      An array of parameters from the CLI (in the argv format)
-     * @param InputDefinition $definition A InputDefinition instance
-     *
-     * @deprecated The second argument is deprecated as it does not work (will be removed in 3.0), use 'bind' method instead
+     * @param string $input An array of parameters from the CLI (in the argv format)
      */
-    public function __construct($input, InputDefinition $definition = null)
+    public function __construct($input)
     {
-        if ($definition) {
-            @trigger_error('The $definition argument of the '.__METHOD__.' method is deprecated and will be removed in 3.0. Set this parameter with the bind() method instead.', E_USER_DEPRECATED);
-        }
-
-        parent::__construct(array(), null);
+        parent::__construct(array());
 
         $this->setTokens($this->tokenize($input));
-
-        if (null !== $definition) {
-            $this->bind($definition);
-        }
     }
 
     /**

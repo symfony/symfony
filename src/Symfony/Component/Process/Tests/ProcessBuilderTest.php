@@ -17,17 +17,11 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 {
     public function testInheritEnvironmentVars()
     {
-        $_ENV['MY_VAR_1'] = 'foo';
-
         $proc = ProcessBuilder::create()
             ->add('foo')
             ->getProcess();
 
-        unset($_ENV['MY_VAR_1']);
-
-        $env = $proc->getEnv();
-        $this->assertArrayHasKey('MY_VAR_1', $env);
-        $this->assertEquals('foo', $env['MY_VAR_1']);
+        $this->assertTrue($proc->areEnvironmentVariablesInherited());
     }
 
     public function testAddEnvironmentVariables()
@@ -46,22 +40,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         ;
 
         $this->assertSame($env, $proc->getEnv());
-    }
-
-    public function testProcessShouldInheritAndOverrideEnvironmentVars()
-    {
-        $_ENV['MY_VAR_1'] = 'foo';
-
-        $proc = ProcessBuilder::create()
-            ->setEnv('MY_VAR_1', 'bar')
-            ->add('foo')
-            ->getProcess();
-
-        unset($_ENV['MY_VAR_1']);
-
-        $env = $proc->getEnv();
-        $this->assertArrayHasKey('MY_VAR_1', $env);
-        $this->assertEquals('bar', $env['MY_VAR_1']);
+        $this->assertFalse($proc->areEnvironmentVariablesInherited());
     }
 
     /**
@@ -215,7 +194,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Process\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Symfony\Component\Process\ProcessBuilder::setInput only accepts strings or stream resources.
+     * @expectedExceptionMessage Symfony\Component\Process\ProcessBuilder::setInput only accepts strings, Traversable objects or stream resources.
      */
     public function testInvalidInput()
     {

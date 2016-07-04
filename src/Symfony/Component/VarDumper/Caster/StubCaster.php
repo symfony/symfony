@@ -55,6 +55,7 @@ class StubCaster
             $stub->class = '';
             $stub->handle = 0;
             $stub->value = null;
+            $stub->cut = $c->cut;
 
             $a = array();
 

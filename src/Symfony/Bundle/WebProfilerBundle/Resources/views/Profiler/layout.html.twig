@@ -19,6 +19,47 @@
                             {% endif %}
                         </h2>
 
+                        {% set request_collector = profile.collectors.request|default(false) %}
+                        {% if request_collector is defined and request_collector.redirect -%}
+                            {%- set redirect = request_collector.redirect -%}
+                            {%- set controller = redirect.controller -%}
+                            {%- set redirect_route = '@' ~ redirect.route %}
+                            <dl class="metadata">
+                                <dt>
+                                    <span class="label">{{ redirect.status_code }}</span>
+                                    Redirect from
+                                </dt>
+                                <dd>
+                                    {{ 'GET' != redirect.method ? redirect.method }}
+                                    {% if redirect.controller.class is defined -%}
+                                        {%- set link = controller.file|file_link(controller.line) -%}
+                                        {% if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
+                                            {{ redirect_route }}
+                                        {%- if link %}</a>{% endif -%}
+                                    {%- else -%}
+                                            {{ redirect_route }}
+                                    {%- endif %}
+                                    (<a href="{{ path('_profiler', { token: redirect.token }) }}">{{ redirect.token }}</a>)
+                                </dd>
+                            </dl>
+                        {%- endif %}
+
+                        {% if request_collector and request_collector.forward|default(false) and request_collector.forward.controller.class is defined -%}
+                            {%- set forward = request_collector.forward -%}
+                            {%- set controller = forward.controller -%}
+                            <dl class="metadata">
+                                <dt>Forwarded to</dt>
+                                <dd>
+                                    {% set link = controller.file|file_link(controller.line) -%}
+                                    {%- if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
+                                        {{- controller.class|abbr_class|striptags -}}
+                                        {{- controller.method ? ' :: ' ~ controller.method }}
+                                    {%- if link %}</a>{% endif %}
+                                    (<a href="{{ path('_profiler', { token: forward.token }) }}">{{ forward.token }}</a>)
+                                </dd>
+                            </dl>
+                        {%- endif %}
+
                         <dl class="metadata">
                             <dt>Method</dt>
                             <dd>{{ profile.method|upper }}</dd>
@@ -53,7 +94,7 @@
             <div id="sidebar">
                 <div id="sidebar-shortcuts">
                     <div class="shortcuts">
-                        <a href="#" class="visible-small" onclick="Sfjs.toggleClass(document.getElementById('sidebar'), 'expanded'); return false;">
+                        <a href="#" id="sidebarShortcutsMenu" class="visible-small">
                             <span class="icon">{{ include('@WebProfiler/Icon/menu.svg') }}</span>
                         </a>
 
@@ -83,4 +124,12 @@
             </div>
         </div>
     </div>
+    <script>
+        (function () {
+            Sfjs.addEventListener(document.getElementById('sidebarShortcutsMenu'), 'click', function (event) {
+                event.preventDefault();
+                Sfjs.toggleClass(document.getElementById('sidebar'), 'expanded');
+            })
+        }())
+    </script>
 {% endblock %}

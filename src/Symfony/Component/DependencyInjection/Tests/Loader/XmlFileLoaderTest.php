@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -221,29 +222,6 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $fooArgs = $services['foo']->getArguments();
         $barArgs = $services['bar']->getArguments();
         $this->assertSame($fooArgs[0], $barArgs[0]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyLoadServices()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('legacy-services6.xml');
-        $services = $container->getDefinitions();
-        $this->assertEquals('FooClass', $services['constructor']->getClass());
-        $this->assertEquals('getInstance', $services['constructor']->getFactoryMethod());
-        $this->assertNull($services['factory_service']->getClass());
-        $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
-        $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
-        $this->assertEquals('container', $services['scope.container']->getScope());
-        $this->assertEquals('custom', $services['scope.custom']->getScope());
-        $this->assertEquals('prototype', $services['scope.prototype']->getScope());
-        $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
-        $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
-        $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
-        $this->assertNull($services['request']->getDecoratedService());
     }
 
     public function testLoadServices()
@@ -562,5 +540,27 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services23.xml');
 
         $this->assertTrue($container->getDefinition('bar')->isAutowired());
+    }
+
+    /**
+     * @group legacy
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
+    public function testAliasDefinitionContainsUnsupportedElements()
+    {
+        $deprecations = array(
+            'Using the attribute "class" is deprecated for alias definition "bar"',
+            'Using the element "tag" is deprecated for alias definition "bar"',
+            'Using the element "factory" is deprecated for alias definition "bar"',
+        );
+
+        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
+            $container = new ContainerBuilder();
+            $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+
+            $loader->load('legacy_invalid_alias_definition.xml');
+
+            $this->assertTrue($container->has('bar'));
+        });
     }
 }

@@ -77,36 +77,6 @@ class DefinitionDecorator extends Definition
     /**
      * {@inheritdoc}
      */
-    public function setFactoryClass($class)
-    {
-        $this->changes['factory_class'] = true;
-
-        return parent::setFactoryClass($class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFactoryMethod($method)
-    {
-        $this->changes['factory_method'] = true;
-
-        return parent::setFactoryMethod($method);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFactoryService($service, $triggerDeprecationError = true)
-    {
-        $this->changes['factory_service'] = true;
-
-        return parent::setFactoryService($service, $triggerDeprecationError);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function setConfigurator($callable)
     {
         $this->changes['configurator'] = true;

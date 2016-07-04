@@ -437,7 +437,7 @@
                 <div class="toggle-icon empty"></div>
             {% endif %}
 
-            {{ name|default('(no name)') }} {% if data.type_class is defined and data.type is defined %}[<abbr title="{{ data.type_class }}">{{ data.type|split('\\')|last }}</abbr>]{% endif %}
+            {{ name|default('(no name)') }} {% if data.type_class is defined %}[<abbr title="{{ data.type_class }}">{{ data.type_class|split('\\')|last }}</abbr>]{% endif %}
         </div>
 
         {% if data.children is not empty %}

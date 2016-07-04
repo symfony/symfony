@@ -429,6 +429,80 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSetterInjection()
+    {
+        $container = new ContainerBuilder();
+        $container->register('app_foo', Foo::class);
+        $container->register('app_a', A::class);
+        $container->register('app_collision_a', CollisionA::class);
+        $container->register('app_collision_b', CollisionB::class);
+
+        // manually configure *one* call, to override autowiring
+        $container
+            ->register('setter_injection', SetterInjection::class)
+            ->setAutowired(true)
+            ->addMethodCall('setWithCallsConfigured', array('manual_arg1', 'manual_arg2'))
+        ;
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $methodCalls = $container->getDefinition('setter_injection')->getMethodCalls();
+
+        // grab the call method names
+        $actualMethodNameCalls = array_map(function ($call) {
+            return $call[0];
+        }, $methodCalls);
+        $this->assertEquals(
+            array('setWithCallsConfigured', 'setFoo'),
+            $actualMethodNameCalls
+        );
+
+        // test setWithCallsConfigured args
+        $this->assertEquals(
+            array('manual_arg1', 'manual_arg2'),
+            $methodCalls[0][1]
+        );
+        // test setFoo args
+        $this->assertEquals(
+            array(new Reference('app_foo')),
+            $methodCalls[1][1]
+        );
+    }
+
+    /**
+     * @dataProvider getCreateResourceTests
+     */
+    public function testCreateResourceForClass($className, $isEqual)
+    {
+        $startingResource = AutowirePass::createResourceForClass(
+            new \ReflectionClass(__NAMESPACE__.'\ClassForResource')
+        );
+        $newResource = AutowirePass::createResourceForClass(
+            new \ReflectionClass(__NAMESPACE__.'\\'.$className)
+        );
+
+        // hack so the objects don't differ by the class name
+        $startingReflObject = new \ReflectionObject($startingResource);
+        $reflProp = $startingReflObject->getProperty('class');
+        $reflProp->setAccessible(true);
+        $reflProp->setValue($startingResource, __NAMESPACE__.'\\'.$className);
+
+        if ($isEqual) {
+            $this->assertEquals($startingResource, $newResource);
+        } else {
+            $this->assertNotEquals($startingResource, $newResource);
+        }
+    }
+
+    public function getCreateResourceTests()
+    {
+        return array(
+            array('IdenticalClassResource', true),
+            array('ClassChangedConstructorArgs', false),
+        );
+    }
+
     public function testIgnoreServiceWithClassNotExisting()
     {
         $container = new ContainerBuilder();
@@ -442,6 +516,24 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $this->assertTrue($container->hasDefinition('bar'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Unable to autowire argument of type "Symfony\Component\DependencyInjection\Tests\Compiler\CollisionInterface" for the service "setter_injection_collision". Multiple services exist for this interface (c1, c2).
+     * @expectedExceptionCode 1
+     */
+    public function testSetterInjectionCollisionThrowsException()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('c1', CollisionA::class);
+        $container->register('c2', CollisionB::class);
+        $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollision::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
     }
 }
 
@@ -596,5 +688,88 @@ class MultipleArgumentsOptionalScalarNotReallyOptional
 {
     public function __construct(A $a, $foo = 'default_val', Lille $lille)
     {
+    }
+}
+
+/*
+ * Classes used for testing createResourceForClass
+ */
+class ClassForResource
+{
+    public function __construct($foo, Bar $bar = null)
+    {
+    }
+
+    public function setBar(Bar $bar)
+    {
+    }
+}
+class IdenticalClassResource extends ClassForResource
+{
+}
+
+class ClassChangedConstructorArgs extends ClassForResource
+{
+    public function __construct($foo, Bar $bar, $baz)
+    {
+    }
+}
+
+class SetterInjection
+{
+    public function setFoo(Foo $foo)
+    {
+        // should be called
+    }
+
+    public function setDependencies(Foo $foo, A $a)
+    {
+        // should be called
+    }
+
+    public function setBar()
+    {
+        // should not be called
+    }
+
+    public function setNotAutowireable(NotARealClass $n)
+    {
+        // should not be called
+    }
+
+    public function setArgCannotAutowire($foo)
+    {
+        // should not be called
+    }
+
+    public function setOptionalNotAutowireable(NotARealClass $n = null)
+    {
+        // should not be called
+    }
+
+    public function setOptionalNoTypeHint($foo = null)
+    {
+        // should not be called
+    }
+
+    public function setOptionalArgNoAutowireable($other = 'default_val')
+    {
+        // should not be called
+    }
+
+    public function setWithCallsConfigured(A $a)
+    {
+        // this method has a calls configured on it
+        // should not be called
+    }
+}
+
+class SetterInjectionCollision
+{
+    public function setMultipleInstancesForOneArg(CollisionInterface $collision)
+    {
+        // The CollisionInterface cannot be autowired - there are multiple
+
+        // should throw an exception
     }
 }

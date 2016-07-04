@@ -176,13 +176,37 @@ brief: >
 yaml: |
     zero: 0
     simple: 12
-    one-thousand: 1,000
-    negative one-thousand: -1,000
 php: |
     array(
       'zero' => 0,
       'simple' => 12,
+    )
+---
+test: Positive Big Integer
+deprecated: true
+dump_skip: true
+brief: >
+    An integer is a series of numbers, optionally
+    starting with a positive or negative sign.  Integers
+    may also contain commas for readability.
+yaml: |
+    one-thousand: 1,000
+php: |
+    array(
       'one-thousand' => 1000.0,
+    )
+---
+test: Negative Big Integer
+deprecated: true
+dump_skip: true
+brief: >
+    An integer is a series of numbers, optionally
+    starting with a positive or negative sign.  Integers
+    may also contain commas for readability.
+yaml: |
+    negative one-thousand: -1,000
+php: |
+    array(
       'negative one-thousand' => -1000.0
     )
 ---
@@ -208,13 +232,25 @@ brief: >
      positive and negative infinity and "not a number."
 yaml: |
      a simple float: 2.00
-     larger float: 1,000.09
      scientific notation: 1.00009e+3
 php: |
      array(
        'a simple float' => 2.0,
-       'larger float' => 1000.09,
        'scientific notation' => 1000.09
+     )
+---
+test: Larger Float
+dump_skip: true
+deprecated: true
+brief: >
+     Floats are represented by numbers with decimals,
+     allowing for scientific notation, as well as
+     positive and negative infinity and "not a number."
+yaml: |
+     larger float: 1,000.09
+php: |
+     array(
+       'larger float' => 1000.09,
      )
 ---
 test: Time

@@ -96,11 +96,11 @@ class WebProfilerExtensionTest extends TestCase
 
         $this->assertSame($listenerInjected, $this->container->has('web_profiler.debug_toolbar'));
 
+        $this->assertSaneContainer($this->getDumpedContainer());
+
         if ($listenerInjected) {
             $this->assertSame($listenerEnabled, $this->container->get('web_profiler.debug_toolbar')->isEnabled());
         }
-
-        $this->assertSaneContainer($this->getDumpedContainer());
     }
 
     public function getDebugModes()

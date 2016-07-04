@@ -11,13 +11,8 @@
 
 namespace Symfony\Component\Finder;
 
-use Symfony\Component\Finder\Adapter\AdapterInterface;
-use Symfony\Component\Finder\Adapter\GnuFindAdapter;
-use Symfony\Component\Finder\Adapter\BsdFindAdapter;
-use Symfony\Component\Finder\Adapter\PhpAdapter;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
-use Symfony\Component\Finder\Exception\ExceptionInterface;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
@@ -60,7 +55,6 @@ class Finder implements \IteratorAggregate, \Countable
     private $iterators = array();
     private $contains = array();
     private $notContains = array();
-    private $adapters = null;
     private $paths = array();
     private $notPaths = array();
     private $ignoreUnreadableDirs = false;
@@ -83,110 +77,6 @@ class Finder implements \IteratorAggregate, \Countable
     public static function create()
     {
         return new static();
-    }
-
-    /**
-     * Registers a finder engine implementation.
-     *
-     * @param AdapterInterface $adapter  An adapter instance
-     * @param int              $priority Highest is selected first
-     *
-     * @return Finder The current Finder instance
-     *
-     * @deprecated since 2.8, to be removed in 3.0.
-     */
-    public function addAdapter(AdapterInterface $adapter, $priority = 0)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $this->initDefaultAdapters();
-
-        $this->adapters[$adapter->getName()] = array(
-            'adapter' => $adapter,
-            'priority' => $priority,
-            'selected' => false,
-        );
-
-        return $this->sortAdapters();
-    }
-
-    /**
-     * Sets the selected adapter to the best one according to the current platform the code is run on.
-     *
-     * @return Finder The current Finder instance
-     *
-     * @deprecated since 2.8, to be removed in 3.0.
-     */
-    public function useBestAdapter()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $this->initDefaultAdapters();
-
-        $this->resetAdapterSelection();
-
-        return $this->sortAdapters();
-    }
-
-    /**
-     * Selects the adapter to use.
-     *
-     * @param string $name
-     *
-     * @return Finder The current Finder instance
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @deprecated since 2.8, to be removed in 3.0.
-     */
-    public function setAdapter($name)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $this->initDefaultAdapters();
-
-        if (!isset($this->adapters[$name])) {
-            throw new \InvalidArgumentException(sprintf('Adapter "%s" does not exist.', $name));
-        }
-
-        $this->resetAdapterSelection();
-        $this->adapters[$name]['selected'] = true;
-
-        return $this->sortAdapters();
-    }
-
-    /**
-     * Removes all adapters registered in the finder.
-     *
-     * @return Finder The current Finder instance
-     *
-     * @deprecated since 2.8, to be removed in 3.0.
-     */
-    public function removeAdapters()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $this->adapters = array();
-
-        return $this;
-    }
-
-    /**
-     * Returns registered adapters ordered by priority without extra information.
-     *
-     * @return AdapterInterface[]
-     *
-     * @deprecated since 2.8, to be removed in 3.0.
-     */
-    public function getAdapters()
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        $this->initDefaultAdapters();
-
-        return array_values(array_map(function (array $adapter) {
-            return $adapter['adapter'];
-        }, $this->adapters));
     }
 
     /**
@@ -734,22 +624,6 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return Finder The current Finder instance
-     */
-    private function sortAdapters()
-    {
-        uasort($this->adapters, function (array $a, array $b) {
-            if ($a['selected'] || $b['selected']) {
-                return $a['selected'] ? -1 : 1;
-            }
-
-            return $a['priority'] > $b['priority'] ? -1 : 1;
-        });
-
-        return $this;
-    }
-
-    /**
      * @param $dir
      *
      * @return \Iterator
@@ -762,19 +636,6 @@ class Finder implements \IteratorAggregate, \Countable
 
         if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
             $this->notPaths[] = '#(^|/)\..+(/|$)#';
-        }
-
-        if ($this->adapters) {
-            foreach ($this->adapters as $adapter) {
-                if ($adapter['adapter']->isSupported()) {
-                    try {
-                        return $this
-                            ->buildAdapter($adapter['adapter'])
-                            ->searchInDirectory($dir);
-                    } catch (ExceptionInterface $e) {
-                    }
-                }
-            }
         }
 
         $minDepth = 0;
@@ -851,55 +712,5 @@ class Finder implements \IteratorAggregate, \Countable
         }
 
         return $iterator;
-    }
-
-    /**
-     * @param AdapterInterface $adapter
-     *
-     * @return AdapterInterface
-     */
-    private function buildAdapter(AdapterInterface $adapter)
-    {
-        return $adapter
-            ->setFollowLinks($this->followLinks)
-            ->setDepths($this->depths)
-            ->setMode($this->mode)
-            ->setExclude($this->exclude)
-            ->setNames($this->names)
-            ->setNotNames($this->notNames)
-            ->setContains($this->contains)
-            ->setNotContains($this->notContains)
-            ->setSizes($this->sizes)
-            ->setDates($this->dates)
-            ->setFilters($this->filters)
-            ->setSort($this->sort)
-            ->setPath($this->paths)
-            ->setNotPath($this->notPaths)
-            ->ignoreUnreadableDirs($this->ignoreUnreadableDirs);
-    }
-
-    /**
-     * Unselects all adapters.
-     */
-    private function resetAdapterSelection()
-    {
-        $this->adapters = array_map(function (array $properties) {
-            $properties['selected'] = false;
-
-            return $properties;
-        }, $this->adapters);
-    }
-
-    private function initDefaultAdapters()
-    {
-        if (null === $this->adapters) {
-            $this->adapters = array();
-            $this
-                ->addAdapter(new GnuFindAdapter())
-                ->addAdapter(new BsdFindAdapter())
-                ->addAdapter(new PhpAdapter(), -50)
-                ->setAdapter('php')
-            ;
-        }
     }
 }

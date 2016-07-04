@@ -11,23 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 
 class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('collection', array(
-            'entry_type' => 'text',
-        ));
-
-        $this->assertSame('collection', $form->getConfig()->getType()->getName());
-    }
-
     public function testContainsNoChildByDefault()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', null, array(
@@ -274,22 +261,6 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertSame('__test__', $form->getConfig()->getAttribute('prototype')->getName());
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyEntryOptions()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\NumberType',
-            'options' => array('attr' => array('maxlength' => '10')),
-        ));
-
-        $resolvedOptions = $form->getConfig()->getOptions();
-
-        $this->assertEquals('Symfony\Component\Form\Extension\Core\Type\NumberType', $resolvedOptions['entry_type']);
-        $this->assertEquals(array('attr' => array('maxlength' => '10'), 'block_name' => 'entry'), $resolvedOptions['entry_options']);
-    }
-
     public function testPrototypeDefaultLabel()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
@@ -316,24 +287,6 @@ class CollectionTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         ));
 
         $this->assertSame('foo', $form->createView()->vars['prototype']->vars['value']);
-        $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyPrototypeData()
-    {
-        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CollectionType', array(), array(
-            'allow_add' => true,
-            'prototype' => true,
-            'type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
-            'options' => array(
-                'data' => 'bar',
-                'label' => false,
-            ),
-        ));
-        $this->assertSame('bar', $form->createView()->vars['prototype']->vars['value']);
         $this->assertFalse($form->createView()->vars['prototype']->vars['label']);
     }
 

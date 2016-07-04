@@ -70,4 +70,14 @@ class PhpDocExtractorTest extends \PHPUnit_Framework_TestCase
             array('donotexist', null, null, null),
         );
     }
+
+    public function testReturnNullOnEmptyDocBlock()
+    {
+        $this->assertNull($this->extractor->getShortDescription(EmptyDocBlock::class, 'foo'));
+    }
+}
+
+class EmptyDocBlock
+{
+    public $foo;
 }

@@ -59,34 +59,7 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
         return $storage;
     }
 
-    public function testPhpSession53()
-    {
-        if (PHP_VERSION_ID >= 50400) {
-            $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
-        }
-
-        $storage = $this->getStorage();
-
-        $this->assertFalse(isset($_SESSION));
-        $this->assertFalse($storage->getSaveHandler()->isActive());
-
-        session_start();
-        $this->assertTrue(isset($_SESSION));
-        // in PHP 5.3 we cannot reliably tell if a session has started
-        $this->assertFalse($storage->getSaveHandler()->isActive());
-        // PHP session might have started, but the storage driver has not, so false is correct here
-        $this->assertFalse($storage->isStarted());
-
-        $key = $storage->getMetadataBag()->getStorageKey();
-        $this->assertFalse(isset($_SESSION[$key]));
-        $storage->start();
-        $this->assertTrue(isset($_SESSION[$key]));
-    }
-
-    /**
-     * @requires PHP 5.4
-     */
-    public function testPhpSession54()
+    public function testPhpSession()
     {
         $storage = $this->getStorage();
 

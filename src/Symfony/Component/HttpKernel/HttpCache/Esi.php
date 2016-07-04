@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpKernel\HttpCache;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Esi implements the ESI capabilities to Request and Response instances.
@@ -26,105 +25,15 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Esi implements SurrogateInterface
+class Esi extends AbstractSurrogate
 {
-    private $contentTypes;
-    private $phpEscapeMap = array(
-        array('<?', '<%', '<s', '<S'),
-        array('<?php echo "<?"; ?>', '<?php echo "<%"; ?>', '<?php echo "<s"; ?>', '<?php echo "<S"; ?>'),
-    );
-
-    /**
-     * Constructor.
-     *
-     * @param array $contentTypes An array of content-type that should be parsed for ESI information
-     *                            (default: text/html, text/xml, application/xhtml+xml, and application/xml)
-     */
-    public function __construct(array $contentTypes = array('text/html', 'text/xml', 'application/xhtml+xml', 'application/xml'))
-    {
-        $this->contentTypes = $contentTypes;
-    }
-
     public function getName()
     {
         return 'esi';
     }
 
     /**
-     * Returns a new cache strategy instance.
-     *
-     * @return ResponseCacheStrategyInterface A ResponseCacheStrategyInterface instance
-     */
-    public function createCacheStrategy()
-    {
-        return new ResponseCacheStrategy();
-    }
-
-    /**
-     * Checks that at least one surrogate has ESI/1.0 capability.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
-     */
-    public function hasSurrogateCapability(Request $request)
-    {
-        if (null === $value = $request->headers->get('Surrogate-Capability')) {
-            return false;
-        }
-
-        return false !== strpos($value, 'ESI/1.0');
-    }
-
-    /**
-     * Checks that at least one surrogate has ESI/1.0 capability.
-     *
-     * @param Request $request A Request instance
-     *
-     * @return bool true if one surrogate has ESI/1.0 capability, false otherwise
-     *
-     * @deprecated since version 2.6, to be removed in 3.0. Use hasSurrogateCapability() instead
-     */
-    public function hasSurrogateEsiCapability(Request $request)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the hasSurrogateCapability() method instead.', E_USER_DEPRECATED);
-
-        return $this->hasSurrogateCapability($request);
-    }
-
-    /**
-     * Adds ESI/1.0 capability to the given Request.
-     *
-     * @param Request $request A Request instance
-     */
-    public function addSurrogateCapability(Request $request)
-    {
-        $current = $request->headers->get('Surrogate-Capability');
-        $new = 'symfony2="ESI/1.0"';
-
-        $request->headers->set('Surrogate-Capability', $current ? $current.', '.$new : $new);
-    }
-
-    /**
-     * Adds ESI/1.0 capability to the given Request.
-     *
-     * @param Request $request A Request instance
-     *
-     * @deprecated since version 2.6, to be removed in 3.0. Use addSurrogateCapability() instead
-     */
-    public function addSurrogateEsiCapability(Request $request)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the addSurrogateCapability() method instead.', E_USER_DEPRECATED);
-
-        $this->addSurrogateCapability($request);
-    }
-
-    /**
-     * Adds HTTP headers to specify that the Response needs to be parsed for ESI.
-     *
-     * This method only adds an ESI HTTP header if the Response has some ESI tags.
-     *
-     * @param Response $response A Response instance
+     * {@inheritdoc}
      */
     public function addSurrogateControl(Response $response)
     {
@@ -134,46 +43,7 @@ class Esi implements SurrogateInterface
     }
 
     /**
-     * Checks that the Response needs to be parsed for ESI tags.
-     *
-     * @param Response $response A Response instance
-     *
-     * @return bool true if the Response needs to be parsed, false otherwise
-     */
-    public function needsParsing(Response $response)
-    {
-        if (!$control = $response->headers->get('Surrogate-Control')) {
-            return false;
-        }
-
-        return (bool) preg_match('#content="[^"]*ESI/1.0[^"]*"#', $control);
-    }
-
-    /**
-     * Checks that the Response needs to be parsed for ESI tags.
-     *
-     * @param Response $response A Response instance
-     *
-     * @return bool true if the Response needs to be parsed, false otherwise
-     *
-     * @deprecated since version 2.6, to be removed in 3.0. Use needsParsing() instead
-     */
-    public function needsEsiParsing(Response $response)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.6 and will be removed in 3.0. Use the needsParsing() method instead.', E_USER_DEPRECATED);
-
-        return $this->needsParsing($response);
-    }
-
-    /**
-     * Renders an ESI tag.
-     *
-     * @param string $uri          A URI
-     * @param string $alt          An alternate URI
-     * @param bool   $ignoreErrors Whether to ignore errors or not
-     * @param string $comment      A comment to add as an esi:include tag
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function renderIncludeTag($uri, $alt = null, $ignoreErrors = true, $comment = '')
     {
@@ -191,12 +61,7 @@ class Esi implements SurrogateInterface
     }
 
     /**
-     * Replaces a Response ESI tags with the included resource content.
-     *
-     * @param Request  $request  A Request instance
-     * @param Response $response A Response instance
-     *
-     * @return Response
+     * {@inheritdoc}
      */
     public function process(Request $request, Response $response)
     {
@@ -245,51 +110,6 @@ class Esi implements SurrogateInterface
         $response->headers->set('X-Body-Eval', 'ESI');
 
         // remove ESI/1.0 from the Surrogate-Control header
-        if ($response->headers->has('Surrogate-Control')) {
-            $value = $response->headers->get('Surrogate-Control');
-            if ('content="ESI/1.0"' == $value) {
-                $response->headers->remove('Surrogate-Control');
-            } elseif (preg_match('#,\s*content="ESI/1.0"#', $value)) {
-                $response->headers->set('Surrogate-Control', preg_replace('#,\s*content="ESI/1.0"#', '', $value));
-            } elseif (preg_match('#content="ESI/1.0",\s*#', $value)) {
-                $response->headers->set('Surrogate-Control', preg_replace('#content="ESI/1.0",\s*#', '', $value));
-            }
-        }
-    }
-
-    /**
-     * Handles an ESI from the cache.
-     *
-     * @param HttpCache $cache        An HttpCache instance
-     * @param string    $uri          The main URI
-     * @param string    $alt          An alternative URI
-     * @param bool      $ignoreErrors Whether to ignore errors or not
-     *
-     * @return string
-     *
-     * @throws \RuntimeException
-     * @throws \Exception
-     */
-    public function handle(HttpCache $cache, $uri, $alt, $ignoreErrors)
-    {
-        $subRequest = Request::create($uri, 'get', array(), $cache->getRequest()->cookies->all(), array(), $cache->getRequest()->server->all());
-
-        try {
-            $response = $cache->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true);
-
-            if (!$response->isSuccessful()) {
-                throw new \RuntimeException(sprintf('Error when rendering "%s" (Status code is %s).', $subRequest->getUri(), $response->getStatusCode()));
-            }
-
-            return $response->getContent();
-        } catch (\Exception $e) {
-            if ($alt) {
-                return $this->handle($cache, $alt, '', $ignoreErrors);
-            }
-
-            if (!$ignoreErrors) {
-                throw $e;
-            }
-        }
+        $this->removeFromControl($response);
     }
 }

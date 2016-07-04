@@ -37,4 +37,40 @@ class ConstantNode extends Node
     {
         return $this->attributes['value'];
     }
+
+    public function toArray()
+    {
+        $array = array();
+        $value = $this->attributes['value'];
+
+        if (true === $value) {
+            $array[] = 'true';
+        } elseif (false === $value) {
+            $array[] = 'false';
+        } elseif (null === $value) {
+            $array[] = 'null';
+        } elseif (is_numeric($value)) {
+            $array[] = $value;
+        } elseif (!is_array($value)) {
+            $array[] = $this->dumpString($value);
+        } elseif ($this->isHash($value)) {
+            foreach ($value as $k => $v) {
+                $array[] = ', ';
+                $array[] = new self($k);
+                $array[] = ': ';
+                $array[] = new self($v);
+            }
+            $array[0] = '{';
+            $array[] = '}';
+        } else {
+            foreach ($value as $v) {
+                $array[] = ', ';
+                $array[] = new self($v);
+            }
+            $array[0] = '[';
+            $array[] = ']';
+        }
+
+        return $array;
+    }
 }

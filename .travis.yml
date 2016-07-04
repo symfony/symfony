@@ -9,10 +9,12 @@ addons:
     apt_packages:
         - parallel
         - language-pack-fr-base
+        - ldap-utils
+        - slapd
 
 env:
     global:
-        - MIN_PHP=5.3.9
+        - MIN_PHP=5.5.9
         - SYMFONY_PROCESS_PHP_TEST_BINARY=~/.phpenv/versions/5.6/bin/php
 
 matrix:
@@ -22,8 +24,6 @@ matrix:
           sudo: required
           dist: trusty
           group: edge
-        - php: 5.3
-        - php: 5.4
         - php: 5.5
         - php: 5.6
           env: deps=high
@@ -36,10 +36,14 @@ cache:
         - .phpunit
         - php-$MIN_PHP
 
-services: mongodb
+services:
+    - mongodb
+    - redis-server
 
 before_install:
     - stty cols 120
+    - mkdir /tmp/slapd
+    - slapd -f src/Symfony/Component/Ldap/Tests/Fixtures/conf/slapd.conf -h ldap://localhost:3389 &
     - PHP=$TRAVIS_PHP_VERSION
     # Matrix lines for intermediate PHP versions are skipped for pull requests
     - if [[ ! $deps && ! $PHP = ${MIN_PHP%.*} && ! $PHP = hhvm* && $TRAVIS_PULL_REQUEST != false ]]; then deps=skip; skip=1; fi
@@ -48,6 +52,7 @@ before_install:
     - if [[ ! $PHP = hhvm* ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi
     - if [[ ! $skip ]]; then echo memory_limit = -1 >> $INI_FILE; fi
     - if [[ ! $skip ]]; then echo session.gc_probability = 0 >> $INI_FILE; fi
+    - if [[ ! $skip ]]; then echo opcache.enable_cli = 1 >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then echo extension = mongo.so >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then echo extension = memcache.so >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.10 && echo apc.enable_cli = 1 >> $INI_FILE); fi
@@ -55,11 +60,14 @@ before_install:
     - if [[ ! $deps && $PHP = 5.* ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> $INI_FILE); fi
     - if [[ ! $skip && $PHP = 5.* ]]; then pecl install -f memcached-2.1.0; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = ldap.so >> $INI_FILE; fi
+    - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = redis.so >> $INI_FILE; fi;
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini; fi
     - if [[ ! $skip ]]; then composer self-update --stable; fi
     - if [[ ! $skip ]]; then cp .composer/* ~/.composer/; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip ]]; then export PHPUNIT=$(readlink -f ./phpunit); fi
+    - if [[ ! $skip ]]; then ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif; fi
+    - if [[ ! $skip ]]; then ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif; fi
 
 install:
     - if [[ ! $skip ]]; then COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi
@@ -83,3 +91,5 @@ script:
     - if [[ ! $deps && $PHP = ${MIN_PHP%.*} ]]; then echo -e "1\\n0" | xargs -I{} sh -c 'echo "\\nPHP --enable-sigchild enhanced={}" && ENHANCE_SIGCHLD={} php-$MIN_PHP/sapi/cli/php .phpunit/phpunit-4.8/phpunit --colors=always src/Symfony/Component/Process/'; fi
     - if [[ $deps = high ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --no-progress --ansi; $PHPUNIT --exclude-group tty,benchmark,intl-data'$LEGACY; fi
     - if [[ $deps = low ]]; then echo "$COMPONENTS" | parallel --gnu -j10% 'cd {}; composer update --no-progress --ansi --prefer-lowest --prefer-stable; $PHPUNIT --exclude-group tty,benchmark,intl-data'; fi
+    # Test the PhpUnit bridge using the original phpunit script
+    - if [[ $deps = low ]]; then (cd src/Symfony/Bridge/PhpUnit && phpenv global 5.3 && php --version && composer update && phpunit); fi

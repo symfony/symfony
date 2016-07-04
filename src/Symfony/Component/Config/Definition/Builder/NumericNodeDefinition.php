@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Config\Definition\Builder;
 
+use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+
 /**
  * Abstract class that contains common code of integer and float node definitions.
  *
@@ -62,12 +64,10 @@ abstract class NumericNodeDefinition extends ScalarNodeDefinition
     /**
      * {@inheritdoc}
      *
-     * @deprecated Deprecated since version 2.8, to be removed in 3.0.
+     * @throws InvalidDefinitionException
      */
     public function cannotBeEmpty()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        return parent::cannotBeEmpty();
+        throw new InvalidDefinitionException('->cannotBeEmpty() is not applicable to NumericNodeDefinition.');
     }
 }

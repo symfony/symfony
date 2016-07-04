@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface as ExecutionContextInterface2Dot5;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
-use Symfony\Component\Validator\Violation\LegacyConstraintViolationBuilder;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Base class for constraint validators.
@@ -51,51 +49,6 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     }
 
     /**
-     * Wrapper for {@link ExecutionContextInterface::buildViolation} that
-     * supports the 2.4 context API.
-     *
-     * @param string $message    The violation message
-     * @param array  $parameters The message parameters
-     *
-     * @return ConstraintViolationBuilderInterface The violation builder
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     */
-    protected function buildViolation($message, array $parameters = array())
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        if ($this->context instanceof ExecutionContextInterface2Dot5) {
-            return $this->context->buildViolation($message, $parameters);
-        }
-
-        return new LegacyConstraintViolationBuilder($this->context, $message, $parameters);
-    }
-
-    /**
-     * Wrapper for {@link ExecutionContextInterface::buildViolation} that
-     * supports the 2.4 context API.
-     *
-     * @param ExecutionContextInterface $context    The context to use
-     * @param string                    $message    The violation message
-     * @param array                     $parameters The message parameters
-     *
-     * @return ConstraintViolationBuilderInterface The violation builder
-     *
-     * @deprecated since version 2.5, to be removed in 3.0.
-     */
-    protected function buildViolationInContext(ExecutionContextInterface $context, $message, array $parameters = array())
-    {
-        @trigger_error('The '.__METHOD__.' is deprecated since version 2.5 and will be removed in 3.0.', E_USER_DEPRECATED);
-
-        if ($context instanceof ExecutionContextInterface2Dot5) {
-            return $context->buildViolation($message, $parameters);
-        }
-
-        return new LegacyConstraintViolationBuilder($context, $message, $parameters);
-    }
-
-    /**
      * Returns a string representation of the type of the value.
      *
      * This method should be used if you pass the type of a value as
@@ -119,7 +72,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      * (i.e. "false" for false, "1" for 1 etc.). Strings are always wrapped
      * in double quotes ("). Objects, arrays and resources are formatted as
      * "object", "array" and "resource". If the $format bitmask contains
-     * the PRETTY_DATE bit, then {@link \DateTime} objects will be formatted 
+     * the PRETTY_DATE bit, then {@link \DateTime} objects will be formatted
      * as RFC-3339 dates ("Y-m-d H:i:s").
      *
      * Be careful when passing message parameters to a constraint violation
@@ -136,7 +89,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function formatValue($value, $format = 0)
     {
-        $isDateTime = $value instanceof \DateTime || $value instanceof \DateTimeInterface;
+        $isDateTime = $value instanceof \DateTimeInterface;
 
         if (($format & self::PRETTY_DATE) && $isDateTime) {
             if (class_exists('IntlDateFormatter')) {

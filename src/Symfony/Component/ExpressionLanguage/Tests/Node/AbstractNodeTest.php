@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 abstract class AbstractNodeTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,4 +37,15 @@ abstract class AbstractNodeTest extends \PHPUnit_Framework_TestCase
     }
 
     abstract public function getCompileData();
+
+    /**
+     * @dataProvider getDumpData
+     */
+    public function testDump($expected, $node)
+    {
+        $expr = new ParsedExpression($expected, $node);
+        $this->assertSame($expected, $expr->dump());
+    }
+
+    abstract public function getDumpData();
 }

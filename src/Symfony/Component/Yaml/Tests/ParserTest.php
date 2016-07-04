@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Parser;
 
@@ -32,9 +31,30 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getDataFormSpecifications
      */
-    public function testSpecifications($file, $expected, $yaml, $comment)
+    public function testSpecifications($file, $expected, $yaml, $comment, $deprecated)
     {
+        $deprecations = array();
+
+        if ($deprecated) {
+            set_error_handler(function ($type, $msg) use (&$deprecations) {
+                if (E_USER_DEPRECATED !== $type) {
+                    restore_error_handler();
+
+                    return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+                }
+
+                $deprecations[] = $msg;
+            });
+        }
+
         $this->assertEquals($expected, var_export($this->parser->parse($yaml), true), $comment);
+
+        if ($deprecated) {
+            restore_error_handler();
+
+            $this->assertCount(1, $deprecations);
+            $this->assertContains('Using the comma as a group separator for floats is deprecated since version 3.2 and will be removed in 4.0.', $deprecations[0]);
+        }
     }
 
     public function getDataFormSpecifications()
@@ -59,7 +79,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 } else {
                     eval('$expected = '.trim($test['php']).';');
 
-                    $tests[] = array($file, var_export($expected, true), $test['yaml'], $test['test']);
+                    $tests[] = array($file, var_export($expected, true), $test['yaml'], $test['test'], isset($test['deprecated']) ? $test['deprecated'] : false);
                 }
             }
         }
@@ -423,16 +443,34 @@ EOF;
     public function testObjectSupportEnabled()
     {
         $input = <<<EOF
-foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
-        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
+    }
 
+    /**
+     * @group legacy
+     */
+    public function testObjectSupportEnabledPassingTrue()
+    {
         $input = <<<EOF
 foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
         $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, false, true), '->parse() is able to parse objects');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testObjectSupportEnabledWithDeprecatedTag()
+    {
+        $input = <<<EOF
+foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
+bar: 1
+EOF;
+        $this->assertEquals(array('foo' => new B(), 'bar' => 1), $this->parser->parse($input, Yaml::PARSE_OBJECT), '->parse() is able to parse objects');
     }
 
     /**
@@ -447,6 +485,15 @@ EOF;
      * @dataProvider getObjectForMapTests
      */
     public function testObjectForMap($yaml, $expected)
+    {
+        $this->assertEquals($expected, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider getObjectForMapTests
+     */
+    public function testObjectForMapEnabledWithMappingUsingBooleanToggles($yaml, $expected)
     {
         $this->assertEquals($expected, $this->parser->parse($yaml, false, false, true));
     }
@@ -520,7 +567,17 @@ YAML;
      */
     public function testObjectsSupportDisabledWithExceptions($yaml)
     {
-        $this->parser->parse($yaml, true, false);
+        $this->parser->parse($yaml, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+    }
+
+    /**
+     * @group legacy
+     * @dataProvider invalidDumpedObjectProvider
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testObjectsSupportDisabledWithExceptionsUsingBooleanToggles($yaml)
+    {
+        $this->parser->parse($yaml, true);
     }
 
     public function invalidDumpedObjectProvider()
@@ -926,20 +983,16 @@ EOF;
     }
 
     /**
-     * @group legacy
-     * throw ParseException in Symfony 3.0
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage A colon cannot be used in an unquoted mapping value
      */
     public function testColonInMappingValueException()
     {
-        $parser = $this->parser;
-
-        ErrorAssert::assertDeprecationsAreTriggered('Using a colon in the unquoted mapping value "bar: baz" in line 1 is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', function () use ($parser) {
-            $yaml = <<<EOF
+        $yaml = <<<EOF
 foo: bar: baz
 EOF;
-            $parser->parse($yaml);
-        });
+
+        $this->parser->parse($yaml);
     }
 
     public function testColonInMappingValueExceptionNotTriggeredByColonInComment()
@@ -1135,6 +1188,100 @@ EOT
             ),
             $this->parser->parse($yaml)
         );
+    }
+
+    /**
+     * @dataProvider getBinaryData
+     */
+    public function testParseBinaryData($data)
+    {
+        $this->assertSame(array('data' => 'Hello world'), $this->parser->parse($data));
+    }
+
+    public function getBinaryData()
+    {
+        return array(
+            'enclosed with double quotes' => array('data: !!binary "SGVsbG8gd29ybGQ="'),
+            'enclosed with single quotes' => array("data: !!binary 'SGVsbG8gd29ybGQ='"),
+            'containing spaces' => array('data: !!binary  "SGVs bG8gd 29ybGQ="'),
+            'in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8gd29ybGQ=
+EOT
+    ),
+            'containing spaces in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVs bG8gd 29ybGQ=
+EOT
+    ),
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidBinaryData
+     */
+    public function testParseInvalidBinaryData($data, $expectedMessage)
+    {
+        $this->setExpectedExceptionRegExp('\Symfony\Component\Yaml\Exception\ParseException', $expectedMessage);
+
+        $this->parser->parse($data);
+    }
+
+    public function getInvalidBinaryData()
+    {
+        return array(
+            'length not a multiple of four' => array('data: !!binary "SGVsbG8d29ybGQ="', '/The normalized base64 encoded data \(data without whitespace characters\) length must be a multiple of four \(\d+ bytes given\)/'),
+            'invalid characters' => array('!!binary "SGVsbG8#d29ybGQ="', '/The base64 encoded data \(.*\) contains invalid characters/'),
+            'too many equals characters' => array('data: !!binary "SGVsbG8gd29yb==="', '/The base64 encoded data \(.*\) contains invalid characters/'),
+            'misplaced equals character' => array('data: !!binary "SGVsbG8gd29ybG=Q"', '/The base64 encoded data \(.*\) contains invalid characters/'),
+            'length not a multiple of four in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8d29ybGQ=
+EOT
+                ,
+                '/The normalized base64 encoded data \(data without whitespace characters\) length must be a multiple of four \(\d+ bytes given\)/',
+            ),
+            'invalid characters in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8#d29ybGQ=
+EOT
+                ,
+                '/The base64 encoded data \(.*\) contains invalid characters/',
+            ),
+            'too many equals characters in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8gd29yb===
+EOT
+                ,
+                '/The base64 encoded data \(.*\) contains invalid characters/',
+            ),
+            'misplaced equals character in block scalar' => array(
+                <<<EOT
+data: !!binary |
+    SGVsbG8gd29ybG=Q
+EOT
+                ,
+                '/The base64 encoded data \(.*\) contains invalid characters/',
+            ),
+        );
+    }
+
+    public function testParseDateAsMappingValue()
+    {
+        $yaml = <<<EOT
+date: 2002-12-14
+EOT;
+        $expectedDate = new \DateTime();
+        $expectedDate->setTimeZone(new \DateTimeZone('UTC'));
+        $expectedDate->setDate(2002, 12, 14);
+        $expectedDate->setTime(0, 0, 0);
+
+        $this->assertEquals(array('date' => $expectedDate), $this->parser->parse($yaml, Yaml::PARSE_DATETIME));
     }
 
     /**

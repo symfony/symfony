@@ -27,7 +27,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
     private $isSkipped = array();
 
     /**
-     * @param array $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive)
+     * @param array $mockedNamespaces List of namespaces, indexed by mocked features (time-sensitive or dns-sensitive)
      */
     public function __construct(array $mockedNamespaces = array())
     {
@@ -44,6 +44,11 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             if ('time-sensitive' === $type) {
                 foreach ($namespaces as $ns) {
                     ClockMock::register($ns.'\DummyClass');
+                }
+            }
+            if ('dns-sensitive' === $type) {
+                foreach ($namespaces as $ns) {
+                    DnsMock::register($ns.'\DummyClass');
                 }
             }
         }
@@ -100,6 +105,9 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                         if (in_array('time-sensitive', $groups, true)) {
                             ClockMock::register($test->getName());
                         }
+                        if (in_array('dns-sensitive', $groups, true)) {
+                            DnsMock::register($test->getName());
+                        }
                     }
                 }
             }
@@ -140,6 +148,9 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                 ClockMock::register(get_class($test));
                 ClockMock::withClockMock(true);
             }
+            if (in_array('dns-sensitive', $groups, true)) {
+                DnsMock::register(get_class($test));
+            }
         }
     }
 
@@ -150,6 +161,9 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 
             if (in_array('time-sensitive', $groups, true)) {
                 ClockMock::withClockMock(false);
+            }
+            if (in_array('dns-sensitive', $groups, true)) {
+                DnsMock::withMockedHosts(array());
             }
         }
     }

@@ -1,4 +1,4 @@
-<script>/*<![CDATA[*/
+<script{% if csp_script_nonce is defined and csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>/*<![CDATA[*/
     {# Caution: the contents of this file are processed by Twig before loading
                 them as JavaScript source code. Always use '/*' comments instead
                 of '//' comments to avoid impossible-to-debug side-effects #}
@@ -123,6 +123,19 @@
                             }
                             methodCell.textContent = request.method;
                             row.appendChild(methodCell);
+
+                            var statusCodeCell = document.createElement('td');
+                            var statusCode = document.createElement('span');
+                            if (request.statusCode < 300) {
+                                statusCode.setAttribute('class', 'sf-toolbar-status');
+                            } else if (request.statusCode < 400) {
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
+                            } else {
+                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+                            }
+                            statusCode.textContent = request.statusCode || '-';
+                            statusCodeCell.appendChild(statusCode);
+                            row.appendChild(statusCodeCell);
 
                             var pathCell = document.createElement('td');
                             pathCell.className = 'sf-ajax-request-url';
@@ -255,7 +268,7 @@
                                 stackElement.duration = new Date() - stackElement.start;
                                 stackElement.loading = false;
                                 stackElement.error = self.status < 200 || self.status >= 400;
-
+                                stackElement.statusCode = self.status;
                                 extractHeaders(self, stackElement);
 
                                 Sfjs.renderAjaxRequests();

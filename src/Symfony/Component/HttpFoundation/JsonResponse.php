@@ -29,16 +29,17 @@ class JsonResponse extends Response
 
     // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
     // 15 === JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
-    protected $encodingOptions = 15;
+    const DEFAULT_ENCODING_OPTIONS = 15;
+
+    protected $encodingOptions = self::DEFAULT_ENCODING_OPTIONS;
 
     /**
-     * Constructor.
-     *
      * @param mixed $data    The response data
      * @param int   $status  The response status code
      * @param array $headers An array of response headers
+     * @param bool  $json    If the data is already a JSON string
      */
-    public function __construct($data = null, $status = 200, $headers = array())
+    public function __construct($data = null, $status = 200, $headers = array(), $json = false)
     {
         parent::__construct('', $status, $headers);
 
@@ -46,7 +47,7 @@ class JsonResponse extends Response
             $data = new \ArrayObject();
         }
 
-        $this->setData($data);
+        $json ? $this->setJson($data) : $this->setData($data);
     }
 
     /**
@@ -85,6 +86,22 @@ class JsonResponse extends Response
     }
 
     /**
+     * Sets a raw string containing a JSON document to be sent.
+     *
+     * @param string $json
+     *
+     * @return JsonResponse
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setJson($json)
+    {
+        $this->data = $json;
+
+        return $this->update();
+    }
+
+    /**
      * Sets the data to be sent as JSON.
      *
      * @param mixed $data
@@ -102,39 +119,12 @@ class JsonResponse extends Response
             $data = json_encode($data, $this->encodingOptions);
         } else {
             try {
-                if (PHP_VERSION_ID < 50400) {
-                    // PHP 5.3 triggers annoying warnings for some
-                    // types that can't be serialized as JSON (INF, resources, etc.)
-                    // but doesn't provide the JsonSerializable interface.
-                    set_error_handler(function () { return false; });
-                    $data = @json_encode($data, $this->encodingOptions);
-                } else {
-                    // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
-                    // objects in a new exception that needs to be removed.
-                    // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
-                    if (PHP_VERSION_ID < 50500) {
-                        // Clear json_last_error()
-                        json_encode(null);
-                        $errorHandler = set_error_handler('var_dump');
-                        restore_error_handler();
-                        set_error_handler(function () use ($errorHandler) {
-                            if (JSON_ERROR_NONE === json_last_error()) {
-                                return $errorHandler && false !== call_user_func_array($errorHandler, func_get_args());
-                            }
-                        });
-                    }
-
-                    $data = json_encode($data, $this->encodingOptions);
-                }
-
-                if (PHP_VERSION_ID < 50500) {
-                    restore_error_handler();
-                }
+                // PHP 5.4 and up wrap exceptions thrown by JsonSerializable
+                // objects in a new exception that needs to be removed.
+                // Fortunately, PHP 5.5 and up do not trigger any warning anymore.
+                $data = json_encode($data, $this->encodingOptions);
             } catch (\Exception $e) {
-                if (PHP_VERSION_ID < 50500) {
-                    restore_error_handler();
-                }
-                if (PHP_VERSION_ID >= 50400 && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
+                if ('Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
                     throw $e->getPrevious() ?: $e;
                 }
                 throw $e;
@@ -145,9 +135,7 @@ class JsonResponse extends Response
             throw new \InvalidArgumentException(json_last_error_msg());
         }
 
-        $this->data = $data;
-
-        return $this->update();
+        return $this->setJson($data);
     }
 
     /**

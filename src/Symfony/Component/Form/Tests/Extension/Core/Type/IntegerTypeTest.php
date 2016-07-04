@@ -23,16 +23,6 @@ class IntegerTypeTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyName()
-    {
-        $form = $this->factory->create('integer');
-
-        $this->assertSame('integer', $form->getConfig()->getType()->getName());
-    }
-
     public function testSubmitCastsToInteger()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\IntegerType');

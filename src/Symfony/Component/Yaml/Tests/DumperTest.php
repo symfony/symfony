@@ -13,6 +13,7 @@ namespace Symfony\Component\Yaml\Tests;
 
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Dumper;
+use Symfony\Component\Yaml\Yaml;
 
 class DumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,6 +51,34 @@ class DumperTest extends \PHPUnit_Framework_TestCase
         $this->array = null;
     }
 
+    public function testIndentationInConstructor()
+    {
+        $dumper = new Dumper(7);
+        $expected = <<<'EOF'
+'': bar
+foo: '#bar'
+'foo''bar': {  }
+bar:
+       - 1
+       - foo
+foobar:
+       foo: bar
+       bar:
+              - 1
+              - foo
+       foobar:
+              foo: bar
+              bar:
+                     - 1
+                     - foo
+
+EOF;
+        $this->assertEquals($expected, $dumper->dump($this->array, 4, 0));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testSetIndentation()
     {
         $this->dumper->setIndentation(7);
@@ -178,6 +207,16 @@ EOF;
 
     public function testObjectSupportEnabled()
     {
+        $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_OBJECT);
+
+        $this->assertEquals('{ foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testObjectSupportEnabledPassingTrue()
+    {
         $dump = $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, false, true);
 
         $this->assertEquals('{ foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}, bar: 1 }', $dump, '->dump() is able to dump objects');
@@ -195,7 +234,16 @@ EOF;
      */
     public function testObjectSupportDisabledWithExceptions()
     {
-        $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, true, false);
+        $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
+    }
+
+    /**
+     * @group legacy
+     * @expectedException \Symfony\Component\Yaml\Exception\DumpException
+     */
+    public function testObjectSupportDisabledWithExceptionsPassingTrue()
+    {
+        $this->dumper->dump(array('foo' => new A(), 'bar' => 1), 0, 0, true);
     }
 
     /**
@@ -229,13 +277,81 @@ EOF;
         );
     }
 
+    public function testBinaryDataIsDumpedBase64Encoded()
+    {
+        $binaryData = file_get_contents(__DIR__.'/Fixtures/arrow.gif');
+        $expected = '{ data: !!binary '.base64_encode($binaryData).' }';
+
+        $this->assertSame($expected, $this->dumper->dump(array('data' => $binaryData)));
+    }
+
+    public function testNonUtf8DataIsDumpedBase64Encoded()
+    {
+        // "für" (ISO-8859-1 encoded)
+        $this->assertSame('!!binary ZsM/cg==', $this->dumper->dump("f\xc3\x3fr"));
+    }
+
+    /**
+     * @dataProvider objectAsMapProvider
+     */
+    public function testDumpObjectAsMap($object, $expected)
+    {
+        $yaml = $this->dumper->dump($object, 0, 0, Yaml::DUMP_OBJECT_AS_MAP);
+
+        $this->assertEquals($expected, Yaml::parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
+    }
+
+    public function objectAsMapProvider()
+    {
+        $tests = array();
+
+        $bar = new \stdClass();
+        $bar->class = 'classBar';
+        $bar->args = array('bar');
+        $zar = new \stdClass();
+        $foo = new \stdClass();
+        $foo->bar = $bar;
+        $foo->zar = $zar;
+        $object = new \stdClass();
+        $object->foo = $foo;
+        $tests['stdClass'] = array($object, $object);
+
+        $arrayObject = new \ArrayObject();
+        $arrayObject['foo'] = 'bar';
+        $arrayObject['baz'] = 'foobar';
+        $parsedArrayObject = new \stdClass();
+        $parsedArrayObject->foo = 'bar';
+        $parsedArrayObject->baz = 'foobar';
+        $tests['ArrayObject'] = array($arrayObject, $parsedArrayObject);
+
+        $a = new A();
+        $tests['arbitrary-object'] = array($a, null);
+
+        return $tests;
+    }
+
+    public function testDumpMultiLineStringAsScalarBlock()
+    {
+        $data = array(
+            'data' => array(
+                'single_line' => 'foo bar baz',
+                'multi_line' => "foo\nline with trailing spaces:\n  \nbar\r\ninteger like line:\n123456789\nempty line:\n\nbaz",
+                'nested_inlined_multi_line_string' => array(
+                    'inlined_multi_line' => "foo\nbar\r\nempty line:\n\nbaz",
+                ),
+            ),
+        );
+
+        $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block.yml'), $this->dumper->dump($data, 3, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage The indentation must be greater than zero
      */
     public function testZeroIndentationThrowsException()
     {
-        $this->dumper->setIndentation(0);
+        new Dumper(0);
     }
 
     /**
@@ -244,7 +360,7 @@ EOF;
      */
     public function testNegativeIndentationThrowsException()
     {
-        $this->dumper->setIndentation(-4);
+        new Dumper(-4);
     }
 }
 

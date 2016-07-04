@@ -11,12 +11,15 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-class FragmentController extends ContainerAware
+class FragmentController implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     public function indexAction(Request $request)
     {
         return $this->container->get('templating')->renderResponse('fragment.html.php', array('bar' => new Bar()));

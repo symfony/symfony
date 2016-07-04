@@ -25,7 +25,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
     public function testInterface()
     {
         $classMetadata = new ClassMetadataFactory(new LoaderChain(array()));
-        $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory', $classMetadata);
+        $this->assertInstanceOf('Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface', $classMetadata);
     }
 
     public function testGetMetadataFor()
@@ -45,6 +45,9 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($factory->hasMetadataFor('Dunglas\Entity'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCacheExists()
     {
         $cache = $this->getMock('Doctrine\Common\Cache\Cache');
@@ -58,17 +61,14 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testCacheNotExists()
     {
         $cache = $this->getMock('Doctrine\Common\Cache\Cache');
-        $cache
-            ->method('fetch')
-            ->will($this->returnValue(false))
-        ;
-
-        $cache
-            ->method('save')
-        ;
+        $cache->method('fetch')->will($this->returnValue(false));
+        $cache->method('save');
 
         $factory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()), $cache);
         $metadata = $factory->getMetadataFor('Symfony\Component\Serializer\Tests\Fixtures\GroupDummy');

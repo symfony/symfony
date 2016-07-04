@@ -15,7 +15,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
+use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -39,8 +42,9 @@ class ContextListener implements ListenerInterface
     private $userProviders;
     private $dispatcher;
     private $registered;
+    private $trustResolver;
 
-    public function __construct(TokenStorageInterface $tokenStorage, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct(TokenStorageInterface $tokenStorage, array $userProviders, $contextKey, LoggerInterface $logger = null, EventDispatcherInterface $dispatcher = null, AuthenticationTrustResolverInterface $trustResolver = null)
     {
         if (empty($contextKey)) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -58,6 +62,7 @@ class ContextListener implements ListenerInterface
         $this->sessionKey = '_security_'.$contextKey;
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
+        $this->trustResolver = $trustResolver ?: new AuthenticationTrustResolver(AnonymousToken::class, RememberMeToken::class);
     }
 
     /**
@@ -121,7 +126,7 @@ class ContextListener implements ListenerInterface
         $request = $event->getRequest();
         $session = $request->getSession();
 
-        if ((null === $token = $this->tokenStorage->getToken()) || ($token instanceof AnonymousToken)) {
+        if ((null === $token = $this->tokenStorage->getToken()) || $this->trustResolver->isAnonymous($token)) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
             }

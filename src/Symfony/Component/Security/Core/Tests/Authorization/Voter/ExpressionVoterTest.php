@@ -17,15 +17,6 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class ExpressionVoterTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSupportsAttribute()
-    {
-        $expression = $this->createExpression();
-        $expressionLanguage = $this->getMock('Symfony\Component\Security\Core\Authorization\ExpressionLanguage');
-        $voter = new ExpressionVoter($expressionLanguage, $this->createTrustResolver(), $this->createRoleHierarchy());
-
-        $this->assertTrue($voter->supportsAttribute($expression));
-    }
-
     /**
      * @dataProvider getVoteTests
      */

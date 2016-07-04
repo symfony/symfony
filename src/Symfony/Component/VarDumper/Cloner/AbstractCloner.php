@@ -67,6 +67,8 @@ abstract class AbstractCloner implements ClonerInterface
         'DOMProcessingInstruction' => 'Symfony\Component\VarDumper\Caster\DOMCaster::castProcessingInstruction',
         'DOMXPath' => 'Symfony\Component\VarDumper\Caster\DOMCaster::castXPath',
 
+        'XmlReader' => 'Symfony\Component\VarDumper\Caster\XmlReaderCaster::castXmlReader',
+
         'ErrorException' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castErrorException',
         'Exception' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castException',
         'Error' => 'Symfony\Component\VarDumper\Caster\ExceptionCaster::castError',
@@ -99,6 +101,9 @@ abstract class AbstractCloner implements ClonerInterface
         'OuterIterator' => 'Symfony\Component\VarDumper\Caster\SplCaster::castOuterIterator',
 
         'MongoCursorInterface' => 'Symfony\Component\VarDumper\Caster\MongoCaster::castCursor',
+
+        'Redis' => 'Symfony\Component\VarDumper\Caster\RedisCaster::castRedis',
+        'RedisArray' => 'Symfony\Component\VarDumper\Caster\RedisCaster::castRedisArray',
 
         ':curl' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castCurl',
         ':dba' => 'Symfony\Component\VarDumper\Caster\ResourceCaster::castDba',
@@ -185,8 +190,20 @@ abstract class AbstractCloner implements ClonerInterface
      */
     public function cloneVar($var, $filter = 0)
     {
+        $this->prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) {
+            if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
+                // Cloner never dies
+                throw new \ErrorException($msg, 0, $type, $file, $line);
+            }
+
+            if ($this->prevErrorHandler) {
+                return call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
+            }
+
+            return false;
+        });
         $this->filter = $filter;
-        $this->prevErrorHandler = set_error_handler(array($this, 'handleError'));
+
         try {
             $data = $this->doClone($var);
         } catch (\Exception $e) {
@@ -297,24 +314,5 @@ abstract class AbstractCloner implements ClonerInterface
         }
 
         return $a;
-    }
-
-    /**
-     * Special handling for errors: cloning must be fail-safe.
-     *
-     * @internal
-     */
-    public function handleError($type, $msg, $file, $line, $context)
-    {
-        if (E_RECOVERABLE_ERROR === $type || E_USER_ERROR === $type) {
-            // Cloner never dies
-            throw new \ErrorException($msg, 0, $type, $file, $line);
-        }
-
-        if ($this->prevErrorHandler) {
-            return call_user_func($this->prevErrorHandler, $type, $msg, $file, $line, $context);
-        }
-
-        return false;
     }
 }

@@ -24,12 +24,11 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
     /**
      * Transforms a DateTime object into a timestamp in the configured timezone.
      *
-     * @param \DateTime|\DateTimeInterface $dateTime A DateTime object
+     * @param \DateTimeInterface $dateTime A DateTimeInterface object
      *
      * @return int A timestamp
      *
-     * @throws TransformationFailedException If the given value is not an instance
-     *                                       of \DateTime or \DateTimeInterface
+     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
      */
     public function transform($dateTime)
     {
@@ -37,8 +36,8 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
             return;
         }
 
-        if (!$dateTime instanceof \DateTime && !$dateTime instanceof \DateTimeInterface) {
-            throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
+        if (!$dateTime instanceof \DateTimeInterface) {
+            throw new TransformationFailedException('Expected a \DateTimeInterface.');
         }
 
         return $dateTime->getTimestamp();

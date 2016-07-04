@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClass;
@@ -553,5 +554,16 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($object, 'publicAccessor[value2]', 'baz');
         $this->assertSame('baz', $this->propertyAccessor->getValue($object, 'publicAccessor[value2]'));
         $this->assertSame(array('value1' => 'foo', 'value2' => 'baz'), $object->getPublicAccessor());
+    }
+
+    public function testCacheReadAccess()
+    {
+        $obj = new TestClass('foo');
+
+        $propertyAccessor = new PropertyAccessor(false, false, new ArrayAdapter());
+        $this->assertEquals('foo', $propertyAccessor->getValue($obj, 'publicGetSetter'));
+        $propertyAccessor->setValue($obj, 'publicGetSetter', 'bar');
+        $propertyAccessor->setValue($obj, 'publicGetSetter', 'baz');
+        $this->assertEquals('baz', $propertyAccessor->getValue($obj, 'publicGetSetter'));
     }
 }

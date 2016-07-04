@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by hhamon at 2016-07-01T19:22:08Z
+
+At first sight it may look like a BC break but the `UuidValidator` class already has several methods arguments that are typehinted on the `Uuid` constraint concrete class in their signatures.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-02T06:46:54Z
+
+Im not sure.. some validators do it, others dont. There are also not much validators that typehint against constraints (ie the job is always done directy  in `validate()`).
+
+Currently we can give an any constraint providing the same options (which is nice i guess... but only works if we depend on constraint options, not specific constraints) for most validators. This should be consistent imo.
+
+Undefined option calls failing due invalid constraints is a different story :) It could be solved with something like `Constraint::get($constraint, 'message', 'Default message');`..
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-07-02T07:16:46Z
+
+If you look at the `validateLoose` and `validateStrict` methods, they already typehint against the `Uuid` constraint concrete type. It was already forced by design.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-02T10:36:42Z
+
+From a class scope pov the type check is good (ie. better than violating typehints), from a package scope pov i would just stick with `private function validateLoose($value, Constraint $constraint)`. However currently its in between.. so lets see :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-02T16:14:50Z
+
+Do we have any other class with such a check? If not, I propose to close this PR as it does not really add any value.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T06:17:25Z
+
+This one added a lot: https://github.com/symfony/symfony/commit/df56c23d8f1fc94f46853018df84a2c3c3ba2613
+
+edit: edit: Seems like Uuid is the last one without such a check :') lets do it.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-07-03T18:22:25Z
+
+@fabpot every other concrete validator classes does that! For instance `LengthValidator::validate` method checks the received constraint is an instance of the `Length` constraint.

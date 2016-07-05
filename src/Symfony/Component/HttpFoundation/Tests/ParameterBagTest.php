@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
@@ -135,13 +136,22 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDate()
     {
-        $bag = new ParameterBag(array('d1' => '2016-01-01'));
+        $isoDate = '2016-07-05T15:30:00CET';
+        $bag = new ParameterBag(array(
+            'd1' => '2016-01-01',
+            'iso' => $isoDate
+        ));
+
         $date = \DateTime::createFromFormat('Y-m-d', '2016-01-01');
         $diff = $date->diff($bag->getDate('d1'));
 
         $this->assertEquals(0, $diff->days, '->getDate() returns a date via the format specified');
         $this->assertFalse($bag->getDate('d1', 'd/m/Y'), '->getDate() returns false if the format is not valid');
         $this->assertNull($bag->getDate('d2', 'd/m/Y'), '->getDate() returns null if the parameter is not found');
+
+        $date = $bag->getDate('iso', \DateTime::ISO8601);
+        $this->assertEquals(new \DateTime($isoDate), $date);
+        $this->assertEquals("CET", $date->getTimezone()->getName());
     }
 
     public function testFilter()

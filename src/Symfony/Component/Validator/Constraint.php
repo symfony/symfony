@@ -207,8 +207,6 @@ abstract class Constraint
      * @throws InvalidOptionsException If an invalid option name is given
      *
      * @internal This method should not be used or overwritten in userland code.
-     *
-     * @since 2.6
      */
     public function __get($option)
     {
@@ -296,8 +294,6 @@ abstract class Constraint
      * @internal This method may be replaced by an implementation of
      *           {@link \Serializable} in the future. Please don't use or
      *           overwrite it.
-     *
-     * @since 2.6
      */
     public function __sleep()
     {

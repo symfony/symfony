@@ -21,8 +21,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 
 /**
- * @since 2.5.3
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCase

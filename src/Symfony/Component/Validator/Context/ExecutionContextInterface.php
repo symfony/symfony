@@ -57,8 +57,6 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * cannot store a context and expect that the methods still return the same
  * results later on.
  *
- * @since  2.5
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ExecutionContextInterface

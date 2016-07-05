@@ -19,20 +19,19 @@ use Symfony\Component\Form\Exception\InvalidArgumentException;
  */
 class ButtonBuilderTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @return array
      */
     public function getValidNames()
     {
-        return [
-            ['reset'],
-            ['submit'],
-            ['foo'],
-            ['0'],
-            [0],
-            ['button[]'],
-        ];
+        return array(
+            array('reset'),
+            array('submit'),
+            array('foo'),
+            array('0'),
+            array(0),
+            array('button[]'),
+        );
     }
 
     /**
@@ -50,11 +49,11 @@ class ButtonBuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function getInvalidNames()
     {
-        return [
-            [''],
-            [false],
-            [null],
-        ];
+        return array(
+            array(''),
+            array(false),
+            array(null),
+        );
     }
 
     /**
@@ -67,5 +66,4 @@ class ButtonBuilderTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(InvalidArgumentException::class, 'Buttons cannot have empty names.');
         new ButtonBuilder($name);
     }
-
 }

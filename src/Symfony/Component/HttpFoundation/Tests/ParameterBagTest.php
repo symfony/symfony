@@ -140,9 +140,12 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         
         $diff = $date->diff($bag->getDate('d1'));
 
+        var_dump($bag->getDate('d1', 'd/m/Y'));
+        var_dump($bag->getDate('d1', 'd/m/Y'));
+
         $this->assertEquals(0, $diff->days, '->getDate() returns a date via the format specified');
-        $this->assertEquals(false, $bag->getDate('d1', 'd/m/Y'), '->getDate() returns a date from the specified format');
-        $this->assertEquals(null, $bag->getDate('d1', 'd/m/Y'), '->getDate() returns null if the parameter is not found');
+        $this->assertFalse($bag->getDate('d1', 'd/m/Y'), '->getDate() returns false if the format is not valid');
+        $this->assertNull($bag->getDate('d2', 'd/m/Y'), '->getDate() returns null if the parameter is not found');
     }
 
     public function testFilter()

@@ -196,7 +196,11 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function getDate($key, $format = 'Y-m-d', $default = null, \DateTimeZone $timeZone = null)
     {
-        return \DateTime::createFromFormat($format, $this->get($key, $default), $timeZone);
+        if ($this->has($key)) {
+            return \DateTime::createFromFormat($format, $this->get($key), $timeZone);
+        }
+
+        return $default;
     }
 
     /***

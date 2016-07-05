@@ -81,6 +81,10 @@ class UuidValidator extends ConstraintValidator
             return;
         }
 
+        if (!$constraint instanceof Uuid) {
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Uuid');
+        }
+
         if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
@@ -232,20 +236,14 @@ class UuidValidator extends ConstraintValidator
                 if ($i !== $h) {
                     if ($this->context instanceof ExecutionContextInterface) {
                         $this->context->buildViolation($constraint->message)
-                             ->setParameter(
-                                 '{{ value }}',
-                                 $this->formatValue($value)
-                             )
-                             ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                             ->addViolation();
+                            ->setParameter('{{ value }}', $this->formatValue($value))
+                            ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                            ->addViolation();
                     } else {
                         $this->buildViolation($constraint->message)
-                              ->setParameter(
-                                  '{{ value }}',
-                                  $this->formatValue($value)
-                              )
-                              ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
-                              ->addViolation();
+                            ->setParameter('{{ value }}', $this->formatValue($value))
+                            ->setCode(Uuid::INVALID_HYPHEN_PLACEMENT_ERROR)
+                            ->addViolation();
                     }
 
                     return;

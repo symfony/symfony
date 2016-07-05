@@ -29,8 +29,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Verifies that a validator satisfies the API of Symfony 2.5+.
  *
- * @since  2.5
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest

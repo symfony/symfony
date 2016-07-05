@@ -14,8 +14,6 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 
 /**
- * @since  2.5.3
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @group  legacy
  */

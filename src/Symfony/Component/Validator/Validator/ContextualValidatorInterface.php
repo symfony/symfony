@@ -17,8 +17,6 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 /**
  * A validator in a specific execution context.
  *
- * @since  2.5
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 interface ContextualValidatorInterface

@@ -16,8 +16,6 @@ namespace Symfony\Component\Validator\Validator;
 /**
  * A validator that supports both the API of Symfony < 2.5 and Symfony 2.5+.
  *
- * @since  2.5
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
  * @see \Symfony\Component\Validator\ValidatorInterface

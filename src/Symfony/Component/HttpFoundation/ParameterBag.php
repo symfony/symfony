@@ -195,7 +195,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * @param mixed  $default  The default value if the parameter key does not exist
      * @param mixed  $timeZone
      *
-     * @return \DateTime|false
+     * @return mixed
      */
     public function getDate($key, $format = 'Y-m-d', $default = null, $timeZone = null)
     {
@@ -225,7 +225,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      * @param mixed  $default  The default value if the parameter key does not exist
      * @param mixed  $timeZone
      *
-     * @return \DateTime|false
+     * @return mixed
      */
     public function getDateTime($key, $format = 'Y-m-d H:i:s', $default = null, \DateTimeZone $timeZone = null)
     {

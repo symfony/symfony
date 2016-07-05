@@ -190,10 +190,10 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter value converted to a DateTime object.
      *
-     * @param string              $key      The parameter key
-     * @param string              $format   The expected date format
-     * @param \DateTime|null      $default  The default value if the parameter key does not exist
-     * @param \DateTimeZone|null  $timeZone
+     * @param string             $key      The parameter key
+     * @param string             $format   The expected date format
+     * @param \DateTime|null     $default  The default value if the parameter key does not exist
+     * @param \DateTimeZone|null $timeZone
      *
      * @return \DateTime|null
      */
@@ -215,7 +215,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
             // Failure to parse the date according to the specified format will return null
             if ($result === false) {
-                return null;
+                return;
             }
 
             return $result;
@@ -227,10 +227,10 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter value converted to a DateTime object while also parsing the time.
      *
-     * @param string              $key      The parameter key
-     * @param string              $format   The expected date format
-     * @param \DateTime|null      $default  The default value if the parameter key does not exist
-     * @param \DateTimeZone|null  $timeZone
+     * @param string             $key      The parameter key
+     * @param string             $format   The expected date format
+     * @param \DateTime|null     $default  The default value if the parameter key does not exist
+     * @param \DateTimeZone|null $timeZone
      *
      * @return \DateTime|null
      */

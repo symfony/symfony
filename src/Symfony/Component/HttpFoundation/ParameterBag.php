@@ -202,7 +202,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
         if (!$this->has($key)) {
             return $default;
         }
-        
+
         $time = $this->get($key);
 
         // if the user has specified a timezone then pass that

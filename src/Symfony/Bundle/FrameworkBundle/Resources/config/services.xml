@@ -24,6 +24,17 @@
 
         <service id="kernel.class_cache.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassCacheCacheWarmer">
             <tag name="kernel.cache_warmer" />
+            <argument type="collection">
+                <argument>Doctrine\Common\Annotations\AnnotationRegistry</argument>
+                <argument>Symfony\Component\HttpFoundation\ParameterBag</argument>
+                <argument>Symfony\Component\HttpFoundation\HeaderBag</argument>
+                <argument>Symfony\Component\HttpFoundation\FileBag</argument>
+                <argument>Symfony\Component\HttpFoundation\ServerBag</argument>
+                <argument>Symfony\Component\HttpFoundation\Request</argument>
+                <argument>Symfony\Component\HttpKernel\Kernel</argument>
+                <argument>Symfony\Component\ClassLoader\ClassCollectionLoader</argument>
+                <argument>Symfony\Component\ClassLoader\ApcClassLoader</argument>
+            </argument>
         </service>
 
         <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer">

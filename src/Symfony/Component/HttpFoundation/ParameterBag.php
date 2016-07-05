@@ -80,7 +80,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string $key     The key
      * @param mixed  $default The default value if the parameter key does not exist
-     *
+     *g
      * @return mixed
      */
     public function get($key, $default = null)
@@ -199,29 +199,25 @@ class ParameterBag implements \IteratorAggregate, \Countable
      */
     public function getDate($key, $format = 'Y-m-d', $default = null, $timeZone = null)
     {
-        if ($this->has($key)) {
-            $time = $this->get($key);
+        if (!$this->has($key)) {
+            return $default;
+        }
+        
+        $time = $this->get($key);
 
-            // if the user has specified a timezone then pass that
-            // otherwise do not even attempt to put a value but rather let the runtime decide
-            // the default value by itself
-            // this is in order to ensure compatibility with all php versions since
-            // some accept null as a TimeZone parameter and others do not
-            if ($timeZone !== null) {
-                $result = \DateTime::createFromFormat($format, $time, $timeZone);
-            } else {
-                $result = \DateTime::createFromFormat($format, $time);
-            }
-
-            // Failure to parse the date according to the specified format will return null
-            if ($result === false) {
-                return;
-            }
-
-            return $result;
+        // if the user has specified a timezone then pass that
+        // otherwise do not even attempt to put a value but rather let the runtime decide
+        // the default value by itself
+        // this is in order to ensure compatibility with all php versions since
+        // some accept null as a TimeZone parameter and others do not
+        if ($timeZone !== null) {
+            $result = \DateTime::createFromFormat($format, $time, $timeZone);
+        } else {
+            $result = \DateTime::createFromFormat($format, $time);
         }
 
-        return $default;
+        // Failure to parse the date according to the specified format will return null
+        return false === $result ? null : $result;
     }
 
     /**

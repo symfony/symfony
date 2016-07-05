@@ -210,8 +210,8 @@ array:2 [
     executing: {
       Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo(): {
         %sGeneratorDemo.php:10: """
-                  yield 1;\n
-              }\n
+              yield 1;\n
+          }\n
           \n
           """
       }

@@ -20,8 +20,6 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 /**
  * Data collector for {@link FormInterface} instances.
  *
- * @since  2.4
- *
  * @author Robert Schönthal <robert.schoenthal@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  */

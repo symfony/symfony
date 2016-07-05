@@ -274,6 +274,8 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
     {
+        @trigger_error(sprintf('"%s()" has been deprecated sin Symfony 3.1 and will be removed in version 4.0. Use "%s::instantiateComplexObject()" instead.', __METHOD__, __CLASS__));
+
         return $this->instantiateComplexObject($data, $class, $context, $reflectionClass, $allowedAttributes);
     }
 

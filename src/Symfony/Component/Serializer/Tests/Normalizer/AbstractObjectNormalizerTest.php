@@ -24,6 +24,19 @@ class AbstractObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($normalizedData->bar);
         $this->assertSame('baz', $normalizedData->baz);
     }
+
+    /**
+     * @group legacy
+     */
+    public function testInstantiateObjectDenormalizer()
+    {
+        $data = array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz');
+        $class = __NAMESPACE__.'\Dummy';
+        $context = [];
+        
+        $normalizer = new AbstractObjectNormalizerDummy();
+        $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), []);
+    }
 }
 
 class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
@@ -45,6 +58,13 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
     {
         return in_array($attribute, array('foo', 'baz'));
     }
+
+    public function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    {
+        return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes);
+    }
+
+
 }
 
 class Dummy

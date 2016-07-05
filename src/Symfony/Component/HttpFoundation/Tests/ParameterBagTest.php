@@ -137,7 +137,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
     {
         $bag = new ParameterBag(array('d1' => '2016-01-01'));
         $date = \DateTime::createFromFormat('Y-m-d', '2016-01-01');
-        
         $diff = $date->diff($bag->getDate('d1'));
 
         $this->assertEquals(0, $diff->days, '->getDate() returns a date via the format specified');

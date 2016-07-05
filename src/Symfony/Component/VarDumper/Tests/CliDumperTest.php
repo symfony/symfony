@@ -200,7 +200,7 @@ EOTXT
             $twig = <<<EOTXT
           foo.twig:2: """
             foo bar\\n
-                twig source\\n
+              twig source\\n
             \\n
             """
 

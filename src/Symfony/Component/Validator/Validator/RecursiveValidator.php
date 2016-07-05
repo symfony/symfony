@@ -20,8 +20,6 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
 /**
  * Recursive implementation of {@link ValidatorInterface}.
  *
- * @since  2.5
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class RecursiveValidator implements ValidatorInterface

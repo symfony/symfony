@@ -117,8 +117,6 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * @param string               $registerAliasMethodName Name of Configuration class method to
      *                                                      register alias.
      * @param string[]             $aliasMap                Map of alias to namespace
-     *
-     * @since Support for bundle alias was added in Symfony 2.6
      */
     public function __construct($driver, array $namespaces, array $managerParameters, $driverPattern, $enabledParameter = false, $configurationPattern = '', $registerAliasMethodName = '', array $aliasMap = array())
     {

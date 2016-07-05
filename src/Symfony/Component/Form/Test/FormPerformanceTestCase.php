@@ -62,8 +62,6 @@ abstract class FormPerformanceTestCase extends FormIntegrationTestCase
     }
 
     /**
-     * @since Method available since Release 2.3.0
-     *
      * @return int
      */
     public function getMaxRunningTime()

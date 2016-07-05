@@ -23,8 +23,6 @@ class Callback extends Constraint
 {
     /**
      * @var string|callable
-     *
-     * @since 2.4
      */
     public $callback;
 

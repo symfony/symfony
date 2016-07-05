@@ -62,7 +62,7 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function setVoters(array $voters)
     {
-        if (!$this->manager instanceof AccessDecisionManager) {
+        if (!method_exists($this->manager, 'setVoters')) {
             return;
         }
 

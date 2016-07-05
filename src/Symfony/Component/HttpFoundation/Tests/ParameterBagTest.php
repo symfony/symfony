@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\Validator\Constraints\DateTime;
 
 class ParameterBagTest extends \PHPUnit_Framework_TestCase
 {
@@ -139,7 +138,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $isoDate = '2016-07-05T15:30:00CET';
         $bag = new ParameterBag(array(
             'd1' => '2016-01-01',
-            'iso' => $isoDate
+            'iso' => $isoDate,
         ));
 
         $date = \DateTime::createFromFormat('Y-m-d', '2016-01-01');
@@ -151,7 +150,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $date = $bag->getDate('iso', \DateTime::ISO8601);
         $this->assertEquals(new \DateTime($isoDate), $date);
-        $this->assertEquals("CET", $date->getTimezone()->getName());
+        $this->assertEquals('CET', $date->getTimezone()->getName());
     }
 
     public function testFilter()

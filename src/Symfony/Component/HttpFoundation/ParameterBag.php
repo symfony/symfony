@@ -188,7 +188,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns the parameter value converted to a DateTime object
+     * Returns the parameter value converted to a DateTime object.
      *
      * @param string $key      The parameter key
      * @param string $format   The expected date format
@@ -218,7 +218,7 @@ class ParameterBag implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Returns the parameter value converted to a DateTime object while also paring the time portion
+     * Returns the parameter value converted to a DateTime object while also paring the time portion.
      *
      * @param string $key      The parameter key
      * @param string $format   The expected date format

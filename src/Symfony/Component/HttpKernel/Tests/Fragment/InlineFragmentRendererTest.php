@@ -198,7 +198,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         Request::setTrustedHeaderName(Request::HEADER_CLIENT_IP, $trustedHeaderName);
     }
 
-    public function testIfNotModifiedSinceHeaderIsAssignedToSubrequest()
+    public function testHeadersPossiblyResultingIn304AreNotAssignedToSubrequest()
     {
         $expectedSubRequest = Request::create('/');
         if (Request::getTrustedHeaderName(Request::HEADER_CLIENT_IP)) {
@@ -207,7 +207,8 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
         }
 
         $strategy = new InlineFragmentRenderer($this->getKernelExpectingRequest($expectedSubRequest));
-        $strategy->render('/', Request::create('/', 'GET', array(), array(), array(), array('HTTP_IF_MODIFIED_SINCE' => 'Fri, 01 Jan 2016 00:00:00 GMT')));
+        $request = Request::create('/', 'GET', array(), array(), array(), array('HTTP_IF_MODIFIED_SINCE' => 'Fri, 01 Jan 2016 00:00:00 GMT', 'HTTP_IF_NONE_MATCH' => '*'));
+        $strategy->render('/', $request);
     }
 }
 

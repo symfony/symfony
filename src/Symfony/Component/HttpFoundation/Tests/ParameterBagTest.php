@@ -151,6 +151,8 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $date = $bag->getDate('iso', \DateTime::ISO8601);
         $this->assertEquals(new \DateTime($isoDate), $date);
         $this->assertEquals('UTC', $date->getTimezone()->getName());
+
+        $this->assertEquals($date, $bag->getDate('nokey', 'Y-m-d', $date));
     }
 
     public function testFilter()

@@ -135,7 +135,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDate()
     {
-        $isoDate = '2016-07-05T15:30:00+00:00';
+        $isoDate = '2016-07-05T15:30:00UTC';
         $bag = new ParameterBag(array(
             'd1' => '2016-01-01',
             'iso' => $isoDate,
@@ -150,7 +150,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $date = $bag->getDate('iso', \DateTime::ISO8601);
         $this->assertEquals(new \DateTime($isoDate), $date);
-        $this->assertEquals('+00:00', $date->getTimezone()->getName());
+        $this->assertEquals('UTC', $date->getTimezone()->getName());
     }
 
     public function testFilter()

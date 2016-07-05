@@ -52,7 +52,7 @@ class StubCaster
     public static function castEnum(EnumStub $c, array $a, Stub $stub, $isNested)
     {
         if ($isNested) {
-            $stub->class = '';
+            $stub->class = $c->dumpKeys ? '' : null;
             $stub->handle = 0;
             $stub->value = null;
             $stub->cut = $c->cut;

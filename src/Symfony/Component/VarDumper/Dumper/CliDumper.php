@@ -115,6 +115,10 @@ class CliDumper extends AbstractDumper
         $attr = array();
 
         switch ($type) {
+            case 'default':
+                $style = 'default';
+                break;
+
             case 'integer':
                 $style = 'num';
                 break;

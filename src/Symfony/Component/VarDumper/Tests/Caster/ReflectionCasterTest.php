@@ -156,11 +156,11 @@ Generator {
   this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
   executing: {
     Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz(): {
-      %sGeneratorDemo.php:14: """
-        {\n
-            yield from bar();\n
-        }\n
-        """
+      %sGeneratorDemo.php: {
+        13: {
+        14:     yield from bar();
+        15: }
+      }
     }
   }
 }
@@ -177,43 +177,31 @@ array:2 [
   0 => ReflectionGenerator {
     this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
     trace: {
-      3. Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo() ==> yield(): {
-        src: {
-          %sGeneratorDemo.php:9: """
-            {\n
-                yield 1;\n
-            }\n
-            """
-        }
+      3. %sGeneratorDemo.php: {
+         8: {
+         9:     yield 1;
+        10: }
       }
-      2. Symfony\Component\VarDumper\Tests\Fixtures\bar() ==> Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo(): {
-        src: {
-          %sGeneratorDemo.php:20: """
-            {\n
-                yield from GeneratorDemo::foo();\n
-            }\n
-            """
-        }
+      2. %sGeneratorDemo.php: {
+        19: {
+        20:     yield from GeneratorDemo::foo();
+        21: }
       }
-      1. Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz() ==> Symfony\Component\VarDumper\Tests\Fixtures\bar(): {
-        src: {
-          %sGeneratorDemo.php:14: """
-            {\n
-                yield from bar();\n
-            }\n
-            """
-        }
+      1. %sGeneratorDemo.php: {
+        13: {
+        14:     yield from bar();
+        15: }
       }
     }
   }
   1 => Generator {
     executing: {
       Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo(): {
-        %sGeneratorDemo.php:10: """
-              yield 1;\n
-          }\n
-          \n
-          """
+        %sGeneratorDemo.php: {
+           9:     yield 1;
+          10: }
+          11: 
+        }
       }
     }
   }

@@ -190,12 +190,12 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter value converted to a DateTime object.
      *
-     * @param string $key      The parameter key
-     * @param string $format   The expected date format
-     * @param mixed  $default  The default value if the parameter key does not exist
-     * @param mixed  $timeZone
+     * @param string              $key      The parameter key
+     * @param string              $format   The expected date format
+     * @param \DateTime|null      $default  The default value if the parameter key does not exist
+     * @param \DateTimeZone|null  $timeZone
      *
-     * @return mixed
+     * @return \DateTime|null
      */
     public function getDate($key, $format = 'Y-m-d', $default = null, $timeZone = null)
     {
@@ -208,24 +208,31 @@ class ParameterBag implements \IteratorAggregate, \Countable
             // this is in order to ensure compatibility with all php versions since
             // some accept null as a TimeZone parameter and others do not
             if ($timeZone !== null) {
-                return \DateTime::createFromFormat($format, $time, $timeZone);
+                $result = \DateTime::createFromFormat($format, $time, $timeZone);
+            } else {
+                $result = \DateTime::createFromFormat($format, $time);
             }
 
-            return \DateTime::createFromFormat($format, $time);
+            // Failure to parse the date according to the specified format will return null
+            if ($result === false) {
+                return null;
+            }
+
+            return $result;
         }
 
         return $default;
     }
 
     /**
-     * Returns the parameter value converted to a DateTime object while also paring the time portion.
+     * Returns the parameter value converted to a DateTime object while also parsing the time.
      *
-     * @param string $key      The parameter key
-     * @param string $format   The expected date format
-     * @param mixed  $default  The default value if the parameter key does not exist
-     * @param mixed  $timeZone
+     * @param string              $key      The parameter key
+     * @param string              $format   The expected date format
+     * @param \DateTime|null      $default  The default value if the parameter key does not exist
+     * @param \DateTimeZone|null  $timeZone
      *
-     * @return mixed
+     * @return \DateTime|null
      */
     public function getDateTime($key, $format = 'Y-m-d H:i:s', $default = null, \DateTimeZone $timeZone = null)
     {

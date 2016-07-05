@@ -32,10 +32,10 @@ class AbstractObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $data = array('foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz');
         $class = __NAMESPACE__.'\Dummy';
-        $context = [];
-        
+        $context = array();
+
         $normalizer = new AbstractObjectNormalizerDummy();
-        $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), []);
+        $normalizer->instantiateObject($data, $class, $context, new \ReflectionClass($class), array());
     }
 }
 
@@ -63,8 +63,6 @@ class AbstractObjectNormalizerDummy extends AbstractObjectNormalizer
     {
         return parent::instantiateObject($data, $class, $context, $reflectionClass, $allowedAttributes);
     }
-
-
 }
 
 class Dummy

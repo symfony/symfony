@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-05T08:28:15Z
+
+fabbot's failure is a false positive on a fixture.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-05T10:01:44Z
+
+Unless someone asks for more time, I'm going to merge this one in about one hour to unlock other work I'm doing on top.

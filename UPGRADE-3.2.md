@@ -70,3 +70,30 @@ Validator
        // ...
    }
    ```
+
+ * `Symfony\Component\Validator\Mapping\Cache\DoctrineCache` has been deprecated
+   in favor of `Symfony\Component\Validator\Mapping\Cache\Psr6Cache`.
+
+   Before:
+   ```php
+   use Doctrine\Common\Cache\ApcCache;
+   use Symfony\Component\Validator\Mapping\Cache\DoctrineCache;
+
+   $cache = new DoctrineCache(new ApcCache());
+   ```
+
+   After:
+   ```php
+   use Symfony\Component\Cache\Adapter\ApcuAdapter;
+   use Symfony\Component\Validator\Mapping\Cache\Psr6Cache;
+
+   $cache = new Psr6Cache(new ApcuAdapter());
+
+   // or
+
+   use Doctrine\Common\Cache\ApcCache;
+   use Symfony\Component\Cache\Adapter\DoctrineAdapter;
+   use Symfony\Component\Validator\Mapping\Cache\Psr6Cache;
+
+   $cache = new Psr6Cache(new DoctrineAdapter(new ApcCache()));
+   ```

@@ -12,12 +12,16 @@
 namespace Symfony\Component\Validator\Mapping\Cache;
 
 use Doctrine\Common\Cache\Cache;
+use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * Adapts a Doctrine cache to a CacheInterface.
  *
  * @author Florian Voutzinos <florian@voutzinos.com>
+ *
+ * @deprecated since 3.2, to be removed in 4.0. Use {@link Psr6Cache}
+ *             with {@link DoctrineAdapter} instead.
  */
 final class DoctrineCache implements CacheInterface
 {
@@ -30,6 +34,7 @@ final class DoctrineCache implements CacheInterface
      */
     public function __construct(Cache $cache)
     {
+        @trigger_error(sprintf('%s is deprecated since version 3.2 and will be removed in 4.0. Use %s with %s instead.', __CLASS__, Psr6Cache::class, DoctrineAdapter::class), E_USER_DEPRECATED);
         $this->cache = $cache;
     }
 

@@ -187,6 +187,30 @@ class ParameterBag implements \IteratorAggregate, \Countable
         return $this->filter($key, $default, FILTER_VALIDATE_BOOLEAN);
     }
 
+    /***
+     * @param string             $key     The parameter key
+     * @param string             $format  The expected date format
+     * @param mixed              $default The default value if the parameter key does not exist
+     * @param \DateTimeZone|null $timeZone
+     * @return \DateTime|false
+     */
+    public function getDate($key, $format = 'Y-m-d', $default = null, \DateTimeZone $timeZone = null)
+    {
+        return \DateTime::createFromFormat($format, $this->get($key, $default), $timeZone);
+    }
+
+    /***
+     * @param string             $key     The parameter key
+     * @param string             $format  The expected date time format
+     * @param mixed              $default The default value if the parameter key does not exist
+     * @param \DateTimeZone|null $timeZone
+     * @return \DateTime|false
+     */
+    public function getDateTime($key, $format = 'Y-m-d H:i:s', $default = null, \DateTimeZone $timeZone = null)
+    {
+        return $this->getDate($key, $format, $default, $timeZone);
+    }
+
     /**
      * Filter key.
      *

@@ -124,6 +124,27 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
+    public function testGetDateTime()
+    {
+        $format = 'Y-m-d H:i:s';
+        $bag = new ParameterBag(array('d1' => '2016-01-01 00:00:00'));
+        $date = \DateTime::createFromFormat($format, '2016-01-01 00:00:00');
+
+        $this->assertEquals($date, $bag->getDateTime('d1', $format), '->getDateTime() returns a date from the specified format');
+    }
+
+    public function testGetDate()
+    {
+        $bag = new ParameterBag(array('d1' => '2016-01-01'));
+        $date = \DateTime::createFromFormat('Y-m-d', '2016-01-01');
+        
+        $diff = $date->diff($bag->getDate('d1'));
+
+        $this->assertEquals(0, $diff->days, '->getDate() returns a date via the format specified');
+        $this->assertEquals(false, $bag->getDate('d1', 'd/m/Y'), '->getDate() returns a date from the specified format');
+        $this->assertEquals(null, $bag->getDate('d1', 'd/m/Y'), '->getDate() returns null if the parameter is not found');
+    }
+
     public function testFilter()
     {
         $bag = new ParameterBag(array(

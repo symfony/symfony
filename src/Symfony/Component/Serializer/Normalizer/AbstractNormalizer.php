@@ -330,11 +330,7 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
 
                         $params = array_merge($params, $data[$paramName]);
                     }
-
-                    continue;
-                }
-
-                if ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
+                } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                     $parameterData = $data[$key];
                     if (null !== $constructorParameter->getClass()) {
                         $parameterData = $this->serializer->deserialize($parameterData, $constructorParameter->getClass()->getName(), $format, $context);
@@ -343,30 +339,24 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                     // Don't run set for a parameter passed to the constructor
                     $params[] = $parameterData;
                     unset($data[$key]);
-
-                    continue;
-                }
-
-                if ($constructorParameter->isDefaultValueAvailable()) {
+                } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();
-
-                    continue;
+                } else {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
+                            $class,
+                            $constructorParameter->name
+                        )
+                    );
                 }
-
-                throw new RuntimeException(
-                    sprintf(
-                        'Cannot create an instance of %s from serialized data because its constructor requires parameter "%s" to be present.',
-                        $class,
-                        $constructorParameter->name
-                    )
-                );
             }
 
             if ($constructor->isConstructor()) {
                 return $reflectionClass->newInstanceArgs($params);
+            } else {
+                return $constructor->invokeArgs(null, $params);
             }
-
-            return $constructor->invokeArgs(null, $params);
         }
 
         return new $class();

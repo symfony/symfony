@@ -180,6 +180,27 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('rab', $obj->getInner()->bar);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
+     * @expectedExceptionMessage Could not determine the class of the parameter "unknown".
+     */
+    public function testConstructorWithUnknownObjectTypeHintDenormalize()
+    {
+        $data = array(
+            'id' => 10,
+            'unknown' => array(
+                'foo' => 'oof',
+                'bar' => 'rab',
+            ),
+        );
+
+        $normalizer = new ObjectNormalizer();
+        $serializer = new DenormalizerDecoratorSerializer($normalizer);
+        $normalizer->setSerializer($serializer);
+
+        $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);
+    }
+
     public function testGroupsNormalize()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
@@ -825,5 +846,12 @@ class DummyWithConstructorObject
     public function getInner()
     {
         return $this->inner;
+    }
+}
+
+class DummyWithConstructorInexistingObject
+{
+    public function __construct($id, Unknown $unknown)
+    {
     }
 }

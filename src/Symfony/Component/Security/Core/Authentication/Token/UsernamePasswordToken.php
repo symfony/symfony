@@ -17,6 +17,8 @@ use Symfony\Component\Security\Core\Role\Role;
  * UsernamePasswordToken implements a username and password token.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated Since Symfony 3.1, to be removed in 4.0. Use UsernamePasswordRequestToken or AuthenticatedUserToken instead.
  */
 class UsernamePasswordToken extends AbstractToken
 {
@@ -33,8 +35,12 @@ class UsernamePasswordToken extends AbstractToken
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, $credentials, $providerKey, array $roles = array())
+    public function __construct($user, $credentials, $providerKey, array $roles = array(), $deprecation = true)
     {
+        if ($deprecation) {
+            @trigger_error(__CLASS__.' is deprecated since version 3.1 and will be removed in 4.0. Use UsernamePasswordRequestToken or AuthenticatedUserToken instead.');
+        }
+
         parent::__construct($roles);
 
         if (empty($providerKey)) {

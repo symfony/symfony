@@ -234,7 +234,7 @@ class ExceptionCaster
                 'file' => $a[Caster::PREFIX_PROTECTED.'file'],
                 'line' => $a[Caster::PREFIX_PROTECTED.'line'],
             ));
-            $a[$xPrefix.'trace'] = new TraceStub($trace);
+            $a[$xPrefix.'trace'] = new TraceStub($trace, self::$traceArgs);
         }
         if (empty($a[$xPrefix.'previous'])) {
             unset($a[$xPrefix.'previous']);

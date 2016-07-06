@@ -192,25 +192,21 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @param string             $key      The parameter key
      * @param string             $format   The expected date format
-     * @param \DateTime|null     $default  The default value if the parameter key does not exist
-     * @param \DateTimeZone|null $timeZone
+     * @param string             $default  The default value to be converted to a DateTime object if the parameter key does not exist
+     * @param \DateTimeZone|null $timeZone A DateTimeZone object representing the desired time zone
      *
      * @return \DateTime|null
      */
-    public function getDate($key, $format = 'Y-m-d', $default = null, $timeZone = null)
+    public function getDate($key, $format, $default = null, $timeZone = null)
     {
-        if (!$this->has($key)) {
-            return $default;
-        }
-
-        $time = $this->get($key);
+        $time = $this->get($key, (string) $default);
 
         // if the user has specified a timezone then pass that
         // otherwise do not even attempt to put a value but rather let the runtime decide
         // the default value by itself
         // this is in order to ensure compatibility with all php versions since
         // some accept null as a TimeZone parameter and others do not
-        if ($timeZone !== null) {
+        if (null !== $timeZone) {
             $result = \DateTime::createFromFormat($format, $time, $timeZone);
         } else {
             $result = \DateTime::createFromFormat($format, $time);
@@ -218,21 +214,6 @@ class ParameterBag implements \IteratorAggregate, \Countable
 
         // Failure to parse the date according to the specified format will return null
         return false === $result ? null : $result;
-    }
-
-    /**
-     * Returns the parameter value converted to a DateTime object while also parsing the time.
-     *
-     * @param string             $key      The parameter key
-     * @param string             $format   The expected date format
-     * @param \DateTime|null     $default  The default value if the parameter key does not exist
-     * @param \DateTimeZone|null $timeZone
-     *
-     * @return \DateTime|null
-     */
-    public function getDateTime($key, $format = 'Y-m-d H:i:s', $default = null, \DateTimeZone $timeZone = null)
-    {
-        return $this->getDate($key, $format, $default, $timeZone);
     }
 
     /**

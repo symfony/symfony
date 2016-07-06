@@ -124,15 +124,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
     }
 
-    public function testGetDateTime()
-    {
-        $format = 'Y-m-d H:i:s';
-        $bag = new ParameterBag(array('d1' => '2016-01-01 00:00:00'));
-        $date = \DateTime::createFromFormat($format, '2016-01-01 00:00:00');
-
-        $this->assertEquals($date, $bag->getDateTime('d1', $format), '->getDateTime() returns a date from the specified format');
-    }
-
     public function testGetDate()
     {
         $isoDate = '2016-07-05T15:30:00UTC';
@@ -142,17 +133,21 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         ));
 
         $date = \DateTime::createFromFormat('Y-m-d', '2016-01-01');
-        $diff = $date->diff($bag->getDate('d1'));
+        $diff = $date->diff($bag->getDate('d1', 'Y-m-d'));
 
         $this->assertEquals(0, $diff->days, '->getDate() returns a date via the format specified');
-        $this->assertNull($bag->getDate('d1', 'd/m/Y'), '->getDate() returns false if the format is not valid');
+        $this->assertNull($bag->getDate('d1', 'd/m/Y'), '->getDate() returns null if the format is not valid');
         $this->assertNull($bag->getDate('d2', 'd/m/Y'), '->getDate() returns null if the parameter is not found');
 
         $date = $bag->getDate('iso', \DateTime::ISO8601);
         $this->assertEquals(new \DateTime($isoDate), $date);
         $this->assertEquals('UTC', $date->getTimezone()->getName());
 
-        $this->assertEquals($date, $bag->getDate('nokey', 'Y-m-d', $date));
+        $this->assertEquals($date, $bag->getDate('nokey', \DateTime::ISO8601, $isoDate));
+        $this->assertNull($bag->getDate('nokey', 'd/m/Y', $isoDate), '->getDate() returns null when the default value is not in the specified format');
+
+        $tz = $bag->getDate('d1', 'Y-m-d', null, new \DateTimeZone('Europe/Tirane'))->getTimezone()->getName();
+        $this->assertEquals('Europe/Tirane', $tz, '->getDate() accepts a DateTimeZone object which specifies the preferred timezone');
     }
 
     public function testFilter()

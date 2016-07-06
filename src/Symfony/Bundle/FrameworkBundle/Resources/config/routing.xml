@@ -13,6 +13,7 @@
         <parameter key="router.options.matcher_dumper_class">Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper</parameter>
         <parameter key="router.options.matcher.cache_class">%router.cache_class_prefix%UrlMatcher</parameter>
         <parameter key="router.options.generator.cache_class">%router.cache_class_prefix%UrlGenerator</parameter>
+        <parameter key="router.options.route_collection.cache_file">%router.cache_class_prefix%RouteCollection</parameter>
         <parameter key="router.request_context.host">localhost</parameter>
         <parameter key="router.request_context.scheme">http</parameter>
         <parameter key="router.request_context.base_url"></parameter>
@@ -73,6 +74,7 @@
                 <argument key="matcher_base_class">%router.options.matcher_base_class%</argument>
                 <argument key="matcher_dumper_class">%router.options.matcher_dumper_class%</argument>
                 <argument key="matcher_cache_class">%router.options.matcher.cache_class%</argument>
+                <argument key="route_collection_cache_file">%router.options.route_collection.cache_file%</argument>
             </argument>
             <argument type="service" id="router.request_context" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />

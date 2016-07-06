@@ -137,6 +137,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             'matcher_base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
             'matcher_dumper_class' => 'Symfony\\Component\\Routing\\Matcher\\Dumper\\PhpMatcherDumper',
             'matcher_cache_class' => 'ProjectUrlMatcher',
+            'route_collection_cache_file' => 'ProjectRouteCollection',
             'resource_type' => null,
             'strict_requirements' => true,
         );
@@ -197,7 +198,19 @@ class Router implements RouterInterface, RequestMatcherInterface
     public function getRouteCollection()
     {
         if (null === $this->collection) {
-            $this->collection = $this->loader->load($this->resource, $this->options['resource_type']);
+            if (null === $this->options['cache_dir'] || null === $this->options['route_collection_cache_file']) {
+                $this->collection = $this->loadRouteCollection();
+            } else {
+                $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['route_collection_cache_file'].'.cache',
+                    function (ConfigCacheInterface $cache) {
+                        $collection = $this->loadRouteCollection();
+
+                        $cache->write(serialize($collection), $collection->getResources());
+                    }
+                );
+
+                $this->collection = unserialize(file_get_contents($cache->getPath()));
+            }
         }
 
         return $this->collection;
@@ -369,6 +382,16 @@ class Router implements RouterInterface, RequestMatcherInterface
     protected function getMatcherDumperInstance()
     {
         return new $this->options['matcher_dumper_class']($this->getRouteCollection());
+    }
+
+    /**
+     * Loads route collection.
+     *
+     * @return RouteCollection
+     */
+    protected function loadRouteCollection()
+    {
+        return $this->loader->load($this->resource, $this->options['resource_type']);
     }
 
     /**

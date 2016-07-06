@@ -93,6 +93,30 @@ class RouterTest extends TestCase
     }
 
     /**
+     * @dataProvider provideRouteCollectionOptionsPreventingCaching
+     */
+    public function testThatRouteCollectionIsLoadedIfCacheIsNotConfigured($option)
+    {
+        $this->router->setOption($option, null);
+
+        $routeCollection = $this->getMock('Symfony\Component\Routing\RouteCollection');
+
+        $this->loader->expects($this->once())
+            ->method('load')->with('routing.yml', null)
+            ->will($this->returnValue($routeCollection));
+
+        $this->assertSame($routeCollection, $this->router->getRouteCollection());
+    }
+
+    public function provideRouteCollectionOptionsPreventingCaching()
+    {
+        return array(
+            array('cache_dir'),
+            array('route_collection_cache_file'),
+        );
+    }
+
+    /**
      * @dataProvider provideMatcherOptionsPreventingCaching
      */
     public function testMatcherIsCreatedIfCacheIsNotConfigured($option)

@@ -302,4 +302,17 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals(array('PUT'), $routea->getMethods());
         $this->assertEquals(array('PUT'), $routeb->getMethods());
     }
+    public function testSerialize()
+    {
+        $collection = new RouteCollection();
+
+        $collection->add('route1', new Route('/homepage'));
+        $collection->add('route2', new Route('/prefix/{foo}', array('foo' => 'default'), array('foo' => '\d+')));
+
+        $serialized = serialize($collection);
+        $unserialized = unserialize($serialized);
+
+        $this->assertEquals($collection, $unserialized);
+        $this->assertNotSame($collection, $unserialized);
+    }
 }

@@ -46,7 +46,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
 
             $serviceId = 'console.command.'.strtolower(str_replace('\\', '_', $class));
             if ($container->hasAlias($serviceId)) {
-                $serviceId = $serviceId . '_' . $id;
+                $serviceId = $serviceId.'_'.$id;
             }
             $container->setAlias($serviceId, $id);
             $serviceIds[] = $definition->isPublic() ? $id : $serviceId;

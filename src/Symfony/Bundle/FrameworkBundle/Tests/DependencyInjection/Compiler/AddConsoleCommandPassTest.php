@@ -127,14 +127,14 @@ class AddConsoleCommandPassTest extends TestCase
 
         $definition2 = new Definition('%my-command.class%');
         $definition2->addTag('console.command');
-        
+
         $container->setDefinition('my-command1', $definition1);
         $container->setDefinition('my-command2', $definition2);
 
         $container->compile();
 
         $alias1 = 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
-        $alias2 = $alias1 . '_my-command2';
+        $alias2 = $alias1.'_my-command2';
         $this->assertTrue($container->hasAlias($alias1));
         $this->assertTrue($container->hasAlias($alias2));
     }

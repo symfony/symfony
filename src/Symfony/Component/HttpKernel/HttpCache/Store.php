@@ -14,6 +14,7 @@
 
 namespace Symfony\Component\HttpKernel\HttpCache;
 
+use Symfony\Component\Filesystem\LockHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,6 +27,12 @@ class Store implements StoreInterface
 {
     protected $root;
     private $keyCache;
+
+    /**
+     * LockHandler instances for currently held locks, indexed by cache key
+     *
+     * @var LockHandler[]
+     */
     private $locks;
 
     /**
@@ -51,23 +58,15 @@ class Store implements StoreInterface
     public function cleanup()
     {
         // unlock everything
-        foreach ($this->locks as $lock) {
-            if (file_exists($lock)) {
-                @unlink($lock);
-            }
+        foreach ($this->locks as $lockHandler) {
+            $lockHandler->release();
         }
 
-        $error = error_get_last();
-        if (1 === $error['type'] && false === headers_sent()) {
-            // send a 503
-            header('HTTP/1.0 503 Service Unavailable');
-            header('Retry-After: 10');
-            echo '503 Service Unavailable';
-        }
+        $this->locks = array();
     }
 
     /**
-     * Locks the cache for a given Request.
+     * Tries to lock the cache for a given Request, without blocking.
      *
      * @param Request $request A Request instance
      *
@@ -75,21 +74,16 @@ class Store implements StoreInterface
      */
     public function lock(Request $request)
     {
-        $path = $this->getPath($this->getCacheKey($request).'.lck');
-        if (!is_dir(dirname($path)) && false === @mkdir(dirname($path), 0777, true) && !is_dir(dirname($path))) {
-            return false;
-        }
+        $key = $this->getCacheKey($request);
+        $path = $this->getPath($key);
+        $lockHandler = new LockHandler(basename($path), dirname($path));
 
-        $lock = @fopen($path, 'x');
-        if (false !== $lock) {
-            fclose($lock);
-
-            $this->locks[] = $path;
-
+        if ($lockHandler->lock()) {
+            $this->locks[$key] = $lockHandler;
             return true;
         }
 
-        return !file_exists($path) ?: $path;
+        return $path;
     }
 
     /**
@@ -101,17 +95,36 @@ class Store implements StoreInterface
      */
     public function unlock(Request $request)
     {
-        $file = $this->getPath($this->getCacheKey($request).'.lck');
+        $key = $this->getCacheKey($request);
 
-        return is_file($file) ? @unlink($file) : false;
+        if (isset($this->locks[$key])) {
+            $this->locks[$key]->release();
+            unset($this->locks[$key]);
+
+            return true;
+        }
+
+        return false;
     }
 
     public function isLocked(Request $request)
     {
-        $path = $this->getPath($this->getCacheKey($request).'.lck');
-        clearstatcache(true, $path);
+        $cacheKey = $this->getCacheKey($request);
 
-        return is_file($path);
+        if (isset($this->locks[$cacheKey])) {
+            return true; // shortcut if lock held by this process
+        }
+
+        $path = $this->getPath($cacheKey);
+        $lockHandler = new LockHandler(basename($path), dirname($path));
+
+        if ($lockHandler->lock()) {
+            $lockHandler->release();
+
+            return false;
+        }
+
+        return true;
     }
 
     /**

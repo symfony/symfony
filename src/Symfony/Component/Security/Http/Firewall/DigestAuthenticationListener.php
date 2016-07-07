@@ -78,7 +78,7 @@ class DigestAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $digestAuth->validateAndDecode($this->authenticationEntryPoint->getKey(), $this->authenticationEntryPoint->getRealmName());
+            $digestAuth->validateAndDecode($this->authenticationEntryPoint->getSecret(), $this->authenticationEntryPoint->getRealmName());
         } catch (BadCredentialsException $e) {
             $this->fail($event, $request, $e);
 

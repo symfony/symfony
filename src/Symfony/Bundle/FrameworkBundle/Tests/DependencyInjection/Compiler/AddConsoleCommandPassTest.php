@@ -115,12 +115,12 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass());
-        $container->setParameter('my-command.class', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
+        $className = 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand';
 
-        $definition1 = new Definition('%my-command.class%');
+        $definition1 = new Definition($className);
         $definition1->addTag('console.command');
 
-        $definition2 = new Definition('%my-command.class%');
+        $definition2 = new Definition($className);
         $definition2->addTag('console.command');
 
         $container->setDefinition('my-command1', $definition1);

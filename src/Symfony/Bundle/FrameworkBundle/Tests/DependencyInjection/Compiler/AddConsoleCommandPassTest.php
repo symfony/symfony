@@ -97,35 +97,12 @@ class AddConsoleCommandPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass());
-        $container->setParameter('my-command.class', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
+        $className = 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand';
 
-        $definition1 = new Definition('%my-command.class%');
+        $definition1 = new Definition($className);
         $definition1->addTag('console.command');
 
-        $definition2 = new Definition('%my-command.class%');
-        $definition2->addTag('console.command');
-
-        $container->setDefinition('my-command1', $definition1);
-        $container->setDefinition('my-command2', $definition2);
-
-        $container->compile();
-
-        $alias1 = 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
-        $alias2 = $alias1 . '_my-command2';
-        $this->assertTrue($container->hasAlias($alias1));
-        $this->assertTrue($container->hasAlias($alias2));
-    }
-
-    public function testProcessServicesWithSameCommand()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddConsoleCommandPass());
-        $container->setParameter('my-command.class', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
-
-        $definition1 = new Definition('%my-command.class%');
-        $definition1->addTag('console.command');
-
-        $definition2 = new Definition('%my-command.class%');
+        $definition2 = new Definition($className);
         $definition2->addTag('console.command');
 
         $container->setDefinition('my-command1', $definition1);

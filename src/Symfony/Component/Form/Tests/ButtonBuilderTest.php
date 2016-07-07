@@ -18,9 +18,6 @@ use Symfony\Component\Form\ButtonBuilder;
  */
 class ButtonBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @return array
-     */
     public function getValidNames()
     {
         return array(
@@ -35,17 +32,12 @@ class ButtonBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getValidNames
-     *
-     * @param string $name
      */
     public function testValidNames($name)
     {
         $this->assertInstanceOf('\Symfony\Component\Form\ButtonBuilder', new ButtonBuilder($name));
     }
 
-    /**
-     * @return array
-     */
     public function getInvalidNames()
     {
         return array(
@@ -57,8 +49,6 @@ class ButtonBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getInvalidNames
-     *
-     * @param string $name
      */
     public function testInvalidNames($name)
     {

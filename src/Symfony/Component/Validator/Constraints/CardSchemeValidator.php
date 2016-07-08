@@ -74,8 +74,10 @@ class CardSchemeValidator extends ConstraintValidator
             '/^6[0-9]{11,18}$/',
         ),
         // All MasterCard numbers start with the numbers 51 through 55. All have 16 digits.
+        // October 2016 MasterCard numbers can also start with 222100 through 272099.
         'MASTERCARD' => array(
             '/^5[1-5][0-9]{14}$/',
+            '/^2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12})$/',
         ),
         // All Visa card numbers start with a 4. New cards have 16 digits. Old cards have 13.
         'VISA' => array(

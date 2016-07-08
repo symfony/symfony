@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-05T09:00:19Z
+
+This also affects `If-None-Match` right?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2016-07-05T10:11:34Z
+
+Here's how the HttpCache handles this:
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/HttpCache/HttpCache.php#L420
+
+It does not tweak the `$_SERVER` vars but uses the `Request` API to remove the information after the `HTTP_*` values have been interpreted. This might catch other ways(TM) of sneaking in the problematic header values.
+
+---------------------------------------------------------------------------
+
+by MalteWunsch at 2016-07-06T07:48:02Z
+
+@ro0NL I think you're right and have added the removal of this header accordingly.

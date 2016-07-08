@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-07-07T11:07:35Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-07-08T05:40:42Z
+
+So it looks like we are missing tests for this statement. Can we add one?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-07-08T06:08:37Z
+
+@xabbuh : Hmm, I'm kind of confused by your comment, because I guess it's not the scope of this PR to add a test case for the `DigestAuthenticationListener`. Which kind of test do you have in mind ?
+
+Would it be enough to mock the `DigestAuthenticationEntryPoint` to ensure the `DigestAuthenticationListener::handle()` is calling `DigestAuthenticationEntryPoint::getSecret()` once rather than the `getKey()` method ?
+Or a no assertion test case ensuring `handle` does not trigger any deprecation ? (without mocking the `DigestAuthenticationEntryPoint`)
+
+I'm not sure about the point of such a test, considering the fact a regression is very unlikely to happen. Appart from proving the deprecation was triggered before, which we can obviously observe by looking at the code. 😕
+
+Anyway, I've added a successful digest authentication test case, which will trigger the deprecation without this fix. But I guess the test case itself has to be backported to 2.7, so should not be part of this very same PR. Let me know how to proceed.

@@ -1951,6 +1951,32 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array(str_repeat(':', 101)),
         );
     }
+
+    /**
+     * @dataProvider methodProvider
+     */
+    public function testMethodIdempotent($method, $idempotent)
+    {
+        $request = new Request();
+        $request->setMethod($method);
+        $this->assertEquals($idempotent, $request->isMethodIdempotent());
+    }
+
+    public function methodProvider()
+    {
+        return array(
+            array(Request::METHOD_HEAD, true),
+            array(Request::METHOD_GET, true),
+            array(Request::METHOD_POST, false),
+            array(Request::METHOD_PUT, true),
+            array(Request::METHOD_PATCH, false),
+            array(Request::METHOD_DELETE, true),
+            array(Request::METHOD_PURGE, true),
+            array(Request::METHOD_OPTIONS, true),
+            array(Request::METHOD_TRACE, true),
+            array(Request::METHOD_CONNECT, false),
+        );
+    }
 }
 
 class RequestContentProxy extends Request

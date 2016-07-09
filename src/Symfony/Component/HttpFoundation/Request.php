@@ -1483,6 +1483,24 @@ class Request
     }
 
     /**
+     * Checks whether the method is idempotent or not.
+     *
+     * @return bool
+     */
+    public function isMethodIdempotent()
+    {
+        return in_array($this->getMethod(), array(
+            self::METHOD_HEAD,
+            self::METHOD_GET,
+            self::METHOD_PUT,
+            self::METHOD_DELETE,
+            self::METHOD_TRACE,
+            self::METHOD_OPTIONS,
+            self::METHOD_PURGE,
+        ));
+    }
+
+    /**
      * Returns the request body content.
      *
      * @param bool $asResource If true, a resource will be returned

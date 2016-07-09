@@ -44,6 +44,7 @@ class TranslationUpdateCommand extends ContainerAwareCommand
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the update be done'),
                 new InputOption('no-backup', null, InputOption::VALUE_NONE, 'Should backup be disabled'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
+                new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to update'),
             ))
             ->setDescription('Updates the translation file')
             ->setHelp(<<<'EOF'
@@ -139,6 +140,11 @@ EOF
             }
         }
 
+        if (null !== $domain = $input->getOption('domain')) {
+            $currentCatalogue = $this->filterCatalogue($currentCatalogue, $domain);
+            $extractedCatalogue = $this->filterCatalogue($extractedCatalogue, $domain);
+        }
+
         // process catalogues
         $operation = $input->getOption('clean')
             ? new TargetOperation($currentCatalogue, $extractedCatalogue)
@@ -212,5 +218,24 @@ EOF
         }
 
         $io->success($resultMessage.'.');
+    }
+
+    private function filterCatalogue(MessageCatalogue $catalogue, $domain)
+    {
+        $filteredCatalogue = new MessageCatalogue($catalogue->getLocale());
+
+        if ($messages = $catalogue->all($domain)) {
+            $filteredCatalogue->add($messages, $domain);
+        }
+        foreach ($catalogue->getResources() as $resource) {
+            $filteredCatalogue->addResource($resource);
+        }
+        if ($metadata = $catalogue->getMetadata('', $domain)) {
+            foreach ($metadata as $k => $v) {
+                $filteredCatalogue->setMetadata($k, $v, $domain);
+            }
+        }
+
+        return $filteredCatalogue;
     }
 }

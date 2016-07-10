@@ -1470,7 +1470,7 @@ class Request
      */
     public function isMethodSafe()
     {
-        return in_array($this->getMethod(), array('GET', 'HEAD'));
+        return in_array($this->getMethod(), array('GET', 'HEAD', 'OPTIONS', 'TRACE'));
     }
 
     /**

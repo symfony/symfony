@@ -269,17 +269,6 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
     }
 
     /**
-     * @see instantiateComplexObject
-     * @deprecated Since 3.1, will be removed in 4.0. Use instantiateComplexObject instead.
-     */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
-    {
-        @trigger_error(sprintf('"%s()" has been deprecated since Symfony 3.1 and will be removed in version 4.0. Use "%s::instantiateComplexObject()" instead.', __METHOD__, __CLASS__), E_USER_DEPRECATED);
-
-        return $this->instantiateComplexObject($data, $class, $context, $reflectionClass, $allowedAttributes);
-    }
-
-    /**
      * Instantiates an object using constructor parameters when needed.
      *
      * This method also allows to denormalize data into an existing object if
@@ -298,8 +287,10 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      *
      * @throws RuntimeException
      */
-    protected function instantiateComplexObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, $format = null)
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, $format = null*/)
     {
+        $format = func_num_args() >= 6 ? func_get_arg(5) : null;
+
         if (
             isset($context[static::OBJECT_TO_POPULATE]) &&
             is_object($context[static::OBJECT_TO_POPULATE]) &&

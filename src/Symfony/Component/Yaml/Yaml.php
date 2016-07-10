@@ -73,7 +73,7 @@ class Yaml
     }
 
     /**
-     * Dumps a PHP array to a YAML string.
+     * Dumps a PHP value to a YAML string.
      *
      * The dump method, when supplied with an array, will do its best
      * to convert the array into friendly YAML.
@@ -84,7 +84,7 @@ class Yaml
      * @param bool  $exceptionOnInvalidType true if an exception must be thrown on invalid types (a PHP resource or object), false otherwise
      * @param bool  $objectSupport          true if object support is enabled, false otherwise
      *
-     * @return string A YAML string representing the original PHP array
+     * @return string A YAML string representing the original PHP value
      */
     public static function dump($input, $inline = 2, $indent = 4, $exceptionOnInvalidType = false, $objectSupport = false)
     {

@@ -57,6 +57,10 @@ class ChoiceValidator extends ConstraintValidator
             $choices = $constraint->choices;
         }
 
+        if (false === $constraint->strict) {
+            @trigger_error('Setting the strict option of the Choice constraint to false is deprecated since version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
         if ($constraint->multiple) {
             foreach ($value as $_value) {
                 if (!in_array($_value, $choices, $constraint->strict)) {

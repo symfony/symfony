@@ -34,7 +34,7 @@ class Choice extends Constraint
     public $choices;
     public $callback;
     public $multiple = false;
-    public $strict = true;
+    public $strict = false;
     public $min;
     public $max;
     public $message = 'The value you selected is not a valid choice.';

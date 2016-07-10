@@ -1914,7 +1914,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider methodProvider
+     * @dataProvider methodSafeProvider
      */
     public function testMethodSafe($method, $safe)
     {
@@ -1923,19 +1923,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($safe, $request->isMethodSafe());
     }
 
-    public function methodProvider()
+    public function methodSafeProvider()
     {
         return array(
-            array(Request::METHOD_HEAD, true),
-            array(Request::METHOD_GET, true),
-            array(Request::METHOD_POST, false),
-            array(Request::METHOD_PUT, false),
-            array(Request::METHOD_PATCH, false),
-            array(Request::METHOD_DELETE, false),
-            array(Request::METHOD_PURGE, false),
-            array(Request::METHOD_OPTIONS, true),
-            array(Request::METHOD_TRACE, true),
-            array(Request::METHOD_CONNECT, false),
+            array('HEAD', true),
+            array('GET', true),
+            array('POST', false),
+            array('PUT', false),
+            array('PATCH', false),
+            array('DELETE', false),
+            array('PURGE', false),
+            array('OPTIONS', true),
+            array('TRACE', true),
+            array('CONNECT', false),
         );
     }
 }

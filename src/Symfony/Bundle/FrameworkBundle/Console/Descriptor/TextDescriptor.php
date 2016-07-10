@@ -35,7 +35,7 @@ class TextDescriptor extends Descriptor
     protected function describeRouteCollection(RouteCollection $routes, array $options = array())
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
-        $filter = $options['filter'];
+        $filter = isset($options['filter']) ? $options['filter'] : '';
 
         $tableHeaders = array('Name', 'Method', 'Scheme', 'Host', 'Path');
         if ($showControllers) {

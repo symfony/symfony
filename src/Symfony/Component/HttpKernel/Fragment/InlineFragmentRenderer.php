@@ -129,6 +129,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
 
         $server['REMOTE_ADDR'] = '127.0.0.1';
+        unset($server['HTTP_IF_MODIFIED_SINCE']);
+        unset($server['HTTP_IF_NONE_MATCH']);
 
         $subRequest = Request::create($uri, 'get', array(), $cookies, array(), $server);
         if ($request->headers->has('Surrogate-Capability')) {

@@ -168,6 +168,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->atPath('property.path.name')
             ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
 
@@ -192,6 +193,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->atPath('property.path.bar')
             ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
 
@@ -244,6 +246,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->atPath('property.path.name')
             ->setParameter('{{ value }}', 'Foo')
             ->setInvalidValue('Foo')
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
 
@@ -276,6 +279,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->atPath('property.path.name2')
             ->setParameter('{{ value }}', 'Bar')
             ->setInvalidValue('Bar')
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
 
@@ -409,6 +413,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->atPath('property.path.single')
             ->setParameter('{{ value }}', $entity1)
             ->setInvalidValue($entity1)
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
 

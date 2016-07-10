@@ -35,7 +35,7 @@ class TextDescriptor extends Descriptor
     protected function describeRouteCollection(RouteCollection $routes, array $options = array())
     {
         $showControllers = isset($options['show_controllers']) && $options['show_controllers'];
-        $filter = isset($options['filter']) ? $options['filter'] : '';
+        $filter = $options['filter'];
 
         $tableHeaders = array('Name', 'Method', 'Scheme', 'Host', 'Path');
         if ($showControllers) {
@@ -44,7 +44,7 @@ class TextDescriptor extends Descriptor
 
         $tableRows = array();
         foreach ($routes->all() as $name => $route) {
-            if (!preg_match("/{$filter}/", $name)) {
+            if ($filter && false === stripos($name, $filter)) {
                 continue;
             }
 
@@ -67,6 +67,10 @@ class TextDescriptor extends Descriptor
             }
 
             $tableRows[] = $row;
+        }
+
+        if (empty($tableRows)) {
+            throw new \InvalidArgumentException(sprintf('No route was found.'));
         }
 
         if (isset($options['output'])) {

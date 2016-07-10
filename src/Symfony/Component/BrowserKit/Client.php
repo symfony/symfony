@@ -522,9 +522,9 @@ abstract class Client
             return parse_url($currentUri, PHP_URL_SCHEME).':'.$uri;
         }
 
-        // anchor?
-        if (!$uri || '#' == $uri[0]) {
-            return preg_replace('/#.*?$/', '', $currentUri).$uri;
+        // anchor or query string parameters?
+        if (!$uri || '#' == $uri[0] || '?' == $uri[0]) {
+            return preg_replace('/[#?].*?$/', '', $currentUri).$uri;
         }
 
         if ('/' !== $uri[0]) {

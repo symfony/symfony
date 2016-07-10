@@ -1473,13 +1473,23 @@ class Request
     }
 
     /**
-     * Checks whether the method is safe or not.
+     * Checks whether or not the method is safe.
      *
      * @return bool
      */
     public function isMethodSafe()
     {
         return in_array($this->getMethod(), array('GET', 'HEAD'));
+    }
+
+    /**
+     * Checks whether or not the method is idempotent.
+     *
+     * @return bool
+     */
+    public function isMethodIdempotent()
+    {
+        return in_array($this->getMethod(), array('HEAD', 'GET', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'PURGE'));
     }
 
     /**

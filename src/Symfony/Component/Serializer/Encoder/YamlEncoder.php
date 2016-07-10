@@ -26,13 +26,13 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
 
     private $dumper;
     private $parser;
-    private $defaultContext;
+    private $defaultContext = array('yaml_inline' => 0, 'yaml_indent' => 0, 'yaml_flags' => 0);
 
-    public function __construct(Dumper $dumper = null, Parser $parser = null, $defaultContext = array('yaml_inline' => 0, 'yaml_indent' => 0, 'yaml_flags' => 0))
+    public function __construct(Dumper $dumper = null, Parser $parser = null, $defaultContext = array())
     {
         $this->dumper = $dumper ?: new Dumper();
         $this->parser = $parser ?: new Parser();
-        $this->defaultContext = $defaultContext;
+        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**

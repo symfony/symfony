@@ -130,6 +130,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $this->context->buildViolation($constraint->message)
             ->atPath($errorPath)
             ->setInvalidValue($invalidValue)
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->addViolation();
     }
 }

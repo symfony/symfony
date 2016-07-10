@@ -323,14 +323,13 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
                     $parameterData = $data[$key];
-                    if (null !== $constructorParameter->getType()) {
-                        try {
+                    try {
+                        if (null !== $constructorParameter->getClass()) {
                             $parameterClass = $constructorParameter->getClass()->getName();
-                        } catch (\ReflectionException $e) {
-                            throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
+                            $parameterData = $this->serializer->deserialize($parameterData, $parameterClass, $format, $context);
                         }
-
-                        $parameterData = $this->serializer->deserialize($parameterData, $parameterClass, $format, $context);
+                    } catch (\ReflectionException $e) {
+                        throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
                     }
 
                     // Don't run set for a parameter passed to the constructor

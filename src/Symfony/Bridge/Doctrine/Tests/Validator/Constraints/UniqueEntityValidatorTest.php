@@ -448,6 +448,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->atPath('property.path.single')
             ->setParameter('{{ value }}', $expectedValue)
             ->setInvalidValue($expectedValue)
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
 

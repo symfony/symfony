@@ -1953,7 +1953,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider methodProvider
+     * @dataProvider methodIdempotentProvider
      */
     public function testMethodIdempotent($method, $idempotent)
     {
@@ -1962,19 +1962,19 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($idempotent, $request->isMethodIdempotent());
     }
 
-    public function methodProvider()
+    public function methodIdempotentProvider()
     {
         return array(
-            array(Request::METHOD_HEAD, true),
-            array(Request::METHOD_GET, true),
-            array(Request::METHOD_POST, false),
-            array(Request::METHOD_PUT, true),
-            array(Request::METHOD_PATCH, false),
-            array(Request::METHOD_DELETE, true),
-            array(Request::METHOD_PURGE, true),
-            array(Request::METHOD_OPTIONS, true),
-            array(Request::METHOD_TRACE, true),
-            array(Request::METHOD_CONNECT, false),
+            array('HEAD', true),
+            array('GET', true),
+            array('POST', false),
+            array('PUT', true),
+            array('PATCH', false),
+            array('DELETE', true),
+            array('PURGE', true),
+            array('OPTIONS', true),
+            array('TRACE', true),
+            array('CONNECT', false),
         );
     }
 }

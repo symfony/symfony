@@ -47,7 +47,7 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
         $normalizedData = $this->prepareForDenormalization($data);
 
         $reflectionClass = new \ReflectionClass($class);
-        $object = $this->instantiateComplexObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes, $format);
+        $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes, $format);
 
         $classMethods = get_class_methods($object);
         foreach ($normalizedData as $attribute => $value) {

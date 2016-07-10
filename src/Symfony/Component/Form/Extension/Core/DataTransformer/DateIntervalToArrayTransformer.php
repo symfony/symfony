@@ -40,6 +40,7 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         self::INVERT => 'r',
     );
     private $fields;
+    private $pad;
 
     /**
      * @param string[] $fields The date fields

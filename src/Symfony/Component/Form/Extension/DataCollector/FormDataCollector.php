@@ -155,6 +155,12 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
         foreach ($form as $child) {
             $this->collectSubmittedData($child);
+
+            // Expand current form if there are children with errors
+            if (empty($this->dataByForm[$hash]['has_children_error'])) {
+                $childData = $this->dataByForm[spl_object_hash($child)];
+                $this->dataByForm[$hash]['has_children_error'] = !empty($childData['has_children_error']) || !empty($childData['errors']);
+            }
         }
     }
 

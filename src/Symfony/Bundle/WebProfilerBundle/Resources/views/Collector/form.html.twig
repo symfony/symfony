@@ -164,6 +164,9 @@
             font-weight: bold;
             vertical-align: middle;
         }
+        .has-error {
+            color: #B0413E;
+        }
         .errors h3 {
             color: #B0413E;
         }
@@ -423,11 +426,12 @@
     </script>
 {% endblock %}
 
-{% macro form_tree_entry(name, data, expanded) %}
+{% macro form_tree_entry(name, data, is_root) %}
     {% import _self as tree %}
+    {% set has_error = data.errors is defined and data.errors|length > 0 %}
     <li>
         <div class="tree-inner" data-tab-target-id="{{ data.id }}-details">
-            {% if data.errors is defined and data.errors|length > 0 %}
+            {% if has_error %}
                 <div class="badge-error">{{ data.errors|length }}</div>
             {% endif %}
 
@@ -437,11 +441,13 @@
                 <div class="toggle-icon empty"></div>
             {% endif %}
 
-            {{ name|default('(no name)') }} {% if data.type_class is defined %}[<abbr title="{{ data.type_class }}">{{ data.type_class|split('\\')|last }}</abbr>]{% endif %}
+            <span {% if has_error or data.has_children_error|default(false) %}class="has-error"{% endif %}>
+                {{ name|default('(no name)') }} {% if data.type_class is defined %}[<abbr title="{{ data.type_class }}">{{ data.type_class|split('\\')|last }}</abbr>]{% endif %}
+            </span>
         </div>
 
         {% if data.children is not empty %}
-            <ul id="{{ data.id }}-children" {% if not expanded %}class="hidden"{% endif %}>
+            <ul id="{{ data.id }}-children" {% if not is_root and not data.has_children_error|default(false) %}class="hidden"{% endif %}>
                 {% for childName, childData in data.children %}
                     {{ tree.form_tree_entry(childName, childData, false) }}
                 {% endfor %}

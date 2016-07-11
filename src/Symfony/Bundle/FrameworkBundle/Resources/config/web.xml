@@ -20,7 +20,7 @@
         <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" public="false" />
 
         <service id="argument_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver" public="false">
-            <argument type="service" id="argument_metadata_factory" />
+            <argument type="service" id="argument_metadata_factory.cached" />
             <argument type="collection" />
         </service>
 
@@ -38,6 +38,31 @@
 
         <service id="argument_resolver.variadic" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolver" public="false">
             <tag name="controller.argument_value_resolver" priority="-150" />
+        </service>
+
+        <service id="argument_metadata_factory.cached" class="Symfony\Bundle\FrameworkBundle\ControllerMetadata\CachedArgumentMetadataFactory" public="false">
+            <argument type="service" id="argument_metadata_factory"/>
+            <argument type="service" id="controller_metadata_factory"/>
+        </service>
+
+        <service id="controller_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ControllerMetadataFactory">
+            <argument type="service" id="argument_metadata_factory"/>
+            <!-- config factory -->
+        </service>
+
+        <service id="controller_metadata_factory.cached" public="false" class="Symfony\Bundle\FrameworkBundle\ControllerMetadata\CachedControllerMetadataFactory" decorates="controller_metadata_factory">
+            <argument type="service" id="controller_metadata_factory.cached.inner"/>
+            <argument type="service" id="router"/>
+            <argument>%kernel.cache_dir%/controller_metadata.php</argument>
+        </service>
+
+        <service id="controller_metadata_factory.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ControllerMetadataCacheWarmer">
+            <tag name="kernel.cache_warmer" />
+            <argument type="service" id="router"/>
+            <argument type="service" id="controller_resolver"/>
+            <argument type="service" id="config_cache_factory"/>
+            <argument type="service" id="controller_metadata_factory.cached"/>
+            <argument>%kernel.cache_dir%/controller_metadata.php</argument>
         </service>
 
         <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">

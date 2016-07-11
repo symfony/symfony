@@ -281,13 +281,16 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      * @param array            $context
      * @param \ReflectionClass $reflectionClass
      * @param array|bool       $allowedAttributes
+     * @param string|null      $format
      *
      * @return object
      *
      * @throws RuntimeException
      */
-    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes)
+    protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, $format = null*/)
     {
+        $format = func_num_args() >= 6 ? func_get_arg(5) : null;
+
         if (
             isset($context[static::OBJECT_TO_POPULATE]) &&
             is_object($context[static::OBJECT_TO_POPULATE]) &&
@@ -319,8 +322,18 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                         $params = array_merge($params, $data[$paramName]);
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || array_key_exists($key, $data))) {
-                    $params[] = $data[$key];
-                    // don't run set for a parameter passed to the constructor
+                    $parameterData = $data[$key];
+                    try {
+                        if (null !== $constructorParameter->getClass()) {
+                            $parameterClass = $constructorParameter->getClass()->getName();
+                            $parameterData = $this->serializer->deserialize($parameterData, $parameterClass, $format, $context);
+                        }
+                    } catch (\ReflectionException $e) {
+                        throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);
+                    }
+
+                    // Don't run set for a parameter passed to the constructor
+                    $params[] = $parameterData;
                     unset($data[$key]);
                 } elseif ($constructorParameter->isDefaultValueAvailable()) {
                     $params[] = $constructorParameter->getDefaultValue();

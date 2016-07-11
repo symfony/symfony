@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-03T10:48:42Z
+
+This case was omitted when adding deserialization support for complex relations (in 3.1). IMO it should be merged in 3.1.
+
+Can you add a test for this?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-03T12:02:45Z
+
+Hm, looks like this also occurs for setters but this is a bigger problem: the serializer leave the set part to the property accessor, so it doesn't have access to the mutator and can't guess the type.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-03T21:42:43Z
+
+@dunglas not sure where the problem lies right now, will have to dig a bit into it later although I hope there won't be any big change.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-04T21:09:47Z
+
+@dunglas tests are passing
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-06T13:46:33Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-10T17:03:02Z
+
+Status: Reviewed
+
+👍 when tests for PHP <7 will be fixed

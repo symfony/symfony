@@ -26,7 +26,7 @@ class ArrayDenormalizer implements DenormalizerInterface, SerializerAwareInterfa
     /**
      * @var SerializerInterface|DenormalizerInterface
      */
-    private $serializer;
+    protected $serializer;
 
     /**
      * {@inheritdoc}

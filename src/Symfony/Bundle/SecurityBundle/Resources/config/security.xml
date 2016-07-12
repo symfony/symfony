@@ -18,6 +18,11 @@
             <argument>%security.access.always_authenticate_before_granting%</argument>
         </service>
 
+        <service id="security.role_checker" class="Symfony\Component\Security\Core\Authorization\RoleChecker">
+            <argument type="service" id="security.authorization_checker" />
+            <argument type="service" id="security.role_hierarchy" />
+        </service>
+
         <service id="security.token_storage" class="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage" />
 
         <service id="security.user_value_resolver" class="Symfony\Bundle\SecurityBundle\SecurityUserValueResolver" public="false">

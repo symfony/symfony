@@ -373,6 +373,12 @@ class Response
         $this->sendHeaders();
         $this->sendContent();
 
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        } elseif ('cli' !== PHP_SAPI) {
+            static::closeOutputBuffers(0, true);
+        }
+
         return $this;
     }
 

@@ -344,7 +344,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     private function getCacheKey($format, array $context)
     {
         try {
-            return $format.'-'.md5(serialize($context));
+            return md5(serialize($format.$context));
         } catch (\Exception $exception) {
             // The context cannot be serialized, skip the cache
             return false;

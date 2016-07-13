@@ -15,6 +15,7 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata\Configuration;
  * Shared interface between configurations on a controller action.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
+ * @internal 
  */
 interface ConfigurationInterface
 {

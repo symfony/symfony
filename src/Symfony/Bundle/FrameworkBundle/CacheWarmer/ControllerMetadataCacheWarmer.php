@@ -100,7 +100,6 @@ final class ControllerMetadataCacheWarmer implements CacheWarmerInterface
                     continue;
                 }
 
-                // avoid duplicates
                 $controllers[$className][$method->getName()] = true;
             }
         }
@@ -114,7 +113,6 @@ final class ControllerMetadataCacheWarmer implements CacheWarmerInterface
                 $metadatas[$controller.':'.$method] = serialize($metadata);
                 foreach ($metadata->getTrackedFiles() as $file) {
                     if (isset($trackedFiles[$file])) {
-                        // already tracked
                         continue;
                     }
 

@@ -105,7 +105,7 @@ class ArgumentMetadata implements \Serializable
      */
     public function serialize()
     {
-        return serialize([$this->name, $this->type, $this->isVariadic, $this->hasDefaultValue, $this->defaultValue]);
+        return serialize(array($this->name, $this->type, $this->isVariadic, $this->hasDefaultValue, $this->defaultValue));
     }
 
     /**

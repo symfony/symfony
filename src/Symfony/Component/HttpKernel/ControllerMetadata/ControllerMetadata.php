@@ -69,13 +69,15 @@ class ControllerMetadata implements \Serializable
      */
     public function getTrackedFiles()
     {
-        $tracked = array();
+        $tracked = array((new \ReflectionClass($this->className))->getFileName());
 
         foreach ($this->configurations as $configuration) {
-            $tracked[] = $configuration->getTrackedFiles();
+            foreach ($configuration->getTrackedFiles() as $trackedFile) {
+                $tracked[] = $trackedFile;
+            }
         }
 
-        return array_merge([(new \ReflectionClass($this->className))->getFileName()], ...$tracked);
+        return $tracked;
     }
 
     /**
@@ -101,7 +103,7 @@ class ControllerMetadata implements \Serializable
      */
     public function serialize()
     {
-        return serialize([$this->className, $this->method, $this->arguments, $this->configurations]);
+        return serialize(array($this->className, $this->method, $this->arguments, $this->configurations));
     }
 
     /**

@@ -56,7 +56,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public function normalize($object, $format = null, array $context = array())
     {
         if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getCacheKey($context);
+            $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
         if ($this->isCircularReference($object, $context)) {
@@ -169,7 +169,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getCacheKey($context);
+            $context['cache_key'] = $this->getCacheKey($format, $context);
         }
         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
@@ -336,14 +336,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Gets the cache key to use.
      *
-     * @param array $context
+     * @param string|null $format
+     * @param array       $context
      *
      * @return bool|string
      */
-    private function getCacheKey(array $context)
+    private function getCacheKey($format, array $context)
     {
         try {
-            return md5(serialize($context));
+            return md5($format.serialize($context));
         } catch (\Exception $exception) {
             // The context cannot be serialized, skip the cache
             return false;

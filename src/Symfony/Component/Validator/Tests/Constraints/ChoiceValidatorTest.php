@@ -245,6 +245,9 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /**
+     * @group legacy
+     */
     public function testNonStrict()
     {
         $constraint = new Choice(array(
@@ -286,6 +289,9 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    /**
+     * @group legacy
+     */
     public function testNonStrictWithMultipleChoices()
     {
         $constraint = new Choice(array(

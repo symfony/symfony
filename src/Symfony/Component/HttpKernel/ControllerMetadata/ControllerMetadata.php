@@ -87,7 +87,7 @@ class ControllerMetadata implements \Serializable
      */
     public function getConfigurationsByClass($className)
     {
-        $found = [];
+        $found = array();
 
         foreach ($this->configurations as $configuration) {
             if (get_class($configuration) === $className || is_subclass_of($className, $configuration)) {

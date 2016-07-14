@@ -35,7 +35,7 @@ final class ControllerMetadataFactory implements ControllerMetadataFactoryInterf
     public function createControllerMetadata(callable $controller)
     {
         if (null === ($logicalName = ControllerMetadataUtil::getControllerLogicalName($controller))) {
-            return null;
+            return;
         }
 
         list($className, $method) = $logicalName;

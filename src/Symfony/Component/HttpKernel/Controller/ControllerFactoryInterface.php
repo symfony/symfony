@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\HttpKernel\ControllerMetadata;
+namespace Symfony\Component\HttpKernel\Controller;
 
 /**
- * Builds controller data.
- *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-interface ControllerMetadataFactoryInterface
+interface ControllerFactoryInterface
 {
     /**
-     * @param callable $controller The controller to resolve the arguments for
+     * Create a controller callable based on a string.
      *
-     * @return ControllerMetadata|null
+     * @param string $controller
+     *
+     * @return callable
      */
-    public function createControllerMetadata(callable $controller);
+    public function createFromString($controller);
 }

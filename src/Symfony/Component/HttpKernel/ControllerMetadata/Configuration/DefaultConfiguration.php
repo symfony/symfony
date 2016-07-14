@@ -15,6 +15,7 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata\Configuration;
  * A default implemention of a configuration option on a controller action.
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
+ *
  * @internal
  */
 abstract class DefaultConfiguration implements ConfigurationInterface

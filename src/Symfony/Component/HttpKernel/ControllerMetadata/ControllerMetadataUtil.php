@@ -26,7 +26,7 @@ abstract class ControllerMetadataUtil
     {
         if ($controller instanceof \Closure) {
             // cannot store any metadata of anonymous functions
-            return null;
+            return;
         }
 
         if (is_object($controller)) {
@@ -42,7 +42,7 @@ abstract class ControllerMetadataUtil
 
         if (null !== $controller[0]) {
             if (!is_string($controller[0])) {
-                $className = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($controller[0]) : get_class($controller[0]);
+                $className = class_exists(ClassUtils::class) ? ClassUtils::getClass($controller[0]) : get_class($controller[0]);
             } else {
                 $className = $controller[0];
             }

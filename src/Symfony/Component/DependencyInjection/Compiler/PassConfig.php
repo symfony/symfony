@@ -152,7 +152,7 @@ class PassConfig
     }
 
     /**
-     * Gets all passes for the Merge pass.
+     * Gets the Merge pass.
      *
      * @return CompilerPassInterface The merge pass
      */

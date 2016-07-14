@@ -82,6 +82,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
 
         // force cache generation
         $this->setOption('cache_dir', $cacheDir);
+        $this->getRouteCollection();
         $this->getMatcher();
         $this->getGenerator();
 

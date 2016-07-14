@@ -277,11 +277,15 @@ class RouteCollection implements \IteratorAggregate, \Countable, \Serializable
 
     public function serialize()
     {
-        return serialize($this->routes);
+        $serializableResources = array_filter($this->resources, function($resource) {
+            return $resource instanceof \Serializable;
+        });
+
+        return serialize(array($this->routes, $serializableResources));
     }
 
     public function unserialize($serialized)
     {
-        $this->routes = unserialize($serialized);
+        list($this->routes, $this->resources) = unserialize($serialized);
     }
 }

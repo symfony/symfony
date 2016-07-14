@@ -583,6 +583,8 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                     file_put_contents($this->getCacheDir().'/'.$class.'Compiler.log', null !== $container ? implode("\n", $container->getCompiler()->getLog()) : '');
                 }
             }
+
+            $resources = $container->getResources();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
             $fresh = false;
@@ -592,6 +594,10 @@ abstract class Kernel implements KernelInterface, TerminableInterface
 
         $this->container = new $class();
         $this->container->set('kernel', $this);
+
+        if (!$fresh) {
+            $this->container->set('service_container.resources', $resources);
+        }
 
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));

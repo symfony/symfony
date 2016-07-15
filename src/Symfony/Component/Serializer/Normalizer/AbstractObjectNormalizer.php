@@ -108,7 +108,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $stack[$attribute] = $attributeValue;
             }
 
-            $data = $this->updateData($data, $attribute, $attributeValue);
+            $data = $this->updateData($data, $attribute, $attributeValue, $object);
         }
 
         foreach ($stack as $attribute => $attributeValue) {
@@ -116,7 +116,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer', $attribute));
             }
 
-            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute)));
+            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $this->createChildContext($context, $attribute)), $object);
         }
 
         return $data;
@@ -238,7 +238,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
-        $normalizedData = $this->prepareForDenormalization($data);
+        $normalizedData = $this->prepareForDenormalization($data, $class);
         $extraAttributes = array();
 
         $reflectionClass = new \ReflectionClass($class);
@@ -273,6 +273,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
+    {
+        if (preg_match('/^(get|is|has|set)(.+)$/i', $attribute, $matches)) {
+            // We do not allow access to accessors or mutators directly
+            return false;
+        }
+
+        return !in_array($attribute, $this->ignoredAttributes);
+    }
+
+    /**
      * Sets attribute value.
      *
      * @param object      $object
@@ -300,6 +313,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         $expectedTypes = array();
+        /** @var Type $type */
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
                 return;
@@ -334,6 +348,24 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 if ($this->serializer->supportsDenormalization($data, $class, $format, $childContext)) {
                     return $this->serializer->denormalize($data, $class, $format, $childContext);
                 }
+            } elseif (Type::BUILTIN_TYPE_ARRAY === $builtinType) {
+                if (!$this->serializer instanceof DenormalizerInterface) {
+                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
+                }
+
+                if (!is_array($data) && !$data instanceof \Traversable) {
+                    throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because the value is "%s", expected array', $attribute, $class, gettype($data)));
+                }
+
+                $denormalizedData = [];
+                $childClass = $type->getCollectionValueType()->getClassName();
+                foreach ($data as $d) {
+                    if ($this->serializer->supportsDenormalization($d, $childClass, $format)) {
+                        $denormalizedData[] = $this->serializer->denormalize($d, $childClass, $format, $context);
+                    }
+                }
+
+                return $denormalizedData;
             }
 
             // JSON only has a Number type corresponding to both int and float PHP types.
@@ -399,8 +431,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * Sets an attribute and apply the name converter if necessary.
      *
      * @param mixed $attributeValue
+     * @internal
      */
-    private function updateData(array $data, string $attribute, $attributeValue): array
+    protected function updateData(array $data, string $attribute, $attributeValue): array
     {
         if ($this->nameConverter) {
             $attribute = $this->nameConverter->normalize($attribute);

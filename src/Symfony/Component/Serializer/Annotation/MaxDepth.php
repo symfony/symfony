@@ -28,6 +28,9 @@ class MaxDepth
      */
     private $maxDepth;
 
+    /**
+     * @param array $data
+     */
     public function __construct(array $data)
     {
         if (!isset($data['value'])) {
@@ -41,6 +44,9 @@ class MaxDepth
         $this->maxDepth = $data['value'];
     }
 
+    /**
+     * @return int
+     */
     public function getMaxDepth()
     {
         return $this->maxDepth;

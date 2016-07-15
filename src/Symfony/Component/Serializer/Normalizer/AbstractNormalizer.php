@@ -288,10 +288,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * the denormalization process.
      *
      * @param object|array $data
+     * @param string $class
      *
      * @return array
      */
-    protected function prepareForDenormalization($data)
+    protected function prepareForDenormalization($data, $class)
     {
         return (array) $data;
     }

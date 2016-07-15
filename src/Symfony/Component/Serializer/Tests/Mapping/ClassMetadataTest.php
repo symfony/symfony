@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class ClassMetadataTest extends TestCase
 {
@@ -64,9 +65,34 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals(array('a1' => $ac1), $classMetadata2->getAttributesMetadata());
     }
 
+    public function testExclusionPolicy()
+    {
+        $policy = 'foo';
+        $classMetadata = new ClassMetadata('a');
+        $this->assertNull($classMetadata->getExclusionPolicy());
+
+        $classMetadata->setExclusionPolicy($policy);
+        $this->assertEquals($policy, $classMetadata->getExclusionPolicy());
+    }
+
+    public function testReadOnly()
+    {
+        $classMetadata = new ClassMetadata('a');
+        $this->assertNull($classMetadata->getReadOnly());
+
+        $classMetadata->setReadOnly(true);
+        $this->assertTrue($classMetadata->getReadOnly());
+
+        $classMetadata->setReadOnly(false);
+        $this->assertFalse($classMetadata->getReadOnly());
+    }
+
     public function testSerialize()
     {
         $classMetadata = new ClassMetadata('a');
+
+        $classMetadata->setExclusionPolicy('foo');
+        $classMetadata->setReadOnly(true);
 
         $a1 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $a1->method('getName')->willReturn('b1');

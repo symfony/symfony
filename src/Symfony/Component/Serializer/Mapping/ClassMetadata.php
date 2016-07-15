@@ -26,6 +26,24 @@ class ClassMetadata implements ClassMetadataInterface
     public $name;
 
     /**
+     * @var string
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getName()} instead.
+     */
+    public $exclusionPolicy;
+
+    /**
+     * @var bool
+     *
+     * @internal This property is public in order to reduce the size of the
+     *           class' serialized representation. Do not access it. Use
+     *           {@link getName()} instead.
+     */
+    public $readOnly;
+
+    /**
      * @var AttributeMetadataInterface[]
      *
      * @internal This property is public in order to reduce the size of the
@@ -66,6 +84,46 @@ class ClassMetadata implements ClassMetadataInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExclusionPolicy()
+    {
+        return $this->exclusionPolicy;
+    }
+
+    /**
+     * @param string $exclusionPolicy
+     *
+     * @return ClassMetadata
+     */
+    public function setExclusionPolicy($exclusionPolicy)
+    {
+        $this->exclusionPolicy = $exclusionPolicy;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getReadOnly()
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * @param boolean $readOnly
+     *
+     * @return ClassMetadata
+     */
+    public function setReadOnly($readOnly)
+    {
+        $this->readOnly = $readOnly;
+
+        return $this;
     }
 
     /**
@@ -135,6 +193,8 @@ class ClassMetadata implements ClassMetadataInterface
     {
         return array(
             'name',
+            'exclusionPolicy',
+            'readOnly',
             'attributesMetadata',
             'classDiscriminatorMapping',
         );

@@ -21,6 +21,7 @@ namespace Symfony\Component\Serializer\Mapping;
  * @internal
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 interface ClassMetadataInterface
 {
@@ -30,6 +31,34 @@ interface ClassMetadataInterface
      * @return string The name of the backing class
      */
     public function getName();
+
+    /**
+     * The default policy for excluding or exposing attributes.
+     *
+     * @return string|null
+     */
+    public function getExclusionPolicy();
+
+    /**
+     * Set the policy for excluding attributes.
+     *
+     * @param string $policy
+     */
+    public function setExclusionPolicy($policy);
+
+    /**
+     * True if this class should be ignored when deserializing.
+     *
+     * @return boolean|null
+     */
+    public function getReadOnly();
+
+    /**
+     * Set boolean value if this is a read only class.
+     *
+     * @param bool $bool
+     */
+    public function setReadOnly($bool);
 
     /**
      * Adds an {@link AttributeMetadataInterface}.

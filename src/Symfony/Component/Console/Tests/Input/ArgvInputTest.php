@@ -215,7 +215,6 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
     {
         $input = new ArgvInput(array('cli.php', '--name=foo', '--name=bar', '--name=baz'));
         $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY))));
-
         $this->assertEquals(array('name' => array('foo', 'bar', 'baz')), $input->getOptions(), '->parse() parses array options ("--option=value" syntax)');
 
         $input = new ArgvInput(array('cli.php', '--name', 'foo', '--name', 'bar', '--name', 'baz'));
@@ -228,7 +227,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
 
         $input = new ArgvInput(array('cli.php', '--name=foo,bar'));
         $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY))));
-        $this->assertSame(array('name' => array('foo', 'bar')), $input->getOptions(), '->parse() parses empty array options as null ("--option=value" syntax)');
+        $this->assertSame(array('name' => array('foo,bar')), $input->getOptions(), '->parse() parses empty array options as null ("--option=value" syntax)');
 
         $input = new ArgvInput(array('cli.php', '--name', 'foo', '--name', 'bar', '--name', '--anotherOption'));
         $input->bind(new InputDefinition(array(
@@ -236,6 +235,13 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
             new InputOption('anotherOption', null, InputOption::VALUE_NONE),
         )));
         $this->assertSame(array('name' => array('foo', 'bar', null), 'anotherOption' => true), $input->getOptions(), '->parse() parses empty array options as null ("--option value" syntax)');
+    }
+
+    public function testParseArrayValueIsCommaSeparatedOption()
+    {
+        $input = new ArgvInput(array('cli.php', '--name=foo,bar'));
+        $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY | InputOption::VALUE_IS_COMMA_SEPARATED))));
+        $this->assertSame(array('name' => array('foo', 'bar')), $input->getOptions(), '->parse() parses empty array options as null ("--option=value" syntax)');
     }
 
     public function testParseNegativeNumberAfterDoubleDash()

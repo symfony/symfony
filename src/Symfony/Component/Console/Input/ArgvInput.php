@@ -246,7 +246,7 @@ class ArgvInput extends Input
         }
 
         if ($option->isArray()) {
-            if (strpos($value, ',') !== false) {
+            if ($option->isValueCommaSeparated()) {
                 if (!isset($this->options[$name])) {
                     $this->options[$name] = array();
                 }

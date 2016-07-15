@@ -226,6 +226,10 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
         $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY))));
         $this->assertSame(array('name' => array('foo', 'bar', null)), $input->getOptions(), '->parse() parses empty array options as null ("--option=value" syntax)');
 
+        $input = new ArgvInput(array('cli.php', '--name=foo,bar'));
+        $input->bind(new InputDefinition(array(new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY))));
+        $this->assertSame(array('name' => array('foo', 'bar')), $input->getOptions(), '->parse() parses empty array options as null ("--option=value" syntax)');
+
         $input = new ArgvInput(array('cli.php', '--name', 'foo', '--name', 'bar', '--name', '--anotherOption'));
         $input->bind(new InputDefinition(array(
             new InputOption('name', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY),

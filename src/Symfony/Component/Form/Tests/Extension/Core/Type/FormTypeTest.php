@@ -11,11 +11,18 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Tests\Fixtures\MoneyType;
+use Symfony\Component\Form\Tests\Fixtures\MoneyTypeConverter;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\DataMapper\CallbackFormDataToObjectConverter;
+use Symfony\Component\Form\Extension\Core\DataMapper\SimpleObjectMapper;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Tests\Fixtures\Money;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class FormTest_AuthorWithoutRefSetter
 {
@@ -627,6 +634,99 @@ class FormTypeTest extends BaseTypeTest
             ->createView();
 
         $this->assertSame('0', $view->vars['label']);
+    }
+
+    public function provideSimpleObjectMapperOption()
+    {
+        return array(
+            array(false, true),
+            array('foo', true),
+            array(function (array $data, $originalData) {}, false),
+            array(new CallbackFormDataToObjectConverter(function (array $data, $originalData) {}), false),
+            array(null, false),
+        );
+    }
+
+    /**
+     * @dataProvider provideSimpleObjectMapperOption
+     */
+    public function testSimpleObjectMapperOptionExpectations($value, $expectsException = false)
+    {
+        if ($expectsException) {
+            $this->setExpectedException(InvalidOptionsException::class);
+        }
+
+        $this->factory->create(FormType::class, null, array(
+            'simple_object_mapper' => $value,
+        ));
+    }
+
+    public function testSimpleObjectMapperOptionSetsDataMapper()
+    {
+        $form = $this->factory->create(FormType::class, null, array(
+            'simple_object_mapper' => function (array $data, $originalData) {},
+        ));
+
+        $this->assertInstanceOf(SimpleObjectMapper::class, $form->getConfig()->getDataMapper());
+    }
+
+    public function testEmptyDataCallableReturnsNullWithSimpleObjectMapper()
+    {
+        $form = $this->factory->create(FormType::class, null, array(
+            'data_class' => \stdClass::class,
+            'simple_object_mapper' => function (array $data, $originalData) {},
+        ));
+
+        $this->assertNull(call_user_func($form->getConfig()->getEmptyData(), $form));
+    }
+
+    public function testSimpleObjectMapperOptionProperlyMapsObject()
+    {
+        $money = new Money(20.5, 'EUR');
+
+        $form = $this->factory->create(MoneyType::class, $money, array(
+            'simple_object_mapper' => function (array $data, $originalData) use ($money) {
+                $this->assertSame($money, $originalData);
+
+                $converter = new MoneyTypeConverter();
+
+                return $converter->convertFormDataToObject($data, $originalData);
+            }, ))
+        ;
+
+        $this->assertSame($money->getAmount(), $form->get('amount')->getData());
+        $this->assertSame($money->getCurrency(), $form->get('currency')->getData());
+
+        $form->submit(array('amount' => 15.0, 'currency' => 'USD'));
+
+        $newMoney = $form->getData();
+
+        $this->assertNotSame($money, $newMoney);
+        $this->assertInstanceOf(Money::class, $newMoney);
+        $this->assertSame(15.0, $newMoney->getAmount());
+        $this->assertSame('USD', $newMoney->getCurrency());
+    }
+
+    public function provideTestSimpleObjectMapperOptionData()
+    {
+        return array(
+            array(new Money(20.5, 'EUR'), array('amount' => 15.0, 'currency' => 'USD'), new Money(15.0, 'USD')),
+            array(new Money(20.5, 'EUR'), array(), null),
+            array(null, array('amount' => 15.0, 'currency' => 'USD'), new Money(15.0, 'USD')),
+            array(null, array(), null),
+        );
+    }
+
+    /**
+     * @dataProvider provideTestSimpleObjectMapperOptionData
+     */
+    public function testSimpleObjectMapperOption($initialData, $submittedData, $expectedData)
+    {
+        $form = $this->factory->create(MoneyType::class, $initialData);
+
+        $form->submit($submittedData);
+
+        $this->assertEquals($expectedData, $form->getData());
     }
 
     protected function getTestedType()

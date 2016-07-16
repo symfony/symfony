@@ -267,7 +267,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer', $attribute, $class));
                 }
 
-                if ($this->serializer->supportsDenormalization($data, $class, $format)) {
+                if ($this->serializer->supportsDenormalization($data, $class, $format, $context)) {
                     return $this->serializer->denormalize($data, $class, $format, $context);
                 }
             }

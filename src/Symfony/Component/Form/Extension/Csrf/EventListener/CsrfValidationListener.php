@@ -101,8 +101,10 @@ class CsrfValidationListener implements EventSubscriberInterface
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
+        $method = $form->getConfig()->getMethod();
+        $postRequestSizeExceeded = $method === 'POST' && $this->serverParams->hasPostMaxSizeBeenExceeded();
 
-        if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$this->serverParams->hasPostMaxSizeBeenExceeded()) {
+        if ($form->isRoot() && $form->getConfig()->getOption('compound') && !$postRequestSizeExceeded) {
             $data = $event->getData();
 
             if (!isset($data[$this->fieldName]) || !$this->tokenManager->isTokenValid(new CsrfToken($this->tokenId, $data[$this->fieldName]))) {

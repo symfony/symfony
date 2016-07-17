@@ -88,7 +88,7 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true)
         ;
 
-        $event = new FormEvent($this->form, ['csrf' => 'token']);
+        $event = new FormEvent($this->form, array('csrf' => 'token'));
         $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, $serverParams);
 
         $validation->preSubmit($event);

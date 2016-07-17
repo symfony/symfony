@@ -26,7 +26,7 @@ class ServerParams
     }
 
     /**
-     * Returns true if the POST max size has been exceeded in the request
+     * Returns true if the POST max size has been exceeded in the request.
      *
      * @return bool
      */

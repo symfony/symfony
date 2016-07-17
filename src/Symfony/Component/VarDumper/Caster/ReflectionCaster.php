@@ -69,7 +69,7 @@ class ReflectionCaster
         }
 
         $prefix = Caster::PREFIX_DYNAMIC;
-        unset($a['name'], $a[$prefix.'0'], $a[$prefix.'this'], $a[$prefix.'parameter'], $a[Caster::PREFIX_VIRTUAL.'extra']);
+        unset($a['name'], $a[$prefix.'this'], $a[$prefix.'parameter'], $a[Caster::PREFIX_VIRTUAL.'extra']);
 
         return $a;
     }

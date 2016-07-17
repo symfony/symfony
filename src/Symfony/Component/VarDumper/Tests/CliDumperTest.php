@@ -133,6 +133,45 @@ EOTXT
         );
     }
 
+    public function testJsonCast()
+    {
+        $var = (array) json_decode('{"0":{},"1":null}');
+        foreach ($var as &$v) {
+        }
+        $var[] = &$v;
+        $var[''] = 2;
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+array:4 [
+  "0" => {}
+  "1" => &1 null
+  0 => &1 null
+  "" => 2
+]
+EOTXT
+            ,
+            $var
+        );
+    }
+
+    public function testObjectCast()
+    {
+        $var = (object) array(1 => 1);
+        $var->{1} = 2;
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+{
+  +1: 1
+  +"1": 2
+}
+EOTXT
+            ,
+            $var
+        );
+    }
+
     public function testClosedResource()
     {
         if (defined('HHVM_VERSION') && HHVM_VERSION_ID < 30600) {

@@ -288,7 +288,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      * the denormalization process.
      *
      * @param object|array $data
-     * @param string $class
+     * @param string       $class
      *
      * @return array
      */

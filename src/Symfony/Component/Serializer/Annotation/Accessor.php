@@ -29,7 +29,7 @@ final class Accessor
         if (empty($data)) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', get_class($this)));
         }
-        
+
         foreach (array('getter', 'setter') as $parameter) {
             if (!isset($data[$parameter]) || !$data[$parameter]) {
                 continue;

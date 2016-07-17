@@ -13,9 +13,7 @@ namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\Serializer\Annotation;
-use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
-use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 
 /**

@@ -61,7 +61,7 @@ interface AttributeMetadataInterface
     /**
      * True if this attribute should be excluded.
      *
-     * @return boolean|null
+     * @return bool|null
      */
     public function getExclude();
 
@@ -75,7 +75,7 @@ interface AttributeMetadataInterface
     /**
      * True if this attribute should be exposed.
      *
-     * @return boolean|null
+     * @return bool|null
      */
     public function getExpose();
 
@@ -117,7 +117,7 @@ interface AttributeMetadataInterface
     /**
      * True if this attribute should be ignored when deserializing.
      *
-     * @return boolean|null
+     * @return bool|null
      */
     public function getReadOnly();
 

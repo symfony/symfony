@@ -14,7 +14,7 @@ class ReflectionPropertyAccess
     /**
      * @param object $object
      * @param string $propertyName
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function setValue($object, $propertyName, $value)
     {
@@ -36,7 +36,7 @@ class ReflectionPropertyAccess
     }
 
     /**
-     * @param mixed $objectOrClass
+     * @param mixed  $objectOrClass
      * @param string $propertyName
      *
      * @return \ReflectionProperty

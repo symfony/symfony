@@ -16,7 +16,6 @@ class CompositionDummy
      */
     private $child;
 
-
     public function __construct($withValues = false)
     {
         if ($withValues) {

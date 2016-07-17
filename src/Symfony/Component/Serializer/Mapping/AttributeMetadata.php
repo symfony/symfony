@@ -158,7 +158,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getExclude()
     {
@@ -166,7 +166,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * @param boolean $exclude
+     * @param bool $exclude
      *
      * @return AttributeMetadata
      */
@@ -178,7 +178,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getExpose()
     {
@@ -186,7 +186,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * @param boolean $expose
+     * @param bool $expose
      *
      * @return AttributeMetadata
      */
@@ -232,7 +232,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getReadOnly()
     {
@@ -240,7 +240,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     }
 
     /**
-     * @param boolean $readOnly
+     * @param bool $readOnly
      *
      * @return AttributeMetadata
      */

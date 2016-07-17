@@ -107,7 +107,7 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getReadOnly()
     {
@@ -115,7 +115,7 @@ class ClassMetadata implements ClassMetadataInterface
     }
 
     /**
-     * @param boolean $readOnly
+     * @param bool $readOnly
      *
      * @return ClassMetadata
      */

@@ -2,15 +2,12 @@
 
 namespace Symfony\Component\Serializer\PropertyManager;
 
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 /**
- *
- *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class MetadataAwarePropertyTypeExtractor implements PropertyTypeExtractorInterface
@@ -27,8 +24,8 @@ class MetadataAwarePropertyTypeExtractor implements PropertyTypeExtractorInterfa
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory, PropertyTypeExtractorInterface $propertyTypeExtractor = null)
     {
-        $this->classMetadataFactory  = $classMetadataFactory;
-        $this->propertyTypeExtractor  = $propertyTypeExtractor;
+        $this->classMetadataFactory = $classMetadataFactory;
+        $this->propertyTypeExtractor = $propertyTypeExtractor;
     }
 
     public function getTypes($class, $property, array $context = array())
@@ -41,16 +38,15 @@ class MetadataAwarePropertyTypeExtractor implements PropertyTypeExtractorInterfa
             return array($this->convertStringToType($string));
         }
 
-
         if (null === $this->propertyTypeExtractor || null === $types = $this->propertyTypeExtractor->getTypes($class, $property)) {
-            return null;
+            return;
         }
 
         return $types;
     }
 
     /**
-     * Convert a plain string to a Type
+     * Convert a plain string to a Type.
      *
      * @param string $doctype
      */

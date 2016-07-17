@@ -24,6 +24,7 @@ final class ReadOnly
     {
         if (empty($data) || !isset($data['value'])) {
             $this->readOnly = true;
+
             return;
         }
 

@@ -344,7 +344,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     throw new LogicException(sprintf('Cannot denormalize attribute "%s" for class "%s" because the value is "%s", expected array', $attribute, $class, gettype($data)));
                 }
 
-                $denormalizedData = [];
+                $denormalizedData = array();
                 $childClass = $type->getCollectionValueType()->getClassName();
                 foreach ($data as $d) {
                     if ($this->serializer->supportsDenormalization($d, $childClass, $format)) {

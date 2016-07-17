@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Annotation\ExclusionPolicy;
-use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -216,14 +214,14 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
      */
     protected function prepareForDenormalization($data, $class)
     {
-        $preparedData = [];
+        $preparedData = array();
         $data = (array) $data;
         /** @var ClassMetadataInterface $classMetadata */
         $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
         $attributeMetadata = $classMetadata->getAttributesMetadata();
         $classReadOnly = true === $classMetadata->getReadOnly();
 
-        $validSerializedKeys = [];
+        $validSerializedKeys = array();
         foreach ($attributeMetadata as $attributeName => $metadata) {
             $attributeReadOnly = $metadata->getReadOnly();
             if ($attributeReadOnly === true || ($classReadOnly && $attributeReadOnly !== false)) {

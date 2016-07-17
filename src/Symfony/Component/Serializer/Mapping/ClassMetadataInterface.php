@@ -49,7 +49,7 @@ interface ClassMetadataInterface
     /**
      * True if this class should be ignored when deserializing.
      *
-     * @return boolean|null
+     * @return bool|null
      */
     public function getReadOnly();
 

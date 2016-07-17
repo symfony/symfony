@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-16T13:26:19Z
+
+Ready, with a bunch of really weird edge cases fixed when casting from array to object and vice versa.
+appveyor failure unrelated

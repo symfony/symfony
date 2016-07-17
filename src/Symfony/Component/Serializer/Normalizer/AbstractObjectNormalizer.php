@@ -273,19 +273,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = array())
-    {
-        if (preg_match('/^(get|is|has|set)(.+)$/i', $attribute, $matches)) {
-            // We do not allow access to accessors or mutators directly
-            return false;
-        }
-
-        return !in_array($attribute, $this->ignoredAttributes);
-    }
-
-    /**
      * Sets attribute value.
      *
      * @param object      $object

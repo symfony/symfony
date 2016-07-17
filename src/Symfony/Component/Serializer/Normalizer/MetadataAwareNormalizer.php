@@ -34,7 +34,7 @@ class MetadataAwareNormalizer extends AbstractObjectNormalizer
     protected $propertyAccessor;
 
     public function __construct(
-        ClassMetadataFactoryInterface $classMetadataFactory,
+        ClassMetadataFactoryInterface $classMetadataFactory = null,
         NameConverterInterface $nameConverter = null,
         PropertyAccessorInterface $propertyAccessor = null,
         PropertyTypeExtractorInterface $propertyTypeExtractor = null)

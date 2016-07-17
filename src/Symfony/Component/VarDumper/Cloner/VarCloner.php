@@ -28,7 +28,7 @@ class VarCloner extends AbstractCloner
         $i = 0;                         // Current iteration position in $queue
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the first level
-        $refs = 0;                      // Hard references counter
+        $refsCounter = 0;               // Hard references counter
         $queue = array(array($var));    // This breadth-first queue is the return value
         $arrayRefs = array();           // Map of queue indexes to stub array objects
         $hardRefs = array();            // Map of original zval hashes to stub objects
@@ -60,27 +60,32 @@ class VarCloner extends AbstractCloner
         for ($i = 0; $i < $len; ++$i) {
             $indexed = true;            // Whether the currently iterated array is numerically indexed or not
             $j = -1;                    // Position in the currently iterated array
-            $step = $queue[$i];         // Copy of the currently iterated array used for hard references detection
-            foreach ($step as $k => $v) {
+            $fromObjCast = array_keys($queue[$i]);
+            $fromObjCast = array_keys(array_flip($fromObjCast)) !== $fromObjCast;
+            $refs = $vals = $fromObjCast ? array_values($queue[$i]) : $queue[$i];
+            foreach ($queue[$i] as $k => $v) {
                 // $k is the original key
                 // $v is the original value or a stub object in case of hard references
-                if ($indexed && $k !== ++$j) {
+                if ($k !== ++$j) {
                     $indexed = false;
                 }
+                if ($fromObjCast) {
+                    $k = $j;
+                }
                 if ($useExt) {
-                    $zval = symfony_zval_info($k, $step);
+                    $zval = symfony_zval_info($k, $refs);
                 } else {
-                    $step[$k] = $cookie;
-                    if ($zval['zval_isref'] = $queue[$i][$k] === $cookie) {
+                    $refs[$k] = $cookie;
+                    if ($zval['zval_isref'] = $vals[$k] === $cookie) {
                         $zval['zval_hash'] = $v instanceof Stub ? spl_object_hash($v) : null;
                     }
                     $zval['type'] = gettype($v);
                 }
                 if ($zval['zval_isref']) {
-                    $queue[$i][$k] = &$stub;    // Break hard references to make $queue completely
+                    $vals[$k] = &$stub;         // Break hard references to make $queue completely
                     unset($stub);               // independent from the original structure
                     if (isset($hardRefs[$zval['zval_hash']])) {
-                        $queue[$i][$k] = $useExt ? ($v = $hardRefs[$zval['zval_hash']]) : ($step[$k] = $v);
+                        $vals[$k] = $useExt ? ($v = $hardRefs[$zval['zval_hash']]) : ($refs[$k] = $v);
                         if ($v->value instanceof Stub && (Stub::TYPE_OBJECT === $v->value->type || Stub::TYPE_RESOURCE === $v->value->type)) {
                             ++$v->value->refCount;
                         }
@@ -204,18 +209,18 @@ class VarCloner extends AbstractCloner
                 if (isset($stub)) {
                     if ($zval['zval_isref']) {
                         if ($useExt) {
-                            $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = $v = new Stub();
+                            $vals[$k] = $hardRefs[$zval['zval_hash']] = $v = new Stub();
                             $v->value = $stub;
                         } else {
-                            $step[$k] = new Stub();
-                            $step[$k]->value = $stub;
-                            $h = spl_object_hash($step[$k]);
-                            $queue[$i][$k] = $hardRefs[$h] = &$step[$k];
+                            $refs[$k] = new Stub();
+                            $refs[$k]->value = $stub;
+                            $h = spl_object_hash($refs[$k]);
+                            $vals[$k] = $hardRefs[$h] = &$refs[$k];
                             $values[$h] = $v;
                         }
-                        $queue[$i][$k]->handle = ++$refs;
+                        $vals[$k]->handle = ++$refsCounter;
                     } else {
-                        $queue[$i][$k] = $stub;
+                        $vals[$k] = $stub;
                     }
 
                     if ($a) {
@@ -243,18 +248,37 @@ class VarCloner extends AbstractCloner
                     $stub = $a = null;
                 } elseif ($zval['zval_isref']) {
                     if ($useExt) {
-                        $queue[$i][$k] = $hardRefs[$zval['zval_hash']] = new Stub();
-                        $queue[$i][$k]->value = $v;
+                        $vals[$k] = $hardRefs[$zval['zval_hash']] = new Stub();
+                        $vals[$k]->value = $v;
                     } else {
-                        $step[$k] = $queue[$i][$k] = new Stub();
-                        $step[$k]->value = $v;
-                        $h = spl_object_hash($step[$k]);
-                        $hardRefs[$h] = &$step[$k];
+                        $refs[$k] = $vals[$k] = new Stub();
+                        $refs[$k]->value = $v;
+                        $h = spl_object_hash($refs[$k]);
+                        $hardRefs[$h] = &$refs[$k];
                         $values[$h] = $v;
                     }
-                    $queue[$i][$k]->handle = ++$refs;
+                    $vals[$k]->handle = ++$refsCounter;
                 }
             }
+
+            if ($fromObjCast) {
+                $refs = $vals;
+                $vals = array();
+                $j = -1;
+                foreach ($queue[$i] as $k => $v) {
+                    foreach (array($k => $v) as $a => $v) {
+                    }
+                    if ($a !== $k) {
+                        $vals = (object) $vals;
+                        $vals->{$k} = $refs[++$j];
+                        $vals = (array) $vals;
+                    } else {
+                        $vals[$k] = $refs[++$j];
+                    }
+                }
+            }
+
+            $queue[$i] = $vals;
 
             if (isset($arrayRefs[$i])) {
                 if ($indexed) {

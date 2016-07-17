@@ -1977,6 +1977,32 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('CONNECT', false),
         );
     }
+
+    /**
+     * @dataProvider methodSafeProvider
+     */
+    public function testMethodSafe($method, $safe)
+    {
+        $request = new Request();
+        $request->setMethod($method);
+        $this->assertEquals($safe, $request->isMethodSafe());
+    }
+
+    public function methodSafeProvider()
+    {
+        return array(
+            array('HEAD', true),
+            array('GET', true),
+            array('POST', false),
+            array('PUT', false),
+            array('PATCH', false),
+            array('DELETE', false),
+            array('PURGE', false),
+            array('OPTIONS', true),
+            array('TRACE', true),
+            array('CONNECT', false),
+        );
+    }
 }
 
 class RequestContentProxy extends Request

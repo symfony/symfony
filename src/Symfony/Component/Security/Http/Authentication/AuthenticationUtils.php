@@ -65,7 +65,13 @@ class AuthenticationUtils
      */
     public function getLastUsername()
     {
-        $session = $this->getRequest()->getSession();
+        $request = $this->getRequest();
+
+        if ($request->attributes->has(Security::LAST_USERNAME)) {
+            return $request->attributes->get(Security::LAST_USERNAME);
+        }
+
+        $session = $request->getSession();
 
         return null === $session ? '' : $session->get(Security::LAST_USERNAME);
     }

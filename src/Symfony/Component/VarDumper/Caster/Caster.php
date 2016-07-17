@@ -45,6 +45,8 @@ class Caster
     {
         if ($reflector->hasMethod('__debugInfo')) {
             $a = $obj->__debugInfo();
+        } elseif ($obj instanceof \Closure) {
+            $a = array();
         } else {
             $a = (array) $obj;
         }
@@ -52,7 +54,7 @@ class Caster
         if ($a) {
             $p = array_keys($a);
             foreach ($p as $i => $k) {
-                if (!isset($k[0]) || ("\0" !== $k[0] && !$reflector->hasProperty($k))) {
+                if (isset($k[0]) && "\0" !== $k[0] && !$reflector->hasProperty($k)) {
                     $p[$i] = self::PREFIX_DYNAMIC.$k;
                 } elseif (isset($k[16]) && "\0" === $k[16] && 0 === strpos($k, "\0class@anonymous\0")) {
                     $p[$i] = "\0".$reflector->getParentClass().'@anonymous'.strrchr($k, "\0");

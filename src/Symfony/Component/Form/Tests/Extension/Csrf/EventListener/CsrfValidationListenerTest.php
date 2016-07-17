@@ -72,4 +72,25 @@ class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
         // Validate accordingly
         $this->assertSame($data, $event->getData());
     }
+
+    public function testMaxPostSizeExceeded()
+    {
+        $serverParams = $this
+            ->getMockBuilder('\Symfony\Component\Form\Util\ServerParams')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+
+        $serverParams
+            ->expects($this->once())
+            ->method('hasPostMaxSizeBeenExceeded')
+            ->willReturn(true)
+        ;
+
+        $event = new FormEvent($this->form, ['csrf' => 'token']);
+        $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, $serverParams);
+
+        $validation->preSubmit($event);
+        $this->assertEmpty($this->form->getErrors());
+    }
 }

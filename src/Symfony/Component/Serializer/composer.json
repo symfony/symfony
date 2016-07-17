@@ -19,7 +19,7 @@
         "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.8|~3.0",
+        "symfony/yaml": "~3.1",
         "symfony/config": "~2.8|~3.0",
         "symfony/property-access": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
@@ -29,7 +29,8 @@
         "doctrine/cache": "~1.0"
     },
     "conflict": {
-        "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4"
+        "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4",
+        "symfony/yaml": "<3.1"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",

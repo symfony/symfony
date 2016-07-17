@@ -197,9 +197,9 @@ class ParameterBag implements \IteratorAggregate, \Countable
      *
      * @return \DateTime|null
      */
-    public function getDate($key, $format, $default = null, $timeZone = null)
+    public function getDate($key, $format, $default = null, \DateTimeZone $timeZone = null)
     {
-        $time = $this->get($key, (string) $default);
+        $time = $this->get($key, $default);
 
         // if the user has specified a timezone then pass that
         // otherwise do not even attempt to put a value but rather let the runtime decide

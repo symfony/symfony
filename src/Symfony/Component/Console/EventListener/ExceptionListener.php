@@ -13,7 +13,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * Attempts to log exceptions or abnormal terminations of console commands.
  *
- * @package Symfony\Component\Console\EventListener;
  * @author  James Halsall <james.t.halsall@googlemail.com>
  */
 class ExceptionListener implements EventSubscriberInterface
@@ -85,7 +84,7 @@ class ExceptionListener implements EventSubscriberInterface
     {
         return array(
             ConsoleEvents::EXCEPTION => array('onKernelException', -128),
-            ConsoleEvents::TERMINATE => array('onKernelTerminate', -128)
+            ConsoleEvents::TERMINATE => array('onKernelTerminate', -128),
         );
     }
 }

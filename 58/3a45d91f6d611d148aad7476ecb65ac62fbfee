@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-04T09:29:12Z
+
+Status: needs work
+The warm up of the classes.php file is broken: it should inline many more classes but because it excludes currently declared ones, many are excluded.
+I'd like to inspect this behavior and it's related to this PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-05T18:58:50Z
+
+Status: needs review.
+
+This is not finished, yet it's a complex topic. The `classes.php` file is "broken" on 3.1.
+Since #16263, this file is created by a cache warmer, but its generation is affected by the current list of declared classes. This list happens to be quite big when the cache warmer is executed, which means many classes are excluded from inlining.
+
+Without the cache warmer, the file is generated very early in the bootstrapping process, with more classes being inlined.
+
+The outcome of this issue is "only" lower performance of course.
+
+This PR adds mechanisms to compute a very early declared classes list, and inject it later the cache warmer. I'm not sure the implementation is the right one, thus, I'm calling for ideas on the best way to fix this issue (reverting is not possible because that would break read-only containers based on 3.1).
+
+FYI, the list of classes that are re-inlined after using this PR on a SE is the following:
+> *SessionListener, NativeSessionStorage, NativeSessionHandler, NativeFileSessionHandler, SessionHandlerProxy, Session, TemplateNameParser, TemplateNameParser, TemplateLocator, UrlGenerator, RequestContext, Router, UrlMatcher, RedirectableUrlMatcher, Router, FileLocator, Event, EventDispatcher, ContainerAwareEventDispatcher, ResponseListener, RouterListener, ControllerResolver, ArgumentMetadata, KernelEvent, FilterControllerEvent, FilterResponseEvent, GetResponseEvent, GetResponseForControllerResultEvent, GetResponseForExceptionEvent, FileLocator, ControllerNameParser, ControllerResolver, Firewall, AuthenticationProviderManager, TokenStorage, AccessDecisionManager, AuthorizationChecker, FirewallMap, FirewallContext, RequestMatcher, Twig_Environment, Twig_Extension_Core, Twig_Extension_Escaper, Twig_Extension_Optimizer, NormalizerFormatter, LineFormatter, StreamHandler, FilterHandler, TestHandler, Logger, Logger, DebugHandler, ClassUtils, Registry, ControllerListener, ParamConverterListener, TemplateListener, HttpCacheListener, SecurityListener.*
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-06T06:53:12Z
+
+I think I found the way to go: using `get_included_files()` combined with `get_declared_classes()` allows filtering out early-declared classes without "snapshoting" these all the time even when not need, and without changing anything in HttpKernel.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-06T08:56:12Z
+
+Just added `ClassCollectionLoader::inline()`, RFR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-10T06:55:34Z
+
+Much simpler now, magic removed, let's be plain explicit.
+Requires sensiolabs/SensioDistributionBundle#272
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-10T07:51:35Z
+
+I like this approach. Being to have some tests somewhere about this one would be great.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-17T19:16:29Z
+
+I just added unit tests. But for the list of classes given to the cache warmer, this would require an integration test, to be done on the standard edition. Not possible here.

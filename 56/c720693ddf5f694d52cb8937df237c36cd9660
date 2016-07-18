@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by antograssiot at 2016-07-17T13:31:20Z
+
+ping @nicolas-grekas I've updated as requested.
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2016-07-17T15:41:25Z
+
+@nicolas-grekas the tests are passing locally but fails with low deps on travis due to composer issue. This doesn't seems related to my change, am I right ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-17T15:46:45Z
+
+FrameworkBundle now needs Translation 3.2, that's why lowest tests are failing
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2016-07-17T15:55:15Z
+
+@nicolas-grekas thanks for your explanation on the Travis build and your review.
+It should now be limited to the minimum changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-17T18:08:56Z
+
+Looks like your target can be achieved with changing the translation component:
+https://github.com/symfony/symfony/compare/master...nicolas-grekas:console-translation-domain-choice
+Or do you miss a test case?
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2016-07-17T18:25:51Z
+
+Nicolas I'm sorry I don't get your comment. You tm branch is not up to date with mine but I tested it again in an app and it seems to work as expected.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-17T18:28:37Z
+
+@antograssiot if you're fine with my patch, then make it yours. If we don't need to change anything in the translation component, it's better.
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2016-07-17T20:24:49Z
+
+@nicolas-grekas I now understood your first comment. Yes I'm missing a test case.
+Your patch will only work when using the ``--dump-messages`` flag but when using ``--force`` all files will still get generated, that's how I came to modify the ``AbstractOperation``.
+
+A test proving that only one file is generated is missing. I tried to wrote one but I failed and I couldn't find any existing test that could guide me. ``$this->translationDir.'/Resources/translations`` seems to always stay empty.
+
+The only solution that I can see without updating the translation component would be to find a way to filter ``$operation->getResult()`` fro ``TranslationUpdateCommand.php``but I don't know how.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-18T04:31:59Z
+
+@antograssiot see updated patch at https://github.com/symfony/symfony/compare/master...nicolas-grekas:console-translation-domain-choice
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2016-07-18T04:55:31Z
+
+@nicolas-grekas It works fine in my case but I'm concerned about ``MessageCatalogue::addMetadata()`` being a private function.
+Thanks for your work on patching this anyway, should I close my PR ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-18T05:02:33Z
+
+I didn't spot the method was private, fixed. No need to close this PR, just make my patch yours by doing e.g.:
+```
+git checkout console-translation-domain-choice
+git fetch https://github.com/nicolas-grekas/symfony.git console-translation-domain-choice
+git reset --hard FETCH_HEAD
+git push -f origin console-translation-domain-choice
+```
+
+---------------------------------------------------------------------------
+
+by antograssiot at 2016-07-18T05:26:08Z
+
+PR updated. Thank you very much @nicolas-grekas for your help and patience
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-18T05:32:56Z
+
+:+1:

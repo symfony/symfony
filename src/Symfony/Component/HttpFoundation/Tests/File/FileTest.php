@@ -124,8 +124,8 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->assertFileNotExists($path);
         $this->assertEquals(realpath($targetPath), $movedFile->getRealPath());
         $this->assertEquals(
-            substr(sprintf('%o', 0660 & ~umask()), -4),
-            substr(sprintf('%o', fileperms($targetPath)), -4)
+            substr(sprintf('%o', 0660 & ~umask()), -3),
+            substr(sprintf('%o', fileperms($targetPath)), -3)
         );
 
         @unlink($targetPath);

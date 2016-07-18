@@ -206,9 +206,9 @@ class UploadedFile extends File
     /**
      * Moves the file to a new location.
      *
-     * @param string  $directory   The destination folder
-     * @param string  $name        The new file name
-     * @param integer $permissions The desired file permissions
+     * @param string $directory   The destination folder
+     * @param string $name        The new file name
+     * @param int    $permissions The desired file permissions
      *
      * @return File A File object representing the new file
      *

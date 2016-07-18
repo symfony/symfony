@@ -252,8 +252,9 @@ class DbalSessionHandler implements \SessionHandlerInterface
     {
         $params = $this->con->getParams();
 
+        // Explicit platform version requested (supersedes auto-detection), so we respect it.
         if (isset($params['serverVersion'])) {
-            return $params['serverVersion']; // Explicit platform version requested (supersedes auto-detection), so we respect it.
+            return $params['serverVersion'];
         }
 
         $wrappedConnection = $this->con->getWrappedConnection();
@@ -262,10 +263,12 @@ class DbalSessionHandler implements \SessionHandlerInterface
             return $wrappedConnection->getServerVersion();
         }
 
-        if ($wrappedConnection instanceof \PDO) { // Support DBAL 2.4 by accessing it directly when using PDO PgSQL
+        // Support DBAL 2.4 by accessing it directly when using PDO PgSQL
+        if ($wrappedConnection instanceof \PDO) {
             return $wrappedConnection->getAttribute(\PDO::ATTR_SERVER_VERSION);
         }
 
-        return ''; // If we cannot guess the version, the empty string will mean we won't use the code for newer versions when doing version checks.
+        // If we cannot guess the version, the empty string will mean we won't use the code for newer versions when doing version checks.
+        return '';
     }
 }

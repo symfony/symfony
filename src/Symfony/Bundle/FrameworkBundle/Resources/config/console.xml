@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="console.exception_listener" class="Symfony\Component\Console\EventListener\ExceptionListener">
+            <tag name="kernel.event_subscriber" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+    </services>
+</container>

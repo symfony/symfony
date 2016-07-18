@@ -66,6 +66,7 @@ class FrameworkExtension extends Extension
         $loader->load('web.xml');
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
+        $loader->load('console.xml');
 
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator

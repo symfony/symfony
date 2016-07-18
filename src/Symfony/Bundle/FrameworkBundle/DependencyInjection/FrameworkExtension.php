@@ -170,15 +170,23 @@ class FrameworkExtension extends Extension
         }
 
         $this->addClassesToCompile(array(
+            'Symfony\\Component\\Config\\ConfigCache',
             'Symfony\\Component\\Config\\FileLocator',
 
             'Symfony\\Component\\Debug\\ErrorHandler',
 
+            'Symfony\\Component\\DependencyInjection\\ContainerAwareInterface',
+            'Symfony\\Component\\DependencyInjection\\Container',
+
             'Symfony\\Component\\EventDispatcher\\Event',
             'Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher',
 
+            'Symfony\\Component\\HttpFoundation\\Response',
+            'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
+
             'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
+            'Symfony\\Component\\HttpKernel\\Bundle\\Bundle',
             'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
             'Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolver',
             'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadata',
@@ -189,13 +197,18 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
             'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
+            'Symfony\\Component\\HttpKernel\\HttpKernel',
             'Symfony\\Component\\HttpKernel\\KernelEvents',
             'Symfony\\Component\\HttpKernel\\Config\\FileLocator',
 
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
+
             // Cannot be included because annotations will parse the big compiled class file
             // 'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+
+            // cannot be included as commands are discovered based on the path to this class via Reflection
+            // 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
         ));
     }
 

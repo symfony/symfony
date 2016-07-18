@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\HttpFoundation;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\Platforms\SQLServer2008Platform;
 
 /**
@@ -241,9 +242,33 @@ class DbalSessionHandler implements \SessionHandlerInterface
                     "WHEN MATCHED THEN UPDATE SET $this->dataCol = :data, $this->timeCol = :time;";
             case 'sqlite' === $platform:
                 return "INSERT OR REPLACE INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time)";
-            case 'postgresql' === $platform && version_compare($this->con->getServerVersion(), '9.5', '>='):
+            case 'postgresql' === $platform && version_compare($this->getServerVersion(), '9.5', '>='):
                 return "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->timeCol) VALUES (:id, :data, :time) ".
                     "ON CONFLICT ($this->idCol) DO UPDATE SET ($this->dataCol, $this->timeCol) = (EXCLUDED.$this->dataCol, EXCLUDED.$this->timeCol)";
         }
+    }
+
+    private function getServerVersion()
+    {
+        $params = $this->con->getParams();
+
+        // Explicit platform version requested (supersedes auto-detection), so we respect it.
+        if (isset($params['serverVersion'])) {
+            return $params['serverVersion'];
+        }
+
+        $wrappedConnection = $this->con->getWrappedConnection();
+
+        if ($wrappedConnection instanceof ServerInfoAwareConnection) {
+            return $wrappedConnection->getServerVersion();
+        }
+
+        // Support DBAL 2.4 by accessing it directly when using PDO PgSQL
+        if ($wrappedConnection instanceof \PDO) {
+            return $wrappedConnection->getAttribute(\PDO::ATTR_SERVER_VERSION);
+        }
+
+        // If we cannot guess the version, the empty string will mean we won't use the code for newer versions when doing version checks.
+        return '';
     }
 }

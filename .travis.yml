@@ -24,8 +24,9 @@ matrix:
           group: edge
         - php: 5.5
         - php: 5.6
-          env: deps=high
         - php: 7.0
+          env: deps=high
+        - php: 7.1
           env: deps=low
     fast_finish: true
 
@@ -48,13 +49,12 @@ before_install:
     - if [[ ! $skip ]]; then echo session.gc_probability = 0 >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then echo extension = mongo.so >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then echo extension = memcache.so >> $INI_FILE; fi
-    - if [[ ! $skip && $PHP = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.10 && echo apc.enable_cli = 1 >> $INI_FILE); fi
-    - if [[ ! $skip && $PHP = 7.* ]]; then (echo yes | pecl install -f apcu-5.1.2 && echo apc.enable_cli = 1 >> $INI_FILE); fi
+    - if [[ ! $skip && $PHP = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.11 && echo apc.enable_cli = 1 >> $INI_FILE); fi
+    - if [[ ! $skip && $PHP = 7.0 ]]; then (echo yes | pecl install -f apcu-5.1.5 && echo apc.enable_cli = 1 >> $INI_FILE); fi
     - if [[ ! $deps && $PHP = 5.* ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> $INI_FILE); fi
     - if [[ ! $skip && $PHP = 5.* ]]; then pecl install -f memcached-2.1.0; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = ldap.so >> $INI_FILE; fi
-    - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini; fi
-    - if [[ ! $skip ]]; then composer self-update --stable; fi
+    - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini || echo "xdebug not available"; fi
     - if [[ ! $skip ]]; then cp .composer/* ~/.composer/; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip ]]; then export PHPUNIT=$(readlink -f ./phpunit); fi

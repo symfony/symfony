@@ -22,5 +22,5 @@ class ProjectServiceContainer extends Container
     }
 }
 
-class stdClass_%s extends \stdClass implements \ProxyManager\%s
+class stdClass_%s extends %SstdClass implements \ProxyManager\%s
 {%a}%A

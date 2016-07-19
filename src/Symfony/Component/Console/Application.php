@@ -360,7 +360,7 @@ class Application
         if (!$command->isEnabled()) {
             $command->setApplication(null);
 
-            return;
+            return $command;
         }
 
         if (null === $command->getDefinition()) {

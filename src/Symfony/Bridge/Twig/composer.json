@@ -33,7 +33,7 @@
         "symfony/security-acl": "~2.6",
         "symfony/stopwatch": "~2.2",
         "symfony/console": "~2.7",
-        "symfony/var-dumper": "~2.6",
+        "symfony/var-dumper": "~2.7.16|~2.8.9",
         "symfony/expression-language": "~2.4"
     },
     "suggest": {

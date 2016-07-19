@@ -19,7 +19,7 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.1",
+        "symfony/yaml": "~2.3.42|~2.7.14|~2.8.7",
         "symfony/config": "~2.2",
         "symfony/expression-language": "~2.6"
     },

@@ -109,6 +109,10 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testMoveWithPermissions()
     {
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Can not verify chmod operations on Windows');
+        }
+
         $path = __DIR__.'/Fixtures/test.copy.gif';
         $targetDir = __DIR__.'/Fixtures/directory';
         $targetPath = $targetDir.'/test.copy.gif';

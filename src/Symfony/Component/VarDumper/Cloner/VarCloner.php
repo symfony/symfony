@@ -315,7 +315,7 @@ class VarCloner extends AbstractCloner
             if (!empty($frame['line'])) {
                 ob_start();
                 debug_zval_dump($obj);
-                self::$hashMask = substr(ob_get_clean(), 17);
+                self::$hashMask = (int) substr(ob_get_clean(), 17);
             }
         }
 

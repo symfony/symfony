@@ -80,7 +80,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function decideAffirmative(TokenInterface $token, array $attributes, $object = null)
     {
-        $deny = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($token, $object, $attributes);
             switch ($result) {
@@ -88,17 +87,11 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                     return true;
 
                 case VoterInterface::ACCESS_DENIED:
-                    ++$deny;
-
-                    break;
+                    return false;
 
                 default:
                     break;
             }
-        }
-
-        if ($deny > 0) {
-            return false;
         }
 
         return $this->allowIfAllAbstainDecisions;
@@ -161,16 +154,13 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     private function decideUnanimous(TokenInterface $token, array $attributes, $object = null)
     {
-        $grant = 0;
         foreach ($attributes as $attribute) {
             foreach ($this->voters as $voter) {
                 $result = $voter->vote($token, $object, array($attribute));
 
                 switch ($result) {
                     case VoterInterface::ACCESS_GRANTED:
-                        ++$grant;
-
-                        break;
+                        return true;
 
                     case VoterInterface::ACCESS_DENIED:
                         return false;
@@ -179,11 +169,6 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
                         break;
                 }
             }
-        }
-
-        // no deny votes
-        if ($grant > 0) {
-            return true;
         }
 
         return $this->allowIfAllAbstainDecisions;

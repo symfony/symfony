@@ -351,7 +351,7 @@ class Application
      *
      * @param Command $command A Command object
      *
-     * @return Command The registered command
+     * @return Command|null The registered command
      */
     public function add(Command $command)
     {
@@ -360,7 +360,7 @@ class Application
         if (!$command->isEnabled()) {
             $command->setApplication(null);
 
-            return $command;
+            return null;
         }
 
         if (null === $command->getDefinition()) {

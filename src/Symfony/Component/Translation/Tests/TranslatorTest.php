@@ -75,7 +75,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($locale, $translator->getLocale());
     }
 
-    public function testGetCatalogue()
+    /**
+     * @group legacy
+     */
+    public function testLegacyGetCatalogue()
     {
         $translator = new Translator('en');
 
@@ -85,7 +88,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new MessageCatalogue('fr'), $translator->getCatalogue('fr'));
     }
 
-    public function testGetCatalogueReturnsConsolidatedCatalogue()
+    /**
+     * @deprecated
+     */
+    public function testLegacyGetCatalogueReturnsConsolidatedCatalogue()
     {
         /*
          * This will be useful once we refactor so that different domains will be loaded lazily (on-demand).

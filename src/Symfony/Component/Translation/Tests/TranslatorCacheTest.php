@@ -178,7 +178,10 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
     }
 
-    public function testPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching()
+    /**
+     * @group legacy
+     */
+    public function testLegacyPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching()
     {
         /*
          * As a safeguard against potential BC breaks, make sure that primary and fallback

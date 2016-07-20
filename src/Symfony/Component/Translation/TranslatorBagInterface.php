@@ -15,6 +15,8 @@ namespace Symfony\Component\Translation;
  * TranslatorBagInterface.
  *
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
+ *
+ * @deprecated since 2.8, to be removed in 3.0.
  */
 interface TranslatorBagInterface
 {

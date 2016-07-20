@@ -14,7 +14,7 @@ namespace Symfony\Component\Translation;
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
  */
-class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface
+class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface, FallbackLocaleAwareInterface
 {
     const MESSAGE_DEFINED = 0;
     const MESSAGE_MISSING = 1;
@@ -31,12 +31,22 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     private $messages = array();
 
     /**
+     * @var FallbackLocaleAwareInterface
+     */
+    private $fallbackLocaleAware;
+
+    /**
      * @param TranslatorInterface $translator The translator must implement TranslatorBagInterface
      */
     public function __construct(TranslatorInterface $translator)
     {
-        if (!$translator instanceof TranslatorBagInterface) {
-            throw new \InvalidArgumentException(sprintf('The Translator "%s" must implement TranslatorInterface and TranslatorBagInterface.', get_class($translator)));
+        if ($translator instanceof FallbackLocaleAwareInterface) {
+            $this->fallbackLocaleAware = $translator;
+        } else if ($translator instanceof TranslatorBagInterface) {
+            @trigger_error(sprintf('The Translator "%" should implement \Symfony\Component\Translation\FallbackLocaleAwareInterface instead of (or in addition to) \Symfony\Component\Translation\TranslatorBagInterface.', get_class($translator)), E_USER_DEPRECATED);
+            $this->fallbackLocaleAware = new TranslatorBagToFallbackLocaleAwareAdapter($translator);
+        } else {
+            throw new \InvalidArgumentException(sprintf('The Translator "%s" implements neither \Symfony\Component\Translation\FallbackLocaleAwareInterface nor the deprecated \Symfony\Component\Translation\TranslatorBagInterface.', get_class($translator)));
         }
 
         $this->translator = $translator;
@@ -67,6 +77,16 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     /**
      * {@inheritdoc}
      */
+    public function resolveLocale($id, $domain = null, $locale = null)
+    {
+        return $this->fallbackLocaleAware->resolveLocale($id, $domain, $locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @api
+     */
     public function setLocale($locale)
     {
         $this->translator->setLocale($locale);
@@ -82,9 +102,15 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated TranslatorBagInterface implementation will be removed in 3.0.
      */
     public function getCatalogue($locale = null)
     {
+        if (!$this->translator instanceof TranslatorBagInterface) {
+            throw new \RuntimeException(sprintf('You called the deprecated \Symfony\Component\Translation\DataCollectorTranslator::getCatalogue() method, but the Translator provided to the \Symfony\Component\Translation\DataCollectorTranslator constructor does not implement TranslatorBagInterface. (Hint: The class is %s.)',  get_class($this->translator)));
+        }
+
         return $this->translator->getCatalogue($locale);
     }
 
@@ -118,25 +144,25 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
             $domain = 'messages';
         }
 
+        if (null === $locale) {
+            $locale = $this->translator->getLocale();
+        }
+
         $id = (string) $id;
-        $catalogue = $this->translator->getCatalogue($locale);
-        $locale = $catalogue->getLocale();
-        if ($catalogue->defines($id, $domain)) {
-            $state = self::MESSAGE_DEFINED;
-        } elseif ($catalogue->has($id, $domain)) {
-            $state = self::MESSAGE_EQUALS_FALLBACK;
+        $resolvedLocale = $this->translator->resolveLocale($id, $domain, $locale);
 
-            $fallbackCatalogue = $catalogue->getFallBackCatalogue();
-            while ($fallbackCatalogue) {
-                if ($fallbackCatalogue->defines($id, $domain)) {
-                    $locale = $fallbackCatalogue->getLocale();
-                    break;
-                }
+        switch (true) {
+            case $resolvedLocale === $locale:
+                $state = self::MESSAGE_DEFINED;
+                break;
 
-                $fallbackCatalogue = $fallbackCatalogue->getFallBackCatalogue();
-            }
-        } else {
-            $state = self::MESSAGE_MISSING;
+            case $resolvedLocale === null:
+                $state = self::MESSAGE_MISSING;
+                break;
+
+            default:
+                $state = self::MESSAGE_EQUALS_FALLBACK;
+                $locale = $resolvedLocale;
         }
 
         $this->messages[] = array(

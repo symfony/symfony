@@ -23,7 +23,7 @@
 {%- endblock %}
 
 {% block money_widget -%}
-    <div class="row collapse">
+    <div class="row">
         {% set prepend = '{{' == money_pattern[0:2] %}
         {% if not prepend %}
             <div class="small-3 large-2 columns">
@@ -223,7 +223,7 @@
 
 {% block choice_label -%}
     {% if errors|length > 0 -%}
-        {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' is-invalid-input')|trim}) %}
+        {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' is-invalid-label')|trim}) %}
     {% endif %}
     {# remove the checkbox-inline and radio-inline class, it's only useful for embed labels #}
     {% set label_attr = label_attr|merge({class: label_attr.class|default('')|replace({'checkbox-inline': '', 'radio-inline': ''})|trim}) %}
@@ -318,11 +318,13 @@
 
 {% block form_errors -%}
     {% if errors|length > 0 -%}
+        <div class="row columns">
         {% if form.parent %}<small class="form-error is-visible">{% else %}<div data-alert class="alert-box alert">{% endif %}
-        {%- for error in errors -%}
-            {{ error.message }}
-            {% if not loop.last %}, {% endif %}
-        {%- endfor -%}
-        {% if form.parent %}</small>{% else %}</div>{% endif %}
+                {%- for error in errors -%}
+                    {{ error.message }}
+                    {% if not loop.last %}, {% endif %}
+                {%- endfor -%}
+            {% if form.parent %}</small>{% else %}</div>
+        </div>
     {%- endif %}
 {%- endblock form_errors %}

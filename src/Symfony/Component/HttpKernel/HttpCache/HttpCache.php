@@ -600,6 +600,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function store(Request $request, Response $response)
     {
+        if (!$response->headers->has('Date')) {
+            $response->setDate(\DateTime::createFromFormat('U', time()));
+        }
         try {
             $this->store->write($request, $response);
 

@@ -55,7 +55,8 @@
         "twig/twig": "~1.23|~2.0"
     },
     "conflict": {
-        "phpdocumentor/reflection-docblock": "<3.0"
+        "phpdocumentor/reflection-docblock": "<3.0",
+        "phpdocumentor/type-resolver": "<0.2.0"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",

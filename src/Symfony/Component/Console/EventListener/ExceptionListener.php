@@ -42,16 +42,7 @@ class ExceptionListener implements EventSubscriberInterface
 
         $exception = $event->getException();
 
-        $message = sprintf(
-            '%s: %s (uncaught exception) at %s line %s while running console command `%s`',
-            get_class($exception),
-            $exception->getMessage(),
-            $exception->getFile(),
-            $exception->getLine(),
-            $event->getCommand()->getName()
-        );
-
-        $this->logger->error($message, array('exception' => $exception));
+        $this->logger->error($exception->getMessage(), array('exception' => $exception));
     }
 
     /**

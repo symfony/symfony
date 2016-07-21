@@ -350,6 +350,7 @@ class ClassMetadata extends ElementMetadata implements ClassMetadataInterface
                 $member = clone $member;
 
                 foreach ($member->getConstraints() as $constraint) {
+                    $member->constraintsByGroup[$this->getDefaultGroup()][] = $constraint;
                     $constraint->addImplicitGroupName($this->getDefaultGroup());
                 }
 

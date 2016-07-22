@@ -163,7 +163,7 @@ class YamlFileLoader extends FileLoader
      */
     private function parseDefinition($id, $service, $file)
     {
-        if (is_string($service) && 0 === strpos($service, '@')) {
+        if (is_string($service) && $service[0] === '@') {
             $this->container->setAlias($id, substr($service, 1));
 
             return;
@@ -454,11 +454,11 @@ class YamlFileLoader extends FileLoader
             $value = array_map(array($this, 'resolveServices'), $value);
         } elseif (is_string($value) &&  0 === strpos($value, '@=')) {
             return new Expression(substr($value, 2));
-        } elseif (is_string($value) &&  0 === strpos($value, '@')) {
-            if (0 === strpos($value, '@@')) {
+        } elseif (is_string($value) &&  $value[0] === '@') {
+            if ('@' === $value[1]) {
                 $value = substr($value, 1);
                 $invalidBehavior = null;
-            } elseif (0 === strpos($value, '@?')) {
+            } elseif ('?' === $value[1]) {
                 $value = substr($value, 2);
                 $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
             } else {

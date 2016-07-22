@@ -36,7 +36,7 @@ services:
             - [setBar, ['@?foo2']]
             - [setBar, ['@?foo3']]
             - [setBar, ['@?foobaz']]
-            - [setBar, ['@=service("foo").foo() ~ (container.hasparameter("foo") ? parameter("foo") : "default")']]
+            - [setBar, ['@=service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")']]
 
     foo_with_inline:
         class: Foo

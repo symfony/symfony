@@ -166,11 +166,7 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     public function testEndThenPartNotSpecified()
     {
         $builder = $this->getTestBuilder();
-
-        $reflection = new \ReflectionProperty($builder, 'ifPart');
-        $reflection->setAccessible(true);
-        $reflection->setValue($builder, 'test');
-
+        $builder->ifPart = 'test';
         $builder->end();
     }
 

@@ -6,3 +6,13 @@ composer.phar
 package.tar
 /packages.json
 /.phpunit
+/app/bootstrap.php.cache
+/var/bootstrap.php.cache
+/var/cache/*
+/var/logs/*
+!var/cache/.gitkeep
+!var/logs/.gitkeep
+/web/*
+
+# Parameters
+/app/config/parameters.yml

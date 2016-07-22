@@ -213,7 +213,7 @@ class Application
     }
 
     /**
-     * Set an input definition set to be used with this application.
+     * Set an input definition to be used with this application.
      *
      * @param InputDefinition $definition The input definition
      */
@@ -335,6 +335,8 @@ class Application
     /**
      * Adds an array of command objects.
      *
+     * If a Command is not enabled it will not be added.
+     * 
      * @param Command[] $commands An array of commands
      */
     public function addCommands(array $commands)
@@ -348,10 +350,11 @@ class Application
      * Adds a command object.
      *
      * If a command with the same name already exists, it will be overridden.
+     * If the command is not enabled it will not be added.
      *
      * @param Command $command A Command object
      *
-     * @return Command|null The registered command
+     * @return Command|null The registered command if enabled or null
      */
     public function add(Command $command)
     {
@@ -420,9 +423,9 @@ class Application
     /**
      * Returns an array of all unique namespaces used by currently registered commands.
      *
-     * It does not returns the global namespace which always exists.
+     * It does not return the global namespace which always exists.
      *
-     * @return array An array of namespaces
+     * @return string[] An array of namespaces
      */
     public function getNamespaces()
     {
@@ -954,7 +957,7 @@ class Application
     /**
      * Runs and parses mode CON if it's available, suppressing any error output.
      *
-     * @return string <width>x<height> or null if it could not be parsed
+     * @return string|null <width>x<height> or null if it could not be parsed
      */
     private function getConsoleMode()
     {
@@ -1013,7 +1016,7 @@ class Application
      * @param string             $name       The string
      * @param array|\Traversable $collection The collection
      *
-     * @return array A sorted array of similar string
+     * @return string[] A sorted array of similar string
      */
     private function findAlternatives($name, $collection)
     {
@@ -1067,6 +1070,11 @@ class Application
         $this->defaultCommand = $commandName;
     }
 
+    /**
+     * @param string $string
+     * 
+     * @return int
+     */
     private function stringWidth($string)
     {
         if (!function_exists('mb_strwidth')) {
@@ -1080,6 +1088,12 @@ class Application
         return mb_strwidth($string, $encoding);
     }
 
+    /**
+     * @param string $string
+     * @param int    $width
+     *
+     * @return string[]
+     */
     private function splitStringByWidth($string, $width)
     {
         // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.
@@ -1121,7 +1135,7 @@ class Application
      *
      * @param string $name The full name of the command
      *
-     * @return array The namespaces of the command
+     * @return string[] The namespaces of the command
      */
     private function extractAllNamespaces($name)
     {

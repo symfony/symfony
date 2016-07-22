@@ -131,13 +131,7 @@ class Table
      */
     public function setStyle($name)
     {
-        if ($name instanceof TableStyle) {
-            $this->style = $name;
-        } elseif (isset(self::$styles[$name])) {
-            $this->style = self::$styles[$name];
-        } else {
-            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
-        }
+        $this->style = $this->findStyle($name);
 
         return $this;
     }
@@ -164,13 +158,7 @@ class Table
     {
         $columnIndex = intval($columnIndex);
 
-        if ($name instanceof TableStyle) {
-            $this->columnStyles[$columnIndex] = $name;
-        } elseif (isset(self::$styles[$name])) {
-            $this->columnStyles[$columnIndex] = self::$styles[$name];
-        } else {
-            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
-        }
+        $this->columnStyles[$columnIndex] = $this->findStyle($name);
 
         return $this;
     }
@@ -700,5 +688,18 @@ class Table
             'compact' => $compact,
             'symfony-style-guide' => $styleGuide,
         );
+    }
+
+    private function findStyle($name)
+    {
+        if ($name instanceof TableStyle) {
+            return $name;
+        }
+
+        if (isset(self::$styles[$name])) {
+            return self::$styles[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
     }
 }

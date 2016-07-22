@@ -115,11 +115,11 @@ class Table
             self::$styles = self::initStyles();
         }
 
-        if (!self::$styles[$name]) {
-            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
+        if (isset(self::$styles[$name])) {
+            return self::$styles[$name];
         }
 
-        return self::$styles[$name];
+        throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
     }
 
     /**

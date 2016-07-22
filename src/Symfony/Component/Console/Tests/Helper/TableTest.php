@@ -704,6 +704,15 @@ TABLE;
         $table->setStyle('absent');
     }
 
+    public function testGetStyleDefinition()
+    {
+        $this->setExpectedException(
+            'InvalidArgumentException',
+            'Style "absent" is not defined.'
+        );
+        Table::getStyleDefinition('absent');
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, false);

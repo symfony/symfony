@@ -490,6 +490,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('myfile.foo', $client->getRequest()->getFiles(), '->followRedirect() keeps files with POST method');
         $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->followRedirect() keeps $_SERVER with POST method');
         $this->assertEquals($content, $client->getRequest()->getContent(), '->followRedirect() keeps content with POST method');
+        $this->assertEquals('POST', $client->getRequest()->getMethod(), '->followRedirect() keeps request method');
     }
 
     public function testBack()

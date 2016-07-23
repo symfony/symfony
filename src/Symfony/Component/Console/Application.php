@@ -335,7 +335,7 @@ class Application
     /**
      * Adds an array of command objects.
      *
-     * If a Command is not enabled it will not be added.
+     * @see Application::add()
      * 
      * @param Command[] $commands An array of commands
      */

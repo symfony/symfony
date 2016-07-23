@@ -11,11 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication;
 
-use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
 use Symfony\Component\Security\Core\Authentication\ContainerAwareAuthenticationProviderManager;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class ContainerAwareAuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
@@ -49,7 +46,7 @@ class ContainerAwareAuthenticationProviderManagerTest extends \PHPUnit_Framework
 
         $container = $this->getContainer(array(
             'first_provider' => $this->getAuthenticationProvider(true, $expected = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
-            'second_provider' => $second
+            'second_provider' => $second,
         ));
 
         $manager = new ContainerAwareAuthenticationProviderManager(
@@ -67,7 +64,7 @@ class ContainerAwareAuthenticationProviderManagerTest extends \PHPUnit_Framework
             'provider_service' => $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
         ));
         $manager = new ContainerAwareAuthenticationProviderManager(
-            ['provider_service'],
+            array('provider_service'),
             $container
         );
 
@@ -78,7 +75,7 @@ class ContainerAwareAuthenticationProviderManagerTest extends \PHPUnit_Framework
             'provider_service' => $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
         ));
         $manager = new ContainerAwareAuthenticationProviderManager(
-            ['provider_service'],
+            array('provider_service'),
             $container,
             false
         );

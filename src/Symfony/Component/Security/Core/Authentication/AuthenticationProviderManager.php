@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authentication;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 
 /**

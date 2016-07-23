@@ -24,7 +24,8 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAuthenticateWithoutProviders()
     {
-        new AuthenticationProviderManager(array());
+        $manager = new AuthenticationProviderManager(array());
+        $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
     }
 
     /**
@@ -32,9 +33,10 @@ class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAuthenticateWithProvidersWithIncorrectInterface()
     {
-        new AuthenticationProviderManager(array(
+        $manager = new AuthenticationProviderManager(array(
             new \stdClass(),
         ));
+        $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
     }
 
     public function testAuthenticateWhenNoProviderSupportsToken()

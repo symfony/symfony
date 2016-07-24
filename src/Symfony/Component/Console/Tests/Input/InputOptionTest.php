@@ -193,6 +193,9 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     {
         $option = new InputOption('foo', 'ff2|ff3', InputOption::VALUE_REQUIRED, 'The foo level ordered option', 'default');
         $this->assertSame('ff2|ff3', $option->getShortcut());
+
+        $option = new InputOption('foo', 'a|b|c|d', InputOption::VALUE_REQUIRED, 'The foo level ordered option', 'default');
+        $this->assertSame('a|b|c|d', $option->getShortcut());
     }
 
     public function testAddShortcutNonAlnumOption()
@@ -226,6 +229,33 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
     public function testAddWrongShortcutLevelOrderOption()
     {
         new InputOption('foo', 'ff|f', InputOption::VALUE_REQUIRED, 'The wrong ordered foo level option', 'default');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage An option shortcut cannot be formed only with "|" chars, since they are used as level separators.
+     */
+    public function testAddWrongShortcutWithOnlyPipesOption()
+    {
+        new InputOption('foo', '|||', InputOption::VALUE_REQUIRED, 'The wrong foo option with only pipes', 'default');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage An option shortcut cannot be formed only with "|" chars, since they are used as level separators.
+     */
+    public function testAddWrongShortcutWithOnlySinglePipeOption()
+    {
+        new InputOption('foo', '|', InputOption::VALUE_REQUIRED, 'The wrong foo option with a single pipe', 'default');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Invalid shortcut option "a|aa|a", its levels must not be repeated.
+     */
+    public function testAddWrongShortcutWithRepeatedLevelOption()
+    {
+        new InputOption('foo', 'a|aa|a', InputOption::VALUE_REQUIRED, 'The wrong foo option with repeated level', 'default');
     }
 
     public function testEquals()

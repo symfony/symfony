@@ -203,6 +203,9 @@ class InputOption
         if (is_array($shortcut)) {
             $shortcut = implode('|', $shortcut);
         }
+        if ('' === str_replace(array('|'), '', $shortcut)) {
+            throw new \InvalidArgumentException('An option shortcut cannot be formed only with "|" chars, since they are used as level separators.');
+        }
         if ('' === str_replace(array('|', '-'), '', $shortcut)) {
             throw new \InvalidArgumentException('An option shortcut cannot be formed only with "-" chars.');
         }
@@ -219,6 +222,9 @@ class InputOption
                 throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", it must be formed by a single char.', $shortcut));
             }
         } else {
+            if (array_unique($shortcuts) !== $shortcuts) {
+                throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", its levels must not be repeated.', implode('|', $shortcuts)));
+            }
             $sortedShortcuts = $shortcuts;
             natcasesort($sortedShortcuts);
 

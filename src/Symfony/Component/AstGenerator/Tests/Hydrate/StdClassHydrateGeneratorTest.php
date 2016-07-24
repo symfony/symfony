@@ -19,26 +19,12 @@ use Symfony\Component\AstGenerator\Hydrate\StdClassHydrateGenerator;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
-class StdClassHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
+class StdClassHydrateGeneratorTest extends AbstractHydratorTest
 {
-    /** @var Standard */
-    protected $printer;
-
-    public function setUp()
-    {
-        $this->printer = new Standard();
-    }
-
     public function testHydrateGenerator()
     {
-        $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
-        $propertyInfoExtractor->getProperties(Foo::class, Argument::type('array'))->willReturn(['foo', 'bar']);
-        $propertyInfoExtractor->isReadable(Foo::class, 'foo', Argument::type('array'))->willReturn(true);
-        $propertyInfoExtractor->isReadable(Foo::class, 'bar', Argument::type('array'))->willReturn(false);
-        $propertyInfoExtractor->getTypes(Foo::class, 'foo', Argument::type('array'))->willReturn([
-            new Type('string'),
-        ]);
-        $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor->reveal(), new FooTypeGenerator());
+        $propertyInfoExtractor = $this->getPropertyInfoExtractor(Foo::class);
+        $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor, new FooTypeGenerator());
 
         $this->assertTrue($hydrateGenerator->supportsGeneration(Foo::class));
 
@@ -60,8 +46,8 @@ class StdClassHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testNoInput()
     {
-        $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
-        $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor->reveal(), new FooTypeGenerator());
+        $propertyInfoExtractor = $this->getMockBuilder(PropertyInfoExtractorInterface::class)->getMock();
+        $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor, new FooTypeGenerator());
         $hydrateGenerator->generate(Foo::class);
     }
 
@@ -70,8 +56,8 @@ class StdClassHydrateGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testNoOutput()
     {
-        $propertyInfoExtractor = $this->prophesize(PropertyInfoExtractorInterface::class);
-        $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor->reveal(), new FooTypeGenerator());
+        $propertyInfoExtractor = $this->getMockBuilder(PropertyInfoExtractorInterface::class)->getMock();
+        $hydrateGenerator = new StdClassHydrateGenerator($propertyInfoExtractor, new FooTypeGenerator());
         $hydrateGenerator->generate(Foo::class, ['input' => new Expr\Variable('test')]);
     }
 }

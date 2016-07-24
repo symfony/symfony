@@ -26,56 +26,63 @@ class AstGeneratorChainTest extends \PHPUnit_Framework_TestCase
 
     public function testSupports()
     {
-        $generatorSub = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub->supportsGeneration('dummy')->willReturn(true);
-        $generatorSub->generate('dummy', [])->willReturn(['ast']);
+        $generatorSub = $this->getGeneratorMock(true, ['ast']);
 
-        $generator = new AstGeneratorChain([$generatorSub->reveal()]);
+        $generator = new AstGeneratorChain([$generatorSub]);
         $this->assertTrue($generator->supportsGeneration('dummy'));
         $this->assertEquals(['ast'], $generator->generate('dummy'));
     }
 
     public function testMultiSupports()
     {
-        $generatorSub1 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub1->supportsGeneration('dummy')->willReturn(true);
-        $generatorSub1->generate('dummy', [])->willReturn(['ast1']);
+        $generatorSub1 = $this->getGeneratorMock(true, ['ast1']);
+        $generatorSub2 = $this->getGeneratorMock(true, ['ast2']);
 
-        $generatorSub2 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub2->supportsGeneration('dummy')->willReturn(true);
-        $generatorSub2->generate('dummy', [])->willReturn(['ast2']);
-
-        $generator = new AstGeneratorChain([$generatorSub1->reveal(), $generatorSub2->reveal()]);
+        $generator = new AstGeneratorChain([$generatorSub1, $generatorSub2]);
         $this->assertTrue($generator->supportsGeneration('dummy'));
         $this->assertEquals(['ast1', 'ast2'], $generator->generate('dummy'));
     }
 
     public function testPartialSupports()
     {
-        $generatorSub1 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub1->supportsGeneration('dummy')->willReturn(true);
-        $generatorSub1->generate('dummy', [])->willReturn(['ast1']);
+        $generatorSub1 = $this->getGeneratorMock(true, ['ast1']);
+        $generatorSub2 = $this->getGeneratorMock(false);
 
-        $generatorSub2 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub2->supportsGeneration('dummy')->willReturn(false);
-
-        $generator = new AstGeneratorChain([$generatorSub1->reveal(), $generatorSub2->reveal()]);
+        $generator = new AstGeneratorChain([$generatorSub1, $generatorSub2]);
         $this->assertTrue($generator->supportsGeneration('dummy'));
         $this->assertEquals(['ast1'], $generator->generate('dummy'));
     }
 
     public function testMultiSupportsWithFirstReturn()
     {
-        $generatorSub1 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub1->supportsGeneration('dummy')->willReturn(true);
-        $generatorSub1->generate('dummy', [])->willReturn(['ast1']);
+        $generatorSub1 = $this->getGeneratorMock(true, ['ast1']);
+        $generatorSub2 = $this->getGeneratorMock(true, ['ast2']);
 
-        $generatorSub2 = $this->prophesize(AstGeneratorInterface::class);
-        $generatorSub2->supportsGeneration('dummy')->willReturn(true);
-        $generatorSub2->generate('dummy', [])->willReturn(['ast2']);
-
-        $generator = new AstGeneratorChain([$generatorSub1->reveal(), $generatorSub2->reveal()], true);
+        $generator = new AstGeneratorChain([$generatorSub1, $generatorSub2], true);
         $this->assertTrue($generator->supportsGeneration('dummy'));
         $this->assertEquals(['ast1'], $generator->generate('dummy'));
+    }
+
+    private function getGeneratorMock($support, $return = null)
+    {
+        $generatorSub = $this->getMockBuilder(AstGeneratorInterface::class)->getMock();
+        $generatorSub
+            ->expects($this->any())
+            ->method('supportsGeneration')
+            ->with('dummy')
+            ->willReturn($support);
+        if (null === $return) {
+            $generatorSub
+                ->expects($this->never())
+                ->method('generate');
+        } else {
+            $generatorSub
+                ->expects($this->any())
+                ->method('generate')
+                ->with('dummy', array())
+                ->willReturn($return);
+        }
+
+        return $generatorSub;
     }
 }

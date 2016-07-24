@@ -34,19 +34,35 @@ class NormalizerGeneratorTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateDummyNormalizer()
     {
-        $normalizerStatementsGenerator = $this->prophesize(AstGeneratorInterface::class);
-        $normalizerStatementsGenerator->supportsGeneration(Dummy::class)->willReturn(true);
-        $normalizerStatementsGenerator->generate(Dummy::class, Argument::type('array'))->willReturn([
-            new Stmt\Return_(new Expr\New_(new Name('\\stdClass'))),
-        ]);
+        $normalizerStatementsGenerator = $this->getMockBuilder(AstGeneratorInterface::class)->getMock();
+        $normalizerStatementsGenerator
+            ->expects($this->any())
+            ->method('supportsGeneration')
+            ->with(Dummy::class)
+            ->willReturn(true);
+        $normalizerStatementsGenerator
+            ->expects($this->any())
+            ->method('generate')
+            ->with(Dummy::class, $this->isType('array'))
+            ->willReturn([
+                new Stmt\Return_(new Expr\New_(new Name('\\stdClass'))),
+            ]);
 
-        $denormalizerStatementsGenerator = $this->prophesize(AstGeneratorInterface::class);
-        $denormalizerStatementsGenerator->supportsGeneration(Dummy::class)->willReturn(true);
-        $denormalizerStatementsGenerator->generate(Dummy::class, Argument::type('array'))->willReturn([
-            new Stmt\Return_(new Expr\New_(new Name('\\'.Dummy::class))),
-        ]);
+        $denormalizerStatementsGenerator = $this->getMockBuilder(AstGeneratorInterface::class)->getMock();
+        $denormalizerStatementsGenerator
+            ->expects($this->any())
+            ->method('supportsGeneration')
+            ->with(Dummy::class)
+            ->willReturn(true);
+        $denormalizerStatementsGenerator
+            ->expects($this->any())
+            ->method('generate')
+            ->with(Dummy::class, $this->isType('array'))
+            ->willReturn([
+                new Stmt\Return_(new Expr\New_(new Name('\\'.Dummy::class))),
+            ]);
 
-        $normalizerGenerator = new NormalizerGenerator($normalizerStatementsGenerator->reveal(), $denormalizerStatementsGenerator->reveal());
+        $normalizerGenerator = new NormalizerGenerator($normalizerStatementsGenerator, $denormalizerStatementsGenerator);
 
         $this->assertTrue($normalizerGenerator->supportsGeneration(Dummy::class));
 

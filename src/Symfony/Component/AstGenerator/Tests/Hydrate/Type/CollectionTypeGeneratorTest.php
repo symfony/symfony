@@ -13,7 +13,6 @@ namespace Symfony\Component\AstGenerator\Tests\Hydrate\Type;
 
 use PhpParser\Node\Expr;
 use PhpParser\PrettyPrinter\Standard;
-use Prophecy\Argument;
 use Symfony\Component\AstGenerator\AstGeneratorInterface;
 use Symfony\Component\AstGenerator\Hydrate\Type\CollectionTypeGenerator;
 use Symfony\Component\PropertyInfo\Type;
@@ -33,8 +32,8 @@ class CollectionTypeGeneratorTest  extends \PHPUnit_Framework_TestCase
      */
     public function testNoInput()
     {
-        $itemGenerator = $this->prophesize(AstGeneratorInterface::class);
-        $hydrateGenerator = new CollectionTypeGenerator($itemGenerator->reveal());
+        $itemGenerator = $this->getMockBuilder(AstGeneratorInterface::class)->getMock();
+        $hydrateGenerator = new CollectionTypeGenerator($itemGenerator);
         $hydrateGenerator->generate(new Type('array', false, null, true));
     }
 
@@ -43,8 +42,8 @@ class CollectionTypeGeneratorTest  extends \PHPUnit_Framework_TestCase
      */
     public function testNoOutput()
     {
-        $itemGenerator = $this->prophesize(AstGeneratorInterface::class);
-        $hydrateGenerator = new CollectionTypeGenerator($itemGenerator->reveal());
+        $itemGenerator = $this->getMockBuilder(AstGeneratorInterface::class)->getMock();
+        $hydrateGenerator = new CollectionTypeGenerator($itemGenerator);
         $hydrateGenerator->generate(new Type('array', false, null, true), ['input' => new Expr\Variable('test')]);
     }
 
@@ -54,13 +53,9 @@ class CollectionTypeGeneratorTest  extends \PHPUnit_Framework_TestCase
         $collectionValueType = new Type('string');
         $type = new Type('array', false, null, true, $collectionKeyType, $collectionValueType);
 
-        $itemGenerator = $this->prophesize(AstGeneratorInterface::class);
-        $itemGenerator->supportsGeneration($collectionValueType)->willReturn(true);
-        $itemGenerator->generate($collectionValueType, Argument::type('array'))->will(function ($args) {
-            return [new Expr\Assign($args[1]['output'], $args[1]['input'])];
-        });
+        $itemGenerator = $this->getItemGeneratorMock($collectionValueType);
 
-        $generator = new CollectionTypeGenerator($itemGenerator->reveal());
+        $generator = new CollectionTypeGenerator($itemGenerator);
 
         $this->assertTrue($generator->supportsGeneration($type));
 
@@ -86,13 +81,9 @@ class CollectionTypeGeneratorTest  extends \PHPUnit_Framework_TestCase
         $collectionValueType = new Type('string');
         $type = new Type('array', false, null, true, $collectionKeyType, $collectionValueType);
 
-        $itemGenerator = $this->prophesize(AstGeneratorInterface::class);
-        $itemGenerator->supportsGeneration($collectionValueType)->willReturn(true);
-        $itemGenerator->generate($collectionValueType, Argument::type('array'))->will(function ($args) {
-            return [new Expr\Assign($args[1]['output'], $args[1]['input'])];
-        });
+        $itemGenerator = $this->getItemGeneratorMock($collectionValueType);
 
-        $generator = new CollectionTypeGenerator($itemGenerator->reveal());
+        $generator = new CollectionTypeGenerator($itemGenerator);
 
         $this->assertTrue($generator->supportsGeneration($type));
 
@@ -119,14 +110,10 @@ class CollectionTypeGeneratorTest  extends \PHPUnit_Framework_TestCase
         $collectionValueType = new Type('string');
         $type = new Type('array', false, null, true, $collectionKeyType, $collectionValueType);
 
-        $itemGenerator = $this->prophesize(AstGeneratorInterface::class);
-        $itemGenerator->supportsGeneration($collectionValueType)->willReturn(true);
-        $itemGenerator->generate($collectionValueType, Argument::type('array'))->will(function ($args) {
-            return [new Expr\Assign($args[1]['output'], $args[1]['input'])];
-        });
+        $itemGenerator = $this->getItemGeneratorMock($collectionValueType);
 
         $generator = new CollectionTypeGenerator(
-            $itemGenerator->reveal(),
+            $itemGenerator,
             CollectionTypeGenerator::COLLECTION_WITH_OBJECT,
             '\ArrayObject',
             CollectionTypeGenerator::OBJECT_ASSIGNMENT_ARRAY
@@ -149,5 +136,24 @@ class CollectionTypeGeneratorTest  extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('bar', $output);
         $this->assertEquals('foo', $output['foo']);
         $this->assertEquals('bar', $output['bar']);
+    }
+
+    private function getItemGeneratorMock(Type $collectionValueType)
+    {
+        $itemGenerator = $this->getMockBuilder(AstGeneratorInterface::class)->getMock();
+        $itemGenerator
+            ->expects($this->any())
+            ->method('supportsGeneration')
+            ->with($collectionValueType)
+            ->willReturn(true);
+        $itemGenerator
+            ->expects($this->any())
+            ->method('generate')
+            ->with($collectionValueType, $this->isType('array'))
+            ->will($this->returnCallback(function ($object, array $context) {
+                return [new Expr\Assign($context['output'], $context['input'])];
+            }));
+
+        return $itemGenerator;
     }
 }

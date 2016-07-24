@@ -196,6 +196,12 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
 
         $option = new InputOption('foo', 'a|b|c|d', InputOption::VALUE_REQUIRED, 'The foo level ordered option', 'default');
         $this->assertSame('a|b|c|d', $option->getShortcut());
+
+        $option = new InputOption('fooWithNumbers', '1|2|13|24', InputOption::VALUE_REQUIRED, 'The foo level ordered option', 'default');
+        $this->assertSame('1|2|13|24', $option->getShortcut());
+
+        $option = new InputOption('fooWithAlnumLevels', '1|2|133|b', InputOption::VALUE_REQUIRED, 'The foo level ordered option', 'default');
+        $this->assertSame('1|2|133|b', $option->getShortcut());
     }
 
     public function testAddShortcutNonAlnumOption()

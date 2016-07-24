@@ -179,6 +179,55 @@ class InputOptionTest extends \PHPUnit_Framework_TestCase
         $option->setDefault('default');
     }
 
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Invalid shortcut option "ff", it must be formed by a single char.
+     */
+    public function testAddWrongLengthShortcutOption()
+    {
+        $option = new InputOption('foo', 'ff', InputOption::VALUE_OPTIONAL, 'The wrong length foo option');
+        $option->setDefault('default');
+    }
+
+    public function testAddShortcutLevelOrderOption()
+    {
+        $option = new InputOption('foo', 'ff2|ff3', InputOption::VALUE_REQUIRED, 'The foo level ordered option', 'default');
+        $this->assertSame('ff2|ff3', $option->getShortcut());
+    }
+
+    public function testAddShortcutNonAlnumOption()
+    {
+        $option = new InputOption('foo', '//|///', InputOption::VALUE_REQUIRED, 'The foo non alnum option', 'default');
+        $this->assertSame('//|///', $option->getShortcut());
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage An option shortcut cannot be formed only with "-" chars.
+     */
+    public function testAddWrongShortcutWithOnlyMultipleDashesOption()
+    {
+        new InputOption('foo', '-|--', InputOption::VALUE_REQUIRED, 'The wrong foo option with only multiple dashes', 'default');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage An option shortcut cannot be formed only with "-" chars.
+     */
+    public function testAddWrongShortcutWithSingleDashOption()
+    {
+        new InputOption('foo', '-', InputOption::VALUE_REQUIRED, 'The wrong foo option with only one single dash', 'default');
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Invalid shortcut option "ff|f", its levels must be ordered ascending.
+     */
+    public function testAddWrongShortcutLevelOrderOption()
+    {
+        new InputOption('foo', 'ff|f', InputOption::VALUE_REQUIRED, 'The wrong ordered foo level option', 'default');
+    }
+
     public function testEquals()
     {
         $option = new InputOption('foo', 'f', null, 'Some description');

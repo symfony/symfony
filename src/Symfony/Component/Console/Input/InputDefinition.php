@@ -246,9 +246,6 @@ class InputDefinition
         }
 
         if ($option->getShortcut()) {
-            if (strlen($option->getShortcut()) > 1 && false === strpos($option->getShortcut(), '|')) {
-                throw new \LogicException(sprintf('Invalid shortcut option "%s", it must be formed by a single char.', $option->getShortcut()));
-            }
             foreach (explode('|', $option->getShortcut()) as $shortcut) {
                 if (isset($this->shortcuts[$shortcut]) && !$option->equals($this->options[$this->shortcuts[$shortcut]])) {
                     throw new \LogicException(sprintf('An option with shortcut "%s" already exists.', $shortcut));

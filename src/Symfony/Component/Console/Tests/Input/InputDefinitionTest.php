@@ -265,6 +265,17 @@ class InputDefinitionTest extends \PHPUnit_Framework_TestCase
         $definition->addOption($this->foo1);
     }
 
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage Invalid shortcut option "ff", it must be formed by a single char.
+     */
+    public function testAddWrongLengthShortcutOption()
+    {
+        new InputDefinition(array(
+            new InputOption('foo', 'ff', InputOption::VALUE_REQUIRED, 'The wrong length foo option'),
+        ));
+    }
+
     public function testGetOption()
     {
         $this->initializeOptions();

@@ -70,8 +70,9 @@ class NormalizerGenerator implements AstGeneratorInterface
                 'implements' => [
                     new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerInterface'),
                     new Name('\Symfony\Component\Serializer\Normalizer\NormalizerInterface'),
+                    new Name('\Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface'),
                 ],
-                'extends' => new Name('\Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer'),
+                'uses' => new Name('\Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait'),
             ]
         )];
     }
@@ -161,7 +162,11 @@ class NormalizerGenerator implements AstGeneratorInterface
             ],
             'stmts' => array_merge($this->normalizeStatementsGenerator->generate($class, array_merge($context, [
                 'input' => $input,
-                'output' => $output
+                'output' => $output,
+                'normalizer' => new Expr\MethodCall(
+                    new Expr\Variable('$this'),
+                    'getNormalizer'
+                )
             ])), [
                 new Stmt\Return_($output)
             ])

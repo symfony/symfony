@@ -55,7 +55,7 @@ class InputOption
         }
 
         if (null !== $shortcut) {
-            $shortcut = $this->sanitizeShortcut($shortcut);
+            $shortcut = $this->filterShortcut($shortcut);
         }
 
         if (null === $mode) {
@@ -198,7 +198,16 @@ class InputOption
         ;
     }
 
-    private function sanitizeShortcut($shortcut)
+    /**
+     * Filters invalid shortcuts.
+     *
+     * @param string|array $shortcut
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string
+     */
+    private function filterShortcut($shortcut)
     {
         if (is_array($shortcut)) {
             $shortcut = implode('|', $shortcut);
@@ -210,9 +219,8 @@ class InputOption
             throw new \InvalidArgumentException('An option shortcut cannot be formed only with "-" chars.');
         }
         $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
-        $shortcuts = array_filter($shortcuts);
 
-        if (!$shortcuts) {
+        if (!$shortcuts = array_filter($shortcuts)) {
             throw new \InvalidArgumentException('An option shortcut cannot be empty.');
         }
         $shortcuts = array_values($shortcuts);

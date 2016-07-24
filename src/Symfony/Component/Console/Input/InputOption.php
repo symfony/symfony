@@ -227,7 +227,7 @@ class InputOption
             }
             $sortedShortcuts = $shortcuts;
             natcasesort($sortedShortcuts);
-            uksort($sortedShortcuts, 'strcasecmp');
+            uksort($sortedShortcuts, 'strnatcasecmp');
 
             if ($sortedShortcuts !== $shortcuts) {
                 throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", its levels must be ordered ascending.', implode('|', $shortcuts)));

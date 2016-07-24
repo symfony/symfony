@@ -213,18 +213,18 @@ class InputOption
             throw new \InvalidArgumentException('An option shortcut cannot be empty.');
         }
         $shortcuts = array_values($shortcuts);
-        $shortcutMinLevelRef = $shortcuts[0];
-        $shortcutLevels = count($shortcuts);
 
-        if (1 === $shortcutLevels && strlen($shortcutMinLevelRef) > 1) {
-            throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", it must be formed by a single char.', $shortcut));
-        }
+        if (1 === count($shortcuts)) {
+            if (strlen($shortcuts[0]) > 1) {
+                throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", it must be formed by a single char.', $shortcut));
+            }
+        } else {
+            $sortedShortcuts = $shortcuts;
+            natcasesort($sortedShortcuts);
 
-        $sortedShortcuts = $shortcuts;
-        natcasesort($sortedShortcuts);
-
-        if ($sortedShortcuts !== $shortcuts) {
-            throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", its levels must be ordered ascending.', implode('|', $shortcuts)));
+            if ($sortedShortcuts !== $shortcuts) {
+                throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", its levels must be ordered ascending.', implode('|', $shortcuts)));
+            }
         }
 
         return implode('|', $shortcuts);

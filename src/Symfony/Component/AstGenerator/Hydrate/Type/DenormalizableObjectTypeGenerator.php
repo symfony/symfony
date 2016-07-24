@@ -15,6 +15,7 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Name;
+use PhpParser\Node\Scalar;
 use Symfony\Component\AstGenerator\AstGeneratorInterface;
 use Symfony\Component\AstGenerator\Exception\MissingContextException;
 use Symfony\Component\PropertyInfo\Type;
@@ -24,7 +25,7 @@ use Symfony\Component\PropertyInfo\Type;
  *
  * @author Guilhem N. <egetick@gmail.com>
  */
-class NormalizableObjectTypeGenerator implements AstGeneratorInterface
+class DenormalizableObjectTypeGenerator implements AstGeneratorInterface
 {
     /**
      * {@inheritdoc}
@@ -41,35 +42,37 @@ class NormalizableObjectTypeGenerator implements AstGeneratorInterface
             throw new MissingContextException('Output variable not defined or not an Expr in generation context');
         }
 
-        if (!isset($context['normalizer']) || !($context['normalizer'] instanceof Expr)) {
-            throw new MissingContextException('Normalizer variable not defined or not an Expr in generation context');
+        if (!isset($context['denormalizer']) || !($context['denormalizer'] instanceof Expr)) {
+            throw new MissingContextException('Denormalizer variable not defined or not an Expr in generation context');
         }
 
-        $normalizationArgs = array(new Arg($context['input']));
+        $denormalizationArgs = array(
+            new Arg($context['input']),
+            new Arg(new Scalar\String_($object->getClassName())),
+        );
         if (isset($context['format'])) {
-            $normalizationArgs[] = new Arg($context['format']);
+            $denormalizationArgs[] = new Arg($context['format']);
         } else {
-            $normalizationArgs[] = new Arg(new Expr\ConstFetch(new Name('null')));
+            $denormalizationArgs[] = new Arg(new Expr\ConstFetch(new Name('null')));
         }
         if (isset($context['context'])) {
-            $normalizationArgs[] = new Arg($context['context']);
+            $denormalizationArgs[] = new Arg($context['context']);
         }
 
         $assign = [
             new Expr\Assign($context['output'], new Expr\MethodCall(
-                $context['normalizer'],
-                'normalize',
-                $normalizationArgs
+                $context['denormalizer'],
+                'denormalize',
+                $denormalizationArgs
             ))
         ];
 
         if (isset($context['condition']) && $context['condition']) {
             return [new Stmt\If_(
                 new Expr\BinaryOp\LogicalAnd(
-                    new Expr\Instanceof_(new Expr\Variable('data'), new Name($object->getClassName())),
                     new Expr\MethodCall(
-                        $context['normalizer'],
-                        'supportsNormalization',
+                        $context['denormalizer'],
+                        'supportsDenormalization',
                         $normalizationArgs
                     )
                 ),

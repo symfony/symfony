@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AstGenerator\Normalizer;
 
+use PhpParser\Comment;
 use PhpParser\Node\Name;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
@@ -58,6 +59,10 @@ class NormalizerGenerator implements AstGeneratorInterface
             new Name($context['name']),
             [
                 'stmts' => [
+                    new Stmt\Use_(array(
+                        new Name('\Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait'),
+                        new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait'),
+                    )),
                     $this->createSupportsNormalizationMethod($object),
                     $this->createSupportsDenormalizationMethod($object),
                     $this->createNormalizeMethod($object, array_merge($context, [
@@ -71,8 +76,11 @@ class NormalizerGenerator implements AstGeneratorInterface
                     new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerInterface'),
                     new Name('\Symfony\Component\Serializer\Normalizer\NormalizerInterface'),
                     new Name('\Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface'),
+                    new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface'),
                 ],
-                'uses' => new Name('\Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait'),
+            ],
+            [
+                'comments' => [new Comment("/**\n * This class is generated.\n * Please do not update it manually.\n */")],
             ]
         )];
     }
@@ -163,10 +171,12 @@ class NormalizerGenerator implements AstGeneratorInterface
             'stmts' => array_merge($this->normalizeStatementsGenerator->generate($class, array_merge($context, [
                 'input' => $input,
                 'output' => $output,
-                'normalizer' => new Expr\MethodCall(
-                    new Expr\Variable('$this'),
-                    'getNormalizer'
-                )
+                'normalizer' => new Expr\PropertyFetch(
+                    new Expr\Variable('this'),
+                    'normalizer'
+                ),
+                'format' => new Expr\Variable(new Name('format')),
+                'context' => new Expr\Variable(new Name('context')),
             ])), [
                 new Stmt\Return_($output)
             ])
@@ -197,6 +207,12 @@ class NormalizerGenerator implements AstGeneratorInterface
             'stmts' => array_merge($this->denormalizeStatementsGenerator->generate($class, array_merge($context, [
                 'input' => $input,
                 'output' => $output,
+                'denormalizer' => new Expr\PropertyFetch(
+                    new Expr\Variable('this'),
+                    'denormalizer'
+                ),
+                'format' => new Expr\Variable(new Name('format')),
+                'context' => new Expr\Variable(new Name('context')),
             ])), [
                 new Stmt\Return_($output),
             ]),

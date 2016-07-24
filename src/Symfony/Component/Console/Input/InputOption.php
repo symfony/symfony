@@ -226,7 +226,7 @@ class InputOption
                 throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", its levels must not be repeated.', implode('|', $shortcuts)));
             }
             $sortedShortcuts = $shortcuts;
-            uksort($sortedShortcuts, 'strcasecmp');
+            uksort($sortedShortcuts, 'strnatcasecmp');
 
             if ($sortedShortcuts !== $shortcuts) {
                 throw new \InvalidArgumentException(sprintf('Invalid shortcut option "%s", its levels must be ordered ascending.', implode('|', $shortcuts)));

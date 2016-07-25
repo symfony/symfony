@@ -194,7 +194,6 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('enabled' => false), $this->getField($node, 'falseEquivalent'));
         $this->assertEquals(array('enabled' => true), $this->getField($node, 'trueEquivalent'));
         $this->assertEquals(array('enabled' => true), $this->getField($node, 'nullEquivalent'));
-        $this->assertEquals(array('enabled' => true), $this->getField($node, 'nullEquivalent'));
 
         $nodeChildren = $this->getField($node, 'children');
         $this->assertArrayHasKey('enabled', $nodeChildren);

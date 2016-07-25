@@ -1151,6 +1151,7 @@ class Crawler extends \SplObjectStorage
         $crawler = new static($nodes, $this->uri, $this->baseHref);
         $crawler->isHtml = $this->isHtml;
         $crawler->document = $this->document;
+        $crawler->namespaces = $this->namespaces;
 
         return $crawler;
     }

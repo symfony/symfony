@@ -335,7 +335,7 @@ class Application
     /**
      * Adds an array of command objects.
      *
-     * @see Application::add()
+     * If a Command is not enabled it will not be added.
      * 
      * @param Command[] $commands An array of commands
      */
@@ -363,7 +363,7 @@ class Application
         if (!$command->isEnabled()) {
             $command->setApplication(null);
 
-            return null;
+            return;
         }
 
         if (null === $command->getDefinition()) {
@@ -1070,11 +1070,6 @@ class Application
         $this->defaultCommand = $commandName;
     }
 
-    /**
-     * @param string $string
-     * 
-     * @return int
-     */
     private function stringWidth($string)
     {
         if (!function_exists('mb_strwidth')) {
@@ -1088,12 +1083,6 @@ class Application
         return mb_strwidth($string, $encoding);
     }
 
-    /**
-     * @param string $string
-     * @param int    $width
-     *
-     * @return string[]
-     */
     private function splitStringByWidth($string, $width)
     {
         // str_split is not suitable for multi-byte characters, we should use preg_split to get char array properly.

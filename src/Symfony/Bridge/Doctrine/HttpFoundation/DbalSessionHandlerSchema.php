@@ -38,8 +38,8 @@ final class DbalSessionHandlerSchema extends Schema
     {
         $table = $this->createTable($tableName);
         $table->addColumn('sess_id', 'string');
-        $table->addColumn('sess_data', 'text')->setNotnull(true);
-        $table->addColumn('sess_time', 'integer')->setNotnull(true)->setUnsigned(true);
+        $table->addColumn('sess_data', 'text')->setNotNull(true);
+        $table->addColumn('sess_time', 'integer')->setNotNull(true)->setUnsigned(true);
         $table->setPrimaryKey(array('sess_id'));
     }
 }

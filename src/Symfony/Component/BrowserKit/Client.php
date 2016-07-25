@@ -455,7 +455,7 @@ abstract class Client
         $request = $this->internalRequest;
 
         if (in_array($this->internalResponse->getStatus(), array(302, 303))) {
-            $method = 'get';
+            $method = 'GET';
             $files = array();
             $content = null;
         } else {
@@ -464,7 +464,7 @@ abstract class Client
             $content = $request->getContent();
         }
 
-        if ('get' === strtolower($method)) {
+        if ('GET' === strtoupper($method)) {
             // Don't forward parameters for GET request as it should reach the redirection URI
             $parameters = array();
         } else {

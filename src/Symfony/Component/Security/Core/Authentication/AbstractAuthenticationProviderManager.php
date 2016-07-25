@@ -67,9 +67,7 @@ abstract class AbstractAuthenticationProviderManager implements AuthenticationMa
             if (!$provider instanceof AuthenticationProviderInterface) {
                 throw new \InvalidArgumentException(sprintf('Provider "%s" must implement the AuthenticationProviderInterface.', get_class($provider)));
             }
-        }
 
-        foreach ($providers as $provider) {
             if (!$provider->supports($token)) {
                 continue;
             }

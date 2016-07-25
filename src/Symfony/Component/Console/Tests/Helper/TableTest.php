@@ -694,22 +694,22 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Style "absent" is not defined.
+     */
     public function testIsNotDefinedStyleException()
     {
-        $this->setExpectedException(
-            'InvalidArgumentException',
-            'Style "absent" is not defined.'
-        );
         $table = new Table($this->getOutputStream());
         $table->setStyle('absent');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Style "absent" is not defined.
+     */
     public function testGetStyleDefinition()
     {
-        $this->setExpectedException(
-            'InvalidArgumentException',
-            'Style "absent" is not defined.'
-        );
         Table::getStyleDefinition('absent');
     }
 

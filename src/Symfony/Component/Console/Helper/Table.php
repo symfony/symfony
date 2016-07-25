@@ -131,7 +131,7 @@ class Table
      */
     public function setStyle($name)
     {
-        $this->style = $this->findStyle($name);
+        $this->style = $this->resolveStyle($name);
 
         return $this;
     }
@@ -158,7 +158,7 @@ class Table
     {
         $columnIndex = intval($columnIndex);
 
-        $this->columnStyles[$columnIndex] = $this->findStyle($name);
+        $this->columnStyles[$columnIndex] = $this->resolveStyle($name);
 
         return $this;
     }
@@ -690,16 +690,16 @@ class Table
         );
     }
 
-    private function findStyle($name)
+    private function resolveStyle($name)
     {
         if ($name instanceof TableStyle) {
             return $name;
         }
 
-        if (isset(self::$styles[$name])) {
-            return self::$styles[$name];
+        if (empty(self::$styles[$name])) {
+            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
         }
 
-        throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
+        return self::$styles[$name];
     }
 }

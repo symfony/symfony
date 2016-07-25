@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-07-25T09:34:34Z
+
+See https://github.com/symfony/symfony/issues/12298#issuecomment-234897430 for the blackfire comparison
+
+---------------------------------------------------------------------------
+
+by stof at 2016-07-25T09:35:38Z
+
+The reason I missed this when I optimized the component in the past is because I was working on queries without namespaces
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-07-25T09:42:37Z
+
+👍
+
+Status: Reviewed

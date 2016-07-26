@@ -13,7 +13,7 @@ namespace Symfony\Component\Debug\Tests;
 
 use Symfony\Component\Debug\ExceptionHandler;
 
-class MockExceptionHandler extends Exceptionhandler
+class MockExceptionHandler extends ExceptionHandler
 {
     public $e;
 

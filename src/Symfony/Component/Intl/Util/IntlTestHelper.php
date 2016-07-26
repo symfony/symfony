@@ -31,7 +31,7 @@ class IntlTestHelper
      *
      * @param \PhpUnit_Framework_TestCase $testCase
      */
-    public static function requireIntl(\PhpUnit_Framework_TestCase $testCase)
+    public static function requireIntl(\PHPUnit_Framework_TestCase $testCase)
     {
         // We only run tests if the version is *one specific version*.
         // This condition is satisfied if
@@ -63,7 +63,7 @@ class IntlTestHelper
      *
      * @param \PhpUnit_Framework_TestCase $testCase
      */
-    public static function requireFullIntl(\PhpUnit_Framework_TestCase $testCase)
+    public static function requireFullIntl(\PHPUnit_Framework_TestCase $testCase)
     {
         // We only run tests if the intl extension is loaded...
         if (!Intl::isExtensionLoaded()) {
@@ -92,7 +92,7 @@ class IntlTestHelper
      *
      * @param \PhpUnit_Framework_TestCase $testCase
      */
-    public static function require32Bit(\PhpUnit_Framework_TestCase $testCase)
+    public static function require32Bit(\PHPUnit_Framework_TestCase $testCase)
     {
         if (4 !== PHP_INT_SIZE) {
             $testCase->markTestSkipped('PHP 32 bit is required.');
@@ -104,7 +104,7 @@ class IntlTestHelper
      *
      * @param \PhpUnit_Framework_TestCase $testCase
      */
-    public static function require64Bit(\PhpUnit_Framework_TestCase $testCase)
+    public static function require64Bit(\PHPUnit_Framework_TestCase $testCase)
     {
         if (8 !== PHP_INT_SIZE) {
             $testCase->markTestSkipped('PHP 64 bit is required.');

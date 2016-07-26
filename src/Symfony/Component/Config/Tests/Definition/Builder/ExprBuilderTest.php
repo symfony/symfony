@@ -151,6 +151,26 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage You must specify an if part.
+     */
+    public function testEndIfPartNotSpecified()
+    {
+        $this->getTestBuilder()->end();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage You must specify a then part.
+     */
+    public function testEndThenPartNotSpecified()
+    {
+        $builder = $this->getTestBuilder();
+        $builder->ifPart = 'test';
+        $builder->end();
+    }
+
+    /**
      * Create a test treebuilder with a variable node, and init the validation.
      *
      * @return TreeBuilder

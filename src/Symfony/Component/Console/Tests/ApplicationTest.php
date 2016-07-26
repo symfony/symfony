@@ -425,7 +425,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $application->add(new \FooCommand());
         $application->add(new \Foo1Command());
         $application->add(new \Foo2Command());
-        $application->add(new \foo3Command());
+        $application->add(new \Foo3Command());
 
         try {
             $application->find('Unknown-namespace:Unknown-command');

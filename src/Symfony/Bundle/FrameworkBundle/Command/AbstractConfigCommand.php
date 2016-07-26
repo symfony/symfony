@@ -45,7 +45,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         } else {
             $output->writeln('Available registered bundles with their extension alias if available:');
             $table = new Table($output);
-            $table->setHeaders($headers)->setRows($rows)->render($output);
+            $table->setHeaders($headers)->setRows($rows)->render();
         }
     }
 

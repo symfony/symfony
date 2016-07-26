@@ -58,7 +58,7 @@ class IdentityTranslator implements TranslatorInterface
     /**
      * {@inheritdoc}
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number = 1, array $parameters = array(), $domain = null, $locale = null)
     {
         return strtr($this->selector->choose((string) $id, (int) $number, $locale ?: $this->getLocale()), $parameters);
     }

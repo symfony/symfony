@@ -196,7 +196,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
+    public function transChoice($id, $number = 1, array $parameters = array(), $domain = null, $locale = null)
     {
         if (null === $domain) {
             $domain = 'messages';

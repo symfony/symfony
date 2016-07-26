@@ -44,7 +44,7 @@ class TranslatorHelper extends Helper
     /**
      * @see TranslatorInterface::transChoice()
      */
-    public function transChoice($id, $number, array $parameters = array(), $domain = 'messages', $locale = null)
+    public function transChoice($id, $number = 1, array $parameters = array(), $domain = 'messages', $locale = null)
     {
         return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
     }

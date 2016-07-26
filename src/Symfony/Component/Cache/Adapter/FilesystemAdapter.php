@@ -126,7 +126,7 @@ class FilesystemAdapter extends AbstractAdapter
     protected function doSave(array $values, $lifetime)
     {
         $ok = true;
-        $expiresAt = $lifetime ? time() + $lifetime : PHP_INT_MAX;
+        $expiresAt = time() + ($lifetime ?: 31557600); // 31557600s = 1 year
         $tmp = $this->directory.uniqid('', true);
 
         foreach ($values as $id => $value) {

@@ -21,12 +21,12 @@
 
 {% block money_widget -%}
     <div class="input-group">
-        {% set prepend = '{{' == money_pattern[0:2] %}
-        {% if not prepend %}
+        {% set append = money_pattern starts with '{{' %}
+        {% if not append %}
             <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
         {% endif %}
         {{- block('form_widget_simple') -}}
-        {% if prepend %}
+        {% if append %}
             <span class="input-group-addon">{{ money_pattern|replace({ '{{ widget }}':''}) }}</span>
         {% endif %}
     </div>

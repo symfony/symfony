@@ -410,7 +410,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->setNextResponse(new Response('', 302, array('Location' => 'http://www.example.com/redirected')));
         $client->request('POST', 'http://www.example.com/foo/foobar', array('name' => 'bar'));
 
-        $this->assertEquals('get', $client->getRequest()->getMethod(), '->followRedirect() uses a get for 302');
+        $this->assertEquals('GET', $client->getRequest()->getMethod(), '->followRedirect() uses a GET for 302');
         $this->assertEquals(array(), $client->getRequest()->getParameters(), '->followRedirect() does not submit parameters when changing the method');
     }
 
@@ -487,6 +487,26 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(-1, $client->getMaxRedirects(), '->getMaxRedirects() returns default value');
         $client->setMaxRedirects(3);
         $this->assertEquals(3, $client->getMaxRedirects(), '->getMaxRedirects() returns assigned value');
+    }
+
+    public function testFollowRedirectWithPostMethod()
+    {
+        $parameters = array('foo' => 'bar');
+        $files = array('myfile.foo' => 'baz');
+        $server = array('X_TEST_FOO' => 'bazbar');
+        $content = 'foobarbaz';
+
+        $client = new TestClient();
+
+        $client->setNextResponse(new Response('', 307, array('Location' => 'http://www.example.com/redirected')));
+        $client->request('POST', 'http://www.example.com/foo/foobar', $parameters, $files, $server, $content);
+
+        $this->assertEquals('http://www.example.com/redirected', $client->getRequest()->getUri(), '->followRedirect() follows a redirect with POST method');
+        $this->assertArrayHasKey('foo', $client->getRequest()->getParameters(), '->followRedirect() keeps parameters with POST method');
+        $this->assertArrayHasKey('myfile.foo', $client->getRequest()->getFiles(), '->followRedirect() keeps files with POST method');
+        $this->assertArrayHasKey('X_TEST_FOO', $client->getRequest()->getServer(), '->followRedirect() keeps $_SERVER with POST method');
+        $this->assertEquals($content, $client->getRequest()->getContent(), '->followRedirect() keeps content with POST method');
+        $this->assertEquals('POST', $client->getRequest()->getMethod(), '->followRedirect() keeps request method');
     }
 
     public function testBack()

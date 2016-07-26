@@ -41,5 +41,6 @@
         <framework:validation enabled="true" cache="validator.mapping.cache.doctrine.apc" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
         <framework:serializer enabled="true" enable-annotations="true" name-converter="serializer.name_converter.camel_case_to_snake_case" />
+        <framework:property-info />
     </framework:config>
 </container>

@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 /**

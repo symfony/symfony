@@ -47,7 +47,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         parent::tearDown();
     }
 
-    protected function assertXpathNodeValue(\DomElement $element, $expression, $nodeValue)
+    protected function assertXpathNodeValue(\DOMElement $element, $expression, $nodeValue)
     {
         $xpath = new \DOMXPath($element->ownerDocument);
         $nodeList = $xpath->evaluate($expression);

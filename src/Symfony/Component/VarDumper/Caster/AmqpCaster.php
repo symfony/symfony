@@ -131,7 +131,7 @@ class AmqpCaster
             $prefix.'contentType' => $c->getContentType(),
             $prefix.'contentEncoding' => $c->getContentEncoding(),
             $prefix.'type' => $c->getType(),
-            $prefix.'timestamp' => $c->getTimestamp(),
+            $prefix.'timestamp' => $c->getTimeStamp(),
             $prefix.'priority' => $c->getPriority(),
             $prefix.'expiration' => $c->getExpiration(),
             $prefix.'userId' => $c->getUserId(),

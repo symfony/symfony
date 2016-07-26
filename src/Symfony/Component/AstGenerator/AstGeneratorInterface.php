@@ -26,7 +26,7 @@ interface AstGeneratorInterface
      *
      * @return \PhpParser\Node[] An array of statements (AST Node)
      */
-    public function generate($object, array $context = []);
+    public function generate($object, array $context = array());
 
     /**
      * Check whether the given object is supported for generation by this generator.

@@ -71,7 +71,7 @@ class CollectionTypeGenerator implements AstGeneratorInterface
      *
      * @param Type $object A type extracted with PropertyInfo component
      */
-    public function generate($object, array $context = [])
+    public function generate($object, array $context = array())
     {
         if (!isset($context['input']) || !($context['input'] instanceof Expr)) {
             throw new MissingContextException('Input variable not defined or not an Expr in generation context');
@@ -82,9 +82,9 @@ class CollectionTypeGenerator implements AstGeneratorInterface
         }
 
         $uniqueVariableScope = isset($context['unique_variable_scope']) ? $context['unique_variable_scope'] : new UniqueVariableScope();
-        $statements = [
+        $statements = array(
             new Expr\Assign($context['output'], $this->createCollectionAssignStatement($object)),
-        ];
+        );
 
         // Create item input
         $loopValueVar = new Expr\Variable($uniqueVariableScope->getUniqueName('value'));
@@ -94,19 +94,19 @@ class CollectionTypeGenerator implements AstGeneratorInterface
         $output = $this->createCollectionItemExpr($object, $loopKeyVar, $context['output']);
 
         // Loop statements
-        $loopStatements = [new Expr\Assign($output, $loopValueVar)];
+        $loopStatements = array(new Expr\Assign($output, $loopValueVar));
 
         if (null !== $object->getCollectionValueType() && $this->subValueTypeGenerator->supportsGeneration($object->getCollectionValueType())) {
-            $loopStatements = $this->subValueTypeGenerator->generate($object->getCollectionValueType(), array_merge($context, [
+            $loopStatements = $this->subValueTypeGenerator->generate($object->getCollectionValueType(), array_merge($context, array(
                 'input' => $loopValueVar,
                 'output' => $output
-            ]));
+            )));
         }
 
-        $statements[] = new Stmt\Foreach_($context['input'], $loopValueVar, [
+        $statements[] = new Stmt\Foreach_($context['input'], $loopValueVar, array(
             'keyVar' => $loopKeyVar,
             'stmts'  => $loopStatements
-        ]);
+        ));
 
         return $statements;
     }

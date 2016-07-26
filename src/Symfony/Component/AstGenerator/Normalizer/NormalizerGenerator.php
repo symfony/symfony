@@ -48,41 +48,41 @@ class NormalizerGenerator implements AstGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($object, array $context = [])
+    public function generate($object, array $context = array())
     {
         if (!isset($context['name'])) {
             $reflectionClass = new \ReflectionClass($object);
             $context['name'] = $reflectionClass->getShortName().'Normalizer';
         }
 
-        return [new Stmt\Class_(
+        return array(new Stmt\Class_(
             new Name($context['name']),
-            [
-                'stmts' => [
+            array(
+                'stmts' => array(
                     new Stmt\Use_(array(
                         new Name('\Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait'),
                         new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait'),
                     )),
                     $this->createSupportsNormalizationMethod($object),
                     $this->createSupportsDenormalizationMethod($object),
-                    $this->createNormalizeMethod($object, array_merge($context, [
+                    $this->createNormalizeMethod($object, array_merge($context, array(
                         'unique_variable_scope' => new UniqueVariableScope(),
-                    ])),
-                    $this->createDenormalizeMethod($object, array_merge($context, [
+                    ))),
+                    $this->createDenormalizeMethod($object, array_merge($context, array(
                         'unique_variable_scope' => new UniqueVariableScope(),
-                    ])),
-                ],
-                'implements' => [
+                    ))),
+                ),
+                'implements' => array(
                     new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerInterface'),
                     new Name('\Symfony\Component\Serializer\Normalizer\NormalizerInterface'),
                     new Name('\Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface'),
                     new Name('\Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface'),
-                ],
-            ],
-            [
-                'comments' => [new Comment("/**\n * This class is generated.\n * Please do not update it manually.\n */")],
-            ]
-        )];
+                ),
+            ),
+            array(
+                'comments' => array(new Comment("/**\n * This class is generated.\n * Please do not update it manually.\n */")),
+            )
+        ));
     }
 
     /**
@@ -98,24 +98,24 @@ class NormalizerGenerator implements AstGeneratorInterface
             $class = '\\'.$class;
         }
 
-        return new Stmt\ClassMethod('supportsNormalization', [
+        return new Stmt\ClassMethod('supportsNormalization', array(
             'type' => Stmt\Class_::MODIFIER_PUBLIC,
-            'params' => [
+            'params' => array(
                 new Param('data'),
                 new Param('format', new Expr\ConstFetch(new Name('null'))),
-            ],
-            'stmts' => [
+            ),
+            'stmts' => array(
                 new Stmt\If_(
                     new Expr\Instanceof_(new Expr\Variable('data'), new Name($class)),
-                    [
-                        'stmts' => [
+                    array(
+                        'stmts' => array(
                             new Stmt\Return_(new Expr\ConstFetch(new Name('true'))),
-                        ],
-                    ]
+                        ),
+                    )
                 ),
                 new Stmt\Return_(new Expr\ConstFetch(new Name('false'))),
-            ],
-        ]);
+            ),
+        ));
     }
 
     /**
@@ -127,25 +127,25 @@ class NormalizerGenerator implements AstGeneratorInterface
      */
     protected function createSupportsDenormalizationMethod($class)
     {
-        return new Stmt\ClassMethod('supportsDenormalization', [
+        return new Stmt\ClassMethod('supportsDenormalization', array(
             'type' => Stmt\Class_::MODIFIER_PUBLIC,
-            'params' => [
+            'params' => array(
                 new Param('data'),
                 new Param('type'),
                 new Param('format', new Expr\ConstFetch(new Name('null'))),
-            ],
-            'stmts' => [
+            ),
+            'stmts' => array(
                 new Stmt\If_(
                     new Expr\BinaryOp\NotIdentical(new Expr\Variable('type'), new Scalar\String_($class)),
-                    [
-                        'stmts' => [
+                    array(
+                        'stmts' => array(
                             new Stmt\Return_(new Expr\ConstFetch(new Name('false'))),
-                        ],
-                    ]
+                        ),
+                    )
                 ),
                 new Stmt\Return_(new Expr\ConstFetch(new Name('true'))),
-            ],
-        ]);
+            ),
+        ));
     }
 
     /**
@@ -156,19 +156,19 @@ class NormalizerGenerator implements AstGeneratorInterface
      *
      * @return Stmt\ClassMethod
      */
-    protected function createNormalizeMethod($class, array $context = [])
+    protected function createNormalizeMethod($class, array $context = array())
     {
         $input = new Expr\Variable('object');
         $output = new Expr\Variable('data');
 
-        return new Stmt\ClassMethod('normalize', [
+        return new Stmt\ClassMethod('normalize', array(
             'type' => Stmt\Class_::MODIFIER_PUBLIC,
-            'params' => [
+            'params' => array(
                 new Param('object'),
                 new Param('format', new Expr\ConstFetch(new Name('null'))),
                 new Param('context', new Expr\Array_(), 'array'),
-            ],
-            'stmts' => array_merge($this->normalizeStatementsGenerator->generate($class, array_merge($context, [
+            ),
+            'stmts' => array_merge($this->normalizeStatementsGenerator->generate($class, array_merge($context, array(
                 'input' => $input,
                 'output' => $output,
                 'normalizer' => new Expr\PropertyFetch(
@@ -177,10 +177,10 @@ class NormalizerGenerator implements AstGeneratorInterface
                 ),
                 'format' => new Expr\Variable(new Name('format')),
                 'context' => new Expr\Variable(new Name('context')),
-            ])), [
-                new Stmt\Return_($output)
-            ])
-        ]);
+            ))), array(
+                new Stmt\Return_($output),
+            ))
+        ));
     }
 
     /**
@@ -191,20 +191,20 @@ class NormalizerGenerator implements AstGeneratorInterface
      *
      * @return Stmt\ClassMethod
      */
-    protected function createDenormalizeMethod($class, array $context = [])
+    protected function createDenormalizeMethod($class, array $context = array())
     {
         $input = new Expr\Variable('data');
         $output = new Expr\Variable('object');
 
-        return new Stmt\ClassMethod('denormalize', [
+        return new Stmt\ClassMethod('denormalize', array(
             'type' => Stmt\Class_::MODIFIER_PUBLIC,
-            'params' => [
+            'params' => array(
                 new Param('data'),
                 new Param('class'),
                 new Param('format', new Expr\ConstFetch(new Name('null'))),
                 new Param('context', new Expr\Array_(), 'array'),
-            ],
-            'stmts' => array_merge($this->denormalizeStatementsGenerator->generate($class, array_merge($context, [
+            ),
+            'stmts' => array_merge($this->denormalizeStatementsGenerator->generate($class, array_merge($context, array(
                 'input' => $input,
                 'output' => $output,
                 'denormalizer' => new Expr\PropertyFetch(
@@ -213,10 +213,10 @@ class NormalizerGenerator implements AstGeneratorInterface
                 ),
                 'format' => new Expr\Variable(new Name('format')),
                 'context' => new Expr\Variable(new Name('context')),
-            ])), [
+            ))), array(
                 new Stmt\Return_($output),
-            ]),
-        ]);
+            )),
+        ));
     }
 
     /**

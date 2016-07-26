@@ -39,7 +39,7 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($object, array $context = [])
+    public function generate($object, array $context = array())
     {
         if (!isset($context['input']) || !($context['input'] instanceof Expr\Variable)) {
             throw new MissingContextException('Input variable not defined or not a Expr\Variable in generation context');
@@ -49,7 +49,7 @@ abstract class HydrateFromObjectGenerator implements AstGeneratorInterface
             throw new MissingContextException('Output variable not defined or not a Expr\Variable in generation context');
         }
 
-        $statements = [$this->getAssignStatement($context['output'])];
+        $statements = array($this->getAssignStatement($context['output']));
 
         foreach ($this->propertyInfoExtractor->getProperties($object, $context) as $property) {
             // Only normalize readable property

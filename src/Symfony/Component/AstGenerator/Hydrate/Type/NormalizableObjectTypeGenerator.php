@@ -31,7 +31,7 @@ class NormalizableObjectTypeGenerator implements AstGeneratorInterface
      *
      * @param Type $object A type extracted with PropertyInfo component
      */
-    public function generate($object, array $context = [])
+    public function generate($object, array $context = array())
     {
         if (!isset($context['input']) || !($context['input'] instanceof Expr)) {
             throw new MissingContextException('Input variable not defined or not an Expr in generation context');
@@ -55,16 +55,16 @@ class NormalizableObjectTypeGenerator implements AstGeneratorInterface
             $normalizationArgs[] = new Arg($context['context']);
         }
 
-        $assign = [
+        $assign = array(
             new Expr\Assign($context['output'], new Expr\MethodCall(
                 $context['normalizer'],
                 'normalize',
                 $normalizationArgs
             ))
-        ];
+        );
 
         if (isset($context['condition']) && $context['condition']) {
-            return [new Stmt\If_(
+            return array(new Stmt\If_(
                 new Expr\BinaryOp\LogicalAnd(
                     new Expr\Instanceof_(new Expr\Variable('data'), new Name($object->getClassName())),
                     new Expr\MethodCall(
@@ -73,10 +73,10 @@ class NormalizableObjectTypeGenerator implements AstGeneratorInterface
                         $normalizationArgs
                     )
                 ),
-                [
+                array(
                     'stmts' => $assign
-                ]
-            )];
+                )
+            ));
         }
 
         return $assign;

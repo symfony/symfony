@@ -41,7 +41,7 @@ abstract class ObjectHydrateGenerator implements AstGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($object, array $context = [])
+    public function generate($object, array $context = array())
     {
         if (!isset($context['input']) || !($context['input'] instanceof Expr\Variable)) {
             throw new MissingContextException('Input variable not defined or not a Expr\Variable in generation context');
@@ -52,9 +52,9 @@ abstract class ObjectHydrateGenerator implements AstGeneratorInterface
         }
 
         $uniqueVariableScope = isset($context['unique_variable_scope']) ? $context['unique_variable_scope'] : new UniqueVariableScope();
-        $statements = [
+        $statements = array(
             new Expr\Assign($context['output'], new Expr\New_(new Name("\\".$object))),
-        ];
+        );
 
         foreach ($this->propertyInfoExtractor->getProperties($object, $context) as $property) {
             // Only hydrate writable property

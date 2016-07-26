@@ -32,7 +32,7 @@ class DenormalizableObjectTypeGenerator implements AstGeneratorInterface
      *
      * @param Type $object A type extracted with PropertyInfo component
      */
-    public function generate($object, array $context = [])
+    public function generate($object, array $context = array())
     {
         if (!isset($context['input']) || !($context['input'] instanceof Expr)) {
             throw new MissingContextException('Input variable not defined or not an Expr in generation context');
@@ -68,7 +68,7 @@ class DenormalizableObjectTypeGenerator implements AstGeneratorInterface
         ];
 
         if (isset($context['condition']) && $context['condition']) {
-            return [new Stmt\If_(
+            return array(new Stmt\If_(
                 new Expr\BinaryOp\LogicalAnd(
                     new Expr\MethodCall(
                         $context['denormalizer'],
@@ -76,10 +76,10 @@ class DenormalizableObjectTypeGenerator implements AstGeneratorInterface
                         $normalizationArgs
                     )
                 ),
-                [
+                array(
                     'stmts' => $assign
-                ]
-            )];
+                )
+            ));
         }
 
         return $assign;

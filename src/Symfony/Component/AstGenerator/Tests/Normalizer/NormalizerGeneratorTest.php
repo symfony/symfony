@@ -19,7 +19,9 @@ use Prophecy\Argument;
 use Symfony\Component\AstGenerator\AstGeneratorInterface;
 use Symfony\Component\AstGenerator\Normalizer\NormalizerGenerator;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 
 class NormalizerGeneratorTest extends \PHPUnit_Framework_TestCase
@@ -74,7 +76,8 @@ class NormalizerGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(NormalizerInterface::class, $dummyNormalizer);
         $this->assertInstanceOf(DenormalizerInterface::class, $dummyNormalizer);
-        $this->assertInstanceOf(SerializerAwareInterface::class, $dummyNormalizer);
+        $this->assertInstanceOf(DenormalizerAwareInterface::class, $dummyNormalizer);
+        $this->assertInstanceOf(NormalizerAwareInterface::class, $dummyNormalizer);
 
         $this->assertTrue($dummyNormalizer->supportsNormalization(new Dummy()));
         $this->assertTrue($dummyNormalizer->supportsDenormalization([], Dummy::class));

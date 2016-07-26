@@ -16,7 +16,7 @@ namespace Symfony\Component\AstGenerator;
  */
 class UniqueVariableScope
 {
-    private $registry = [];
+    private $registry = array();
 
     /**
      * Return an unique name for a variable.

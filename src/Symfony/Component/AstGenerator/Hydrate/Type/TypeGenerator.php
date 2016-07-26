@@ -26,28 +26,28 @@ use Symfony\Component\PropertyInfo\Type;
  */
 class TypeGenerator implements AstGeneratorInterface
 {
-    protected $supportedTypes = [
+    protected $supportedTypes = array(
         Type::BUILTIN_TYPE_BOOL,
         Type::BUILTIN_TYPE_FLOAT,
         Type::BUILTIN_TYPE_INT,
         Type::BUILTIN_TYPE_NULL,
         Type::BUILTIN_TYPE_STRING,
-    ];
+    );
 
-    protected $conditionMapping = [
+    protected $conditionMapping = array(
         Type::BUILTIN_TYPE_BOOL => 'is_bool',
         Type::BUILTIN_TYPE_FLOAT => 'is_float',
         Type::BUILTIN_TYPE_INT => 'is_int',
         Type::BUILTIN_TYPE_NULL => 'is_null',
         Type::BUILTIN_TYPE_STRING => 'is_string',
-    ];
+    );
 
     /**
      * {@inheritdoc}
      *
      * @param Type $object A type extracted with PropertyInfo component
      */
-    public function generate($object, array $context = [])
+    public function generate($object, array $context = array())
     {
         if (!isset($context['input']) || !($context['input'] instanceof Expr)) {
             throw new MissingContextException('Input variable not defined or not an Expr in generation context');
@@ -57,22 +57,22 @@ class TypeGenerator implements AstGeneratorInterface
             throw new MissingContextException('Output variable not defined or not an Expr in generation context');
         }
 
-        $assign = [
+        $assign = array(
             new Expr\Assign($context['output'], $context['input'])
-        ];
+        );
 
         if (isset($context['condition']) && $context['condition']) {
-            return [new Stmt\If_(
+            return array(new Stmt\If_(
                 new Expr\FuncCall(
                     new Name($this->conditionMapping[$object->getBuiltinType()]),
-                    [
+                    array(
                         new Arg($context['input'])
-                    ]
+                    )
                 ),
-                [
+                array(
                     'stmts' => $assign
-                ]
-            )];
+                )
+            ));
         }
 
         return $assign;

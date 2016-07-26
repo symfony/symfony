@@ -24,7 +24,7 @@ class AstGeneratorChain implements AstGeneratorInterface
     /** @var bool Whether the generation must return as soon as possible or use all generators, default to false */
     protected $returnOnFirst;
 
-    public function __construct(array $generators = [], $returnOnFirst = false)
+    public function __construct(array $generators = array(), $returnOnFirst = false)
     {
         $this->generators = $generators;
         $this->returnOnFirst = $returnOnFirst;
@@ -33,9 +33,9 @@ class AstGeneratorChain implements AstGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($object, array $context = [])
+    public function generate($object, array $context = array())
     {
-        $nodes = [];
+        $nodes = array();
 
         foreach ($this->generators as $generator) {
             if ($generator instanceof AstGeneratorInterface && $generator->supportsGeneration($object)) {

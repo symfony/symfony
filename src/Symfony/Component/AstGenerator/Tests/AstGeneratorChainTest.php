@@ -26,41 +26,41 @@ class AstGeneratorChainTest extends \PHPUnit_Framework_TestCase
 
     public function testSupports()
     {
-        $generatorSub = $this->getGeneratorMock(true, ['ast']);
+        $generatorSub = $this->getGeneratorMock(true, array('ast'));
 
-        $generator = new AstGeneratorChain([$generatorSub]);
+        $generator = new AstGeneratorChain(array($generatorSub));
         $this->assertTrue($generator->supportsGeneration('dummy'));
-        $this->assertEquals(['ast'], $generator->generate('dummy'));
+        $this->assertEquals(array('ast'), $generator->generate('dummy'));
     }
 
     public function testMultiSupports()
     {
-        $generatorSub1 = $this->getGeneratorMock(true, ['ast1']);
-        $generatorSub2 = $this->getGeneratorMock(true, ['ast2']);
+        $generatorSub1 = $this->getGeneratorMock(true, array('ast1'));
+        $generatorSub2 = $this->getGeneratorMock(true, array('ast2'));
 
-        $generator = new AstGeneratorChain([$generatorSub1, $generatorSub2]);
+        $generator = new AstGeneratorChain(array($generatorSub1, $generatorSub2));
         $this->assertTrue($generator->supportsGeneration('dummy'));
-        $this->assertEquals(['ast1', 'ast2'], $generator->generate('dummy'));
+        $this->assertEquals(array('ast1', 'ast2'), $generator->generate('dummy'));
     }
 
     public function testPartialSupports()
     {
-        $generatorSub1 = $this->getGeneratorMock(true, ['ast1']);
+        $generatorSub1 = $this->getGeneratorMock(true, array('ast1'));
         $generatorSub2 = $this->getGeneratorMock(false);
 
-        $generator = new AstGeneratorChain([$generatorSub1, $generatorSub2]);
+        $generator = new AstGeneratorChain(array($generatorSub1, $generatorSub2));
         $this->assertTrue($generator->supportsGeneration('dummy'));
-        $this->assertEquals(['ast1'], $generator->generate('dummy'));
+        $this->assertEquals(array('ast1'), $generator->generate('dummy'));
     }
 
     public function testMultiSupportsWithFirstReturn()
     {
-        $generatorSub1 = $this->getGeneratorMock(true, ['ast1']);
-        $generatorSub2 = $this->getGeneratorMock(true, ['ast2']);
+        $generatorSub1 = $this->getGeneratorMock(true, array('ast1'));
+        $generatorSub2 = $this->getGeneratorMock(true, array('ast2'));
 
-        $generator = new AstGeneratorChain([$generatorSub1, $generatorSub2], true);
+        $generator = new AstGeneratorChain(array($generatorSub1, $generatorSub2), true);
         $this->assertTrue($generator->supportsGeneration('dummy'));
-        $this->assertEquals(['ast1'], $generator->generate('dummy'));
+        $this->assertEquals(array('ast1'), $generator->generate('dummy'));
     }
 
     private function getGeneratorMock($support, $return = null)

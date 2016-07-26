@@ -35,12 +35,9 @@ class ContainerAwareAuthenticationProviderManager extends AbstractAuthentication
 
     protected function getProviders()
     {
-        $providers = array();
         foreach ($this->providerServiceIds as $serviceId) {
-            $providers[] = $this->container->get($serviceId);
+            yield $this->container->get($serviceId);
         }
-
-        return $providers;
     }
 
     protected function shouldEraseCredentials()

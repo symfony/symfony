@@ -38,19 +38,20 @@ class ContainerAwareAuthenticationProviderManagerTest extends \PHPUnit_Framework
 
     public function testAuthenticateReturnsTokenOfTheFirstMatchingProvider()
     {
-        $second = $this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface');
-        $second
+        $third = $this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface');
+        $third
             ->expects($this->never())
             ->method('supports')
         ;
 
         $container = $this->getContainer(array(
-            'first_provider' => $this->getAuthenticationProvider(true, $expected = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
-            'second_provider' => $second,
+            'first_provider' => $this->getAuthenticationProvider(false),
+            'second_provider' => $this->getAuthenticationProvider(true, $expected = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
+            'third_provider' => $third,
         ));
 
         $manager = new ContainerAwareAuthenticationProviderManager(
-            array('first_provider', 'second_provider'),
+            array('first_provider', 'second_provider', 'third_provider'),
             $container
         );
 

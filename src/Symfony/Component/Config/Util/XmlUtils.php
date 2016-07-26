@@ -123,7 +123,7 @@ class XmlUtils
      *
      * @return array A PHP array
      */
-    public static function convertDomElementToArray(\DomElement $element, $checkPrefix = true)
+    public static function convertDomElementToArray(\DOMElement $element, $checkPrefix = true)
     {
         $prefix = (string) $element->prefix;
         $empty = true;

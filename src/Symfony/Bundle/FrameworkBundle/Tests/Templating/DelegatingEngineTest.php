@@ -38,7 +38,7 @@ class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
 
         $delegatingEngine = new DelegatingEngine($container, array('engine.first', 'engine.second'));
 
-        $this->assertSame($secondEngine, $delegatingEngine->getEngine('template.php', array('foo' => 'bar')));
+        $this->assertSame($secondEngine, $delegatingEngine->getEngine('template.php'));
     }
 
     /**
@@ -55,7 +55,7 @@ class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
         ));
 
         $delegatingEngine = new DelegatingEngine($container, array('engine.first', 'engine.second'));
-        $delegatingEngine->getEngine('template.php', array('foo' => 'bar'));
+        $delegatingEngine->getEngine('template.php');
     }
 
     public function testRenderResponseWithFrameworkEngine()

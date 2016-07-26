@@ -185,6 +185,48 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCanBeDisabled()
+    {
+        $node = new ArrayNodeDefinition('root');
+        $node->canBeDisabled();
+
+        $this->assertTrue($this->getField($node, 'addDefaults'));
+        $this->assertEquals(array('enabled' => false), $this->getField($node, 'falseEquivalent'));
+        $this->assertEquals(array('enabled' => true), $this->getField($node, 'trueEquivalent'));
+        $this->assertEquals(array('enabled' => true), $this->getField($node, 'nullEquivalent'));
+
+        $nodeChildren = $this->getField($node, 'children');
+        $this->assertArrayHasKey('enabled', $nodeChildren);
+
+        $enabledNode = $nodeChildren['enabled'];
+        $this->assertTrue($this->getField($enabledNode, 'default'));
+        $this->assertTrue($this->getField($enabledNode, 'defaultValue'));
+    }
+
+    public function testIgnoreExtraKeys()
+    {
+        $node = new ArrayNodeDefinition('root');
+
+        $this->assertFalse($this->getField($node, 'ignoreExtraKeys'));
+
+        $result = $node->ignoreExtraKeys();
+
+        $this->assertEquals($node, $result);
+        $this->assertTrue($this->getField($node, 'ignoreExtraKeys'));
+    }
+
+    public function testNormalizeKeys()
+    {
+        $node = new ArrayNodeDefinition('root');
+
+        $this->assertTrue($this->getField($node, 'normalizeKeys'));
+
+        $result = $node->normalizeKeys(false);
+
+        $this->assertEquals($node, $result);
+        $this->assertFalse($this->getField($node, 'normalizeKeys'));
+    }
+
     public function getEnableableNodeFixtures()
     {
         return array(

@@ -67,7 +67,7 @@ class SymfonyQuestionHelper extends QuestionHelper
 
                 break;
 
-            case $question instanceof ChoiceQuestion && $question->isMultiSelect():
+            case $question instanceof ChoiceQuestion && $question->isMultiselect():
                 $choices = $question->getChoices();
                 $default = explode(',', $default);
 

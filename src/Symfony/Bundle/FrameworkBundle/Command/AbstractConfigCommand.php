@@ -47,7 +47,7 @@ abstract class AbstractConfigCommand extends ContainerDebugCommand
         } else {
             $output->writeln($title);
             $table = new Table($output);
-            $table->setHeaders($headers)->setRows($rows)->render($output);
+            $table->setHeaders($headers)->setRows($rows)->render();
         }
     }
 

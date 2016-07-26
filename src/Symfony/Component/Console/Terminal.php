@@ -81,7 +81,7 @@ class Terminal
     /**
      * Runs and parses mode CON if it's available, suppressing any error output.
      *
-     * @return array|null An array composed of the width and the height or null if it could not be parsed
+     * @return int[]|null An array composed of the width and the height or null if it could not be parsed
      */
     private static function getConsoleMode()
     {
@@ -109,7 +109,7 @@ class Terminal
     /**
      * Runs and parses stty -a if it's available, suppressing any error output.
      *
-     * @return string
+     * @return string|null
      */
     private static function getSttyColumns()
     {

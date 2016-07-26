@@ -314,10 +314,10 @@ abstract class AbstractDoctrineExtension extends Extension
     /**
      * Loads a cache driver.
      *
-     * @param string                                                  $cacheDriverServiceId The cache driver name
-     * @param string                                                  $objectManagerName    The object manager name
-     * @param array                                                   $cacheDriver          The cache driver mapping
-     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container            The ContainerBuilder instance
+     * @param string           $cacheName         The cache driver name
+     * @param string           $objectManagerName The object manager name
+     * @param array            $cacheDriver       The cache driver mapping
+     * @param ContainerBuilder $container         The ContainerBuilder instance
      *
      * @return string
      *

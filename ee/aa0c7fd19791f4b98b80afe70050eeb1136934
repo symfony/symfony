@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-19T22:57:45Z
+
+Why do we even return the command ? IMO we should instead return a boolean specifiing whether or not the command was added to the application.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-07-19T23:02:33Z
+
+> IMO we should instead return a boolean specifiing whether or not the command was added to the application.
+
+What do you suggest to do with `false` result? Try to add command again?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-19T23:17:02Z
+
+Nothing in the core but it might be useful in third party libraries. At least more that returning one of the parameter passed.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-07-20T05:14:48Z
+
+it is done so you chain things up like;
+```php
+$app->add(new MyCommand())->myCommandMethod('called after construction and adding');
+```
+
+this only works if you always get an object back.
+So it might make more sense to either throw an exception or allow adding a disabled command so it can be enabled later on and still be used. (and updating the PHPDoc and test would be nice as well ;) )
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-20T06:06:02Z
+
+I think the behavior was correct, just need to update the docblock.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-07-20T08:09:38Z
+
+Updated the doc and the return value.
+SF switched to explicit `null` return to support the new return `void` 'type' right?
+(i.e. fabbot is wrong on this one)
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-07-20T20:57:01Z
+
+> Nothing in the core but it might be useful in third party libraries.
+
+I think that `@return bool` is poor replacement for exceptions when it is supposed to describe whether command (in general meaning of this term, not CLI one) succeeded.
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-07-20T21:04:42Z
+
+@unkind I agree, I would expect that the only returned value is the Command added and if it wasn't an exception was thrown. But I think the PR is a nice compromise, having a correct PHPDoc is a nice little improvement, I don't want the PR to grow bigger than needed :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-07-22T13:57:42Z
+
+👍
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-07-25T17:57:59Z
+
+cleaned up to the minimal of changes to get the type hint correct on end points

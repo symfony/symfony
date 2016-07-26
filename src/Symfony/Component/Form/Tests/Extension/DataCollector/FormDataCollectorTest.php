@@ -123,7 +123,7 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
              'config' => 'foo',
              'default_data' => 'foo',
              'submitted_data' => 'foo',
-             'expanded' => false,
+             'has_children_error' => false,
              'children' => array(
                  'child' => $childFormData,
              ),
@@ -324,7 +324,7 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
             'config' => 'foo',
             'default_data' => 'foo',
             'submitted_data' => 'foo',
-            'expanded' => false,
+            'has_children_error' => false,
             'children' => array(
                 'child' => $childFormData,
             ),
@@ -579,11 +579,11 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
         $child2Data = $formData['children']['child2'];
         $child21Data = $child2Data['children']['child21'];
 
-        $this->assertTrue($formData['expanded']);
-        $this->assertTrue($child1Data['expanded']);
-        $this->assertFalse(isset($child11Data['expanded']), 'The leaf data does not contains "expanded" property.');
-        $this->assertFalse($child2Data['expanded']);
-        $this->assertFalse(isset($child21Data['expanded']), 'The leaf data does not contains "expanded" property.');
+        $this->assertTrue($formData['has_children_error']);
+        $this->assertTrue($child1Data['has_children_error']);
+        $this->assertFalse(isset($child11Data['has_children_error']), 'The leaf data does not contains "has_children_error" property.');
+        $this->assertFalse($child2Data['has_children_error']);
+        $this->assertFalse(isset($child21Data['has_children_error']), 'The leaf data does not contains "has_children_error" property.');
     }
 
     private function createForm($name)

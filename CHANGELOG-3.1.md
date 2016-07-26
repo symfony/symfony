@@ -217,3 +217,4 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #17133 [DependencyInjection] Make YamlFileLoader raise a deprecation notice if a service definition contains unsupported keywords. (hhamon)
  * feature #17191 [Serializer] Move the normalization logic in an abstract class (dunglas)
  * feature #16994 [Form] Deprecate the "choices_as_values" option of ChoiceType (nicolas-grekas)
+ * feature #19432 [Translation] [TwigBridge] [FrameworkBundle] Uses a Default 'Number' Index on Translation Pluralisation Methods

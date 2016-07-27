@@ -20,7 +20,8 @@
         "symfony/filesystem": "~2.8|~3.0"
     },
     "suggest": {
-        "symfony/yaml": "To use the yaml reference dumper"
+        "symfony/yaml": "To use the yaml reference dumper",
+        "symfony/expression-language": "To use the expression node type"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Config\\": "" },

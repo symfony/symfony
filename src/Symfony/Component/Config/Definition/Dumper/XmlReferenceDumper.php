@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
  * Dumps a XML reference configuration for the given configuration/node instance.
@@ -118,6 +119,10 @@ class XmlReferenceDumper
 
                             case 'Symfony\Component\Config\Definition\EnumNode':
                                 $prototypeValue = implode('|', array_map('json_encode', $prototype->getValues()));
+                                break;
+
+                            case 'Symfony\Component\Config\Definition\ExpressionNode':
+                                $prototypeValue = 'expression';
                                 break;
 
                             default:
@@ -295,6 +300,10 @@ class XmlReferenceDumper
 
         if (empty($value)) {
             return '';
+        }
+
+        if ($value instanceof Expression) {
+            return (string) $value;
         }
 
         if (is_array($value)) {

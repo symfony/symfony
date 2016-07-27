@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\EnumNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Yaml\Inline;
 
 /**
@@ -106,6 +107,8 @@ class YamlReferenceDumper
                     } elseif (!is_array($example)) {
                         $default = '[]';
                     }
+                } elseif ($default instanceof Expression) {
+                    $default = Inline::dump((string) $default);
                 } else {
                     $default = Inline::dump($default);
                 }

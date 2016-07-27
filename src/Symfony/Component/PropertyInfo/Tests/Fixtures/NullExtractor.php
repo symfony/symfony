@@ -79,7 +79,7 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     private function assertIsString($string)
     {
         if (!is_string($string)) {
-            throw new \Exception(sprintf('"%s" expects strings, given "%s".', __CLASS__, gettype($string)));
+            throw new \InvalidArgumentException(sprintf('"%s" expects strings, given "%s".', __CLASS__, gettype($string)));
         }
     }
 }

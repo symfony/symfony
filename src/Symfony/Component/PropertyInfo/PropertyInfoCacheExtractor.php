@@ -108,7 +108,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
 
         $key = $this->escape($method.'.'.$serializedArguments);
 
-        if (isset($this->arrayCache[$key])) {
+        if (array_key_exists($key, $this->arrayCache)) {
             return $this->arrayCache[$key];
         }
 

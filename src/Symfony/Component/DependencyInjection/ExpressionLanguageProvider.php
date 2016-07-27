@@ -19,6 +19,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  *
  * To get a service, use service('request').
  * To get a parameter, use parameter('kernel.debug').
+ * To get an environment variable, use env('UID').
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -38,6 +39,20 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             }, function (array $variables, $value) {
                 return $variables['container']->getParameter($value);
             }),
+
+            new ExpressionFunction('env', function ($arg, $default = null) {
+                if (2 > func_num_args()) {
+                    return sprintf('$this->getEnvironmentVariable(%s)', $arg);
+                }
+
+                return sprintf('$this->getEnvironmentVariable(%s, %s)', $arg, $default);
+            }, \Closure::bind(function (array $variables, $value, $default = null) {
+                if (3 > func_num_args()) {
+                    return $variables['container']->getEnvironmentVariable($value);
+                }
+
+                return $variables['container']->getEnvironmentVariable($value, $default);
+            }, null, Container::class)),
         );
     }
 }

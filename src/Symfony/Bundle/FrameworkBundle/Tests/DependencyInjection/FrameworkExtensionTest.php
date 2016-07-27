@@ -462,6 +462,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertEquals('Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader', $argument[0]->getClass());
         $this->assertNull($container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
         $this->assertEquals(new Reference('serializer.name_converter.camel_case_to_snake_case'), $container->getDefinition('serializer.normalizer.object')->getArgument(1));
+        $this->assertEquals(new Reference('property_info', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE), $container->getDefinition('serializer.normalizer.object')->getArgument(3));
     }
 
     public function testRegisterSerializerExtractor()

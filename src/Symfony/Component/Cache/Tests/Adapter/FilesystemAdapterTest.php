@@ -11,21 +11,20 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 /**
  * @group time-sensitive
  */
-class FilesystemAdapterTest extends CachePoolTest
+class FilesystemAdapterTest extends AdapterTestCase
 {
-    public function createCachePool()
+    public function createCachePool($defaultLifetime = 0)
     {
         if (defined('HHVM_VERSION')) {
             $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
         }
 
-        return new FilesystemAdapter('sf-cache');
+        return new FilesystemAdapter('', $defaultLifetime);
     }
 
     public static function tearDownAfterClass()

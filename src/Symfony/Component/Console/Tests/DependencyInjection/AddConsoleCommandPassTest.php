@@ -9,17 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\Console\Tests\DependencyInjection;
 
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass;
+use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * @group legacy
- */
 class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -28,8 +25,9 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
     public function testProcess($public)
     {
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->addCompilerPass(new AddConsoleCommandPass());
-        $container->setParameter('my-command.class', 'Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
+        $container->setParameter('my-command.class', 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand');
 
         $definition = new Definition('%my-command.class%');
         $definition->setPublic($public);
@@ -38,17 +36,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
 
         $container->compile();
 
-        $alias = 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
-        if ($container->hasAlias($alias)) {
-            $this->assertSame('my-command', (string) $container->getAlias($alias));
-        } else {
-            // The alias is replaced by a Definition by the ReplaceAliasByActualDefinitionPass
-            // in case the original service is private
-            $this->assertFalse($container->hasDefinition('my-command'));
-            $this->assertTrue($container->hasDefinition($alias));
-        }
-
-        $id = $public ? 'my-command' : 'console.command.symfony_bundle_frameworkbundle_tests_dependencyinjection_compiler_mycommand';
+        $id = $public ? 'my-command' : 'console.command.symfony_component_console_tests_dependencyinjection_mycommand';
         $this->assertTrue($container->hasParameter('console.command.ids'));
         $this->assertSame(array($id), $container->getParameter('console.command.ids'));
     }
@@ -68,9 +56,10 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
     public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
     {
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->addCompilerPass(new AddConsoleCommandPass());
 
-        $definition = new Definition('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
+        $definition = new Definition('Symfony\Component\Console\Tests\DependencyInjection\MyCommand');
         $definition->addTag('console.command');
         $definition->setAbstract(true);
         $container->setDefinition('my-command', $definition);
@@ -85,6 +74,7 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
     public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()
     {
         $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
         $container->addCompilerPass(new AddConsoleCommandPass());
 
         $definition = new Definition('SplObjectStorage');

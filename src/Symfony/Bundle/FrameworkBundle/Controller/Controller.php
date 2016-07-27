@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
@@ -367,16 +366,12 @@ abstract class Controller implements ContainerAwareInterface
      *
      * @return mixed
      *
-     * @deprecated as of 3.2 and will be removed in 4.0. You can typehint your method argument with Symfony\Component\Security\Core\User\UserInterface instead.
-     *
      * @throws \LogicException If SecurityBundle is not available
      *
      * @see TokenInterface::getUser()
      */
     protected function getUser()
     {
-        @trigger_error(sprintf('%s() is deprecated as of 3.2 and will be removed in 4.0. You can typehint your method argument with %s instead.', __METHOD__, UserInterface::class), E_USER_DEPRECATED);
-
         if (!$this->container->has('security.token_storage')) {
             throw new \LogicException('The SecurityBundle is not registered in your application.');
         }

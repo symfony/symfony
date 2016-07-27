@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-26T14:08:46Z
+
+Good catch! The new config flag isn't necessary because the ObjectNormalizer class already contains a test to determine if it can use the PropertyInfo component or not.
+
+This PR must be merged in 3.1 as bug fix.
+
+You're right, there are a lot of missing docs for the Symfony Serializer (this feature, the MaxDepth annotation, new normalizers like the data: URI one, new encoders...). I've started working on updating the doc but don't except PRs before the end of August (any help welcome, most PRs already include a documentation draft in their descriptions).
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2016-07-26T14:22:36Z
+
+done :) should i create a new PR for symfony 3.1?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-26T16:28:41Z
+
+Thanks. No we are able to merge directly this PR in the right branch.
+
+Status: reviewed
+
+:+1:

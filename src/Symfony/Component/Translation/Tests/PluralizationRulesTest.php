@@ -31,7 +31,7 @@ class PluralizationRulesTest extends \PHPUnit_Framework_TestCase
     /**
      * We test failed langcode here.
      *
-     * TODO: The languages mentioned in the data provide need to g  et fixed somehow within PluralizationRules.
+     * TODO: The languages mentioned in the data provide need to get fixed somehow within PluralizationRules.
      *
      * @dataProvider failingLangcodes
      */

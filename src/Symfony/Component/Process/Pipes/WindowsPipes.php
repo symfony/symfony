@@ -52,27 +52,30 @@ class WindowsPipes extends AbstractPipes
                 Process::STDERR => Process::ERR,
             );
             $tmpDir = sys_get_temp_dir();
-            if (!@fopen($file = $tmpDir.'\\sf_proc_00.check', 'wb')) {
-                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
-            }
-            @unlink($file);
+            $error = 'unknown reason';
+            set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
             for ($i = 0;; ++$i) {
                 foreach ($pipes as $pipe => $name) {
                     $file = sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
-                    if (file_exists($file) && !@unlink($file)) {
+                    if (file_exists($file) && !unlink($file)) {
                         continue 2;
                     }
-                    $h = @fopen($file, 'xb');
+                    $h = fopen($file, 'xb');
+                    if (!$h && false === strpos($error, 'File exists')) {
+                        restore_error_handler();
+                        throw new RuntimeException(sprintf('A temporary file could not be opened to write the process output: %s', $error));
+                    }
                     if (!$h || !$this->fileHandles[$pipe] = fopen($file, 'rb')) {
                         continue 2;
                     }
                     if (isset($this->files[$pipe])) {
-                        @unlink($this->files[$pipe]);
+                        unlink($this->files[$pipe]);
                     }
                     $this->files[$pipe] = $file;
                 }
                 break;
             }
+            restore_error_handler();
         }
 
         parent::__construct($input);

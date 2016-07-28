@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2016-07-06T12:37:32Z
+
+Appveyor tests fail because HttpCacheTestCase tries to clear directories and lacks permissions to unlink LockHandler's lockfiles.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2016-07-06T16:32:09Z
+
+@nicolas-grekas you seem to be the master of tests here. How would you approach this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-06T16:37:24Z
+
+On Windows, a file can't be unlinked until all handlers to it have been closed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-17T19:48:09Z
+
+Not sure this is the right approach: a real lock file will create another race condition unless the lock file is *not* unlinked (the race being when a lock is acquired but another process unlinks the just locked file).
+Let's assume we don't want to leave lock files behind, we can't use `flock()` to fix the race...
+Would a shutdown registered function help instead? Or do you really encounter a situation where your process is abruptly killed? Then what about adding a timeout on lock files, based on filemtime()?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2016-07-17T20:48:07Z
+
+@nicolas-grekas Not sure I got your above comment right 😦
+
+My intention was to use `LockHandler` because it applies `flock()` based locking, i. e. the lock will be released (by the OS) when the process holding it crashes/terminates/exits.
+
+In fact `LockHandler` leaves the file used for `flock()` behind, but that should not matter.
+
+Regarding the Windows tests, for some reason `LockHandler` seems to still hold references to a file when some `tearDown()` method tries to clean up a directory.
+
+Do you have any idea how I could debug this? I don't have a Windows machine with PHP set up anywhere near... :-(
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-18T05:24:39Z
+
+> In fact LockHandler leaves the file used for flock() behind, but that should not matter.
+
+We need to be sure of that. It will leave standalone files forever, and their number can grow large. Does it really not matter?
+
+If we assume yes (which need confirmation), then maybe use flock directly here? The LockHandler only adds boilerplate to me in this case.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2016-07-18T08:27:00Z
+
+I am using `LockHandler` in various other places and yes, it leaves `sf.{someId}.lock` files in the filesystem also after you release a lock and/or the process terminates. Also, `LockHandler` does not call `unlink()` anywhere.
+
+This PR places the lock files in the same directory as the cache entry in question. So I'd say yes, this can double the amount of files present in the `http_cache` directory.
+
+> a real lock file will create another race condition unless the lock file is not unlinked (the race being when a lock is acquired but another process unlinks the just locked file).
+
+Now I get that: You cannot safely `unlink()` the lock file, because you'd need to release the lock first; and after that, you cannot tell whether another process obtained another lock that prevents us from deleting the file. Probably that's why `LockHandler` just leaves the files alone.
+
+>  The LockHandler only adds boilerplate to me in this case.
+
+My assumption was that all it does was to handle the edge-cases and platform inconsistencies of using file locking, tested and packed up behind a simple API. Don't you think I'd have to reinvent all this if I refrain from using `LockHandler`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-18T09:07:03Z
+
+Then what about locking the cache file itself instead of creating a dedicated lock file? Using flock directly also should be better, there are no special inconsistencies to deal with in LockHandler
+
+---------------------------------------------------------------------------
+
+by mpdude at 2016-07-18T15:27:30Z
+
+Note to self: flock() also supports shared "reader" locks, might be an additional advantage here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-19T08:40:18Z
+
+Looks like a matter of correctly implementing it to me and not fall into the dangerous traps, isn't it?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2016-07-19T16:52:24Z
+
+Locking was only applied when an existing cache entry was updated, so no need for shared (read) locks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-26T07:12:45Z
+
+See proposal at https://github.com/nicolas-grekas/symfony/pull/5
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-26T13:19:24Z
+
+:+1: :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-07-26T13:44:41Z
+
+:+1:

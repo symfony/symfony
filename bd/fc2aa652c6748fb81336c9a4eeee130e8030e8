@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-27T10:48:58Z
+
+Shouldn't it target master instead of 2.7?
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-07-27T10:51:52Z
+
+why is that, it is not a BC?
+(happy to retarget btw.)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-27T18:28:56Z
+
+It might if some code rely on the message (very unlikely but you have the case with the tests), let's wait for fabpot pov anyway :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-27T22:54:01Z
+
+We can change an exception message, which is not part of the BC promise. Nobody should ever rely on an exception message in code anyway.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-28T05:51:46Z
+
+Ok then big 👍 :)

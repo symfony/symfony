@@ -302,7 +302,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function testParseTagsWithoutNameThrowsException()
     {
@@ -312,7 +312,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedException InvalidArgumentException
      * @expectedExceptionMessageRegExp /The tag name for service ".+" in .* must be a non-empty string/
      */
     public function testParseTagWithEmptyNameThrowsException()

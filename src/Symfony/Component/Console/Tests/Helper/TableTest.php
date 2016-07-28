@@ -695,7 +695,7 @@ TABLE;
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Style "absent" is not defined.
      */
     public function testIsNotDefinedStyleException()
@@ -705,7 +705,7 @@ TABLE;
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Style "absent" is not defined.
      */
     public function testGetStyleDefinition()

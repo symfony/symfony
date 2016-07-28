@@ -264,15 +264,14 @@ EOTXT
 
         if (method_exists($twig, 'getSource')) {
             $twig = <<<EOTXT
-          foo.twig:2: """
-            foo bar\\n
-              twig source\\n
-            \\n
-            """
-
+foo.twig: {
+        1: foo bar
+        2:   twig source
+        3: 
+      }
 EOTXT;
         } else {
-            $twig = '';
+            $twig = '%A';
         }
 
         $r = defined('HHVM_VERSION') ? '' : '#%d';
@@ -289,50 +288,26 @@ stream resource {@{$ref}
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     -trace: {
-      %d. __TwigTemplate_VarDumperFixture_u75a09->doDisplay() ==> new Exception(): {
-        src: {
-          %sTwig.php:19: """
-                // line 2\\n
-                throw new \Exception('Foobar');\\n
-            }\\n
-            """
-{$twig}        }
+      %d. {$twig}
+      %d. %sTemplate.php: {
+        %d: try {
+        %d:     \$this->doDisplay(\$context, \$blocks);
+        %d: } catch (Twig_Error \$e) {
       }
-      %d. Twig_Template->displayWithErrorHandling() ==> __TwigTemplate_VarDumperFixture_u75a09->doDisplay(): {
-        src: {
-          %sTemplate.php:%d: """
-            try {\\n
-                \$this->doDisplay(\$context, \$blocks);\\n
-            } catch (Twig_Error \$e) {\\n
-            """
-        }
+      %d. %sTemplate.php: {
+        %d: {
+        %d:     \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));
+        %d: }
       }
-      %d. Twig_Template->display() ==> Twig_Template->displayWithErrorHandling(): {
-        src: {
-          %sTemplate.php:%d: """
-            {\\n
-                \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));\\n
-            }\\n
-            """
-        }
+      %d. %sTemplate.php: {
+        %d: try {
+        %d:     \$this->display(\$context);
+        %d: } catch (Exception \$e) {
       }
-      %d. Twig_Template->render() ==> Twig_Template->display(): {
-        src: {
-          %sTemplate.php:%d: """
-            try {\\n
-                \$this->display(\$context);\\n
-            } catch (Exception \$e) {\\n
-            """
-        }
-      }
-      %d. %slosure%s() ==> Twig_Template->render(): {
-        src: {
-          %sCliDumperTest.php:{$line}: """
-                    }\\n
-                };'),\\n
-            ));\\n
-            """
-        }
+      %d. %sCliDumperTest.php: {
+        %d:         }
+        {$line}:     };'),
+        %d: ));
       }
     }
   }

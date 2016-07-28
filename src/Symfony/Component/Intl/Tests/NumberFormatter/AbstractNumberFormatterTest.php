@@ -656,7 +656,7 @@ abstract class AbstractNumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $formatter = $this->getNumberFormatter('en', NumberFormatter::DECIMAL);
         $parsedValue = $formatter->parse($value, NumberFormatter::TYPE_INT32);
-        $this->assertSame($expected, $parsedValue);
+        $this->assertSame($expected, $parsedValue, $message);
     }
 
     public function parseTypeInt32Provider()

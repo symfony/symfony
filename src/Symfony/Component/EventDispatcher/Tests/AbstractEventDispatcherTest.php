@@ -128,7 +128,7 @@ abstract class AbstractEventDispatcherTest extends \PHPUnit_Framework_TestCase
     public function testLegacyDispatch()
     {
         $event = new Event();
-        $return = $this->dispatcher->dispatch(self::preFoo, $event);
+        $this->dispatcher->dispatch(self::preFoo, $event);
         $this->assertEquals('pre.foo', $event->getName());
     }
 

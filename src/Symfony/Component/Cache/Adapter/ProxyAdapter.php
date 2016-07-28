@@ -144,6 +144,9 @@ class ProxyAdapter implements AdapterInterface
         }
         $item = (array) $item;
         $expiry = $item["\0*\0expiry"];
+        if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {
+            $expiry = time() + $item["\0*\0defaultLifetime"];
+        }
         $innerItem = $item["\0*\0poolHash"] === $this->poolHash ? $item["\0*\0innerItem"] : $this->pool->getItem($this->namespace.$item["\0*\0key"]);
         $innerItem->set($item["\0*\0value"]);
         $innerItem->expiresAt(null !== $expiry ? \DateTime::createFromFormat('U', $expiry) : null);

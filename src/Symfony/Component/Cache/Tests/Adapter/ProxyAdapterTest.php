@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
@@ -20,16 +19,16 @@ use Symfony\Component\Cache\CacheItem;
 /**
  * @group time-sensitive
  */
-class ProxyAdapterTest extends CachePoolTest
+class ProxyAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = array(
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
     );
 
-    public function createCachePool()
+    public function createCachePool($defaultLifetime = 0)
     {
-        return new ProxyAdapter(new ArrayAdapter());
+        return new ProxyAdapter(new ArrayAdapter(), '', $defaultLifetime);
     }
 
     /**

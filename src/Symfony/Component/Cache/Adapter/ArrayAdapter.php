@@ -151,6 +151,9 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
                 return false;
             }
         }
+        if (null === $expiry && 0 < $item["\0*\0defaultLifetime"]) {
+            $expiry = time() + $item["\0*\0defaultLifetime"];
+        }
 
         $this->values[$key] = $value;
         $this->expiries[$key] = null !== $expiry ? $expiry : PHP_INT_MAX;

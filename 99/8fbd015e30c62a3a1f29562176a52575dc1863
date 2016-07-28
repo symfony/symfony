@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-28T09:21:30Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-28T14:37:01Z
+
+LGTM now. Can you submit another PR for Symfony 2.7 (keep this one open as it's going to be merged as well for more recent versions of Symfony)?
+
+---------------------------------------------------------------------------
+
+by ReenExe at 2016-07-28T15:52:03Z
+
+@fabpot, try with cherry-pick but have conflicts. Can i make new PR in 2.7 (arm move changes) and close this PR?
+
+---------------------------------------------------------------------------
+
+by ReenExe at 2016-07-28T15:54:46Z
+
+Also in 2.7
+1. abcent method `Table::setColumnStyle`
+2. Use `\InvalidArgumentException` instead `\Symfony\...\InvalidArgumentException`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-28T16:04:17Z
+
+you should close this one yes, then open a new one against 2.7, then if you'd like another one against the first branch where setColumnStyle exists (and so on).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-28T16:10:49Z
+
+No, please, don't close this one. @ReenExe You are right, that's why I need a specific PR for 2.7. This one will still be merged for the additional changes. Thanks.
+
+---------------------------------------------------------------------------
+
+by ReenExe at 2016-07-28T16:13:19Z
+
+@fabpot, i will try, but conflict stay between branches - it's normal?
+In next time first changes make to 2.7 and next in master? (maybe miss some manual from Contributing)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-28T16:20:06Z
+
+Just submit a PR on 2.7 and I will take care of merge conflict myself.
+
+---------------------------------------------------------------------------
+
+by ReenExe at 2016-07-28T16:20:25Z
+
+Make new PR - thats only covers bugfix #19470
+
+---------------------------------------------------------------------------
+
+by ReenExe at 2016-07-28T16:25:48Z
+
+@fabpot, i see this after try submit (make my branch from `master`)
+![first-symfony-pr-conflict](https://cloud.githubusercontent.com/assets/10358615/17220685/0478157e-54f9-11e6-9abe-d0388d2999d2.png)

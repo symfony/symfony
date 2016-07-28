@@ -151,13 +151,7 @@ class Table
     {
         $columnIndex = intval($columnIndex);
 
-        if ($name instanceof TableStyle) {
-            $this->columnStyles[$columnIndex] = $name;
-        } elseif (isset(self::$styles[$name])) {
-            $this->columnStyles[$columnIndex] = self::$styles[$name];
-        } else {
-            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
-        }
+        $this->columnStyles[$columnIndex] = $this->resolveStyle($name);
 
         return $this;
     }

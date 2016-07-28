@@ -11,21 +11,20 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * @group time-sensitive
  */
-class ArrayAdapterTest extends CachePoolTest
+class ArrayAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = array(
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
     );
 
-    public function createCachePool()
+    public function createCachePool($defaultLifetime = 0)
     {
-        return new ArrayAdapter();
+        return new ArrayAdapter($defaultLifetime);
     }
 }

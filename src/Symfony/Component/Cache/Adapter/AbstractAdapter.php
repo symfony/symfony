@@ -56,7 +56,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
 
                 foreach ($deferred as $key => $item) {
                     if (null === $item->expiry) {
-                        $byLifetime[0][$namespace.$key] = $item->value;
+                        $byLifetime[0 < $item->defaultLifetime ? $item->defaultLifetime : 0][$namespace.$key] = $item->value;
                     } elseif ($item->expiry > $now) {
                         $byLifetime[$item->expiry - $now][$namespace.$key] = $item->value;
                     } else {

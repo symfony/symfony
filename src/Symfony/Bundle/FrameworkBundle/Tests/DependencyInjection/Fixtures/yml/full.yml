@@ -53,6 +53,10 @@ framework:
          enabled:        true
          enable_annotations: true
          name_converter: serializer.name_converter.camel_case_to_snake_case
+    property_access:
+         enable_annotations: true
+         magic_call: false
+         throw_exception_on_invalid_index: false
     ide: file%%link%%format
     request:
         formats:

@@ -628,6 +628,8 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->info('Property access configuration')
                     ->children()
+                        ->scalarNode('cache')->end()
+                        ->booleanNode('enable_annotations')->defaultFalse()->end()
                         ->booleanNode('magic_call')->defaultFalse()->end()
                         ->booleanNode('throw_exception_on_invalid_index')->defaultFalse()->end()
                     ->end()

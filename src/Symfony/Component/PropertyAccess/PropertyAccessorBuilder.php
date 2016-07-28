@@ -12,11 +12,13 @@
 namespace Symfony\Component\PropertyAccess;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\PropertyAccess\Mapping\Factory\MetadataFactoryInterface;
 
 /**
  * A configurable builder to create a PropertyAccessor.
  *
  * @author Jérémie Augustin <jeremie.augustin@pixel-cookers.com>
+ * @author Luis Ramón López <lrlopez@gmail.com>
  */
 class PropertyAccessorBuilder
 {
@@ -34,6 +36,11 @@ class PropertyAccessorBuilder
      * @var CacheItemPoolInterface|null
      */
     private $cacheItemPool;
+
+    /**
+     * @var MetadataFactoryInterface
+     */
+    private $metadataFactoryInterface = null;
 
     /**
      * Enables the use of "__call" by the PropertyAccessor.
@@ -129,12 +136,35 @@ class PropertyAccessorBuilder
     }
 
     /**
+     * Allows to take into account metadata in order to override getter/setter/adder and remover method
+     * calls to properties.
+     *
+     * @param MetadataFactoryInterface|null $metadataFactoryInterface
+     *
+     * @return PropertyAccessorBuilder The builder object
+     */
+    public function setMetadataFactory(MetadataFactoryInterface $metadataFactoryInterface = null)
+    {
+        $this->metadataFactoryInterface = $metadataFactoryInterface;
+
+        return $this;
+    }
+
+    /**
+     * @return MetadataFactoryInterface|null the current object that retrieves metadata or null if not used
+     */
+    public function getMetadataFactory()
+    {
+        return $this->metadataFactoryInterface;
+    }
+
+    /**
      * Builds and returns a new PropertyAccessor object.
      *
      * @return PropertyAccessorInterface The built PropertyAccessor
      */
     public function getPropertyAccessor()
     {
-        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool);
+        return new PropertyAccessor($this->magicCall, $this->throwExceptionOnInvalidIndex, $this->cacheItemPool, $this->metadataFactoryInterface);
     }
 }

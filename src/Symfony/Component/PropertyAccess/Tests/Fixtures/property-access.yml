@@ -1,0 +1,9 @@
+'Symfony\Component\PropertyAccess\Tests\Fixtures\Dummy':
+  properties:
+    foo:
+      getter: getter1
+      setter: setter1
+      adder: adder1
+      remover: remover1
+    bar:
+      getter: getter2

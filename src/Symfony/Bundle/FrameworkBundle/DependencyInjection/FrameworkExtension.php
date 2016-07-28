@@ -20,11 +20,14 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\PropertyAccess\Mapping\Loader\XmlFileLoader as PropertyAccessXmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\PropertyAccess\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\PropertyAccess\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
@@ -138,7 +141,7 @@ class FrameworkExtension extends Extension
         }
 
         $this->registerAnnotationsConfiguration($config['annotations'], $container, $loader);
-        $this->registerPropertyAccessConfiguration($config['property_access'], $container);
+        $this->registerPropertyAccessConfiguration($config['property_access'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['serializer'])) {
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
@@ -928,13 +931,75 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container)
+    private function registerPropertyAccessConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
+        $loader->load('property_access.xml');
+
         $container
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $config['magic_call'])
             ->replaceArgument(1, $config['throw_exception_on_invalid_index'])
         ;
+
+        $chainLoader = $container->getDefinition('property_access.mapping.chain_loader');
+
+        $serializerLoaders = array();
+        if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            $annotationLoader = new Definition(
+                AnnotationLoader::class,
+                array(new Reference('annotation_reader'))
+            );
+            $annotationLoader->setPublic(false);
+
+            $serializerLoaders[] = $annotationLoader;
+        }
+
+        $bundles = $container->getParameter('kernel.bundles');
+        foreach ($bundles as $bundle) {
+            $reflection = new \ReflectionClass($bundle);
+            $dirname = dirname($reflection->getFileName());
+
+            if (is_file($file = $dirname.'/Resources/config/property_access.xml')) {
+                $definition = new Definition(PropertyAccessXmlFileLoader::class, array(realpath($file)));
+                $definition->setPublic(false);
+
+                $serializerLoaders[] = $definition;
+                $container->addResource(new FileResource($file));
+            }
+
+            if (is_file($file = $dirname.'/Resources/config/property_access.yml')) {
+                $definition = new Definition(YamlFileLoader::class, array(realpath($file)));
+                $definition->setPublic(false);
+
+                $serializerLoaders[] = $definition;
+                $container->addResource(new FileResource($file));
+            }
+
+            if (is_dir($dir = $dirname.'/Resources/config/property_access')) {
+                foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
+                    $definition = new Definition(PropertyAccessXmlFileLoader::class, array($file->getRealpath()));
+                    $definition->setPublic(false);
+
+                    $serializerLoaders[] = $definition;
+                }
+                foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
+                    $definition = new Definition(YamlFileLoader::class, array($file->getRealpath()));
+                    $definition->setPublic(false);
+
+                    $serializerLoaders[] = $definition;
+                }
+
+                $container->addResource(new DirectoryResource($dir));
+            }
+        }
+
+        $chainLoader->replaceArgument(0, $serializerLoaders);
+
+        if (isset($config['cache']) && $config['cache']) {
+            $container->getDefinition('property_access.mapping.class_metadata_factory')->replaceArgument(
+                1, new Reference($config['cache'])
+            );
+        }
     }
 
     /**

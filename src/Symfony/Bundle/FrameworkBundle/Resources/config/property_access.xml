@@ -5,10 +5,22 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!-- Loader -->
+        <service id="property_access.mapping.chain_loader" class="Symfony\Component\PropertyAccess\Mapping\Loader\LoaderChain" public="false">
+            <argument type="collection" />
+        </service>
+
+        <!-- Class Metadata Factory -->
+        <service id="property_access.mapping.class_metadata_factory" class="Symfony\Component\PropertyAccess\Mapping\Factory\LazyLoadingMetadataFactory" public="false">
+            <argument type="service" id="property_access.mapping.chain_loader" />
+            <argument>null</argument>
+        </service>
+
         <service id="property_accessor" class="Symfony\Component\PropertyAccess\PropertyAccessor" >
             <argument /> <!-- magicCall, set by the extension -->
             <argument /> <!-- throwExceptionOnInvalidIndex, set by the extension -->
             <argument type="service" id="cache.property_access" on-invalid="ignore" />
+            <argument type="service" id="property_access.mapping.class_metadata_factory" on-invalid="ignore" />
         </service>
     </services>
 </container>

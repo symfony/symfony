@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fernandobandeira at 2016-07-27T16:30:12Z
+
+Status: Reviewed
+
+Thank you for this quick PR.
+I've done more tests and had no more problems since this PR,
+Before the exception were killing the process, now it's just a warning.
+
+I was waiting for the author of #19336 to test his issue but it's been over a week, so at least for me this fixes my issue and should also fix his.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-27T16:38:32Z
+
+Thanks. The warning should be gone btw.

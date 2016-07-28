@@ -48,7 +48,7 @@ class FilesystemLoaderTest extends TestCase
         ;
         $loader = new FilesystemLoader($locator, $parser);
 
-        return $this->assertTrue($loader->exists($template));
+        $this->assertTrue($loader->exists($template));
     }
 
     /**

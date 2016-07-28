@@ -642,25 +642,6 @@ TABLE;
     }
 
     /**
-     * @expectedException Symfony\Component\Console\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Style "absent" is not defined.
-     */
-    public function testGetStyleDefinition()
-    {
-        Table::getStyleDefinition('absent');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Style "absent" is not defined.
-     */
-    public function testIsNotDefinedStyleException()
-    {
-        $table = new Table($this->getOutputStream());
-        $table->setStyle('absent');
-    }
-
-    /**
      * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
      * @expectedExceptionMessage Style "absent" is not defined.
      */

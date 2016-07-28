@@ -176,10 +176,10 @@ class ArgvInput extends Input
         } else {
             $all = $this->definition->getArguments();
             if (count($all)) {
-                throw new \RuntimeException(sprintf('Too many arguments, expected arguments "%s".', implode(', ', array_keys($all))));
+                throw new \RuntimeException(sprintf('Too many arguments, expected arguments "%s".', implode('" "', array_keys($all))));
             }
 
-            throw new \RuntimeException(sprintf('No argument expected, got "%s".', $token));
+            throw new \RuntimeException(sprintf('No arguments expected got "%s".', $token));
         }
     }
 

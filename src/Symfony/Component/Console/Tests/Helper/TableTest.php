@@ -577,6 +577,25 @@ TABLE;
         $this->assertEquals($table, $table->addRow(new TableSeparator()), 'fluent interface on addRow() with a single TableSeparator() works');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Style "absent" is not defined.
+     */
+    public function testIsNotDefinedStyleException()
+    {
+        $table = new Table($this->getOutputStream());
+        $table->setStyle('absent');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Style "absent" is not defined.
+     */
+    public function testGetStyleDefinition()
+    {
+        Table::getStyleDefinition('absent');
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, false);

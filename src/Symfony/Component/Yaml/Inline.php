@@ -383,6 +383,11 @@ class Inline
 
             // key
             $key = self::parseScalar($mapping, array(':', ' '), array('"', "'"), $i, false);
+            $i = strpos($mapping, ':', $i);
+
+            if (!isset($mapping[$i + 1]) || ' ' !== $mapping[$i + 1]) {
+                throw new ParseException('Missing space after mapping key definition.');
+            }
 
             // value
             $done = false;

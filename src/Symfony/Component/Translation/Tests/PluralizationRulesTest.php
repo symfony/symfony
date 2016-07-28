@@ -31,13 +31,13 @@ class PluralizationRulesTest extends \PHPUnit_Framework_TestCase
     /**
      * We test failed langcode here.
      *
-     * TODO: The languages mentioned in the data provide need to get fixed somehow within PluralizationRules.
+     * TODO: The languages mentioned in the data provide need to g  et fixed somehow within PluralizationRules.
      *
      * @dataProvider failingLangcodes
      */
     public function testFailedLangcodes($nplural, $langCodes)
     {
-        $matrix = $this->generateTestData($nplural, $langCodes);
+        $matrix = $this->generateTestData($langCodes);
         $this->validateMatrix($nplural, $matrix, false);
     }
 
@@ -46,7 +46,7 @@ class PluralizationRulesTest extends \PHPUnit_Framework_TestCase
      */
     public function testLangcodes($nplural, $langCodes)
     {
-        $matrix = $this->generateTestData($nplural, $langCodes);
+        $matrix = $this->generateTestData($langCodes);
         $this->validateMatrix($nplural, $matrix);
     }
 
@@ -108,7 +108,7 @@ class PluralizationRulesTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    protected function generateTestData($plural, $langCodes)
+    protected function generateTestData($langCodes)
     {
         $matrix = array();
         foreach ($langCodes as $langCode) {

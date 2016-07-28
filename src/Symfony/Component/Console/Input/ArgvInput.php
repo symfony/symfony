@@ -179,7 +179,7 @@ class ArgvInput extends Input
                 throw new \RuntimeException(sprintf('Too many arguments, expected arguments "%s".', implode('" "', array_keys($all))));
             }
 
-            throw new \RuntimeException(sprintf('No arguments expected got "%s".', $token));
+            throw new \RuntimeException(sprintf('No arguments expected, got "%s".', $token));
         }
     }
 

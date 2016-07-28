@@ -183,7 +183,7 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
             array(
                 array('cli.php', 'foo', 'bar'),
                 new InputDefinition(),
-                'No argument expected got "foo".',
+                'No arguments expected, got "foo".',
             ),
             array(
                 array('cli.php', 'foo', 'bar'),

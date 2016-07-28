@@ -30,12 +30,12 @@ class TagAwareRedisArrayAdapterTest extends AbstractRedisAdapterTest
         self::$redis->connect('127.0.0.1');
     }
 
-    public function createCachePool()
+    public function createCachePool($defaultLifeTime = 0)
     {
         if (defined('HHVM_VERSION')) {
             $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
         }
 
-        return new TagAwareRedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), 0, new ArrayAdapter());
+        return new TagAwareRedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), 0, new ArrayAdapter($defaultLifeTime));
     }
 }

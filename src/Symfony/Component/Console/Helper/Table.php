@@ -108,11 +108,11 @@ class Table
             self::$styles = self::initStyles();
         }
 
-        if (!self::$styles[$name]) {
-            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
+        if (isset(self::$styles[$name])) {
+            return self::$styles[$name];
         }
 
-        return self::$styles[$name];
+        throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
     }
 
     /**
@@ -124,13 +124,7 @@ class Table
      */
     public function setStyle($name)
     {
-        if ($name instanceof TableStyle) {
-            $this->style = $name;
-        } elseif (isset(self::$styles[$name])) {
-            $this->style = self::$styles[$name];
-        } else {
-            throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
-        }
+        $this->style = $this->resolveStyle($name);
 
         return $this;
     }
@@ -659,5 +653,18 @@ class Table
             'compact' => $compact,
             'symfony-style-guide' => $styleGuide,
         );
+    }
+
+    private function resolveStyle($name)
+    {
+        if ($name instanceof TableStyle) {
+            return $name;
+        }
+
+        if (isset(self::$styles[$name])) {
+            return self::$styles[$name];
+        }
+
+        throw new InvalidArgumentException(sprintf('Style "%s" is not defined.', $name));
     }
 }

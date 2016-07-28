@@ -23,7 +23,6 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Validator\Validation;
 
 /**
  * FrameworkExtension.

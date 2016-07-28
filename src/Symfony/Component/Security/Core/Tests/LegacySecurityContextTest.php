@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Tests;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\SecurityContext;
 
 /**

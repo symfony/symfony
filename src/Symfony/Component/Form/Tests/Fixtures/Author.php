@@ -58,5 +58,4 @@ class Author
     public function getPrivateSetter()
     {
     }
-
 }

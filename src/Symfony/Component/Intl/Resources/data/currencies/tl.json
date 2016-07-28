@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.22.93",
     "Names": {
         "AED": [
             "AED",
@@ -19,7 +19,7 @@
         ],
         "ANG": [
             "ANG",
-            "Netherlands Antillean Guilder"
+            "Antillean Guilder ng Netherlands"
         ],
         "AOA": [
             "AOA",
@@ -27,7 +27,7 @@
         ],
         "ARS": [
             "ARS",
-            "Argentine Peso"
+            "Piso ng Argentina"
         ],
         "AUD": [
             "A$",
@@ -35,7 +35,7 @@
         ],
         "AWG": [
             "AWG",
-            "Aruban Florin"
+            "Florin ng Aruba"
         ],
         "AZN": [
             "AZN",
@@ -75,11 +75,11 @@
         ],
         "BOB": [
             "BOB",
-            "Bolivian Boliviano"
+            "Boliviano ng Bolivia"
         ],
         "BRL": [
             "R$",
-            "Brazilian Real"
+            "Real ng Barzil"
         ],
         "BSD": [
             "BSD",
@@ -127,7 +127,7 @@
         ],
         "CRC": [
             "CRC",
-            "Costa Rican Colón"
+            "Colón ng Costa Rica"
         ],
         "CUC": [
             "CUC",
@@ -155,7 +155,7 @@
         ],
         "DKK": [
             "DKK",
-            "Denmark Krone"
+            "Danish Krone"
         ],
         "DOP": [
             "DOP",
@@ -191,7 +191,7 @@
         ],
         "FKP": [
             "FKP",
-            "Falkland Islands Pound"
+            "Pound ng Falkland Islands"
         ],
         "FRF": [
             "FRF",
@@ -223,7 +223,7 @@
         ],
         "GTQ": [
             "GTQ",
-            "Guatemalan Quetzal"
+            "Quetzal ng Guatemala"
         ],
         "GYD": [
             "GYD",
@@ -235,7 +235,7 @@
         ],
         "HNL": [
             "HNL",
-            "Honduran Lempira"
+            "Lempira ng Honduras"
         ],
         "HRK": [
             "HRK",
@@ -243,7 +243,7 @@
         ],
         "HTG": [
             "HTG",
-            "Haitian Gourde"
+            "Gourde ng Haiti"
         ],
         "HUF": [
             "HUF",
@@ -303,11 +303,11 @@
         ],
         "KPW": [
             "KPW",
-            "North Korean Won"
+            "Won ng Hilagang Korea"
         ],
         "KRW": [
             "₩",
-            "South Korean Won"
+            "Won ng Timog Korea"
         ],
         "KWD": [
             "KWD",
@@ -327,7 +327,7 @@
         ],
         "LBP": [
             "LBP",
-            "Lebanese Pound"
+            "Pound ng Lebanon"
         ],
         "LKR": [
             "LKR",
@@ -419,7 +419,7 @@
         ],
         "NIO": [
             "NIO",
-            "Nicaraguan Córdoba"
+            "Córdoba ng Nicaragua"
         ],
         "NOK": [
             "NOK",
@@ -439,7 +439,7 @@
         ],
         "PAB": [
             "PAB",
-            "Panamanian Balboa"
+            "Balboa ng Panama"
         ],
         "PEN": [
             "PEN",
@@ -499,7 +499,7 @@
         ],
         "SDG": [
             "SDG",
-            "Sudanese Pound"
+            "Pound ng Sudan"
         ],
         "SEK": [
             "SEK",
@@ -535,11 +535,11 @@
         ],
         "SSP": [
             "SSP",
-            "South Sudanese Pound"
+            "Pound ng Timog Sudan"
         ],
         "STD": [
             "STD",
-            "Sao Tome and Principe Dobra"
+            "São Tomé & Príncipe Dobra"
         ],
         "SYP": [
             "SYP",
@@ -611,7 +611,7 @@
         ],
         "VEF": [
             "VEF",
-            "Venezuelan Bolívar"
+            "Bolívar ng Venezuela"
         ],
         "VND": [
             "₫",
@@ -635,7 +635,7 @@
         ],
         "XOF": [
             "CFA",
-            "CFA Franc BCEAO"
+            "CFA Franc ng Kanlurang Africa"
         ],
         "XPF": [
             "CFPF",
@@ -647,7 +647,7 @@
         ],
         "ZAR": [
             "ZAR",
-            "South African Rand"
+            "Rand ng Timog Africa"
         ],
         "ZMK": [
             "ZMK",

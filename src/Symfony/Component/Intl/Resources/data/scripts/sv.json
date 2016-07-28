@@ -1,8 +1,9 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.23.66",
     "Names": {
         "Afak": "afakiska",
         "Aghb": "kaukasiska albanska",
+        "Ahom": "ahom",
         "Arab": "arabiska",
         "Armi": "imperisk arameiska",
         "Armn": "armeniska",
@@ -49,6 +50,7 @@
         "Hano": "hanunå",
         "Hans": "förenklade",
         "Hant": "traditionella",
+        "Hatr": "hatran",
         "Hebr": "hebreiska",
         "Hira": "hiragana",
         "Hluw": "hittitiska hieroglyfer",
@@ -95,6 +97,7 @@
         "Moon": "moon",
         "Mroo": "mru",
         "Mtei": "meitei-mayek",
+        "Mult": "multaniska",
         "Mymr": "burmesiska",
         "Narb": "fornnordarabiska",
         "Nbat": "nabatateiska",

@@ -1,7 +1,8 @@
 {
-    "Version": "2.1.11.59",
+    "Version": "2.1.24.13",
     "Names": {
         "bax": "Bamum",
-        "en_US": "United States English"
+        "en_US": "United States English",
+        "ro_MD": "Moldovan"
     }
 }

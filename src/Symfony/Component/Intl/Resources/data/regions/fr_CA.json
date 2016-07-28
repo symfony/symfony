@@ -1,9 +1,13 @@
 {
-    "Version": "2.1.13.23",
+    "Version": "2.1.24.13",
     "Names": {
         "BY": "Bélarus",
         "CC": "Îles Cocos (Keeling)",
         "FM": "Micronésie",
+        "MF": "Saint-Martin (France)",
+        "MM": "Myanmar",
+        "SX": "Saint-Martin (Pays-Bas)",
+        "TK": "Tokelau",
         "VC": "Saint-Vincent-et-les Grenadines"
     }
 }

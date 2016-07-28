@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.24.16",
     "Names": {
         "AED": [
             "AED",
@@ -530,7 +530,7 @@
             "Lilangeni Swazi"
         ],
         "THB": [
-            "฿",
+            "THB",
             "Baht Thai"
         ],
         "TJS": [

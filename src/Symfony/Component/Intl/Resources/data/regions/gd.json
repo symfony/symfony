@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.22.93",
     "Names": {
         "AC": "Eilean na Deasgabhalach",
         "AD": "Andorra",
@@ -148,7 +148,7 @@
         "MH": "Eileanan Mharshall",
         "MK": "A’ Mhasadon",
         "ML": "Màili",
-        "MM": "Miànmar (Burma)",
+        "MM": "Miànmar",
         "MN": "Dùthaich nam Mongol",
         "MO": "Macàthu SAR na Sìne",
         "MP": "Na h-Eileanan Mairianach a Tuath",
@@ -235,7 +235,7 @@
         "TZ": "An Tansan",
         "UA": "An Ucràin",
         "UG": "Uganda",
-        "UM": "Meanbh-Eileanan Iomallach nan Stàitean Aonaichte",
+        "UM": "Meanbh-Eileanan Iomallach nan SA",
         "US": "Na Stàitean Aonaichte",
         "UY": "Uruguaidh",
         "UZ": "Usbagastàn",

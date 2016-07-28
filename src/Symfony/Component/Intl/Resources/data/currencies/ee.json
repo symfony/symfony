@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.23.7",
     "Names": {
         "ADP": [
             "ADP",
@@ -74,8 +74,8 @@
             "ɔstriaga schilling"
         ],
         "AUD": [
-            "A$",
-            "australiaga dollar"
+            "AU$",
+            "Australiaga dollar"
         ],
         "AWG": [
             "AWG",
@@ -183,7 +183,7 @@
         ],
         "BRL": [
             "R$",
-            "brazilga real"
+            "Braziliaga real"
         ],
         "BRN": [
             "BRN",
@@ -227,7 +227,7 @@
         ],
         "CAD": [
             "CA$",
-            "kanadaga dollar"
+            "Canadaga dollar"
         ],
         "CDF": [
             "CDF",
@@ -239,7 +239,7 @@
         ],
         "CHF": [
             "CHF",
-            "swissga franc"
+            "Swissga franc"
         ],
         "CHW": [
             "CHW",
@@ -263,7 +263,7 @@
         ],
         "CNY": [
             "CN¥",
-            "tsainaga yuan"
+            "Chinesega yuan"
         ],
         "COP": [
             "COP",
@@ -319,7 +319,7 @@
         ],
         "DKK": [
             "DKK",
-            "danemarkga krone"
+            "Denmarkga krone"
         ],
         "DOP": [
             "DOP",
@@ -367,7 +367,7 @@
         ],
         "EUR": [
             "€",
-            "euro"
+            "EUR"
         ],
         "FIM": [
             "FIM",
@@ -387,7 +387,7 @@
         ],
         "GBP": [
             "£",
-            "britainga pound"
+            "Britishga pound"
         ],
         "GEK": [
             "GEK",
@@ -447,7 +447,7 @@
         ],
         "HKD": [
             "HK$",
-            "hong kongga dollar"
+            "Hong Kongga dollar"
         ],
         "HNL": [
             "HNL",
@@ -471,7 +471,7 @@
         ],
         "IDR": [
             "IDR",
-            "indinesiaga rupiah"
+            "Indonesiaga rupiah"
         ],
         "IEP": [
             "IEP",
@@ -491,7 +491,7 @@
         ],
         "INR": [
             "₹",
-            "indiaga rupee"
+            "Indiaga rupee"
         ],
         "IQD": [
             "IQD",
@@ -523,7 +523,7 @@
         ],
         "JPY": [
             "JP¥",
-            "dzapanga yen"
+            "Japanesega yen"
         ],
         "KES": [
             "KES",
@@ -555,7 +555,7 @@
         ],
         "KRW": [
             "₩",
-            "anyiehe koreaga won"
+            "South Koreaga won"
         ],
         "KWD": [
             "KWD",
@@ -695,7 +695,7 @@
         ],
         "MXN": [
             "MX$",
-            "meksikoga peso"
+            "Mexicoga peso"
         ],
         "MYR": [
             "MYR",
@@ -719,7 +719,7 @@
         ],
         "NOK": [
             "NOK",
-            "norwayga krone"
+            "Norwayga krone"
         ],
         "NPR": [
             "NPR",
@@ -799,7 +799,7 @@
         ],
         "RUB": [
             "RUB",
-            "rɔtsiaga ruble"
+            "Russiaga ruble"
         ],
         "RUR": [
             "RUR",
@@ -811,7 +811,7 @@
         ],
         "SAR": [
             "SAR",
-            "saudiga riyal"
+            "Saudi Arabiaga riyal"
         ],
         "SBD": [
             "SBD",
@@ -835,7 +835,7 @@
         ],
         "SEK": [
             "SEK",
-            "swedenga krona"
+            "Swedishga krone"
         ],
         "SGD": [
             "SGD",
@@ -890,8 +890,8 @@
             "swaziga lilangeni"
         ],
         "THB": [
-            "THB",
-            "thaiga baht"
+            "฿",
+            "Thailandga baht"
         ],
         "TJR": [
             "TJR",
@@ -927,7 +927,7 @@
         ],
         "TRY": [
             "TRY",
-            "tɛkiiga lira"
+            "Turkishga lira"
         ],
         "TTD": [
             "TTD",
@@ -935,7 +935,7 @@
         ],
         "TWD": [
             "NT$",
-            "taiwanga yeye dollar"
+            "Taiwanga dollar"
         ],
         "TZS": [
             "TZS",
@@ -959,7 +959,7 @@
         ],
         "USD": [
             "US$",
-            "us ga dollar"
+            "US ga dollar"
         ],
         "USN": [
             "USN",
@@ -1071,7 +1071,7 @@
         ],
         "ZAR": [
             "ZAR",
-            "anyiehe afrikaga rand"
+            "South Africaga rand"
         ],
         "ZMK": [
             "ZMK",

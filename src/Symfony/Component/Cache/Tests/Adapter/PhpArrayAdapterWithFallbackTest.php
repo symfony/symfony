@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
 /**
  * @group time-sensitive
  */
-class PhpArrayAdapterWithFallbackTest extends CachePoolTest
+class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
 {
     protected $skippedTests = array(
         'testGetItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
@@ -26,6 +25,7 @@ class PhpArrayAdapterWithFallbackTest extends CachePoolTest
         'testHasItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
+        'testDefaultLifeTime' => 'PhpArrayAdapter does not allow configuring a default lifetime.',
     );
 
     private static $file;

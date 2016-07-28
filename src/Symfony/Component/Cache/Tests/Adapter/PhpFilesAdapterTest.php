@@ -11,14 +11,17 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
 /**
  * @group time-sensitive
  */
-class PhpFilesAdapterTest extends CachePoolTest
+class PhpFilesAdapterTest extends AdapterTestCase
 {
+    protected $skippedTests = array(
+        'testDefaultLifeTime' => 'PhpFilesAdapter does not allow configuring a default lifetime.',
+    );
+
     public function createCachePool()
     {
         if (defined('HHVM_VERSION')) {

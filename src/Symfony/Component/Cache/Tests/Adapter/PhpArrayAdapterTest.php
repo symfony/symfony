@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Cache\IntegrationTests\CachePoolTest;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
-class PhpArrayAdapterTest extends CachePoolTest
+class PhpArrayAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = array(
         'testBasicUsage' => 'PhpArrayAdapter is read-only.',
@@ -45,6 +44,8 @@ class PhpArrayAdapterTest extends CachePoolTest
         'testHasItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testDeleteItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
+
+        'testDefaultLifeTime' => 'PhpArrayAdapter does not allow configuring a default lifetime.',
     );
 
     private static $file;

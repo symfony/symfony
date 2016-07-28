@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-07-05T08:44:37Z
+
+👍
+
+This looks much better. Thanks Nicolas!
+
+---
+
+I'd also suggest to not use 1-letter variable names because it makes code hard to understand and maintain in the long term.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-05T12:38:06Z
+
+New "after":
+![after](https://cloud.githubusercontent.com/assets/243674/16584794/fc648518-42bd-11e6-8b90-ecca8fc1d73b.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-17T09:24:16Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-18T07:13:22Z
+
+Status: needs work
+I'd like to try a few more ideas when dumping arguments.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-24T19:32:20Z
+
+Updated to be compact also when args are dumped. Test cases added.
+
+Status: needs review

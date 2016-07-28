@@ -614,6 +614,7 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                         ->scalarNode('cache')->end()
                         ->scalarNode('name_converter')->end()
+                        ->scalarNode('datetime_format')->end()
                     ->end()
                 ->end()
             ->end()

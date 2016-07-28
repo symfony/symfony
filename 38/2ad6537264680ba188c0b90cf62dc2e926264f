@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-07-28T16:22:57Z
+
+Please don't change the order between the return and the exception
+
+---------------------------------------------------------------------------
+
+by ReenExe at 2016-07-28T16:36:04Z
+
+@stof, this need to same style on `master`, https://github.com/symfony/symfony/pull/19406#discussion_r72616152

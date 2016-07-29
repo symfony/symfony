@@ -1,4 +1,4 @@
-<info>My Symfony application</info> version <comment>v1.0</comment>
+My Symfony application <info>v1.0</info>
 
 <comment>Usage:</comment>
   command [options] [arguments]

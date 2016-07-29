@@ -1,0 +1,150 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-03T09:26:44Z
+
+`app` is not really the kernel, just the name. In this case I'd expect to see `AppKernel`, would that be nicer to show?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T10:04:05Z
+
+If it's namespaced it can get messy.. but you're right; it's different information. Both are useful :')
+
+What about;
+`Symfony 3.2.0-DEV on \My\AppKernel(name: app, env: dev, debug: true)`
+
+Or with verbosity;
+```
+$ bin/console -V
+Symfony 3.2.0-DEV
+```
+ vs.
+```
+$ bin/console -V --verbose
+Symfony 3.2.0-DEV on \My\AppKernel(name: app, env: dev, debug: true)
+```
+
+But im not sure thats common or even semantically correct..
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-03T10:21:14Z
+
+I personally prefer the verbosity flag but I don't know how intuitive this is.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-07-03T10:37:15Z
+
+Another solution would be to remove the `name: app` thing and to not add the kernel info either.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-03T10:41:14Z
+
+There might be a lot more info about the kernel you'd want to see...  What about simply adding the version + release date (if available) and making an application info command? Not sure if this would be interesting for the core, but it might show nice things such as which bundles are enabled.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T10:42:11Z
+
+@iltar i was just thinking about that.. with `--verbose` we can go really crazy;
+
+![image](https://cloud.githubusercontent.com/assets/1047696/16544997/8a3e0c14-411b-11e6-9d44-649aef33d4e6.png)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-03T10:44:24Z
+
+I'm afraid that eventually it will come down to this: We need a command line WDT variant
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T10:54:59Z
+
+Agree, this is still not great as a header line when used with `bin/console`. So what do we need to show for `-V` then? (assuming everything is available with `bin/console info` in some time).
+
+Perhaps kernel info is a  bit too specific indeed =/
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-03T11:00:03Z
+
+For now I'd say a limit of what's available in the `Kernel` constants. I would love to have more debugging info on the command line though, such as a CLI WDT. Maybe a nice feature for 3.2 (though I have no time to work on this).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T14:13:59Z
+
+~~removed kernel:info command~~
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-07-03T14:16:21Z
+
+Please, let's focus first on finishing this pull request about the console header. Then we can discuss about the `kernel:info` command in a separate issue. Thanks!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-03T14:32:15Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-08T10:20:05Z
+
+I would not remove the app name here. You can have several one and being able to have it with `-V` is important.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-13T08:45:31Z
+
+Any news on this one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-19T15:34:55Z
+
+@ro0NL Still interested in finishing this one?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-20T06:26:05Z
+
+Yes. Try to work on it today. As soon as my laptop is connected :(
+
+Op 19 jul. 2016 17:35 schreef "Fabien Potencier" <notifications@github.com>:
+
+> @ro0NL <https://github.com/ro0NL> Still interested in finishing this one?
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/19275#issuecomment-233671981>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AA_8kAIy7NN_USpVFhfpth5vuvP7fo8Pks5qXO68gaJpZM4JD0O5>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-20T10:28:08Z
+
+Back up :) @fabpot it's going to be `Symfony 3.2.0-DEV (kernel: app, env: dev, debug: true)` then.. where `kernel` refers the kernel name, not the kernel type.
+
+I think it makes sense.. if #19278 is accepted we have more detailed information anyway.
+
+Maybe the minor UI change for console applications is worth noting..., not sure.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-28T20:28:40Z
+
+Tests should be updated as they do not pass with these changes.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-29T09:52:08Z
+
+Green :)

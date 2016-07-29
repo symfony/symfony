@@ -23,18 +23,18 @@ abstract class AdapterTestCase extends CachePoolTest
             return;
         }
 
-        $this->cache = $this->createCachePool(2);
+        $cache = $this->createCachePool(2);
 
-        $item = $this->cache->getItem('key.dlt');
+        $item = $cache->getItem('key.dlt');
         $item->set('value');
-        $this->cache->save($item);
+        $cache->save($item);
         sleep(1);
 
-        $item = $this->cache->getItem('key.dlt');
+        $item = $cache->getItem('key.dlt');
         $this->assertTrue($item->isHit());
 
         sleep(2);
-        $item = $this->cache->getItem('key.dlt');
+        $item = $cache->getItem('key.dlt');
         $this->assertFalse($item->isHit());
     }
 }

@@ -694,6 +694,79 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testSetRow()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(array('ISBN', 'Title', 'Author', 'Price'))
+            ->setRows(array(
+                array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri', '9.95'),
+                array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25'),
+            ))
+            ->setColumnWidths(array(15, 0, -1, 10))
+            ->setRow(0, array('9998', 'Jurassic Park', 'Steven Spielberg', '12.25'));
+
+        $table->render();
+
+        $expected =
+            <<<TABLE
++-----------------+----------------------+------------------+------------+
+| ISBN            | Title                | Author           | Price      |
++-----------------+----------------------+------------------+------------+
+| 9998            | Jurassic Park        | Steven Spielberg | 12.25      |
+| 9971-5-0210-0   | A Tale of Two Cities | Charles Dickens  | 139.25     |
++-----------------+----------------------+------------------+------------+
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testRenderWithCustomTableStyle()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(array('ISBN', 'Title', 'Author', 'Price'))
+            ->setRows(array(
+                array('99921-58-10-7', 'Divine Comedy', 'Dante Alighieri', '9.95'),
+                array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25'),
+                array('9922', 'A City', 'Charles Dickens', '1.24'),
+            ));
+
+        $style = new TableStyle();
+        $style->setPadType(STR_PAD_LEFT);
+        $style->setPaddingChar('a');
+        $style->setCellRowFormat('b%sc');
+        $style->setBorderFormat('d%se');
+
+        $table->setStyle($style);
+        $table->render();
+
+        $expected =
+            <<<TABLE
+d+---------------+----------------------+-----------------+--------+e
+d|eaaaaaaaaa ISBN d|eaaaaaaaaaaaaaaa Title d|eaaaaaaaaa Author d|ea Price d|e
+d+---------------+----------------------+-----------------+--------+e
+d|eb 99921-58-10-7 cd|ebaaaaaaa Divine Comedy cd|eb Dante Alighieri cd|ebaa 9.95 cd|e
+d|eb 9971-5-0210-0 cd|eb A Tale of Two Cities cd|eb Charles Dickens cd|eb 139.25 cd|e
+d|ebaaaaaaaaa 9922 cd|ebaaaaaaaaaaaaaa A City cd|eb Charles Dickens cd|ebaa 1.24 cd|e
+d+---------------+----------------------+-----------------+--------+e
+
+TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @expectedExceptionMessage A row must be an array or a TableSeparator instance.
+     */
+    public function testAddRowWithInvalidType()
+    {
+        $table = new Table($this->getOutputStream());
+        $table->addRow('invalid');
+    }
+
     protected function getOutputStream()
     {
         return new StreamOutput($this->stream, StreamOutput::VERBOSITY_NORMAL, false);

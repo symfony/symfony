@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Output;
 
+use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -26,6 +27,18 @@ class NullOutputTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('', $buffer, '->write() does nothing (at least nothing is printed)');
         $this->assertFalse($output->isDecorated(), '->isDecorated() returns false');
+    }
+
+    public function testDefaultValues()
+    {
+        $output = new NullOutput();
+
+        $this->assertTrue($output->isQuiet());
+        $this->assertFalse($output->isVeryVerbose());
+        $this->assertFalse($output->isDebug());
+
+        $output->setFormatter($this->getMock(OutputFormatterInterface::class));
+        $output->setDecorated(true);
     }
 
     public function testVerbosity()

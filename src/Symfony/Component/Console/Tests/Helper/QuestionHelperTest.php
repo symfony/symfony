@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -34,7 +35,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
 
         $heroes = array('Superman', 'Batman', 'Spiderman');
 
-        $inputStream = $this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\n1\n0,2\n 0 , 2  \n\n\n");
+        $inputStream = $this->getInputStream("\n1\n  1  \nFabien\n1\nFabien\né\n1\n0,2\n 0 , 2  \n\n\n\n");
 
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '2');
         $question->setMaxAttempts(1);
@@ -64,6 +65,16 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
             $this->assertEquals('Value "Fabien" is invalid', $e->getMessage());
         }
 
+        try {
+            $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, '1');
+            $question->setMaxAttempts(1);
+            $question->setMultiselect(true);
+            $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question);
+            $this->fail();
+        } catch (InvalidArgumentException $e) {
+            $this->assertEquals('Value "é" is invalid', $e->getMessage());
+        }
+
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, null);
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
@@ -81,8 +92,10 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $question = new ChoiceQuestion('What is your favorite superhero?', $heroes, ' 0 , 1 ');
         $question->setMaxAttempts(1);
         $question->setMultiselect(true);
+        $question->setPrompt('Choose wisely');
 
-        $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
+        $this->assertOutputContains('Choose wisely', $output);
     }
 
     public function testAsk()
@@ -773,5 +786,12 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         exec('stty 2>&1', $output, $exitcode);
 
         return $exitcode === 0;
+    }
+
+    private function assertOutputContains($expected, StreamOutput $output)
+    {
+        rewind($output->getStream());
+        $stream = stream_get_contents($output->getStream());
+        $this->assertContains($expected, $stream);
     }
 }

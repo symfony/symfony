@@ -15,6 +15,21 @@ use Symfony\Component\Console\Helper\Helper;
 
 class HelperTest extends \PHPUnit_Framework_TestCase
 {
+    public function formatMemoryProvider()
+    {
+        return array(
+            array(0,          '0 B'),
+            array(1,          '1 B'),
+            array(1000,       '1000 B'),
+            array(1024,       '1 KiB'),
+            array(1025,       '1 KiB'),
+            array(1048576,    '1.0 MiB'),
+            array(1048577,    '1.0 MiB'),
+            array(1073741824, '1.0 GiB'),
+            array(1073741825, '1.0 GiB'),
+        );
+    }
+
     public function formatTimeProvider()
     {
         return array(
@@ -50,5 +65,16 @@ class HelperTest extends \PHPUnit_Framework_TestCase
     public function testFormatTime($secs, $expectedFormat)
     {
         $this->assertEquals($expectedFormat, Helper::formatTime($secs));
+    }
+
+    /**
+     * @dataProvider formatMemoryProvider
+     *
+     * @param int    $bytes
+     * @param string $expectedFormat
+     */
+    public function testFormatMemory($bytes, $expectedFormat)
+    {
+        $this->assertEquals($expectedFormat, Helper::formatMemory($bytes));
     }
 }

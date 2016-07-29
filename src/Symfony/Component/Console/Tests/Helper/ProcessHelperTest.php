@@ -31,6 +31,28 @@ class ProcessHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->getOutput($output));
     }
 
+    public function testMustRun()
+    {
+        $helper = new ProcessHelper();
+        $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
+        $output = $this->getOutputStream(StreamOutput::VERBOSITY_VERBOSE);
+        $helper->mustRun($output, 'php -r "echo 42;"', null);
+
+        $this->assertSame('', $this->getOutput($output));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
+     * @expectedExceptionMessage The command "php -r "echo 42"" failed.
+     */
+    public function testMustRunThrowsProcessFailedException()
+    {
+        $helper = new ProcessHelper();
+        $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
+        $output = $this->getOutputStream(StreamOutput::VERBOSITY_VERBOSE);
+        $helper->mustRun($output, 'php -r "echo 42"', null);
+    }
+
     public function testPassedCallbackIsExecuted()
     {
         $helper = new ProcessHelper();

@@ -156,6 +156,28 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('name1'), $command->getAliases(), '->setAliases() sets the aliases');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @expectedExceptionMessage $aliases must be an array or an instance of \Traversable
+     */
+    public function testSetAliasesThrowsInvalidArgumentException()
+    {
+        $command = new \TestCommand();
+
+        $command->setAliases('foo');
+    }
+
+    public function testAddUsage()
+    {
+        $command = new \TestCommand();
+
+        $command
+            ->addUsage('foo')
+            ->addUsage('bar');
+
+        $this->assertSame(array('namespace:name foo', 'namespace:name bar'), $command->getUsages());
+    }
+
     public function testGetSynopsis()
     {
         $command = new \TestCommand();

@@ -138,7 +138,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $diff->days, '->getDate() returns a date via the format specified');
         $this->assertNull($bag->getDate('d1', 'd/m/Y'), '->getDate() returns null if the format is not valid');
         $this->assertNull($bag->getDate('d2', 'd/m/Y'), '->getDate() returns null if the parameter is not found');
-        $this->assertEquals($date, $bag->getDate('d1', 'Y-m-d', new \DateTime('2016-12-01')), '->getDate() parses the value if the key is present');
+        $this->assertEquals($date->format('Ymd'), $bag->getDate('d1', 'Y-m-d', new \DateTime('2016-12-01'))->format('Ymd'), '->getDate() parses the value if the key is present');
 
         $date = $bag->getDate('iso', \DateTime::ISO8601);
         $this->assertEquals(new \DateTime($isoDate), $date);

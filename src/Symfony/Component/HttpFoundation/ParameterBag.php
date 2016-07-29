@@ -190,16 +190,20 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Returns the parameter value converted to a DateTime object.
      *
-     * @param string             $key      The parameter key
-     * @param string             $format   The expected date format
-     * @param string             $default  The default value to be converted to a DateTime object if the parameter key does not exist
-     * @param \DateTimeZone|null $timeZone A DateTimeZone object representing the desired time zone
+     * @param string                    $key      The parameter key
+     * @param string                    $format   The expected date format
+     * @param \DateTimeInterface|string $default  The default value to be converted to a DateTime object if the parameter key does not exist
+     * @param \DateTimeZone|null        $timeZone A DateTimeZone object representing the desired time zone
      *
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDate($key, $format, $default = null, \DateTimeZone $timeZone = null)
     {
         $time = $this->get($key, $default);
+
+        if ($time instanceof \DateTimeInterface) {
+            return $default;
+        }
 
         // if the user has specified a timezone then pass that
         // otherwise do not even attempt to put a value but rather let the runtime decide

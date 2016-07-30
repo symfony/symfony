@@ -167,6 +167,6 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function hasParent()
     {
-        return (null !== $this->parent) ? true : false;
+        return null !== $this->parent;
     }
 }

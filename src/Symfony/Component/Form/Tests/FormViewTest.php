@@ -25,6 +25,6 @@ class FormViewTest extends \PHPUnit_Framework_TestCase
     public function testHasParent()
     {
         $this->formView->parent = new FormView();
-        $this->assertTrue($this->formView->hasParent());
+        $this->assertFalse($this->formView->hasParent());
     }
 }

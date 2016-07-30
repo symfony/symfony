@@ -56,7 +56,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
     public function getItem($key)
     {
         if (!$isHit = $this->hasItem($key)) {
-            $value = null;
+            $this->values[$key] = $value = null;
         } elseif ($this->storeSerialized) {
             $value = unserialize($this->values[$key]);
         } else {
@@ -77,6 +77,16 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
         }
 
         return $this->generateItems($keys, time());
+    }
+
+    /**
+     * Returns all cached values, with cache miss as null.
+     *
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->values;
     }
 
     /**
@@ -183,7 +193,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
 
         foreach ($keys as $key) {
             if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] >= $now || !$this->deleteItem($key))) {
-                $value = null;
+                $this->values[$key] = $value = null;
             } elseif ($this->storeSerialized) {
                 $value = unserialize($this->values[$key]);
             } else {

@@ -7,6 +7,37 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.9 (2016-07-30)
+
+ * bug #19470 undefined offset fix (#19406) (ReenExe)
+ * bug #19300 [HttpKernel] Use flock() for HttpCache's lock files (mpdude)
+ * bug #19428 [Process] Fix write access check for pipes on Windows (nicolas-grekas)
+ * bug #19439 [DependencyInjection] Fixed deprecated default message template with XML (jeremyFreeAgent)
+ * bug #19397  [HttpFoundation] HttpCache refresh stale responses containing an ETag (maennchen)
+ * bug #19426 [Form] Fix the money form type render with Bootstrap3 (Th3Mouk)
+ * bug #19422 [DomCrawler] Inherit the namespace cache in subcrawlers (stof)
+ * bug #19425 [BrowserKit] Uppercase the "GET" method in redirects (jakzal)
+ * bug #19384 Fix PHP 7.1 related failures (nicolas-grekas)
+ * bug #19379 [VarDumper] Fix for PHP 7.1 (nicolas-grekas)
+ * bug #19342 Added class existence check if is_subclass_of() fails in compiler passes (SCIF)
+ * bug #19369 Fix the DBAL session handler version check for Postgresql (stof)
+ * bug #19368 [VarDumper] Fix dumping jsons casted as arrays (nicolas-grekas)
+ * bug #19334 [Security] Fix the retrieval of the last username when using forwarding (stof)
+ * bug #19321 [HttpFoundation] Add OPTIONS and TRACE to the list of safe methods (dunglas)
+ * bug #19317 [BrowserKit] Update Client::getAbsoluteUri() for query string only URIs (georaldc)
+ * bug #19298 [ClassLoader] Fix declared classes being computed when not needed (nicolas-grekas)
+ * bug #19316 [Validator] Added additional MasterCard range to the CardSchemeValidator (Dennis Væversted)
+ * bug #19290 [HttpKernel] fixed internal subrequests having an if-modified-since-header (MalteWunsch)
+ * bug #19307 [Security] Fix deprecated usage of DigestAuthenticationEntryPoint::getKey() in DigestAuthenticationListener (Maxime STEINHAUSSER)
+ * bug #19309 [DoctrineBridge] added missing error code for constraint. (Koc)
+ * bug #19306 [Form] fixed bug - name in ButtonBuilder (cheprasov)
+ * bug #19292 [varDumper] Fix missing usage of ExceptionCaster::$traceArgs (nicolas-grekas)
+ * bug #19288 [VarDumper] Fix indentation trimming in ExceptionCaster (nicolas-grekas)
+ * bug #19267 [Validator] UuidValidator must accept a Uuid constraint. (hhamon)
+ * bug #19186 Fix for #19183 to add support for new PHP MongoDB extension in sessions. (omanizer)
+ * bug #19253 [Console] Fix block() padding formatting after #19189 (chalasr)
+ * bug #19218 [Security][Guard] check if session exist before using it (pasdeloup)
+
 * 2.8.8 (2016-06-30)
 
  * bug #19217 [HttpKernel] Inline ValidateRequestListener logic into HttpKernel (nicolas-grekas)

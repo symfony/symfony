@@ -1,0 +1,188 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-04-13T17:19:21Z
+
+> Deprecate configuration keys for annotations caching in all concerned services (validator, serializer, Doctrine ORM)
+
+As your adapter is read-only, this cannot work unless you rewrite most logic. There is nothing ensuring that *all* the cache is of these services is warmed up by the cache warmer, and services using them are not writing all their cache in a single batch (the ORM does not for instance)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-13T17:20:45Z
+
+> Introduce a unified configuration key to enable/disable annotations cache everywhere
+
+We already have a single annotation cache.
+
+I'm quite sure you are confusing the annotation cache and the cache for metadata of each of these services (which must be separate as they store unrelated data, and which can be built from other sources that annotations)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-14T09:01:27Z
+
+I updated this PR to limit it to the introduction of the OpCacheAdapter. I will create other PRs for the implementation in Symfony.
+
+Don't hesitate to rereview :) .
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-17T12:05:02Z
+
+- the factory is now a static method of OpCacheAdapter;
+- AnnotationsCacheWarmer warms up both the opcache and the fallback pool, so that both PHP 7 & PHP 5 users can start with a warm annotations cache;
+- ~~the NullAdapter is not needed anymore~~ -> it is in the tests;
+- storeSerialized on OpCacheAdapter is replaced by adaptative serialisation when required only (`null` are always serialized, so that `isset()` can be used instead of `array_key_exists`);
+- tests are simplified yet should cover a few more behaviors;
+- and a few minor fixes found along the way.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-04-18T09:55:07Z
+
+@nicolas-grekas I think the link to the gist is wrong, according to its content
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-18T09:57:19Z
+
+@stof the gist is outdated, @tgalopin already made the required changes here.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-18T12:39:31Z
+
+Looks like some tweaks have to be made to make the tests pass on HHVM.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-18T12:44:42Z
+
+Yes, Nicolas did them, I'll merge them as soon as I am on a computer
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-18T14:09:10Z
+
+I updated, we will see on HHVM
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-18T14:37:53Z
+
+Green, ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-19T14:26:05Z
+
+:+1: (rebase needed)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-04-20T09:00:42Z
+
+👍 (but I left some minor comments)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-21T14:12:31Z
+
+Comments adresses and tests are passing
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-21T21:39:29Z
+
+http://www.doctrine-project.org/2015/08/31/security_misconfiguration_vulnerability_in_various_doctrine_projects.html
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-04-22T06:54:01Z
+
+The code looks good so far. But we need to take @nicolas-grekas' last comment into account.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-02T21:05:31Z
+
+Security issue fixed, failure on Travis not related.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-03T13:28:12Z
+
+I did the changes (the tests are failing as https://github.com/symfony/symfony/pull/18667 will need to be merged)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-03T13:41:37Z
+
+I based this PR on https://github.com/symfony/symfony/pull/18667 to take into account the new modifications in the cache system.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-05T20:19:43Z
+
+I rebased this on master.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-14T13:09:26Z
+
+Rebase needed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-19T09:32:23Z
+
+Given than keys validation is slow (from my benchmarks), I suggest we remove all keys validation from OpCache and Null adapters (and skip any related failing tests):
+- for OpCacheAdapter, either the key exists or the validation is done by the fallback adapter in a good enough way,
+- for NullAdapter, let's make it really fast instead of perfectly correct.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-19T20:30:45Z
+
+I did the changes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-05-20T15:31:43Z
+
+:+1: Hurray
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-20T16:42:48Z
+
+I splited this PR in three different one for better review. To review with ease, start by https://github.com/symfony/symfony/pull/18825, then https://github.com/symfony/symfony/pull/18823 and finally this PR.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-05-25T11:48:14Z
+
+I updated this PR following the changes in #18825 and #18823
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-15T17:30:45Z
+
+Any performance profiles?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-07-29T11:36:14Z
+
+With Blackfire it's really hard to highlight the performance gain because it's small. With `ab -n 1000 -c 100` against a `php -S` on the standard edition, I get a median of 280ms per request with the patch and 285ms with Doctrine APCu.
+
+To sum up, the benefit provided by this PR are:
+- annotations can be warmed up offline
+- on PHP 7, there is no need for user extension to get maximum performances
+- on PHP 7 again, we are not sensitive to APCu memory fragmentation
+- last but not least, global performance is the same if not slightly better
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-29T11:47:56Z
+
+Status: reviewed

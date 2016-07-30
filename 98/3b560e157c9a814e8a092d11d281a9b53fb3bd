@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-28T20:17:04Z
+
+I've been working on this with @tgalopin, so here are a few more thoughts:
+
+Currently, bundles can use addClassesToCompile to declare which FQCN should be inlined for fast bootstrapping.
+This PR extends this mechanism in two ways: bundle can now declare the same using wildcards. FQCN discovery is done against composer class maps so that only composer-dumped classes can match against the patterns. `**Test**` classes are blacklisted by default, except when a pattern explicitly whitelists them again. Patterns that contain no wildcards at all are used directly without checking any class maps.
+
+The second feature is adding a way for bundles to declare which classes have annotations that are going to be used in the app. This is useful for warming up annotation reader caches, but also makes it possible to inline classes that have annotations on them (and thus add the `Controller` class back in the list of classes to compile).
+
+The linked PR uses these to warm up the annotations cache.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-29T08:52:27Z
+
+I don't see any code reading the annotations.map file. Is there something missing in the diff ?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-06-29T15:50:51Z
+
+@stof : The idea is to change the behavior of classes to compile and introduce the annotations.map file here and use it in the https://github.com/symfony/symfony/pull/18533 PR afterwards.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-06-29T15:56:30Z
+
+I did the changes.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-29T16:00:13Z
+
+@tgalopin then it is good to explain it, so that people reviewing the code can understand it.
+
+and this makes me tell than the split in multiple PRs is not good, as this PR introduces dead features. This PR should probably deal only with compiled classes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-06-29T16:03:11Z
+
+I think that this really belong to its own PR: the generated `annotations.map` file is open to any use cases.
+The same is btw for the `classes.map`. Tightening this with the annotation cache warmer sends the wrong signal. We're not creating an internal detail but a public artifact that people can use as they want.
+Thus dedicated PR, changelog entry, etc.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-28T07:41:32Z
+
+:+1:

@@ -75,10 +75,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     /**
      * Does nothing. The data is collected during the form event listeners.
-     *
-     * @param Request         $request
-     * @param Response        $response
-     * @param \Exception|null $exception
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
@@ -219,11 +215,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         return $this->data;
     }
 
-    /**
-     * @param FormInterface $form
-     * @param $output
-     * @param array $outputByHash
-     */
     private function recursiveBuildPreliminaryFormTree(FormInterface $form, &$output, array &$outputByHash)
     {
         $hash = spl_object_hash($form);
@@ -243,12 +234,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         }
     }
 
-    /**
-     * @param FormInterface|null $form
-     * @param FormView           $view
-     * @param $output
-     * @param array $outputByHash
-     */
     private function recursiveBuildFinalFormTree(FormInterface $form = null, FormView $view, &$output, array &$outputByHash)
     {
         $viewHash = spl_object_hash($view);

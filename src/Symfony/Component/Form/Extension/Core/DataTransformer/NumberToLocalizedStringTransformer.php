@@ -72,28 +72,12 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
 
-    /**
-     * @var bool
-     */
     protected $grouping;
 
-    /**
-     * @var int
-     */
     protected $roundingMode;
 
-    /**
-     * @var null
-     */
     private $scale;
 
-    /**
-     * NumberToLocalizedStringTransformer constructor.
-     *
-     * @param null $scale
-     * @param bool $grouping
-     * @param int  $roundingMode
-     */
     public function __construct($scale = null, $grouping = false, $roundingMode = self::ROUND_HALF_UP)
     {
         if (null === $grouping) {
@@ -112,7 +96,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
     /**
      * Transforms a number type into localized number.
      *
-     * @param int|float|null $value Number value
+     * @param int|float $value Number value
      *
      * @return string Localized value
      *

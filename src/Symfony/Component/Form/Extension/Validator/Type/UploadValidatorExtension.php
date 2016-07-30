@@ -23,10 +23,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class UploadValidatorExtension extends AbstractTypeExtension
 {
     private $translator;
-
-    /**
-     * @var null|string
-     */
     private $translationDomain;
 
     /**

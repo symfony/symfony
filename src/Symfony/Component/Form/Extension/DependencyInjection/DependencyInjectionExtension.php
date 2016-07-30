@@ -18,41 +18,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DependencyInjectionExtension implements FormExtensionInterface
 {
-    /**
-     * @var ContainerInterface
-     */
     private $container;
-
-    /**
-     * @var array
-     */
     private $typeServiceIds;
-
-    /**
-     * @var array
-     */
     private $typeExtensionServiceIds;
-
-    /**
-     * @var array
-     */
     private $guesserServiceIds;
-
     private $guesser;
-
-    /**
-     * @var bool
-     */
     private $guesserLoaded = false;
 
-    /**
-     * DependencyInjectionExtension constructor.
-     *
-     * @param ContainerInterface $container
-     * @param array              $typeServiceIds
-     * @param array              $typeExtensionServiceIds
-     * @param array              $guesserServiceIds
-     */
     public function __construct(ContainerInterface $container, array $typeServiceIds, array $typeExtensionServiceIds, array $guesserServiceIds)
     {
         $this->container = $container;
@@ -61,11 +33,6 @@ class DependencyInjectionExtension implements FormExtensionInterface
         $this->guesserServiceIds = $guesserServiceIds;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return object
-     */
     public function getType($name)
     {
         if (!isset($this->typeServiceIds[$name])) {
@@ -75,21 +42,11 @@ class DependencyInjectionExtension implements FormExtensionInterface
         return $this->container->get($this->typeServiceIds[$name]);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public function hasType($name)
     {
         return isset($this->typeServiceIds[$name]);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return array
-     */
     public function getTypeExtensions($name)
     {
         $extensions = array();
@@ -114,19 +71,11 @@ class DependencyInjectionExtension implements FormExtensionInterface
         return $extensions;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public function hasTypeExtensions($name)
     {
         return isset($this->typeExtensionServiceIds[$name]);
     }
 
-    /**
-     * @return FormTypeGuesserChain
-     */
     public function getTypeGuesser()
     {
         if (!$this->guesserLoaded) {

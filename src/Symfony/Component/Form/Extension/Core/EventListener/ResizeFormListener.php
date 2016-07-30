@@ -52,15 +52,6 @@ class ResizeFormListener implements EventSubscriberInterface
      */
     private $deleteEmpty;
 
-    /**
-     * ResizeFormListener constructor.
-     *
-     * @param $type
-     * @param array $options
-     * @param bool  $allowAdd
-     * @param bool  $allowDelete
-     * @param bool  $deleteEmpty
-     */
     public function __construct($type, array $options = array(), $allowAdd = false, $allowDelete = false, $deleteEmpty = false)
     {
         $this->type = $type;
@@ -70,9 +61,6 @@ class ResizeFormListener implements EventSubscriberInterface
         $this->deleteEmpty = $deleteEmpty;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -83,9 +71,6 @@ class ResizeFormListener implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();
@@ -112,9 +97,6 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -149,9 +131,6 @@ class ResizeFormListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -183,7 +162,8 @@ class ResizeFormListener implements EventSubscriberInterface
             }
         }
 
-        // The data mapper only adds, but does not remove items, so do this here
+        // The data mapper only adds, but does not remove items, so do this
+        // here
         if ($this->allowDelete) {
             $toDelete = array();
 

@@ -23,14 +23,8 @@ use Symfony\Component\Form\Extension\Validator\Constraints\Form;
  */
 class ValidationListener implements EventSubscriberInterface
 {
-    /**
-     * @var ValidatorInterface
-     */
     private $validator;
 
-    /**
-     * @var ViolationMapperInterface
-     */
     private $violationMapper;
 
     /**

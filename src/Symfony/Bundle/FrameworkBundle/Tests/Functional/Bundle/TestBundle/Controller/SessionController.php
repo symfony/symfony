@@ -42,7 +42,7 @@ class SessionController extends ContainerAware
 
     public function logoutAction(Request $request)
     {
-        $request->getSession('session')->invalidate();
+        $request->getSession()->invalidate();
 
         return new Response('Session cleared.');
     }

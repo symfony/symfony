@@ -1,0 +1,146 @@
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-01-26T12:48:32Z
+
+Any opinion on the methods names here?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-01-29T10:26:54Z
+
+I rebased this on master. What do you think if this feature?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-04T10:56:35Z
+
+I would use the method names from the Linux behavior.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-03-12T14:24:12Z
+
+I did the changes.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-13T19:01:40Z
+
+looks like you need to fix the tests
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-03-13T20:28:43Z
+
+I fixed the tests
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-15T20:18:40Z
+
+I think this is ready, targeting 3.1. Any review?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-17T19:58:12Z
+
+I did the changes.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-19T06:44:54Z
+
+I have an issue of consistency between Windows and Linux: https://ci.appveyor.com/project/fabpot/symfony/build/1.0.8378#L622).
+
+Under Windows, as we are using `realpath`, the next direct target of a link is fully resolved and a canonicalized path is returned. Under Linux, the path may contain `../`. I suggest to canonicalize all the paths we return from readlink and realpath, but if we do, we obviously can't use the `realpath` native function (that's the reason of this PR). If we want to do that, we have to create a `makePathAbsolute` method (which is not incoherent as we already have `makePathRelative`).
+
+What do you guys think?
+
+EDIT: it's also a problem with HHVM: https://travis-ci.org/symfony/symfony/jobs/124106259#L4531
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-19T11:02:12Z
+
+I think we should not reimplement realpath! But we should have a clear definition of the expected behavior.
+That made me review the doc of the readlink command (`man readlink`), which has four modes:
+- `-f, --canonicalize`
+- `-e, --canonicalize-existing`
+- `-m, --canonicalize-missing`
+- and the default one.
+
+It looks like:
+- HHVM's realpath behaves like `readlink -m` or `-f`
+- PHP's realpath behaves like `readlink -e`
+
+Which makes me have the following suggestions:
+- have a single `readlink($file, $canonicalize = false)` method
+- when `$canonicalize` is `false`, throw an exception if `$file` is not a link, and return the link target otherwise (even if the target does not exist).
+- when `$canonicalize` is `true`, accept any file type (link or not), return its canonicalized path, and throw an exception if `$file` does not exist.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-04-19T11:09:07Z
+
+By canonicalized, do you mean absolute or also fully resolved link?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-04-19T12:20:53Z
+
+Both, ie what realpath does (on PHP/Linux)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-21T20:42:04Z
+
+@tgalopin Any news on this PR? Is it worth finishing it?
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-06-21T21:14:55Z
+
+@fabpot I think it is, I'll work on it.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-07-29T12:18:57Z
+
+After some research, I propose the following behavior (same for every platform), following the way the `readlink` command works:
+
+Signature: `readlink($path, $canonicalize = false)`
+
+**By default (`$canonicalize = false`) corresponding to command `readlink <path>`**
+
+- if `$path` does not exist or is not a link, return null
+- if `$path` is link, return the value of the link (ie. the next direct target of the link, without consideration of existence)
+
+**With canonicalization (`$canonicalize = true`) corresponding to command `readlink -f <path>`**
+
+- if `$path` does not exist, return null
+- if `$path` exists, return the absolute, fully resolved final target of the link (in the case of `bar -> baz -> foo`, `readlink(bar)` would return `/absolute/path/to/foo`)
+
+Is everyone OK with this behavior? If it's ok for everyone, I'll start working on it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-29T12:39:35Z
+
+Ok for me with this updated version (no exceptions but return null instead)
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-07-29T15:04:12Z
+
+I applied this behavior and tests are green, I think this is ready for review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-30T07:19:15Z
+
+:+1:
+Status: reviewed

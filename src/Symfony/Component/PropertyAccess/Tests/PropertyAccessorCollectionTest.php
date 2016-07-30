@@ -166,33 +166,25 @@ abstract class PropertyAccessorCollectionTest extends PropertyAccessorArrayAcces
     public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
     {
         $car = $this->getMock(__CLASS__.'_Car');
-        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
-
-        $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes', $axes));
+        $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfOnlyAdderExists()
     {
         $car = $this->getMock(__CLASS__.'_CarOnlyAdder');
-        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
-
-        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfOnlyRemoverExists()
     {
         $car = $this->getMock(__CLASS__.'_CarOnlyRemover');
-        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
-
-        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
     {
         $car = $this->getMock(__CLASS__.'_CarNoAdderAndRemover');
-        $axes = $this->getContainer(array(1 => 'first', 2 => 'second', 3 => 'third'));
-
-        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes', $axes));
+        $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
     /**

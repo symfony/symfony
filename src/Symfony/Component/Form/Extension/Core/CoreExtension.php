@@ -38,9 +38,6 @@ class CoreExtension extends AbstractExtension
 
     /**
      * CoreExtension constructor.
-     *
-     * @param PropertyAccessorInterface|null  $propertyAccessor
-     * @param ChoiceListFactoryInterface|null $choiceListFactory
      */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
     {

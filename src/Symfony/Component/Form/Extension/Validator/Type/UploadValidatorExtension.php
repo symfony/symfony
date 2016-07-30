@@ -22,9 +22,6 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class UploadValidatorExtension extends AbstractTypeExtension
 {
-    /**
-     * @var TranslatorInterface
-     */
     private $translator;
 
     /**

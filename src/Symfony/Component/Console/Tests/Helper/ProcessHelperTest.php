@@ -44,6 +44,9 @@ class ProcessHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($executed);
     }
 
+    /**
+     * @return array
+     */
     public function provideCommandsAndOutput()
     {
         $successOutputVerbose = <<<EOT

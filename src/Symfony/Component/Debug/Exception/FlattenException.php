@@ -201,6 +201,7 @@ class FlattenException
                 continue;
             }
             
+            
             $class = '';
             $namespace = '';
             if (isset($entry['class'])) {

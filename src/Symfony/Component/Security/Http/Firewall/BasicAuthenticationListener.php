@@ -56,7 +56,7 @@ class BasicAuthenticationListener implements ListenerInterface
     {
         $request = $event->getRequest();
 
-        if (false === $username = $request->headers->get('PHP_AUTH_USER', false)) {
+        if (null === $username = $request->headers->get('PHP_AUTH_USER')) {
             return;
         }
 

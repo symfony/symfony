@@ -268,8 +268,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'cache' => array(
                 'pools' => array(),
-                'app' => 'cache.adapter.filesystem',
-                'system' => 'cache.adapter.system',
+                'app' => null,
+                'system' => null,
                 'directory' => '%kernel.cache_dir%/pools',
                 'default_redis_provider' => 'redis://localhost',
             ),

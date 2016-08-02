@@ -111,7 +111,7 @@ abstract class AbstractPipes implements PipesInterface
             if ($input) {
                 for (;;) {
                     $data = fread($input, self::CHUNK_SIZE);
-                    if (!isset($data[0])) {
+                    if (false === $data || '' === $data) {
                         break;
                     }
                     $written = fwrite($stdin, $data);

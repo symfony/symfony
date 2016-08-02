@@ -134,9 +134,7 @@ abstract class AbstractPipes implements PipesInterface
         if (null === $this->input && !isset($this->inputBuffer[0])) {
             fclose($this->pipes[0]);
             unset($this->pipes[0]);
-        }
-
-        if (!$w) {
+        } elseif (!$w) {
             return array($this->pipes[0]);
         }
     }

@@ -139,7 +139,7 @@ class WindowsPipes extends AbstractPipes
         foreach ($this->fileHandles as $type => $fileHandle) {
             $data = stream_get_contents($fileHandle, -1, $this->readBytes[$type]);
 
-            if (isset($data[0])) {
+            if (false !== $data && '' !== $data) {
                 $this->readBytes[$type] += strlen($data);
                 $read[$type] = $data;
             }

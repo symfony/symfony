@@ -21,10 +21,14 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
+use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
@@ -542,8 +546,16 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testSerializerCacheActivated()
     {
+        if (!class_exists(CacheClassMetadataFactory::class) || !method_exists(XmlFileLoader::class, 'getMappedClasses') || !method_exists(YamlFileLoader::class, 'getMappedClasses')) {
+            $this->markTestSkipped('The Serializer default cache warmer has been introduced in the Serializer Component version 3.2.');
+        }
+
         $container = $this->createContainerFromFile('serializer_enabled');
+
         $this->assertTrue($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+
+        $cache = $container->getDefinition('serializer.mapping.cache_class_metadata_factory')->getArgument(1);
+        $this->assertEquals(new Reference('serializer.mapping.cache.symfony'), $cache);
     }
 
     public function testSerializerCacheDisabled()
@@ -562,7 +574,10 @@ abstract class FrameworkExtensionTest extends TestCase
             $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
 
             $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-            $this->assertEquals(new Reference('foo'), $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
+            $this->assertTrue($container->hasDefinition('serializer.mapping.class_metadata_factory'));
+
+            $cache = $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1);
+            $this->assertEquals(new Reference('foo'), $cache);
         });
     }
 

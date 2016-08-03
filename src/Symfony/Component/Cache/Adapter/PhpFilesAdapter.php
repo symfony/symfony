@@ -70,7 +70,7 @@ class PhpFilesAdapter extends AbstractAdapter
             if ('N;' === $value) {
                 $values[$id] = null;
             } elseif (is_string($value) && isset($value[2]) && ':' === $value[1]) {
-                $values[$id] = unserialize($value);
+                $values[$id] = parent::unserialize($value);
             }
         }
 
@@ -98,7 +98,7 @@ class PhpFilesAdapter extends AbstractAdapter
                 $value = serialize($value);
             } elseif (is_array($value)) {
                 $serialized = serialize($value);
-                $unserialized = unserialize($serialized);
+                $unserialized = parent::unserialize($serialized);
                 // Store arrays serialized if they contain any objects or references
                 if ($unserialized !== $value || (false !== strpos($serialized, ';R:') && preg_match('/;R:[1-9]/', $serialized))) {
                     $value = $serialized;

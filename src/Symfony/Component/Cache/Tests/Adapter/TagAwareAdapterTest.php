@@ -97,4 +97,30 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         $this->assertTrue($pool->getItem('k')->isHit());
     }
+
+    public function testTagsImpactSubContexts()
+    {
+        $pool = $this->createCachePool();
+        $fork = $pool->withContext('ns');
+
+        $poolItem = $pool->getItem('i1');
+        $forkItem = $fork->getItem('i2');
+
+        $poolItem->tag('foo');
+        $forkItem->tag('foo');
+
+        $pool->save($poolItem);
+        $fork->save($forkItem);
+
+        $this->assertTrue($pool->hasItem('i1'));
+        $this->assertTrue($fork->hasItem('i2'));
+
+        $this->assertTrue($fork->invalidateTags('foo'));
+
+        $this->assertFalse($pool->hasItem('i1'));
+        $this->assertFalse($fork->hasItem('i2'));
+
+        $this->assertFalse($pool->getItem('i1')->isHit());
+        $this->assertFalse($fork->getItem('i2')->isHit());
+    }
 }

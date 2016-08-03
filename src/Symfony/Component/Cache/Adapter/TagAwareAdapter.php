@@ -14,11 +14,12 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\CacheException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class TagAwareAdapter implements TagAwareAdapterInterface
+class TagAwareAdapter implements ContextAwareAdapterInterface, TagAwareAdapterInterface
 {
     const TAGS_PREFIX = "\0tags\0";
 
@@ -240,6 +241,22 @@ class TagAwareAdapter implements TagAwareAdapterInterface
         }
 
         return $this->itemsAdapter->commit() && $ok;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withContext($context)
+    {
+        if (!$this->itemsAdapter instanceof ContextAwareAdapterInterface) {
+            throw new CacheException(sprintf('%s does not implement ContextAwareAdapterInterface.', get_class($this->itemsAdapter)));
+        }
+
+        $fork = clone $this;
+        $fork->itemsAdapter = $this->itemsAdapter->withContext($context);
+        $fork->deferred = array();
+
+        return $fork;
     }
 
     public function __destruct()

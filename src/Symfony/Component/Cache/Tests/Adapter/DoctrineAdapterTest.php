@@ -23,10 +23,20 @@ class DoctrineAdapterTest extends AdapterTestCase
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayCache is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayCache is not.',
         'testNotUnserializable' => 'ArrayCache does not use serialize/unserialize',
+        'testBadContext' => 'ContextAwareAdapterInterface not implemented.',
     );
 
     public function createCachePool($defaultLifetime = 0)
     {
         return new DoctrineAdapter(new ArrayCache($defaultLifetime), '', $defaultLifetime);
+    }
+
+    /**
+     * @expectedException Symfony\Component\Cache\Exception\CacheException
+     * @expectedExceptionMessage Symfony\Component\Cache\Adapter\DoctrineAdapter does not implement ContextAwareAdapterInterface.
+     */
+    public function testContext()
+    {
+        parent::testContext();
     }
 }

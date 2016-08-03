@@ -22,6 +22,10 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
  */
 class ChainAdapterTest extends AdapterTestCase
 {
+    protected $skippedTests = array(
+        'testBadContext' => 'ContextAwareAdapterInterface not implemented by ExternalAdapter.',
+    );
+
     public function createCachePool($defaultLifetime = 0)
     {
         return new ChainAdapter(array(new ArrayAdapter($defaultLifetime), new ExternalAdapter(), new FilesystemAdapter('', $defaultLifetime)), $defaultLifetime);
@@ -43,5 +47,14 @@ class ChainAdapterTest extends AdapterTestCase
     public function testInvalidAdapterException()
     {
         new ChainAdapter(array(new \stdClass()));
+    }
+
+    /**
+     * @expectedException Symfony\Component\Cache\Exception\CacheException
+     * @expectedExceptionMessage Symfony\Component\Cache\Adapter\ProxyAdapter does not implement ContextAwareAdapterInterface.
+     */
+    public function testContext()
+    {
+        parent::testContext();
     }
 }

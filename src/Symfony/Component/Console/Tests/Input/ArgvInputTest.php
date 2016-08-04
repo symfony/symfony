@@ -72,6 +72,30 @@ class ArgvInputTest extends \PHPUnit_Framework_TestCase
                 '->parse() parses long options with a required value (with a space separator)',
             ),
             array(
+                array('cli.php', '--bar'),
+                array(new InputOption('foo', 'bar')),
+                array('foo' => true),
+                '->parse() parses long option shortcuts without a value',
+            ),
+            array(
+                array('cli.php', '--bar-baz'),
+                array(new InputOption('foo', 'bar-baz')),
+                array('foo' => true),
+                '->parse() parses hyphenated long option shortcuts without a value',
+            ),
+            array(
+                array('cli.php', '--bar=baz'),
+                array(new InputOption('foo', 'bar', InputOption::VALUE_REQUIRED)),
+                array('foo' => 'baz'),
+                '->parse() parses long option shortcuts with a required value (with a = separator)',
+            ),
+            array(
+                array('cli.php', '--bar', 'baz'),
+                array(new InputOption('foo', 'bar', InputOption::VALUE_REQUIRED)),
+                array('foo' => 'baz'),
+                '->parse() parses long option shortcuts with a required value (with a space separator)',
+            ),
+            array(
                 array('cli.php', '-f'),
                 array(new InputOption('foo', 'f')),
                 array('foo' => true),

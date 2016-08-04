@@ -1574,6 +1574,7 @@ php: |
   array(
     'fixed' => 1230.15,
   )
+---
 test: Float
 yaml: |
    canonical: 1.23015e+3

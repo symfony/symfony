@@ -242,8 +242,7 @@ class Parser
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             $data[$key] = null;
-                        }
-                        elseif ($exceptionOnDuplicate) {
+                        } elseif ($exceptionOnDuplicate) {
                             throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                         }
                     } else {
@@ -252,8 +251,7 @@ class Parser
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             $data[$key] = $value;
-                        }
-                        elseif ($exceptionOnDuplicate) {
+                        } elseif ($exceptionOnDuplicate) {
                             throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                         }
                     }
@@ -263,8 +261,7 @@ class Parser
                     // But overwriting is allowed when a merge node is used in current block.
                     if ($allowOverwrite || !isset($data[$key])) {
                         $data[$key] = $value;
-                    }
-                    elseif ($exceptionOnDuplicate) {
+                    } elseif ($exceptionOnDuplicate) {
                         throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                     }
                 }

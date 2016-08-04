@@ -477,8 +477,7 @@ class Inline
                         // are processed sequentially.
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
-                        }
-                        elseif (static::$exceptionOnDuplicate) {
+                        } elseif (static::$exceptionOnDuplicate) {
                             throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                         }
                         $done = true;
@@ -491,8 +490,7 @@ class Inline
                         // are processed sequentially.
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
-                        }
-                        elseif (static::$exceptionOnDuplicate) {
+                        } elseif (static::$exceptionOnDuplicate) {
                             throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                         }
                         $done = true;
@@ -507,8 +505,7 @@ class Inline
                         // are processed sequentially.
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
-                        }
-                        elseif (static::$exceptionOnDuplicate) {
+                        } elseif (static::$exceptionOnDuplicate) {
                             throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                         }
                         $done = true;

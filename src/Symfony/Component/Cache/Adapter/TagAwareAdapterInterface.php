@@ -27,7 +27,7 @@ interface TagAwareAdapterInterface extends AdapterInterface
      *
      * @return bool True on success
      *
-     * @throws InvalidArgumentException When $tags is not valid.
+     * @throws InvalidArgumentException When $tags is not valid
      */
     public function invalidateTags($tags);
 }

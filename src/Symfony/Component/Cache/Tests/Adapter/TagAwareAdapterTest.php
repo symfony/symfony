@@ -11,8 +11,24 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-trait TagAwareAdapterTestTrait
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+
+/**
+ * @group time-sensitive
+ */
+class TagAwareAdapterTest extends AdapterTestCase
 {
+    public function createCachePool($defaultLifetime = 0)
+    {
+        return new TagAwareAdapter(new FilesystemAdapter('', $defaultLifetime));
+    }
+
+    public static function tearDownAfterClass()
+    {
+        FilesystemAdapterTest::rmdir(sys_get_temp_dir().'/symfony-cache');
+    }
+
     /**
      * @expectedException Psr\Cache\InvalidArgumentException
      */

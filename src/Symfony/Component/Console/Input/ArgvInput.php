@@ -213,7 +213,11 @@ class ArgvInput extends Input
     private function addLongOption($name, $value)
     {
         if (!$this->definition->hasOption($name)) {
-            throw new RuntimeException(sprintf('The "--%s" option does not exist.', $name));
+            if ($this->definition->hasShortcut($name)) {
+                $name = $this->definition->getOptionForShortcut($name)->getName();
+            } else {
+                throw new RuntimeException(sprintf('The "--%s" option does not exist.', $name));
+            }
         }
 
         $option = $this->definition->getOption($name);

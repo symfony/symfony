@@ -61,7 +61,7 @@ class InputOption
             if (is_array($shortcut)) {
                 $shortcut = implode('|', $shortcut);
             }
-            $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
+            $shortcuts = preg_split('{(\|)-{0,2}}', ltrim($shortcut, '-'));
             $shortcuts = array_filter($shortcuts);
             $shortcut = implode('|', $shortcuts);
 

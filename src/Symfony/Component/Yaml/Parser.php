@@ -104,6 +104,7 @@ class Parser
         $data = array();
         $context = null;
         $allowOverwrite = false;
+        $exceptionOnDuplicate = (bool) (Yaml::PARSE_EXCEPTION_ON_DUPLICATE & $flags);
         while ($this->moveToNextLine()) {
             if ($this->isCurrentLineEmpty()) {
                 continue;
@@ -242,12 +243,18 @@ class Parser
                         if ($allowOverwrite || !isset($data[$key])) {
                             $data[$key] = null;
                         }
+                        elseif ($exceptionOnDuplicate) {
+                            throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
+                        }
                     } else {
                         $value = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(), $flags);
                         // Spec: Keys MUST be unique; first one wins.
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             $data[$key] = $value;
+                        }
+                        elseif ($exceptionOnDuplicate) {
+                            throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                         }
                     }
                 } else {
@@ -256,6 +263,9 @@ class Parser
                     // But overwriting is allowed when a merge node is used in current block.
                     if ($allowOverwrite || !isset($data[$key])) {
                         $data[$key] = $value;
+                    }
+                    elseif ($exceptionOnDuplicate) {
+                        throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                     }
                 }
                 if ($isRef) {

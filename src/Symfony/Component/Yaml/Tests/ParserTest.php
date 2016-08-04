@@ -803,6 +803,70 @@ EOD;
         $this->assertSame($expected, Yaml::parse($input));
     }
 
+    /**
+     * @dataProvider getParseExceptionOnDuplicateData
+     */
+    public function testParseExceptionOnDuplicate($input, $duplicate_key) {
+        $this->setExpectedException('\Symfony\Component\Yaml\Exception\ParseException', 'Duplicate key "' . $duplicate_key . '" detected whilst parsing YAML');
+        Yaml::parse($input, Yaml::PARSE_EXCEPTION_ON_DUPLICATE);
+    }
+
+    public function getParseExceptionOnDuplicateData() {
+        $tests = array();
+
+        $yaml = <<<EOD
+parent: { child: first, child: duplicate }
+EOD;
+        $tests[] = [$yaml, 'child'];
+
+        $yaml = <<<EOD
+parent:
+  child: first,
+  child: duplicate
+EOD;
+        $tests[] = [$yaml, 'child'];
+
+        $yaml = <<<EOD
+parent: { child: foo }
+parent: { child: bar }
+EOD;
+        $tests[] = [$yaml, 'parent'];
+
+        $yaml = <<<EOD
+parent: { child_mapping: { value: bar},  child_mapping: { value: bar} }
+EOD;
+        $tests[] = [$yaml, 'child_mapping'];
+
+        $yaml = <<<EOD
+parent:
+  child_mapping:
+    value: bar
+  child_mapping:
+    value: bar
+EOD;
+        $tests[] = [$yaml, 'child_mapping'];
+
+        $yaml = <<<EOD
+parent: { child_sequence: ['key1', 'key2', 'key3'],  child_sequence: ['key1', 'key2', 'key3'] }
+EOD;
+        $tests[] = [$yaml, 'child_sequence'];
+
+        $yaml = <<<EOD
+parent:
+  child_sequence:
+    - key1
+    - key2
+    - key3
+  child_sequence:
+    - key1
+    - key2
+    - key3
+EOD;
+        $tests[] = [$yaml, 'child_sequence'];
+
+        return $tests;
+    }
+
     public function testEmptyValue()
     {
         $input = <<<'EOF'

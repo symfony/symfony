@@ -29,6 +29,7 @@ class Inline
     private static $objectSupport = false;
     private static $objectForMap = false;
     private static $constantSupport = false;
+    private static $exceptionOnDuplicate = false;
 
     /**
      * Converts a YAML string to a PHP array.
@@ -79,6 +80,7 @@ class Inline
         self::$objectSupport = (bool) (Yaml::PARSE_OBJECT & $flags);
         self::$objectForMap = (bool) (Yaml::PARSE_OBJECT_FOR_MAP & $flags);
         self::$constantSupport = (bool) (Yaml::PARSE_CONSTANT & $flags);
+        self::$exceptionOnDuplicate = (bool) (Yaml::PARSE_EXCEPTION_ON_DUPLICATE & $flags);
 
         $value = trim($value);
 
@@ -476,6 +478,9 @@ class Inline
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
                         }
+                        elseif (static::$exceptionOnDuplicate) {
+                            throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
+                        }
                         $done = true;
                         break;
                     case '{':
@@ -486,6 +491,9 @@ class Inline
                         // are processed sequentially.
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
+                        }
+                        elseif (static::$exceptionOnDuplicate) {
+                            throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                         }
                         $done = true;
                         break;
@@ -499,6 +507,9 @@ class Inline
                         // are processed sequentially.
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
+                        }
+                        elseif (static::$exceptionOnDuplicate) {
+                            throw new ParseException(sprintf('Duplicate key "%s" detected whilst parsing YAML', $key));
                         }
                         $done = true;
                         --$i;

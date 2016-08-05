@@ -17,9 +17,6 @@ class ApcuAdapterTest extends AdapterTestCase
 {
     public function createCachePool($defaultLifetime = 0)
     {
-        if (defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
-        }
         if (!function_exists('apcu_fetch') || !ini_get('apc.enabled') || ('cli' === PHP_SAPI && !ini_get('apc.enable_cli'))) {
             $this->markTestSkipped('APCu extension is required.');
         }

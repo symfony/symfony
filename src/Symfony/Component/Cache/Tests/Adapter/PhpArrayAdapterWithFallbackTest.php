@@ -44,10 +44,6 @@ class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
 
     public function createCachePool()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
-        }
-
         return new PhpArrayAdapter(self::$file, new FilesystemAdapter('php-array-fallback'));
     }
 }

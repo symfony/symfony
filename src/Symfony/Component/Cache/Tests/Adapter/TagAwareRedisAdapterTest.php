@@ -26,10 +26,6 @@ class TagAwareRedisAdapterTest extends AbstractRedisAdapterTest
 
     public function createCachePool($defaultLifeTime = 0)
     {
-        if (defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
-        }
-
         return new TagAwareRedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifeTime);
     }
 }

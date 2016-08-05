@@ -24,9 +24,6 @@ class PhpFilesAdapterTest extends AdapterTestCase
 
     public function createCachePool()
     {
-        if (defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
-        }
         if (!PhpFilesAdapter::isSupported()) {
             $this->markTestSkipped('OPcache extension is not enabled.');
         }

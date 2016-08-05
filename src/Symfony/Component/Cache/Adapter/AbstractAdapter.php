@@ -98,7 +98,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             return $fs;
         }
 
-        $apcu = new ApcuAdapter($namespace, $defaultLifetime / 5, $version);
+        $apcu = new ApcuAdapter($namespace, (int) $defaultLifetime / 5, $version);
         if (null !== $logger) {
             $apcu->setLogger($logger);
         }
@@ -289,9 +289,6 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
     {
         if (!$item instanceof CacheItem) {
             return false;
-        }
-        if ($this->deferred) {
-            $this->commit();
         }
         $this->deferred[$item->getKey()] = $item;
 

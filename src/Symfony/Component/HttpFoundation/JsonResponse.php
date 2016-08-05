@@ -59,6 +59,14 @@ class JsonResponse extends Response
     }
 
     /**
+     * Make easier the creation of JsonResponse from raw json.
+     */
+    public static function fromJsonString($data = null, $status = 200, $headers = array())
+    {
+        return new static($data, $status, $headers, true);
+    }
+
+    /**
      * Sets the JSONP callback.
      *
      * @param string|null $callback The JSONP callback or null to use none

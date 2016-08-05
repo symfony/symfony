@@ -198,6 +198,12 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
     }
 
+    public function testItAcceptsJsonAsString()
+    {
+        $response = JsonResponse::fromJsonString('{"foo":"bar"}');
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */

@@ -81,6 +81,6 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCa
      */
     public function testIsWritable($collection, $path)
     {
-        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path, 'Updated'));
+        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
     }
 }

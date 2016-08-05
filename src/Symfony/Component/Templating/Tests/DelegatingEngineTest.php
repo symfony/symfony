@@ -121,7 +121,7 @@ class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
         $secondEngine = $this->getEngineMock('template.php', false);
 
         $delegatingEngine = new DelegatingEngine(array($firstEngine, $secondEngine));
-        $delegatingEngine->getEngine('template.php', array('foo' => 'bar'));
+        $delegatingEngine->getEngine('template.php');
     }
 
     private function getEngineMock($template, $supports)

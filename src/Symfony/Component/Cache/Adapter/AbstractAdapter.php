@@ -78,7 +78,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             return $fs;
         }
 
-        $apcu = new ApcuAdapter($namespace, $defaultLifetime / 5, $version);
+        $apcu = new ApcuAdapter($namespace, (int) $defaultLifetime / 5, $version);
         if (null !== $logger) {
             $apcu->setLogger($logger);
         }

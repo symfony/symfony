@@ -26,6 +26,6 @@ class DoctrineAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        return new DoctrineAdapter(new ArrayCache(), '', $defaultLifetime);
+        return new DoctrineAdapter(new ArrayCache($defaultLifetime), '', $defaultLifetime);
     }
 }

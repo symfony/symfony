@@ -15,6 +15,9 @@ use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 
+/**
+ * @group time-sensitive
+ */
 class PhpArrayAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = array(

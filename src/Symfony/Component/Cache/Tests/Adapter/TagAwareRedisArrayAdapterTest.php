@@ -21,6 +21,9 @@ class TagAwareRedisArrayAdapterTest extends AbstractRedisAdapterTest
     protected $skippedTests = array(
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
+        'testExpiration' => 'Testing expiration slows down the test suite',
+        'testHasItemReturnsFalseWhenDeferredItemIsExpired' => 'Testing expiration slows down the test suite',
+        'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
     );
 
     public static function setupBeforeClass()

@@ -21,6 +21,6 @@ class NamespacedProxyAdapterTest extends ProxyAdapterTest
 {
     public function createCachePool($defaultLifetime = 0)
     {
-        return new ProxyAdapter(new ArrayAdapter(), 'foo', $defaultLifetime);
+        return new ProxyAdapter(new ArrayAdapter($defaultLifetime), 'foo', $defaultLifetime);
     }
 }

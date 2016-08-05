@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-05T08:24:39Z
+
+@remicollet can you remove the first commit please?
+
+---------------------------------------------------------------------------
+
+by remicollet at 2016-08-05T08:27:41Z
+
+Sorry, I don't know how.... :(
+But as already in 2.8, should be OK (see the "This branch has no conflicts with the base branch"), else download the patch and use git am ;)   (Damned github...)

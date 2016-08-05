@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group time-sensitive
  */
 class ChainAdapterTest extends AdapterTestCase
 {

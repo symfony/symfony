@@ -94,10 +94,10 @@ SplFileObject {
   file: true
   dir: false
   link: false
-%AcsvControl: array:2 [
+%AcsvControl: array:%d [
     0 => ","
     1 => """
-  ]
+%A]
   flags: DROP_NEW_LINE|SKIP_EMPTY
   maxLineLen: 0
   fstat: array:26 [

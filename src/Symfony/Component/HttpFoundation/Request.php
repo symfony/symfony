@@ -1505,7 +1505,7 @@ class Request
                 return $resource;
             }
 
-            $this->content = false;
+            $this->content = null;
 
             return fopen('php://input', 'rb');
         }

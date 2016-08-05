@@ -23,10 +23,6 @@ class ChainAdapterTest extends AdapterTestCase
 {
     public function createCachePool($defaultLifetime = 0)
     {
-        if (defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
-        }
-
         return new ChainAdapter(array(new ArrayAdapter($defaultLifetime), new ExternalAdapter(), new FilesystemAdapter('', $defaultLifetime)), $defaultLifetime);
     }
 

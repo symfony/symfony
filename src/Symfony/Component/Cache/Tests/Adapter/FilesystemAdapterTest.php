@@ -20,10 +20,6 @@ class FilesystemAdapterTest extends AdapterTestCase
 {
     public function createCachePool($defaultLifetime = 0)
     {
-        if (defined('HHVM_VERSION')) {
-            $this->skippedTests['testDeferredSaveWithoutCommit'] = 'Fails on HHVM';
-        }
-
         return new FilesystemAdapter('', $defaultLifetime);
     }
 

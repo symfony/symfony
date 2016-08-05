@@ -270,9 +270,6 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         if (!$item instanceof CacheItem) {
             return false;
         }
-        if ($this->deferred) {
-            $this->commit();
-        }
         $this->deferred[$item->getKey()] = $item;
 
         return $this->commit();

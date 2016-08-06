@@ -302,6 +302,14 @@
                 <source>An empty file is not allowed.</source>
                 <target>Súbor nesmie byť prázdny.</target>
             </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Hostiteľa nebolo možné rozpoznať.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Táto hodnota nezodpovedá očakávanej znakovej sade {{ charset }}.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

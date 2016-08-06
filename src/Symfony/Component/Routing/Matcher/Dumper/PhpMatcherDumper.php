@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Routing\Matcher\Dumper;
 
+use Symfony\Component\AstGenerator\Util\AstHelper;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Matcher\Generator\PhpMatcherGenerator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -31,6 +33,7 @@ class PhpMatcherDumper extends MatcherDumper
      * @var ExpressionFunctionProviderInterface[]
      */
     private $expressionLanguageProviders = array();
+    private $generator;
 
     /**
      * Dumps a set of routes to a PHP class.
@@ -46,42 +49,9 @@ class PhpMatcherDumper extends MatcherDumper
      */
     public function dump(array $options = array())
     {
-        $options = array_replace(array(
-            'class' => 'ProjectUrlMatcher',
-            'base_class' => 'Symfony\\Component\\Routing\\Matcher\\UrlMatcher',
-        ), $options);
+        $generator = new PhpMatcherGenerator();
 
-        // trailing slash support is only enabled if we know how to redirect the user
-        $interfaces = class_implements($options['base_class']);
-        $supportsRedirections = isset($interfaces['Symfony\\Component\\Routing\\Matcher\\RedirectableUrlMatcherInterface']);
-
-        return <<<EOF
-<?php
-
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RequestContext;
-
-/**
- * {$options['class']}.
- *
- * This class has been auto-generated
- * by the Symfony Routing Component.
- */
-class {$options['class']} extends {$options['base_class']}
-{
-    /**
-     * Constructor.
-     */
-    public function __construct(RequestContext \$context)
-    {
-        \$this->context = \$context;
-    }
-
-{$this->generateMatchMethod($supportsRedirections)}
-}
-
-EOF;
+        return AstHelper::dump($generator->generate($this->getRoutes(), $options));
     }
 
     public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)

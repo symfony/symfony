@@ -10,4 +10,4 @@
   <info>-o, --option_name</info>  
 
 <comment>Help:</comment>
- command 2 help
+  command 2 help

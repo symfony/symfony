@@ -79,7 +79,8 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $route = $routeCollection->get('blog_show');
 
         $this->assertInstanceOf('Symfony\Component\Routing\Route', $route);
-        $this->assertSame('/blog/{slug}', $route->getPath());
+        $this->assertSame('/blög/{slug}', $route->getPath());
+        $this->assertSame(array('locale' => '\w+', 'slug' => '[a-zë]+'), $route->getRequirements());
         $this->assertSame('{locale}.example.com', $route->getHost());
         $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertSame('\w+', $route->getRequirement('locale'));
@@ -99,7 +100,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
 
         foreach ($routes as $route) {
-            $this->assertSame('/{foo}/blog/{slug}', $route->getPath());
+            $this->assertSame('/{foo}/blög/{slug}', $route->getPath());
             $this->assertSame('123', $route->getDefault('foo'));
             $this->assertSame('\d+', $route->getRequirement('foo'));
             $this->assertSame('bar', $route->getOption('foo'));

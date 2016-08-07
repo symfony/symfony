@@ -73,9 +73,10 @@ class {$options['class']} extends {$options['base_class']}
     /**
      * Constructor.
      */
-    public function __construct(RequestContext \$context)
+    public function __construct(RequestContext \$context, \$charset)
     {
         \$this->context = \$context;
+        \$this->charset = \$charset;
     }
 
 {$this->generateMatchMethod($supportsRedirections)}
@@ -104,7 +105,7 @@ EOF;
     public function match(\$pathinfo)
     {
         \$allow = array();
-        \$pathinfo = rawurldecode(\$pathinfo);
+        \$pathinfo = \$this->toUtf8(rawurldecode(\$pathinfo));
         \$context = \$this->context;
         \$request = \$this->request;
 

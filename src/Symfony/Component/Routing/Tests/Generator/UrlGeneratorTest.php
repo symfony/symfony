@@ -326,15 +326,31 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testUrlEncoding()
     {
         // This tests the encoding of reserved characters that are used for delimiting of URI components (defined in RFC 3986)
-        // and other special ASCII chars. These chars are tested as static text path, variable path and query param.
-        $chars = '@:[]/()*\'" +,;-._~&$<>|{}%\\^`!?foo=bar#id';
+        // and other special chars. These chars are tested as static text path, variable path and query param.
+        $chars = '@:[]/()*\'" +,;-._~&$<>|{}%\\^`!?foo=bar#idé';
         $routes = $this->getRoutes('test', new Route("/$chars/{varpath}", array(), array('varpath' => '.+')));
-        $this->assertSame('/app.php/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
-           .'/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id'
-           .'?query=%40%3A%5B%5D/%28%29%2A%27%22+%2B%2C%3B-._%7E%26%24%3C%3E%7C%7B%7D%25%5C%5E%60%21%3Ffoo%3Dbar%23id',
-            $this->getGenerator($routes)->generate('test', array(
+
+        $generator = $this->getGenerator($routes);
+        $this->assertSame('/app.php/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id%C3%A9'
+           .'/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id%C3%A9'
+           .'?query=%40%3A%5B%5D/%28%29%2A%27%22+%2B%2C%3B-._%7E%26%24%3C%3E%7C%7B%7D%25%5C%5E%60%21%3Ffoo%3Dbar%23id%C3%A9'
+           .'#%40%3A%5B%5D/%28%29%2A%27%22%20%2B%2C%3B-._~%26%24%3C%3E%7C%7B%7D%25%5C%5E%60%21?foo%3Dbar%23id%C3%A9',
+            $generator->generate('test', array(
                 'varpath' => $chars,
                 'query' => $chars,
+                '_fragment' => $chars,
+            ))
+        );
+
+        $generator = $this->getGenerator($routes, array(), null, 'ISO-8859-1');
+        $this->assertSame('/app.php/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id%E9'
+           .'/@:%5B%5D/%28%29*%27%22%20+,;-._~%26%24%3C%3E|%7B%7D%25%5C%5E%60!%3Ffoo=bar%23id%E9'
+           .'?query=%40%3A%5B%5D/%28%29%2A%27%22+%2B%2C%3B-._%7E%26%24%3C%3E%7C%7B%7D%25%5C%5E%60%21%3Ffoo%3Dbar%23id%E9'
+           .'#%40%3A%5B%5D/%28%29%2A%27%22%20%2B%2C%3B-._~%26%24%3C%3E%7C%7B%7D%25%5C%5E%60%21?foo%3Dbar%23id%E9',
+            $generator->generate('test', array(
+                'varpath' => $chars,
+                'query' => $chars,
+                '_fragment' => $chars,
             ))
         );
     }
@@ -360,6 +376,62 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         // and following optional variables like _format could never match.
         $this->setExpectedException('Symfony\Component\Routing\Exception\InvalidParameterException');
         $generator->generate('test', array('x' => 'do.t', 'y' => '123', 'z' => 'bar', '_format' => 'xml'));
+    }
+
+    public function testCharsetUtf8()
+    {
+        $routes = $this->getRoutes('test', new Route('/foo'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/foo?bar=%C3%A9', $generator->generate('test', array('bar' => 'é')));
+
+        $routes = $this->getRoutes('test', new Route('/foo'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/foo#%C3%A9', $generator->generate('test', array('_fragment' => 'é')));
+
+        $routes = $this->getRoutes('test', new Route('/ü'));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/%C3%BC', $generator->generate('test'));
+
+        $routes = $this->getRoutes('test', new Route('/ü/{what}', array(), array('what' => 'é')));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/%C3%BC/%C3%A9', $generator->generate('test', array('what' => 'é')));
+
+        $routes = $this->getRoutes('test', new Route('/ü/{what}', array(), array('what' => '\pL')));
+        $generator = $this->getGenerator($routes);
+
+        $this->assertSame('/app.php/%C3%BC/%C3%A9', $generator->generate('test', array('what' => 'é')));
+    }
+
+    public function testCharsetIso88591()
+    {
+        $routes = $this->getRoutes('test', new Route('/foo'));
+        $generator = $this->getGenerator($routes, array(), null, 'ISO-8859-1');
+
+        $this->assertSame('/app.php/foo?bar=%E9', $generator->generate('test', array('bar' => 'é')));
+
+        $routes = $this->getRoutes('test', new Route('/foo'));
+        $generator = $this->getGenerator($routes, array(), null, 'ISO-8859-1');
+
+        $this->assertSame('/app.php/foo#%E9', $generator->generate('test', array('_fragment' => 'é')));
+
+        $routes = $this->getRoutes('test', new Route('/ü'));
+        $generator = $this->getGenerator($routes, array(), null, 'ISO-8859-1');
+
+        $this->assertSame('/app.php/%FC', $generator->generate('test'));
+
+        $routes = $this->getRoutes('test', new Route('/ü/{what}', array(), array('what' => 'é')));
+        $generator = $this->getGenerator($routes, array(), null, 'ISO-8859-1');
+
+        $this->assertSame('/app.php/%FC/%E9', $generator->generate('test', array('what' => 'é')));
+
+        $routes = $this->getRoutes('test', new Route('/ü/{what}', array(), array('what' => '\pL')));
+        $generator = $this->getGenerator($routes, array(), null, 'ISO-8859-1');
+
+        $this->assertSame('/app.php/%FC/%E9', $generator->generate('test', array('what' => 'é')));
     }
 
     public function testOptionalVariableWithNoRealSeparator()
@@ -653,7 +725,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/testing#?/', $url);
     }
 
-    protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
+    protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null, $charset = 'UTF-8')
     {
         $context = new RequestContext('/app.php');
         foreach ($parameters as $key => $value) {
@@ -661,7 +733,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
             $context->$method($value);
         }
 
-        return new UrlGenerator($routes, $context, $logger);
+        return new UrlGenerator($routes, $context, $logger, $charset);
     }
 
     protected function getRoutes($name, Route $route)

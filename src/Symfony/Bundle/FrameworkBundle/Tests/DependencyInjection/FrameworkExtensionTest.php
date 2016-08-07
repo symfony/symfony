@@ -639,6 +639,7 @@ abstract class FrameworkExtensionTest extends TestCase
             'kernel.bundles' => array('FrameworkBundle' => 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle'),
             'kernel.cache_dir' => __DIR__,
             'kernel.debug' => false,
+            'kernel.charset' => 'UTF-8',
             'kernel.environment' => 'test',
             'kernel.name' => 'kernel',
             'kernel.root_dir' => __DIR__,

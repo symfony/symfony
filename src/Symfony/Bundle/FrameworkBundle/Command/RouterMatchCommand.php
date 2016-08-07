@@ -90,9 +90,12 @@ EOF
             $context->setHost($host);
         }
 
-        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context);
+        $pathInfo = $input->getArgument('path_info');
 
-        $traces = $matcher->getTraces($input->getArgument('path_info'));
+        $charset = mb_detect_encoding($pathInfo, null, true);
+        $matcher = new TraceableUrlMatcher($router->getRouteCollection(), $context, $charset);
+
+        $traces = $matcher->getTraces($pathInfo);
 
         $io->newLine();
 

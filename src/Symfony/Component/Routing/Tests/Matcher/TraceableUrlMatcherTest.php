@@ -32,7 +32,7 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $context = new RequestContext();
         $context->setHost('baz');
 
-        $matcher = new TraceableUrlMatcher($coll, $context);
+        $matcher = new TraceableUrlMatcher($coll, $context, 'UTF-8');
         $traces = $matcher->getTraces('/babar');
         $this->assertSame(array(0, 0, 0, 0, 0, 0), $this->getLevels($traces));
 
@@ -81,7 +81,7 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $context = new RequestContext();
         $context->setHost('baz');
 
-        $matcher = new TraceableUrlMatcher($routes, $context);
+        $matcher = new TraceableUrlMatcher($routes, $context, 'UTF-8');
 
         $traces = $matcher->getTraces('/mypath/');
         $this->assertSame(
@@ -108,7 +108,7 @@ class TraceableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $context = new RequestContext();
         $context->setHost('baz');
 
-        $matcher = new TraceableUrlMatcher($routes, $context);
+        $matcher = new TraceableUrlMatcher($routes, $context, 'UTF-8');
 
         $notMatchingRequest = Request::create('/foo', 'GET');
         $traces = $matcher->getTracesForRequest($notMatchingRequest);

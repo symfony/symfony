@@ -106,9 +106,20 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * Available options:
      *
-     *   * cache_dir:     The cache directory (or null to disable caching)
-     *   * debug:         Whether to enable debugging or not (false by default)
-     *   * resource_type: Type hint for the main resource (optional)
+     *   * cache_dir:              The cache directory (or null to disable caching)
+     *   * charset:                The encoding used in URLs (UTF-8 by default
+     *   * debug:                  Whether to enable debugging or not (false by default)
+     *   * generator_class:        The name of a UrlGeneratorInterface implementation
+     *   * generator_base_class:   The base class for the dumped generator class
+     *   * generator_cache_class:  The class name for the dumped generator class
+     *   * generator_dumper_class: The name of a GeneratorDumperInterface implementation
+     *   * matcher_class:          The name of a UrlMatcherInterface implementation
+     *   * matcher_base_class:     The base class for the dumped matcher class
+     *   * matcher_dumper_class:   The class name for the dumped matcher class
+     *   * matcher_cache_class:    The name of a MatcherDumperInterface implementation
+     *   * resource_type:          Type hint for the main resource (optional)
+     *   * strict_requirements:    Configure strict requirement checking for generators
+     *                             implementing ConfigurableRequirementsInterface (default is true)
      *
      * @param array $options An array of options
      *
@@ -118,6 +129,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     {
         $this->options = array(
             'cache_dir' => null,
+            'charset' => 'UTF-8',
             'debug' => false,
             'generator_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
             'generator_base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
@@ -268,7 +280,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->options['charset']);
             if (method_exists($this->matcher, 'addExpressionLanguageProvider')) {
                 foreach ($this->expressionLanguageProviders as $provider) {
                     $this->matcher->addExpressionLanguageProvider($provider);
@@ -298,7 +310,7 @@ class Router implements RouterInterface, RequestMatcherInterface
 
         require_once $cache->getPath();
 
-        return $this->matcher = new $this->options['matcher_cache_class']($this->context);
+        return $this->matcher = new $this->options['matcher_cache_class']($this->context, $this->options['charset']);
     }
 
     /**
@@ -313,7 +325,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
+            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger, $this->options['charset']);
         } else {
             $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['generator_cache_class'].'.php',
                 function (ConfigCacheInterface $cache) {
@@ -330,7 +342,7 @@ class Router implements RouterInterface, RequestMatcherInterface
 
             require_once $cache->getPath();
 
-            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger);
+            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger, $this->options['charset']);
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {

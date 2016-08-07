@@ -420,7 +420,7 @@ EOF;
 
     private function formatGoogleLink($query)
     {
-        return '<a href="//google.com/search?q=' . urlencode(strip_tags($query)) . '" target="_blank" rel="noopener noreferrer" title="Search error on Google"><img src="//google.com/favicon.ico" alt="Search error on Google"></a>';
+        return '<a href="https://google.com/search?q=' . urlencode(strip_tags($query)) . '" target="_blank" rel="noopener noreferrer" title="Search error on Google"><img src="//google.com/favicon.ico" alt="Search error on Google"></a>';
     }
 }
 

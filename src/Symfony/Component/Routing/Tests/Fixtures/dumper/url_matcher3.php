@@ -15,15 +15,16 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
     /**
      * Constructor.
      */
-    public function __construct(RequestContext $context)
+    public function __construct(RequestContext $context, $charset)
     {
         $this->context = $context;
+        $this->charset = $charset;
     }
 
     public function match($pathinfo)
     {
         $allow = array();
-        $pathinfo = rawurldecode($pathinfo);
+        $pathinfo = $this->toUtf8(rawurldecode($pathinfo));
         $context = $this->context;
         $request = $this->request;
 
@@ -34,7 +35,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Matcher\UrlMatcher
             }
 
             // dynamic
-            if (preg_match('#^/rootprefix/(?P<var>[^/]++)$#s', $pathinfo, $matches)) {
+            if (preg_match('#^/rootprefix/(?P<var>[^/]++)$#us', $pathinfo, $matches)) {
                 return $this->mergeDefaults(array_replace($matches, array('_route' => 'dynamic')), array ());
             }
 

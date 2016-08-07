@@ -21,6 +21,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ExceptionCaster
 {
+    public static $srcContext = 1;
     public static $traceArgs = true;
     public static $errorTypes = array(
         E_DEPRECATED => 'E_DEPRECATED',
@@ -42,12 +43,12 @@ class ExceptionCaster
 
     public static function castError(\Error $e, array $a, Stub $stub, $isNested, $filter = 0)
     {
-        return self::filterExceptionArray($a, "\0Error\0", $filter);
+        return self::filterExceptionArray($stub->class, $a, "\0Error\0", $filter);
     }
 
     public static function castException(\Exception $e, array $a, Stub $stub, $isNested, $filter = 0)
     {
-        return self::filterExceptionArray($a, "\0Exception\0", $filter);
+        return self::filterExceptionArray($stub->class, $a, "\0Exception\0", $filter);
     }
 
     public static function castErrorException(\ErrorException $e, array $a, Stub $stub, $isNested)
@@ -64,54 +65,130 @@ class ExceptionCaster
         $prefix = Caster::PREFIX_PROTECTED;
         $xPrefix = "\0Exception\0";
 
-        if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'][0])) {
+        if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'])) {
             $b = (array) $a[$xPrefix.'previous'];
-            $b[$xPrefix.'trace'][0] += array(
+            array_unshift($b[$xPrefix.'trace'], array(
+                'function' => 'new '.get_class($a[$xPrefix.'previous']),
                 'file' => $b[$prefix.'file'],
                 'line' => $b[$prefix.'line'],
-            );
-            array_splice($b[$xPrefix.'trace'], -1 - count($a[$xPrefix.'trace']));
-            static::filterTrace($b[$xPrefix.'trace'], false);
-            $a[Caster::PREFIX_VIRTUAL.'trace'] = $b[$xPrefix.'trace'];
+            ));
+            $a[$xPrefix.'trace'] = new TraceStub($b[$xPrefix.'trace'], false, 0, -1 - count($a[$xPrefix.'trace']->value));
         }
 
-        unset($a[$xPrefix.'trace'], $a[$xPrefix.'previous'], $a[$prefix.'code'], $a[$prefix.'file'], $a[$prefix.'line']);
+        unset($a[$xPrefix.'previous'], $a[$prefix.'code'], $a[$prefix.'file'], $a[$prefix.'line']);
 
         return $a;
     }
 
-    public static function filterTrace(&$trace, $dumpArgs, $offset = 0)
+    public static function castTraceStub(TraceStub $trace, array $a, Stub $stub, $isNested)
     {
-        if (0 > $offset || empty($trace[$offset])) {
-            return $trace = null;
+        if (!$isNested) {
+            return $a;
         }
+        $stub->class = '';
+        $stub->handle = 0;
+        $frames = $trace->value;
+        $prefix = Caster::PREFIX_VIRTUAL;
 
-        $t = $trace[$offset];
-
-        if (empty($t['class']) && isset($t['function'])) {
-            if ('user_error' === $t['function'] || 'trigger_error' === $t['function']) {
-                ++$offset;
-            }
+        $a = array();
+        $j = count($frames);
+        if (0 > $i = $trace->sliceOffset) {
+            $i = max(0, $j + $i);
         }
-
-        if ($offset) {
-            array_splice($trace, 0, $offset);
+        if (!isset($trace->value[$i])) {
+            return array();
         }
+        $lastCall = isset($frames[$i]['function']) ? ' ==> '.(isset($frames[$i]['class']) ? $frames[0]['class'].$frames[$i]['type'] : '').$frames[$i]['function'].'()' : '';
+        $frames[] = array('function' => '');
 
-        foreach ($trace as &$t) {
-            $t = array(
-                'call' => (isset($t['class']) ? $t['class'].$t['type'] : '').$t['function'].'()',
-                'file' => isset($t['line']) ? "{$t['file']}:{$t['line']}" : '',
-                'args' => &$t['args'],
+        for ($j += $trace->numberingOffset - $i++; isset($frames[$i]); ++$i, --$j) {
+            $f = $frames[$i];
+            $call = isset($f['function']) ? (isset($f['class']) ? $f['class'].$f['type'] : '').$f['function'].'()' : '???';
+
+            $label = $call.$lastCall;
+            $frame = new FrameStub(
+                array(
+                    'object' => isset($f['object']) ? $f['object'] : null,
+                    'class' => isset($f['class']) ? $f['class'] : null,
+                    'type' => isset($f['type']) ? $f['type'] : null,
+                    'function' => isset($f['function']) ? $f['function'] : null,
+                ) + $frames[$i - 1],
+                $trace->keepArgs,
+                true
             );
-
-            if (!isset($t['args']) || !$dumpArgs) {
-                unset($t['args']);
+            $f = self::castFrameStub($frame, array(), $frame, true);
+            if (isset($f[$prefix.'src'])) {
+                foreach ($f[$prefix.'src']->value as $label => $frame) {
+                }
+                if (isset($f[$prefix.'args']) && $frame instanceof EnumStub) {
+                    $frame->value['args'] = $f[$prefix.'args'];
+                }
             }
+            $a[$prefix.$j.'. '.$label] = $frame;
+
+            $lastCall = ' ==> '.$call;
         }
+        if (null !== $trace->sliceLength) {
+            $a = array_slice($a, 0, $trace->sliceLength, true);
+        }
+
+        return $a;
     }
 
-    private static function filterExceptionArray(array $a, $xPrefix, $filter)
+    public static function castFrameStub(FrameStub $frame, array $a, Stub $stub, $isNested)
+    {
+        if (!$isNested) {
+            return $a;
+        }
+        $f = $frame->value;
+        $prefix = Caster::PREFIX_VIRTUAL;
+
+        if (isset($f['file'], $f['line'])) {
+            if (preg_match('/\((\d+)\)(?:\([\da-f]{32}\))? : (?:eval\(\)\'d code|runtime-created function)$/', $f['file'], $match)) {
+                $f['file'] = substr($f['file'], 0, -strlen($match[0]));
+                $f['line'] = (int) $match[1];
+            }
+            $src = array();
+            if (file_exists($f['file']) && 0 <= self::$srcContext) {
+                if (!empty($f['class']) && is_subclass_of($f['class'], 'Twig_Template') && method_exists($f['class'], 'getDebugInfo')) {
+                    $template = isset($f['object']) ? $f['object'] : new $f['class'](new \Twig_Environment(new \Twig_Loader_Filesystem()));
+
+                    try {
+                        $templateName = $template->getTemplateName();
+                        $templateSrc = explode("\n", method_exists($template, 'getSource') ? $template->getSource() : $template->getEnvironment()->getLoader()->getSource($templateName));
+                        $templateInfo = $template->getDebugInfo();
+                        if (isset($templateInfo[$f['line']])) {
+                            $src[$templateName] = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext);
+                        }
+                    } catch (\Twig_Error_Loader $e) {
+                    }
+                }
+                if (!$src) {
+                    $src[$f['file']] = self::extractSource(explode("\n", file_get_contents($f['file'])), $f['line'], self::$srcContext);
+                }
+            } else {
+                $src[$f['file']] = $f['line'];
+            }
+            $a[$prefix.'src'] = new EnumStub($src);
+        }
+
+        unset($a[$prefix.'args'], $a[$prefix.'line'], $a[$prefix.'file']);
+        if ($frame->inTraceStub) {
+            unset($a[$prefix.'class'], $a[$prefix.'type'], $a[$prefix.'function']);
+        }
+        foreach ($a as $k => $v) {
+            if (!$v) {
+                unset($a[$k]);
+            }
+        }
+        if ($frame->keepArgs && isset($f['args'])) {
+            $a[$prefix.'args'] = new EnumStub($f['args'], false);
+        }
+
+        return $a;
+    }
+
+    private static function filterExceptionArray($xClass, array $a, $xPrefix, $filter)
     {
         if (isset($a[$xPrefix.'trace'])) {
             $trace = $a[$xPrefix.'trace'];
@@ -121,11 +198,12 @@ class ExceptionCaster
         }
 
         if (!($filter & Caster::EXCLUDE_VERBOSE)) {
-            static::filterTrace($trace, static::$traceArgs);
-
-            if (null !== $trace) {
-                $a[$xPrefix.'trace'] = $trace;
-            }
+            array_unshift($trace, array(
+                'function' => $xClass ? 'new '.$xClass : null,
+                'file' => $a[Caster::PREFIX_PROTECTED.'file'],
+                'line' => $a[Caster::PREFIX_PROTECTED.'line'],
+            ));
+            $a[$xPrefix.'trace'] = new TraceStub($trace, self::$traceArgs);
         }
         if (empty($a[$xPrefix.'previous'])) {
             unset($a[$xPrefix.'previous']);
@@ -133,5 +211,49 @@ class ExceptionCaster
         unset($a[$xPrefix.'string'], $a[Caster::PREFIX_DYNAMIC.'xdebug_message'], $a[Caster::PREFIX_DYNAMIC.'__destructorException']);
 
         return $a;
+    }
+
+    private static function extractSource(array $srcArray, $line, $srcContext)
+    {
+        $src = array();
+
+        for ($i = $line - 1 - $srcContext; $i <= $line - 1 + $srcContext; ++$i) {
+            $src[] = (isset($srcArray[$i]) ? $srcArray[$i] : '')."\n";
+        }
+
+        $ltrim = 0;
+        do {
+            $pad = null;
+            for ($i = $srcContext << 1; $i >= 0; --$i) {
+                if (isset($src[$i][$ltrim]) && "\r" !== ($c = $src[$i][$ltrim]) && "\n" !== $c) {
+                    if (null === $pad) {
+                        $pad = $c;
+                    }
+                    if ((' ' !== $c && "\t" !== $c) || $pad !== $c) {
+                        break;
+                    }
+                }
+            }
+            ++$ltrim;
+        } while (0 > $i && null !== $pad);
+
+        --$ltrim;
+
+        $pad = strlen($line + $srcContext);
+        $srcArray = array();
+
+        foreach ($src as $i => $c) {
+            if ($ltrim) {
+                $c = isset($c[$ltrim]) && "\r" !== $c[$ltrim] ? substr($c, $ltrim) : ltrim($c, " \t");
+            }
+            $c = substr($c, 0, -1);
+            $c = new ConstStub($c, $c);
+            if ($i !== $srcContext) {
+                $c->class = 'default';
+            }
+            $srcArray[sprintf("% {$pad}d", $i + $line - $srcContext)] = $c;
+        }
+
+        return new EnumStub($srcArray);
     }
 }

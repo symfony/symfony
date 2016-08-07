@@ -1,0 +1,57 @@
+{
+    "name": "symfony/property-info",
+    "type": "library",
+    "description": "Symfony Property Info Component",
+    "keywords": [
+        "property",
+        "type",
+        "PHPDoc",
+        "symfony",
+        "validator",
+        "doctrine"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "dunglas@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/inflector": "~3.1"
+    },
+    "require-dev": {
+        "symfony/serializer": "~2.8|~3.0",
+        "symfony/cache": "~3.1",
+        "phpdocumentor/reflection-docblock": "^3.0",
+        "doctrine/annotations": "~1.0"
+    },
+    "conflict": {
+        "phpdocumentor/reflection-docblock": "<3.0",
+        "phpdocumentor/type-resolver": "<0.2.0"
+    },
+    "suggest": {
+        "psr/cache-implementation": "To cache results",
+        "symfony/doctrine-bridge": "To use Doctrine metadata",
+        "phpdocumentor/reflection-docblock": "To use the PHPDoc",
+        "symfony/serializer": "To use Serializer metadata"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\PropertyInfo\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.2-dev"
+        }
+    }
+}

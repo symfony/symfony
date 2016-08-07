@@ -68,9 +68,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
         $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('type_name'));
-        $type->expects($this->any())
             ->method('getInnerType')
             ->will($this->returnValue(new \stdClass()));
 
@@ -81,7 +78,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(
             'id' => 'name',
             'name' => 'name',
-            'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
             'passed_options' => array(),
@@ -92,9 +88,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
     public function testExtractConfigurationSortsPassedOptions()
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('type_name'));
         $type->expects($this->any())
             ->method('getInnerType')
             ->will($this->returnValue(new \stdClass()));
@@ -115,7 +108,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(
             'id' => 'name',
             'name' => 'name',
-            'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
             'passed_options' => array(
@@ -130,9 +122,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
     public function testExtractConfigurationSortsResolvedOptions()
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('type_name'));
         $type->expects($this->any())
             ->method('getInnerType')
             ->will($this->returnValue(new \stdClass()));
@@ -150,7 +139,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(
             'id' => 'name',
             'name' => 'name',
-            'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
             'passed_options' => array(),
@@ -165,9 +153,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
     public function testExtractConfigurationBuildsIdRecursively()
     {
         $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $type->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('type_name'));
         $type->expects($this->any())
             ->method('getInnerType')
             ->will($this->returnValue(new \stdClass()));
@@ -190,7 +175,6 @@ class FormDataExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(
             'id' => 'grandParent_parent_name',
             'name' => 'name',
-            'type' => 'type_name',
             'type_class' => 'stdClass',
             'synchronized' => 'true',
             'passed_options' => array(),

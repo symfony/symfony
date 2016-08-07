@@ -73,6 +73,7 @@ abstract class FileDumper implements DumperInterface
             $fullpath = $options['path'].'/'.$this->getRelativePath($domain, $messages->getLocale());
             if (file_exists($fullpath)) {
                 if ($this->backup) {
+                    @trigger_error('Creating a backup while dumping a message catalogue is deprecated since version 3.1 and will be removed in 4.0. Use TranslationWriter::disableBackup() to disable the backup.', E_USER_DEPRECATED);
                     copy($fullpath, $fullpath.'~');
                 }
             } else {
@@ -82,7 +83,7 @@ abstract class FileDumper implements DumperInterface
                 }
             }
             // save file
-            file_put_contents($fullpath, $this->format($messages, $domain));
+            file_put_contents($fullpath, $this->formatCatalogue($messages, $domain, $options));
         }
     }
 
@@ -91,10 +92,11 @@ abstract class FileDumper implements DumperInterface
      *
      * @param MessageCatalogue $messages
      * @param string           $domain
+     * @param array            $options
      *
      * @return string representation
      */
-    abstract protected function format(MessageCatalogue $messages, $domain);
+    abstract public function formatCatalogue(MessageCatalogue $messages, $domain, array $options = array());
 
     /**
      * Gets the file extension of the dumper.

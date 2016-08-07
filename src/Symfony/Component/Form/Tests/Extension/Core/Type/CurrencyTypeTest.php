@@ -26,7 +26,7 @@ class CurrencyTypeTest extends TestCase
 
     public function testCurrenciesAreSelectable()
     {
-        $form = $this->factory->create('currency');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CurrencyType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

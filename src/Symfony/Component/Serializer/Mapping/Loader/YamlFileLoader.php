@@ -87,6 +87,14 @@ class YamlFileLoader extends FileLoader
                             $attributeMetadata->addGroup($group);
                         }
                     }
+
+                    if (isset($data['max_depth'])) {
+                        if (!is_int($data['max_depth'])) {
+                            throw new MappingException('The "max_depth" value must an integer  in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName());
+                        }
+
+                        $attributeMetadata->setMaxDepth($data['max_depth']);
+                    }
                 }
             }
 

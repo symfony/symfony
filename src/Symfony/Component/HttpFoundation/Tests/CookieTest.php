@@ -151,4 +151,13 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $cookie = new Cookie('foo', 'bar', 0, '/', '');
         $this->assertEquals('foo=bar; path=/; httponly', $cookie->__toString());
     }
+
+    public function testRawCookie()
+    {
+        $cookie = new Cookie('foo', 'bar', 3600, '/', '.myfoodomain.com', false, true);
+        $this->assertFalse($cookie->isRaw());
+
+        $cookie = new Cookie('foo', 'bar', 3600, '/', '.myfoodomain.com', false, true, true);
+        $this->assertTrue($cookie->isRaw());
+    }
 }

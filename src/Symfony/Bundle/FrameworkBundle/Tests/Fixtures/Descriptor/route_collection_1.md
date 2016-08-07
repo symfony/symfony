@@ -2,9 +2,9 @@ route_1
 -------
 
 - Path: /hello/{name}
-- Path Regex: #^/hello(?:/(?P<name>[a-z]+))?$#s
+- Path Regex: #^/hello(?:/(?P<name>[a-z]+))?$#us
 - Host: localhost
-- Host Regex: #^localhost$#si
+- Host Regex: #^localhost$#usi
 - Scheme: http|https
 - Method: GET|HEAD
 - Class: Symfony\Component\Routing\Route
@@ -22,9 +22,9 @@ route_2
 -------
 
 - Path: /name/add
-- Path Regex: #^/name/add$#s
+- Path Regex: #^/name/add$#us
 - Host: localhost
-- Host Regex: #^localhost$#si
+- Host Regex: #^localhost$#usi
 - Scheme: http|https
 - Method: PUT|POST
 - Class: Symfony\Component\Routing\Route
@@ -34,3 +34,4 @@ route_2
     - `compiler_class`: Symfony\Component\Routing\RouteCompiler
     - `opt1`: val1
     - `opt2`: val2
+

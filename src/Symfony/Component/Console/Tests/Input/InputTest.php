@@ -129,4 +129,12 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input->setInteractive(false);
         $this->assertFalse($input->isInteractive(), '->setInteractive() changes the interactive flag');
     }
+
+    public function testSetGetStream()
+    {
+        $input = new ArrayInput(array());
+        $stream = fopen('php://memory', 'r+', false);
+        $input->setStream($stream);
+        $this->assertSame($stream, $input->getStream());
+    }
 }

@@ -96,24 +96,24 @@ class YamlDumper extends Dumper
             $code .= sprintf("        synthetic: true\n");
         }
 
-        if ($definition->isSynchronized(false)) {
-            $code .= sprintf("        synchronized: true\n");
+        if ($definition->isDeprecated()) {
+            $code .= sprintf("        deprecated: %s\n", $definition->getDeprecationMessage('%service_id%'));
         }
 
-        if ($definition->getFactoryClass(false)) {
-            $code .= sprintf("        factory_class: %s\n", $this->dumper->dump($definition->getFactoryClass(false)));
+        if ($definition->isAutowired()) {
+            $code .= "        autowire: true\n";
+        }
+
+        $autowiringTypesCode = '';
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $autowiringTypesCode .= sprintf("            - %s\n", $this->dumper->dump($autowiringType));
+        }
+        if ($autowiringTypesCode) {
+            $code .= sprintf("        autowiring_types:\n%s", $autowiringTypesCode);
         }
 
         if ($definition->isLazy()) {
             $code .= sprintf("        lazy: true\n");
-        }
-
-        if ($definition->getFactoryMethod(false)) {
-            $code .= sprintf("        factory_method: %s\n", $this->dumper->dump($definition->getFactoryMethod(false)));
-        }
-
-        if ($definition->getFactoryService(false)) {
-            $code .= sprintf("        factory_service: %s\n", $this->dumper->dump($definition->getFactoryService(false)));
         }
 
         if ($definition->getArguments()) {
@@ -128,15 +128,18 @@ class YamlDumper extends Dumper
             $code .= sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
         }
 
-        if (ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope()) {
-            $code .= sprintf("        scope: %s\n", $this->dumper->dump($scope));
+        if (!$definition->isShared()) {
+            $code .= "        shared: false\n";
         }
 
         if (null !== $decorated = $definition->getDecoratedService()) {
-            list($decorated, $renamedId) = $decorated;
+            list($decorated, $renamedId, $priority) = $decorated;
             $code .= sprintf("        decorates: %s\n", $decorated);
             if (null !== $renamedId) {
                 $code .= sprintf("        decoration_inner_name: %s\n", $renamedId);
+            }
+            if (0 !== $priority) {
+                $code .= sprintf("        decoration_priority: %s\n", $priority);
             }
         }
 

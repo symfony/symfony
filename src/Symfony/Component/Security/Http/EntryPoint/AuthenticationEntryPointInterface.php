@@ -16,8 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * AuthenticationEntryPointInterface is the interface used to start the
- * authentication scheme.
+ * Implement this interface for any classes that will be called to "start"
+ * the authentication process (see method for more details).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */

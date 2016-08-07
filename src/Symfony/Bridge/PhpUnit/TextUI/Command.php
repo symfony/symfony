@@ -19,6 +19,14 @@ class Command extends \PHPUnit_TextUI_Command
     /**
      * {@inheritdoc}
      */
+    protected function createRunner()
+    {
+        return new TestRunner($this->arguments['loader']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function handleBootstrap($filename)
     {
         parent::handleBootstrap($filename);

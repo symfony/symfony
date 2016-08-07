@@ -106,9 +106,20 @@ class Router implements RouterInterface, RequestMatcherInterface
      *
      * Available options:
      *
-     *   * cache_dir:     The cache directory (or null to disable caching)
-     *   * debug:         Whether to enable debugging or not (false by default)
-     *   * resource_type: Type hint for the main resource (optional)
+     *   * cache_dir:              The cache directory (or null to disable caching)
+     *   * charset:                The encoding used in URLs (UTF-8 by default
+     *   * debug:                  Whether to enable debugging or not (false by default)
+     *   * generator_class:        The name of a UrlGeneratorInterface implementation
+     *   * generator_base_class:   The base class for the dumped generator class
+     *   * generator_cache_class:  The class name for the dumped generator class
+     *   * generator_dumper_class: The name of a GeneratorDumperInterface implementation
+     *   * matcher_class:          The name of a UrlMatcherInterface implementation
+     *   * matcher_base_class:     The base class for the dumped matcher class
+     *   * matcher_dumper_class:   The class name for the dumped matcher class
+     *   * matcher_cache_class:    The name of a MatcherDumperInterface implementation
+     *   * resource_type:          Type hint for the main resource (optional)
+     *   * strict_requirements:    Configure strict requirement checking for generators
+     *                             implementing ConfigurableRequirementsInterface (default is true)
      *
      * @param array $options An array of options
      *
@@ -118,6 +129,7 @@ class Router implements RouterInterface, RequestMatcherInterface
     {
         $this->options = array(
             'cache_dir' => null,
+            'charset' => 'UTF-8',
             'debug' => false,
             'generator_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
             'generator_base_class' => 'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
@@ -268,7 +280,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['matcher_cache_class']) {
-            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context);
+            $this->matcher = new $this->options['matcher_class']($this->getRouteCollection(), $this->context, $this->options['charset']);
             if (method_exists($this->matcher, 'addExpressionLanguageProvider')) {
                 foreach ($this->expressionLanguageProviders as $provider) {
                     $this->matcher->addExpressionLanguageProvider($provider);
@@ -278,32 +290,27 @@ class Router implements RouterInterface, RequestMatcherInterface
             return $this->matcher;
         }
 
-        $class = $this->options['matcher_cache_class'];
-        $baseClass = $this->options['matcher_base_class'];
-        $expressionLanguageProviders = $this->expressionLanguageProviders;
-        $that = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
-
-        $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$class.'.php',
-            function (ConfigCacheInterface $cache) use ($that, $class, $baseClass, $expressionLanguageProviders) {
-                $dumper = $that->getMatcherDumperInstance();
+        $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['matcher_cache_class'].'.php',
+            function (ConfigCacheInterface $cache) {
+                $dumper = $this->getMatcherDumperInstance();
                 if (method_exists($dumper, 'addExpressionLanguageProvider')) {
-                    foreach ($expressionLanguageProviders as $provider) {
+                    foreach ($this->expressionLanguageProviders as $provider) {
                         $dumper->addExpressionLanguageProvider($provider);
                     }
                 }
 
                 $options = array(
-                    'class' => $class,
-                    'base_class' => $baseClass,
+                    'class' => $this->options['matcher_cache_class'],
+                    'base_class' => $this->options['matcher_base_class'],
                 );
 
-                $cache->write($dumper->dump($options), $that->getRouteCollection()->getResources());
+                $cache->write($dumper->dump($options), $this->getRouteCollection()->getResources());
             }
         );
 
         require_once $cache->getPath();
 
-        return $this->matcher = new $class($this->context);
+        return $this->matcher = new $this->options['matcher_cache_class']($this->context, $this->options['charset']);
     }
 
     /**
@@ -318,27 +325,24 @@ class Router implements RouterInterface, RequestMatcherInterface
         }
 
         if (null === $this->options['cache_dir'] || null === $this->options['generator_cache_class']) {
-            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger);
+            $this->generator = new $this->options['generator_class']($this->getRouteCollection(), $this->context, $this->logger, $this->options['charset']);
         } else {
-            $class = $this->options['generator_cache_class'];
-            $baseClass = $this->options['generator_base_class'];
-            $that = $this; // required for PHP 5.3 where "$this" cannot be use()d in anonymous functions. Change in Symfony 3.0.
-            $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$class.'.php',
-                function (ConfigCacheInterface $cache) use ($that, $class, $baseClass) {
-                    $dumper = $that->getGeneratorDumperInstance();
+            $cache = $this->getConfigCacheFactory()->cache($this->options['cache_dir'].'/'.$this->options['generator_cache_class'].'.php',
+                function (ConfigCacheInterface $cache) {
+                    $dumper = $this->getGeneratorDumperInstance();
 
                     $options = array(
-                        'class' => $class,
-                        'base_class' => $baseClass,
+                        'class' => $this->options['generator_cache_class'],
+                        'base_class' => $this->options['generator_base_class'],
                     );
 
-                    $cache->write($dumper->dump($options), $that->getRouteCollection()->getResources());
+                    $cache->write($dumper->dump($options), $this->getRouteCollection()->getResources());
                 }
             );
 
             require_once $cache->getPath();
 
-            $this->generator = new $class($this->context, $this->logger);
+            $this->generator = new $this->options['generator_cache_class']($this->context, $this->logger, $this->options['charset']);
         }
 
         if ($this->generator instanceof ConfigurableRequirementsInterface) {
@@ -354,25 +358,17 @@ class Router implements RouterInterface, RequestMatcherInterface
     }
 
     /**
-     * This method is public because it needs to be callable from a closure in PHP 5.3. It should be converted back to protected in 3.0.
-     *
-     * @internal
-     *
      * @return GeneratorDumperInterface
      */
-    public function getGeneratorDumperInstance()
+    protected function getGeneratorDumperInstance()
     {
         return new $this->options['generator_dumper_class']($this->getRouteCollection());
     }
 
     /**
-     * This method is public because it needs to be callable from a closure in PHP 5.3. It should be converted back to protected in 3.0.
-     *
-     * @internal
-     *
      * @return MatcherDumperInterface
      */
-    public function getMatcherDumperInstance()
+    protected function getMatcherDumperInstance()
     {
         return new $this->options['matcher_dumper_class']($this->getRouteCollection());
     }

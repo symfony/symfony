@@ -67,11 +67,6 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
         return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
     }
 
-    protected function renderEnctype(FormView $view)
-    {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'enctype');
-    }
-
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
     {
         if ($label !== null) {
@@ -114,40 +109,5 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
     protected function setTheme(FormView $view, array $themes)
     {
         $this->extension->renderer->setTheme($view, $themes);
-    }
-
-    public function testRange()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testRangeWithMinMaxValues()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testLabelWithoutTranslationOnButton()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testSingleChoiceWithPlaceholderWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testButtonlabelWithoutTranslation()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
-    }
-
-    public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
-    {
-        // No-op for forward compatibility with AbstractLayoutTest 2.8
     }
 }

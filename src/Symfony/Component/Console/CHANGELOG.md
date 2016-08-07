@@ -1,6 +1,31 @@
 CHANGELOG
 =========
 
+3.2.0
+------
+
+* added `setInputs()` method to CommandTester for ease testing of commands expecting inputs
+* added `setStream()` and `getStream()` methods to Input (implement StreamableInputInterface)
+* added StreamableInputInterface
+* added LockableTrait
+
+3.1.0
+-----
+
+ * added truncate method to FormatterHelper
+ * added setColumnWidth(s) method to Table 
+
+2.8.3
+-----
+
+ * remove readline support from the question helper as it caused issues
+
+2.8.0
+-----
+
+ * use readline for user input in the question helper when available to allow
+   the use of arrow keys
+
 2.6.0
 -----
 

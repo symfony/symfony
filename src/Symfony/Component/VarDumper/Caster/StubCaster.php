@@ -33,12 +33,39 @@ class StubCaster
         }
     }
 
+    public static function castCutArray(CutArrayStub $c, array $a, Stub $stub, $isNested)
+    {
+        return $isNested ? $c->preservedSubset : $a;
+    }
+
     public static function cutInternals($obj, array $a, Stub $stub, $isNested)
     {
         if ($isNested) {
             $stub->cut += count($a);
 
             return array();
+        }
+
+        return $a;
+    }
+
+    public static function castEnum(EnumStub $c, array $a, Stub $stub, $isNested)
+    {
+        if ($isNested) {
+            $stub->class = $c->dumpKeys ? '' : null;
+            $stub->handle = 0;
+            $stub->value = null;
+            $stub->cut = $c->cut;
+
+            $a = array();
+
+            if ($c->value) {
+                foreach (array_keys($c->value) as $k) {
+                    $keys[] = Caster::PREFIX_VIRTUAL.$k;
+                }
+                // Preserve references with array_combine()
+                $a = array_combine($keys, $c->value);
+            }
         }
 
         return $a;

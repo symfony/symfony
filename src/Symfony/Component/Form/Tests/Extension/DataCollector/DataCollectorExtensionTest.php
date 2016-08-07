@@ -33,7 +33,7 @@ class DataCollectorExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadTypeExtensions()
     {
-        $typeExtensions = $this->extension->getTypeExtensions('form');
+        $typeExtensions = $this->extension->getTypeExtensions('Symfony\Component\Form\Extension\Core\Type\FormType');
 
         $this->assertInternalType('array', $typeExtensions);
         $this->assertCount(1, $typeExtensions);

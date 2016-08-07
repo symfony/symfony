@@ -372,6 +372,7 @@ abstract class AbstractDoctrineExtension extends Extension
                 $cacheDef->addMethodCall('setRedis', array(new Reference($this->getObjectManagerElementName(sprintf('%s_redis_instance', $objectManagerName)))));
                 break;
             case 'apc':
+            case 'apcu':
             case 'array':
             case 'xcache':
             case 'wincache':

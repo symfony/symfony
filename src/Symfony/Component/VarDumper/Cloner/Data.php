@@ -83,29 +83,6 @@ class Data
     }
 
     /**
-     * Returns a depth limited clone of $this.
-     *
-     * @param int  $maxDepth         The max dumped depth level
-     * @param int  $maxItemsPerDepth The max number of items dumped per depth level
-     * @param bool $useRefHandles    False to hide ref. handles
-     *
-     * @return self A depth limited clone of $this
-     *
-     * @deprecated since Symfony 2.7, to be removed in 3.0. Use withMaxDepth, withMaxItemsPerDepth or withRefHandles instead.
-     */
-    public function getLimitedClone($maxDepth, $maxItemsPerDepth, $useRefHandles = true)
-    {
-        @trigger_error('The '.__METHOD__.' method is deprecated since Symfony 2.7 and will be removed in 3.0. Use withMaxDepth, withMaxItemsPerDepth or withRefHandles methods instead.', E_USER_DEPRECATED);
-
-        $data = clone $this;
-        $data->maxDepth = (int) $maxDepth;
-        $data->maxItemsPerDepth = (int) $maxItemsPerDepth;
-        $data->useRefHandles = $useRefHandles ? -1 : 0;
-
-        return $data;
-    }
-
-    /**
      * Dumps data with a DumperInterface dumper.
      */
     public function dump(DumperInterface $dumper)
@@ -185,7 +162,7 @@ class Data
                     $withChildren = $children && $cursor->depth !== $this->maxDepth && $this->maxItemsPerDepth;
                     $dumper->enterHash($cursor, $item->type, $item->class, $withChildren);
                     if ($withChildren) {
-                        $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type);
+                        $cut = $this->dumpChildren($dumper, $cursor, $refs, $children, $cut, $item->type, null !== $item->class);
                     } elseif ($children && 0 <= $cut) {
                         $cut += count($children);
                     }
@@ -214,10 +191,11 @@ class Data
      * @param array           $children     The children to dump
      * @param int             $hashCut      The number of items removed from the original hash
      * @param string          $hashType     A Cursor::HASH_* const
+     * @param bool            $dumpKeys     Whether keys should be dumped or not
      *
      * @return int The final number of removed items
      */
-    private function dumpChildren($dumper, $parentCursor, &$refs, $children, $hashCut, $hashType)
+    private function dumpChildren($dumper, $parentCursor, &$refs, $children, $hashCut, $hashType, $dumpKeys)
     {
         $cursor = clone $parentCursor;
         ++$cursor->depth;
@@ -227,7 +205,7 @@ class Data
         $cursor->hashCut = $hashCut;
         foreach ($children as $key => $child) {
             $cursor->hashKeyIsBinary = isset($key[0]) && !preg_match('//u', $key);
-            $cursor->hashKey = $key;
+            $cursor->hashKey = $dumpKeys ? $key :  null;
             $this->dumpItem($dumper, $cursor, $refs, $child);
             if (++$cursor->hashIndex === $this->maxItemsPerDepth || $cursor->stop) {
                 $parentCursor->stop = true;

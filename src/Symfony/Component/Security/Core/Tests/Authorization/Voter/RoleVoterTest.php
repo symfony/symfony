@@ -17,13 +17,6 @@ use Symfony\Component\Security\Core\Role\Role;
 
 class RoleVoterTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSupportsClass()
-    {
-        $voter = new RoleVoter();
-
-        $this->assertTrue($voter->supportsClass('Foo'));
-    }
-
     /**
      * @dataProvider getVoteTests
      */

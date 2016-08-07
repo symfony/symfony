@@ -31,9 +31,10 @@ class RouteCompiler implements RouteCompilerInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \LogicException  If a variable is referenced more than once
-     * @throws \DomainException If a variable name is numeric because PHP raises an error for such
-     *                          subpatterns in PCRE and thus would break matching, e.g. "(?P<123>.+)".
+     * @throws \InvalidArgumentException If a path variable is named _fragment
+     * @throws \LogicException           If a variable is referenced more than once
+     * @throws \DomainException          If a variable name is numeric because PHP raises an error for such
+     *                                   subpatterns in PCRE and thus would break matching, e.g. "(?P<123>.+)".
      */
     public static function compile(Route $route)
     {
@@ -59,6 +60,13 @@ class RouteCompiler implements RouteCompilerInterface
         $staticPrefix = $result['staticPrefix'];
 
         $pathVariables = $result['variables'];
+
+        foreach ($pathVariables as $pathParam) {
+            if ('_fragment' === $pathParam) {
+                throw new \InvalidArgumentException(sprintf('Route pattern "%s" cannot contain "_fragment" as a path parameter.', $route->getPath()));
+            }
+        }
+
         $variables = array_merge($variables, $pathVariables);
 
         $tokens = $result['tokens'];
@@ -163,7 +171,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         return array(
             'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s'.($isHost ? 'i' : ''),
+            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'us'.($isHost ? 'i' : ''),
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         );

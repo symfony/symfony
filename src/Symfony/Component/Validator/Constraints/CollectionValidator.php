@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -56,53 +55,30 @@ class CollectionValidator extends ConstraintValidator
 
             if ($existsInArray || $existsInArrayAccess) {
                 if (count($fieldConstraint->constraints) > 0) {
-                    if ($context instanceof ExecutionContextInterface) {
-                        $context->getValidator()
-                            ->inContext($context)
-                            ->atPath('['.$field.']')
-                            ->validate($value[$field], $fieldConstraint->constraints);
-                    } else {
-                        // 2.4 API
-                        $context->validateValue($value[$field], $fieldConstraint->constraints, '['.$field.']');
-                    }
+                    $context->getValidator()
+                        ->inContext($context)
+                        ->atPath('['.$field.']')
+                        ->validate($value[$field], $fieldConstraint->constraints);
                 }
             } elseif (!$fieldConstraint instanceof Optional && !$constraint->allowMissingFields) {
-                if ($context instanceof ExecutionContextInterface) {
-                    $context->buildViolation($constraint->missingFieldsMessage)
-                        ->atPath('['.$field.']')
-                        ->setParameter('{{ field }}', $this->formatValue($field))
-                        ->setInvalidValue(null)
-                        ->setCode(Collection::MISSING_FIELD_ERROR)
-                        ->addViolation();
-                } else {
-                    $this->buildViolationInContext($context, $constraint->missingFieldsMessage)
-                        ->atPath('['.$field.']')
-                        ->setParameter('{{ field }}', $this->formatValue($field))
-                        ->setInvalidValue(null)
-                        ->setCode(Collection::MISSING_FIELD_ERROR)
-                        ->addViolation();
-                }
+                $context->buildViolation($constraint->missingFieldsMessage)
+                    ->atPath('['.$field.']')
+                    ->setParameter('{{ field }}', $this->formatValue($field))
+                    ->setInvalidValue(null)
+                    ->setCode(Collection::MISSING_FIELD_ERROR)
+                    ->addViolation();
             }
         }
 
         if (!$constraint->allowExtraFields) {
             foreach ($value as $field => $fieldValue) {
                 if (!isset($constraint->fields[$field])) {
-                    if ($context instanceof ExecutionContextInterface) {
-                        $context->buildViolation($constraint->extraFieldsMessage)
-                            ->atPath('['.$field.']')
-                            ->setParameter('{{ field }}', $this->formatValue($field))
-                            ->setInvalidValue($fieldValue)
-                            ->setCode(Collection::NO_SUCH_FIELD_ERROR)
-                            ->addViolation();
-                    } else {
-                        $this->buildViolationInContext($context, $constraint->extraFieldsMessage)
-                            ->atPath('['.$field.']')
-                            ->setParameter('{{ field }}', $this->formatValue($field))
-                            ->setInvalidValue($fieldValue)
-                            ->setCode(Collection::NO_SUCH_FIELD_ERROR)
-                            ->addViolation();
-                    }
+                    $context->buildViolation($constraint->extraFieldsMessage)
+                        ->atPath('['.$field.']')
+                        ->setParameter('{{ field }}', $this->formatValue($field))
+                        ->setInvalidValue($fieldValue)
+                        ->setCode(Collection::NO_SUCH_FIELD_ERROR)
+                        ->addViolation();
                 }
             }
         }

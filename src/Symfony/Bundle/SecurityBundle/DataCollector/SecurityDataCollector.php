@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\Security\Core\Role\RoleInterface;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 
 /**
  * SecurityDataCollector.
@@ -27,17 +30,23 @@ class SecurityDataCollector extends DataCollector
 {
     private $tokenStorage;
     private $roleHierarchy;
+    private $logoutUrlGenerator;
+    private $accessDecisionManager;
 
     /**
      * Constructor.
      *
-     * @param TokenStorageInterface|null  $tokenStorage
-     * @param RoleHierarchyInterface|null $roleHierarchy
+     * @param TokenStorageInterface|null          $tokenStorage
+     * @param RoleHierarchyInterface|null         $roleHierarchy
+     * @param LogoutUrlGenerator|null             $logoutUrlGenerator
+     * @param AccessDecisionManagerInterface|null $accessDecisionManager
      */
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
+        $this->logoutUrlGenerator = $logoutUrlGenerator;
+        $this->accessDecisionManager = $accessDecisionManager;
     }
 
     /**
@@ -50,6 +59,7 @@ class SecurityDataCollector extends DataCollector
                 'enabled' => false,
                 'authenticated' => false,
                 'token_class' => null,
+                'logout_url' => null,
                 'user' => '',
                 'roles' => array(),
                 'inherited_roles' => array(),
@@ -60,6 +70,7 @@ class SecurityDataCollector extends DataCollector
                 'enabled' => true,
                 'authenticated' => false,
                 'token_class' => null,
+                'logout_url' => null,
                 'user' => '',
                 'roles' => array(),
                 'inherited_roles' => array(),
@@ -68,6 +79,7 @@ class SecurityDataCollector extends DataCollector
         } else {
             $inheritedRoles = array();
             $assignedRoles = $token->getRoles();
+
             if (null !== $this->roleHierarchy) {
                 $allRoles = $this->roleHierarchy->getReachableRoles($assignedRoles);
                 foreach ($allRoles as $role) {
@@ -76,15 +88,40 @@ class SecurityDataCollector extends DataCollector
                     }
                 }
             }
+
+            $logoutUrl = null;
+            try {
+                if (null !== $this->logoutUrlGenerator) {
+                    $logoutUrl = $this->logoutUrlGenerator->getLogoutPath();
+                }
+            } catch (\Exception $e) {
+                // fail silently when the logout URL cannot be generated
+            }
+
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
                 'token_class' => get_class($token),
+                'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
                 'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles),
                 'inherited_roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
+        }
+
+        // collect voters and access decision manager information
+        if ($this->accessDecisionManager instanceof DebugAccessDecisionManager) {
+            $this->data['access_decision_log'] = $this->accessDecisionManager->getDecisionLog();
+            $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
+
+            foreach ($this->accessDecisionManager->getVoters() as $voter) {
+                $this->data['voters'][] = get_class($voter);
+            }
+        } else {
+            $this->data['access_decision_log'] = array();
+            $this->data['voter_strategy'] = 'unknown';
+            $this->data['voters'] = array();
         }
     }
 
@@ -157,6 +194,46 @@ class SecurityDataCollector extends DataCollector
     public function getTokenClass()
     {
         return $this->data['token_class'];
+    }
+
+    /**
+     * Get the provider key (i.e. the name of the active firewall).
+     *
+     * @return string The provider key
+     */
+    public function getLogoutUrl()
+    {
+        return $this->data['logout_url'];
+    }
+
+    /**
+     * Returns the FQCN of the security voters enabled in the application.
+     *
+     * @return string[]
+     */
+    public function getVoters()
+    {
+        return $this->data['voters'];
+    }
+
+    /**
+     * Returns the strategy configured for the security voters.
+     *
+     * @return string
+     */
+    public function getVoterStrategy()
+    {
+        return $this->data['voter_strategy'];
+    }
+
+    /**
+     * Returns the log of the security decisions made by the access decision manager.
+     *
+     * @return array
+     */
+    public function getAccessDecisionLog()
+    {
+        return $this->data['access_decision_log'];
     }
 
     /**

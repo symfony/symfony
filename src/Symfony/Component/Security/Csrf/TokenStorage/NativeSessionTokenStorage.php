@@ -108,11 +108,7 @@ class NativeSessionTokenStorage implements TokenStorageInterface
 
     private function startSession()
     {
-        if (PHP_VERSION_ID >= 50400) {
-            if (PHP_SESSION_NONE === session_status()) {
-                session_start();
-            }
-        } elseif (!session_id()) {
+        if (PHP_SESSION_NONE === session_status()) {
             session_start();
         }
 

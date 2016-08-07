@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * added `readlink()` as a platform independent method to read links
+
+3.0.0
+-----
+
+ * removed `$mode` argument from `Filesystem::dumpFile()`
+
+2.8.0
+-----
+
+ * added tempnam() a stream aware version of PHP's native tempnam()
+
 2.6.0
 -----
 

@@ -2,11 +2,10 @@
     "definitions": {
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
-            "scope": "container",
             "public": false,
             "synthetic": true,
             "lazy": false,
-            "synchronized": false,
+            "shared": true,
             "abstract": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
@@ -31,7 +30,12 @@
 
                     ]
                 }
-            ]
+            ],
+            "calls": [
+                "setMailer"
+            ],
+            "autowire": false,
+            "autowiring_types": []
         }
     },
     "aliases": [

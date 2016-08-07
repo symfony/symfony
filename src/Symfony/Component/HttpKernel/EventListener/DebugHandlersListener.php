@@ -45,12 +45,12 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param bool                 $scream           Enables/disables screaming mode, where even silenced errors are logged
      * @param string               $fileLinkFormat   The format for links to source files
      */
-    public function __construct($exceptionHandler, LoggerInterface $logger = null, $levels = null, $throwAt = -1, $scream = true, $fileLinkFormat = null)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, $throwAt = E_ALL, $scream = true, $fileLinkFormat = null)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
-        $this->levels = $levels;
-        $this->throwAt = is_numeric($throwAt) ? (int) $throwAt : (null === $throwAt ? null : ($throwAt ? -1 : null));
+        $this->levels = null === $levels ? E_ALL : $levels;
+        $this->throwAt = is_numeric($throwAt) ? (int) $throwAt : (null === $throwAt ? null : ($throwAt ? E_ALL : null));
         $this->scream = (bool) $scream;
         $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
     }
@@ -79,7 +79,7 @@ class DebugHandlersListener implements EventSubscriberInterface
                             $scream |= $type;
                         }
                     } else {
-                        $scream = null === $this->levels ? E_ALL | E_STRICT : $this->levels;
+                        $scream = $this->levels;
                     }
                     if ($this->scream) {
                         $handler->screamAt($scream);

@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
@@ -54,19 +53,17 @@ class FragmentRendererPass implements CompilerPassInterface
 
             $class = $container->getParameterBag()->resolveValue($def->getClass());
             $interface = 'Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface';
+
             if (!is_subclass_of($class, $interface)) {
+                if (!class_exists($class, false)) {
+                    throw new \InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                }
+
                 throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
             }
 
             foreach ($tags as $tag) {
-                if (!isset($tag['alias'])) {
-                    @trigger_error(sprintf('Service "%s" will have to define the "alias" attribute on the "%s" tag as of Symfony 3.0.', $id, $this->rendererTag), E_USER_DEPRECATED);
-
-                    // register the handler as a non-lazy-loaded one
-                    $definition->addMethodCall('addRenderer', array(new Reference($id)));
-                } else {
-                    $definition->addMethodCall('addRendererService', array($tag['alias'], $id));
-                }
+                $definition->addMethodCall('addRendererService', array($tag['alias'], $id));
             }
         }
     }

@@ -40,7 +40,7 @@ class FormFactoryBuilderTest extends \PHPUnit_Framework_TestCase
         $extensions = $registry->getExtensions();
 
         $this->assertCount(1, $extensions);
-        $this->assertTrue($extensions[0]->hasType($this->type->getName()));
+        $this->assertTrue($extensions[0]->hasType(get_class($this->type)));
         $this->assertNull($extensions[0]->getTypeGuesser());
     }
 

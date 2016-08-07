@@ -3,7 +3,7 @@ test: Some characters at the beginning of a string must be escaped
 brief: >
     Some characters at the beginning of a string must be escaped
 yaml: |
-    foo: | bar
+    foo: '| bar'
 php: |
     array('foo' => '| bar')
 ---

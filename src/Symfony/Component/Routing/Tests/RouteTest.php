@@ -164,24 +164,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($route->hasScheme('httpS'));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacySchemeRequirement()
-    {
-        $route = new Route('/');
-        $route->setRequirement('_scheme', 'http|https');
-        $this->assertEquals('http|https', $route->getRequirement('_scheme'));
-        $this->assertEquals(array('http', 'https'), $route->getSchemes());
-        $this->assertTrue($route->hasScheme('https'));
-        $this->assertTrue($route->hasScheme('http'));
-        $this->assertFalse($route->hasScheme('ftp'));
-        $route->setSchemes(array('hTTp'));
-        $this->assertEquals('http', $route->getRequirement('_scheme'));
-        $route->setSchemes(array());
-        $this->assertNull($route->getRequirement('_scheme'));
-    }
-
     public function testMethod()
     {
         $route = new Route('/');
@@ -190,21 +172,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('GET'), $route->getMethods(), '->setMethods() accepts a single method string and uppercases it');
         $route->setMethods(array('gEt', 'PosT'));
         $this->assertEquals(array('GET', 'POST'), $route->getMethods(), '->setMethods() accepts an array of methods and uppercases them');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyMethodRequirement()
-    {
-        $route = new Route('/');
-        $route->setRequirement('_method', 'GET|POST');
-        $this->assertEquals('GET|POST', $route->getRequirement('_method'));
-        $this->assertEquals(array('GET', 'POST'), $route->getMethods());
-        $route->setMethods(array('gEt'));
-        $this->assertEquals('GET', $route->getRequirement('_method'));
-        $route->setMethods(array());
-        $this->assertNull($route->getRequirement('_method'));
     }
 
     public function testCondition()
@@ -222,18 +189,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($compiled, $route->compile(), '->compile() only compiled the route once if unchanged');
         $route->setRequirement('foo', '.*');
         $this->assertNotSame($compiled, $route->compile(), '->compile() recompiles if the route was modified');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyPattern()
-    {
-        $route = new Route('/{foo}');
-        $this->assertEquals('/{foo}', $route->getPattern());
-
-        $route->setPattern('/bar');
-        $this->assertEquals('/bar', $route->getPattern());
     }
 
     public function testSerialize()
@@ -271,7 +226,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
      */
     public function testSerializedRepresentationKeepsWorking()
     {
-        $serialized = 'C:31:"Symfony\Component\Routing\Route":934:{a:8:{s:4:"path";s:13:"/prefix/{foo}";s:4:"host";s:20:"{locale}.example.net";s:8:"defaults";a:1:{s:3:"foo";s:7:"default";}s:12:"requirements";a:1:{s:3:"foo";s:3:"\d+";}s:7:"options";a:1:{s:14:"compiler_class";s:39:"Symfony\Component\Routing\RouteCompiler";}s:7:"schemes";a:0:{}s:7:"methods";a:0:{}s:8:"compiled";C:39:"Symfony\Component\Routing\CompiledRoute":569:{a:8:{s:4:"vars";a:2:{i:0;s:6:"locale";i:1;s:3:"foo";}s:11:"path_prefix";s:7:"/prefix";s:10:"path_regex";s:30:"#^/prefix(?:/(?P<foo>\d+))?$#s";s:11:"path_tokens";a:2:{i:0;a:4:{i:0;s:8:"variable";i:1;s:1:"/";i:2;s:3:"\d+";i:3;s:3:"foo";}i:1;a:2:{i:0;s:4:"text";i:1;s:7:"/prefix";}}s:9:"path_vars";a:1:{i:0;s:3:"foo";}s:10:"host_regex";s:39:"#^(?P<locale>[^\.]++)\.example\.net$#si";s:11:"host_tokens";a:2:{i:0;a:2:{i:0;s:4:"text";i:1;s:12:".example.net";}i:1;a:4:{i:0;s:8:"variable";i:1;s:0:"";i:2;s:7:"[^\.]++";i:3;s:6:"locale";}}s:9:"host_vars";a:1:{i:0;s:6:"locale";}}}}}';
+        $serialized = 'C:31:"Symfony\Component\Routing\Route":936:{a:8:{s:4:"path";s:13:"/prefix/{foo}";s:4:"host";s:20:"{locale}.example.net";s:8:"defaults";a:1:{s:3:"foo";s:7:"default";}s:12:"requirements";a:1:{s:3:"foo";s:3:"\d+";}s:7:"options";a:1:{s:14:"compiler_class";s:39:"Symfony\Component\Routing\RouteCompiler";}s:7:"schemes";a:0:{}s:7:"methods";a:0:{}s:8:"compiled";C:39:"Symfony\Component\Routing\CompiledRoute":571:{a:8:{s:4:"vars";a:2:{i:0;s:6:"locale";i:1;s:3:"foo";}s:11:"path_prefix";s:7:"/prefix";s:10:"path_regex";s:31:"#^/prefix(?:/(?P<foo>\d+))?$#us";s:11:"path_tokens";a:2:{i:0;a:4:{i:0;s:8:"variable";i:1;s:1:"/";i:2;s:3:"\d+";i:3;s:3:"foo";}i:1;a:2:{i:0;s:4:"text";i:1;s:7:"/prefix";}}s:9:"path_vars";a:1:{i:0;s:3:"foo";}s:10:"host_regex";s:40:"#^(?P<locale>[^\.]++)\.example\.net$#usi";s:11:"host_tokens";a:2:{i:0;a:2:{i:0;s:4:"text";i:1;s:12:".example.net";}i:1;a:4:{i:0;s:8:"variable";i:1;s:0:"";i:2;s:7:"[^\.]++";i:3;s:6:"locale";}}s:9:"host_vars";a:1:{i:0;s:6:"locale";}}}}}';
         $unserialized = unserialize($serialized);
 
         $route = new Route('/prefix/{foo}', array('foo' => 'default'), array('foo' => '\d+'));

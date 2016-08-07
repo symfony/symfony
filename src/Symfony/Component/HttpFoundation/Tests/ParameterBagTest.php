@@ -73,37 +73,6 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($bag->get('foo[bar]'));
     }
 
-    /**
-     * @dataProvider getInvalidPaths
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGetDeepWithInvalidPaths($path)
-    {
-        $bag = new ParameterBag(array('foo' => array('bar' => 'moo')));
-
-        $bag->get($path, null, true);
-    }
-
-    public function getInvalidPaths()
-    {
-        return array(
-            array('foo[['),
-            array('foo[d'),
-            array('foo[bar]]'),
-            array('foo[bar]d'),
-        );
-    }
-
-    public function testGetDeep()
-    {
-        $bag = new ParameterBag(array('foo' => array('bar' => array('moo' => 'boo'))));
-
-        $this->assertEquals(array('moo' => 'boo'), $bag->get('foo[bar]', null, true));
-        $this->assertEquals('boo', $bag->get('foo[bar][moo]', null, true));
-        $this->assertEquals('default', $bag->get('foo[bar][foo]', 'default', true));
-        $this->assertEquals('default', $bag->get('bar[moo][foo]', 'default', true));
-    }
-
     public function testSet()
     {
         $bag = new ParameterBag(array());
@@ -168,26 +137,26 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($bag->filter('nokey'), '->filter() should return empty by default if no key is found');
 
-        $this->assertEquals('0123', $bag->filter('digits', '', false, FILTER_SANITIZE_NUMBER_INT), '->filter() gets a value of parameter as integer filtering out invalid characters');
+        $this->assertEquals('0123', $bag->filter('digits', '', FILTER_SANITIZE_NUMBER_INT), '->filter() gets a value of parameter as integer filtering out invalid characters');
 
-        $this->assertEquals('example@example.com', $bag->filter('email', '', false, FILTER_VALIDATE_EMAIL), '->filter() gets a value of parameter as email');
+        $this->assertEquals('example@example.com', $bag->filter('email', '', FILTER_VALIDATE_EMAIL), '->filter() gets a value of parameter as email');
 
-        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', false, FILTER_VALIDATE_URL, array('flags' => FILTER_FLAG_PATH_REQUIRED)), '->filter() gets a value of parameter as URL with a path');
+        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', FILTER_VALIDATE_URL, array('flags' => FILTER_FLAG_PATH_REQUIRED)), '->filter() gets a value of parameter as URL with a path');
 
         // This test is repeated for code-coverage
-        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', false, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED), '->filter() gets a value of parameter as URL with a path');
+        $this->assertEquals('http://example.com/foo', $bag->filter('url', '', FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED), '->filter() gets a value of parameter as URL with a path');
 
-        $this->assertFalse($bag->filter('dec', '', false, FILTER_VALIDATE_INT, array(
+        $this->assertFalse($bag->filter('dec', '', FILTER_VALIDATE_INT, array(
             'flags' => FILTER_FLAG_ALLOW_HEX,
             'options' => array('min_range' => 1, 'max_range' => 0xff),
         )), '->filter() gets a value of parameter as integer between boundaries');
 
-        $this->assertFalse($bag->filter('hex', '', false, FILTER_VALIDATE_INT, array(
+        $this->assertFalse($bag->filter('hex', '', FILTER_VALIDATE_INT, array(
             'flags' => FILTER_FLAG_ALLOW_HEX,
             'options' => array('min_range' => 1, 'max_range' => 0xff),
         )), '->filter() gets a value of parameter as integer between boundaries');
 
-        $this->assertEquals(array('bang'), $bag->filter('array', '', false), '->filter() gets a value of parameter as an array');
+        $this->assertEquals(array('bang'), $bag->filter('array', ''), '->filter() gets a value of parameter as an array');
     }
 
     public function testGetIterator()

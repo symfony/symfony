@@ -1,0 +1,16 @@
+framework:
+    workflows:
+        my_workflow:
+            marking_store:
+                type: property_accessor
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+            places:
+                - first
+                - last
+            transitions:
+                go:
+                    from:
+                        - first
+                    to:
+                        - last

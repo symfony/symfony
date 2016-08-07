@@ -42,6 +42,16 @@ class Router extends BaseRouter implements WarmableInterface
 
         $this->resource = $resource;
         $this->context = $context ?: new RequestContext();
+
+        if (array_key_exists('charset', $options)) {
+            try {
+                $this->setOption('charset', $options['charset']);
+            } catch (\InvalidArgumentException $e) {
+                // symfony/routing version 3.x does not support the charset option.
+                unset($options['charset']);
+            }
+        }
+
         $this->setOptions($options);
     }
 
@@ -92,10 +102,6 @@ class Router extends BaseRouter implements WarmableInterface
             }
 
             foreach ($route->getRequirements() as $name => $value) {
-                if ('_scheme' === $name || '_method' === $name) {
-                    continue; // ignore deprecated requirements to not trigger deprecation warnings
-                }
-
                 $route->setRequirement($name, $this->resolve($value));
             }
 

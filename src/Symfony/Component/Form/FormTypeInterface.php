@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -69,31 +69,26 @@ interface FormTypeInterface
     public function finishView(FormView $view, FormInterface $form, array $options);
 
     /**
-     * Sets the default options for this type.
+     * Configures the options for this type.
      *
-     * @param OptionsResolverInterface $resolver The resolver for the options
-     *
-     * @deprecated since version 2.7, to be renamed in 3.0.
-     *             Use the method configureOptions instead. This method will be
-     *             added to the FormTypeInterface with Symfony 3.0.
+     * @param OptionsResolver $resolver The resolver for the options
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver);
+    public function configureOptions(OptionsResolver $resolver);
+
+    /**
+     * Returns the prefix of the template block name for this type.
+     *
+     * The block prefix defaults to the underscored short class name with
+     * the "Type" suffix removed (e.g. "UserProfileType" => "user_profile").
+     *
+     * @return string The prefix of the template block name
+     */
+    public function getBlockPrefix();
 
     /**
      * Returns the name of the parent type.
      *
-     * You can also return a type instance from this method, although doing so
-     * is discouraged because it leads to a performance penalty. The support
-     * for returning type instances may be dropped from future releases.
-     *
-     * @return string|null|FormTypeInterface The name of the parent type if any, null otherwise
+     * @return string|null The name of the parent type if any, null otherwise
      */
     public function getParent();
-
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
-    public function getName();
 }

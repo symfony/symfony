@@ -13,6 +13,11 @@ namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
 
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
 class GetAttrNode extends Node
 {
     const PROPERTY_CALL = 1;
@@ -34,7 +39,7 @@ class GetAttrNode extends Node
                 $compiler
                     ->compile($this->nodes['node'])
                     ->raw('->')
-                    ->raw($this->nodes['attribute']->attributes['value'])
+                    ->raw($this->nodes['attribute']->attributes['name'])
                 ;
                 break;
 
@@ -42,7 +47,7 @@ class GetAttrNode extends Node
                 $compiler
                     ->compile($this->nodes['node'])
                     ->raw('->')
-                    ->raw($this->nodes['attribute']->attributes['value'])
+                    ->raw($this->nodes['attribute']->attributes['name'])
                     ->raw('(')
                     ->compile($this->nodes['arguments'])
                     ->raw(')')
@@ -68,7 +73,7 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
 
-                $property = $this->nodes['attribute']->attributes['value'];
+                $property = $this->nodes['attribute']->attributes['name'];
 
                 return $obj->$property;
 
@@ -78,7 +83,7 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
 
-                return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['value']), $this->nodes['arguments']->evaluate($functions, $values));
+                return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['name']), $this->nodes['arguments']->evaluate($functions, $values));
 
             case self::ARRAY_CALL:
                 $array = $this->nodes['node']->evaluate($functions, $values);
@@ -87,6 +92,20 @@ class GetAttrNode extends Node
                 }
 
                 return $array[$this->nodes['attribute']->evaluate($functions, $values)];
+        }
+    }
+
+    public function toArray()
+    {
+        switch ($this->attributes['type']) {
+            case self::PROPERTY_CALL:
+                return array($this->nodes['node'], '.', $this->nodes['attribute']);
+
+            case self::METHOD_CALL:
+                return array($this->nodes['node'], '.', $this->nodes['attribute'], '(', $this->nodes['arguments'], ')');
+
+            case self::ARRAY_CALL:
+                return array($this->nodes['node'], '[', $this->nodes['attribute'], ']');
         }
     }
 }

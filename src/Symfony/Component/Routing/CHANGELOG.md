@@ -1,6 +1,40 @@
 CHANGELOG
 =========
 
+4.0.0
+-----
+ * URLs are now assumed to be encoded in UTF-8. Regular expressions for route requirements now use
+   the PCRE_UTF8 flag to allow matching non-ASCII characters. To support legacy URLs in other encodings,
+   the default encoding can be overridden using the `charset` option.
+
+3.2.0
+-----
+
+ * Added support for `bool`, `int`, `float`, `string`, `list` and `map` defaults in XML configurations.
+  
+2.8.0
+-----
+
+ * allowed specifying a directory to recursively load all routing configuration files it contains
+ * Added ObjectRouteLoader and ServiceRouteLoader that allow routes to be loaded
+   by calling a method on an object/service.
+ * [DEPRECATION] Deprecated the hardcoded value for the `$referenceType` argument of the `UrlGeneratorInterface::generate` method.
+   Use the constants defined in the `UrlGeneratorInterface` instead.
+
+   Before:
+
+   ```php
+   $router->generate('blog_show', array('slug' => 'my-blog-post'), true);
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+   $router->generate('blog_show', array('slug' => 'my-blog-post'), UrlGeneratorInterface::ABSOLUTE_URL);
+   ```
+
 2.5.0
 -----
 

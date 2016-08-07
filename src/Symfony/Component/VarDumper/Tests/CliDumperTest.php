@@ -13,13 +13,15 @@ namespace Symfony\Component\VarDumper\Tests;
 
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
-use Symfony\Component\VarDumper\Test\VarDumperTestCase;
+use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class CliDumperTest extends VarDumperTestCase
+class CliDumperTest extends \PHPUnit_Framework_TestCase
 {
+    use VarDumperTestTrait;
+
     public function testGet()
     {
         require __DIR__.'/Fixtures/dumb-var.php';
@@ -42,17 +44,8 @@ class CliDumperTest extends VarDumperTestCase
         $out = preg_replace('/[ \t]+$/m', '', $out);
         $intMax = PHP_INT_MAX;
         $res = (int) $var['res'];
-        $closure54 = '';
+
         $r = defined('HHVM_VERSION') ? '' : '#%d';
-
-        if (PHP_VERSION_ID >= 50400) {
-            $closure54 = <<<EOTXT
-
-    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
-    this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
-EOTXT;
-        }
-
         $this->assertStringMatchesFormat(
             <<<EOTXT
 array:24 [
@@ -80,14 +73,16 @@ array:24 [
     +foo: "foo"
     +"bar": "bar"
   }
-  "closure" => Closure {{$r}{$closure54}
-    parameters: array:2 [
-      "\$a" => []
-      "&\$b" => array:2 [
-        "typeHint" => "PDO"
-        "default" => null
-      ]
-    ]
+  "closure" => Closure {{$r}
+    class: "Symfony\Component\VarDumper\Tests\CliDumperTest"
+    this: Symfony\Component\VarDumper\Tests\CliDumperTest {{$r} …}
+    parameters: {
+      \$a: {}
+      &\$b: {
+        typeHint: "PDO"
+        default: null
+      }
+    }
     file: "{$var['file']}"
     line: "{$var['line']} to {$var['line']}"
   }
@@ -201,9 +196,44 @@ EOTXT
         );
     }
 
+    public function testFlags()
+    {
+        putenv('DUMP_LIGHT_ARRAY=1');
+        putenv('DUMP_STRING_LENGTH=1');
+
+        $var = array(
+            range(1, 3),
+            array('foo', 2 => 'bar'),
+        );
+
+        $this->assertDumpEquals(
+            <<<EOTXT
+[
+  [
+    1
+    2
+    3
+  ]
+  [
+    0 => (3) "foo"
+    2 => (3) "bar"
+  ]
+]
+EOTXT
+            ,
+            $var
+        );
+
+        putenv('DUMP_LIGHT_ARRAY=');
+        putenv('DUMP_STRING_LENGTH=');
+    }
+
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+b');
+
+        require_once __DIR__.'/Fixtures/Twig.php';
+        $twig = new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem()));
 
         $dumper = new CliDumper();
         $dumper->setColors(false);
@@ -216,18 +246,33 @@ EOTXT
             },
         ));
         $cloner->addCasters(array(
-            ':stream' => function () {
-                throw new \Exception('Foobar');
-            },
+            ':stream' => eval('return function () use ($twig) {
+                try {
+                    $twig->render(array());
+                } catch (\Twig_Error_Runtime $e) {
+                    throw $e->getPrevious();
+                }
+            };'),
         ));
-        $line = __LINE__ - 3;
-        $file = __FILE__;
+        $line = __LINE__ - 2;
         $ref = (int) $out;
 
         $data = $cloner->cloneVar($out);
         $dumper->dump($data, $out);
         rewind($out);
         $out = stream_get_contents($out);
+
+        if (method_exists($twig, 'getSource')) {
+            $twig = <<<EOTXT
+foo.twig: {
+        1: foo bar
+        2:   twig source
+        3: 
+      }
+EOTXT;
+        } else {
+            $twig = '%A';
+        }
 
         $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
@@ -242,12 +287,29 @@ stream resource {@{$ref}
 %Aoptions: []
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
-    trace: array:1 [
-      0 => array:2 [
-        "call" => "%slosure%s()"
-        "file" => "{$file}:{$line}"
-      ]
-    ]
+    -trace: {
+      %d. {$twig}
+      %d. %sTemplate.php: {
+        %d: try {
+        %d:     \$this->doDisplay(\$context, \$blocks);
+        %d: } catch (Twig_Error \$e) {
+      }
+      %d. %sTemplate.php: {
+        %d: {
+        %d:     \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));
+        %d: }
+      }
+      %d. %sTemplate.php: {
+        %d: try {
+        %d:     \$this->display(\$context);
+        %d: } catch (Exception \$e) {
+      }
+      %d. %sCliDumperTest.php: {
+        %d:         }
+        {$line}:     };'),
+        %d: ));
+      }
+    }
   }
 }
 

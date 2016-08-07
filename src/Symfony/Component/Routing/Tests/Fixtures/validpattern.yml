@@ -1,8 +1,8 @@
 blog_show:
-    path:         /blog/{slug}
+    path:         /blög/{slug}
     defaults:     { _controller: "MyBundle:Blog:show" }
     host:         "{locale}.example.com"
-    requirements: { 'locale': '\w+' }
+    requirements: { 'locale': '\w+', 'slug': '[a-zë]+' }
     methods:      ['GET','POST','put','OpTiOnS']
     schemes:      ['https']
     condition:    'context.getMethod() == "GET"'
@@ -10,4 +10,4 @@ blog_show:
         compiler_class: RouteCompiler
 
 blog_show_inherited:
-    path:      /blog/{slug}
+    path:      /blög/{slug}

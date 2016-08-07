@@ -41,7 +41,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
                      ->method('getContext')
                      ->will($this->returnValue($context));
 
-        $listener = new RouterListener($urlMatcher, null, null, $this->requestStack);
+        $listener = new RouterListener($urlMatcher, $this->requestStack);
         $event = $this->createGetResponseEventForUri($uri);
         $listener->onKernelRequest($event);
 
@@ -79,7 +79,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidMatcher()
     {
-        new RouterListener(new \stdClass(), null, null, $this->requestStack);
+        new RouterListener(new \stdClass(), $this->requestStack);
     }
 
     public function testRequestMatcher()
@@ -94,7 +94,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
                        ->with($this->isInstanceOf('Symfony\Component\HttpFoundation\Request'))
                        ->will($this->returnValue(array()));
 
-        $listener = new RouterListener($requestMatcher, new RequestContext(), null, $this->requestStack);
+        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
         $listener->onKernelRequest($event);
     }
 
@@ -112,7 +112,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
 
         $context = new RequestContext();
 
-        $listener = new RouterListener($requestMatcher, new RequestContext(), null, $this->requestStack);
+        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext());
         $listener->onKernelRequest($event);
 
         // sub-request with another HTTP method
@@ -128,7 +128,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getLoggingParameterData
      */
-    public function testLoggingParameter($parameter, $log)
+    public function testLoggingParameter($parameter, $log, $parameters)
     {
         $requestMatcher = $this->getMock('Symfony\Component\Routing\Matcher\RequestMatcherInterface');
         $requestMatcher->expects($this->once())
@@ -138,20 +138,20 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())
           ->method('info')
-          ->with($this->equalTo($log));
+          ->with($this->equalTo($log), $this->equalTo($parameters));
 
         $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
         $request = Request::create('http://localhost/');
 
-        $listener = new RouterListener($requestMatcher, new RequestContext(), $logger, $this->requestStack);
+        $listener = new RouterListener($requestMatcher, $this->requestStack, new RequestContext(), $logger);
         $listener->onKernelRequest(new GetResponseEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST));
     }
 
     public function getLoggingParameterData()
     {
         return array(
-            array(array('_route' => 'foo'), 'Matched route "foo".'),
-            array(array(), 'Matched route "n/a".'),
+            array(array('_route' => 'foo'), 'Matched route "{route}".', array('route' => 'foo', 'route_parameters' => array('_route' => 'foo'), 'request_uri' => 'http://localhost/', 'method' => 'GET')),
+            array(array(), 'Matched route "{route}".', array('route' => 'n/a', 'route_parameters' => array(), 'request_uri' => 'http://localhost/', 'method' => 'GET')),
         );
     }
 }

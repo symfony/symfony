@@ -28,6 +28,7 @@ class DebugExtensionTest extends \PHPUnit_Framework_TestCase
             array(
                 'id' => 'dump',
                 'template' => '@Debug/Profiler/dump.html.twig',
+                'priority' => 240,
             ),
         );
 

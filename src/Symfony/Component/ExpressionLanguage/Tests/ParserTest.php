@@ -98,24 +98,24 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 '(3 - 3) * 2',
             ),
             array(
-                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar'), new Node\ArgumentsNode(), Node\GetAttrNode::PROPERTY_CALL),
+                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\NameNode('bar'), new Node\ArgumentsNode(), Node\GetAttrNode::PROPERTY_CALL),
                 'foo.bar',
                 array('foo'),
             ),
             array(
-                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar'), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
+                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\NameNode('bar'), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
                 'foo.bar()',
                 array('foo'),
             ),
             array(
-                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('not'), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
+                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\NameNode('not'), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
                 'foo.not()',
                 array('foo'),
             ),
             array(
                 new Node\GetAttrNode(
                     new Node\NameNode('foo'),
-                    new Node\ConstantNode('bar'),
+                    new Node\NameNode('bar'),
                     $arguments,
                     Node\GetAttrNode::METHOD_CALL
                 ),
@@ -159,7 +159,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     private function createGetAttrNode($node, $item, $type)
     {
-        return new Node\GetAttrNode($node, new Node\ConstantNode($item), new Node\ArgumentsNode(), $type);
+        $attr = Node\GetAttrNode::ARRAY_CALL === $type ? new Node\ConstantNode($item) : new Node\NameNode($item);
+
+        return new Node\GetAttrNode($node, $attr, new Node\ArgumentsNode(), $type);
     }
 
     /**

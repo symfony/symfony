@@ -19,9 +19,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CookieTheftException;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Util\SecureRandomInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Security\Core\Util\StringUtils;
 
 /**
  * Concrete implementation of the RememberMeServicesInterface which needs
@@ -33,24 +30,6 @@ use Symfony\Component\Security\Core\Util\StringUtils;
 class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
 {
     private $tokenProvider;
-    private $secureRandom;
-
-    /**
-     * Constructor.
-     *
-     * @param array                 $userProviders
-     * @param string                $key
-     * @param string                $providerKey
-     * @param array                 $options
-     * @param LoggerInterface       $logger
-     * @param SecureRandomInterface $secureRandom
-     */
-    public function __construct(array $userProviders, $key, $providerKey, array $options, LoggerInterface $logger = null, SecureRandomInterface $secureRandom)
-    {
-        parent::__construct($userProviders, $key, $providerKey, $options, $logger);
-
-        $this->secureRandom = $secureRandom;
-    }
 
     /**
      * Sets the token provider.
@@ -91,7 +70,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
         list($series, $tokenValue) = $cookieParts;
         $persistentToken = $this->tokenProvider->loadTokenBySeries($series);
 
-        if (!StringUtils::equals($persistentToken->getTokenValue(), $tokenValue)) {
+        if (!hash_equals($persistentToken->getTokenValue(), $tokenValue)) {
             throw new CookieTheftException('This token was already used. The account is possibly compromised.');
         }
 
@@ -99,7 +78,7 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
             throw new AuthenticationException('The cookie has expired.');
         }
 
-        $tokenValue = base64_encode($this->secureRandom->nextBytes(64));
+        $tokenValue = base64_encode(random_bytes(64));
         $this->tokenProvider->updateToken($series, $tokenValue, new \DateTime());
         $request->attributes->set(self::COOKIE_ATTR_NAME,
             new Cookie(
@@ -121,8 +100,8 @@ class PersistentTokenBasedRememberMeServices extends AbstractRememberMeServices
      */
     protected function onLoginSuccess(Request $request, Response $response, TokenInterface $token)
     {
-        $series = base64_encode($this->secureRandom->nextBytes(64));
-        $tokenValue = base64_encode($this->secureRandom->nextBytes(64));
+        $series = base64_encode(random_bytes(64));
+        $tokenValue = base64_encode(random_bytes(64));
 
         $this->tokenProvider->createNewToken(
             new PersistentToken(

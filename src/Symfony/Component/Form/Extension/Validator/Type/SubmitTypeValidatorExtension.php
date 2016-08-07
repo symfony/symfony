@@ -21,6 +21,6 @@ class SubmitTypeValidatorExtension extends BaseValidatorExtension
      */
     public function getExtendedType()
     {
-        return 'submit';
+        return 'Symfony\Component\Form\Extension\Core\Type\SubmitType';
     }
 }

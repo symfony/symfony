@@ -90,4 +90,14 @@ class NumericNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $node = $def->min(3.0)->max(7e2)->getNode();
         $this->assertEquals(4.5, $node->finalize(4.5));
     }
+
+    /**
+     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
+     * @expectedExceptionMessage ->cannotBeEmpty() is not applicable to NumericNodeDefinition.
+     */
+    public function testCannotBeEmptyThrowsAnException()
+    {
+        $def = new NumericNodeDefinition('foo');
+        $def->cannotBeEmpty();
+    }
 }

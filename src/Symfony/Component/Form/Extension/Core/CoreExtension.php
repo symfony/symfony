@@ -36,12 +36,18 @@ class CoreExtension extends AbstractExtension
      */
     private $choiceListFactory;
 
+    /**
+     * CoreExtension constructor.
+     */
     public function __construct(PropertyAccessorInterface $propertyAccessor = null, ChoiceListFactoryInterface $choiceListFactory = null)
     {
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->choiceListFactory = $choiceListFactory ?: new CachingFactoryDecorator(new PropertyAccessDecorator(new DefaultChoiceListFactory(), $this->propertyAccessor));
     }
 
+    /**
+     * @return array
+     */
     protected function loadTypes()
     {
         return array(

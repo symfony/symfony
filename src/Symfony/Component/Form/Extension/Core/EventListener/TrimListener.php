@@ -23,6 +23,9 @@ use Symfony\Component\Form\Util\StringUtil;
  */
 class TrimListener implements EventSubscriberInterface
 {
+    /**
+     * @param FormEvent $event
+     */
     public function preSubmit(FormEvent $event)
     {
         $data = $event->getData();
@@ -34,6 +37,9 @@ class TrimListener implements EventSubscriberInterface
         $event->setData(StringUtil::trim($data));
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return array(FormEvents::PRE_SUBMIT => 'preSubmit');

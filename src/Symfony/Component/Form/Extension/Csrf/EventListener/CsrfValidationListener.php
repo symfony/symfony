@@ -65,6 +65,9 @@ class CsrfValidationListener implements EventSubscriberInterface
      */
     private $translationDomain;
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -72,6 +75,16 @@ class CsrfValidationListener implements EventSubscriberInterface
         );
     }
 
+    /**
+     * CsrfValidationListener constructor.
+     *
+     * @param $fieldName
+     * @param CsrfTokenManagerInterface $tokenManager
+     * @param $tokenId
+     * @param $errorMessage
+     * @param TranslatorInterface|null $translator
+     * @param null                     $translationDomain
+     */
     public function __construct($fieldName, CsrfTokenManagerInterface $tokenManager, $tokenId, $errorMessage, TranslatorInterface $translator = null, $translationDomain = null)
     {
         $this->fieldName = $fieldName;
@@ -82,6 +95,9 @@ class CsrfValidationListener implements EventSubscriberInterface
         $this->translationDomain = $translationDomain;
     }
 
+    /**
+     * @param FormEvent $event
+     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();

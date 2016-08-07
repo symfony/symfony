@@ -22,6 +22,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class FixUrlProtocolListener implements EventSubscriberInterface
 {
+    /**
+     * @var null|string
+     */
     private $defaultProtocol;
 
     /**
@@ -34,6 +37,9 @@ class FixUrlProtocolListener implements EventSubscriberInterface
         $this->defaultProtocol = $defaultProtocol;
     }
 
+    /**
+     * @param FormEvent $event
+     */
     public function onSubmit(FormEvent $event)
     {
         $data = $event->getData();
@@ -43,6 +49,9 @@ class FixUrlProtocolListener implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return array(FormEvents::SUBMIT => 'onSubmit');

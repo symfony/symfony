@@ -101,8 +101,8 @@ class TagAwareAdapter implements TagAwareAdapterInterface
             return true;
         }
 
-        foreach ($this->tagsAdapter->getItems(array_keys($itemTags)) as $tag => $version) {
-            if ($itemTags[$tag] !== ($version->get() ?: 0)) {
+        foreach ($this->getTagVersions(array($itemTags)) as $tag => $version) {
+            if ($itemTags[$tag] !== $version) {
                 return false;
             }
         }

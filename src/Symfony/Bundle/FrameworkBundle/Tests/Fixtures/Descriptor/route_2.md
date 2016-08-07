@@ -1,7 +1,7 @@
 - Path: /name/add
-- Path Regex: #^/name/add$#s
+- Path Regex: #^/name/add$#us
 - Host: localhost
-- Host Regex: #^localhost$#si
+- Host Regex: #^localhost$#usi
 - Scheme: http|https
 - Method: PUT|POST
 - Class: Symfony\Component\Routing\Route

@@ -37,6 +37,11 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     protected $context;
 
     /**
+     * @var string
+     */
+    protected $charset;
+
+    /**
      * @var array
      */
     protected $allow = array();
@@ -59,11 +64,13 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
      *
      * @param RouteCollection $routes  A RouteCollection instance
      * @param RequestContext  $context The context
+     * @param string          $charset The encoding used in the URLs to be matched
      */
-    public function __construct(RouteCollection $routes, RequestContext $context)
+    public function __construct(RouteCollection $routes, RequestContext $context, $charset)
     {
         $this->routes = $routes;
         $this->context = $context;
+        $this->charset = $charset;
     }
 
     /**
@@ -89,7 +96,7 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
     {
         $this->allow = array();
 
-        if ($ret = $this->matchCollection(rawurldecode($pathinfo), $this->routes)) {
+        if ($ret = $this->matchCollection($this->toUtf8(rawurldecode($pathinfo)), $this->routes)) {
             return $ret;
         }
 
@@ -247,5 +254,21 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
         }
 
         return $this->expressionLanguage;
+    }
+
+    /**
+     * Converts a string to UTF-8 from the encoding used in URLs.
+     *
+     * @param string $string A URL in the encoding used in URLs
+     *
+     * @return string A UTF-8-encoded string
+     */
+    protected function toUtf8($string)
+    {
+        if ('UTF-8' === $this->charset) {
+            return $string;
+        }
+
+        return mb_convert_encoding($string, 'UTF-8', $this->charset);
     }
 }

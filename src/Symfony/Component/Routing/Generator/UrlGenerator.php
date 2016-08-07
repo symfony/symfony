@@ -48,6 +48,13 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
     protected $logger;
 
     /**
+     * The output encoding used when generating URLs (path, query string and fragment).
+     *
+     * @var string
+     */
+    protected $charset;
+
+    /**
      * This array defines the characters (besides alphanumeric ones) that will not be percent-encoded in the path segment of the generated URL.
      *
      * PHP's rawurlencode() encodes all chars except "a-zA-Z0-9-._~" according to RFC 3986. But we want to allow some chars
@@ -81,12 +88,14 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * @param RouteCollection      $routes  A RouteCollection instance
      * @param RequestContext       $context The context
      * @param LoggerInterface|null $logger  A logger instance
+     * @param string               $charset The encoding used in the generated URLs
      */
-    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null)
+    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null, $charset = 'UTF-8')
     {
         $this->routes = $routes;
         $this->context = $context;
         $this->logger = $logger;
+        $this->charset = $charset;
     }
 
     /**
@@ -158,7 +167,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             if ('variable' === $token[0]) {
                 if (!$optional || !array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
                     // check requirement
-                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
+                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#u', $mergedParams[$token[3]])) {
                         if ($this->strictRequirements) {
                             throw new InvalidParameterException(strtr($message, array('{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]])));
                         }
@@ -185,7 +194,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // the contexts base URL is already encoded (see Symfony\Component\HttpFoundation\Request)
-        $url = strtr(rawurlencode($url), $this->decodedChars);
+        $url = strtr(rawurlencode($this->fromUtf8($url)), $this->decodedChars);
 
         // the path segments "." and ".." are interpreted as relative reference when resolving a URI; see http://tools.ietf.org/html/rfc3986#section-3.3
         // so we need to encode them as they are not used for this purpose here
@@ -266,17 +275,43 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $fragment = isset($extra['_fragment']) ? $extra['_fragment'] : '';
         unset($extra['_fragment']);
 
-        if ($extra && $query = http_build_query($extra, '', '&')) {
-            // "/" and "?" can be left decoded for better user experience, see
+        // ignore null values
+        $extra = array_filter($extra, function ($value) { return null !== $value; });
+
+        if ($extra) {
+            if ($this->charset != 'UTF-8') {
+                $extra = array_combine(
+                    array_map(array($this, 'fromUtf8'), array_keys($extra)),
+                    array_map(array($this, 'fromUtf8'), $extra)
+                );
+            }
+            $query = http_build_query($extra, '', '&');
+             // "/" and "?" can be left decoded for better user experience, see
             // http://tools.ietf.org/html/rfc3986#section-3.4
             $url .= '?'.strtr($query, array('%2F' => '/'));
         }
 
         if ('' !== $fragment) {
-            $url .= '#'.strtr(rawurlencode($fragment), array('%2F' => '/', '%3F' => '?'));
+            $url .= '#'.strtr(rawurlencode($this->fromUtf8($fragment)), array('%2F' => '/', '%3F' => '?'));
         }
 
         return $url;
+    }
+
+    /**
+     * Converts a string from UTF-8 to the encoding used in URLs.
+     *
+     * @param string $string A UTF-8-encoded string
+     *
+     * @return string A string in the encoded used in URLs
+     */
+    protected function fromUtf8($string)
+    {
+        if ('UTF-8' === $this->charset) {
+            return $string;
+        }
+
+        return mb_convert_encoding($string, $this->charset, 'UTF-8');
     }
 
     /**

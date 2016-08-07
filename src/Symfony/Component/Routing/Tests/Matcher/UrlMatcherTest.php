@@ -25,7 +25,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $this->assertInternalType('array', $matcher->match('/foo'));
     }
 
@@ -34,7 +34,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('post')));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
 
         try {
             $matcher->match('/foo');
@@ -49,7 +49,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('get')));
 
-        $matcher = new UrlMatcher($coll, new RequestContext('', 'head'));
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'head'), 'UTF-8');
         $this->assertInternalType('array', $matcher->match('/foo'));
     }
 
@@ -59,7 +59,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo1', new Route('/foo', array(), array(), array(), '', array(), array('post')));
         $coll->add('foo2', new Route('/foo', array(), array(), array(), '', array(), array('put', 'delete')));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
 
         try {
             $matcher->match('/foo');
@@ -74,7 +74,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         // test the patterns are matched and parameters are returned
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo/{bar}'));
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         try {
             $matcher->match('/no-match');
             $this->fail();
@@ -85,17 +85,17 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         // test that defaults are merged
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo/{bar}', array('def' => 'test')));
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => 'foo', 'bar' => 'baz', 'def' => 'test'), $matcher->match('/foo/baz'));
 
         // test that route "method" is ignored if no method is given in the context
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo', array(), array(), array(), '', array(), array('get', 'head')));
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertInternalType('array', $matcher->match('/foo'));
 
         // route does not match with POST method context
-        $matcher = new UrlMatcher($collection, new RequestContext('', 'post'));
+        $matcher = new UrlMatcher($collection, new RequestContext('', 'post'), 'UTF-8');
         try {
             $matcher->match('/foo');
             $this->fail();
@@ -103,31 +103,43 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         }
 
         // route does match with GET or HEAD method context
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertInternalType('array', $matcher->match('/foo'));
-        $matcher = new UrlMatcher($collection, new RequestContext('', 'head'));
+        $matcher = new UrlMatcher($collection, new RequestContext('', 'head'), 'UTF-8');
         $this->assertInternalType('array', $matcher->match('/foo'));
 
         // route with an optional variable as the first segment
         $collection = new RouteCollection();
         $collection->add('bar', new Route('/{bar}/foo', array('bar' => 'bar'), array('bar' => 'foo|bar')));
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => 'bar', 'bar' => 'bar'), $matcher->match('/bar/foo'));
         $this->assertEquals(array('_route' => 'bar', 'bar' => 'foo'), $matcher->match('/foo/foo'));
 
         $collection = new RouteCollection();
         $collection->add('bar', new Route('/{bar}', array('bar' => 'bar'), array('bar' => 'foo|bar')));
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => 'bar', 'bar' => 'foo'), $matcher->match('/foo'));
         $this->assertEquals(array('_route' => 'bar', 'bar' => 'bar'), $matcher->match('/'));
 
         // route with only optional variables
         $collection = new RouteCollection();
         $collection->add('bar', new Route('/{foo}/{bar}', array('foo' => 'foo', 'bar' => 'bar'), array()));
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => 'bar', 'foo' => 'foo', 'bar' => 'bar'), $matcher->match('/'));
         $this->assertEquals(array('_route' => 'bar', 'foo' => 'a', 'bar' => 'bar'), $matcher->match('/a'));
         $this->assertEquals(array('_route' => 'bar', 'foo' => 'a', 'bar' => 'b'), $matcher->match('/a/b'));
+
+        // route with UTF-8 encoding.
+        $collection = new RouteCollection();
+        $collection->add('bar', new Route('/föö/{bar}/{baz}', array(), array('baz' => '\pL')));
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'bär', 'baz' => 'ü'), $matcher->match('/f%C3%B6%C3%B6/b%C3%A4r/%C3%BC'));
+
+        // route with ISO-8859-1 encoding.
+        $collection = new RouteCollection();
+        $collection->add('bar', new Route('/föö/{bar}/{baz}', array(), array('baz' => '\pL')));
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'ISO-8859-1');
+        $this->assertEquals(array('_route' => 'bar', 'bar' => 'bär', 'baz' => 'ü'), $matcher->match('/f%F6%F6/b%E4r/%FC'));
     }
 
     public function testMatchWithPrefixes()
@@ -137,7 +149,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $collection->addPrefix('/b');
         $collection->addPrefix('/a');
 
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => 'foo', 'foo' => 'foo'), $matcher->match('/a/b/foo'));
     }
 
@@ -148,7 +160,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $collection->addPrefix('/b');
         $collection->addPrefix('/{_locale}');
 
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_locale' => 'fr', '_route' => 'foo', 'foo' => 'foo'), $matcher->match('/fr/b/foo'));
     }
 
@@ -157,7 +169,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
         $collection->add('$péß^a|', new Route('/bar'));
 
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => '$péß^a|'), $matcher->match('/bar'));
     }
 
@@ -167,7 +179,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $chars = '!"$%éà &\'()*+,./:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\[]^_`abcdefghijklmnopqrstuvwxyz{|}~-';
         $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '['.preg_quote($chars).']+')));
 
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.rawurlencode($chars).'/bar'));
         $this->assertEquals(array('_route' => 'foo', 'foo' => $chars), $matcher->match('/'.strtr($chars, array('%' => '%25')).'/bar'));
     }
@@ -177,7 +189,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/{foo}/bar', array(), array('foo' => '.+')));
 
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => 'foo', 'foo' => "\n"), $matcher->match('/'.urlencode("\n").'/bar'), 'linefeed character is matched');
     }
 
@@ -191,7 +203,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $collection->addCollection($collection1);
 
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
 
         $this->assertEquals(array('_route' => 'foo'), $matcher->match('/foo1'));
         $this->setExpectedException('Symfony\Component\Routing\Exception\ResourceNotFoundException');
@@ -204,12 +216,12 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('foo', new Route('/foo/{foo}'));
         $coll->add('bar', new Route('/foo/bar/{foo}'));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('foo' => 'bar', '_route' => 'bar'), $matcher->match('/foo/bar/bar'));
 
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/{bar}'));
-        $matcher = new UrlMatcher($collection, new RequestContext());
+        $matcher = new UrlMatcher($collection, new RequestContext(), 'UTF-8');
         try {
             $matcher->match('/');
             $this->fail();
@@ -222,7 +234,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}', array('page' => 'index', '_format' => 'html')));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('page' => 'my-page', '_format' => 'xml', '_route' => 'test'), $matcher->match('/my-page.xml'));
     }
 
@@ -231,7 +243,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{foo}-{bar}-', array(), array('foo' => '.+', 'bar' => '.+')));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('foo' => 'text1-text2-text3', 'bar' => 'text4', '_route' => 'test'), $matcher->match('/text1-text2-text3-text4-'));
     }
 
@@ -240,7 +252,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{w}{x}{y}{z}.{_format}', array('z' => 'default-z', '_format' => 'html'), array('y' => 'y|Y')));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         // 'w' eagerly matches as much as possible and the other variables match the remaining chars.
         // This also shows that the variables w-z must all exclude the separating char (the dot '.' in this case) by default requirement.
         // Otherwise they would also consume '.xml' and _format would never match as it's an optional variable.
@@ -259,7 +271,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/get{what}', array('what' => 'All')));
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
 
         $this->assertEquals(array('what' => 'All', '_route' => 'test'), $matcher->match('/get'));
         $this->assertEquals(array('what' => 'Sites', '_route' => 'test'), $matcher->match('/getSites'));
@@ -274,7 +286,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/get{what}Suffix'));
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
 
         $this->assertEquals(array('what' => 'Sites', '_route' => 'test'), $matcher->match('/getSitesSuffix'));
     }
@@ -283,7 +295,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}'));
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
 
         $this->assertEquals(array('page' => 'index', '_format' => 'mobile.html', '_route' => 'test'), $matcher->match('/index.mobile.html'));
     }
@@ -295,7 +307,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}'));
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
 
         $matcher->match('/index.sl/ash');
     }
@@ -307,7 +319,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}', array(), array('_format' => 'html|xml')));
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
 
         $matcher->match('/do.t.html');
     }
@@ -319,7 +331,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $matcher->match('/foo');
     }
 
@@ -332,7 +344,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $route = new Route('/foo');
         $route->setCondition('context.getMethod() == "POST"');
         $coll->add('foo', $route);
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $matcher->match('/foo');
     }
 
@@ -341,7 +353,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('foo' => 'bar%23', '_route' => 'foo'), $matcher->match('/foo/bar%2523'));
     }
 
@@ -357,7 +369,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
 
         $coll->addCollection($subColl);
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $this->assertEquals(array('_route' => 'bar'), $matcher->match('/new'));
     }
 
@@ -366,7 +378,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}', array(), array(), array(), '{locale}.example.com'));
 
-        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'), 'UTF-8');
         $this->assertEquals(array('foo' => 'bar', '_route' => 'foo', 'locale' => 'en'), $matcher->match('/foo/bar'));
     }
 
@@ -377,10 +389,10 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll->add('bar', new Route('/bar/{foo}', array(), array(), array(), '{locale}.example.net'));
         $coll->setHost('{locale}.example.com');
 
-        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'), 'UTF-8');
         $this->assertEquals(array('foo' => 'bar', '_route' => 'foo', 'locale' => 'en'), $matcher->match('/foo/bar'));
 
-        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'), 'UTF-8');
         $this->assertEquals(array('foo' => 'bar', '_route' => 'bar', 'locale' => 'en'), $matcher->match('/bar/bar'));
     }
 
@@ -392,7 +404,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}', array(), array(), array(), '{locale}.example.com'));
 
-        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'example.com'));
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'example.com'), 'UTF-8');
         $matcher->match('/foo/bar');
     }
 
@@ -404,7 +416,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/locale', array(), array('locale' => 'EN|FR|DE')));
 
-        $matcher = new UrlMatcher($coll, new RequestContext());
+        $matcher = new UrlMatcher($coll, new RequestContext(), 'UTF-8');
         $matcher->match('/en');
     }
 
@@ -413,7 +425,7 @@ class UrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/', array(), array('locale' => 'EN|FR|DE'), array(), '{locale}.example.com'));
 
-        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'));
+        $matcher = new UrlMatcher($coll, new RequestContext('', 'GET', 'en.example.com'), 'UTF-8');
         $this->assertEquals(array('_route' => 'foo', 'locale' => 'en'), $matcher->match('/'));
     }
 }

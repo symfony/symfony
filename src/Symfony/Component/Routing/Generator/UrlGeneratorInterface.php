@@ -71,6 +71,9 @@ interface UrlGeneratorInterface extends RequestContextAwareInterface
      *
      * The special parameter _fragment will be used as the document fragment suffixed to the final URL.
      *
+     * All parameters should be encoded in UTF-8 when passed to this function. The generated URL will be
+     * encoding using the output encoding configured for this generator.
+     *
      * @param string $name          The name of the route
      * @param mixed  $parameters    An array of parameters
      * @param int    $referenceType The type of reference to be generated (one of the constants)

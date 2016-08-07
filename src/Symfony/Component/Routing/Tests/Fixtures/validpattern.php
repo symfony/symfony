@@ -5,9 +5,9 @@ use Symfony\Component\Routing\Route;
 
 $collection = new RouteCollection();
 $collection->add('blog_show', new Route(
-    '/blog/{slug}',
+    '/blög/{slug}',
     array('_controller' => 'MyBlogBundle:Blog:show'),
-    array('locale' => '\w+'),
+    array('locale' => '\w+', 'slug' => '[a-zë]+'),
     array('compiler_class' => 'RouteCompiler'),
     '{locale}.example.com',
     array('https'),

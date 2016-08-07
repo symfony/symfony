@@ -23,7 +23,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext(), 'UTF-8');
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',
@@ -43,7 +43,7 @@ class RedirectableUrlMatcherTest extends \PHPUnit_Framework_TestCase
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', array(), array(), array(), '', array('https')));
 
-        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext());
+        $matcher = new RedirectableUrlMatcher($coll, $context = new RequestContext(), 'UTF-8');
 
         $this->assertEquals(array(
                 '_controller' => 'Symfony\Bundle\FrameworkBundle\Controller\RedirectController::urlRedirectAction',

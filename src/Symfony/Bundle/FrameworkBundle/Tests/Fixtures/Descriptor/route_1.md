@@ -1,7 +1,7 @@
 - Path: /hello/{name}
-- Path Regex: #^/hello(?:/(?P<name>[a-z]+))?$#s
+- Path Regex: #^/hello(?:/(?P<name>[a-z]+))?$#us
 - Host: localhost
-- Host Regex: #^localhost$#si
+- Host Regex: #^localhost$#usi
 - Scheme: http|https
 - Method: GET|HEAD
 - Class: Symfony\Component\Routing\Route

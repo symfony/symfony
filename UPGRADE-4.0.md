@@ -132,6 +132,14 @@ HttpKernel
    have your own `ControllerResolverInterface` implementation, you should
    inject an `ArgumentResolverInterface` instance.
 
+
+Router
+------
+ * URLs are now assumed to be encoded in UTF-8. Regular expressions for route
+   requirements now use the PCRE_UTF8 flag to allow matching non-ASCII
+   characters. To support legacy URLs in other encodings, the default encoding
+   can be overridden using the `charset` option.
+
 Serializer
 ----------
 

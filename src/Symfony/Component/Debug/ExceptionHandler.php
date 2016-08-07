@@ -291,7 +291,6 @@ EOF;
             .sf-reset .exception_counter { background-color: #fff; color: #333; padding: 6px; float: left; margin-right: 10px; float: left; display: block; }
             .sf-reset .exception_google_link { float: right; display: block;  }
             .sf-reset .exception_google_link a { cursor: pointer; }
-            .sf-reset .exception_google_link img { height: 32px; width: auto }
             .sf-reset .exception_title { margin-left: 3em; margin-bottom: 0.7em; display: block; }
             .sf-reset .exception_message { margin-left: 3em; display: block; }
             .sf-reset .traces li { font-size:12px; padding: 2px 4px; list-style-type:decimal; margin-left:20px; }
@@ -411,6 +410,6 @@ EOF;
      */
     private function formatGoogleLink($query)
     {
-        return '<a href="https://google.com/search?q=' . urlencode(strip_tags($query)) . '" target="_blank" rel="noopener noreferrer" title="Search error on Google"><img src="//google.com/favicon.ico" alt="Search error on Google"></a>';
+        return '<a href="https://google.com/search?q=' . urlencode(strip_tags($query)) . '" target="_blank" rel="noopener noreferrer" title="Search error on Google">Search on Google</a>';
     }
 }

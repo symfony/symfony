@@ -1396,6 +1396,20 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $env);
     }
 
+    public function testInteractiveInput()
+    {
+        $p = $this->getProcess('read && read && echo done');
+        $p->setInputInteractive(true);
+        $p->start();
+        $p->setInput(PHP_EOL);
+        $this->assertTrue($p->isRunning()); // trigger read/write
+        $p->appendInputBuffer(PHP_EOL);
+        $this->assertTrue($p->isRunning()); // trigger read/write
+        usleep(100000); // allow a tenth of a second to complete
+        $this->assertFalse($p->isRunning());
+        $this->assertTrue(false !== strpos($p->getOutput(), 'done'));
+    }
+
     /**
      * @param string      $commandline
      * @param null|string $cwd

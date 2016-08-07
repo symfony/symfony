@@ -54,6 +54,7 @@ class Process implements \IteratorAggregate
     private $cwd;
     private $env;
     private $input;
+    private $inputInteractive = false;
     private $starttime;
     private $lastOutputTime;
     private $timeout;
@@ -1122,15 +1123,77 @@ class Process implements \IteratorAggregate
      *
      * @return self The current Process instance
      *
-     * @throws LogicException In case the process is running
+     * @throws LogicException In case the process is running and not interactive
      */
     public function setInput($input)
     {
+        $input = ProcessUtils::validateInput(__METHOD__, $input);
+
         if ($this->isRunning()) {
-            throw new LogicException('Input can not be set while the process is running.');
+            if ($this->inputInteractive) {
+                // If process is already running $this->input will not be read,
+                // thus the input must be set directly on processPipes.
+                $this->processPipes->setInput($input);
+            } else {
+                throw new LogicException('Input can not be set while the process is running.');
+            }
+        } else {
+            // Only used for before process is running.
+            $this->input = $input;
         }
 
-        $this->input = ProcessUtils::validateInput(__METHOD__, $input);
+        return $this;
+    }
+
+    /**
+     * Set the input interactive flag.
+     *
+     * True indicates that the input pipe will not be closed when the given
+     * input has been written to the pipe. Defaults to false which means the
+     * pipe will be closed after the initial input has been exhausted.
+     *
+     * @param bool $interactive The interactive flag
+     *
+     * @return self The current Process instance
+     *
+     * @throws LogicException In case the process is running
+     */
+    public function setInputInteractive($interactive)
+    {
+        if ($this->isRunning()) {
+            throw new LogicException('Input interactivity can not be set while the process is running.');
+        }
+
+        $this->inputInteractive = $interactive;
+
+        return $this;
+    }
+
+    /**
+     * Appends the input buffer (string/scalar only).
+     *
+     * This content will be passed to the underlying process standard input.
+     *
+     * @param mixed $buffer The content
+     *
+     * @return self The current Process instance
+     *
+     * @throws LogicException In case the process is not running or not interactive
+     * @throws LogicException In case the buffer is a resource
+     */
+    public function appendInputBuffer($buffer)
+    {
+        if (!$this->inputInteractive || !$this->isRunning()) {
+            throw new LogicException('Input buffer can not be appended if not in interactive mode or while the process is not running.');
+        }
+
+        if (is_resource($buffer)) {
+            throw new LogicException('Input buffer may not be a resource.');
+        }
+
+        // Validate looks for scalar or string and returns string.
+        $buffer = ProcessUtils::validateInput(__METHOD__, $buffer);
+        $this->processPipes->appendInputBuffer($buffer);
 
         return $this;
     }
@@ -1299,6 +1362,7 @@ class Process implements \IteratorAggregate
         } else {
             $this->processPipes = new UnixPipes($this->isTty(), $this->isPty(), $this->input, !$this->outputDisabled || $this->hasCallback);
         }
+        $this->processPipes->setInputInteractive($this->inputInteractive);
 
         return $this->processPipes->getDescriptors();
     }

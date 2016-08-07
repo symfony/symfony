@@ -23,6 +23,8 @@ abstract class AbstractPipes implements PipesInterface
     /** @var array */
     public $pipes = array();
 
+    /** @var bool */
+    protected $inputInteractive = false;
     /** @var string */
     private $inputBuffer = '';
     /** @var resource|scalar|\Iterator|null */
@@ -32,13 +34,7 @@ abstract class AbstractPipes implements PipesInterface
 
     public function __construct($input)
     {
-        if (is_resource($input) || $input instanceof \Iterator) {
-            $this->input = $input;
-        } elseif (is_string($input)) {
-            $this->inputBuffer = $input;
-        } else {
-            $this->inputBuffer = (string) $input;
-        }
+        $this->setInput($input);
     }
 
     /**
@@ -50,6 +46,39 @@ abstract class AbstractPipes implements PipesInterface
             fclose($pipe);
         }
         $this->pipes = array();
+    }
+
+    /**
+     * @see Process::setInput()
+     */
+    public function setInput($input)
+    {
+        if (is_resource($input) || $input instanceof \Iterator) {
+            $this->input = $input;
+        } elseif (is_string($input)) {
+            $this->inputBuffer = $input;
+        } else {
+            $this->inputBuffer = (string) $input;
+        }
+    }
+
+    /**
+     * @see Process::setInputInteractive()
+     */
+    public function setInputInteractive($interactive)
+    {
+        $this->inputInteractive = $interactive;
+    }
+
+    /**
+     * @see Process::appendInputBuffer()
+     */
+    public function appendInputBuffer($buffer)
+    {
+        // An interesting alternative would be to provide a loopback stream
+        // resource that could be give as $input and simply written to
+        // repeatedly, but this is non-trivial to achieve.
+        $this->inputBuffer .= $buffer;
     }
 
     /**
@@ -158,7 +187,7 @@ abstract class AbstractPipes implements PipesInterface
         }
 
         // no input to read on resource, buffer is empty
-        if (!isset($this->inputBuffer[0]) && !($this->input instanceof \Iterator ? $this->input->valid() : $this->input)) {
+        if (!$this->inputInteractive && !isset($this->inputBuffer[0]) && !($this->input instanceof \Iterator ? $this->input->valid() : $this->input)) {
             $this->input = null;
             fclose($this->pipes[0]);
             unset($this->pipes[0]);

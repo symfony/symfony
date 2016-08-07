@@ -12,6 +12,8 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Predis\Connection\Factory;
+use Predis\Connection\Aggregate\PredisCluster;
+use Predis\Connection\Aggregate\RedisCluster;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -20,8 +22,6 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  */
 class RedisAdapter extends AbstractAdapter
 {
-    use RedisAdapterTrait;
-
     private static $defaultConnectionOptions = array(
         'class' => null,
         'persistent' => 0,
@@ -29,6 +29,7 @@ class RedisAdapter extends AbstractAdapter
         'read_timeout' => 0,
         'retry_interval' => 0,
     );
+    private $redis;
 
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
@@ -36,7 +37,14 @@ class RedisAdapter extends AbstractAdapter
     public function __construct($redisClient, $namespace = '', $defaultLifetime = 0)
     {
         parent::__construct($namespace, $defaultLifetime);
-        $this->setRedis($redisClient, $namespace);
+
+        if (preg_match('#[^-+_.A-Za-z0-9]#', $namespace, $match)) {
+            throw new InvalidArgumentException(sprintf('RedisAdapter namespace contains "%s" but only characters in [-+_.A-Za-z0-9] are allowed.', $match[0]));
+        }
+        if (!$redisClient instanceof \Redis && !$redisClient instanceof \RedisArray && !$redisClient instanceof \RedisCluster && !$redisClient instanceof \Predis\Client) {
+            throw new InvalidArgumentException(sprintf('%s() expects parameter 1 to be Redis, RedisArray, RedisCluster or Predis\Client, %s given', __METHOD__, is_object($redisClient) ? get_class($redisClient) : gettype($redisClient)));
+        }
+        $this->redis = $redisClient;
     }
 
     /**
@@ -152,6 +160,71 @@ class RedisAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
+    protected function doClear($namespace)
+    {
+        // When using a native Redis cluster, clearing the cache cannot work and always returns false.
+        // Clearing the cache should then be done by any other means (e.g. by restarting the cluster).
+
+        $cleared = true;
+        $hosts = array($this->redis);
+        $evalArgs = array(array($namespace), 0);
+
+        if ($this->redis instanceof \Predis\Client) {
+            $evalArgs = array(0, $namespace);
+
+            $connection = $this->redis->getConnection();
+            if ($connection instanceof PredisCluster) {
+                $hosts = array();
+                foreach ($connection as $c) {
+                    $hosts[] = new \Predis\Client($c);
+                }
+            } elseif ($connection instanceof RedisCluster) {
+                return false;
+            }
+        } elseif ($this->redis instanceof \RedisArray) {
+            $hosts = array();
+            foreach ($this->redis->_hosts() as $host) {
+                $hosts[] = $this->redis->_instance($host);
+            }
+        } elseif ($this->redis instanceof \RedisCluster) {
+            return false;
+        }
+        foreach ($hosts as $host) {
+            if (!isset($namespace[0])) {
+                $cleared = $host->flushDb() && $cleared;
+                continue;
+            }
+
+            $info = $host->info('Server');
+            $info = isset($info['Server']) ? $info['Server'] : $info;
+
+            if (!version_compare($info['redis_version'], '2.8', '>=')) {
+                // As documented in Redis documentation (http://redis.io/commands/keys) using KEYS
+                // can hang your server when it is executed against large databases (millions of items).
+                // Whenever you hit this scale, you should really consider upgrading to Redis 2.8 or above.
+                $cleared = $host->eval("local keys=redis.call('KEYS',ARGV[1]..'*') for i=1,#keys,5000 do redis.call('DEL',unpack(keys,i,math.min(i+4999,#keys))) end return 1", $evalArgs[0], $evalArgs[1]) && $cleared;
+                continue;
+            }
+
+            $cursor = null;
+            do {
+                $keys = $host instanceof \Predis\Client ? $host->scan($cursor, 'MATCH', $namespace.'*', 'COUNT', 1000) : $host->scan($cursor, $namespace.'*', 1000);
+                if (isset($keys[1]) && is_array($keys[1])) {
+                    $cursor = $keys[0];
+                    $keys = $keys[1];
+                }
+                if ($keys) {
+                    $host->del($keys);
+                }
+            } while ($cursor = (int) $cursor);
+        }
+
+        return $cleared;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function doDelete(array $ids)
     {
         if ($ids) {
@@ -194,5 +267,48 @@ class RedisAdapter extends AbstractAdapter
         });
 
         return $failed;
+    }
+
+    private function execute($command, $id, array $args, $redis = null)
+    {
+        array_unshift($args, $id);
+        call_user_func_array(array($redis ?: $this->redis, $command), $args);
+    }
+
+    private function pipeline(\Closure $callback)
+    {
+        $redis = $this->redis;
+
+        try {
+            if ($redis instanceof \Predis\Client) {
+                $redis->pipeline(function ($pipe) use ($callback) {
+                    $this->redis = $pipe;
+                    $callback(array($this, 'execute'));
+                });
+            } elseif ($redis instanceof \RedisArray) {
+                $connections = array();
+                $callback(function ($command, $id, $args) use (&$connections) {
+                    if (!isset($connections[$h = $this->redis->_target($id)])) {
+                        $connections[$h] = $this->redis->_instance($h);
+                        $connections[$h]->multi(\Redis::PIPELINE);
+                    }
+                    $this->execute($command, $id, $args, $connections[$h]);
+                });
+                foreach ($connections as $c) {
+                    $c->exec();
+                }
+            } else {
+                $pipe = $redis->multi(\Redis::PIPELINE);
+                try {
+                    $callback(array($this, 'execute'));
+                } finally {
+                    if ($pipe) {
+                        $redis->exec();
+                    }
+                }
+            }
+        } finally {
+            $this->redis = $redis;
+        }
     }
 }

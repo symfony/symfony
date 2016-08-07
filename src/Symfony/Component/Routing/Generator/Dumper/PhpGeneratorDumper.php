@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing\Generator\Dumper;
 
-use Symfony\Component\AstGenerator\Util\AstHelper;
-use Symfony\Component\Routing\Generator\AstGenerator\UrlGeneratorGenerator;
+use Symfony\Component\Ast\AstDumper;
+use Symfony\Component\Routing\Generator\AstGenerator\GeneratorAstGenerator;
 
 /**
  * PhpGeneratorDumper creates a PHP class able to generate URLs for a given set of routes.
@@ -36,10 +36,9 @@ class PhpGeneratorDumper extends GeneratorDumper
      */
     public function dump(array $options = array())
     {
-        $generator = new UrlGeneratorGenerator();
+        $dumper = new AstDumper();
+        $generator = new GeneratorAstGenerator($this->getRoutes());
 
-        $code = AstHelper::dump($generator->generate($this->getRoutes(), $options));
-
-        return $code;
+        return $dumper->dump($generator->generate($options));
     }
 }

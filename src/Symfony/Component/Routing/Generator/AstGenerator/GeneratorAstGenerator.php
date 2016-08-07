@@ -18,63 +18,57 @@ use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Expr;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\AstGenerator\AstGeneratorInterface;
-use Symfony\Component\AstGenerator\Util\AstHelper;
+use Symfony\Component\Ast\NodeList;
+use Symfony\Component\Ast\Util\AstHelper;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * @author Guilhem N. <egetick@gmail.com>
  */
-class UrlGeneratorGenerator implements AstGeneratorInterface
+final class GeneratorAstGenerator implements GeneratorAstGeneratorInterface
 {
-    public function __construct()
+    public function __construct(RouteCollection $routes)
     {
+        $this->routes = $routes;
         $this->factory = new BuilderFactory();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function generate($object, array $context = array())
+    public function generate(array $options = array())
     {
-        $context = array_replace(array(
+        $options = array_replace(array(
             'class' => 'ProjectUrlGenerator',
             'base_class' => UrlGenerator::class,
-        ), $context);
+        ), $options);
 
-        return array($this->generateClass($object, $context)->getNode());
+        return new NodeList(array($this->generateClass($options)->getNode()));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsGeneration($object)
-    {
-        return is_string($object) && class_exists($object);
-    }
-
-    private function generateClass($object, array $context)
+    private function generateClass(array $options)
     {
         $docComment = <<<COMMENT
 /**
- * {$context['class']}.
+ * {$options['class']}.
  *
  * This class has been auto-generated
  * by the Symfony Routing Component.
  */
 COMMENT;
 
-        return $this->factory->class($context['class'])
+        return $this->factory->class($options['class'])
             ->setDocComment($docComment)
-            ->extend($context['base_class'])
+            ->extend($options['base_class'])
             ->addStmt($this->factory->property('declaredRoutes')->makePrivate()->makeStatic())
-            ->addStmt($this->generateConstructor($object, $context))
-            ->addStmt($this->generateGenerateMethod($object, $context));
+            ->addStmt($this->generateConstructor())
+            ->addStmt($this->generateGenerateMethod());
     }
 
-    private function generateConstructor($object, array $context)
+    private function generateConstructor()
     {
         $constructor = $this->factory->method('__construct')
             ->makePublic()
@@ -98,7 +92,7 @@ EOF;
                 'stmts' => array(
                     new Expr\Assign(
                         new Expr\StaticPropertyFetch(new Name('self'), 'declaredRoutes'),
-                        $this->generateDeclaredRoutes($object, $context)
+                        $this->generateDeclaredRoutes()
                     ),
                 ),
             )
@@ -113,10 +107,10 @@ EOF;
      *
      * @return Expr\Array_
      */
-    private function generateDeclaredRoutes($object, array $context)
+    private function generateDeclaredRoutes()
     {
         $routes = array();
-        foreach ($object->all() as $name => $route) {
+        foreach ($this->routes->all() as $name => $route) {
             $compiledRoute = $route->compile();
 
             $properties = array();

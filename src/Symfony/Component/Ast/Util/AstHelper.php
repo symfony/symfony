@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\AstGenerator\Util;
+namespace Symfony\Component\Ast\Util;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr;

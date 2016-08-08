@@ -116,6 +116,7 @@ class Configuration implements ConfigurationInterface
         $this->addPropertyAccessSection($rootNode);
         $this->addPropertyInfoSection($rootNode);
         $this->addCacheSection($rootNode);
+        $this->addPhpErrorsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -686,6 +687,30 @@ class Configuration implements ConfigurationInterface
                                 ->ifTrue(function ($v) { return isset($v['cache.app']) || isset($v['cache.system']); })
                                 ->thenInvalid('"cache.app" and "cache.system" are reserved names')
                             ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addPhpErrorsSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('php_errors')
+                    ->info('PHP errors handling configuration')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('log')
+                            ->info('Use the app logger instead of the PHP logger for logging PHP errors.')
+                            ->defaultValue(false)
+                            ->treatNullLike(false)
+                        ->end()
+                        ->booleanNode('throw')
+                            ->info('Throw PHP errors as \ErrorException instances.')
+                            ->defaultValue($this->debug)
+                            ->treatNullLike($this->debug)
                         ->end()
                     ->end()
                 ->end()

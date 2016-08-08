@@ -475,8 +475,7 @@ class Inline
                         // are processed sequentially.
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
-                        }
-                        else {
+                        } else {
                             @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $key), E_USER_DEPRECATED);
                         }
                         $done = true;

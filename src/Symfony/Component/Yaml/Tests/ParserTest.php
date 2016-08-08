@@ -808,7 +808,7 @@ EOD;
      */
     public function testParseExceptionOnDuplicate($input, $duplicate_key)
     {
-        $deprecations = [];
+        $deprecations = array();
         set_error_handler(function ($type, $msg) use (&$deprecations) {
             if (E_USER_DEPRECATED !== $type) {
                 restore_error_handler();
@@ -819,7 +819,7 @@ EOD;
             $deprecations[] = $msg;
         });
         Yaml::parse($input);
-        $this->assertEquals([sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $duplicate_key)], $deprecations);
+        $this->assertEquals(array(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $duplicate_key)), $deprecations);
     }
 
     public function getParseExceptionOnDuplicateData()

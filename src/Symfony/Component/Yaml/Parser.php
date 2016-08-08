@@ -241,7 +241,7 @@ class Parser
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             $data[$key] = null;
-                        } elseif (!$allowOverwrite) {
+                        } else {
                             @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $key), E_USER_DEPRECATED);
                         }
                     } else {
@@ -250,7 +250,7 @@ class Parser
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             $data[$key] = $value;
-                        } elseif (!$allowOverwrite) {
+                        } else {
                             @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $key), E_USER_DEPRECATED);
                         }
                     }
@@ -260,7 +260,7 @@ class Parser
                     // But overwriting is allowed when a merge node is used in current block.
                     if ($allowOverwrite || !isset($data[$key])) {
                         $data[$key] = $value;
-                    } elseif (!$allowOverwrite) {
+                    } else {
                         @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $key), E_USER_DEPRECATED);
                     }
                 }

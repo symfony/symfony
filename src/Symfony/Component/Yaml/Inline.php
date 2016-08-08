@@ -476,7 +476,7 @@ class Inline
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
                         } else {
-                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $key), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key), E_USER_DEPRECATED);
                         }
                         $done = true;
                         break;
@@ -489,7 +489,7 @@ class Inline
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
                         } else {
-                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $key), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key), E_USER_DEPRECATED);
                         }
                         $done = true;
                         break;
@@ -504,7 +504,7 @@ class Inline
                         if (!isset($output[$key])) {
                             $output[$key] = $value;
                         } else {
-                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $key), E_USER_DEPRECATED);
+                            @trigger_error(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $key), E_USER_DEPRECATED);
                         }
                         $done = true;
                         --$i;

@@ -771,7 +771,7 @@ EOF
      * @see http://yaml.org/spec/1.2/spec.html#id2759572
      * @see http://yaml.org/spec/1.1/#id932806
      */
-    public function testMappingDuplicateKeyBlock()
+    public function testLegacyMappingDuplicateKeyBlock()
     {
         $input = <<<EOD
 parent:
@@ -789,7 +789,7 @@ EOD;
         $this->assertSame($expected, Yaml::parse($input));
     }
 
-    public function testMappingDuplicateKeyFlow()
+    public function testLegacyMappingDuplicateKeyFlow()
     {
         $input = <<<EOD
 parent: { child: first, child: duplicate }

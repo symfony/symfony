@@ -45,8 +45,9 @@ class YamlReferenceDumper
     /**
      * @param NodeInterface $node
      * @param int           $depth
+     * @param bool          $prototypedArray
      */
-    private function writeNode(NodeInterface $node, $depth = 0)
+    private function writeNode(NodeInterface $node, $depth = 0, $prototypedArray = false)
     {
         $comments = array();
         $default = '';
@@ -66,17 +67,17 @@ class YamlReferenceDumper
                 }
 
                 // check for attribute as key
-                if ($key = $node->getKeyAttribute()) {
-                    $keyNodeClass = 'Symfony\Component\Config\Definition\\'.($prototype instanceof ArrayNode ? 'ArrayNode' : 'ScalarNode');
-                    $keyNode = new $keyNodeClass($key, $node);
-                    $keyNode->setInfo('Prototype');
+                $key = $node->getKeyAttribute();
 
-                    // add children
-                    foreach ($children as $childNode) {
-                        $keyNode->addChild($childNode);
-                    }
-                    $children = array($key => $keyNode);
+                $keyNodeClass = 'Symfony\Component\Config\Definition\\'.($prototype instanceof ArrayNode ? 'ArrayNode' : 'ScalarNode');
+                $keyNode = new $keyNodeClass($key, $node);
+                $keyNode->setInfo('Prototype');
+
+                // add children
+                foreach ($children as $childNode) {
+                    $keyNode->addChild($childNode);
                 }
+                $children = array($key => $keyNode);
             }
 
             if (!$children) {
@@ -120,7 +121,8 @@ class YamlReferenceDumper
         $default = (string) $default != '' ? ' '.$default : '';
         $comments = count($comments) ? '# '.implode(', ', $comments) : '';
 
-        $text = rtrim(sprintf('%-20s %s %s', $node->getName().':', $default, $comments), ' ');
+        $key = $prototypedArray ? '-' : $node->getName().':';
+        $text = rtrim(sprintf('%-20s %s %s', $key, $default, $comments), ' ');
 
         if ($info = $node->getInfo()) {
             $this->writeLine('');
@@ -154,7 +156,7 @@ class YamlReferenceDumper
 
         if ($children) {
             foreach ($children as $childNode) {
-                $this->writeNode($childNode, $depth + 1);
+                $this->writeNode($childNode, $depth + 1, $node instanceof PrototypedArrayNode && !$node->getKeyAttribute());
             }
         }
     }

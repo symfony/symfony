@@ -821,7 +821,7 @@ EOD;
 
         Yaml::parse($input);
         restore_error_handler();
-        $this->assertEquals(array(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $duplicate_key)), $deprecations);
+        $this->assertEquals(array(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $duplicate_key)), $deprecations);
     }
 
     public function getParseExceptionOnDuplicateData()

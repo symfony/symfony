@@ -230,6 +230,10 @@ Yaml
  * The `!!php/object` tag to indicate dumped PHP objects was removed in favor of
    the `!php/object` tag.
 
+ * Support for silently ignoring duplicate keys in YAML has been deprecated and
+   will lead to a `ParseException` in Symfony 4.0.
+
+
 Validator
 ---------
 

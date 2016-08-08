@@ -49,6 +49,9 @@ class MergeCollectionListener implements EventSubscriberInterface
         $this->allowDelete = $allowDelete;
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return array(
@@ -56,6 +59,9 @@ class MergeCollectionListener implements EventSubscriberInterface
         );
     }
 
+    /**
+     * @param FormEvent $event
+     */
     public function onSubmit(FormEvent $event)
     {
         $dataToMergeInto = $event->getForm()->getNormData();

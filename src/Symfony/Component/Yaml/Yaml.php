@@ -29,7 +29,6 @@ class Yaml
     const DUMP_OBJECT_AS_MAP = 64;
     const DUMP_MULTI_LINE_LITERAL_BLOCK = 128;
     const PARSE_CONSTANT = 256;
-    const PARSE_EXCEPTION_ON_DUPLICATE = 512;
 
     /**
      * Parses YAML into a PHP value.

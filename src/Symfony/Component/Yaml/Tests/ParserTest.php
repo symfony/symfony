@@ -808,8 +808,18 @@ EOD;
      */
     public function testParseExceptionOnDuplicate($input, $duplicate_key)
     {
-        $this->setExpectedException('\Symfony\Component\Yaml\Exception\ParseException', 'Duplicate key "'.$duplicate_key.'" detected whilst parsing YAML');
-        Yaml::parse($input, Yaml::PARSE_EXCEPTION_ON_DUPLICATE);
+        $deprecations = [];
+        set_error_handler(function ($type, $msg) use (&$deprecations) {
+            if (E_USER_DEPRECATED !== $type) {
+                restore_error_handler();
+
+                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
+            }
+
+            $deprecations[] = $msg;
+        });
+        Yaml::parse($input);
+        $this->assertEquals([sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.3 and will cause an exception in 4.0.', $duplicate_key)], $deprecations);
     }
 
     public function getParseExceptionOnDuplicateData()

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Parser;
 
@@ -770,8 +771,9 @@ EOF
      *
      * @see http://yaml.org/spec/1.2/spec.html#id2759572
      * @see http://yaml.org/spec/1.1/#id932806
+     * @group legacy
      */
-    public function testLegacyMappingDuplicateKeyBlock()
+    public function testMappingDuplicateKeyBlock()
     {
         $input = <<<EOD
 parent:
@@ -789,7 +791,10 @@ EOD;
         $this->assertSame($expected, Yaml::parse($input));
     }
 
-    public function testLegacyMappingDuplicateKeyFlow()
+    /**
+     * @group legacy
+     */
+    public function testMappingDuplicateKeyFlow()
     {
         $input = <<<EOD
 parent: { child: first, child: duplicate }
@@ -808,20 +813,9 @@ EOD;
      */
     public function testParseExceptionOnDuplicate($input, $duplicate_key)
     {
-        $deprecations = array();
-        set_error_handler(function ($type, $msg) use (&$deprecations) {
-            if (E_USER_DEPRECATED !== $type) {
-                restore_error_handler();
-
-                return call_user_func_array('PHPUnit_Util_ErrorHandler::handleError', func_get_args());
-            }
-
-            $deprecations[] = $msg;
+        ErrorAssert::assertDeprecationsAreTriggered(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $duplicate_key), function () use ($input) {
+            Yaml::parse($input);
         });
-
-        Yaml::parse($input);
-        restore_error_handler();
-        $this->assertEquals(array(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $duplicate_key)), $deprecations);
     }
 
     public function getParseExceptionOnDuplicateData()

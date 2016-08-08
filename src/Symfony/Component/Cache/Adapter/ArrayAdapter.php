@@ -55,12 +55,22 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
      */
     public function getItem($key)
     {
-        if (!$isHit = $this->hasItem($key)) {
+        $isHit = $this->hasItem($key);
+        try {
+            if (!$isHit) {
+                $value = null;
+            } elseif (!$this->storeSerialized) {
+                $value = $this->values[$key];
+            } elseif ('b:0;' === $value = $this->values[$key]) {
+                $value = false;
+            } elseif (false === $value = unserialize($value)) {
+                $value = null;
+                $isHit = false;
+            }
+        } catch (\Exception $e) {
+            CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', array('key' => $key, 'exception' => $e));
             $value = null;
-        } elseif ($this->storeSerialized) {
-            $value = unserialize($this->values[$key]);
-        } else {
-            $value = $this->values[$key];
+            $isHit = false;
         }
         $f = $this->createCacheItem;
 
@@ -181,16 +191,30 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
     {
         $f = $this->createCacheItem;
 
-        foreach ($keys as $key) {
-            if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] >= $now || !$this->deleteItem($key))) {
+        foreach ($keys as $i => $key) {
+            try {
+                if (!$isHit = isset($this->expiries[$key]) && ($this->expiries[$key] >= $now || !$this->deleteItem($key))) {
+                    $value = null;
+                } elseif (!$this->storeSerialized) {
+                    $value = $this->values[$key];
+                } elseif ('b:0;' === $value = $this->values[$key]) {
+                    $value = false;
+                } elseif (false === $value = unserialize($value)) {
+                    $value = null;
+                    $isHit = false;
+                }
+            } catch (\Exception $e) {
+                CacheItem::log($this->logger, 'Failed to unserialize key "{key}"', array('key' => $key, 'exception' => $e));
                 $value = null;
-            } elseif ($this->storeSerialized) {
-                $value = unserialize($this->values[$key]);
-            } else {
-                $value = $this->values[$key];
+                $isHit = false;
             }
+            unset($keys[$i]);
 
             yield $key => $f($key, $value, $isHit);
+        }
+
+        foreach ($keys as $key) {
+            yield $key => $f($key, null, false);
         }
     }
 }

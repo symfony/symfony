@@ -32,7 +32,25 @@ class DoctrineAdapter extends AbstractAdapter
      */
     protected function doFetch(array $ids)
     {
-        return $this->provider->fetchMultiple($ids);
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', parent::class.'::handleUnserializeCallback');
+        try {
+            return $this->provider->fetchMultiple($ids);
+        } catch (\Error $e) {
+            $trace = $e->getTrace();
+
+            if (isset($trace[0]['function']) && !isset($trace[0]['class'])) {
+                switch ($trace[0]['function']) {
+                    case 'unserialize':
+                    case 'apcu_fetch':
+                    case 'apc_fetch':
+                        throw new \ErrorException($e->getMessage(), $e->getCode(), E_ERROR, $e->getFile(), $e->getLine());
+                }
+            }
+
+            throw $e;
+        } finally {
+            ini_set('unserialize_callback_func', $unserializeCallbackHandler);
+        }
     }
 
     /**

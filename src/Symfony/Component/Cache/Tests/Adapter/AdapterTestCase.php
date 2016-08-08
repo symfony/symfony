@@ -46,4 +46,42 @@ abstract class AdapterTestCase extends CachePoolTest
         $item = $cache->getItem('key.dlt');
         $this->assertFalse($item->isHit());
     }
+
+    public function testNotUnserializable()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+
+            return;
+        }
+
+        $cache = $this->createCachePool();
+
+        $item = $cache->getItem('foo');
+        $cache->save($item->set(new NotUnserializable()));
+
+        $item = $cache->getItem('foo');
+        $this->assertFalse($item->isHit());
+
+        foreach ($cache->getItems(array('foo')) as $item) {
+        }
+        $cache->save($item->set(new NotUnserializable()));
+
+        foreach ($cache->getItems(array('foo')) as $item) {
+        }
+        $this->assertFalse($item->isHit());
+    }
+}
+
+class NotUnserializable implements \Serializable
+{
+    public function serialize()
+    {
+        return serialize(123);
+    }
+
+    public function unserialize($ser)
+    {
+        throw new \Exception(__CLASS__);
+    }
 }

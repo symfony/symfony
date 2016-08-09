@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-04T14:37:24Z
+
+I'd love this feature. In a few big applications with 25+ developers, mistakes like this happen every once in a while. I love to see them crash instead of silently continuing.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-04T20:43:42Z
+
+As proposed by other people, i would prefer deprecate this and throw an exception in symfony 4.0.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-07T15:15:29Z
+
+@alexpott OK to replace this flag by a deprecation?
+
+---------------------------------------------------------------------------
+
+by alexpott at 2016-08-08T12:38:24Z
+
+The failure in fabbot.io is on a line not changed by this patch - I guess src/Symfony/Component/Yaml/Tests/Fixtures/YtsSpecificationExamples.yml does not comply with the standard.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-08T13:50:06Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-08-08T14:05:36Z
+
+Please also update the upgrade files for 3.2 and 4.0.

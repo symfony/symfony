@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by dosten at 2016-08-02T15:25:34Z
+
+In some way this can be a BC break, while your example works fine, but what happens if someone do something like this: `get_class($e) === 'InvalidArgumentException'`?
+
+---------------------------------------------------------------------------
+
+by leofeyer at 2016-08-02T15:28:23Z
+
+`get_class($e) === 'InvalidArgumentException'` is wrong in the first place.
+
+You would normally check `$e instanceof \InvalidArgumentException` and because the class extends from `\InvalidArgumentException`, there is no BC break implied.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2016-08-05T09:24:48Z
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-09T12:23:44Z
+
+:+1:

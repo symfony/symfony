@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Parser;
 
@@ -770,6 +771,7 @@ EOF
      *
      * @see http://yaml.org/spec/1.2/spec.html#id2759572
      * @see http://yaml.org/spec/1.1/#id932806
+     * @group legacy
      */
     public function testMappingDuplicateKeyBlock()
     {
@@ -789,6 +791,9 @@ EOD;
         $this->assertSame($expected, Yaml::parse($input));
     }
 
+    /**
+     * @group legacy
+     */
     public function testMappingDuplicateKeyFlow()
     {
         $input = <<<EOD
@@ -801,6 +806,75 @@ EOD;
             ),
         );
         $this->assertSame($expected, Yaml::parse($input));
+    }
+
+    /**
+     * @dataProvider getParseExceptionOnDuplicateData
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
+     */
+    public function testParseExceptionOnDuplicate($input, $duplicate_key)
+    {
+        ErrorAssert::assertDeprecationsAreTriggered(sprintf('Duplicate key "%s" detected whilst parsing YAML. Silent handling of duplicates in YAML is deprecated since version 3.2 and will throw \Symfony\Component\Yaml\Exception\ParseException in 4.0.', $duplicate_key), function () use ($input) {
+            Yaml::parse($input);
+        });
+    }
+
+    public function getParseExceptionOnDuplicateData()
+    {
+        $tests = array();
+
+        $yaml = <<<EOD
+parent: { child: first, child: duplicate }
+EOD;
+        $tests[] = array($yaml, 'child');
+
+        $yaml = <<<EOD
+parent:
+  child: first,
+  child: duplicate
+EOD;
+        $tests[] = array($yaml, 'child');
+
+        $yaml = <<<EOD
+parent: { child: foo }
+parent: { child: bar }
+EOD;
+        $tests[] = array($yaml, 'parent');
+
+        $yaml = <<<EOD
+parent: { child_mapping: { value: bar},  child_mapping: { value: bar} }
+EOD;
+        $tests[] = array($yaml, 'child_mapping');
+
+        $yaml = <<<EOD
+parent:
+  child_mapping:
+    value: bar
+  child_mapping:
+    value: bar
+EOD;
+        $tests[] = array($yaml, 'child_mapping');
+
+        $yaml = <<<EOD
+parent: { child_sequence: ['key1', 'key2', 'key3'],  child_sequence: ['key1', 'key2', 'key3'] }
+EOD;
+        $tests[] = array($yaml, 'child_sequence');
+
+        $yaml = <<<EOD
+parent:
+  child_sequence:
+    - key1
+    - key2
+    - key3
+  child_sequence:
+    - key1
+    - key2
+    - key3
+EOD;
+        $tests[] = array($yaml, 'child_sequence');
+
+        return $tests;
     }
 
     public function testEmptyValue()

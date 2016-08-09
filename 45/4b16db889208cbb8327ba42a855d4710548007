@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-28T15:39:55Z
+
+👍 closes https://github.com/symfony/symfony/issues/19315.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-08-04T20:39:08Z
+
+👍
+
+@jakzal is this still WIP or is it ready to be merged? Thanks!
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-08-09T11:13:15Z
+
+@javiereguiluz this is indeed ready now. I was looking into updating ICU data on travis so we could run related tests, but I can do it as a separate PR (tests are not run for the  current version either).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-09T12:04:29Z
+
+:+1:

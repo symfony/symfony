@@ -810,6 +810,8 @@ EOD;
 
     /**
      * @dataProvider getParseExceptionOnDuplicateData
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
      */
     public function testParseExceptionOnDuplicate($input, $duplicate_key)
     {

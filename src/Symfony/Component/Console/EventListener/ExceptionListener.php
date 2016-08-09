@@ -64,7 +64,7 @@ class ExceptionListener implements EventSubscriberInterface
 
         $message = sprintf(
             'Command `%s` exited with status code %d',
-            join(' ', $_SERVER['argv']),
+            implode(' ', $_SERVER['argv']),
             $exitCode
         );
 

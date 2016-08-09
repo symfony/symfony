@@ -234,7 +234,7 @@ final class Intl
      */
     public static function getIcuStubVersion()
     {
-        return '55.1';
+        return '57.1';
     }
 
     /**

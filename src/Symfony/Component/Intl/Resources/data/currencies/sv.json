@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.23.66",
     "Names": {
         "ADP": [
             "ADP",
@@ -226,7 +226,7 @@
             "belizisk dollar"
         ],
         "CAD": [
-            "CAN$",
+            "CA$",
             "kanadensisk dollar"
         ],
         "CDF": [
@@ -675,7 +675,7 @@
         ],
         "MRO": [
             "MRO",
-            "mauretansk ouquiya"
+            "mauretansk ouguiya"
         ],
         "MTL": [
             "MTL",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.23.12",
     "Names": {
         "ADP": [
             "ADP",
@@ -459,7 +459,7 @@
         ],
         "HUF": [
             "HUF",
-            "Forint Hungaria"
+            "Forint Hungary"
         ],
         "IDR": [
             "IDR",
@@ -855,7 +855,7 @@
         ],
         "SHP": [
             "SHP",
-            "Bảng Saint Helena"
+            "Bảng St. Helena"
         ],
         "SIT": [
             "SIT",
@@ -1027,7 +1027,7 @@
         ],
         "XAF": [
             "FCFA",
-            "CFA Franc BEAC"
+            "Franc CFA Trung Phi"
         ],
         "XCD": [
             "EC$",
@@ -1047,7 +1047,7 @@
         ],
         "XOF": [
             "CFA",
-            "Franc CFA BCEAO"
+            "Franc CFA Tây Phi"
         ],
         "XPF": [
             "CFPF",

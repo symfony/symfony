@@ -1,9 +1,9 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.24.11",
     "Names": {
         "ADP": [
             "ADP",
-            "Andorská peseta"
+            "andorská peseta"
         ],
         "AED": [
             "AED",
@@ -31,7 +31,7 @@
         ],
         "AOK": [
             "AOK",
-            "Angolská kwanza (1977–1990)"
+            "angolská kwanza (1977–1990)"
         ],
         "AON": [
             "AON",
@@ -39,15 +39,15 @@
         ],
         "AOR": [
             "AOR",
-            "Angolská kwanza Reajustado (1995–1999)"
+            "angolská kwanza reajustado (1995–1999)"
         ],
         "ARA": [
             "ARA",
-            "Argentinský austral"
+            "argentínsky austral"
         ],
         "ARP": [
             "ARP",
-            "Argentinské peso (1983–1985)"
+            "argentínske peso (1983 – 1985)"
         ],
         "ARS": [
             "ARS",
@@ -55,7 +55,7 @@
         ],
         "ATS": [
             "ATS",
-            "Rakúsky šiling"
+            "rakúsky šiling"
         ],
         "AUD": [
             "AUD",
@@ -67,7 +67,7 @@
         ],
         "AZM": [
             "AZM",
-            "Azerbajdžanský manat (1993–2006)"
+            "azerbajdžanský manat (1993–2006)"
         ],
         "AZN": [
             "AZN",
@@ -75,7 +75,7 @@
         ],
         "BAD": [
             "BAD",
-            "Bosnianský dinár"
+            "bosniansko-hercegovinský dinár (1992–1994)"
         ],
         "BAM": [
             "BAM",
@@ -91,19 +91,19 @@
         ],
         "BEC": [
             "BEC",
-            "Belgický frank (konvertibilný)"
+            "belgický frank (konvertibilný)"
         ],
         "BEF": [
             "BEF",
-            "Belgický frank"
+            "belgický frank"
         ],
         "BEL": [
             "BEL",
-            "Belgický frank (finančný)"
+            "belgický frank (finančný)"
         ],
         "BGL": [
             "BGL",
-            "Bulharský leva"
+            "bulharský tvrdý lev"
         ],
         "BGN": [
             "BGN",
@@ -131,23 +131,23 @@
         ],
         "BOP": [
             "BOP",
-            "Bolivíjske peso"
+            "bolívijské peso"
         ],
         "BOV": [
             "BOV",
-            "Bolivíjske mvdol"
+            "bolívijské MVDOL"
         ],
         "BRB": [
             "BRB",
-            "Bolivíjske Cruzeiro Novo (1967–1986)"
+            "brazílske cruzeiro novo (1967–1986)"
         ],
         "BRC": [
             "BRC",
-            "Bolivíjske cruzado"
+            "brazílske cruzado (1986 – 1989)"
         ],
         "BRE": [
             "BRE",
-            "Bolivíjske cruzeiro (1990–1993)"
+            "brazílske cruzeiro (1990 – 1993)"
         ],
         "BRL": [
             "BRL",

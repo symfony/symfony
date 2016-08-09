@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.22.93",
     "Names": {
         "ab": "abkhazera",
         "ach": "Acholiera",
@@ -203,7 +203,7 @@
         "su": "sundanera",
         "sv": "suediera",
         "sw": "swahili",
-        "swc": "Kongoko swahilia",
+        "sw_CD": "Kongoko swahilia",
         "ta": "tamilera",
         "te": "teluguera",
         "teo": "tesoera",

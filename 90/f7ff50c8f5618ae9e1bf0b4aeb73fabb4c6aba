@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-29T07:16:09Z
+
+Tests are failing
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-29T07:24:04Z
+
+👍 Thanks Tristan!
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-29T07:55:07Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by stof at 2016-07-29T08:39:04Z
+
+:+1:
+
+Would be great to open a PR on SensioFrameworkExtraBundle making use of these setters when they are available, for its checks on the ``@Security`` annotation
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-09T12:18:47Z
+
+:+1:

@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * Attempts to log exceptions or abnormal terminations of console commands.
  *
- * @author  James Halsall <james.t.halsall@googlemail.com>
+ * @author James Halsall <james.t.halsall@googlemail.com>
  */
 class ExceptionListener implements EventSubscriberInterface
 {
@@ -60,10 +60,6 @@ class ExceptionListener implements EventSubscriberInterface
 
         if ($exitCode === 0) {
             return;
-        }
-
-        if ($exitCode > 255) {
-            $event->setExitCode(255);
         }
 
         $message = sprintf('Command `%s` exited with status code %d');

@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleVO;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
@@ -506,9 +507,22 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function getKernelParameters()
     {
         $bundles = array();
-        foreach ($this->bundles as $name => $bundle) {
-            $bundles[$name] = get_class($bundle);
-        }
+        $bundleHierarchy = array();
+        $numBundles = count($this->bundles);
+        $numProcessedBundles = 0;
+        do {
+            foreach ($this->bundles as $name => $bundle) {
+                $parent = $bundle->getParent();
+                if (null !== $parent && !isset($bundles[$parent])) {
+                    continue;
+                }
+                if (!isset($bundles[$name])) {
+                    $bundles[$name] = get_class($bundle);
+                    $bundleHierarchy[$name] = new BundleVO($name, $bundle->getNamespace(), $bundles[$name], $bundle->getPath(), isset($bundleHierarchy[$parent]) ? $bundleHierarchy[$parent] : null);
+                    ++$numProcessedBundles;
+                }
+            }
+        } while ($numProcessedBundles < $numBundles);
 
         return array_merge(
             array(
@@ -519,6 +533,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
                 'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
                 'kernel.bundles' => $bundles,
+                'kernel.bundle_hierarchy' => $bundleHierarchy,
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
             ),

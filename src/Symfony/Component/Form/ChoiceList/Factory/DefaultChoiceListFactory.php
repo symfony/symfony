@@ -39,7 +39,11 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
-        return new LazyChoiceList($loader, $value);
+        $choiceList = $loader->loadChoiceList($value);
+        if(!$choiceList instanceof ChoiceListInterface){
+            throw new \UnexpectedValueException(get_class($loader).'::loadChoiceList method should return a ChoiceListInterface');
+        }
+        return $choiceList;
     }
 
     /**

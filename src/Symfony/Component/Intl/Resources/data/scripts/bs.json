@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.13.46",
+    "Version": "2.1.23.7",
     "Names": {
         "Arab": "arapsko pismo",
         "Armi": "imperijsko aramejsko pismo",
@@ -40,8 +40,8 @@
         "Hang": "hangul pismo",
         "Hani": "han pismo",
         "Hano": "hanuno pismo",
-        "Hans": "pojednostavljeno kinesko pismo",
-        "Hant": "tradicionalno kinesko pismo",
+        "Hans": "pojednostavljeno",
+        "Hant": "tradicionalno",
         "Hebr": "hebrejsko pismo",
         "Hira": "hiragana",
         "Hmng": "pahawh hmong pismo",
@@ -101,7 +101,6 @@
         "Sgnw": "znakovno pismo",
         "Shaw": "šavian pismo",
         "Sinh": "sinhala pismo",
-        "Sund": "sudansko pismo",
         "Sylo": "siloti nagri pismo",
         "Syrc": "sirijsko pismo",
         "Syre": "sirijsko estrangelo pismo",
@@ -130,6 +129,6 @@
         "Zsym": "simboli",
         "Zxxx": "nepisani jezik",
         "Zyyy": "zajedničko pismo",
-        "Zzzz": "nepoznato ili nevažeće pismo"
+        "Zzzz": "nepoznato pismo"
     }
 }

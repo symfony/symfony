@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.22.93",
     "Names": {
         "ADP": [
             "ADP",
@@ -426,7 +426,7 @@
             "haiti gourde"
         ],
         "HUF": [
-            "HUF",
+            "Ft",
             "magyar forint"
         ],
         "IDR": [

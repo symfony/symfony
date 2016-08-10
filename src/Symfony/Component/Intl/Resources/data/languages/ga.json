@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.22.93",
     "Names": {
         "aa": "Afáiris",
         "ab": "Abcáisis",
@@ -34,7 +34,7 @@
         "bua": "Buiriáitis",
         "bug": "Buiginis",
         "ca": "Catalóinis",
-        "ce": "Sisinis",
+        "ce": "Seisnis",
         "ceb": "Seabúáinis",
         "ch": "Seamóiris",
         "chm": "Mairis",
@@ -181,6 +181,7 @@
         "nb": "Ioruais Bokmål",
         "nd": "Ndeibéilis an Tuaiscirt",
         "nds": "Gearmáinis Íochtarach",
+        "nds_NL": "Sacsainis Íochtarach",
         "ne": "Neipeailis",
         "ng": "Ndongais",
         "niu": "Níobhais",
@@ -244,7 +245,7 @@
         "sux": "Suiméiris",
         "sv": "Sualainnis",
         "sw": "Svahaílis",
-        "swc": "Svahaílis an Chongó",
+        "sw_CD": "Svahaílis an Chongó",
         "syr": "Siricis",
         "szl": "Siléisis",
         "ta": "Tamailis",

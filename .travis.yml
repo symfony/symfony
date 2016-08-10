@@ -63,8 +63,7 @@ before_install:
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = ldap.so >> $INI_FILE; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = redis.so >> $INI_FILE; fi;
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini || echo "xdebug not available"; fi
-    - if [[ ! $skip ]]; then composer self-update --stable; fi
-    - if [[ ! $skip ]]; then cp .composer/* ~/.composer/; fi
+    - if [[ ! $skip ]]; then [ -d ~/.composer ] || mkdir ~/.composer; cp .composer/* ~/.composer/; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip ]]; then export PHPUNIT=$(readlink -f ./phpunit); fi
     - if [[ ! $skip ]]; then ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif; fi

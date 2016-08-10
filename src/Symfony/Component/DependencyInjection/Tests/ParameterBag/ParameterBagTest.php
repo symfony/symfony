@@ -80,6 +80,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             'foo' => 'foo',
             'bar' => 'bar',
             'baz' => 'baz',
+            'fiz' => array('bar' => array('boo' => 12)),
         ));
 
         $this->setExpectedException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException', $exceptionMessage);
@@ -93,6 +94,8 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
             array('foo1', 'You have requested a non-existent parameter "foo1". Did you mean this: "foo"?'),
             array('bag', 'You have requested a non-existent parameter "bag". Did you mean one of these: "bar", "baz"?'),
             array('', 'You have requested a non-existent parameter "".'),
+
+            array('fiz.bar.boo', 'You have requested a non-existent parameter "fiz.bar.boo". You cannot access nested array items, do you want to inject "fiz" instead?'),
         );
     }
 

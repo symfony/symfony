@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.22.93",
     "Names": {
         "AED": [
             "AED",
@@ -67,7 +67,7 @@
         ],
         "BMD": [
             "BMD",
-            "Dollari e Bermudeve"
+            "Dollari i Bermudeve"
         ],
         "BND": [
             "BND",
@@ -91,7 +91,7 @@
         ],
         "BWP": [
             "BWP",
-            "Pula botsvane"
+            "Pula botsuane"
         ],
         "BYR": [
             "BYR",
@@ -131,11 +131,11 @@
         ],
         "CUC": [
             "CUC",
-            "Pezoja kubane e shkëmbyeshme"
+            "Pezoja kubaneze e shkëmbyeshme"
         ],
         "CUP": [
             "CUP",
-            "Pezoja kubane"
+            "Pezoja kubaneze"
         ],
         "CVE": [
             "CVE",
@@ -319,7 +319,7 @@
         ],
         "LKR": [
             "LKR",
-            "Rupia e Sri Lankës"
+            "Rupia e Sri-Lankës"
         ],
         "LRD": [
             "LRD",
@@ -475,11 +475,11 @@
         ],
         "SBD": [
             "SBD",
-            "Dollari i Ishujve Solomon"
+            "Dollari i Ishujve Solomonë"
         ],
         "SCR": [
             "SCR",
-            "Rupia e Ishujve Sejçelë"
+            "Rupia e Ishujve Sishelë"
         ],
         "SDG": [
             "SDG",
@@ -495,11 +495,11 @@
         ],
         "SHP": [
             "SHP",
-            "Stërlina e Ishullit të Shën Helenës"
+            "Stërlina e Ishullit të Shën-Helenës"
         ],
         "SLL": [
             "SLL",
-            "Leoni i Sierra Leones"
+            "Leoni i Sierra-Leones"
         ],
         "SOS": [
             "SOS",
@@ -515,7 +515,7 @@
         ],
         "STD": [
             "STD",
-            "Dobra e Sao Tomes dhe Prinsipes"
+            "Dobra e Sao-Tomes dhe Prinsipes"
         ],
         "SYP": [
             "SYP",
@@ -523,7 +523,7 @@
         ],
         "SZL": [
             "SZL",
-            "Lilangeni i Svazilandit"
+            "Lilangeni i Suazilandës"
         ],
         "THB": [
             "฿",

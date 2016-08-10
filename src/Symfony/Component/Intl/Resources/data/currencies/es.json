@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.13.21",
+    "Version": "2.1.23.18",
     "Names": {
         "ADP": [
             "ADP",
@@ -23,7 +23,7 @@
         ],
         "AMD": [
             "AMD",
-            "dram armenio"
+            "dram"
         ],
         "ANG": [
             "ANG",
@@ -307,7 +307,7 @@
         ],
         "ERN": [
             "ERN",
-            "nakfa eritreo"
+            "nakfa"
         ],
         "ESA": [
             "ESA",

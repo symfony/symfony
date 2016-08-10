@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.10.93",
+    "Version": "2.1.22.93",
     "Names": {
         "Arab": "i-Arab",
         "Armn": "i-Armenian",
@@ -16,7 +16,7 @@
         "Hang": "i-Hangul",
         "Hani": "i-Han",
         "Hans": "i-Simplified",
-        "Hant": "Okosiko",
+        "Hant": "okosiko",
         "Hebr": "i-Hebrew",
         "Hira": "i-Hiragana",
         "Jpan": "i-Japanese",
@@ -36,9 +36,9 @@
         "Thaa": "i-Thaana",
         "Thai": "i-Thai",
         "Tibt": "i-Tibetan",
-        "Zsym": "Amasimbuli",
-        "Zxxx": "Okungabhaliwe",
-        "Zyyy": "Ejwayelekile",
-        "Zzzz": "Iskripthi esingaziwa"
+        "Zsym": "amasimbuli",
+        "Zxxx": "okungabhaliwe",
+        "Zyyy": "ejwayelekile",
+        "Zzzz": "iskripthi esingaziwa"
     }
 }

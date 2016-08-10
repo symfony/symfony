@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.22.93",
     "Names": {
         "Arab": "Arabic",
         "Armn": "Armenian",
@@ -15,8 +15,8 @@
         "Guru": "Gurmukhi",
         "Hang": "Hangul",
         "Hani": "Han",
-        "Hans": "Simplified",
-        "Hant": "Traditional",
+        "Hans": "Pinasimple",
+        "Hant": "Tradisyonal",
         "Hebr": "Hebrew",
         "Hira": "Hiragana",
         "Jpan": "Japanese",

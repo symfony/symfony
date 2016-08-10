@@ -252,8 +252,8 @@ class NumberFormatter
     );
 
     private static $enTextAttributes = array(
-        self::DECIMAL => array('', '', '-', '', '*', '', ''),
-        self::CURRENCY => array('¤', '', '-¤', '', '*', ''),
+        self::DECIMAL => array('', '', '-', '', ' ', '', ''),
+        self::CURRENCY => array('¤', '', '-¤', '', ' ', ''),
     );
 
     /**

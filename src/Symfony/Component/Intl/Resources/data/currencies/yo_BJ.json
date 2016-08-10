@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.13.24",
+    "Version": "2.1.24.17",
     "Names": {
         "AED": [
             "AED",
@@ -64,10 +64,6 @@
         "ETB": [
             "ETB",
             "Biri ti Orílɛ́ède Eutopia"
-        ],
-        "EUR": [
-            "€",
-            "Uro"
         ],
         "GBP": [
             "£",
@@ -169,10 +165,6 @@
             "SHP",
             "Pɔɔun ti Orílɛ́ède ̣Elena"
         ],
-        "SLL": [
-            "SLL",
-            "Lioni"
-        ],
         "SOS": [
             "SOS",
             "Sile ti Orílɛ́ède Somali"
@@ -180,10 +172,6 @@
         "STD": [
             "STD",
             "Dobira ti Orílɛ́ède Sao tome Ati Pirisipe"
-        ],
-        "SZL": [
-            "SZL",
-            "Lilangeni"
         ],
         "TND": [
             "TND",

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.13.23",
+    "Version": "2.1.24.13",
     "Names": {
         "AED": [
             "AED",
@@ -100,6 +100,10 @@
         "FKP": [
             "FKP",
             "Libra das Ilhas Falkland"
+        ],
+        "GBP": [
+            "£",
+            "Libra esterlina britânica"
         ],
         "GHS": [
             "GHS",

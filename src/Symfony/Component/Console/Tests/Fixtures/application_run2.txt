@@ -18,12 +18,12 @@ Options:
   -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
 Help:
- The help command displays help for a given command:
- 
-   php app/console help list
- 
- You can also output the help in other formats by using the --format option:
- 
-   php app/console help --format=xml list
- 
- To display the list of available commands, please use the list command.
+  The help command displays help for a given command:
+  
+    php app/console help list
+  
+  You can also output the help in other formats by using the --format option:
+  
+    php app/console help --format=xml list
+  
+  To display the list of available commands, please use the list command.

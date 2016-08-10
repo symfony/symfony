@@ -1,9 +1,17 @@
 {
-    "Version": "2.1.13.23",
+    "Version": "2.1.21.97",
     "Names": {
+        "AMD": [
+            "AMD",
+            "dram armenio"
+        ],
         "CAD": [
             "CAD",
             "dólar canadiense"
+        ],
+        "ERN": [
+            "ERN",
+            "nafka"
         ],
         "EUR": [
             "EUR",

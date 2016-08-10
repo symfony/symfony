@@ -1,8 +1,9 @@
 {
-    "Version": "2.1.13.33",
+    "Version": "2.1.22.93",
     "Names": {
         "Afak": "afaka",
         "Aghb": "kaukasianalbanialainen",
+        "Ahom": "ahom",
         "Arab": "arabialainen",
         "Armi": "valtakunnanaramealainen",
         "Armn": "armenialainen",
@@ -49,6 +50,7 @@
         "Hano": "hanunoolainen",
         "Hans": "yksinkertaistettu han",
         "Hant": "perinteinen han",
+        "Hatr": "hatralainen",
         "Hebr": "heprealainen",
         "Hira": "hiragana",
         "Hluw": "anatolialaiset hieroglyfit",
@@ -95,6 +97,7 @@
         "Moon": "moon-kohokirjoitus",
         "Mroo": "mro",
         "Mtei": "meitei",
+        "Mult": "multanilainen",
         "Mymr": "burmalainen",
         "Narb": "muinaispohjoisarabialainen",
         "Nbat": "nabatealainen",

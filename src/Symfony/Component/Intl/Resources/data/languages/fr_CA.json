@@ -1,6 +1,9 @@
 {
-    "Version": "2.1.13.23",
+    "Version": "2.1.24.13",
     "Names": {
-        "luo": "luo"
+        "arn": "araukan",
+        "luo": "luo",
+        "mgo": "Meta’",
+        "nds": "bas allemand"
     }
 }

@@ -4,4 +4,4 @@
   alias2
 
 <comment>Help:</comment>
- command 1 help
+  command 1 help

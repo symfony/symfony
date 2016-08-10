@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.10.93",
+    "Version": "2.1.22.93",
     "Names": {
         "AC": "Ynys Ascension",
         "AD": "Andorra",
@@ -76,7 +76,7 @@
         "FJ": "Fiji",
         "FK": "Ynysoedd y Falkland\/Malvinas",
         "FM": "Micronesia",
-        "FO": "Føroyar",
+        "FO": "Ynysoedd Ffaro",
         "FR": "Ffrainc",
         "GA": "Gabon",
         "GB": "Y Deyrnas Unedig",
@@ -179,7 +179,7 @@
         "PE": "Periw",
         "PF": "Polynesia Ffrengig",
         "PG": "Papua Guinea Newydd",
-        "PH": "Pilipinas",
+        "PH": "Y Philipinau",
         "PK": "Pakistan",
         "PL": "Gwlad Pwyl",
         "PM": "Saint-Pierre-et-Miquelon",
@@ -207,7 +207,7 @@
         "SK": "Slofacia",
         "SL": "Sierra Leone",
         "SM": "San Marino",
-        "SN": "Sénégal",
+        "SN": "Senegal",
         "SO": "Somalia",
         "SR": "Suriname",
         "SS": "De Swdan",

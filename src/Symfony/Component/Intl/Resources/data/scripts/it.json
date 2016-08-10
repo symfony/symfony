@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.13.6",
+    "Version": "2.1.22.93",
     "Names": {
         "Afak": "afaka",
         "Arab": "arabo",
@@ -158,6 +158,6 @@
         "Zsym": "simboli",
         "Zxxx": "non scritto",
         "Zyyy": "comune",
-        "Zzzz": "ignoto o non valido"
+        "Zzzz": "scrittura sconosciuta"
     }
 }

@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.13.24",
+    "Version": "2.1.24.17",
     "Names": {
         "AC": "Ostrvo Asension",
         "AD": "Andora",
@@ -39,7 +39,7 @@
         "BY": "Belorusija",
         "BZ": "Belize",
         "CA": "Kanada",
-        "CC": "Kokos (Keling) Ostrva",
+        "CC": "Kokosova (Kilingova) Ostrva",
         "CD": "Kongo - Kinšasa",
         "CF": "Centralnoafrička Republika",
         "CG": "Kongo - Brazavil",
@@ -97,7 +97,7 @@
         "GU": "Guam",
         "GW": "Gvineja-Bisao",
         "GY": "Gvajana",
-        "HK": "Hong Kong S. A. R. Kina",
+        "HK": "SAR Hongkong (Kina)",
         "HN": "Honduras",
         "HR": "Hrvatska",
         "HT": "Haiti",
@@ -165,7 +165,7 @@
         "NA": "Namibija",
         "NC": "Nova Kaledonija",
         "NE": "Niger",
-        "NF": "Norfolk Ostrvo",
+        "NF": "Ostrvo Norfok",
         "NG": "Nigerija",
         "NI": "Nikaragva",
         "NL": "Holandija",

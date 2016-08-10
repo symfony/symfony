@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.23.7",
     "Names": {
         "Arab": "ərəb",
         "Armi": "armi",
@@ -40,9 +40,9 @@
         "Hang": "hanqıl",
         "Hani": "han",
         "Hano": "hanunu",
-        "Hans": "sadələşmiş han",
-        "Hant": "ənənəvi han",
-        "Hebr": "yəhudi",
+        "Hans": "sadələşmiş",
+        "Hant": "ənənəvi",
+        "Hebr": "ibrani",
         "Hira": "iraqana",
         "Hmng": "pahav monq",
         "Hrkt": "katakana vəya hiraqana",

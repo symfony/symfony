@@ -1,7 +1,7 @@
 SVN information
 ===============
 
-URL: http://source.icu-project.org/repos/icu/icu/tags/release-55-1/source
-Revision: 37294
+URL: http://source.icu-project.org/repos/icu/icu/tags/release-57-1/source
+Revision: 38543
 Author: mow
-Date: 2015-03-27T17:27:46.562500Z
+Date: 2016-03-18T21:10:12.382844Z

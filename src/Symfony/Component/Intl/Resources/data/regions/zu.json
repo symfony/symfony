@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.10.93",
+    "Version": "2.1.22.93",
     "Names": {
         "AC": "i-Ascension Island",
         "AD": "i-Andorra",
@@ -35,7 +35,7 @@
         "BR": "i-Brazil",
         "BS": "i-Bahamas",
         "BT": "i-Bhutan",
-        "BW": "i-Botswana",
+        "BW": "iBotswana",
         "BY": "i-Belarus",
         "BZ": "i-Belize",
         "CA": "i-Canada",
@@ -82,7 +82,7 @@
         "GB": "i-United Kingdom",
         "GD": "i-Grenada",
         "GE": "i-Georgia",
-        "GF": "isi-French Guiana",
+        "GF": "i-French Guiana",
         "GG": "i-Guernsey",
         "GH": "i-Ghana",
         "GI": "i-Gibraltar",
@@ -105,7 +105,7 @@
         "IC": "i-Canary Islands",
         "ID": "i-Indonesia",
         "IE": "i-Ireland",
-        "IL": "i-Israel",
+        "IL": "kwa-Israel",
         "IM": "i-Isle of Man",
         "IN": "i-India",
         "IO": "i-British Indian Ocean Territory",
@@ -134,7 +134,7 @@
         "LI": "i-Liechtenstein",
         "LK": "i-Sri Lanka",
         "LR": "i-Liberia",
-        "LS": "i-Lesotho",
+        "LS": "iLesotho",
         "LT": "i-Lithuania",
         "LU": "i-Luxembourg",
         "LV": "i-Latvia",
@@ -147,7 +147,7 @@
         "MG": "i-Madagascar",
         "MH": "i-Marshall Islands",
         "MK": "i-Macedonia",
-        "ML": "i-Mali",
+        "ML": "iMali",
         "MM": "i-Myanmar (Burma)",
         "MN": "i-Mongolia",
         "MO": "i-Macau SAR China",
@@ -158,7 +158,7 @@
         "MT": "i-Malta",
         "MU": "i-Mauritius",
         "MV": "i-Maldives",
-        "MW": "i-Malawi",
+        "MW": "iMalawi",
         "MX": "i-Mexico",
         "MY": "i-Malaysia",
         "MZ": "i-Mozambique",
@@ -213,7 +213,7 @@
         "SS": "i-South Sudan",
         "ST": "i-São Tomé kanye ne-Príncipe",
         "SV": "i-El Salvador",
-        "SX": "I-Sint Maarten",
+        "SX": "i-Sint Maarten",
         "SY": "i-Syria",
         "SZ": "i-Swaziland",
         "TA": "i-Tristan da Cunha",
@@ -253,6 +253,6 @@
         "YT": "i-Mayotte",
         "ZA": "i-South Africa",
         "ZM": "i-Zambia",
-        "ZW": "i-Zimbabwe"
+        "ZW": "iZimbabwe"
     }
 }

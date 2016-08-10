@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.12.94",
+    "Version": "2.1.23.7",
     "Names": {
         "aa": "Afar",
         "ab": "Abchasesch",
@@ -26,7 +26,7 @@
         "ar": "Arabesch",
         "ar_001": "Modernt Héicharabesch",
         "arc": "Aramäesch",
-        "arn": "Araukanesch",
+        "arn": "Mapudungun",
         "aro": "Araona",
         "arp": "Arapaho-Sprooch",
         "arq": "Algerescht Arabesch",
@@ -42,7 +42,6 @@
         "awa": "Awadhi",
         "ay": "Aymara",
         "az": "Aserbaidschanesch",
-        "azb": "Süd-Aserbaidschanesch",
         "ba": "Baschkiresch",
         "bal": "Belutschesch",
         "ban": "Balinesesch",
@@ -514,8 +513,8 @@
         "sux": "Sumeresch",
         "sv": "Schwedesch",
         "sw": "Suaheli",
+        "sw_CD": "Kongo-Swahili",
         "swb": "Komoresch",
-        "swc": "Kongo-Swahili",
         "syc": "Alsyresch",
         "syr": "Syresch",
         "szl": "Schlesesch",

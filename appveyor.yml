@@ -3,6 +3,7 @@ clone_depth: 1
 clone_folder: c:\projects\symfony
 
 cache:
+    - c:\projects\symfony\.composer
     - c:\projects\symfony\composer.phar
     - .phpunit -> phpunit
 
@@ -53,7 +54,12 @@ install:
     - copy /Y .composer\* %APPDATA%\Composer\
     - php phpunit install
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
-    - php composer.phar update --no-progress --ansi
+    - FOR /F "tokens=*" %%i IN ('md5sum composer.json ^| cut -f1 -d" "') DO SET COMPOSER_LOCK=.composer/php-5.3.%%i.lock
+    - c:\cygwin\bin\find .composer/ -name '*.lock' -exec sh -c 'touch -d $(cat {}.mtime) {} {}.mtime' ';'
+    - c:\cygwin\bin\find .composer/ -name '*.lock' -mmin +720 -delete
+    - IF EXIST %COMPOSER_LOCK% (cp %COMPOSER_LOCK% composer.lock)
+    - php composer.phar install --no-progress --ansi
+    - IF NOT EXIST %COMPOSER_LOCK% (cp composer.lock %COMPOSER_LOCK% && c:\cygwin\bin\date -Iseconds > %COMPOSER_LOCK%.mtime)
 
 test_script:
     - cd c:\projects\symfony

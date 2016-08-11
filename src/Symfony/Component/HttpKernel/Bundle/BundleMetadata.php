@@ -12,11 +12,11 @@
 namespace Symfony\Component\HttpKernel\Bundle;
 
 /**
- * Bundle value object.
+ * Value object representing bundle metadata.
  *
  * @author Roland Franssen <franssen.roland@gmail.com>
  */
-final class BundleVO
+final class BundleMetadata
 {
     private $name;
     private $namespace;
@@ -27,13 +27,13 @@ final class BundleVO
     /**
      * Constructor.
      *
-     * @param string        $name
-     * @param string        $namespace
-     * @param string        $className
-     * @param string        $path
-     * @param BundleVO|null $parent
+     * @param string              $name
+     * @param string              $namespace
+     * @param string              $className
+     * @param string              $path
+     * @param BundleMetadata|null $parent
      */
-    public function __construct($name, $namespace, $className, $path, BundleVO $parent = null)
+    public function __construct($name, $namespace, $className, $path, BundleMetadata $parent = null)
     {
         $this->name = $name;
         $this->className = $className;
@@ -84,7 +84,7 @@ final class BundleVO
     /**
      * Get parent bundle, if any.
      *
-     * @return BundleVO|null
+     * @return BundleMetadata|null
      */
     public function getParent()
     {

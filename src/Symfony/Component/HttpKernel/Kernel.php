@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\HttpKernel\Bundle\BundleVO;
+use Symfony\Component\HttpKernel\Bundle\BundleMetadata;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
@@ -518,7 +518,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 }
                 if (!isset($bundles[$name])) {
                     $bundles[$name] = get_class($bundle);
-                    $bundleHierarchy[$name] = new BundleVO($name, $bundle->getNamespace(), $bundles[$name], $bundle->getPath(), isset($bundleHierarchy[$parent]) ? $bundleHierarchy[$parent] : null);
+                    $bundleHierarchy[$name] = new BundleMetadata($name, $bundle->getNamespace(), $bundles[$name], $bundle->getPath(), isset($bundleHierarchy[$parent]) ? $bundleHierarchy[$parent] : null);
                     ++$numProcessedBundles;
                 }
             }

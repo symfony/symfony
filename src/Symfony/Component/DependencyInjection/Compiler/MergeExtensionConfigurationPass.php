@@ -47,6 +47,9 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             $tmpContainer = new ContainerBuilder($container->getParameterBag());
             $tmpContainer->setResourceTracking($container->isTrackingResources());
             $tmpContainer->addObjectResource($extension);
+            if ($container->has('kernel.bundles')) {
+                $tmpContainer->set('kernel.bundles', $container->get('kernel.bundles'));
+            }
 
             foreach ($exprLangProviders as $provider) {
                 $tmpContainer->addExpressionLanguageProvider($provider);

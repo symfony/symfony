@@ -507,22 +507,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     protected function getKernelParameters()
     {
         $bundles = array();
-        $bundleHierarchy = array();
-        $numBundles = count($this->bundles);
-        $numProcessedBundles = 0;
-        do {
-            foreach ($this->bundles as $name => $bundle) {
-                $parent = $bundle->getParent();
-                if (null !== $parent && !isset($bundles[$parent])) {
-                    continue;
-                }
-                if (!isset($bundles[$name])) {
-                    $bundles[$name] = get_class($bundle);
-                    $bundleHierarchy[$name] = new BundleMetadata($name, $bundle->getNamespace(), $bundles[$name], $bundle->getPath(), isset($bundleHierarchy[$parent]) ? $bundleHierarchy[$parent] : null);
-                    ++$numProcessedBundles;
-                }
-            }
-        } while ($numProcessedBundles < $numBundles);
+        foreach ($this->bundles as $name => $bundle) {
+            $bundles[$name] = get_class($bundle);
+        }
 
         return array_merge(
             array(
@@ -533,7 +520,6 @@ abstract class Kernel implements KernelInterface, TerminableInterface
                 'kernel.cache_dir' => realpath($this->getCacheDir()) ?: $this->getCacheDir(),
                 'kernel.logs_dir' => realpath($this->getLogDir()) ?: $this->getLogDir(),
                 'kernel.bundles' => $bundles,
-                'kernel.bundle_hierarchy' => $bundleHierarchy,
                 'kernel.charset' => $this->getCharset(),
                 'kernel.container_class' => $this->getContainerClass(),
             ),
@@ -600,6 +586,23 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function prepareContainer(ContainerBuilder $container)
     {
+        $bundleMetadata = array();
+        $numBundles = count($this->bundles);
+        $numProcessedBundles = 0;
+        do {
+            foreach ($this->bundles as $name => $bundle) {
+                $parent = $bundle->getParent();
+                if (null !== $parent && !isset($bundleMetadata[$parent])) {
+                    continue;
+                }
+                if (!isset($bundleMetadata[$name])) {
+                    $bundleMetadata[$name] = new BundleMetadata($name, $bundle->getNamespace(), get_class($bundle), $bundle->getPath(), isset($bundleMetadata[$parent]) ? $bundleMetadata[$parent] : null);
+                    ++$numProcessedBundles;
+                }
+            }
+        } while ($numProcessedBundles < $numBundles);
+        $container->set('kernel.bundles', new \ArrayIterator($bundleMetadata));
+
         $extensions = array();
         foreach ($this->bundles as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {

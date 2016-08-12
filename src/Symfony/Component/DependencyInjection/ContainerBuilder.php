@@ -419,6 +419,19 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
+        try {
+            $definition = $this->getDefinition($id);
+        } catch (ServiceNotFoundException $e) {
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                throw $e;
+            }
+            $definition = null;
+        }
+
+        if (null !== $definition && $definition instanceof ServiceAwareDefinition) {
+            return $definition->getService();
+        }
+
         if (!$this->compiled) {
             @trigger_error(sprintf('Calling %s() before compiling the container is deprecated since version 3.2 and will throw an exception in 4.0.', __METHOD__), E_USER_DEPRECATED);
         }
@@ -433,14 +446,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $this->get($this->aliasDefinitions[$id]);
         }
 
-        try {
-            $definition = $this->getDefinition($id);
-        } catch (ServiceNotFoundException $e) {
-            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
-                return;
-            }
-
-            throw $e;
+        if (null === $definition) {
+            return;
         }
 
         $this->loading[$id] = true;

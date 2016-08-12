@@ -357,8 +357,11 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters))) {
+        if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]))) {
             throw new InvalidArgumentException(sprintf('The parameter "%s" must be defined.', $name));
+        }
+        if (isset($this->loadedDynamicParameters[$name])) {
+            return $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
         }
 
         return $this->parameters[$name];
@@ -371,7 +374,7 @@ class ProjectServiceContainer extends Container
     {
         $name = strtolower($name);
 
-        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters);
+        return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]);
     }
 
     /**
@@ -388,10 +391,31 @@ class ProjectServiceContainer extends Container
     public function getParameterBag()
     {
         if (null === $this->parameterBag) {
-            $this->parameterBag = new FrozenParameterBag($this->parameters);
+            $parameters = $this->parameters;
+            foreach ($this->loadedDynamicParameters as $name => $loaded) {
+                $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
+            }
+            $this->parameterBag = new FrozenParameterBag($parameters);
         }
 
         return $this->parameterBag;
+    }
+
+    private $loadedDynamicParameters = array();
+    private $dynamicParameters = array();
+
+    /**
+     * Computes a dynamic parameter.
+     *
+     * @param string The name of the dynamic parameter to load
+     *
+     * @return mixed The value of the dynamic parameter
+     *
+     * @throws InvalidArgumentException When the dynamic parameter does not exist
+     */
+    private function getDynamicParameter($name)
+    {
+        throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
     }
 
     /**

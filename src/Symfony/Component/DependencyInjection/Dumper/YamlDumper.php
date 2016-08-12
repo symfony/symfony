@@ -46,7 +46,7 @@ class YamlDumper extends Dumper
             $this->dumper = new YmlDumper();
         }
 
-        return $this->addParameters()."\n".$this->addServices();
+        return $this->container->resolveEnvPlaceholders($this->addParameters()."\n".$this->addServices());
     }
 
     /**

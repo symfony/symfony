@@ -1,0 +1,10 @@
+parameters:
+    env(FOO): foo
+    bar: '%env(FOO)%'
+
+services:
+    test:
+        class: '%env(FOO)%'
+        arguments:
+            - '%env(Bar)%'
+            - 'foo%bar%baz'

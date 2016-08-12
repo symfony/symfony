@@ -55,7 +55,7 @@ class XmlDumper extends Dumper
         $xml = $this->document->saveXML();
         $this->document = null;
 
-        return $xml;
+        return $this->container->resolveEnvPlaceholders($xml);
     }
 
     /**

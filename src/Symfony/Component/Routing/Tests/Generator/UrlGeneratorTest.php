@@ -236,6 +236,15 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Routing\Exception\InvalidParameterException
      */
+    public function testGenerateForRouteWithInvalidUtf8Parameter()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing/{foo}', array(), array('foo' => '\pL+'), array('utf8' => true)));
+        $this->getGenerator($routes)->generate('test', array('foo' => 'abc123'), UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Routing\Exception\InvalidParameterException
+     */
     public function testRequiredParamAndEmptyPassed()
     {
         $routes = $this->getRoutes('test', new Route('/{slug}', array(), array('slug' => '.+')));

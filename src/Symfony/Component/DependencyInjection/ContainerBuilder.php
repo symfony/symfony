@@ -419,15 +419,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        try {
-            $definition = $this->getDefinition($id);
-        } catch (ServiceNotFoundException $e) {
-            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
-                throw $e;
-            }
-            $definition = null;
-        }
-
+        $definition = $this->hasDefinition($id) ? $this->getDefinition($id) : null;
         if (null !== $definition && $definition instanceof ServiceAwareDefinition) {
             return $definition->getService();
         }
@@ -446,9 +438,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $this->get($this->aliasDefinitions[$id]);
         }
 
-        if (null === $definition) {
+        if (null === $definition && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
             return;
         }
+        $definition = $this->getDefinition($id);
 
         $this->loading[$id] = true;
 

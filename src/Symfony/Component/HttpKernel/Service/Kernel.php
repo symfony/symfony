@@ -43,8 +43,9 @@ class Kernel
                     continue;
                 }
                 if (!isset($this->bundles[$name])) {
+                    $serviceClass = $bundle['service_class'];
                     $parentBundle = isset($this->bundles[$parent]) ? $this->bundles[$parent] : null;
-                    $this->bundles[$name] = new $bundle['service_class']($name, $bundle['namespace'], $bundle['class'], $bundle['path'], $parentBundle);
+                    $this->bundles[$name] = new $serviceClass($name, $bundle['namespace'], $bundle['class'], $bundle['path'], $parentBundle);
                     ++$numProcessedBundles;
                 }
             }

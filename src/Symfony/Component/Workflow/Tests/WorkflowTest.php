@@ -134,11 +134,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
         $subject = new \stdClass();
 
-        $subject->marking = array('b'=>1, 'c'=>1);
+        $subject->marking = array('b' => 1, 'c' => 1);
         $this->assertTrue($workflow->can($subject, 't2'));
 
         // If you are in place b you should be able to apply t2
-        $subject->marking = array('b'=>1);
+        $subject->marking = array('b' => 1);
         $this->assertTrue($workflow->can($subject, 't2'));
     }
 

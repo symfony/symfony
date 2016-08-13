@@ -423,6 +423,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         if (null !== $definition && $definition instanceof ServiceAwareDefinition) {
             return $definition->getService();
         }
+        // @TODO allow for available synthetic services?
 
         if (!$this->compiled) {
             @trigger_error(sprintf('Calling %s() before compiling the container is deprecated since version 3.2 and will throw an exception in 4.0.', __METHOD__), E_USER_DEPRECATED);

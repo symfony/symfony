@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Cache;
 
+use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class CacheItem implements TaggedCacheItemInterface
+final class CacheItem implements CacheItemInterface
 {
     protected $key;
     protected $value;
@@ -97,7 +98,13 @@ final class CacheItem implements TaggedCacheItemInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Adds a tag to a cache item.
+     *
+     * @param string|string[] $tags A tag or array of tags
+     *
+     * @return static
+     *
+     * @throws InvalidArgumentException When $tag is not valid.
      */
     public function tag($tags)
     {

@@ -63,7 +63,7 @@ class ServiceAwareDefinition extends Definition
      */
     public function setShared($shared)
     {
-        if ($shared) {
+        if (!$shared) {
             throw new \BadMethodCallException('A service aware definition must always be shared.');
         }
 

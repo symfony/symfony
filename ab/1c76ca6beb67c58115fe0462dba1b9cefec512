@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-08-08T07:46:43Z
+
+@WouterJ @Iltar Would you mind to have a look at this?
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-08-08T08:16:21Z
+
+Sorry to post this in Dutch, but else it becomes an unreadable mess :)
+
+* `Moet` en `moeten` klinkt erg dwingend, `mag niet` klinkt wat vriendelijker.
+* `kon niet gevonden worden` is meer gebruikelijk dan `kon niet worden gevonden.` Maar `Het bestand kon niet worden geüpload.` is dan weer duidelijker dan de vorige versie 👍
+
+Vertalingen hoeven niet letterlijk te worden overgenomen, zolang als de oorspronkelijke bedoeling duidelijk is. Maar dat is slechts mijn mening, dus ik ben benieuwd wat andere vinden 😄
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-08T11:07:00Z
+
+I agree with @sstok's suggestions. Other than that, looks good to me!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-08T13:42:24Z
+
+@sstok
+
+> Moet en moeten klinkt erg dwingend, mag niet klinkt wat vriendelijker.
+
+This is about `should` vs `must`, where `must` is used in several dutch translations currently, ie
+- `This value _should not_ be blank.` = `Deze waarde _mag niet_ leeg zijn` (OK)
+- `This value _should_ be null.` = `Deze waarde _moet_ null zijn.` (Reads as `This value _must_ be null.`)
+
+Shall we change this right now? Sstok's point is `mag niet` (ie `should not`) reads more friendly, which is true. In english you can compare this to `may not`.
+
+edit: Hehe, this is perhaps hard to explain but it only counts when negated (ie `should not`). The 2nd example is also OK. `must` and `should` can both be  translated to `moet` in dutch. My bad.
+
+> 'kon niet gevonden worden' is meer gebruikelijk dan 'kon niet worden gevonden'.
+
+(Dutch) Zeker?, ik vind beide nu duidelijk (worden geupload en worden gevonden). Geen idee of hier grammatica regels bij komen kijken eigenlijk :sweat_smile: google translate vertaald het als "worden gevonden" in ieder geval, zonder verdere suggesties. :confused:
+
+> Vertalingen hoeven niet letterlijk te worden overgenomen, zolang als de oorspronkelijke bedoeling duidelijk is.
+
+This is about `This value is not valid.` meaning the same as `This value is invalid`. Which both can be separately translated in dutch. Sstok's point is it basically doesnt matter to much how you translate this (it means the same). Ie. `This value is invalid` could be translated as `... is ongeldig` (literally `... is invalid`) or `... is niet geldig` (literally `... is not valid`).
+
+Currently i "corrected" this for `This value should be false.`. I tend to agree with sstok (for pragmatic reasons) but still think we should do a "correct" translation when possible (ie not changing syntax/words to much). Especially since these are mostly translations with 1-2 sentences... fully agree with sstok when it comes to translating complete paragraphs.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-08T20:00:10Z
+
+Ok sorry for the maybe incoherent story above. Rewrote it a bit earlier to clarify.
+
+Anyway, for now translations with `should be`. `should not be` and `could not be` are at least consistent.
+- `This value should be false.` was the only exception in dutch using different syntax for `This should be X`. Imho it still reads as well/friendly (like the others do).
+- `could not be` is the problem maybe, with my last commit at least the syntax is consistent. Imho all read as well, however @sstok got me confused as he states it depends on the past participle to determine the most common syntax. Dutch will understand both that's not the problem..
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-09T07:14:09Z
+
+I reverted 2 changes for `could not be`. I understand what @sstok means. In dutch one syntax sounds better/more fluent then the other depending on the verb (said it a few times ;-)). However i have no clear ref on this, but both are valid spelling.
+
+Currently some translations still switch from past to present tense, i guess this is also somewhat context related eventually as they sound more logical in dutch then.
+
+Long story short; this is good to go.

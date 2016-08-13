@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-08-05T06:45:15Z
+
+:+1:
+
+The message that you propose is technically correct ... but I think we could make it easier to understand. If you agree, I was thinking something like the following:
+
+```
+ * Mappings with a colon (`:`) that is not followed by a white space are
+   deprecated and will lead to a `ParseException` in Symfony 4.0 (e.g. `foo:bar`
+   must be `foo: bar`).
+```

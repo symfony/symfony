@@ -53,12 +53,8 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 $tmpContainer->addExpressionLanguageProvider($provider);
             }
 
-            foreach ($container->getDefinitions() as $id => $definition) {
-                if ($definition instanceof ServiceAwareDefinition) {
-                    // definitions are not transferred by design
-                    $tmpContainer->set($id, $definition->getService());
-                }
-                // @TODO allow for available synthetic services to be transferred?
+            foreach ($container->getSynthetics() as $id => $service) {
+                $tmpContainer->set($id, $service);
             }
 
             $extension->load($config, $tmpContainer);

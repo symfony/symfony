@@ -419,16 +419,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        $definition = $this->hasDefinition($id) ? $this->getDefinition($id) : null;
-        if (null !== $definition && $definition instanceof ServiceAwareDefinition) {
-            return $definition->getService();
-        }
-        // @TODO allow for available synthetic services?
-
-        if (!$this->compiled) {
-            @trigger_error(sprintf('Calling %s() before compiling the container is deprecated since version 3.2 and will throw an exception in 4.0.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $id = strtolower($id);
 
         if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
@@ -439,10 +429,27 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $this->get($this->aliasDefinitions[$id]);
         }
 
-        if (null === $definition && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+        try {
+            $definition = $this->getDefinition($id);
+            if ($definition instanceof ServiceAwareDefinition) {
+                return $definition->getService();
+            }
+        } catch (ServiceNotFoundException $e) {
+            if ($this->compiled && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                throw $e;
+            }
+            $definition = null;
+        }
+        if (!$this->compiled) {
+            @trigger_error(sprintf('Calling %s() before compiling the container is deprecated for non-synthetic services since version 3.2 and will throw an exception in 4.0.', __METHOD__), E_USER_DEPRECATED);
+        }
+        if (null === $definition) {
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                throw new ServiceNotFoundException($id);
+            }
+
             return;
         }
-        $definition = $this->getDefinition($id);
 
         $this->loading[$id] = true;
 
@@ -453,6 +460,29 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $service;
+    }
+
+    /**
+     * Get synthetic services.
+     *
+     * @return object[]
+     */
+    public function getSynthetics()
+    {
+        $synthetics = array();
+        foreach ($this->definitions as $id => $definition) {
+            if ($definition instanceof ServiceAwareDefinition) {
+                $synthetics[$id] = $definition->getService();
+            }
+        }
+        foreach (parent::getServiceIds() as $id) {
+            if ('service_container' === $id) {
+                continue;
+            }
+            $synthetics[$id] = parent::get($id);
+        }
+
+        return $synthetics;
     }
 
     /**

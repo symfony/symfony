@@ -134,19 +134,15 @@ class RedisAdapter extends AbstractAdapter
      */
     protected function doFetch(array $ids)
     {
-        $result = array();
-
         if ($ids) {
             $values = $this->redis->mGet($ids);
             $index = 0;
             foreach ($ids as $id) {
                 if ($value = $values[$index++]) {
-                    $result[$id] = unserialize($value);
+                    yield $id => parent::unserialize($value);
                 }
             }
         }
-
-        return $result;
     }
 
     /**

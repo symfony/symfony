@@ -4,6 +4,9 @@ CHANGELOG
 3.2.0
 -----
 
+ * Mappings with a colon that is not followed by a space are deprecated and
+   will lead to a `ParseException` in Symfony 4.0.
+
  * Added support for parsing PHP constants:
 
    ```php

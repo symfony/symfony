@@ -52,17 +52,16 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
+        $route = '';
         foreach ($request->attributes->all() as $key => $value) {
             if ('_route' === $key && is_object($value)) {
-                $attributes[$key] = $this->varToString($value->getPath());
-            } elseif ('_route_params' === $key) {
-                // we need to keep route params as an array (see getRouteParams())
-                foreach ($value as $k => $v) {
-                    $value[$k] = $this->varToString($v);
-                }
-                $attributes[$key] = $value;
+                $attributes[$key] = $this->cloneVar($value->getPath());
             } else {
-                $attributes[$key] = $this->varToString($value);
+                $attributes[$key] = $this->cloneVar($value);
+            }
+
+            if ('_route' === $key) {
+                $route = is_object($value) ? $value->getPath() : $value;
             }
         }
 
@@ -98,12 +97,13 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'content_type' => $response->headers->get('Content-Type', 'text/html'),
             'status_text' => isset(Response::$statusTexts[$statusCode]) ? Response::$statusTexts[$statusCode] : '',
             'status_code' => $statusCode,
-            'request_query' => $request->query->all(),
-            'request_request' => $request->request->all(),
+            'request_query' => array_map(array($this, 'cloneVar'), $request->query->all()),
+            'request_request' => array_map(array($this, 'cloneVar'), $request->request->all()),
             'request_headers' => $request->headers->all(),
             'request_server' => $request->server->all(),
             'request_cookies' => $request->cookies->all(),
             'request_attributes' => $attributes,
+            'route' => $route,
             'response_headers' => $responseHeaders,
             'session_metadata' => $sessionMetadata,
             'session_attributes' => $sessionAttributes,
@@ -247,7 +247,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     public function getRoute()
     {
-        return isset($this->data['request_attributes']['_route']) ? $this->data['request_attributes']['_route'] : '';
+        return $this->data['route'];
+    }
+
+    public function getIdentifier()
+    {
+        return $this->data['route'] ?: (is_array($this->data['controller']) ? $this->data['controller']['class'].'::'.$this->data['controller']['method'].'()' : $this->data['controller']);
     }
 
     /**
@@ -259,7 +264,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     public function getRouteParams()
     {
-        return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params'] : array();
+        return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params'] : $this->cloneVar(array());
     }
 
     /**

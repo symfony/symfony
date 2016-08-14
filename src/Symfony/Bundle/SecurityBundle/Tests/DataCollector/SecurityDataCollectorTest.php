@@ -62,8 +62,12 @@ class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($collector->isAuthenticated());
         $this->assertSame('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken', $collector->getTokenClass());
         $this->assertTrue($collector->supportsRoleHierarchy());
-        $this->assertSame($normalizedRoles, $collector->getRoles());
-        $this->assertSame($inheritedRoles, $collector->getInheritedRoles());
+        $this->assertSame($normalizedRoles, $collector->getRoles()->getRawData()[1]);
+        if ($inheritedRoles) {
+            $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getRawData()[1]);
+        } else {
+            $this->assertSame($inheritedRoles, $collector->getInheritedRoles()->getRawData()[0][0]);
+        }
         $this->assertSame('hhamon', $collector->getUser());
     }
 

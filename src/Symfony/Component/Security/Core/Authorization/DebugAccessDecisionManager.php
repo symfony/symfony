@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
-use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -50,7 +49,7 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
 
         $this->decisionLog[] = array(
             'attributes' => $attributes,
-            'object' => $this->getStringRepresentation($object),
+            'object' => $object,
             'result' => $result,
         );
 
@@ -95,40 +94,5 @@ class DebugAccessDecisionManager implements AccessDecisionManagerInterface
     public function getDecisionLog()
     {
         return $this->decisionLog;
-    }
-
-    /**
-     * @param mixed $object
-     *
-     * @return string
-     */
-    private function getStringRepresentation($object)
-    {
-        if (null === $object) {
-            return 'NULL';
-        }
-
-        if (!is_object($object)) {
-            if (is_bool($object)) {
-                return sprintf('%s (%s)', gettype($object), $object ? 'true' : 'false');
-            }
-            if (is_scalar($object)) {
-                return sprintf('%s (%s)', gettype($object), $object);
-            }
-
-            return gettype($object);
-        }
-
-        $objectClass = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($object) : get_class($object);
-
-        if (method_exists($object, 'getId')) {
-            $objectAsString = sprintf('ID: %s', $object->getId());
-        } elseif (method_exists($object, '__toString')) {
-            $objectAsString = (string) $object;
-        } else {
-            $objectAsString = sprintf('object hash: %s', spl_object_hash($object));
-        }
-
-        return sprintf('%s (%s)', $objectClass, $objectAsString);
     }
 }

@@ -120,7 +120,7 @@
                         <p>No GET parameters</p>
                     </div>
                 {% else %}
-                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestquery }, with_context = false) }}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestquery, maxDepth: 1 }, with_context = false) }}
                 {% endif %}
 
                 <h3>POST Parameters</h3>
@@ -130,7 +130,7 @@
                         <p>No POST parameters</p>
                     </div>
                 {% else %}
-                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestrequest }, with_context = false) }}
+                    {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestrequest, maxDepth: 1 }, with_context = false) }}
                 {% endif %}
 
                 <h3>Request Attributes</h3>
@@ -252,7 +252,7 @@
                 {% for child in profile.children %}
                     <h3>
                         <a href="{{ path('_profiler', { token: child.token }) }}">
-                            {{- child.getcollector('request').requestattributes.get('_controller') -}}
+                            {{- child.getcollector('request').identifier -}}
                         </a>
                         <small>(token = {{ child.token }})</small>
                     </h3>

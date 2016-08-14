@@ -3,7 +3,7 @@
 {% block page_title 'Security' %}
 
 {% block toolbar %}
-    {% if collector.tokenClass %}
+    {% if collector.token %}
         {% set is_authenticated = collector.enabled and collector.authenticated  %}
         {% set color_code = is_authenticated ? '' : 'yellow' %}
     {% else %}
@@ -16,7 +16,7 @@
     {% endset %}
 
     {% set text %}
-        {% if collector.tokenClass %}
+        {% if collector.token %}
             <div class="sf-toolbar-info-piece">
                 <b>Logged in as</b>
                 <span>{{ collector.user }}</span>
@@ -27,7 +27,7 @@
                 <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'red' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
             </div>
 
-            {% if collector.tokenClass != null %}
+            {% if collector.token != null %}
             <div class="sf-toolbar-info-piece">
                 <b>Token class</b>
                 <span>{{ collector.tokenClass|abbr_class }}</span>
@@ -54,7 +54,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ not collector.enabled or not collector.tokenClass ? 'disabled' }}">
+    <span class="label {{ not collector.enabled or not collector.token ? 'disabled' }}">
         <span class="icon">{{ include('@Security/Collector/icon.svg') }}</span>
         <strong>Security</strong>
     </span>
@@ -63,7 +63,7 @@
 {% block panel %}
     <h2>Security Token</h2>
 
-    {% if collector.tokenClass %}
+    {% if collector.token %}
         <div class="metrics">
             <div class="metric">
                 <span class="value">{{ collector.user == 'anon.' ? 'Anonymous' : collector.user }}</span>
@@ -87,7 +87,7 @@
                 <tr>
                     <th>Roles</th>
                     <td>
-                        {{ collector.roles is empty ? 'none' : collector.roles|yaml_encode }}
+                        {{ collector.roles is empty ? 'none' : profiler_dump(collector.roles, maxDepth=1) }}
 
                         {% if not collector.authenticated and collector.roles is empty %}
                             <p class="help">User is not authenticated probably because they have no roles.</p>
@@ -98,14 +98,14 @@
                 {% if collector.supportsRoleHierarchy %}
                 <tr>
                     <th>Inherited Roles</th>
-                    <td>{{ collector.inheritedRoles is empty ? 'none' : collector.inheritedRoles|yaml_encode }}</td>
+                    <td>{{ collector.inheritedRoles is empty ? 'none' : profiler_dump(collector.inheritedRoles, maxDepth=1) }}</td>
                 </tr>
                 {% endif %}
 
-                {% if collector.tokenClass %}
+                {% if collector.token %}
                 <tr>
-                    <th>Token class</th>
-                    <td>{{ collector.tokenClass }}</td>
+                    <th>Token</th>
+                    <td>{{ profiler_dump(collector.token) }}</td>
                 </tr>
                 {% endif %}
             </tbody>

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * deprecated `DataCollector::varToString()`, use `cloneVar()` instead
+
 3.1.0
 -----
  * deprecated passing objects as URI attributes to the ESI and SSI renderers

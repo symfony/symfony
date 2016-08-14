@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * SecurityDataCollector.
@@ -58,6 +59,7 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled' => false,
                 'authenticated' => false,
+                'token' => null,
                 'token_class' => null,
                 'logout_url' => null,
                 'user' => '',
@@ -69,6 +71,7 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => false,
+                'token' => null,
                 'token_class' => null,
                 'logout_url' => null,
                 'user' => '',
@@ -101,18 +104,24 @@ class SecurityDataCollector extends DataCollector
             $this->data = array(
                 'enabled' => true,
                 'authenticated' => $token->isAuthenticated(),
+                'token' => $this->cloneVar($token),
                 'token_class' => get_class($token),
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
-                'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles),
-                'inherited_roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles),
+                'roles' => $this->cloneVar(array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles)),
+                'inherited_roles' => $this->cloneVar(array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles)),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
         }
 
         // collect voters and access decision manager information
         if ($this->accessDecisionManager instanceof DebugAccessDecisionManager) {
-            $this->data['access_decision_log'] = $this->accessDecisionManager->getDecisionLog();
+            $this->data['access_decision_log'] = array_map(function ($decision) {
+                $decision['object'] = $this->cloneVar($decision['object']);
+
+                return $decision;
+            }, $this->accessDecisionManager->getDecisionLog());
+
             $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
 
             foreach ($this->accessDecisionManager->getVoters() as $voter) {
@@ -194,6 +203,16 @@ class SecurityDataCollector extends DataCollector
     public function getTokenClass()
     {
         return $this->data['token_class'];
+    }
+
+    /**
+     * Get the full security token class as Data object.
+     *
+     * @return Data
+     */
+    public function getToken()
+    {
+        return $this->data['token'];
     }
 
     /**

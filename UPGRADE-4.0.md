@@ -155,6 +155,8 @@ HttpKernel
    have your own `ControllerResolverInterface` implementation, you should
    inject an `ArgumentResolverInterface` instance.
 
+ * The `DataCollector::varToString()` method has been removed in favor of `cloneVar()`.
+
 Serializer
 ----------
 

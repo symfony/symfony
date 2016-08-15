@@ -51,11 +51,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $definitions = array();
 
     /**
-     * @var Definition[]
-     */
-    private $obsoleteDefinitions = array();
-
-    /**
      * @var Alias[]
      */
     private $aliasDefinitions = array();
@@ -346,21 +341,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $id = strtolower($id);
 
-        if ($this->isFrozen()) {
-            // setting a synthetic service on a frozen container is alright
-            if (
-                (!isset($this->definitions[$id]) && !isset($this->obsoleteDefinitions[$id]))
-                    ||
-                (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())
-                    ||
-                (isset($this->obsoleteDefinitions[$id]) && !$this->obsoleteDefinitions[$id]->isSynthetic())
-            ) {
-                throw new BadMethodCallException(sprintf('Setting service "%s" on a frozen container is not allowed.', $id));
-            }
-        }
-
-        if (isset($this->definitions[$id])) {
-            $this->obsoleteDefinitions[$id] = $this->definitions[$id];
+        if ($this->isFrozen() && (!isset($this->definitions[$id]) || !$this->definitions[$id]->isSynthetic())) {
+            throw new BadMethodCallException(sprintf('Setting service "%s" for an unknown or non-synthetic service definition on a frozen container is not allowed.', $id));
         }
 
         unset($this->definitions[$id], $this->aliasDefinitions[$id]);

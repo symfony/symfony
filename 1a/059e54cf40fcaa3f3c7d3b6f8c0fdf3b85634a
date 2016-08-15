@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-19T15:33:08Z
+
+You should also add the params to `FormTypeCsrfExtension` and inject `form.server_params` there so that we have the right ServerParams instance instance of an empty one relying on PHP global vars.
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-07-19T21:15:47Z
+
+@fabpot updated
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-20T14:17:45Z
+
+👍

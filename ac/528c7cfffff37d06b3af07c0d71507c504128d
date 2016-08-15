@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-26T16:26:58Z
+
+:+1:
+
+Can you add a non-regression test please?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-26T17:45:44Z
+
+@dunglas done :)
+BTW this shows how much php7 type hints are useful ! I hope symfony 4 will remove php5 support.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-27T11:30:28Z
+
+>BTW this shows how much php7 type hints are useful !
+
+Or any good static code analyzer for that matter :P
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-27T11:38:02Z
+
+@theofidry yes of course (but it is slower) :P
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-27T12:05:20Z
+
+I found another bug but I don't know why it happens...
+[This condition](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/PropertyInfo/PropertyInfoCacheExtractor.php#L111) is never ``true`` and the psr cache is always used.
+Using ``array_key_exists`` solves this issue. Any idea ?
+
+Edit: Ok it happens when the extractor returns ``null``. I'll submit a commit.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-27T12:08:18Z
+
+did you try to dump the value?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-27T14:23:19Z
+
+@Ener-Getick any idea of what the isset was not working?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-27T14:38:24Z
+
+@theofidry yes sorry i forgot to answer you as i updated my message...
+Isset is kind of equals to ``null !== @$value`` so when the value cached is ``null``, ``isset`` returns `` false`` whereas ``array_key_exists`` which returns true as long as the value exists.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-07-27T14:40:06Z
+
+IIRC `null` is not cached in most cache systems, shouldn't we avoid to cache it here as well?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-27T15:05:38Z
+
+@theofidry it is cached in the cross requests cache  but it is not fetched in the array cache which is only here because it is faster than the first one. So it will be cached anyway the only thing changing are the performances.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-10T19:08:27Z
+
+Should I change something else ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-11T01:17:04Z
+
+Ok for me. I'll merge it when I'll be back from vacation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-11T11:57:43Z
+
+:+1:
+Status: reviewed

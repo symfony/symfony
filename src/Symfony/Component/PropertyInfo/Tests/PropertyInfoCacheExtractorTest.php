@@ -26,15 +26,40 @@ class PropertyInfoCacheExtractorTest extends AbstractPropertyInfoExtractorTest
         $this->propertyInfo = new PropertyInfoCacheExtractor($this->propertyInfo, new ArrayAdapter());
     }
 
-    public function testCache()
+    public function testGetShortDescription()
     {
-        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array()));
-        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array()));
+        parent::testGetShortDescription();
+        parent::testGetShortDescription();
     }
 
-    public function testNotSerializableContext()
+    public function testGetLongDescription()
     {
-        $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', array('foo' => function () {})));
+        parent::testGetLongDescription();
+        parent::testGetLongDescription();
+    }
+
+    public function testGetTypes()
+    {
+        parent::testGetTypes();
+        parent::testGetTypes();
+    }
+
+    public function testIsReadable()
+    {
+        parent::testIsReadable();
+        parent::testIsReadable();
+    }
+
+    public function testIsWritable()
+    {
+        parent::testIsWritable();
+        parent::testIsWritable();
+    }
+
+    public function testGetProperties()
+    {
+        parent::testGetProperties();
+        parent::testGetProperties();
     }
 
     /**

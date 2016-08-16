@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-15T15:35:54Z
+
+I don't think it will be merged as long as 2.x will be supported as it could create many merge conflicts for almost no gain.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-15T16:30:11Z
+
+Good point. Didnt really consider upstream merges on this :) not sure it will be that dramatic, but perhaps should be avoided.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-16T07:31:28Z
+
+:+1:, less circumvoluted

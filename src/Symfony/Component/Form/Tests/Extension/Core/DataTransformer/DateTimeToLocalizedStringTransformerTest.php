@@ -227,6 +227,26 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertDateTimeEquals($this->dateTime, $transformer->reverseTransform('02*2010*03 04|05|06'));
     }
 
+    public function testReverseTransformDateOnlyWithDstIssue()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('Europe/Rome', 'Europe/Rome', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'dd/MM/yyyy');
+
+        $this->assertDateTimeEquals(
+            new \DateTime('1978-05-28', new \DateTimeZone('Europe/Rome')),
+            $transformer->reverseTransform('28/05/1978')
+        );
+    }
+
+    public function testReverseTransformDateOnlyWithDstIssueAndEscapedText()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('Europe/Rome', 'Europe/Rome', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, "'day': dd 'month': MM 'year': yyyy");
+
+        $this->assertDateTimeEquals(
+            new \DateTime('1978-05-28', new \DateTimeZone('Europe/Rome')),
+            $transformer->reverseTransform('day: 28 month: 05 year: 1978')
+        );
+    }
+
     public function testReverseTransformEmpty()
     {
         $transformer = new DateTimeToLocalizedStringTransformer();

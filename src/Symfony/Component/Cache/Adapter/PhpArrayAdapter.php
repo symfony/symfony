@@ -39,11 +39,11 @@ class PhpArrayAdapter implements AdapterInterface
         $this->file = $file;
         $this->fallbackPool = $fallbackPool;
         $this->createCacheItem = \Closure::bind(
-            function ($key, $value) {
+            function ($key, $value, $isHit) {
                 $item = new CacheItem();
                 $item->key = $key;
                 $item->value = $value;
-                $item->isHit = true;
+                $item->isHit = $isHit;
 
                 return $item;
             },
@@ -176,16 +176,26 @@ EOF;
         }
 
         $value = $this->values[$key];
+        $isHit = true;
 
         if ('N;' === $value) {
             $value = null;
         } elseif (is_string($value) && isset($value[2]) && ':' === $value[1]) {
-            $value = unserialize($value);
+            try {
+                $e = null;
+                $value = unserialize($value);
+            } catch (\Error $e) {
+            } catch (\Exception $e) {
+            }
+            if (null !== $e) {
+                $value = null;
+                $isHit = false;
+            }
         }
 
         $f = $this->createCacheItem;
 
-        return $f($key, $value);
+        return $f($key, $value, $isHit);
     }
 
     /**
@@ -338,12 +348,18 @@ EOF;
                 $value = $this->values[$key];
 
                 if ('N;' === $value) {
-                    $value = null;
+                    yield $key => $f($key, null, true);
                 } elseif (is_string($value) && isset($value[2]) && ':' === $value[1]) {
-                    $value = unserialize($value);
+                    try {
+                        yield $key => $f($key, unserialize($value), true);
+                    } catch (\Error $e) {
+                        yield $key => $f($key, null, false);
+                    } catch (\Exception $e) {
+                        yield $key => $f($key, null, false);
+                    }
+                } else {
+                    yield $key => $f($key, $value, true);
                 }
-
-                yield $key => $f($key, $value);
             } else {
                 $fallbackKeys[] = $key;
             }

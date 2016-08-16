@@ -86,7 +86,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
      */
     public function getTypes($class, $property, array $context = array())
     {
-        return $this->extract('getTypes', array($class, $context));
+        return $this->extract('getTypes', array($class, $property, $context));
     }
 
     /**
@@ -108,7 +108,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface
 
         $key = $this->escape($method.'.'.$serializedArguments);
 
-        if (isset($this->arrayCache[$key])) {
+        if (array_key_exists($key, $this->arrayCache)) {
             return $this->arrayCache[$key];
         }
 

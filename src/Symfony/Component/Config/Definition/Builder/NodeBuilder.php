@@ -138,7 +138,7 @@ class NodeBuilder implements NodeParentInterface
     /**
      * Returns the parent node.
      *
-     * @return ParentNodeDefinitionInterface The parent node
+     * @return ParentNodeDefinitionInterface|NodeDefinition The parent node
      */
     public function end()
     {

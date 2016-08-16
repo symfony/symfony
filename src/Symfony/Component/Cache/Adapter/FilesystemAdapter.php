@@ -34,7 +34,7 @@ class FilesystemAdapter extends AbstractAdapter
 
         foreach ($ids as $id) {
             $file = $this->getFile($id);
-            if (!$h = @fopen($file, 'rb')) {
+            if (!file_exists($file) || !$h = @fopen($file, 'rb')) {
                 continue;
             }
             if ($now >= (int) $expiresAt = fgets($h)) {
@@ -47,7 +47,7 @@ class FilesystemAdapter extends AbstractAdapter
                 $value = stream_get_contents($h);
                 fclose($h);
                 if ($i === $id) {
-                    $values[$id] = unserialize($value);
+                    $values[$id] = parent::unserialize($value);
                 }
             }
         }

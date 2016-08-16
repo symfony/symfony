@@ -37,6 +37,7 @@ class Definition
     private $lazy = false;
     private $decoratedService;
     private $autowired = false;
+    private $settersAutowired = false;
     private $autowiringTypes = array();
 
     protected $arguments;
@@ -675,6 +676,30 @@ class Definition
     public function setAutowired($autowired)
     {
         $this->autowired = $autowired;
+
+        return $this;
+    }
+
+    /**
+     * Are setters autowired?
+     *
+     * @return bool
+     */
+    public function isSettersAutowired()
+    {
+        return $this->settersAutowired;
+    }
+
+    /**
+     * Sets setters autowired.
+     *
+     * @param $settersAutowired
+     *
+     * @return Definition The current instance
+     */
+    public function setSettersAutowired($settersAutowired)
+    {
+        $this->settersAutowired = $settersAutowired;
 
         return $this;
     }

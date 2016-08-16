@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\DumpTokenParser;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
+use Symfony\Component\VarDumper\Dumper\ToStringDumper;
 
 /**
  * Provides integration of the dump() function with Twig.
@@ -28,7 +29,12 @@ class DumpExtension extends \Twig_Extension
     public function __construct(ClonerInterface $cloner, HtmlDumper $dumper = null)
     {
         $this->cloner = $cloner;
-        $this->dumper = $dumper ?: new HtmlDumper();
+
+        if (null === $dumper || !$dumper instanceof ToStringDumper) {
+            $this->dumper = new ToStringDumper(new HtmlDumper());
+        } else {
+            $this->dumper = $dumper;
+        }
     }
 
     public function getFunctions()
@@ -68,17 +74,12 @@ class DumpExtension extends \Twig_Extension
             unset($vars[0], $vars[1]);
         }
 
-        $dump = fopen('php://memory', 'r+b');
-        $prevOutput = $this->dumper->setOutput($dump);
+        $dump = '';
 
         foreach ($vars as $value) {
-            $this->dumper->dump($this->cloner->cloneVar($value));
+            $dump .= $this->dumper->dump($this->cloner->cloneVar($value));
         }
 
-        $this->dumper->setOutput($prevOutput);
-
-        rewind($dump);
-
-        return stream_get_contents($dump);
+        return $dump;
     }
 }

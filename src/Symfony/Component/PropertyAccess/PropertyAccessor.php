@@ -215,20 +215,12 @@ class PropertyAccessor implements PropertyAccessorInterface
                 $value = $zval[self::VALUE];
             }
         } catch (\TypeError $e) {
-            try {
-                self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0);
-            } catch (InvalidArgumentException $e) {
+            self::throwInvalidArgumentException($e->getMessage(), $e->getTrace(), 0);
+        } finally {
+            if (PHP_VERSION_ID < 70000 && false !== self::$previousErrorHandler) {
+                restore_error_handler();
+                self::$previousErrorHandler = false;
             }
-        } catch (\Exception $e) {
-        } catch (\Throwable $e) {
-        }
-
-        if (PHP_VERSION_ID < 70000 && false !== self::$previousErrorHandler) {
-            restore_error_handler();
-            self::$previousErrorHandler = false;
-        }
-        if (isset($e)) {
-            throw $e;
         }
     }
 

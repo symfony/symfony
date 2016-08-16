@@ -114,7 +114,7 @@ class AutowirePass implements CompilerPassInterface
             $this->autowireMethod($id, $definition, $constructor, true);
         }
 
-        if (!$definition->isSettersAutowired()) {
+        if (!$definition->hasAutowiredSetters()) {
             return;
         }
 

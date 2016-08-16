@@ -295,9 +295,9 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     public function testSettersAutowired()
     {
         $def = new Definition('stdClass');
-        $this->assertFalse($def->isSettersAutowired());
-        $def->setSettersAutowired(true);
-        $this->assertTrue($def->isSettersAutowired());
+        $this->assertFalse($def->hasAutowiredSetters());
+        $def->setAutowiredSetters(true);
+        $this->assertTrue($def->hasAutowiredSetters());
     }
 
     public function testTypes()

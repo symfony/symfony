@@ -19,18 +19,28 @@ use Symfony\Component\DependencyInjection\Alias;
  *
  * @author Christophe Coevoet <stof@notk.org>
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Diego Saint Esteben <diego@saintesteben.me>
  */
 class DecoratorServicePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        $definitions = new \SplPriorityQueue();
+        $order = PHP_INT_MAX;
+
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$decorated = $definition->getDecoratedService()) {
                 continue;
             }
+            $definitions->insert(array($id, $definition), array($decorated[2], --$order));
+        }
+
+        foreach ($definitions as $arr) {
+            list($id, $definition) = $arr;
+            list($inner, $renamedId) = $definition->getDecoratedService();
+
             $definition->setDecoratedService(null);
 
-            list($inner, $renamedId) = $decorated;
             if (!$renamedId) {
                 $renamedId = $id.'.inner';
             }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Style;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -64,53 +65,10 @@ class SymfonyStyle extends OutputStyle
      */
     public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false)
     {
-        $this->autoPrependBlock();
         $messages = is_array($messages) ? array_values($messages) : array($messages);
-        $indentLength = 0;
-        $lines = array();
 
-        if (null !== $type) {
-            $typePrefix = sprintf('[%s] ', $type);
-            $indentLength = strlen($typePrefix);
-            $lineIndentation = str_repeat(' ', $indentLength);
-        }
-
-        // wrap and add newlines for each element
-        foreach ($messages as $key => $message) {
-            $message = OutputFormatter::escape($message);
-            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - Helper::strlen($prefix) - $indentLength, PHP_EOL, true)));
-
-            // prefix each line with a number of spaces equivalent to the type length
-            if (null !== $type) {
-                foreach ($lines as &$line) {
-                    $line = $lineIndentation === substr($line, 0, $indentLength) ? $line : $lineIndentation.$line;
-                }
-            }
-
-            if (count($messages) > 1 && $key < count($messages) - 1) {
-                $lines[] = '';
-            }
-        }
-
-        if (null !== $type) {
-            $lines[0] = substr_replace($lines[0], $typePrefix, 0, $indentLength);
-        }
-
-        if ($padding && $this->isDecorated()) {
-            array_unshift($lines, '');
-            $lines[] = '';
-        }
-
-        foreach ($lines as &$line) {
-            $line = sprintf('%s%s', $prefix, $line);
-            $line .= str_repeat(' ', $this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $line));
-
-            if ($style) {
-                $line = sprintf('<%s>%s</>', $style, $line);
-            }
-        }
-
-        $this->writeln($lines);
+        $this->autoPrependBlock();
+        $this->writeln($this->createBlock($messages, $type, $style, $prefix, $padding, true));
         $this->newLine();
     }
 
@@ -122,7 +80,7 @@ class SymfonyStyle extends OutputStyle
         $this->autoPrependBlock();
         $this->writeln(array(
             sprintf('<comment>%s</>', $message),
-            sprintf('<comment>%s</>', str_repeat('=', strlen($message))),
+            sprintf('<comment>%s</>', str_repeat('=', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
         ));
         $this->newLine();
     }
@@ -135,7 +93,7 @@ class SymfonyStyle extends OutputStyle
         $this->autoPrependBlock();
         $this->writeln(array(
             sprintf('<comment>%s</>', $message),
-            sprintf('<comment>%s</>', str_repeat('-', strlen($message))),
+            sprintf('<comment>%s</>', str_repeat('-', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
         ));
         $this->newLine();
     }
@@ -161,15 +119,24 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependText();
 
-        if (!is_array($message)) {
-            $this->writeln(sprintf(' // %s', $message));
-
-            return;
+        $messages = is_array($message) ? array_values($message) : array($message);
+        foreach ($messages as $message) {
+            $this->writeln(sprintf(' %s', $message));
         }
+    }
 
-        foreach ($message as $element) {
-            $this->text($element);
-        }
+    /**
+     * Formats a command comment.
+     *
+     * @param string|array $message
+     */
+    public function comment($message)
+    {
+        $messages = is_array($message) ? array_values($message) : array($message);
+
+        $this->autoPrependBlock();
+        $this->writeln($this->createBlock($messages, null, null, '<fg=default;bg=default> // </>'));
+        $this->newLine();
     }
 
     /**
@@ -375,7 +342,7 @@ class SymfonyStyle extends OutputStyle
     private function getProgressBar()
     {
         if (!$this->progressBar) {
-            throw new \RuntimeException('The ProgressBar is not started.');
+            throw new RuntimeException('The ProgressBar is not started.');
         }
 
         return $this->progressBar;
@@ -416,5 +383,53 @@ class SymfonyStyle extends OutputStyle
         return array_map(function ($value) {
             return substr($value, -4);
         }, array_merge(array($this->bufferedOutput->fetch()), (array) $messages));
+    }
+
+    private function createBlock($messages, $type = null, $style = null, $prefix = ' ', $padding = false, $escape = false)
+    {
+        $indentLength = 0;
+        $prefixLength = Helper::strlenWithoutDecoration($this->getFormatter(), $prefix);
+        $lines = array();
+
+        if (null !== $type) {
+            $type = sprintf('[%s] ', $type);
+            $indentLength = strlen($type);
+            $lineIndentation = str_repeat(' ', $indentLength);
+        }
+
+        // wrap and add newlines for each element
+        foreach ($messages as $key => $message) {
+            if ($escape) {
+                $message = OutputFormatter::escape($message);
+            }
+
+            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($message, $this->lineLength - $prefixLength - $indentLength, PHP_EOL, true)));
+
+            if (count($messages) > 1 && $key < count($messages) - 1) {
+                $lines[] = '';
+            }
+        }
+
+        $firstLineIndex = 0;
+        if ($padding && $this->isDecorated()) {
+            $firstLineIndex = 1;
+            array_unshift($lines, '');
+            $lines[] = '';
+        }
+
+        foreach ($lines as $i => &$line) {
+            if (null !== $type) {
+                $line = $firstLineIndex === $i ? $type.$line : $lineIndentation.$line;
+            }
+
+            $line = $prefix.$line;
+            $line .= str_repeat(' ', $this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $line));
+
+            if ($style) {
+                $line = sprintf('<%s>%s</>', $style, $line);
+            }
+        }
+
+        return $lines;
     }
 }

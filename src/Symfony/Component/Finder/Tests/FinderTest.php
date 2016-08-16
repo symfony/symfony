@@ -248,6 +248,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             __DIR__.DIRECTORY_SEPARATOR.'BsdFinderTest.php',
             __DIR__.DIRECTORY_SEPARATOR.'FinderTest.php',
             __DIR__.DIRECTORY_SEPARATOR.'GnuFinderTest.php',
+            __DIR__.DIRECTORY_SEPARATOR.'PhpFinderTest.php',
             __DIR__.DIRECTORY_SEPARATOR.'GlobTest.php',
         );
 
@@ -534,6 +535,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAdaptersOrdering()
     {
         $finder = Finder::create()
@@ -552,6 +556,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         );
     }
 
+    /**
+     * @group legacy
+     */
     public function testAdaptersChaining()
     {
         $iterator = new \ArrayIterator(array());
@@ -606,6 +613,9 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsoluteFixtures($expected), $finder);
     }
 
+    /**
+     * @group legacy
+     */
     public function testAdapterSelection()
     {
         // test that by default, PhpAdapter is selected
@@ -728,18 +738,8 @@ class FinderTest extends Iterator\RealIteratorTestCase
         }
     }
 
-    /**
-     * @return AdapterInterface
-     */
-    protected function getAdapter()
+    protected function buildFinder()
     {
-        return new PhpAdapter();
-    }
-
-    private function buildFinder()
-    {
-        return Finder::create()
-            ->removeAdapters()
-            ->addAdapter($this->getAdapter());
+        return Finder::create();
     }
 }

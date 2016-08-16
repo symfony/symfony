@@ -69,7 +69,7 @@ abstract class Constraint
     /**
      * Returns the name of the given error code.
      *
-     * @param int $errorCode The error code
+     * @param string $errorCode The error code
      *
      * @return string The name of the error code
      *

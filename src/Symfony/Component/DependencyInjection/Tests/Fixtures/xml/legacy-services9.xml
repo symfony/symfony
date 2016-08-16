@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
   <parameters>
+    <parameter key="foo_class">Bar\FooClass</parameter>
     <parameter key="baz_class">BazClass</parameter>
     <parameter key="foo">bar</parameter>
   </parameters>
@@ -32,5 +33,6 @@
       <configurator class="%baz_class%" method="configureStatic1"/>
     </service>
     <service id="factory_service" class="Bar" factory-method="getInstance" factory-service="foo.baz"/>
+    <service id="foo_bar" class="%foo_class%" shared="false" scope="prototype"/>
   </services>
 </container>

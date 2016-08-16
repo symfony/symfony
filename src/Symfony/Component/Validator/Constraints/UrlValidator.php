@@ -65,10 +65,12 @@ class UrlValidator extends ConstraintValidator
             if ($this->context instanceof ExecutionContextInterface) {
                 $this->context->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Url::INVALID_URL_ERROR)
                     ->addViolation();
             } else {
                 $this->buildViolation($constraint->message)
                     ->setParameter('{{ value }}', $this->formatValue($value))
+                    ->setCode(Url::INVALID_URL_ERROR)
                     ->addViolation();
             }
 
@@ -81,12 +83,14 @@ class UrlValidator extends ConstraintValidator
             if (!checkdnsrr($host, 'ANY')) {
                 if ($this->context instanceof ExecutionContextInterface) {
                     $this->context->buildViolation($constraint->dnsMessage)
-                       ->setParameter('{{ value }}', $this->formatValue($host))
-                       ->addViolation();
+                        ->setParameter('{{ value }}', $this->formatValue($host))
+                        ->setCode(Url::INVALID_URL_ERROR)
+                        ->addViolation();
                 } else {
                     $this->buildViolation($constraint->dnsMessage)
-                       ->setParameter('{{ value }}', $this->formatValue($host))
-                       ->addViolation();
+                        ->setParameter('{{ value }}', $this->formatValue($host))
+                        ->setCode(Url::INVALID_URL_ERROR)
+                        ->addViolation();
                 }
             }
         }

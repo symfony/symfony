@@ -11,11 +11,16 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\RedisProfilerStorage class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
+
 /**
  * RedisProfilerStorage stores profiling information in Redis.
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
  * @author Stephane PY <py.stephane1@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
  */
 class RedisProfilerStorage implements ProfilerStorageInterface
 {

@@ -19,9 +19,9 @@
         "php": ">=5.3.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.3.42|~2.7.14|~2.8.7",
-        "symfony/config": "~2.2",
-        "symfony/expression-language": "~2.6"
+        "symfony/yaml": "~2.3.42|~2.7.14|~2.8.7|~3.0.7",
+        "symfony/config": "~2.2|~3.0.0",
+        "symfony/expression-language": "~2.6|~3.0.0"
     },
     "conflict": {
         "symfony/expression-language": "<2.6"
@@ -41,7 +41,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

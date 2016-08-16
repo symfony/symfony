@@ -80,6 +80,8 @@ class Application extends BaseApplication
         $this->setDispatcher($container->get('event_dispatcher'));
 
         if (true === $input->hasParameterOption(array('--shell', '-s'))) {
+            @trigger_error('The "--shell" option is deprecated since Symfony 2.8 and will be removed in 3.0.', E_USER_DEPRECATED);
+
             $shell = new Shell($this);
             $shell->setProcessIsolation($input->hasParameterOption(array('--process-isolation')));
             $shell->run();

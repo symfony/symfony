@@ -158,6 +158,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enabled' => false,
                 'fallbacks' => array('en'),
                 'logging' => true,
+                'paths' => array(),
             ),
             'validation' => array(
                 'enabled' => false,
@@ -178,6 +179,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             'property_access' => array(
                 'magic_call' => false,
                 'throw_exception_on_invalid_index' => false,
+            ),
+            'property_info' => array(
+                'enabled' => false,
             ),
             'assets' => array(
                 'version' => null,

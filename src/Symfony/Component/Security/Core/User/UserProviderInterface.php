@@ -43,8 +43,6 @@ interface UserProviderInterface
      *
      * @return UserInterface
      *
-     * @see UsernameNotFoundException
-     *
      * @throws UsernameNotFoundException if the user is not found
      */
     public function loadUserByUsername($username);

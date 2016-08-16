@@ -56,7 +56,7 @@ class ValidatorExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function test2Dot4ValidationApi()
     {
-        $factory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $factory = $this->getMock('Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface');
         $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
         $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')
             ->disableOriginalConstructor()

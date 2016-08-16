@@ -38,6 +38,16 @@ class SerializerPass implements CompilerPassInterface
         $container->getDefinition('serializer')->replaceArgument(1, $encoders);
     }
 
+    /**
+     * Finds all services with the given tag name and order them by their priority.
+     *
+     * @param string           $tagName
+     * @param ContainerBuilder $container
+     *
+     * @return array
+     *
+     * @throws \RuntimeException
+     */
     private function findAndSortTaggedServices($tagName, ContainerBuilder $container)
     {
         $services = $container->findTaggedServiceIds($tagName);
@@ -48,8 +58,8 @@ class SerializerPass implements CompilerPassInterface
 
         $sortedServices = array();
         foreach ($services as $serviceId => $tags) {
-            foreach ($tags as $tag) {
-                $priority = isset($tag['priority']) ? $tag['priority'] : 0;
+            foreach ($tags as $attributes) {
+                $priority = isset($attributes['priority']) ? $attributes['priority'] : 0;
                 $sortedServices[$priority][] = new Reference($serviceId);
             }
         }

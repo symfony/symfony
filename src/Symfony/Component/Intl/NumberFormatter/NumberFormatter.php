@@ -37,6 +37,8 @@ use Symfony\Component\Intl\Locale\Locale;
  *
  * @author Eriksen Costa <eriksen.costa@infranology.com.br>
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class NumberFormatter
 {

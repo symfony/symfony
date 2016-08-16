@@ -256,9 +256,6 @@ TABLE
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testRenderMultiByte()
     {
         $table = new TableHelper();
@@ -282,9 +279,6 @@ TABLE;
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testRenderFullWidthCharacters()
     {
         $table = new TableHelper();

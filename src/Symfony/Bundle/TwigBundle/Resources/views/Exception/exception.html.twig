@@ -37,7 +37,7 @@
 </div>
 
 {% for position, e in exception.toarray %}
-    {% include 'TwigBundle:Exception:traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
+    {% include '@Twig/Exception/traces.html.twig' with { 'exception': e, 'position': position, 'count': previous_count } only %}
 {% endfor %}
 
 {% if logger %}
@@ -63,7 +63,7 @@
         </div>
 
         <div id="logs">
-            {% include 'TwigBundle:Exception:logs.html.twig' with { 'logs': logger.logs } only %}
+            {% include '@Twig/Exception/logs.html.twig' with { 'logs': logger.logs } only %}
         </div>
     </div>
 {% endif %}
@@ -88,7 +88,7 @@
     </div>
 {% endif %}
 
-{% include 'TwigBundle:Exception:traces_text.html.twig' with { 'exception': exception } only %}
+{% include '@Twig/Exception/traces_text.html.twig' with { 'exception': exception } only %}
 
 <script type="text/javascript">//<![CDATA[
     function toggle(id, clazz) {

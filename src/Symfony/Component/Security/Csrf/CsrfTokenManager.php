@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Csrf;
 
-use Symfony\Component\Security\Core\Util\StringUtils;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
@@ -92,6 +91,6 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
             return false;
         }
 
-        return StringUtils::equals($this->storage->getToken($token->getId()), $token->getValue());
+        return hash_equals($this->storage->getToken($token->getId()), $token->getValue());
     }
 }

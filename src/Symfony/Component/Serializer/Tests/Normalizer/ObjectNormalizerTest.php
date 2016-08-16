@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\GroupDummy;
 class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ObjectNormalizerTest
+     * @var ObjectNormalizer
      */
     private $normalizer;
     /**
@@ -237,6 +237,18 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             array(ObjectNormalizer::GROUPS => array('a', 'b'))
         );
         $this->assertEquals($obj, $normalized);
+    }
+
+    public function testNormalizeNoPropertyInGroup()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory);
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new GroupDummy();
+        $obj->setFoo('foo');
+
+        $this->assertEquals(array(), $this->normalizer->normalize($obj, null, array('groups' => array('notExist'))));
     }
 
     public function testGroupsNormalizeWithNameConverter()
@@ -473,6 +485,21 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeStatic()
     {
         $this->assertEquals(array('foo' => 'K'), $this->normalizer->normalize(new ObjectWithStaticPropertiesAndMethods()));
+    }
+
+    public function testNormalizeNotSerializableContext()
+    {
+        $objectDummy = new ObjectDummy();
+        $expected = array(
+            'foo' => null,
+            'baz' => null,
+            'fooBar' => '',
+            'camelCase' => null,
+            'object' => null,
+            'bar' => null,
+        );
+
+        $this->assertEquals($expected, $this->normalizer->normalize($objectDummy, null, array('not_serializable' => function () {})));
     }
 }
 

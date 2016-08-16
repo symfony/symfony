@@ -1,0 +1,64 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider;
+
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+
+/**
+ * LdapFactory creates services for Ldap user provider.
+ *
+ * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Charles Sarrazin <charles@sarraz.in>
+ */
+class LdapFactory implements UserProviderFactoryInterface
+{
+    public function create(ContainerBuilder $container, $id, $config)
+    {
+        $container
+            ->setDefinition($id, new DefinitionDecorator('security.user.provider.ldap'))
+            ->replaceArgument(0, new Reference($config['service']))
+            ->replaceArgument(1, $config['base_dn'])
+            ->replaceArgument(2, $config['search_dn'])
+            ->replaceArgument(3, $config['search_password'])
+            ->replaceArgument(4, $config['default_roles'])
+            ->replaceArgument(5, $config['uid_key'])
+            ->replaceArgument(6, $config['filter'])
+        ;
+    }
+
+    public function getKey()
+    {
+        return 'ldap';
+    }
+
+    public function addConfiguration(NodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->scalarNode('service')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('base_dn')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('search_dn')->end()
+                ->scalarNode('search_password')->end()
+                ->arrayNode('default_roles')
+                    ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
+                    ->requiresAtLeastOneElement()
+                    ->prototype('scalar')->end()
+                ->end()
+                ->scalarNode('uid_key')->defaultValue('sAMAccountName')->end()
+                ->scalarNode('filter')->defaultValue('({uid_key}={username})')->end()
+            ->end()
+        ;
+    }
+}

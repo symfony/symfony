@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Yaml\Tests;
 
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Parser;
 
@@ -442,26 +443,75 @@ EOF;
         $this->assertEquals(array('foo' => null, 'bar' => 1), $this->parser->parse($input), '->parse() does not parse objects');
     }
 
-    public function testObjectForMapEnabledWithMapping()
+    /**
+     * @dataProvider getObjectForMapTests
+     */
+    public function testObjectForMap($yaml, $expected)
     {
+        $this->assertEquals($expected, $this->parser->parse($yaml, false, false, true));
+    }
+
+    public function getObjectForMapTests()
+    {
+        $tests = array();
+
         $yaml = <<<EOF
 foo:
     fiz: [cat]
 EOF;
-        $result = $this->parser->parse($yaml, false, false, true);
+        $expected = new \stdClass();
+        $expected->foo = new \stdClass();
+        $expected->foo->fiz = array('cat');
+        $tests['mapping'] = array($yaml, $expected);
 
-        $this->assertInstanceOf('stdClass', $result);
-        $this->assertInstanceOf('stdClass', $result->foo);
-        $this->assertEquals(array('cat'), $result->foo->fiz);
-    }
+        $yaml = '{ "foo": "bar", "fiz": "cat" }';
+        $expected = new \stdClass();
+        $expected->foo = 'bar';
+        $expected->fiz = 'cat';
+        $tests['inline-mapping'] = array($yaml, $expected);
 
-    public function testObjectForMapEnabledWithInlineMapping()
-    {
-        $result = $this->parser->parse('{ "foo": "bar", "fiz": "cat" }', false, false, true);
+        $yaml = "foo: bar\nbaz: foobar";
+        $expected = new \stdClass();
+        $expected->foo = 'bar';
+        $expected->baz = 'foobar';
+        $tests['object-for-map-is-applied-after-parsing'] = array($yaml, $expected);
 
-        $this->assertInstanceOf('stdClass', $result);
-        $this->assertEquals('bar', $result->foo);
-        $this->assertEquals('cat', $result->fiz);
+        $yaml = <<<EOT
+array:
+  - key: one
+  - key: two
+EOT;
+        $expected = new \stdClass();
+        $expected->array = array();
+        $expected->array[0] = new \stdClass();
+        $expected->array[0]->key = 'one';
+        $expected->array[1] = new \stdClass();
+        $expected->array[1]->key = 'two';
+        $tests['nest-map-and-sequence'] = array($yaml, $expected);
+
+        $yaml = <<<YAML
+map:
+  1: one
+  2: two
+YAML;
+        $expected = new \stdClass();
+        $expected->map = new \stdClass();
+        $expected->map->{1} = 'one';
+        $expected->map->{2} = 'two';
+        $tests['numeric-keys'] = array($yaml, $expected);
+
+        $yaml = <<<YAML
+map:
+  0: one
+  1: two
+YAML;
+        $expected = new \stdClass();
+        $expected->map = new \stdClass();
+        $expected->map->{0} = 'one';
+        $expected->map->{1} = 'two';
+        $tests['zero-indexed-numeric-keys'] = array($yaml, $expected);
+
+        return $tests;
     }
 
     /**
@@ -873,6 +923,33 @@ EOF;
         );
 
         $this->assertEquals($expected, $this->parser->parse($yaml));
+    }
+
+    /**
+     * @group legacy
+     * throw ParseException in Symfony 3.0
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
+    public function testColonInMappingValueException()
+    {
+        $parser = $this->parser;
+
+        ErrorAssert::assertDeprecationsAreTriggered('Using a colon in the unquoted mapping value "bar: baz" in line 1 is deprecated since Symfony 2.8 and will throw a ParseException in 3.0.', function () use ($parser) {
+            $yaml = <<<EOF
+foo: bar: baz
+EOF;
+            $parser->parse($yaml);
+        });
+    }
+
+    public function testColonInMappingValueExceptionNotTriggeredByColonInComment()
+    {
+        $yaml = <<<EOT
+foo:
+    bar: foobar # Note: a comment after a colon
+EOT;
+
+        $this->assertSame(array('foo' => array('bar' => 'foobar')), $this->parser->parse($yaml));
     }
 
     /**

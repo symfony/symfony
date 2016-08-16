@@ -1,12 +1,19 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * deprecated the `key` setting of `anonymous`, `remember_me` and `http_digest`
+   in favor of the `secret` setting.
+ * deprecated the `intention` firewall listener setting in favor of the `csrf_token_id`.
+
 2.6.0
 -----
 
  * Added the possibility to override the default success/failure handler
    to get the provider key and the options injected
- * Deprecated the `security.context` service for the `security.token_storage` and 
+ * Deprecated the `security.context` service for the `security.token_storage` and
    `security.authorization_checker` services.
 
 2.4.0

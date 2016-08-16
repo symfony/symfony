@@ -14,6 +14,7 @@ namespace Symfony\Bundle\TwigBundle\Command;
 use Symfony\Bridge\Twig\Command\DebugCommand as BaseDebugCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
@@ -57,10 +58,11 @@ class DebugCommand extends BaseDebugCommand implements ContainerAwareInterface
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->writeln('<comment>The use of "twig:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:twig" instead.</comment>');
+            $io->caution('The use of "twig:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:twig" instead.');
         }
 
-        parent::execute($input, $output);
+        parent::execute($input, $io);
     }
 }

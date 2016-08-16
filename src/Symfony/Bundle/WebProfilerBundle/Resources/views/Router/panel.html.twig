@@ -1,44 +1,78 @@
-<h2>Routing for "{{ request.pathinfo }}"</h2>
+<h2>Routing</h2>
 
-<ul>
-    <li>
-        <strong>Route:&nbsp;</strong>
-        {% if request.route %}
-            {{ request.route }}
-        {% else %}
-            <em>No matching route</em>
-        {% endif %}
-    </li>
-    <li>
-        <strong>Route parameters:&nbsp;</strong>
-        {% if request.routeParams|length %}
-            {% include '@WebProfiler/Profiler/table.html.twig' with { 'data': request.routeParams, 'class': 'inline' } only %}
-        {% else %}
-            <em>No parameters</em>
-        {% endif %}
-    </li>
-    {% if router.redirect %}
-    <li>
-        <strong>Redirecting to:&nbsp;</strong> "{{ router.targetUrl }}" {% if router.targetRoute %}(route: "{{ router.targetRoute }}"){% endif %}
-    <li>
+<div class="metrics">
+    <div class="metric">
+        <span class="value">{{ request.route ?: '(none)' }}</span>
+        <span class="label">Matched route</span>
+    </div>
+
+    {% if request.route %}
+        <div class="metric">
+            <span class="value">{{ traces|length }}</span>
+            <span class="label">Tested routes before match</span>
+        </div>
     {% endif %}
-    <li>
-        <strong>Route matching logs</strong>
-        <table class="routing inline">
-            <tr>
-                <th>Route name</th>
-                <th>Pattern</th>
-                <th>Log</th>
-            </tr>
-            {% for trace in traces %}
-                <tr class="{{ 1 == trace.level ? 'almost' : 2 == trace.level ? 'matches' : '' }}">
-                    <td>{{ trace.name }}</td>
-                    <td>{{ trace.path }}</td>
-                    <td>{{ trace.log }}</td>
-                </tr>
-            {% endfor %}
-        </table>
-        <em><small>Note: The above matching is based on the configuration for the current router which might differ from
-        the configuration used while routing this request.</small></em>
-    </li>
-</ul>
+</div>
+
+{% if request.route %}
+    <h3>Route Parameters</h3>
+
+    {% if request.routeParams is empty %}
+        <div class="empty">
+            <p>No parameters.</p>
+        </div>
+    {% else %}
+        {{ include('@WebProfiler/Profiler/table.html.twig', { data: request.routeParams, labels: ['Name', 'Value'] }, with_context = false) }}
+    {% endif %}
+{% endif %}
+
+{% if router.redirect %}
+    <h3>Route Redirection</h3>
+
+    <p>This page redirects to:</p>
+    <div class="card break-long-words">
+        {{ router.targetUrl }}
+        {% if router.targetRoute %}<span class="text-muted">(route: "{{ router.targetRoute }}")</span>{% endif %}
+    </div>
+{% endif %}
+
+<h3>Route Matching Logs</h3>
+
+<div class="card">
+    <strong>Path to match:</strong> <code>{{ request.pathinfo }}</code>
+</div>
+
+<table id="router-logs">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Route name</th>
+            <th>Path</th>
+            <th>Log</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for trace in traces %}
+        <tr class="{{ trace.level == 1 ? 'status-warning' : trace.level == 2 ? 'status-success' }}">
+            <td class="font-normal text-muted">{{ loop.index }}</td>
+            <td>{{ trace.name }}</td>
+            <td>{{ trace.path }}</td>
+            <td class="font-normal">
+                {% if trace.level == 1 %}
+                    Path almost matches, but
+                    <span class="newline">{{ trace.log }}</span>
+                {% elseif trace.level == 2 %}
+                    {{ trace.log }}
+                {% else %}
+                    Path does not match
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<p class="help">
+    Note: These matching logs are based on the current router configuration,
+    which might differ from the configuration used when profiling this request.
+</p>

@@ -155,9 +155,6 @@ class LegacyProgressHelperTest extends \PHPUnit_Framework_TestCase
         $progress->advance(1);
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testMultiByteSupport()
     {
         $progress = new ProgressHelper();

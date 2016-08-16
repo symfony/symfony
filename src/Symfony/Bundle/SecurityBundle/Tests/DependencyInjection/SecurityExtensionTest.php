@@ -94,6 +94,30 @@ class SecurityExtensionTest extends \PHPUnit_Framework_TestCase
         $container->compile();
     }
 
+    public function testDisableRoleHierarchyVoter()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', array(
+            'providers' => array(
+                'default' => array('id' => 'foo'),
+            ),
+
+            'role_hierarchy' => null,
+
+            'firewalls' => array(
+                'some_firewall' => array(
+                    'pattern' => '/.*',
+                    'http_basic' => null,
+                ),
+            ),
+        ));
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
+    }
+
     protected function getRawContainer()
     {
         $container = new ContainerBuilder();

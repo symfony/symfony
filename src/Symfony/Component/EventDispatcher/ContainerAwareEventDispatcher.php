@@ -132,6 +132,16 @@ class ContainerAwareEventDispatcher extends EventDispatcher
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getListenerPriority($eventName, $listener)
+    {
+        $this->lazyLoad($eventName);
+
+        return parent::getListenerPriority($eventName, $listener);
+    }
+
+    /**
      * Adds a service as event subscriber.
      *
      * @param string $serviceId The service ID of the subscriber service

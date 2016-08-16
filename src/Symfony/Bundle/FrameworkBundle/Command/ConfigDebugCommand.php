@@ -58,14 +58,16 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
         if (false !== strpos($input->getFirstArgument(), ':d')) {
-            $output->caution('The use of "config:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:config" instead.');
+            $io->caution('The use of "config:debug" command is deprecated since version 2.7 and will be removed in 3.0. Use the "debug:config" instead.');
         }
 
         $name = $input->getArgument('name');
 
         if (empty($name)) {
+            $io->comment('Provide the name of a bundle as the first argument of this command to dump its configuration.');
+            $io->newLine();
             $this->listBundles($output);
 
             return;
@@ -85,12 +87,12 @@ EOF
         $config = $processor->processConfiguration($configuration, $configs);
 
         if ($name === $extension->getAlias()) {
-            $output->writeln(sprintf('# Current configuration for extension with alias: "%s"', $name));
+            $io->title(sprintf('Current configuration for extension with alias "%s"', $name));
         } else {
-            $output->writeln(sprintf('# Current configuration for "%s"', $name));
+            $io->title(sprintf('Current configuration for "%s"', $name));
         }
 
-        $output->writeln(Yaml::dump(array($extension->getAlias() => $config), 10));
+        $io->writeln(Yaml::dump(array($extension->getAlias() => $config), 10));
     }
 
     private function compileContainer()

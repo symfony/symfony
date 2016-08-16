@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Helper;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * The Progress class provides helpers to display progress output.
@@ -241,7 +242,7 @@ class ProgressHelper extends Helper
      * @param int  $step   Number of steps to advance
      * @param bool $redraw Whether to redraw or not
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function advance($step = 1, $redraw = false)
     {
@@ -254,18 +255,18 @@ class ProgressHelper extends Helper
      * @param int  $current The current progress
      * @param bool $redraw  Whether to redraw or not
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function setCurrent($current, $redraw = false)
     {
         if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling setCurrent().');
+            throw new LogicException('You must start the progress bar before calling setCurrent().');
         }
 
         $current = (int) $current;
 
         if ($current < $this->current) {
-            throw new \LogicException('You can\'t regress the progress bar');
+            throw new LogicException('You can\'t regress the progress bar');
         }
 
         if (0 === $this->current) {
@@ -287,12 +288,12 @@ class ProgressHelper extends Helper
      *
      * @param bool $finish Forces the end result
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function display($finish = false)
     {
         if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling display().');
+            throw new LogicException('You must start the progress bar before calling display().');
         }
 
         $message = $this->format;
@@ -320,7 +321,7 @@ class ProgressHelper extends Helper
     public function finish()
     {
         if (null === $this->startTime) {
-            throw new \LogicException('You must start the progress bar before calling finish().');
+            throw new LogicException('You must start the progress bar before calling finish().');
         }
 
         if (null !== $this->startTime) {

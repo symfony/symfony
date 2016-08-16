@@ -26,6 +26,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class ObjectNormalizer extends AbstractNormalizer
 {
+    private $attributesCache = array();
+
     /**
      * @var PropertyAccessorInterface
      */
@@ -53,47 +55,15 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     public function normalize($object, $format = null, array $context = array())
     {
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($context);
+        }
         if ($this->isCircularReference($object, $context)) {
             return $this->handleCircularReference($object);
         }
 
         $data = array();
-        $attributes = $this->getAllowedAttributes($object, $context, true);
-
-        // If not using groups, detect manually
-        if (false === $attributes) {
-            $attributes = array();
-
-            // methods
-            $reflClass = new \ReflectionClass($object);
-            foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-                if (
-                    !$reflMethod->isStatic() &&
-                    !$reflMethod->isConstructor() &&
-                    !$reflMethod->isDestructor() &&
-                    0 === $reflMethod->getNumberOfRequiredParameters()
-                ) {
-                    $name = $reflMethod->getName();
-
-                    if (strpos($name, 'get') === 0 || strpos($name, 'has') === 0) {
-                        // getters and hassers
-                        $attributes[lcfirst(substr($name, 3))] = true;
-                    } elseif (strpos($name, 'is') === 0) {
-                        // issers
-                        $attributes[lcfirst(substr($name, 2))] = true;
-                    }
-                }
-            }
-
-            // properties
-            foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
-                if (!$reflProperty->isStatic()) {
-                    $attributes[$reflProperty->getName()] = true;
-                }
-            }
-
-            $attributes = array_keys($attributes);
-        }
+        $attributes = $this->getAttributes($object, $context);
 
         foreach ($attributes as $attribute) {
             if (in_array($attribute, $this->ignoredAttributes)) {
@@ -137,6 +107,9 @@ class ObjectNormalizer extends AbstractNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        if (!isset($context['cache_key'])) {
+            $context['cache_key'] = $this->getCacheKey($context);
+        }
         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
 
@@ -161,5 +134,96 @@ class ObjectNormalizer extends AbstractNormalizer
         }
 
         return $object;
+    }
+
+    private function getCacheKey(array $context)
+    {
+        try {
+            return md5(serialize($context));
+        } catch (\Exception $exception) {
+            // The context cannot be serialized, skip the cache
+            return false;
+        }
+    }
+
+    /**
+     * Gets and caches attributes for this class and context.
+     *
+     * @param object $object
+     * @param array  $context
+     *
+     * @return string[]
+     */
+    private function getAttributes($object, array $context)
+    {
+        $class = get_class($object);
+        $key = $class.'-'.$context['cache_key'];
+
+        if (isset($this->attributesCache[$key])) {
+            return $this->attributesCache[$key];
+        }
+
+        $allowedAttributes = $this->getAllowedAttributes($object, $context, true);
+
+        if (false !== $allowedAttributes) {
+            if ($context['cache_key']) {
+                $this->attributesCache[$key] = $allowedAttributes;
+            }
+
+            return $allowedAttributes;
+        }
+
+        if (isset($this->attributesCache[$class])) {
+            return $this->attributesCache[$class];
+        }
+
+        return $this->attributesCache[$class] = $this->extractAttributes($object);
+    }
+
+    /**
+     * Extracts attributes for this class and context.
+     *
+     * @param object $object
+     *
+     * @return string[]
+     */
+    private function extractAttributes($object)
+    {
+        // If not using groups, detect manually
+        $attributes = array();
+
+        // methods
+        $reflClass = new \ReflectionClass($object);
+        foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
+            if (
+                $reflMethod->getNumberOfRequiredParameters() !== 0 ||
+                $reflMethod->isStatic() ||
+                $reflMethod->isConstructor() ||
+                $reflMethod->isDestructor()
+            ) {
+                continue;
+            }
+
+            $name = $reflMethod->name;
+
+            if (0 === strpos($name, 'get') || 0 === strpos($name, 'has')) {
+                // getters and hassers
+                $attributes[lcfirst(substr($name, 3))] = true;
+            } elseif (strpos($name, 'is') === 0) {
+                // issers
+                $attributes[lcfirst(substr($name, 2))] = true;
+            }
+        }
+
+        // properties
+        foreach ($reflClass->getProperties(\ReflectionProperty::IS_PUBLIC) as $reflProperty) {
+            if ($reflProperty->isStatic()) {
+                continue;
+            }
+
+            $attributes[$reflProperty->name] = true;
+        }
+
+        return array_keys($attributes);
     }
 }

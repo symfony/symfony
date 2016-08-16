@@ -24,6 +24,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 {
     protected $performDeepMerging = true;
     protected $ignoreExtraKeys = false;
+    protected $removeExtraKeys = true;
     protected $children = array();
     protected $prototype;
     protected $atLeastOne = false;
@@ -284,11 +285,14 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
      * you want to send an entire configuration array through a special
      * tree that processes only part of the array.
      *
+     * @param bool $remove Whether to remove the extra keys
+     *
      * @return ArrayNodeDefinition
      */
-    public function ignoreExtraKeys()
+    public function ignoreExtraKeys($remove = true)
     {
         $this->ignoreExtraKeys = true;
+        $this->removeExtraKeys = $remove;
 
         return $this;
     }
@@ -393,7 +397,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->addEquivalentValue(false, $this->falseEquivalent);
         $node->setPerformDeepMerging($this->performDeepMerging);
         $node->setRequired($this->required);
-        $node->setIgnoreExtraKeys($this->ignoreExtraKeys);
+        $node->setIgnoreExtraKeys($this->ignoreExtraKeys, $this->removeExtraKeys);
         $node->setNormalizeKeys($this->normalizeKeys);
 
         if (null !== $this->normalization) {

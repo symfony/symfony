@@ -217,9 +217,18 @@
 
         <service id="security.authentication.provider.dao" class="%security.authentication.provider.dao.class%" abstract="true" public="false">
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
             <argument /> <!-- Provider-shared Key -->
             <argument type="service" id="security.encoder_factory" />
+            <argument>%security.authentication.hide_user_not_found%</argument>
+        </service>
+
+        <service id="security.authentication.provider.ldap_bind" class="Symfony\Component\Security\Core\Authentication\Provider\LdapBindAuthenticationProvider" public="false" abstract="true">
+            <argument /> <!-- User Provider -->
+            <argument /> <!-- UserChecker -->
+            <argument /> <!-- Provider-shared Key -->
+            <argument /> <!-- LDAP -->
+            <argument /> <!-- Base DN -->
             <argument>%security.authentication.hide_user_not_found%</argument>
         </service>
 
@@ -231,7 +240,7 @@
 
         <service id="security.authentication.provider.pre_authenticated" class="%security.authentication.provider.pre_authenticated.class%" abstract="true" public="false">
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
         </service>
 
         <service id="security.exception_listener" class="%security.exception_listener.class%" public="false" abstract="true">
@@ -251,7 +260,7 @@
             <tag name="monolog.logger" channel="security" />
             <argument type="service" id="security.token_storage" />
             <argument /> <!-- User Provider -->
-            <argument type="service" id="security.user_checker" />
+            <argument /> <!-- User Checker -->
             <argument /> <!--  Provider Key -->
             <argument type="service" id="security.access.decision_manager" />
             <argument type="service" id="logger" on-invalid="null" />

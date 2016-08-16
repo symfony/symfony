@@ -335,6 +335,14 @@ class ChoiceType extends AbstractType
             return $choiceListFactory->createListFromChoices($choices, $options['choice_value']);
         };
 
+        $choicesAsValuesNormalizer = function (Options $options, $choicesAsValues) use ($that) {
+            if (true !== $choicesAsValues) {
+                @trigger_error(sprintf('The value "false" for the "choices_as_values" option of the "%s" form type (%s) is deprecated since version 2.8 and will not be supported anymore in 3.0. Set this option to "true" and flip the contents of the "choices" option instead.', $that->getName(), __CLASS__), E_USER_DEPRECATED);
+            }
+
+            return $choicesAsValues;
+        };
+
         $placeholderNormalizer = function (Options $options, $placeholder) use ($that) {
             if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
                 @trigger_error(sprintf('The form option "empty_value" of the "%s" form type (%s) is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', $that->getName(), __CLASS__), E_USER_DEPRECATED);
@@ -403,6 +411,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('choice_list', $choiceListNormalizer);
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
+        $resolver->setNormalizer('choices_as_values', $choicesAsValuesNormalizer);
 
         $resolver->setAllowedTypes('choice_list', array('null', 'Symfony\Component\Form\ChoiceList\ChoiceListInterface', 'Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface'));
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
@@ -421,6 +430,14 @@ class ChoiceType extends AbstractType
      * {@inheritdoc}
      */
     public function getName()
+    {
+        return $this->getBlockPrefix();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
     {
         return 'choice';
     }
@@ -469,12 +486,12 @@ class ChoiceType extends AbstractType
         );
 
         if ($options['multiple']) {
-            $choiceType = 'checkbox';
+            $choiceType = __NAMESPACE__.'\CheckboxType';
             // The user can check 0 or more checkboxes. If required
             // is true, he is required to check all of them.
             $choiceOpts['required'] = false;
         } else {
-            $choiceType = 'radio';
+            $choiceType = __NAMESPACE__.'\RadioType';
         }
 
         $builder->add($name, $choiceType, $choiceOpts);

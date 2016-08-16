@@ -68,10 +68,12 @@ class ProxyDumper implements DumperInterface
     {
         $instantiation = 'return';
 
-        if (ContainerInterface::SCOPE_CONTAINER === $definition->getScope()) {
+        if ($definition->isShared()) {
             $instantiation .= " \$this->services['$id'] =";
-        } elseif (ContainerInterface::SCOPE_PROTOTYPE !== $scope = $definition->getScope()) {
-            $instantiation .= " \$this->services['$id'] = \$this->scopedServices['$scope']['$id'] =";
+
+            if (defined('Symfony\Component\DependencyInjection\ContainerInterface::SCOPE_CONTAINER') && ContainerInterface::SCOPE_CONTAINER !== $scope = $definition->getScope(false)) {
+                $instantiation .= " \$this->scopedServices['$scope']['$id'] =";
+            }
         }
 
         $methodName = 'get'.Container::camelize($id).'Service';

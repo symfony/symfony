@@ -24,9 +24,19 @@ class CountryTypeTest extends TestCase
         parent::setUp();
     }
 
-    public function testCountriesAreSelectable()
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
     {
         $form = $this->factory->create('country');
+
+        $this->assertSame('country', $form->getConfig()->getType()->getName());
+    }
+
+    public function testCountriesAreSelectable()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 
@@ -40,7 +50,7 @@ class CountryTypeTest extends TestCase
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $form = $this->factory->create('country', 'country');
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType', 'Symfony\Component\Form\Extension\Core\Type\CountryType');
         $view = $form->createView();
         $choices = $view->vars['choices'];
 

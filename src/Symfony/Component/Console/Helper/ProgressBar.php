@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Helper;
 
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Exception\LogicException;
 
 /**
  * The ProgressBar provides helpers to display progress output.
@@ -354,7 +355,7 @@ class ProgressBar
      *
      * @param int $step Number of steps to advance
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function advance($step = 1)
     {
@@ -368,7 +369,7 @@ class ProgressBar
      *
      * @param int $step The current progress
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function setCurrent($step)
     {
@@ -392,13 +393,13 @@ class ProgressBar
      *
      * @param int $step The current progress
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     public function setProgress($step)
     {
         $step = (int) $step;
         if ($step < $this->step) {
-            throw new \LogicException('You can\'t regress the progress bar.');
+            throw new LogicException('You can\'t regress the progress bar.');
         }
 
         if ($this->max && $step > $this->max) {
@@ -577,7 +578,7 @@ class ProgressBar
             },
             'remaining' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
-                    throw new \LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
+                    throw new LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
 
                 if (!$bar->getProgress()) {
@@ -590,7 +591,7 @@ class ProgressBar
             },
             'estimated' => function (ProgressBar $bar) {
                 if (!$bar->getMaxSteps()) {
-                    throw new \LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
+                    throw new LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
 
                 if (!$bar->getProgress()) {

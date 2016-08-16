@@ -17,47 +17,47 @@
 
     <services>
         <service id="data_collector.config" class="%data_collector.config.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/config.html.twig" id="config" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/config.html.twig" id="config" priority="-255" />
             <call method="setKernel"><argument type="service" id="kernel" on-invalid="ignore" /></call>
         </service>
 
         <service id="data_collector.request" class="%data_collector.request.class%">
             <tag name="kernel.event_subscriber" />
-            <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/request.html.twig" id="request" priority="335" />
         </service>
 
-        <service id="data_collector.ajax" class="Symfony\Bundle\FrameworkBundle\DataCollector\AjaxDataCollector" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="255" />
+        <service id="data_collector.ajax" class="Symfony\Component\HttpKernel\DataCollector\AjaxDataCollector" public="false">
+            <tag name="data_collector" template="@WebProfiler/Collector/ajax.html.twig" id="ajax" priority="315" />
         </service>
 
         <service id="data_collector.exception" class="%data_collector.exception.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/exception.html.twig" id="exception" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/exception.html.twig" id="exception" priority="305" />
         </service>
 
         <service id="data_collector.events" class="%data_collector.events.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/events.html.twig" id="events" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/events.html.twig" id="events" priority="290" />
             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.logger" class="%data_collector.logger.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="300" />
             <tag name="monolog.logger" channel="profiler" />
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.time" class="%data_collector.time.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/time.html.twig" id="time" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/time.html.twig" id="time" priority="330" />
             <argument type="service" id="kernel" on-invalid="ignore" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
         </service>
 
         <service id="data_collector.memory" class="%data_collector.memory.class%" public="false">
-            <tag name="data_collector" template="@WebProfiler/Collector/memory.html.twig" id="memory" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/memory.html.twig" id="memory" priority="325" />
         </service>
 
         <service id="data_collector.router" class="%data_collector.router.class%" >
             <tag name="kernel.event_listener" event="kernel.controller" method="onKernelController"/>
-            <tag name="data_collector" template="@WebProfiler/Collector/router.html.twig" id="router" priority="255" />
+            <tag name="data_collector" template="@WebProfiler/Collector/router.html.twig" id="router" priority="285" />
         </service>
     </services>
 </container>

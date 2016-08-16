@@ -34,22 +34,22 @@
             <argument type="collection" />
         </service>
 
+        <service id="kernel.class_cache.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassCacheCacheWarmer">
+            <tag name="kernel.cache_warmer" />
+        </service>
+
         <service id="cache_clearer" class="%cache_clearer.class%">
             <argument type="collection" />
         </service>
 
-        <!--
-            If you want to change the Request class, modify the code in
-            your front controller (app.php) so that it passes an instance of
-            YourRequestClass to the Kernel.
-            This service definition only defines the scope of the request.
-            It is used to check references scope.
+        <service id="request" scope="request" synthetic="true" synchronized="true">
+            <deprecated>The "%service_id%" service is deprecated since Symfony 2.7 and will be removed in 3.0. Use the "request_stack" service instead.</deprecated>
+        </service>
 
-            This service is deprecated, you should use the request_stack service instead.
-        -->
-        <service id="request" scope="request" synthetic="true" synchronized="true" />
-
-        <service id="service_container" synthetic="true" />
+        <service id="service_container" synthetic="true">
+            <autowiring-type>Symfony\Component\DependencyInjection\ContainerInterface</autowiring-type>
+            <autowiring-type>Symfony\Component\DependencyInjection\Container</autowiring-type>
+        </service>
 
         <service id="kernel" synthetic="true" />
 
@@ -63,5 +63,21 @@
         <service id="uri_signer" class="%uri_signer.class%">
             <argument>%kernel.secret%</argument>
         </service>
+
+        <service id="config_cache_factory" class="Symfony\Component\Config\ResourceCheckerConfigCacheFactory">
+            <argument type="collection"></argument>
+        </service>
+
+        <service class="Symfony\Component\Config\Resource\SelfCheckingResourceChecker" public="false">
+            <tag name="config_cache.resource_checker" priority="-990" />
+        </service>
+
+        <!--
+            This service is deprecated and will be removed in 3.0.
+        -->
+        <service class="Symfony\Component\Config\Resource\BCResourceInterfaceChecker" public="false">
+            <tag name="config_cache.resource_checker" priority="-1000" />
+        </service>
+
     </services>
 </container>

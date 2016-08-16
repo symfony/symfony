@@ -179,17 +179,29 @@ class MarkdownDescriptor extends Descriptor
     protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
         $output = '- Class: `'.$definition->getClass().'`'
-            ."\n".'- Scope: `'.$definition->getScope().'`'
+            ."\n".'- Scope: `'.$definition->getScope(false).'`'
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
             ."\n".'- Synthetic: '.($definition->isSynthetic() ? 'yes' : 'no')
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
         ;
+
+        if (method_exists($definition, 'isShared')) {
+            $output .= "\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no');
+        }
 
         if (method_exists($definition, 'isSynchronized')) {
             $output .= "\n".'- Synchronized: '.($definition->isSynchronized(false) ? 'yes' : 'no');
         }
 
         $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
+
+        if (method_exists($definition, 'isAutowired')) {
+            $output .= "\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no');
+
+            foreach ($definition->getAutowiringTypes() as $autowiringType) {
+                $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
+            }
+        }
 
         if ($definition->getFile()) {
             $output .= "\n".'- File: `'.$definition->getFile().'`';
@@ -274,6 +286,7 @@ class MarkdownDescriptor extends Descriptor
             foreach ($registeredListeners as $order => $listener) {
                 $this->write("\n".sprintf('## Listener %d', $order + 1)."\n");
                 $this->describeCallable($listener);
+                $this->write(sprintf('- Priority: `%d`', $eventDispatcher->getListenerPriority($event, $listener))."\n");
             }
         } else {
             ksort($registeredListeners);
@@ -284,6 +297,7 @@ class MarkdownDescriptor extends Descriptor
                 foreach ($eventListeners as $order => $eventListener) {
                     $this->write("\n".sprintf('### Listener %d', $order + 1)."\n");
                     $this->describeCallable($eventListener);
+                    $this->write(sprintf('- Priority: `%d`', $eventDispatcher->getListenerPriority($eventListened, $eventListener))."\n");
                 }
             }
         }

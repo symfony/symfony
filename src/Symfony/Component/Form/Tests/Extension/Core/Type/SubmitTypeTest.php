@@ -18,21 +18,31 @@ use Symfony\Component\Form\Test\TypeTestCase as TestCase;
  */
 class SubmitTypeTest extends TestCase
 {
+    /**
+     * @group legacy
+     */
+    public function testLegacyName()
+    {
+        $form = $this->factory->create('submit');
+
+        $this->assertSame('submit', $form->getConfig()->getType()->getName());
+    }
+
     public function testCreateSubmitButtonInstances()
     {
-        $this->assertInstanceOf('Symfony\Component\Form\SubmitButton', $this->factory->create('submit'));
+        $this->assertInstanceOf('Symfony\Component\Form\SubmitButton', $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType'));
     }
 
     public function testNotClickedByDefault()
     {
-        $button = $this->factory->create('submit');
+        $button = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType');
 
         $this->assertFalse($button->isClicked());
     }
 
     public function testNotClickedIfSubmittedWithNull()
     {
-        $button = $this->factory->create('submit');
+        $button = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType');
         $button->submit(null);
 
         $this->assertFalse($button->isClicked());
@@ -40,7 +50,7 @@ class SubmitTypeTest extends TestCase
 
     public function testClickedIfSubmittedWithEmptyString()
     {
-        $button = $this->factory->create('submit');
+        $button = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType');
         $button->submit('');
 
         $this->assertTrue($button->isClicked());
@@ -48,7 +58,7 @@ class SubmitTypeTest extends TestCase
 
     public function testClickedIfSubmittedWithUnemptyString()
     {
-        $button = $this->factory->create('submit');
+        $button = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\SubmitType');
         $button->submit('foo');
 
         $this->assertTrue($button->isClicked());
@@ -57,9 +67,9 @@ class SubmitTypeTest extends TestCase
     public function testSubmitCanBeAddedToForm()
     {
         $form = $this->factory
-            ->createBuilder('form')
+            ->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType')
             ->getForm();
 
-        $this->assertSame($form, $form->add('send', 'submit'));
+        $this->assertSame($form, $form->add('send', 'Symfony\Component\Form\Extension\Core\Type\SubmitType'));
     }
 }

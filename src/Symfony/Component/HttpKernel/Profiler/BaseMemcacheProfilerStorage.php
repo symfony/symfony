@@ -11,10 +11,15 @@
 
 namespace Symfony\Component\HttpKernel\Profiler;
 
+@trigger_error('The '.__NAMESPACE__.'\BaseMemcacheProfilerStorage class is deprecated since Symfony 2.8 and will be removed in 3.0. Use FileProfilerStorage instead.', E_USER_DEPRECATED);
+
 /**
  * Base Memcache storage for profiling information in a Memcache.
  *
  * @author Andrej Hudec <pulzarraider@gmail.com>
+ *
+ * @deprecated Deprecated since Symfony 2.8, to be removed in Symfony 3.0.
+ *             Use {@link FileProfilerStorage} instead.
  */
 abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 {

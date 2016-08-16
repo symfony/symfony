@@ -13,6 +13,9 @@ namespace Symfony\Component\Finder\Tests\Shell;
 
 use Symfony\Component\Finder\Shell\Command;
 
+/**
+ * @group legacy
+ */
 class CommandTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreate()

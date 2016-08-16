@@ -142,7 +142,6 @@ class Response
         303 => 'See Other',
         304 => 'Not Modified',
         305 => 'Use Proxy',
-        306 => 'Reserved',
         307 => 'Temporary Redirect',
         308 => 'Permanent Redirect',    // RFC7238
         400 => 'Bad Request',
@@ -158,10 +157,10 @@ class Response
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Request Entity Too Large',
-        414 => 'Request-URI Too Long',
+        413 => 'Payload Too Large',
+        414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
-        416 => 'Requested Range Not Satisfiable',
+        416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
         418 => 'I\'m a teapot',                                               // RFC2324
         421 => 'Misdirected Request',                                         // RFC7540
@@ -202,9 +201,6 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-        if (!$this->headers->has('Date')) {
-            $this->setDate(\DateTime::createFromFormat('U', time(), new \DateTimeZone('UTC')));
-        }
     }
 
     /**
@@ -333,10 +329,14 @@ class Response
             return $this;
         }
 
+        if (!$this->headers->has('Date')) {
+            $this->setDate(\DateTime::createFromFormat('U', time()));
+        }
+
         // headers
         foreach ($this->headers->allPreserveCase() as $name => $values) {
             foreach ($values as $value) {
-                header($name.': '.$value, false);
+                header($name.': '.$value, false, $this->statusCode);
             }
         }
 
@@ -612,7 +612,11 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date', new \DateTime());
+        if (!$this->headers->has('Date')) {
+            $this->setDate(\DateTime::createFromFormat('U', time()));
+        }
+
+        return $this->headers->getDate('Date');
     }
 
     /**

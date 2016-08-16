@@ -76,6 +76,13 @@ class YamlDumperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testDumpAutowireData()
+    {
+        $container = include self::$fixturesPath.'/containers/container24.php';
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsFile(self::$fixturesPath.'/yaml/services24.yml', $dumper->dump());
+    }
+
     private function assertEqualYamlStructure($yaml, $expected, $message = '')
     {
         $this->assertEquals(Yaml::parse($expected), Yaml::parse($yaml), $message);

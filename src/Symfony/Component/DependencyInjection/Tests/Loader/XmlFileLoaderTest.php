@@ -236,6 +236,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($services['factory_service']->getClass());
         $this->assertEquals('baz_factory', $services['factory_service']->getFactoryService());
         $this->assertEquals('getInstance', $services['factory_service']->getFactoryMethod());
+        $this->assertEquals('container', $services['scope.container']->getScope());
+        $this->assertEquals('custom', $services['scope.custom']->getScope());
+        $this->assertEquals('prototype', $services['scope.prototype']->getScope());
         $this->assertTrue($services['request']->isSynthetic(), '->load() parses the synthetic flag');
         $this->assertTrue($services['request']->isSynchronized(), '->load() parses the synchronized flag');
         $this->assertTrue($services['request']->isLazy(), '->load() parses the lazy flag');
@@ -249,11 +252,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services6.xml');
         $services = $container->getDefinitions();
         $this->assertTrue(isset($services['foo']), '->load() parses <service> elements');
+        $this->assertFalse($services['not_shared']->isShared(), '->load() parses shared flag');
         $this->assertInstanceOf('Symfony\\Component\\DependencyInjection\\Definition', $services['foo'], '->load() converts <service> element to Definition instances');
         $this->assertEquals('FooClass', $services['foo']->getClass(), '->load() parses the class attribute');
-        $this->assertEquals('container', $services['scope.container']->getScope());
-        $this->assertEquals('custom', $services['scope.custom']->getScope());
-        $this->assertEquals('prototype', $services['scope.prototype']->getScope());
         $this->assertEquals('%path%/foo.php', $services['file']->getFile(), '->load() parses the file tag');
         $this->assertEquals(array('foo', new Reference('foo'), array(true, false)), $services['arguments']->getArguments(), '->load() parses the argument tags');
         $this->assertEquals('sc_configure', $services['configurator1']->getConfigurator(), '->load() parses the configurator tag');
@@ -273,8 +274,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
         $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
 
-        $this->assertEquals(array('decorated', null), $services['decorator_service']->getDecoratedService());
-        $this->assertEquals(array('decorated', 'decorated.pif-pouf'), $services['decorator_service_with_name']->getDecoratedService());
+        $this->assertEquals(array('decorated', null, 0), $services['decorator_service']->getDecoratedService());
+        $this->assertEquals(array('decorated', 'decorated.pif-pouf', 0), $services['decorator_service_with_name']->getDecoratedService());
+        $this->assertEquals(array('decorated', 'decorated.pif-pouf', 5), $services['decorator_service_with_name_and_priority']->getDecoratedService());
     }
 
     public function testParsesTags()
@@ -319,6 +321,21 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('tag_with_empty_name.xml');
+    }
+
+    public function testDeprecated()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_deprecated.xml');
+
+        $this->assertTrue($container->getDefinition('foo')->isDeprecated());
+        $message = 'The "foo" service is deprecated. You should stop using it, as it will soon be removed.';
+        $this->assertSame($message, $container->getDefinition('foo')->getDeprecationMessage('foo'));
+
+        $this->assertTrue($container->getDefinition('bar')->isDeprecated());
+        $message = 'The "bar" service is deprecated.';
+        $this->assertSame($message, $container->getDefinition('bar')->getDeprecationMessage('bar'));
     }
 
     public function testConvertDomElementToArray()
@@ -541,5 +558,23 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $barConfigurator[0]);
         $this->assertSame('Baz', $barConfigurator[0]->getClass());
         $this->assertSame('configureBar', $barConfigurator[1]);
+    }
+
+    public function testType()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services22.xml');
+
+        $this->assertEquals(array('Bar', 'Baz'), $container->getDefinition('foo')->getAutowiringTypes());
+    }
+
+    public function testAutowire()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services23.xml');
+
+        $this->assertTrue($container->getDefinition('bar')->isAutowired());
     }
 }

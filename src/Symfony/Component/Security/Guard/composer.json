@@ -1,0 +1,38 @@
+{
+    "name": "symfony/security-guard",
+    "type": "library",
+    "description": "Symfony Security Component - Guard",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.9",
+        "symfony/security-core": "~2.8|~3.0.0",
+        "symfony/security-http": "~2.7|~3.0.0"
+    },
+    "require-dev": {
+        "psr/log": "~1.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Security\\Guard\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.8-dev"
+        }
+    }
+}

@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * Deprecated usage of a colon in an unquoted mapping value
+ * Deprecated usage of @, \`, | and > at the beginning of an unquoted string
+ * When surrounding strings with double-quotes, you must now escape `\` characters. Not
+   escaping those characters (when surrounded by double-quotes) is deprecated.
+
+   Before:
+
+   ```yml
+   class: "Foo\Var"
+   ```
+
+   After:
+
+   ```yml
+   class: "Foo\\Var"
+   ```
+
 2.1.0
 -----
 

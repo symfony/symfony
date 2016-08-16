@@ -330,6 +330,9 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      */
     public function setCharset($charset)
     {
+        if ('UTF8' === $charset = strtoupper($charset)) {
+            $charset = 'UTF-8'; // iconv on Windows requires "UTF-8" instead of "UTF8"
+        }
         $this->charset = $charset;
 
         foreach ($this->helpers as $helper) {
@@ -448,7 +451,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                  */
                 function ($value) use ($that) {
                     if ('UTF-8' != $that->getCharset()) {
-                        $value = $that->convertEncoding($value, 'UTF-8', $that->getCharset());
+                        $value = iconv($that->getCharset(), 'UTF-8', $value);
                     }
 
                     $callback = function ($matches) use ($that) {
@@ -460,7 +463,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                         }
 
                         // \uHHHH
-                        $char = $that->convertEncoding($char, 'UTF-16BE', 'UTF-8');
+                        $char = iconv('UTF-8', 'UTF-16BE', $char);
 
                         return '\\u'.substr('0000'.bin2hex($char), -4);
                     };
@@ -470,7 +473,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
                     }
 
                     if ('UTF-8' != $that->getCharset()) {
-                        $value = $that->convertEncoding($value, $that->getCharset(), 'UTF-8');
+                        $value = iconv('UTF-8', $that->getCharset(), $value);
                     }
 
                     return $value;
@@ -489,17 +492,13 @@ class PhpEngine implements EngineInterface, \ArrayAccess
      *
      * @return string The string with the new encoding
      *
-     * @throws \RuntimeException if no suitable encoding function is found (iconv or mbstring)
+     * @deprecated since 2.8, to be removed in 3.0. Use iconv() instead.
      */
     public function convertEncoding($string, $to, $from)
     {
-        if (function_exists('mb_convert_encoding')) {
-            return mb_convert_encoding($string, $to, $from);
-        } elseif (function_exists('iconv')) {
-            return iconv($from, $to, $string);
-        }
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 2.8 and will be removed in 3.0. Use iconv() instead.', E_USER_DEPRECATED);
 
-        throw new \RuntimeException('No suitable convert encoding function (use UTF-8 as your encoding or install the iconv or mbstring extension).');
+        return iconv($from, $to, $string);
     }
 
     /**

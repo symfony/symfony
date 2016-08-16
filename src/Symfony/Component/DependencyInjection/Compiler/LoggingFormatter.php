@@ -20,7 +20,7 @@ class LoggingFormatter
 {
     public function formatRemoveService(CompilerPassInterface $pass, $id, $reason)
     {
-        return $this->format($pass, sprintf('Removed service "%s"; reason: %s', $id, $reason));
+        return $this->format($pass, sprintf('Removed service "%s"; reason: %s.', $id, $reason));
     }
 
     public function formatInlineService(CompilerPassInterface $pass, $id, $target)

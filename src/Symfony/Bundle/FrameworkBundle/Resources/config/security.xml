@@ -10,6 +10,8 @@
 
     <services>
         <!-- Pseudorandom Number Generator -->
-        <service id="security.secure_random" class="Symfony\Component\Security\Core\Util\SecureRandom" />
+        <service id="security.secure_random" class="Symfony\Component\Security\Core\Util\SecureRandom">
+            <deprecated>The "%service_id%" service is deprecated since Symfony 2.8 and will be removed in 3.0. Use the random_bytes() function instead.</deprecated>
+        </service>
     </services>
 </container>

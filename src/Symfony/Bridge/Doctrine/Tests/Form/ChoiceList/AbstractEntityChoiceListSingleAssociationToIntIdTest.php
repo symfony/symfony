@@ -15,6 +15,10 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleAssociationToIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityChoiceList;
 
+if (!class_exists('Symfony\Component\Form\Tests\Extension\Core\ChoiceList\AbstractChoiceListTest')) {
+    return;
+}
+
 /**
  * Test choices generated from an entity with a primary foreign key.
  *

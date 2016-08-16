@@ -52,7 +52,7 @@ class HtmlDumperTest extends \PHPUnit_Framework_TestCase
             $closure54 = <<<EOTXT
 
     <span class=sf-dump-meta>class</span>: "<span class=sf-dump-str title="48 characters">Symfony\Component\VarDumper\Tests\HtmlDumperTest</span>"
-    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {{$r} &#8230;}
+    <span class=sf-dump-meta>this</span>: <abbr title="Symfony\Component\VarDumper\Tests\HtmlDumperTest" class=sf-dump-note>HtmlDumperTest</abbr> {{$r} &%s;}
 EOTXT;
         }
 
@@ -68,8 +68,8 @@ EOTXT;
   <span class=sf-dump-key>4</span> => <span class=sf-dump-num>INF</span>
   <span class=sf-dump-key>5</span> => <span class=sf-dump-num>-INF</span>
   <span class=sf-dump-key>6</span> => <span class=sf-dump-num>{$intMax}</span>
-  "<span class=sf-dump-key>str</span>" => "<span class=sf-dump-str title="5 characters">d&#233;j&#224;</span>\\n"
-  <span class=sf-dump-key>7</span> => b"<span class=sf-dump-str title="2 binary or non-UTF-8 characters">&#233;</span>\\x00"
+  "<span class=sf-dump-key>str</span>" => "<span class=sf-dump-str title="5 characters">d&%s;j&%s;</span>\\n"
+  <span class=sf-dump-key>7</span> => b"<span class=sf-dump-str title="2 binary or non-UTF-8 characters">&%s;</span>\\x00"
   "<span class=sf-dump-key>[]</span>" => []
   "<span class=sf-dump-key>res</span>" => <span class=sf-dump-note>stream resource</span> <a class=sf-dump-ref>@{$res}</a><samp>
 %A  <span class=sf-dump-meta>wrapper_type</span>: "<span class=sf-dump-str title="9 characters">plainfile</span>"
@@ -84,13 +84,13 @@ EOTXT;
     +"<span class=sf-dump-public title="Runtime added dynamic property">bar</span>": "<span class=sf-dump-str title="3 characters">bar</span>"
   </samp>}
   "<span class=sf-dump-key>closure</span>" => <span class=sf-dump-note>Closure</span> {{$r}<samp>{$closure54}
-    <span class=sf-dump-meta>parameters</span>: <span class=sf-dump-note>array:2</span> [<samp>
-      "<span class=sf-dump-key>\$a</span>" => []
-      "<span class=sf-dump-key>&amp;\$b</span>" => <span class=sf-dump-note>array:2</span> [<samp>
-        "<span class=sf-dump-key>typeHint</span>" => "<span class=sf-dump-str title="3 characters">PDO</span>"
-        "<span class=sf-dump-key>default</span>" => <span class=sf-dump-const>null</span>
-      </samp>]
-    </samp>]
+    <span class=sf-dump-meta>parameters</span>: {<samp>
+      <span class=sf-dump-meta>\$a</span>: {}
+      <span class=sf-dump-meta>&amp;\$b</span>: {<samp>
+        <span class=sf-dump-meta>typeHint</span>: "<span class=sf-dump-str title="3 characters">PDO</span>"
+        <span class=sf-dump-meta>default</span>: <span class=sf-dump-const>null</span>
+      </samp>}
+    </samp>}
     <span class=sf-dump-meta>file</span>: "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"
     <span class=sf-dump-meta>line</span>: "<span class=sf-dump-str title="%d characters">{$var['line']} to {$var['line']}</span>"
   </samp>}
@@ -106,7 +106,7 @@ EOTXT;
   "<span class=sf-dump-key>snobj</span>" => <a class=sf-dump-ref href=#{$dumpId}-ref03 title="2 occurrences">&amp;3</a> {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   "<span class=sf-dump-key>snobj2</span>" => {<a class=sf-dump-ref href=#{$dumpId}-ref2%d title="3 occurrences">#%d</a>}
   "<span class=sf-dump-key>file</span>" => "<span class=sf-dump-str title="%d characters">{$var['file']}</span>"
-  b"<span class=sf-dump-key>bin-key-&#233;</span>" => ""
+  b"<span class=sf-dump-key>bin-key-&%s;</span>" => ""
 </samp>]
 </bar>
 
@@ -117,9 +117,6 @@ EOTXT
         );
     }
 
-    /**
-     * @requires extension mbstring
-     */
     public function testCharset()
     {
         $var = mb_convert_encoding('Словарь', 'CP1251', 'UTF-8');

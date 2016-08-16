@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * added the BIC (SWIFT-Code) validator
+
 2.7.0
 -----
 

@@ -36,10 +36,36 @@ class LocaleListener implements EventSubscriberInterface
     private $requestStack;
 
     /**
+     * Constructor.
+     *
      * RequestStack will become required in 3.0.
+     *
+     * @param RequestStack                      $requestStack  A RequestStack instance
+     * @param string                            $defaultLocale The default locale
+     * @param RequestContextAwareInterface|null $router        The router
+     *
+     * @throws \InvalidArgumentException
      */
-    public function __construct($defaultLocale = 'en', RequestContextAwareInterface $router = null, RequestStack $requestStack = null)
+    public function __construct($requestStack = null, $defaultLocale = 'en', $router = null)
     {
+        if ((null !== $requestStack && !$requestStack instanceof RequestStack) || $defaultLocale instanceof RequestContextAwareInterface || $router instanceof RequestStack) {
+            $tmp = $router;
+            $router = func_num_args() < 2 ? null : $defaultLocale;
+            $defaultLocale = $requestStack;
+            $requestStack = func_num_args() < 3 ? null : $tmp;
+
+            @trigger_error('The '.__METHOD__.' method now requires a RequestStack to be given as first argument as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
+        } elseif (!$requestStack instanceof RequestStack) {
+            @trigger_error('The '.__METHOD__.' method now requires a RequestStack instance as '.__CLASS__.'::setRequest method will not be supported anymore in 3.0.', E_USER_DEPRECATED);
+        }
+
+        if (null !== $requestStack && !$requestStack instanceof RequestStack) {
+            throw new \InvalidArgumentException('RequestStack instance expected.');
+        }
+        if (null !== $router && !$router instanceof RequestContextAwareInterface) {
+            throw new \InvalidArgumentException('Router must implement RequestContextAwareInterface.');
+        }
+
         $this->defaultLocale = $defaultLocale;
         $this->requestStack = $requestStack;
         $this->router = $router;

@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+2.8.0
+-----
+
+ * allowed specifying a directory to recursively load all routing configuration files it contains
+ * Added ObjectRouteLoader and ServiceRouteLoader that allow routes to be loaded
+   by calling a method on an object/service.
+ * [DEPRECATION] Deprecated the hardcoded value for the `$referenceType` argument of the `UrlGeneratorInterface::generate` method.
+   Use the constants defined in the `UrlGeneratorInterface` instead.
+
+   Before:
+
+   ```php
+   $router->generate('blog_show', array('slug' => 'my-blog-post'), true);
+   ```
+
+   After:
+
+   ```php
+   use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+   $router->generate('blog_show', array('slug' => 'my-blog-post'), UrlGeneratorInterface::ABSOLUTE_URL);
+   ```
+
 2.5.0
 -----
 

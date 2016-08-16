@@ -18,7 +18,7 @@ namespace Symfony\Component\Config\Resource;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FileResource implements ResourceInterface, \Serializable
+class FileResource implements SelfCheckingResourceInterface, \Serializable
 {
     /**
      * @var string|false

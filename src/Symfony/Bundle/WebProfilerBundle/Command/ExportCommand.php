@@ -20,6 +20,8 @@ use Symfony\Component\HttpKernel\Profiler\Profiler;
 /**
  * Exports a profile.
  *
+ * @deprecated since version 2.8, to be removed in 3.0.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class ExportCommand extends Command
@@ -49,7 +51,7 @@ class ExportCommand extends Command
     {
         $this
             ->setName('profiler:export')
-            ->setDescription('Exports a profile')
+            ->setDescription('[DEPRECATED] Exports a profile')
             ->setDefinition(array(
                 new InputArgument('token', InputArgument::REQUIRED, 'The profile token'),
             ))
@@ -64,6 +66,10 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $formatter = $this->getHelper('formatter');
+
+        $output->writeln($formatter->formatSection('warning', 'The profiler:export command is deprecated since version 2.8 and will be removed in 3.0', 'comment'));
+
         $token = $input->getArgument('token');
 
         if (!$profile = $this->profiler->loadProfile($token)) {

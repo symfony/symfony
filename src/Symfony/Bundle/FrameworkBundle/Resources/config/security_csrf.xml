@@ -11,9 +11,7 @@
     </parameters>
 
     <services>
-        <service id="security.csrf.token_generator" class="%security.csrf.token_generator.class%" public="false">
-            <argument type="service" id="security.secure_random" />
-        </service>
+        <service id="security.csrf.token_generator" class="%security.csrf.token_generator.class%" public="false" />
 
         <service id="security.csrf.token_storage" class="%security.csrf.token_storage.class%" public="false">
             <argument type="service" id="session" />

@@ -6,6 +6,7 @@
             "public": false,
             "synthetic": true,
             "lazy": false,
+            "shared": true,
             "synchronized": false,
             "abstract": false,
             "file": "\/path\/to\/file",
@@ -31,7 +32,9 @@
 
                     ]
                 }
-            ]
+            ],
+            "autowire": false,
+            "autowiring_types": []
         }
     },
     "aliases": [

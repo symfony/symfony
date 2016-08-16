@@ -35,6 +35,11 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         return new GreaterThan($options);
     }
 
+    protected function getErrorCode()
+    {
+        return GreaterThan::TOO_LOW_ERROR;
+    }
+
     /**
      * {@inheritdoc}
      */

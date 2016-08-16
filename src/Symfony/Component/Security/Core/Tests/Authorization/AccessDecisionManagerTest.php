@@ -16,6 +16,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testSupportsClass()
     {
         $manager = new AccessDecisionManager(array(
@@ -31,6 +34,9 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($manager->supportsClass('FooClass'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testSupportsAttribute()
     {
         $manager = new AccessDecisionManager(array(
@@ -44,14 +50,6 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
             $this->getVoterSupportsAttribute(false),
         ));
         $this->assertFalse($manager->supportsAttribute('foo'));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testSetVotersEmpty()
-    {
-        $manager = new AccessDecisionManager(array());
     }
 
     /**

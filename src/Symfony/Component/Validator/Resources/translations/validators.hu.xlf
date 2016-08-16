@@ -310,6 +310,10 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Ez az érték nem az elvárt {{ charset }} karakterkódolást használja.</target>
             </trans-unit>
+            <trans-unit id="81">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>Érvénytelen nemzetközi bankazonosító kód (BIC/SWIFT).</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

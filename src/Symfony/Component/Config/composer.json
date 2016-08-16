@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "symfony/filesystem": "~2.3"
+        "symfony/filesystem": "~2.3|~3.0.0"
     },
     "suggest": {
         "symfony/yaml": "To use the yaml reference dumper"
@@ -31,7 +31,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "2.8-dev"
         }
     }
 }

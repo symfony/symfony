@@ -15,6 +15,8 @@ namespace Symfony\Component\DependencyInjection;
  * A simple implementation of ContainerAwareInterface.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since version 2.8, to be removed in 3.0. Use the ContainerAwareTrait instead.
  */
 abstract class ContainerAware implements ContainerAwareInterface
 {

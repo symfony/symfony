@@ -40,6 +40,6 @@ class RepeatedTypeValidatorExtension extends AbstractTypeExtension
      */
     public function getExtendedType()
     {
-        return 'repeated';
+        return 'Symfony\Component\Form\Extension\Core\Type\RepeatedType';
     }
 }

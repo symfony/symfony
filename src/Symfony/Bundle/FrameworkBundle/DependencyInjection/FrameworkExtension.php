@@ -135,6 +135,10 @@ class FrameworkExtension extends Extension
             $this->registerSerializerConfiguration($config['serializer'], $container, $loader);
         }
 
+        if (isset($config['property_info'])) {
+            $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
+        }
+
         $loader->load('debug_prod.xml');
         $definition = $container->findDefinition('debug.debug_handlers_listener');
 
@@ -402,7 +406,7 @@ class FrameworkExtension extends Extension
         // session storage
         $container->setAlias('session.storage', $config['storage_id']);
         $options = array();
-        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
+        foreach (array('name', 'cookie_lifetime', 'cookie_path', 'cookie_domain', 'cookie_secure', 'cookie_httponly', 'use_cookies', 'gc_maxlifetime', 'gc_probability', 'gc_divisor') as $key) {
             if (isset($config[$key])) {
                 $options[$key] = $config[$key];
             }
@@ -701,6 +705,15 @@ class FrameworkExtension extends Extension
                 $dirs[] = $dir;
             }
         }
+
+        foreach ($config['paths'] as $dir) {
+            if (is_dir($dir)) {
+                $dirs[] = $dir;
+            } else {
+                throw new \UnexpectedValueException(sprintf('%s defined in translator.paths does not exist or is not a directory', $dir));
+            }
+        }
+
         if (is_dir($dir = $rootDir.'/Resources/translations')) {
             $dirs[] = $dir;
         }
@@ -839,22 +852,29 @@ class FrameworkExtension extends Extension
     {
         $loader->load('annotations.xml');
 
-        if ('file' === $config['cache']) {
-            $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
-            if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
-                throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+        if ('none' !== $config['cache']) {
+            if ('file' === $config['cache']) {
+                $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
+                if (!is_dir($cacheDir) && false === @mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
+                    throw new \RuntimeException(sprintf('Could not create cache directory "%s".', $cacheDir));
+                }
+
+                $container
+                    ->getDefinition('annotations.filesystem_cache')
+                    ->replaceArgument(0, $cacheDir)
+                ;
+
+                // The annotations.file_cache_reader service is deprecated
+                $container
+                    ->getDefinition('annotations.file_cache_reader')
+                    ->replaceArgument(1, $cacheDir)
+                    ->replaceArgument(2, $config['debug'])
+                ;
             }
 
             $container
-                ->getDefinition('annotations.file_cache_reader')
-                ->replaceArgument(1, $cacheDir)
-                ->replaceArgument(2, $config['debug'])
-            ;
-            $container->setAlias('annotation_reader', 'annotations.file_cache_reader');
-        } elseif ('none' !== $config['cache']) {
-            $container
                 ->getDefinition('annotations.cached_reader')
-                ->replaceArgument(1, new Reference($config['cache']))
+                ->replaceArgument(1, new Reference('file' !== $config['cache'] ? $config['cache'] : 'annotations.filesystem_cache'))
                 ->replaceArgument(2, $config['debug'])
             ;
             $container->setAlias('annotation_reader', 'annotations.cached_reader');
@@ -970,6 +990,32 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
+        }
+
+        if (isset($config['name_converter']) && $config['name_converter']) {
+            $container->getDefinition('serializer.normalizer.object')->replaceArgument(1, new Reference($config['name_converter']));
+        }
+    }
+
+    /**
+     * Loads property info configuration.
+     *
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param XmlFileLoader    $loader
+     */
+    private function registerPropertyInfoConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        if (!$config['enabled']) {
+            return;
+        }
+
+        $loader->load('property_info.xml');
+
+        if (class_exists('phpDocumentor\Reflection\ClassReflector')) {
+            $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
+            $definition->addTag('property_info.description_extractor', array('priority' => -1000));
+            $definition->addTag('property_info.type_extractor', array('priority' => -1001));
         }
     }
 

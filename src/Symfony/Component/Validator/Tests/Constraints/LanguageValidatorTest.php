@@ -82,6 +82,7 @@ class LanguageValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$language.'"')
+            ->setCode(Language::NO_SUCH_LANGUAGE_ERROR)
             ->assertRaised();
     }
 

@@ -64,7 +64,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
             } elseif ('b:0;' === $value = $this->values[$key]) {
                 $value = false;
             } elseif (false === $value = unserialize($value)) {
-                $value = null;
+                $this->values[$key] = $value = null;
                 $isHit = false;
             }
         } catch (\Exception $e) {
@@ -210,7 +210,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
                 } elseif ('b:0;' === $value = $this->values[$key]) {
                     $value = false;
                 } elseif (false === $value = unserialize($value)) {
-                    $value = null;
+                    $this->values[$key] = $value = null;
                     $isHit = false;
                 }
             } catch (\Exception $e) {

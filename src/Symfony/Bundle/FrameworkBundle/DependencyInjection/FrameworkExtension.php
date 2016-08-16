@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * FrameworkExtension.
@@ -978,7 +979,7 @@ class FrameworkExtension extends Extension
             $definition->addTag('serializer.normalizer', array('priority' => -900));
         }
 
-        if (class_exists(YamlEncoder::class)) {
+        if (class_exists(YamlEncoder::class) && defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
             $definition = $container->register('serializer.encoder.yaml', YamlEncoder::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.encoder');

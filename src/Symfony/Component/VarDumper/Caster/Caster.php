@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Symfony\Component\VarDumper\Cloner\Stub;
+
 /**
  * Helper for filtering out properties in casters.
  *
@@ -49,6 +51,9 @@ class Caster
             $a = array();
         } else {
             $a = (array) $obj;
+        }
+        if ($obj instanceof \__PHP_Incomplete_Class) {
+            return $a;
         }
 
         if ($a) {
@@ -116,6 +121,14 @@ class Caster
                 ++$count;
             }
         }
+
+        return $a;
+    }
+
+    public static function castPhpIncompleteClass(\__PHP_Incomplete_Class $c, array $a, Stub $stub, $isNested)
+    {
+        $stub->class .= '('.$a['__PHP_Incomplete_Class_Name'].')';
+        unset($a['__PHP_Incomplete_Class_Name']);
 
         return $a;
     }

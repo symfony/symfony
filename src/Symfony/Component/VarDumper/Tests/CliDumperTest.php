@@ -461,6 +461,21 @@ EOTXT
         );
     }
 
+    public function testIncompleteClass()
+    {
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', null);
+        $var = unserialize('O:8:"Foo\Buzz":0:{}');
+        ini_set('unserialize_callback_func', $unserializeCallbackHandler);
+
+        $this->assertDumpMatchesFormat(
+            <<<EOTXT
+__PHP_Incomplete_Class(Foo\Buzz) {}
+EOTXT
+            ,
+            $var
+        );
+    }
+
     private function getSpecialVars()
     {
         foreach (array_keys($GLOBALS) as $var) {

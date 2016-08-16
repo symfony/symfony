@@ -386,7 +386,7 @@ class AutowirePass implements CompilerPassInterface
         $setters = array();
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             $name = $reflectionMethod->getName();
-            if (isset($methodsCalled[$name]) || $reflectionMethod->isStatic() || 1 !== $reflectionMethod->getNumberOfParameters() || 0 !== strpos($name, 'set')) {
+            if ($reflectionMethod->isStatic() || 1 !== $reflectionMethod->getNumberOfParameters() || 0 !== strpos($name, 'set')) {
                 continue;
             }
 

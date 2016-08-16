@@ -556,6 +556,15 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->getDefinition('bar')->isAutowired());
     }
 
+    public function testAutowireSetters()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services25.xml');
+
+        $this->assertTrue($container->getDefinition('bar')->hasAutowiredSetters());
+    }
+
     /**
      * @group legacy
      * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered

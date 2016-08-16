@@ -28,7 +28,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     private $parser;
     private $defaultContext = array('yaml_inline' => 0, 'yaml_indent' => 0, 'yaml_flags' => 0);
 
-    public function __construct(Dumper $dumper = null, Parser $parser = null, $defaultContext = array())
+    public function __construct(Dumper $dumper = null, Parser $parser = null, array $defaultContext = array())
     {
         $this->dumper = $dumper ?: new Dumper();
         $this->parser = $parser ?: new Parser();

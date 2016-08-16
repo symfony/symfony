@@ -137,7 +137,7 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             return $this->rewindable;
         }
 
-        if (empty($this->getPath())) {
+        if ($this->getPath() === '') {
             return $this->rewindable = false;
         }
 

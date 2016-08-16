@@ -83,9 +83,10 @@ class GraphvizDumper implements DumperInterface
     {
         $transitions = array();
 
-        foreach ($definition->getTransitions() as $name => $transition) {
-            $transitions[$name] = array(
+        foreach ($definition->getTransitions() as $transition) {
+            $transitions[] = array(
                 'attributes' => array('shape' => 'box', 'regular' => true),
+                'name' => $transition->getName(),
             );
         }
 
@@ -111,10 +112,10 @@ class GraphvizDumper implements DumperInterface
     {
         $code = '';
 
-        foreach ($transitions as $id => $place) {
+        foreach ($transitions as $place) {
             $code .= sprintf("  transition_%s [label=\"%s\", shape=box%s];\n",
-                $this->dotize($id),
-                $id,
+                $this->dotize($place['name']),
+                $place['name'],
                 $this->addAttributes($place['attributes'])
             );
         }

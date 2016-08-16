@@ -11,6 +11,12 @@
             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
             <argument /> <!-- name -->
         </service>
+        <service id="state_machine.abstract" class="Symfony\Component\Workflow\StateMachine" abstract="true">
+            <argument /> <!-- workflow definition -->
+            <argument /> <!-- marking store -->
+            <argument type="service" id="event_dispatcher" on-invalid="ignore" />
+            <argument /> <!-- name -->
+        </service>
 
         <service id="workflow.marking_store.property_accessor" class="Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore" abstract="true" />
         <service id="workflow.marking_store.scalar" class="Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore" abstract="true" />

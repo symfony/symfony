@@ -8,32 +8,11 @@ use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore;
-use Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
 class WorkflowTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage The marking store (Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore) of workflow "unnamed" can not store many places. But the transition "t1" has too many output (2). Only one is accepted.
-     */
-    public function testConstructorWithUniqueTransitionOutputInterfaceAndComplexWorkflow()
-    {
-        $definition = $this->createComplexWorkflow();
-
-        new Workflow($definition, new ScalarMarkingStore());
-    }
-
-    public function testConstructorWithUniqueTransitionOutputInterfaceAndSimpleWorkflow()
-    {
-        $places = array('a', 'b');
-        $transition = new Transition('t1', 'a', 'b');
-        $definition = new Definition($places, array($transition));
-
-        new Workflow($definition, new ScalarMarkingStore());
-    }
-
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".
@@ -42,7 +21,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow(new Definition(), $this->getMock(MarkingStoreInterface::class));
+        $workflow = new Workflow(new Definition(), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
 
         $workflow->getMarking($subject);
     }
@@ -217,16 +196,16 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject->marking = array('d' => true);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(2, $transitions);
-        $this->assertSame('t3', $transitions['t3']->getName());
-        $this->assertSame('t4', $transitions['t4']->getName());
+        $this->assertSame('t3', $transitions[0]->getName());
+        $this->assertSame('t4', $transitions[1]->getName());
 
         $subject->marking = array('c' => true, 'e' => true);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(1, $transitions);
-        $this->assertSame('t5', $transitions['t5']->getName());
+        $this->assertSame('t5', $transitions[0]->getName());
     }
 
-    private function createComplexWorkflow()
+    protected function createComplexWorkflow()
     {
         $definition = new Definition();
 

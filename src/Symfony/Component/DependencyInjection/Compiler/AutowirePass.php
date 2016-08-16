@@ -323,7 +323,16 @@ class AutowirePass implements CompilerPassInterface
         }
 
         if (!$typeHint->isInstantiable()) {
-            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
+            if ($typeHint->isInterface()) {
+                if (null !== ($class = $this->findOnlyImplementationOf($typeHint->name))) {
+                    return $this->createAutowiredDefinition(new \ReflectionClass($class), $id);
+                }
+
+                $classOrInterface = 'interface';
+            } else {
+                $classOrInterface = 'class';
+            }
+
             throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $id, $classOrInterface));
         }
 
@@ -384,6 +393,34 @@ class AutowirePass implements CompilerPassInterface
             );
         }
         $this->ambiguousServiceTypes[$type][] = $id;
+    }
+
+    /**
+     * Finds the name of the only implementation of a given interface or returns null.
+     *
+     * @param string $interface
+     *
+     * @return string|null
+     */
+    private function findOnlyImplementationOf($interface)
+    {
+        // Search if there is only one declared class implementing this interface
+        $class = null;
+        foreach (get_declared_classes() as $declaredClass) {
+            if (!is_a($declaredClass, $interface, true)) {
+                continue;
+            }
+
+            if (null === $class) {
+                $class = $declaredClass;
+
+                continue;
+            }
+
+            return;
+        }
+
+        return $class;
     }
 
     private static function getResourceMetadataForMethod(\ReflectionMethod $method)

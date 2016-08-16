@@ -535,6 +535,17 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass = new AutowirePass();
         $pass->process($container);
     }
+
+    public function testInjectOnlyImplementation()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register('d', D::class);
+        $definition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+    }
 }
 
 class Foo
@@ -771,5 +782,20 @@ class SetterInjectionCollision
         // The CollisionInterface cannot be autowired - there are multiple
 
         // should throw an exception
+    }
+}
+
+class K implements KInterface
+{
+}
+
+interface KInterface
+{
+}
+
+class D
+{
+    public function __construct(KInterface $k)
+    {
     }
 }

@@ -12,6 +12,7 @@
             <argument>%form.type_extension.csrf.field_name%</argument>
             <argument type="service" id="translator.default" />
             <argument>%validator.translation_domain%</argument>
+            <argument type="service" id="form.server_params" />
         </service>
     </services>
 </container>

@@ -51,9 +51,10 @@ class WindowsPipes extends AbstractPipes
                 Process::STDOUT => Process::OUT,
                 Process::STDERR => Process::ERR,
             );
+            $tmpCheck = false;
             $tmpDir = sys_get_temp_dir();
-            $error = 'unknown reason';
-            set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+            $lastError = 'unknown reason';
+            set_error_handler(function ($type, $msg) use (&$lastError) { $lastError = $msg; });
             for ($i = 0;; ++$i) {
                 foreach ($pipes as $pipe => $name) {
                     $file = sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
@@ -61,7 +62,11 @@ class WindowsPipes extends AbstractPipes
                         continue 2;
                     }
                     $h = fopen($file, 'xb');
-                    if (!$h && false === strpos($error, 'File exists')) {
+                    if (!$h) {
+                        $error = $lastError;
+                        if ($tmpCheck || $tmpCheck = unlink(tempnam(false, 'sf_check_'))) {
+                            continue;
+                        }
                         restore_error_handler();
                         throw new RuntimeException(sprintf('A temporary file could not be opened to write the process output: %s', $error));
                     }

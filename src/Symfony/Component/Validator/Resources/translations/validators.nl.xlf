@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>Deze waarde mag niet waar zijn.</target>
+                <target>Deze waarde moet onwaar zijn.</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
@@ -36,7 +36,7 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Dit veld was niet verwacht.</target>
+                <target>Dit veld werd niet verwacht.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
@@ -56,7 +56,7 @@
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
-                <target>Het bestand is niet gevonden.</target>
+                <target>Het bestand kon niet gevonden worden.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
@@ -100,7 +100,7 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>Deze waarde is ongeldig.</target>
+                <target>Deze waarde is niet geldig.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
@@ -124,7 +124,7 @@
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Het bestand kon niet geüpload worden.</target>
+                <target>Het bestand kon niet worden geüpload.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -140,15 +140,15 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Deze waarde representeert geen geldige taal.</target>
+                <target>Deze waarde is geen geldige taal.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Deze waarde representeert geen geldige lokalisering.</target>
+                <target>Deze waarde is geen geldige locale.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Deze waarde representeert geen geldig land.</target>
+                <target>Deze waarde is geen geldig land.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -184,7 +184,7 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>Het bestand is niet geheel geüpload.</target>
+                <target>Het bestand is slechts gedeeltelijk geüpload.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>

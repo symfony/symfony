@@ -201,9 +201,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         foreach ($this->data as $dump) {
             $dumper->dump($dump['data']->withMaxDepth($maxDepthLimit)->withMaxItemsPerDepth($maxItemsPerDepth));
-
-            rewind($data);
-            $dump['data'] = stream_get_contents($data);
+            $dump['data'] = stream_get_contents($data, -1, 0);
             ftruncate($data, 0);
             rewind($data);
             $dumps[] = $dump;

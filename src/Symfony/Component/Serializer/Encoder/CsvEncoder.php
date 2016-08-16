@@ -50,7 +50,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
 
         if (!is_array($data)) {
             $data = array(array($data));
-        } elseif(empty($data)) {
+        } elseif (empty($data)) {
             $data = array(array());
         } else {
             // Sequential arrays of arrays are considered as collections
@@ -85,24 +85,6 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         fclose($handle);
 
         return $value;
-    }
-
-    /**
-     * Flattens an array and generates keys including the path.
-     *
-     * @param array  $array
-     * @param array  $result
-     * @param string $parentKey
-     */
-    private function flatten(array $array, array &$result, $parentKey = '')
-    {
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $this->flatten($value, $result, $parentKey.$key.$this->keySeparator);
-            } else {
-                $result[$parentKey.$key] = $value;
-            }
-        }
     }
 
     /**
@@ -177,5 +159,23 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     public function supportsDecoding($format)
     {
         return self::FORMAT === $format;
+    }
+
+    /**
+     * Flattens an array and generates keys including the path.
+     *
+     * @param array  $array
+     * @param array  $result
+     * @param string $parentKey
+     */
+    private function flatten(array $array, array &$result, $parentKey = '')
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $this->flatten($value, $result, $parentKey.$key.$this->keySeparator);
+            } else {
+                $result[$parentKey.$key] = $value;
+            }
+        }
     }
 }

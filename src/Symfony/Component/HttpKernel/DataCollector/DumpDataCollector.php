@@ -211,8 +211,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                 // getLimitedClone is @deprecated, to be removed in 3.0
                 $dumper->dump($dump['data']->getLimitedClone($maxDepthLimit, $maxItemsPerDepth));
             }
-            rewind($data);
-            $dump['data'] = stream_get_contents($data);
+            $dump['data'] = stream_get_contents($data, -1, 0);
             ftruncate($data, 0);
             rewind($data);
             $dumps[] = $dump;

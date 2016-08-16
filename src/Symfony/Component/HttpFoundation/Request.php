@@ -1522,7 +1522,7 @@ class Request
             return stream_get_contents($this->content);
         }
 
-        if (null === $this->content) {
+        if (null === $this->content || false === $this->content) {
             $this->content = file_get_contents('php://input');
         }
 

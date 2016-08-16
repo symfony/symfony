@@ -129,8 +129,7 @@ EOTXT
         $data = $cloner->cloneVar($var);
         $out = fopen('php://memory', 'r+b');
         $dumper->dump($data, $out);
-        rewind($out);
-        $out = stream_get_contents($out);
+        $out = stream_get_contents($out, -1, 0);
 
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -139,7 +138,32 @@ EOTXT
 
 EOTXT
             ,
+            $out
+        );
+    }
 
+    public function testAppend()
+    {
+        $out = fopen('php://memory', 'r+b');
+
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $cloner = new VarCloner();
+
+        $dumper->dump($cloner->cloneVar(123), $out);
+        $dumper->dump($cloner->cloneVar(456), $out);
+
+        $out = stream_get_contents($out, -1, 0);
+
+        $this->assertSame(<<<'EOTXT'
+<foo></foo><bar><span class=sf-dump-num>123</span>
+</bar>
+<bar><span class=sf-dump-num>456</span>
+</bar>
+
+EOTXT
+            ,
             $out
         );
     }

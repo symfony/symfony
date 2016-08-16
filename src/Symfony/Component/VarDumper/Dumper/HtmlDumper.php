@@ -57,18 +57,6 @@ class HtmlDumper extends CliDumper
     /**
      * {@inheritdoc}
      */
-    public function setOutput($output)
-    {
-        if ($output !== $prev = parent::setOutput($output)) {
-            $this->headerIsDumped = false;
-        }
-
-        return $prev;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function setStyles(array $styles)
     {
         $this->headerIsDumped = false;
@@ -111,7 +99,7 @@ class HtmlDumper extends CliDumper
      */
     protected function getDumpHeader()
     {
-        $this->headerIsDumped = true;
+        $this->headerIsDumped = null !== $this->outputStream ? $this->outputStream : $this->lineDumper;
 
         if (null !== $this->dumpHeader) {
             return $this->dumpHeader;
@@ -433,7 +421,7 @@ EOHTML;
         if (-1 === $this->lastDepth) {
             $this->line = sprintf($this->dumpPrefix, $this->dumpId, $this->indentPad).$this->line;
         }
-        if (!$this->headerIsDumped) {
+        if ($this->headerIsDumped !== (null !== $this->outputStream ? $this->outputStream : $this->lineDumper)) {
             $this->line = $this->getDumpHeader().$this->line;
         }
 

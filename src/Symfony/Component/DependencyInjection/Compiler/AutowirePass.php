@@ -383,17 +383,14 @@ class AutowirePass implements CompilerPassInterface
      */
     private static function getSetters(\ReflectionClass $reflectionClass)
     {
-        $setters = array();
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             $name = $reflectionMethod->getName();
             if ($reflectionMethod->isStatic() || 1 !== $reflectionMethod->getNumberOfParameters() || 0 !== strpos($name, 'set')) {
                 continue;
             }
 
-            $setters[] = $reflectionMethod;
+            yield $reflectionMethod;
         }
-
-        return $setters;
     }
 
     private static function getResourceMetadataForMethod(\ReflectionMethod $method)

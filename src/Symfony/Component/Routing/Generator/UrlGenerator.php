@@ -268,10 +268,6 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             return $a == $b ? 0 : 1;
         });
 
-        // extract fragment
-        $fragment = isset($extra['_fragment']) ? $extra['_fragment'] : '';
-        unset($extra['_fragment']);
-
         if (defined('PHP_QUERY_RFC3986')) {
             $query = http_build_query($extra, '', '&', PHP_QUERY_RFC3986);
         } else {

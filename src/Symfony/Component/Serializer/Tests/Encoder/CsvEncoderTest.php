@@ -62,6 +62,26 @@ CSV
     , $this->encoder->encode($value, 'csv'));
     }
 
+    public function testEncodePlainIndexedArray()
+    {
+        $this->assertEquals(<<<'CSV'
+0,1,2
+a,b,c
+
+CSV
+            , $this->encoder->encode(array('a', 'b', 'c'), 'csv'));
+    }
+
+    public function testEncodeNonArray()
+    {
+        $this->assertEquals(<<<'CSV'
+0
+foo
+
+CSV
+            , $this->encoder->encode('foo', 'csv'));
+    }
+
     public function testEncodeNestedArrays()
     {
         $value = array('foo' => 'hello', 'bar' => array(

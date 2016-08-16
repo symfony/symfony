@@ -48,9 +48,21 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
     {
         $handle = fopen('php://temp,', 'w+');
 
-        // Sequential arrays are considered as collections
-        if (array_keys($data) !== range(0, count($data) - 1)) {
-            $data = array($data);
+        if (!is_array($data)) {
+            $data = array(array($data));
+        } elseif(empty($data)) {
+            $data = array(array());
+        } else {
+            // Sequential arrays of arrays are considered as collections
+            $i = 0;
+            foreach ($data as $key => $value) {
+                if ($i !== $key || !is_array($value)) {
+                    $data = array($data);
+                    break;
+                }
+
+                ++$i;
+            }
         }
 
         $headers = null;

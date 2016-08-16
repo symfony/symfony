@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-16T17:07:41Z
+
+Can you add some tests?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-16T17:11:59Z
+
+This is untestable without starting a `php -S` and changing PHP files while it's running (like e.g. removing a class that has been serialized before)

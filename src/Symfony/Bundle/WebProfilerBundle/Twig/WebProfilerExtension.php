@@ -71,6 +71,7 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
 
         return array(
             new \Twig_SimpleFunction('profiler_dump', $profilerDump, array('is_safe' => array('html'), 'needs_environment' => true)),
+            new \Twig_SimpleFunction('profiler_dump_log', array($this, 'dumpLog'), array('is_safe' => array('html'), 'needs_environment' => true)),
         );
     }
 
@@ -86,6 +87,23 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         ftruncate($this->output, 0);
 
         return str_replace("\n</pre", '</pre', rtrim($dump));
+    }
+
+    public function dumpLog(\Twig_Environment $env, $message, Data $context)
+    {
+        $message = twig_escape_filter($env, $message);
+
+        if (false === strpos($message, '{')) {
+            return '<span class="dump-inline">'.$message.'</span>';
+        }
+
+        $replacements = array();
+        foreach ($context->getRawData()[1] as $k => $v) {
+            $v = '{'.twig_escape_filter($env, $k).'}';
+            $replacements['&quot;'.$v.'&quot;'] = $replacements[$v] = $this->dumpData($env, $context->seek($k));
+        }
+
+        return '<span class="dump-inline">'.strtr($message, $replacements).'</span>';
     }
 
     /**

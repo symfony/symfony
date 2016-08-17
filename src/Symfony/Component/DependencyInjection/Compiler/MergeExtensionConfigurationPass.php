@@ -44,7 +44,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             }
             $config = $container->getParameterBag()->resolveValue($config);
 
-            $tmpContainer = new ContainerBuilder($container->getParameterBag());
+            $tmpContainer = new ContainerBuilder($container->getParameterBag(), $container->getContext());
             $tmpContainer->setResourceTracking($container->isTrackingResources());
             $tmpContainer->addObjectResource($extension);
 

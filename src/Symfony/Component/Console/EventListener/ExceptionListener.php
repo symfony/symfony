@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -62,7 +63,9 @@ class ExceptionListener implements EventSubscriberInterface
             return;
         }
 
-        $this->logger->error('Command `{command}` exited with status code {code}', array('command' => implode(' ', $_SERVER['argv']), 'code' => $exitCode));
+        $input = new ArgvInput(null, $event->getCommand()->getDefinition());
+
+        $this->logger->error('Command `{command}` exited with status code {code}', array('command' => (string) $input, 'code' => $exitCode));
     }
 
     public static function getSubscribedEvents()

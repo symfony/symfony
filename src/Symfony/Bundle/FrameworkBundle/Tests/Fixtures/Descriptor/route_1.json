@@ -1,8 +1,8 @@
 {
     "path": "\/hello\/{name}",
-    "pathRegex": "#^\/hello(?:\/(?P<name>[a-z]+))?$#s",
+    "pathRegex": "#^\/hello(?:\/(?P<name>[a-z]+))?$#us",
     "host": "localhost",
-    "hostRegex": "#^localhost$#si",
+    "hostRegex": "#^localhost$#usi",
     "scheme": "http|https",
     "method": "GET|HEAD",
     "class": "Symfony\\Component\\Routing\\Route",

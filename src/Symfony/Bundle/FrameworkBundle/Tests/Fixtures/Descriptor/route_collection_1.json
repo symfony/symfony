@@ -1,9 +1,9 @@
 {
     "route_1": {
         "path": "\/hello\/{name}",
-        "pathRegex": "#^\/hello(?:\/(?P<name>[a-z]+))?$#s",
+        "pathRegex": "#^\/hello(?:\/(?P<name>[a-z]+))?$#us",
         "host": "localhost",
-        "hostRegex": "#^localhost$#si",
+        "hostRegex": "#^localhost$#usi",
         "scheme": "http|https",
         "method": "GET|HEAD",
         "class": "Symfony\\Component\\Routing\\Route",
@@ -21,9 +21,9 @@
     },
     "route_2": {
         "path": "\/name\/add",
-        "pathRegex": "#^\/name\/add$#s",
+        "pathRegex": "#^\/name\/add$#us",
         "host": "localhost",
-        "hostRegex": "#^localhost$#si",
+        "hostRegex": "#^localhost$#usi",
         "scheme": "http|https",
         "method": "PUT|POST",
         "class": "Symfony\\Component\\Routing\\Route",

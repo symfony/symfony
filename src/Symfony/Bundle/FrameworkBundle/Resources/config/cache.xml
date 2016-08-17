@@ -27,7 +27,7 @@
             <tag name="cache.pool" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
-            <argument /> <!-- default lifetime -->
+            <argument>0</argument> <!-- default lifetime -->
             <argument /> <!-- version -->
             <argument>%kernel.cache_dir%/pools</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
@@ -37,7 +37,7 @@
             <tag name="cache.pool" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
-            <argument /> <!-- default lifetime -->
+            <argument>0</argument> <!-- default lifetime -->
             <argument /> <!-- version -->
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
@@ -49,7 +49,7 @@
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Doctrine provider service -->
             <argument /> <!-- namespace -->
-            <argument /> <!-- default lifetime -->
+            <argument>0</argument> <!-- default lifetime -->
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>
@@ -59,7 +59,7 @@
             <tag name="cache.pool" clearer="cache.default_clearer" />
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- namespace -->
-            <argument /> <!-- default lifetime -->
+            <argument>0</argument> <!-- default lifetime -->
             <argument>%kernel.cache_dir%/pools</argument>
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
@@ -70,7 +70,7 @@
             <tag name="cache.pool" provider="cache.default_psr6_provider" clearer="cache.default_clearer" />
             <argument /> <!-- PSR-6 provider service -->
             <argument /> <!-- namespace -->
-            <argument /> <!-- default lifetime -->
+            <argument>0</argument> <!-- default lifetime -->
         </service>
 
         <service id="cache.adapter.redis" class="Symfony\Component\Cache\Adapter\RedisAdapter" abstract="true">
@@ -78,7 +78,7 @@
             <tag name="monolog.logger" channel="cache" />
             <argument /> <!-- Redis connection service -->
             <argument /> <!-- namespace -->
-            <argument /> <!-- default lifetime -->
+            <argument>0</argument> <!-- default lifetime -->
             <call method="setLogger">
                 <argument type="service" id="logger" on-invalid="ignore" />
             </call>

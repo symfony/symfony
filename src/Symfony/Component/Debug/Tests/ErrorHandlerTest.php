@@ -12,9 +12,10 @@
 namespace Symfony\Component\Debug\Tests;
 
 use Psr\Log\LogLevel;
-use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\BufferingLogger;
+use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\Exception\ContextErrorException;
+use Symfony\Component\Debug\Exception\SilencedErrorContext;
 
 /**
  * ErrorHandlerTest.
@@ -202,11 +203,12 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
             $warnArgCheck = function ($logLevel, $message, $context) {
                 $this->assertEquals('info', $logLevel);
-                $this->assertEquals('foo', $message);
-                $this->assertArrayHasKey('type', $context);
-                $this->assertEquals($context['type'], E_USER_DEPRECATED);
-                $this->assertArrayHasKey('stack', $context);
-                $this->assertInternalType('array', $context['stack']);
+                $this->assertEquals('User Deprecated: foo', $message);
+                $this->assertArrayHasKey('exception', $context);
+                $exception = $context['exception'];
+                $this->assertInstanceOf(\ErrorException::class, $exception);
+                $this->assertSame('User Deprecated: foo', $exception->getMessage());
+                $this->assertSame(E_USER_DEPRECATED, $exception->getSeverity());
             };
 
             $logger
@@ -225,9 +227,11 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $logger = $this->getMock('Psr\Log\LoggerInterface');
 
             $logArgCheck = function ($level, $message, $context) {
-                $this->assertEquals('Undefined variable: undefVar', $message);
-                $this->assertArrayHasKey('type', $context);
-                $this->assertEquals($context['type'], E_NOTICE);
+                $this->assertEquals('Notice: Undefined variable: undefVar', $message);
+                $this->assertArrayHasKey('exception', $context);
+                $exception = $context['exception'];
+                $this->assertInstanceOf(SilencedErrorContext::class, $exception);
+                $this->assertSame(E_NOTICE, $exception->getSeverity());
             };
 
             $logger
@@ -278,9 +282,10 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $logArgCheck = function ($level, $message, $context) {
             $this->assertEquals(LogLevel::INFO, $level);
-            $this->assertArrayHasKey('level', $context);
-            $this->assertEquals(E_RECOVERABLE_ERROR | E_USER_ERROR | E_DEPRECATED | E_USER_DEPRECATED, $context['level']);
-            $this->assertArrayHasKey('stack', $context);
+            $this->assertArrayHasKey('exception', $context);
+            $exception = $context['exception'];
+            $this->assertInstanceOf(\ErrorException::class, $exception);
+            $this->assertSame('User Deprecated: Foo deprecation', $exception->getMessage());
         };
 
         $logger = $this->getMock('Psr\Log\LoggerInterface');
@@ -305,9 +310,9 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $logger = $this->getMock('Psr\Log\LoggerInterface');
 
             $logArgCheck = function ($level, $message, $context) {
-                $this->assertEquals('Uncaught Exception: foo', $message);
-                $this->assertArrayHasKey('type', $context);
-                $this->assertEquals($context['type'], E_ERROR);
+                $this->assertSame('Uncaught Exception: foo', $message);
+                $this->assertArrayHasKey('exception', $context);
+                $this->assertInstanceOf(\Exception::class, $context['exception']);
             };
 
             $logger
@@ -349,7 +354,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 ->method('log')
                 ->withConsecutive(
                     array($this->equalTo(LogLevel::WARNING), $this->equalTo('Dummy log')),
-                    array($this->equalTo(LogLevel::DEBUG), $this->equalTo('Silenced warning'))
+                    array($this->equalTo(LogLevel::DEBUG), $this->equalTo('User Warning: Silenced warning'))
                 )
             ;
 
@@ -391,19 +396,27 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($loggers, $handler->setLoggers(array()));
 
         $handler->handleError(E_DEPRECATED, 'Foo message', __FILE__, 123, array());
-        $expectedLog = array(LogLevel::INFO, 'Foo message', array('type' => E_DEPRECATED, 'file' => __FILE__, 'line' => 123, 'level' => error_reporting()));
 
         $logs = $bootLogger->cleanLogs();
-        unset($logs[0][2]['stack']);
 
-        $this->assertSame(array($expectedLog), $logs);
+        $this->assertCount(1, $logs);
+        $log = $logs[0];
+        $this->assertSame('info', $log[0]);
+        $this->assertSame('Deprecated: Foo message', $log[1]);
+        $this->assertArrayHasKey('exception', $log[2]);
+        $exception = $log[2]['exception'];
+        $this->assertInstanceOf(\ErrorException::class, $exception);
+        $this->assertSame('Deprecated: Foo message', $exception->getMessage());
+        $this->assertSame(__FILE__, $exception->getFile());
+        $this->assertSame(123, $exception->getLine());
+        $this->assertSame(E_DEPRECATED, $exception->getSeverity());
 
-        $bootLogger->log($expectedLog[0], $expectedLog[1], $expectedLog[2]);
+        $bootLogger->log(LogLevel::WARNING, 'Foo message', array('exception' => $exception));
 
         $mockLogger = $this->getMock('Psr\Log\LoggerInterface');
         $mockLogger->expects($this->once())
             ->method('log')
-            ->with(LogLevel::WARNING, 'Foo message', $expectedLog[2]);
+            ->with(LogLevel::WARNING, 'Foo message', array('exception' => $exception));
 
         $handler->setLoggers(array(E_DEPRECATED => array($mockLogger, LogLevel::WARNING)));
     }
@@ -424,8 +437,8 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
             $logArgCheck = function ($level, $message, $context) {
                 $this->assertEquals('Fatal Parse Error: foo', $message);
-                $this->assertArrayHasKey('type', $context);
-                $this->assertEquals($context['type'], E_PARSE);
+                $this->assertArrayHasKey('exception', $context);
+                $this->assertInstanceOf(\Exception::class, $context['exception']);
             };
 
             $logger
@@ -477,14 +490,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 ->method('log')
                 ->with(
                     $this->equalTo(LogLevel::CRITICAL),
-                    $this->equalTo('Fatal Error: foo'),
-                    $this->equalTo(array(
-                        'type' => 1,
-                        'file' => 'bar',
-                        'line' => 123,
-                        'level' => -1,
-                        'stack' => array(456),
-                    ))
+                    $this->equalTo('Fatal Error: foo')
                 )
             ;
 

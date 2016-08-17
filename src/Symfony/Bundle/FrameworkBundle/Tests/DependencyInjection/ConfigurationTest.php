@@ -274,6 +274,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'default_redis_provider' => 'redis://localhost',
             ),
             'workflows' => array(),
+            'php_errors' => array(
+                'log' => false,
+                'throw' => true,
+            ),
         );
     }
 }

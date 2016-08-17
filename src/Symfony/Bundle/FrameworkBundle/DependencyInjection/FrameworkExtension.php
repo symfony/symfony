@@ -131,6 +131,7 @@ class FrameworkExtension extends Extension
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerCacheConfiguration($config['cache'], $container);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
+        $this->registerDebugConfiguration($config['php_errors'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['router'])) {
             $this->registerRouterConfiguration($config['router'], $container, $loader);
@@ -145,27 +146,6 @@ class FrameworkExtension extends Extension
 
         if ($this->isConfigEnabled($container, $config['property_info'])) {
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
-        }
-
-        $loader->load('debug_prod.xml');
-        $definition = $container->findDefinition('debug.debug_handlers_listener');
-
-        if ($container->hasParameter('templating.helper.code.file_link_format')) {
-            $definition->replaceArgument(5, '%templating.helper.code.file_link_format%');
-        }
-
-        if ($container->getParameter('kernel.debug')) {
-            $definition->replaceArgument(2, E_ALL & ~(E_COMPILE_ERROR | E_PARSE | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR));
-
-            $loader->load('debug.xml');
-
-            // replace the regular event_dispatcher service with the debug one
-            $definition = $container->findDefinition('event_dispatcher');
-            $definition->setPublic(false);
-            $container->setDefinition('debug.event_dispatcher.parent', $definition);
-            $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
-        } else {
-            $definition->replaceArgument(1, null);
         }
 
         $this->addAnnotatedClassesToCompile(array(
@@ -415,6 +395,48 @@ class FrameworkExtension extends Extension
                 $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $supportedClass));
             }
         }
+    }
+
+    /**
+     * Loads the debug configuration.
+     *
+     * @param array            $config    A php errors configuration array
+     * @param ContainerBuilder $container A ContainerBuilder instance
+     * @param XmlFileLoader    $loader    An XmlFileLoader instance
+     */
+    private function registerDebugConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('debug_prod.xml');
+
+        $debug = $container->getParameter('kernel.debug');
+
+        if ($debug) {
+            $loader->load('debug.xml');
+
+            // replace the regular event_dispatcher service with the debug one
+            $definition = $container->findDefinition('event_dispatcher');
+            $definition->setPublic(false);
+            $container->setDefinition('debug.event_dispatcher.parent', $definition);
+            $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
+        }
+
+        $definition = $container->findDefinition('debug.debug_handlers_listener');
+
+        if (!$config['log']) {
+            $definition->replaceArgument(1, null);
+        }
+
+        if (!$config['throw']) {
+            $container->setParameter('debug.error_handler.throw_at', 0);
+        }
+
+        $definition->replaceArgument(4, $debug);
+
+        if ($container->hasParameter('templating.helper.code.file_link_format')) {
+            $definition->replaceArgument(5, '%templating.helper.code.file_link_format%');
+        }
+
+        $definition->replaceArgument(6, $debug);
     }
 
     /**

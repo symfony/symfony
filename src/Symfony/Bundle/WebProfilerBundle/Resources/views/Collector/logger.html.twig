@@ -6,7 +6,7 @@
     {% if collector.counterrors or collector.countdeprecations or collector.countscreams %}
         {% set icon %}
             {% set status_color = collector.counterrors ? 'red' : collector.countdeprecations ? 'yellow' : '' %}
-            {% set error_count = collector.counterrors + collector.countdeprecations + collector.countscreams %}
+            {% set error_count = collector.counterrors + collector.countdeprecations %}
             {{ include('@WebProfiler/Icon/logger.svg') }}
             <span class="sf-toolbar-value">{{ error_count }}</span>
         {% endset %}
@@ -55,7 +55,7 @@
         {# sort collected logs in groups #}
         {% set deprecation_logs, debug_logs, info_and_error_logs, silenced_logs = [], [], [], [] %}
         {% for log in collector.logs %}
-            {% if log.context.level is defined and log.context.type is defined and log.context.type in [constant('E_DEPRECATED'), constant('E_USER_DEPRECATED')] %}
+            {% if log.context.errorCount is defined and log.context.type is defined and log.context.type in ['E_DEPRECATED', 'E_USER_DEPRECATED'] %}
                 {% set deprecation_logs = deprecation_logs|merge([log]) %}
             {% elseif log.context.scream is defined and log.context.scream == true  %}
                 {% set silenced_logs = silenced_logs|merge([log]) %}
@@ -170,21 +170,22 @@
 {% macro render_log_message(category, log_index, log, is_deprecation = false) %}
     {{ log.message }}
 
+    {% if log.context.errorCount is defined and log.context.errorCount > 1 %}
+        <span class="text-small text-bold">({{ log.context.errorCount }} times)</span>
+    {% endif %}
+
     {% if is_deprecation %}
-        {% set stack = log.context.stack|default([]) %}
-        {% set stack_id = 'sf-call-stack-' ~ category ~ '-' ~ log_index %}
+        {% set trace = log.context.trace|default([]) %}
+        {% set trace_id = 'sf-call-trace-' ~ category ~ '-' ~ log_index %}
 
-        {% if log.context.errorCount is defined %}
-            <span class="text-small text-bold">({{ log.context.errorCount }} times)</span>
+
+        {% if trace %}
+            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ trace_id }}" data-toggle-alt-content="Hide stack trace">Show stack trace</button>
         {% endif %}
 
-        {% if stack %}
-            <button class="btn-link text-small sf-toggle" data-toggle-selector="#{{ stack_id }}" data-toggle-alt-content="Hide stack trace">Show stack trace</button>
-        {% endif %}
-
-        {% for index, call in stack if index > 1 %}
+        {% for index, call in trace if index > 1 %}
             {% if index == 2 %}
-                <ul class="sf-call-stack hidden" id="{{ stack_id }}">
+                <ul class="sf-call-trace hidden" id="{{ trace_id }}">
             {% endif %}
 
             {% if call.class is defined %}
@@ -206,7 +207,7 @@
                 {% endif %}
             </li>
 
-            {% if index == stack|length - 1 %}
+            {% if index == trace|length - 1 %}
                 </ul>
             {% endif %}
         {% endfor %}
@@ -224,7 +225,7 @@
                     <a class="btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide full context">Show full context</a>
 
                     <div id="{{ context_id }}" class="context">
-                        <pre>{{ context_dump }}</pre>
+                        {{ dump(log.context) }}
                     </div>
                 {% else %}
                     {{ context_dump }}

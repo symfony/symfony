@@ -567,9 +567,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $normalizer = new ObjectNormalizer(null, null, null, $extractor);
         $serializer = new Serializer(array(new ArrayDenormalizer(), new DateTimeNormalizer(), $normalizer));
 
-        var_dump($serializer->denormalize(array(
-            'inners' => array('a' => array('foo' => 1)),
-        ), ObjectOuter::class));
+        $serializer->denormalize(array('inners' => array('a' => array('foo' => 1))), ObjectOuter::class);
     }
 
     public function testExtractAttributesRespectsFormat()

@@ -18,6 +18,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ExceptionListener implements EventSubscriberInterface
 {
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
 
     /**
@@ -65,7 +68,7 @@ class ExceptionListener implements EventSubscriberInterface
 
         $input = new ArgvInput(null, $event->getCommand()->getDefinition());
 
-        $this->logger->error('Command `{command}` exited with status code {code}', array('command' => (string) $input, 'code' => $exitCode));
+        $this->logger->error('Command {command} exited with status code {code}', array('command' => (string) $input, 'code' => $exitCode));
     }
 
     public static function getSubscribedEvents()

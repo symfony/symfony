@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-16T15:48:07Z
+
+Do you have any numbers to share about the perf gain?
+
+---------------------------------------------------------------------------
+
+by johnatannvmd at 2016-08-17T06:02:30Z
+
+Twig Metrics:
+
+Opt | Render time | Template calls | Block calls
+------------- | ------------ | ------------- | ------------- |
+Before | 256 ms |  5 | 300
+After | 199 ms |  5 | 50
+Difference | 57 ms | |
+
+It is about 50% of the overall request time.

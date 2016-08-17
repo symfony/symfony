@@ -68,9 +68,7 @@ class ExceptionListener implements EventSubscriberInterface
             $exitCode
         );
 
-        $this->logger->error(
-            $message
-        );
+        $this->logger->error($message);
     }
 
     public static function getSubscribedEvents()

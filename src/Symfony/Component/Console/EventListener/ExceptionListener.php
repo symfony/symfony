@@ -62,10 +62,7 @@ class ExceptionListener implements EventSubscriberInterface
             return;
         }
 
-        // TODO: replace $_SERVER global usage with data from Input
-        $message = sprintf('Command `%s` exited with status code %d', implode(' ', $_SERVER['argv']), $exitCode);
-
-        $this->logger->error($message);
+        $this->logger->error('Command `{command}` exited with status code {code}', array('command' => implode(' ', $_SERVER['argv']), 'code' => $exitCode));
     }
 
     public static function getSubscribedEvents()

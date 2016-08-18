@@ -30,6 +30,7 @@ class FormLoginFactory extends AbstractFactory
         $this->addOption('password_parameter', '_password');
         $this->addOption('csrf_parameter', '_csrf_token');
         $this->addOption('csrf_token_id', 'authenticate');
+        $this->addOption('intention', 'authenticate');
         $this->addOption('post_only', true);
     }
 
@@ -62,7 +63,18 @@ class FormLoginFactory extends AbstractFactory
 
                     return $v;
                 })
-                ->end()
+            ->end()
+            ->beforeNormalization()
+                ->ifTrue(function ($v) { return isset($v['intention']); })
+                ->then(function ($v) {
+                    trigger_error("Setting the 'intention' configuration key on a security firewall is deprecated since version 2.8 and will be removed in 3.0. Use the 'csrf_token_id' key instead.", E_USER_DEPRECATED);
+
+                    $v['csrf_token_id'] = $v['intention'];
+                    unset($v['intention']);
+
+                    return $v;
+                })
+            ->end()
             ->children()
                 ->scalarNode('csrf_token_generator')->cannotBeEmpty()->end()
             ->end()

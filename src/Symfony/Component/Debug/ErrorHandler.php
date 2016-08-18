@@ -89,6 +89,7 @@ class ErrorHandler
     private $tracedErrors = 0x77FB; // E_ALL - E_STRICT - E_PARSE
     private $screamedErrors = 0x55; // E_ERROR + E_CORE_ERROR + E_COMPILE_ERROR + E_PARSE
     private $loggedErrors = 0;
+    private $traceReflector;
 
     private $isRecursive = 0;
     private $isRoot = false;
@@ -147,6 +148,8 @@ class ErrorHandler
             $this->bootstrappingLogger = $bootstrappingLogger;
             $this->setDefaultLogger($bootstrappingLogger);
         }
+        $this->traceReflector = new \ReflectionProperty('Exception', 'trace');
+        $this->traceReflector->setAccessible(true);
     }
 
     /**
@@ -389,16 +392,37 @@ class ErrorHandler
             self::$toStringException = null;
         } elseif (!$throw && !($type & $level)) {
             $errorAsException = new SilencedErrorContext($type, $file, $line);
-        } elseif ($this->scopedErrors & $type) {
-            $errorAsException = new ContextErrorException($logMessage, 0, $type, $file, $line, $context);
         } else {
-            $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);
+            if ($this->scopedErrors & $type) {
+                $errorAsException = new ContextErrorException($logMessage, 0, $type, $file, $line, $context);
+            } else {
+                $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);
+            }
+
+            // Clean the trace by removing function arguments and the first frames added by the error handler itself.
+            if ($throw || $this->tracedErrors & $type) {
+                $backtrace = $backtrace ?: $errorAsException->getTrace();
+                $lightTrace = $backtrace;
+
+                for ($i = 0; isset($backtrace[$i]); ++$i) {
+                    if (isset($backtrace[$i]['file'], $backtrace[$i]['line']) && $backtrace[$i]['line'] === $line && $backtrace[$i]['file'] === $file) {
+                        $lightTrace = array_slice($lightTrace, 1 + $i);
+                        break;
+                    }
+                }
+                if (!($throw || $this->scopedErrors & $type)) {
+                    for ($i = 0; isset($lightTrace[$i]); ++$i) {
+                        unset($lightTrace[$i]['args']);
+                    }
+                }
+                $this->traceReflector->setValue($errorAsException, $lightTrace);
+            } else {
+                $this->traceReflector->setValue($errorAsException, array());
+            }
         }
 
         if ($throw) {
             if (E_USER_ERROR & $type) {
-                $backtrace = $backtrace ?: $errorAsException->getTrace();
-
                 for ($i = 1; isset($backtrace[$i]); ++$i) {
                     if (isset($backtrace[$i]['function'], $backtrace[$i]['type'], $backtrace[$i - 1]['function'])
                         && '__toString' === $backtrace[$i]['function']
@@ -438,14 +462,6 @@ class ErrorHandler
             }
 
             throw $errorAsException;
-        }
-
-        if (!($this->tracedErrors & $type) && $errorAsException instanceof \Exception) {
-            static $freeTrace = null;
-            if (null === $freeTrace) {
-                $freeTrace = \Closure::bind(function ($e) { $e->trace = array(); }, null, \Exception::class);
-            }
-            $freeTrace($errorAsException);
         }
 
         if ($this->isRecursive) {

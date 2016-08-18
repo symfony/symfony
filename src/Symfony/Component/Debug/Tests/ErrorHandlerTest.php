@@ -80,20 +80,16 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('foobar', $exception->getContext());
 
             $trace = $exception->getTrace();
+
             $this->assertEquals(__FILE__, $trace[0]['file']);
-            $this->assertEquals('Symfony\Component\Debug\ErrorHandler', $trace[0]['class']);
-            $this->assertEquals('handleError', $trace[0]['function']);
-            $this->assertEquals('->', $trace[0]['type']);
+            $this->assertEquals(__CLASS__, $trace[0]['class']);
+            $this->assertEquals('triggerNotice', $trace[0]['function']);
+            $this->assertEquals('::', $trace[0]['type']);
 
-            $this->assertEquals(__FILE__, $trace[1]['file']);
+            $this->assertEquals(__FILE__, $trace[0]['file']);
             $this->assertEquals(__CLASS__, $trace[1]['class']);
-            $this->assertEquals('triggerNotice', $trace[1]['function']);
-            $this->assertEquals('::', $trace[1]['type']);
-
-            $this->assertEquals(__FILE__, $trace[1]['file']);
-            $this->assertEquals(__CLASS__, $trace[2]['class']);
-            $this->assertEquals(__FUNCTION__, $trace[2]['function']);
-            $this->assertEquals('->', $trace[2]['type']);
+            $this->assertEquals(__FUNCTION__, $trace[1]['function']);
+            $this->assertEquals('->', $trace[1]['type']);
         } finally {
             restore_error_handler();
             restore_exception_handler();

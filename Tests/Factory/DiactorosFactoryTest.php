@@ -172,4 +172,33 @@ class DiactorosFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('Binary', $psrResponse->getBody()->__toString());
     }
+
+    public function testUploadErrNoFile()
+    {
+        $file = new UploadedFile('', '', null, 0, UPLOAD_ERR_NO_FILE, true);
+        $this->assertEquals(0, $file->getSize());
+        $this->assertEquals(UPLOAD_ERR_NO_FILE, $file->getError());
+        $this->assertFalse($file->getSize(), 'SplFile::getSize() returns false on error');
+        $this->assertInternalType('integer', $file->getClientSize());
+
+        $request = new Request(array(), array(), array(), array(),
+          array(
+            'f1' => $file,
+            'f2' => array('name' => null, 'type' => null, 'tmp_name' => null, 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0),
+          ),
+          array(
+            'REQUEST_METHOD' => 'POST',
+            'HTTP_HOST' => 'dunglas.fr',
+            'HTTP_X_SYMFONY' => '2.8',
+          ),
+          'Content'
+        );
+
+        $psrRequest = $this->factory->createRequest($request);
+
+        $uploadedFiles = $psrRequest->getUploadedFiles();
+
+        $this->assertEquals(UPLOAD_ERR_NO_FILE, $uploadedFiles['f1']->getError());
+        $this->assertEquals(UPLOAD_ERR_NO_FILE, $uploadedFiles['f2']->getError());
+    }
 }

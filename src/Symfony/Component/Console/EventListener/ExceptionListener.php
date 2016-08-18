@@ -1,12 +1,20 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -45,8 +53,9 @@ class ExceptionListener implements EventSubscriberInterface
         }
 
         $exception = $event->getException();
+        $input = (string) $event->getInput();
 
-        $this->logger->error($exception->getMessage(), array('exception' => $exception));
+        $this->logger->error('Exception thrown while running command: "{command}". Message: "{message}"', array('exception' => $exception, 'command' => $input, 'message' => $exception->getMessage()));
     }
 
     /**

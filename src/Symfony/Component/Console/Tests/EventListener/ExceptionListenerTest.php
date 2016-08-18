@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Symfony\Component\Console\Tests\EventListener;
 
 use Psr\Log\LoggerInterface;
@@ -21,10 +30,16 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $logger
             ->expects($this->once())
             ->method('error')
-            ->with('An error occurred', array('exception' => $exception))
+            ->with('Exception thrown while running command: "{command}". Message: "{message}"', array('exception' => $exception, 'command' => '\'test:run\' --foo=baz buzz', 'message' => 'An error occurred'))
         ;
 
-        $listener->onKernelException($this->getConsoleExceptionEvent($exception, 0));
+        $input = array(
+            'name' => 'test:run',
+            '--foo' => 'baz',
+            'bar' => 'buzz'
+        );
+
+        $listener->onKernelException($this->getConsoleExceptionEvent($exception, $input, 0));
     }
 
     public function testOnKernelTerminate()
@@ -32,13 +47,26 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
         $this->markTestIncomplete();
     }
 
+    public function testGetSubscribedEvents()
+    {
+        $this->assertEquals(
+            array(
+                'console.exception' => array('onKernelException', -128),
+                'console.terminate' => array('onKernelTerminate', -128),
+            ),
+            ExceptionListener::getSubscribedEvents()
+        );
+    }
+
     private function getLogger()
     {
         return $this->getMockForAbstractClass(LoggerInterface::class);
     }
 
-    private function getConsoleExceptionEvent(\Exception $exception, $exitCode)
+    private function getConsoleExceptionEvent(\Exception $exception, $input, $exitCode)
     {
-        return new ConsoleExceptionEvent(new Command('test'), new ArrayInput([]), new TestOutput(), $exception, $exitCode);
+        $command = new Command('test:run');
+
+        return new ConsoleExceptionEvent($command, new ArrayInput($input), new TestOutput(), $exception, $exitCode);
     }
 }

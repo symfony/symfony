@@ -51,18 +51,6 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     }
 
     /**
-     * Gets the called events.
-     *
-     * @return array An array of called events
-     *
-     * @see TraceableEventDispatcherInterface
-     */
-    public function countErrors()
-    {
-        return isset($this->data['error_count']) ? $this->data['error_count'] : 0;
-    }
-
-    /**
      * Gets the logs.
      *
      * @return array An array of logs
@@ -75,6 +63,11 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     public function getPriorities()
     {
         return isset($this->data['priorities']) ? $this->data['priorities'] : array();
+    }
+
+    public function countErrors()
+    {
+        return isset($this->data['error_count']) ? $this->data['error_count'] : 0;
     }
 
     public function countDeprecations()

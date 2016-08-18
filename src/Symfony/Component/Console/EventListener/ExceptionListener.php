@@ -75,9 +75,9 @@ class ExceptionListener implements EventSubscriberInterface
             return;
         }
 
-        $input = new ArgvInput(null, $event->getCommand()->getDefinition());
+        $input = (string) $event->getInput();
 
-        $this->logger->error('Command {command} exited with status code {code}', array('command' => (string) $input, 'code' => $exitCode));
+        $this->logger->error('Command "{command}" exited with status code "{code}"', array('command' => (string) $input, 'code' => $exitCode));
     }
 
     public static function getSubscribedEvents()

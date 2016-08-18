@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\EventListener;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\EventListener\ExceptionListener;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Tests\Output\TestOutput;
@@ -39,12 +40,34 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
             'bar' => 'buzz'
         );
 
-        $listener->onKernelException($this->getConsoleExceptionEvent($exception, $input, 0));
+        $listener->onKernelException($this->getConsoleExceptionEvent($exception, $input, 1));
     }
 
-    public function testOnKernelTerminate()
+    public function testOnKernelTerminateForNonZeroExitCodeWritesToLog()
     {
-        $this->markTestIncomplete();
+        $logger = $this->getLogger();
+        $listener = new ExceptionListener($logger);
+
+        $logger
+            ->expects($this->once())
+            ->method('error')
+            ->with('Command "{command}" exited with status code "{code}"', array('command' => '\'test:run\'', 'code' => 255))
+        ;
+
+        $listener->onKernelTerminate($this->getConsoleTerminateEvent(array('name' => 'test:run'), 255));
+    }
+
+    public function testOnKernelTerminateForZeroExitCodeDoesNotWriteToLog()
+    {
+        $logger = $this->getLogger();
+        $listener = new ExceptionListener($logger);
+
+        $logger
+            ->expects($this->never())
+            ->method('error')
+        ;
+
+        $listener->onKernelTerminate($this->getConsoleTerminateEvent(array('name' => 'test:run'), 0));
     }
 
     public function testGetSubscribedEvents()
@@ -65,8 +88,11 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getConsoleExceptionEvent(\Exception $exception, $input, $exitCode)
     {
-        $command = new Command('test:run');
+        return new ConsoleExceptionEvent(new Command('test:run'), new ArrayInput($input), new TestOutput(), $exception, $exitCode);
+    }
 
-        return new ConsoleExceptionEvent($command, new ArrayInput($input), new TestOutput(), $exception, $exitCode);
+    private function getConsoleTerminateEvent($input, $exitCode)
+    {
+        return new ConsoleTerminateEvent(new Command('test:run'), new ArrayInput($input), new TestOutput(), $exitCode);
     }
 }

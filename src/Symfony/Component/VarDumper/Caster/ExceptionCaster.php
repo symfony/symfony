@@ -158,13 +158,13 @@ class ExceptionCaster
                         $templateSrc = explode("\n", method_exists($template, 'getSource') ? $template->getSource() : $template->getEnvironment()->getLoader()->getSource($templateName));
                         $templateInfo = $template->getDebugInfo();
                         if (isset($templateInfo[$f['line']])) {
-                            $src[$templateName] = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext);
+                            $src[$templateName.':'.$templateInfo[$f['line']]] = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext);
                         }
                     } catch (\Twig_Error_Loader $e) {
                     }
                 }
                 if (!$src) {
-                    $src[$f['file']] = self::extractSource(explode("\n", file_get_contents($f['file'])), $f['line'], self::$srcContext);
+                    $src[$f['file'].':'.$f['line']] = self::extractSource(explode("\n", file_get_contents($f['file'])), $f['line'], self::$srcContext);
                 }
             } else {
                 $src[$f['file']] = $f['line'];

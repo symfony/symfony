@@ -156,7 +156,7 @@ Generator {
   this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
   executing: {
     Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz(): {
-      %sGeneratorDemo.php: {
+      %sGeneratorDemo.php:14: {
         13: {
         14:     yield from bar();
         15: }
@@ -177,17 +177,17 @@ array:2 [
   0 => ReflectionGenerator {
     this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
     trace: {
-      3. %sGeneratorDemo.php: {
+      3. %sGeneratorDemo.php:9: {
          8: {
          9:     yield 1;
         10: }
       }
-      2. %sGeneratorDemo.php: {
+      2. %sGeneratorDemo.php:20: {
         19: {
         20:     yield from GeneratorDemo::foo();
         21: }
       }
-      1. %sGeneratorDemo.php: {
+      1. %sGeneratorDemo.php:14: {
         13: {
         14:     yield from bar();
         15: }
@@ -197,7 +197,7 @@ array:2 [
   1 => Generator {
     executing: {
       Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo(): {
-        %sGeneratorDemo.php: {
+        %sGeneratorDemo.php:10: {
            9:     yield 1;
           10: }
           11: 

@@ -30,7 +30,6 @@ class FormLoginFactory extends AbstractFactory
         $this->addOption('password_parameter', '_password');
         $this->addOption('csrf_parameter', '_csrf_token');
         $this->addOption('csrf_token_id', 'authenticate');
-        $this->addOption('intention', 'authenticate'); // for BC
         $this->addOption('post_only', true);
     }
 

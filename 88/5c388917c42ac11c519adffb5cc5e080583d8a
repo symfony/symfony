@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-08-17T10:12:38Z
+
+This is not a bug fix but a new feature to me as it changes the bahavior.
+So it should be done against master, which then also means you do not need the `defined('PHP_QUERY_RFC3986')` check as it always exist in php >=5.5
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-08-17T11:42:59Z
+
+Yeah I opened this against master originally as I wasn't 100% sure whether it would break BC, technically it shouldn't because both URL variations are valid, but it there may be people running assertions on generated URL formats which it could break.
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-08-17T19:03:52Z
+
+Other PR for reference (ignore the number of commits, I switched target branch by mistake) https://github.com/symfony/symfony/pull/19637

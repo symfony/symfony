@@ -167,7 +167,7 @@ class DiactorosFactoryTest extends \PHPUnit_Framework_TestCase
         $file = new UploadedFile('', '', null, 0, UPLOAD_ERR_NO_FILE, true);
         $this->assertEquals(0, $file->getSize());
         $this->assertEquals(UPLOAD_ERR_NO_FILE, $file->getError());
-        $this->assertFalse($file->getSize());
+        $this->assertFalse($file->getSize(), 'SplFile::getSize() returns false on error');
         $this->assertInternalType('integer', $file->getClientSize());
 
         $request = new Request(array(), array(), array(), array(),

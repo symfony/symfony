@@ -264,7 +264,7 @@ EOTXT
 
         if (method_exists($twig, 'getSource')) {
             $twig = <<<EOTXT
-foo.twig: {
+foo.twig:%d: {
         1: foo bar
         2:   twig source
         3: 
@@ -289,22 +289,22 @@ stream resource {@{$ref}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     -trace: {
       %d. {$twig}
-      %d. %sTemplate.php: {
+      %d. %sTemplate.php:%d: {
         %d: try {
         %d:     \$this->doDisplay(\$context, \$blocks);
         %d: } catch (Twig_Error \$e) {
       }
-      %d. %sTemplate.php: {
+      %d. %sTemplate.php:%d: {
         %d: {
         %d:     \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));
         %d: }
       }
-      %d. %sTemplate.php: {
+      %d. %sTemplate.php:%d: {
         %d: try {
         %d:     \$this->display(\$context);
         %d: } catch (Exception \$e) {
       }
-      %d. %sCliDumperTest.php: {
+      %d. %sCliDumperTest.php:{$line}: {
         %d:         }
         {$line}:     };'),
         %d: ));

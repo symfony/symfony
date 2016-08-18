@@ -40,12 +40,12 @@ Exception {
   #file: "%sExceptionCasterTest.php"
   #line: 23
   -trace: {
-    %d. %sExceptionCasterTest.php: {
+    %d. %sExceptionCasterTest.php:23: {
       22: {
       23:     return new \Exception('foo');
       24: }
     }
-    %d. %sExceptionCasterTest.php: {
+    %d. %sExceptionCasterTest.php:%d: {
       %d: {
       %d:     $e = $this->getTestException(1);
       %d: 
@@ -71,12 +71,12 @@ Exception {
   #file: "%sExceptionCasterTest.php"
   #line: 23
   -trace: {
-    %d. %sExceptionCasterTest.php: {
+    %d. %sExceptionCasterTest.php:23: {
       22: {
       23:     return new \Exception('foo');
       24: }
     }
-    %d. %sExceptionCasterTest.php: {
+    %d. %sExceptionCasterTest.php:%d: {
       %d: {
       %d:     $e = $this->getTestException(1);
       %d:     ExceptionCaster::$traceArgs = false;

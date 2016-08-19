@@ -165,6 +165,16 @@ class DefinitionDecorator extends Definition
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setAutowired($autowired)
+    {
+        $this->changes['autowire'] = true;
+
+        return parent::setAutowired($autowired);
+    }
+
+    /**
      * Gets an argument to pass to the service constructor/factory method.
      *
      * If replaceArgument() has been used to replace an argument, this method

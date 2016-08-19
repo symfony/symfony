@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-16T22:07:16Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-08-17T01:32:17Z
+
+There's technically a minor BC break: a service whose parent is autowired, would not have been autowired before, but now it would be. But, except for an *optional* dependency in the constructor, instantiation of that child would have failed, because it would be missing its autowired dependencies. So, the BC break is for child services that have optional, type-hinted constructor args: the container will now try to autowire those, but it didn't before.
+
+Still, this is a bug and that's seems like a *real* edge-case. I think we should fix it.
+
+If I'm right, should be update the CHANGELOG or UPGRADE doc?
+
+👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-17T02:15:46Z
+
+CHANGELOG updated, thanks @weaverryan.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-08-18T11:09:14Z
+
+👍
+
+Although i wouldn't treat it as a BC break. Technically it should either be a bugfix or a BC break :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-18T20:44:26Z
+
+@jakzal Let me know if I can do something for that.
+For now this is described as a bugfix but referenced as a BC break in the DI's changelog.

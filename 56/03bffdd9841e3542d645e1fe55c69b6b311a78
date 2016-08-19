@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-06T15:58:07Z
+
+This now also accepts a Doctrine DBAL Connection.

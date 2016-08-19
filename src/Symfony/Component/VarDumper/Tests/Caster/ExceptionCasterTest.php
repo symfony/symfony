@@ -59,6 +59,31 @@ EODUMP;
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
+    public function testSeek()
+    {
+        $e = $this->getTestException(2);
+
+        $expectedDump = <<<'EODUMP'
+{
+  %d. %sExceptionCasterTest.php:23: {
+    22: {
+    23:     return new \Exception('foo');
+    24: }
+  }
+  %d. %sExceptionCasterTest.php:%d: {
+    %d: {
+    %d:     $e = $this->getTestException(2);
+    %d: 
+    args: {
+      2
+    }
+  }
+%A
+EODUMP;
+
+        $this->assertStringMatchesFormat($expectedDump, $this->getDump($e, 'trace'));
+    }
+
     public function testNoArgs()
     {
         $e = $this->getTestException(1);

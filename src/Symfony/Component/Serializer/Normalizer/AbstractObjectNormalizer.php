@@ -248,8 +248,18 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 return;
             }
 
-            $builtinType = $type->getBuiltinType();
-            $class = $type->getClassName();
+            if ($type->isCollection() && null !== ($collectionValueType = $type->getCollectionValueType()) && Type::BUILTIN_TYPE_OBJECT === $collectionValueType->getBuiltinType()) {
+                $builtinType = Type::BUILTIN_TYPE_OBJECT;
+                $class = $collectionValueType->getClassName().'[]';
+
+                if (null !== $collectionKeyType = $type->getCollectionKeyType()) {
+                    $context['key_type'] = $collectionKeyType;
+                }
+            } else {
+                $builtinType = $type->getBuiltinType();
+                $class = $type->getClassName();
+            }
+
             $expectedTypes[Type::BUILTIN_TYPE_OBJECT === $builtinType && $class ? $class : $builtinType] = true;
 
             if (Type::BUILTIN_TYPE_OBJECT === $builtinType) {

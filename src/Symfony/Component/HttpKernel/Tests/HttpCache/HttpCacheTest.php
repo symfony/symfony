@@ -799,6 +799,21 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertTraceNotContains('miss');
     }
 
+    public function testValidatesCachedResponsesUseSameHttpMethod()
+    {
+        $test = $this;
+
+        $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) use ($test) {
+            $test->assertSame('OPTIONS', $request->getMethod());
+        });
+
+        // build initial request
+        $this->request('OPTIONS', '/');
+
+        // build subsequent request
+        $this->request('OPTIONS', '/');
+    }
+
     public function testValidatesCachedResponsesWithETagAndNoFreshnessInformation()
     {
         $this->setNextResponse(200, array(), 'Hello World', function ($request, $response) {

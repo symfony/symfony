@@ -85,7 +85,7 @@ class StreamOutput extends Output
      *
      * Colorization is disabled if not supported by the stream:
      *
-     *  -  Windows not 10.0.10586 without Ansicon, ConEmu or Mintty
+     *  -  Windows != 10.0.10586 without Ansicon, ConEmu or Mintty
      *  -  non tty consoles
      *
      * @return bool true if the stream supports colorization, false otherwise

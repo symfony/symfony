@@ -77,6 +77,7 @@ class Container implements ResettableContainerInterface
 
     private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
     private $envCache = array();
+    private $compiled = false;
 
     /**
      * @param ParameterBagInterface $parameterBag A ParameterBagInterface instance
@@ -99,15 +100,31 @@ class Container implements ResettableContainerInterface
         $this->parameterBag->resolve();
 
         $this->parameterBag = new FrozenParameterBag($this->parameterBag->all());
+
+        $this->compiled = true;
+    }
+
+    /**
+     * Returns true if the container is compiled.
+     *
+     * @return bool
+     */
+    public function isCompiled()
+    {
+        return $this->compiled;
     }
 
     /**
      * Returns true if the container parameter bag are frozen.
      *
+     * Deprecated since 3.3, to be removed in 4.0.
+     *
      * @return bool true if the container parameter bag are frozen, false otherwise
      */
     public function isFrozen()
     {
+        @trigger_error(sprintf('The %s() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->parameterBag instanceof FrozenParameterBag;
     }
 

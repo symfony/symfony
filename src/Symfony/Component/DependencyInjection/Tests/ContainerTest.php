@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 class ContainerTest extends TestCase
 {
@@ -82,12 +83,31 @@ class ContainerTest extends TestCase
         $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '->compile() copies the current parameters to the new parameter bag');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation The Symfony\Component\DependencyInjection\Container::isFrozen() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.
+     * @expectedDeprecation The Symfony\Component\DependencyInjection\Container::isFrozen() method is deprecated since version 3.3 and will be removed in 4.0. Use the isCompiled() method instead.
+     */
     public function testIsFrozen()
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $this->assertFalse($sc->isFrozen(), '->isFrozen() returns false if the parameters are not frozen');
         $sc->compile();
         $this->assertTrue($sc->isFrozen(), '->isFrozen() returns true if the parameters are frozen');
+    }
+
+    public function testIsCompiled()
+    {
+        $sc = new Container(new ParameterBag(array('foo' => 'bar')));
+        $this->assertFalse($sc->isCompiled(), '->isCompiled() returns false if the container is not compiled');
+        $sc->compile();
+        $this->assertTrue($sc->isCompiled(), '->isCompiled() returns true if the container is compiled');
+    }
+
+    public function testIsCompiledWithFrozenParameters()
+    {
+        $sc = new Container(new FrozenParameterBag(array('foo' => 'bar')));
+        $this->assertFalse($sc->isCompiled(), '->isCompiled() returns false if the container is not compiled but the parameter bag is already frozen');
     }
 
     public function testGetParameterBag()

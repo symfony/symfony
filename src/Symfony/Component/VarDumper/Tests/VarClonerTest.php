@@ -52,6 +52,8 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
         )
 
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
@@ -126,6 +128,8 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
         )
 
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1
@@ -143,7 +147,7 @@ EOTXT;
         $clone = $cloner->cloneVar($data);
 
         $expected = <<<'EOTXT'
-object(Symfony\Component\VarDumper\Cloner\Data)#%i (4) {
+object(Symfony\Component\VarDumper\Cloner\Data)#%i (6) {
   ["data":"Symfony\Component\VarDumper\Cloner\Data":private]=>
   array(2) {
     [0]=>
@@ -187,6 +191,10 @@ object(Symfony\Component\VarDumper\Cloner\Data)#%i (4) {
       }
     }
   }
+  ["position":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  int(0)
+  ["key":"Symfony\Component\VarDumper\Cloner\Data":private]=>
+  int(0)
   ["maxDepth":"Symfony\Component\VarDumper\Cloner\Data":private]=>
   int(20)
   ["maxItemsPerDepth":"Symfony\Component\VarDumper\Cloner\Data":private]=>
@@ -242,6 +250,8 @@ Symfony\Component\VarDumper\Cloner\Data Object
 
         )
 
+    [position:Symfony\Component\VarDumper\Cloner\Data:private] => 0
+    [key:Symfony\Component\VarDumper\Cloner\Data:private] => 0
     [maxDepth:Symfony\Component\VarDumper\Cloner\Data:private] => 20
     [maxItemsPerDepth:Symfony\Component\VarDumper\Cloner\Data:private] => -1
     [useRefHandles:Symfony\Component\VarDumper\Cloner\Data:private] => -1

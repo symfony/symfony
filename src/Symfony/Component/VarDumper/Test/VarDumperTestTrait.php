@@ -29,7 +29,7 @@ trait VarDumperTestTrait
         $this->assertStringMatchesFormat(rtrim($dump), $this->getDump($data), $message);
     }
 
-    protected function getDump($data)
+    protected function getDump($data, $key = null)
     {
         $flags = getenv('DUMP_LIGHT_ARRAY') ? CliDumper::DUMP_LIGHT_ARRAY : 0;
         $flags |= getenv('DUMP_STRING_LENGTH') ? CliDumper::DUMP_STRING_LENGTH : 0;
@@ -39,7 +39,11 @@ trait VarDumperTestTrait
         $cloner->setMaxItems(-1);
         $dumper = new CliDumper($h, null, $flags);
         $dumper->setColors(false);
-        $dumper->dump($cloner->cloneVar($data)->withRefHandles(false));
+        $data = $cloner->cloneVar($data)->withRefHandles(false);
+        if (null !== $key && null === $data = $data->seek($key)) {
+            return;
+        }
+        $dumper->dump($data);
         $data = stream_get_contents($h, -1, 0);
         fclose($h);
 

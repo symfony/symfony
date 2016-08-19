@@ -102,7 +102,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface, Co
     {
         parent::__construct($parameterBag);
 
-        $this->context = $context ?: new Context();
+        $this->context = $context ?: Context::create();
     }
 
     /**
@@ -482,10 +482,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface, Co
         $this->addAliases($container->getAliases());
         $this->getParameterBag()->add($container->getParameterBag()->all());
 
-        if (!$this->context->isLocked()) {
-            $this->context->merge($container->getContext());
-        }
-
         if ($this->trackResources) {
             foreach ($container->getResources() as $resource) {
                 $this->addResource($resource);
@@ -555,8 +551,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface, Co
                 $this->addObjectResource($pass);
             }
         }
-
-        $this->getContext()->lock();
 
         $compiler->compile($this);
         $this->compiled = true;

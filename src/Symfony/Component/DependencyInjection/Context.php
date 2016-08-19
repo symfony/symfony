@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\ContextElementNotFoundException;
 
 /**
@@ -20,7 +19,11 @@ use Symfony\Component\DependencyInjection\Exception\ContextElementNotFoundExcept
 final class Context
 {
     private $elements;
-    private $locked = false;
+
+    private function __construct(array $elements = array())
+    {
+        $this->elements = $elements;
+    }
 
     /**
      * Creates a new context allowing to share elements during the container building phase.
@@ -30,13 +33,19 @@ final class Context
      *
      * For instance:
      *
-     * new Context(array('kernel' => new BootingKernel($kernel)));
+     * Context::create(array('kernel' => new BootingKernel($kernel)));
      *
-     * @param array $elements An array of elements indexed by a string.
+     * You can optionally pass an existing Context instance. Thus, original elements are reused,
+     * but new context elements replace any existing key.
+     *
+     * @param array        $elements An array of elements indexed by a string.
+     * @param Context|null $previous An optional Context instance used as base.
+     *
+     * @return Context
      */
-    public function __construct(array $elements = array())
+    public static function create(array $elements = array(), Context $previous = null)
     {
-        $this->elements = $elements;
+        return new self($previous ? array_replace($previous->elements, $elements) : $elements);
     }
 
     /**
@@ -63,54 +72,5 @@ final class Context
         }
 
         return $this->elements[$key];
-    }
-
-    /**
-     * @param string $key
-     * @param mixed  $element
-     *
-     * @throws BadMethodCallException When trying to set an element on a locked context.
-     */
-    public function set($key, $element)
-    {
-        if ($this->isLocked()) {
-            throw new BadMethodCallException(sprintf('Setting element "%s" on a locked context is not allowed.', $key));
-        }
-
-        $this->elements[$key] = $element;
-    }
-
-    /**
-     * Locks the context making it immutable.
-     */
-    public function lock()
-    {
-        $this->locked = true;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLocked()
-    {
-        return $this->locked;
-    }
-
-    /**
-     * Merges elements found in the given context into the current one.
-     *
-     * @param Context $context
-     *
-     * @throws BadMethodCallException When trying to merge into a locked context.
-     */
-    public function merge(Context $context)
-    {
-        if ($this->isLocked()) {
-            throw new BadMethodCallException('Cannot merge on a locked context.');
-        }
-
-        foreach ($context->elements as $key => $element) {
-            $this->set($key, $element);
-        }
     }
 }

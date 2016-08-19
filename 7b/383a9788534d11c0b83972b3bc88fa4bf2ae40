@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-19T06:36:53Z
+
+could you add a test case please?
+
+---------------------------------------------------------------------------
+
+by nesk at 2016-08-19T07:33:29Z
+
+Done, added a new assertion checking if this line returns `false`:
+
+```php
+IpUtils::checkIp('an_invalid_ip', '192.168.1.0/24');
+```

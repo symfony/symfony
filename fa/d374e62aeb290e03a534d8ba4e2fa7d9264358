@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-18T20:34:53Z
+
+Manually checked out and it fixed it 👍
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-18T21:26:23Z
+
+I dont know wtf is going on.. (github? fabpot?).. but #19662 was removed.. now it's back. Anyway, for reference :-)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-18T21:28:06Z
+
+I thought the owner has been banned and the related issues/PRs too...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-18T21:31:06Z
+
+Me too, but in case of no censor; :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-19T06:28:56Z
+
+:+1: for 2.8 since this is not really a new deprecation but rather a bc-break fix.
+Code is exactly the same on MainConfiguration, we just forgot to add it here also by the time.

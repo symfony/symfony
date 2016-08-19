@@ -83,17 +83,17 @@
                 </div>
             </div>
         {% endif %}
-		
+
         {% if forward_handler is defined %}
-        	<div class="sf-toolbar-info-group">
-            	<div class="sf-toolbar-info-piece">
-                	<b>Forwarded to</b>
-                	<span>
-                    	{{ forward_handler }}
-                    	(<a href="{{ path('_profiler', { token: collector.forward.token }) }}">{{ collector.forward.token }}</a>)
-                	</span>
-            	</div>
-        	</div>
+            <div class="sf-toolbar-info-group">
+                <div class="sf-toolbar-info-piece">
+                    <b>Forwarded to</b>
+                    <span>
+                        {{ forward_handler }}
+                        (<a href="{{ path('_profiler', { token: collector.forward.token }) }}">{{ collector.forward.token }}</a>)
+                    </span>
+                </div>
+            </div>
         {% endif %}
     {% endset %}
 

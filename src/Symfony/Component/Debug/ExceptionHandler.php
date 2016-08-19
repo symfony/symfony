@@ -342,6 +342,7 @@ EOF;
                 border-bottom:1px solid #ccc;
                 border-right:1px solid #ccc;
                 border-left:1px solid #ccc;
+                word-wrap: break-word;
             }
             .sf-reset .block_exception { background-color:#ddd; color: #333; padding:20px;
                 -webkit-border-top-left-radius: 16px;

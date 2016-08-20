@@ -115,6 +115,13 @@
     <service id="factory_service_simple" class="Bar">
       <factory service="factory_simple" method="getInstance"/>
     </service>
+    <service id="shared_private" class="stdClass" public="false"/>
+    <service id="shared_private_dep1" class="stdClass">
+      <property name="dep" type="service" id="shared_private"/>
+    </service>
+    <service id="shared_private_dep2" class="stdClass">
+      <property name="dep" type="service" id="shared_private"/>
+    </service>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>
   </services>

@@ -220,7 +220,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $services = $container->getDefinitions();
         $fooArgs = $services['foo']->getArguments();
         $barArgs = $services['bar']->getArguments();
-        $this->assertSame($fooArgs[0], $barArgs[0]);
+        $this->assertEquals($fooArgs[0], $barArgs[0]);
     }
 
     public function testLoadServices()

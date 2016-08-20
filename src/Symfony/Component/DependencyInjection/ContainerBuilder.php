@@ -355,7 +355,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException(sprintf('Setting service "%s" for an unknown or non-synthetic service definition on a frozen container is not allowed.', $id));
         }
 
-        unset($this->definitions[$id], $this->aliasDefinitions[$id]);
+        unset($this->definitions[$id], $this->aliasDefinitions[$id], $this->privateOriginIds[$id]);
 
         parent::set($id, $service);
     }
@@ -367,7 +367,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeDefinition($id)
     {
-        unset($this->definitions[strtolower($id)]);
+        $id = strtolower($id);
+
+        unset($this->definitions[$id], $this->privateOriginIds[$id]);
     }
 
     /**
@@ -541,13 +543,24 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $compiler->compile($this);
         $this->compiled = true;
 
+        $renameDefinitions = array();
         foreach ($this->definitions as $id => $definition) {
             if (!$definition->isPublic()) {
-                $this->privates[$id] = true;
+                if (null === $privateOriginId = $definition->getPrivateOriginId()) {
+                    Definition::markAsPrivateOrigin($id, $definition);
+                    $privateOriginId = $id;
+                    $id = md5(uniqid($id));
+                    $renameDefinitions[$privateOriginId] = $id;
+                }
+                $this->privateOriginIds[$id] = $privateOriginId;
             }
             if ($this->trackResources && $definition->isLazy() && ($class = $definition->getClass()) && class_exists($class)) {
                 $this->addClassResource(new \ReflectionClass($class));
             }
+        }
+        foreach ($renameDefinitions as $oldId => $newId) {
+            $this->definitions[$newId] = $this->definitions[$oldId];
+            unset($this->definitions[$oldId]);
         }
 
         $this->extensionConfigs = array();
@@ -735,7 +748,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $id = strtolower($id);
 
-        unset($this->aliasDefinitions[$id]);
+        unset($this->aliasDefinitions[$id], $this->privateOriginIds[$id]);
 
         return $this->definitions[$id] = $definition;
     }

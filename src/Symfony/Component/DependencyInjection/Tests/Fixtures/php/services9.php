@@ -48,13 +48,9 @@ class ProjectServiceContainer extends Container
             'new_factory_service' => 'getNewFactoryServiceService',
             'request' => 'getRequestService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
-        );
-        $this->privates = array(
-            'configurator_service' => true,
-            'configurator_service_simple' => true,
-            'factory_simple' => true,
-            'inlined' => true,
-            'new_factory' => true,
+            'shared_private' => 'getSharedPrivateService',
+            'shared_private_dep1' => 'getSharedPrivateDep1Service',
+            'shared_private_dep2' => 'getSharedPrivateDep2Service',
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
@@ -355,6 +351,40 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'shared_private_dep1' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getSharedPrivateDep1Service()
+    {
+        $this->services['shared_private_dep1'] = $instance = new \stdClass();
+
+        $instance->dep = $this->get('shared_private');
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'shared_private_dep2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getSharedPrivateDep2Service()
+    {
+        $this->services['shared_private_dep2'] = $instance = new \stdClass();
+
+        $instance->dep = $this->get('shared_private');
+
+        return $instance;
+    }
+
+    /**
      * Gets the 'configurator_service' service.
      *
      * This service is shared.
@@ -450,6 +480,23 @@ class ProjectServiceContainer extends Container
         $instance->foo = 'bar';
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'shared_private' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * This service is private.
+     * If you want to be able to request this service from the container directly,
+     * make it public, otherwise you might end up with broken code.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getSharedPrivateService()
+    {
+        return $this->services['shared_private'] = new \stdClass();
     }
 
     /**

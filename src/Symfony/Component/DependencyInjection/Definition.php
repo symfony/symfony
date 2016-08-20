@@ -38,6 +38,7 @@ class Definition
     private $decoratedService;
     private $autowired = false;
     private $autowiringTypes = array();
+    private $privateOriginId;
 
     protected $arguments;
 
@@ -49,6 +50,17 @@ class Definition
     {
         $this->class = $class;
         $this->arguments = $arguments;
+    }
+
+    public static function markAsPrivateOrigin($id, Definition $origin)
+    {
+        $origin->public = false;
+        $origin->privateOriginId = $id;
+    }
+
+    final public function getPrivateOriginId()
+    {
+        return !$this->isPublic() ? $this->privateOriginId : null;
     }
 
     /**

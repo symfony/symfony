@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
+use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -839,6 +840,7 @@ EOF;
 
         $code .= "\n        \$this->services = array();\n";
         $code .= $this->addMethodMap();
+        $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'
@@ -903,8 +905,8 @@ EOF;
         $code = '';
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (!$definition->isPublic()) {
-                $code .= '            '.var_export($id, true)." => true,\n";
+            if (null !== $privateOriginId = $definition->getPrivateOriginId()) {
+                $code .= '            '.var_export($id, true).' => '.var_export($privateOriginId, true).",\n";
             }
         }
 
@@ -912,7 +914,7 @@ EOF;
             return '';
         }
 
-        $out = "        \$this->privates = array(\n";
+        $out = "        \$this->privateOriginIds = array(\n";
         $out .= $code;
         $out .= "        );\n";
 

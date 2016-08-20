@@ -270,6 +270,9 @@ class Container implements ResettableContainerInterface
 
                     $alternatives = array();
                     foreach ($this->getServiceIds() as $knownId) {
+                        if (isset($this->privates[$knownId])) {
+                            continue;
+                        }
                         $lev = levenshtein($id, $knownId);
                         if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
                             $alternatives[] = $knownId;

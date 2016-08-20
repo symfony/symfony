@@ -197,21 +197,20 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage You have requested a non-existent service "int". Did you mean this: "internal_lookalike"?
+     */
     public function testGetThrowServiceNotFoundExceptionWithCorrectAlternatives()
     {
         $sc = new ProjectServiceContainer();
         $sc->set('internal_lookalike', $foo = new \stdClass());
-        $privates = new \ReflectionProperty(ProjectServiceContainer::class, 'privates');
-        $privates->setAccessible(true);
-        $this->assertArrayHasKey('internal', $privates->getValue($sc));
+        $reflectionProperty = new \ReflectionProperty(ProjectServiceContainer::class, 'privates');
+        $reflectionProperty->setAccessible(true);
 
-        try {
-            $sc->get('int');
-            $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
-        } catch (\Exception $e) {
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent service "int". Did you mean this: "internal_lookalike"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException excluding private services as advice');
-        }
+        $this->assertArrayHasKey('internal', $reflectionProperty->getValue($sc));
+        $this->assertFalse($sc->has('int'));
+        $sc->get('int');
     }
 
     public function testGetCircularReference()

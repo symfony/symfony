@@ -66,6 +66,8 @@
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="Symfony\Component\Security\Core\Authorization\AccessDecisionManager" public="false">
             <argument type="collection" />
+
+            <autowiring-type>Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface</autowiring-type>
         </service>
 
         <service id="security.role_hierarchy" class="Symfony\Component\Security\Core\Role\RoleHierarchy" public="false">

@@ -1,0 +1,18 @@
+imports:
+    - { resource: ../config/framework.yml }
+
+
+security:
+    providers:
+        in_memory:
+            memory: ~
+
+    firewalls:
+        test:
+            pattern:  ^/
+            security: false
+
+services:
+    test.autowiring_types.autowired_services:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\TestBundle\AutowiringTypes\AutowiredServices
+        autowire: true

@@ -32,7 +32,7 @@ class TemplateLocator implements FileLocatorInterface
      */
     public function __construct(FileLocatorInterface $locator, $cacheDir = null)
     {
-        if (null !== $cacheDir && is_file($cache = $cacheDir.'/templates.php')) {
+        if (null !== $cacheDir && file_exists($cache = $cacheDir.'/templates.php')) {
             $this->cache = require $cache;
         }
 

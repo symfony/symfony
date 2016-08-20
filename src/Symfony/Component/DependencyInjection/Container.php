@@ -269,10 +269,7 @@ class Container implements ResettableContainerInterface
                     }
 
                     $alternatives = array();
-                    foreach ($this->getServiceIds() as $knownId) {
-                        if (isset($this->privates[$knownId])) {
-                            continue;
-                        }
+                    foreach ($this->getServiceIds(false) as $knownId) {
                         $lev = levenshtein($id, $knownId);
                         if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
                             $alternatives[] = $knownId;
@@ -339,11 +336,22 @@ class Container implements ResettableContainerInterface
      *
      * @return array An array of all defined service ids
      */
-    public function getServiceIds()
+    public function getServiceIds(/*$includePrivates = true*/)
     {
+        $includePrivates = true;
+        if (func_num_args() === 1) {
+            $includePrivates = (bool) func_get_arg(0);
+            if ($includePrivates) {
+                @trigger_error(sprintf('Including private services in the list of service id\'s is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            }
+        }
         $ids = array();
         foreach (get_class_methods($this) as $method) {
             if (preg_match('/^get(.+)Service$/', $method, $match)) {
+                $id = self::underscore($match[1]);
+                if (!$includePrivates && isset($this->privates[$id])) {
+                    continue;
+                }
                 $ids[] = self::underscore($match[1]);
             }
         }

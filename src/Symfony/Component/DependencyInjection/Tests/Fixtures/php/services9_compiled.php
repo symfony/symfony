@@ -43,10 +43,13 @@ class ProjectServiceContainer extends Container
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
             'request' => 'getRequestService',
+            'semirandom_shared_private' => 'getSemirandomSharedPrivateService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
-            'shared_private' => 'getSharedPrivateService',
             'shared_private_dep1' => 'getSharedPrivateDep1Service',
             'shared_private_dep2' => 'getSharedPrivateDep2Service',
+        );
+        $this->privateOriginIds = array(
+            'semirandom_shared_private' => 'shared_private',
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
@@ -357,7 +360,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['shared_private_dep1'] = $instance = new \stdClass();
 
-        $instance->dep = $this->get('shared_private');
+        $instance->dep = $this->get('semirandom_shared_private');
 
         return $instance;
     }
@@ -374,13 +377,13 @@ class ProjectServiceContainer extends Container
     {
         $this->services['shared_private_dep2'] = $instance = new \stdClass();
 
-        $instance->dep = $this->get('shared_private');
+        $instance->dep = $this->get('semirandom_shared_private');
 
         return $instance;
     }
 
     /**
-     * Gets the 'shared_private' service.
+     * Gets the 'semirandom_shared_private' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
@@ -391,9 +394,9 @@ class ProjectServiceContainer extends Container
      *
      * @return \stdClass A stdClass instance
      */
-    protected function getSharedPrivateService()
+    protected function getSemirandomSharedPrivateService()
     {
-        return $this->services['shared_private'] = new \stdClass();
+        return $this->services['semirandom_shared_private'] = new \stdClass();
     }
 
     /**

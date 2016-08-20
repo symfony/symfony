@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -25,6 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class RandomizePrivateServiceIdentifiers implements CompilerPassInterface
 {
     private $idMap;
+    private $randomizer;
 
     public function process(ContainerBuilder $container)
     {
@@ -32,7 +32,7 @@ class RandomizePrivateServiceIdentifiers implements CompilerPassInterface
         $this->idMap = array();
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$definition->isPublic()) {
-                $this->idMap[$id] = md5(uniqid($id));
+                $this->idMap[$id] = $this->randomizer ? (string) call_user_func($this->randomizer, $id) : md5(uniqid($id));
             }
         }
 
@@ -61,6 +61,11 @@ class RandomizePrivateServiceIdentifiers implements CompilerPassInterface
                 $definition->setDecoratedService($this->idMap[$decorated[0]], $decorated[1], $decorated[2]);
             }
         }
+    }
+
+    public function setRandomizer(callable $randomizer = null)
+    {
+        $this->randomizer = $randomizer;
     }
 
     private function processArguments(array $arguments)

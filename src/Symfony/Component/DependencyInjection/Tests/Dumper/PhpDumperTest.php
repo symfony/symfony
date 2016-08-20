@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
+use Symfony\Component\DependencyInjection\Compiler\RandomizePrivateServiceIdentifiers;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -122,6 +123,13 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         // with compilation
         $container = include self::$fixturesPath.'/containers/container9.php';
+        foreach ($container->getCompiler()->getPassConfig()->getPasses() as $pass) {
+            if ($pass instanceof RandomizePrivateServiceIdentifiers) {
+                $pass->setRandomizer(function ($id) {
+                    return 'shared_private' === $id ? 'semirandom_'.$id : md5(uniqid($id));
+                });
+            }
+        }
         $container->compile();
         $dumper = new PhpDumper($container);
         $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9_compiled.php')), $dumper->dump(), '->dump() dumps services');

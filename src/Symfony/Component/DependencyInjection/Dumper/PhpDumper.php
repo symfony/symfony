@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
-use Symfony\Component\DependencyInjection\ExpressionLanguageProvider;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\Kernel;
 

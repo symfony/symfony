@@ -28,9 +28,9 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
     {
         return array(
             new ExpressionFunction('service', function ($arg) {
-                return sprintf('$this->get(%s)', $arg);
+                return sprintf('$this->get(%s, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false)', $arg);
             }, function (array $variables, $value) {
-                return $variables['container']->get($value);
+                return $variables['container']->get($value, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
             }),
 
             new ExpressionFunction('parameter', function ($arg) {

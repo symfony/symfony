@@ -235,6 +235,11 @@ class Container implements ResettableContainerInterface
      */
     public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
     {
+        $triggerPrivateDeprecations = true;
+        if (func_num_args() > 2) {
+            $triggerPrivateDeprecations = func_get_arg(2);
+        }
+
         // Attempt to retrieve the service by checking first aliases then
         // available services. Service IDs are case insensitive, however since
         // this method can be called thousands of times during a request, avoid
@@ -281,7 +286,7 @@ class Container implements ResettableContainerInterface
 
                 return;
             }
-            if (isset($this->privates[$id])) {
+            if ($triggerPrivateDeprecations && isset($this->privates[$id])) {
                 @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
 

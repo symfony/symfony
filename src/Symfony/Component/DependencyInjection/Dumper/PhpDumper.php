@@ -1377,13 +1377,13 @@ EOF;
         }
 
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-            return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
+            return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE, false)', $id);
         } else {
             if ($this->container->hasAlias($id)) {
                 $id = (string) $this->container->getAlias($id);
             }
 
-            return sprintf('$this->get(\'%s\')', $id);
+            return sprintf('$this->get(\'%s\', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false)', $id);
         }
     }
 

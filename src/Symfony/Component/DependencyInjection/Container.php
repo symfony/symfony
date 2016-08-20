@@ -288,10 +288,10 @@ class Container implements IntrospectableContainerInterface
                     }
 
                     $alternatives = array();
-                    foreach ($this->services as $key => $associatedService) {
-                        $lev = levenshtein($id, $key);
-                        if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
-                            $alternatives[] = $key;
+                    foreach ($this->getServiceIds() as $knownId) {
+                        $lev = levenshtein($id, $knownId);
+                        if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                            $alternatives[] = $knownId;
                         }
                     }
 

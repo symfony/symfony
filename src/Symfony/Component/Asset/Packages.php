@@ -20,7 +20,7 @@ use Symfony\Component\Asset\Exception\LogicException;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Kris Wallsmith <kris@symfony.com>
  */
-class Packages
+class Packages implements PackageInterface
 {
     private $defaultPackage;
     private $packages = array();

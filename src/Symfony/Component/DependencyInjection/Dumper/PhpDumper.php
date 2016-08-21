@@ -804,7 +804,7 @@ EOF;
 EOF;
 
         $code .= $this->addMethodMap();
-        $code .= $this->addPrivateOriginIdServices();
+        $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'
@@ -839,7 +839,7 @@ EOF;
 
         $code .= "\n        \$this->services = array();\n";
         $code .= $this->addMethodMap();
-        $code .= $this->addPrivateOriginIdServices();
+        $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'
@@ -891,29 +891,32 @@ EOF;
     }
 
     /**
-     * Adds the service metadata property definition.
+     * Adds the privates property definition.
+     *
+     * This method is intented for BC only.
      *
      * @return string
      */
-    private function addPrivateOriginIdServices()
+    private function addPrivateServices()
     {
         if (!$definitions = $this->container->getDefinitions()) {
             return '';
         }
 
+        $reflectionProperty = new \ReflectionProperty(ContainerBuilder::class, 'privates');
+        $reflectionProperty->setAccessible(true);
+
         $code = '';
         ksort($definitions);
-        foreach ($definitions as $id => $definition) {
-            if (null !== $originId = $definition->getOriginId()) {
-                $code .= '            '.var_export($originId, true).' => '.var_export($id, true).",\n";
-            }
+        foreach ($reflectionProperty->getValue($this->container) as $originId => $id) {
+            $code .= '            '.var_export($originId, true).' => '.var_export($id, true).",\n";
         }
 
         if (empty($code)) {
             return '';
         }
 
-        $out = "        \$this->privateOriginIds = array(\n";
+        $out = "        \$this->privates = array(\n";
         $out .= $code;
         $out .= "        );\n";
 

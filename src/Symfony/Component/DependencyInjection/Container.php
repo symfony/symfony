@@ -65,9 +65,9 @@ class Container implements ResettableContainerInterface
 
     protected $services = array();
     protected $methodMap = array();
+    protected $privates = array(); // for BC
     protected $aliases = array();
     protected $loading = array();
-    protected $privateOriginIds = array(); // for BC
 
     private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
 
@@ -172,13 +172,13 @@ class Container implements ResettableContainerInterface
             unset($this->aliases[$id]);
         }
 
-        if (isset($this->privateOriginIds[$id])) {
+        if (isset($this->privates[$id])) {
             if (null === $service) {
                 @trigger_error(sprintf('Unsetting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-                unset($this->privateOriginIds[$id]);
+                unset($this->privates[$id]);
             } else {
                 @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0. A new public service will be created instead.', $id), E_USER_DEPRECATED);
-                $id = $this->privateOriginIds[$id];
+                $id = $this->privates[$id];
             }
         }
 
@@ -209,9 +209,9 @@ class Container implements ResettableContainerInterface
             if (--$i && $id !== $lcId = strtolower($id)) {
                 $id = $lcId;
             } else {
-                if (isset($this->privateOriginIds[$id])) {
+                if (isset($this->privates[$id])) {
                     @trigger_error(sprintf('Checking for the existence of the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
-                    $id = $this->privateOriginIds[$id];
+                    $id = $this->privates[$id];
                 }
 
                 return method_exists($this, 'get'.strtr($id, $this->underscoreMap).'Service');
@@ -266,10 +266,10 @@ class Container implements ResettableContainerInterface
             } elseif (method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
                 // $method is set to the right value, proceed
             } else {
-                if (isset($this->privateOriginIds[$id])) {
+                if (isset($this->privates[$id])) {
                     @trigger_error(sprintf('Requesting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
 
-                    return $this->get($this->privateOriginIds[$id]);
+                    return $this->get($this->privates[$id]);
                 }
 
                 if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
@@ -345,12 +345,12 @@ class Container implements ResettableContainerInterface
     public function getServiceIds()
     {
         $ids = array();
-        $reversedPrivateOriginIds = array_flip($this->privateOriginIds);
+        $reversedPrivates = array_flip($this->privates);
         foreach (get_class_methods($this) as $method) {
             if (preg_match('/^get(.+)Service$/', $method, $match)) {
                 $id = self::underscore($match[1]);
-                if (isset($reversedPrivateOriginIds[$id])) {
-                    $id = $reversedPrivateOriginIds[$id];
+                if (isset($reversedPrivates[$id])) {
+                    $id = $reversedPrivates[$id];
                 }
                 $ids[] = $id;
             }

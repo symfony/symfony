@@ -27,12 +27,11 @@ class RandomizePrivateServiceIdentifiers implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        // mark randomized definitions + build id map
+        // update private definitions + build id map
         $this->idMap = array();
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$definition->isPublic()) {
                 $this->idMap[$id] = $this->randomizer ? (string) call_user_func($this->randomizer, $id) : hash('sha256', mt_rand().$id);
-                $definition->setOriginId($id);
                 $definition->setPublic(true);
             }
         }
@@ -62,6 +61,11 @@ class RandomizePrivateServiceIdentifiers implements CompilerPassInterface
                 $container->setAlias(new Alias($this->idMap[$oldId], $alias->isPublic()), $this->idMap[$oldId]);
             }
         }
+
+        // for BC
+        $reflectionProperty = new \ReflectionProperty(ContainerBuilder::class, 'privates');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($container, $this->idMap);
     }
 
     public function setRandomizer(callable $randomizer = null)

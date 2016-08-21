@@ -48,7 +48,7 @@ class ProjectServiceContainer extends Container
             'shared_private_dep1' => 'getSharedPrivateDep1Service',
             'shared_private_dep2' => 'getSharedPrivateDep2Service',
         );
-        $this->privateOriginIds = array(
+        $this->privates = array(
             'shared_private' => 'semirandom_shared_private',
         );
         $this->aliases = array(

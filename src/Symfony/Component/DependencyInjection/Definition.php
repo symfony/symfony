@@ -38,7 +38,6 @@ class Definition
     private $decoratedService;
     private $autowired = false;
     private $autowiringTypes = array();
-    private $originId;
 
     protected $arguments;
 
@@ -50,16 +49,6 @@ class Definition
     {
         $this->class = $class;
         $this->arguments = $arguments;
-    }
-
-    public function setOriginId($id)
-    {
-        $this->originId = $id;
-    }
-
-    public function getOriginId()
-    {
-        return $this->originId;
     }
 
     /**

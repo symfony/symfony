@@ -541,17 +541,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $compiler->compile($this);
         $this->compiled = true;
 
-        $this->serviceMetadata = array();
+        $this->privateOriginIds = array();
 
         foreach ($this->definitions as $id => $definition) {
-            if (!$definition->isPublic()) {
-                $this->serviceMetadata[$id]['private'] = true;
-            }
             if (null !== $originId = $definition->getOriginId()) {
-                $this->serviceMetadata[$id]['origin_id'] = $originId;
-                if (!$definition->isPublic()) {
-                    $this->serviceMetadata[$originId]['private'] = true;
-                }
+                $this->privateOriginIds[$originId] = $id;
             }
             if ($this->trackResources && $definition->isLazy() && ($class = $definition->getClass()) && class_exists($class)) {
                 $this->addClassResource(new \ReflectionClass($class));

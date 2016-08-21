@@ -400,15 +400,7 @@ class ProjectServiceContainer extends Container
         $this->__internal = new \stdClass();
         $this->__sharing_internal = new \stdClass();
         $this->aliases = array('alias' => 'bar');
-        $this->serviceMetadata = array(
-            'semirandom_internal' => array(
-                'private' => true,
-                'origin_id' => 'internal',
-            ),
-            'internal' => array(
-                'private' => true,
-            ),
-        );
+        $this->privateOriginIds = array('internal' => 'semirandom_internal');
     }
 
     protected function getSemirandomInternalService()

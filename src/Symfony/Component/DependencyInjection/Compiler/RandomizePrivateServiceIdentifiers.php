@@ -33,6 +33,7 @@ class RandomizePrivateServiceIdentifiers implements CompilerPassInterface
             if (!$definition->isPublic()) {
                 $this->idMap[$id] = $this->randomizer ? (string) call_user_func($this->randomizer, $id) : hash('sha256', mt_rand().$id);
                 $definition->setOriginId($id);
+                $definition->setPublic(true);
             }
         }
 

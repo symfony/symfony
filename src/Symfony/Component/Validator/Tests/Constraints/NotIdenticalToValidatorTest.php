@@ -78,7 +78,7 @@ class NotIdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             array(3, '3', 3, '3', 'integer'),
             array('a', '"a"', 'a', '"a"', 'string'),
             array($date, 'Jan 1, 2000, 12:00 AM', $date, 'Jan 1, 2000, 12:00 AM', 'DateTime'),
-            array($object, '2', $object, '2', __NAMESPACE__.'\ComparisonTest_Class'),
+            array($object, '2', $object, '2', ComparisonTest_Class::class),
         );
 
         return $comparisons;

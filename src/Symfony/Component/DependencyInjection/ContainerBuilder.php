@@ -355,7 +355,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException(sprintf('Setting service "%s" for an unknown or non-synthetic service definition on a frozen container is not allowed.', $id));
         }
 
-        unset($this->definitions[$id], $this->aliasDefinitions[$id], $this->privateOriginIds[$id]);
+        unset($this->definitions[$id], $this->aliasDefinitions[$id]);
 
         parent::set($id, $service);
     }
@@ -367,9 +367,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeDefinition($id)
     {
-        $id = strtolower($id);
-
-        unset($this->definitions[$id], $this->privateOriginIds[$id]);
+        unset($this->definitions[strtolower($id)]);
     }
 
     /**
@@ -543,24 +541,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $compiler->compile($this);
         $this->compiled = true;
 
-        $renameDefinitions = array();
+        $this->serviceMetadata = array();
+
         foreach ($this->definitions as $id => $definition) {
             if (!$definition->isPublic()) {
-                if (null === $privateOriginId = $definition->getPrivateOriginId()) {
-                    Definition::markAsPrivateOrigin($id, $definition);
-                    $privateOriginId = $id;
-                    $id = md5(uniqid($id));
-                    $renameDefinitions[$privateOriginId] = $id;
+                $this->serviceMetadata[$id]['private'] = true;
+            }
+            if (null !== $originId = $definition->getOriginId()) {
+                $this->serviceMetadata[$id]['origin_id'] = $originId;
+                if (!$definition->isPublic()) {
+                    $this->serviceMetadata[$originId]['private'] = true;
                 }
-                $this->privateOriginIds[$id] = $privateOriginId;
             }
             if ($this->trackResources && $definition->isLazy() && ($class = $definition->getClass()) && class_exists($class)) {
                 $this->addClassResource(new \ReflectionClass($class));
             }
-        }
-        foreach ($renameDefinitions as $oldId => $newId) {
-            $this->definitions[$newId] = $this->definitions[$oldId];
-            unset($this->definitions[$oldId]);
         }
 
         $this->extensionConfigs = array();
@@ -748,7 +743,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         $id = strtolower($id);
 
-        unset($this->aliasDefinitions[$id], $this->privateOriginIds[$id]);
+        unset($this->aliasDefinitions[$id]);
 
         return $this->definitions[$id] = $definition;
     }

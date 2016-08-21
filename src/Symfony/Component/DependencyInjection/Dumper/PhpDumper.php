@@ -804,7 +804,7 @@ EOF;
 EOF;
 
         $code .= $this->addMethodMap();
-        $code .= $this->addPrivateServices();
+        $code .= $this->addServiceMetadata();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'
@@ -839,7 +839,7 @@ EOF;
 
         $code .= "\n        \$this->services = array();\n";
         $code .= $this->addMethodMap();
-        $code .= $this->addPrivateServices();
+        $code .= $this->addServiceMetadata();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'
@@ -891,11 +891,11 @@ EOF;
     }
 
     /**
-     * Adds the privates property definition.
+     * Adds the service metadata property definition.
      *
      * @return string
      */
-    private function addPrivateServices()
+    private function addServiceMetadata()
     {
         if (!$definitions = $this->container->getDefinitions()) {
             return '';
@@ -904,8 +904,30 @@ EOF;
         $code = '';
         ksort($definitions);
         foreach ($definitions as $id => $definition) {
-            if (null !== $privateOriginId = $definition->getPrivateOriginId()) {
-                $code .= '            '.var_export($id, true).' => '.var_export($privateOriginId, true).",\n";
+            $metadata = array();
+            if (!$definition->isPublic()) {
+                $metadata['private'] = true;
+            }
+            if (null !== $originId = $definition->getOriginId()) {
+                $metadata['origin_id'] = $originId;
+            }
+            if ($metadata) {
+                $code .= '            '.var_export($id, true)." => array(\n";
+                foreach ($metadata as $k => $v) {
+                    $code .= '                '.var_export($k, true).' => '.var_export($v, true).",\n";
+                }
+                $code .= "            ),\n";
+            }
+            if (null === $originId) {
+                continue;
+            }
+            unset($metadata['origin_id']);
+            if ($metadata) {
+                $code .= '            '.var_export($originId, true)." => array(\n";
+                foreach ($metadata as $k => $v) {
+                    $code .= '                '.var_export($k, true).' => '.var_export($v, true).",\n";
+                }
+                $code .= "            ),\n";
             }
         }
 
@@ -913,7 +935,7 @@ EOF;
             return '';
         }
 
-        $out = "        \$this->privateOriginIds = array(\n";
+        $out = "        \$this->serviceMetadata = array(\n";
         $out .= $code;
         $out .= "        );\n";
 

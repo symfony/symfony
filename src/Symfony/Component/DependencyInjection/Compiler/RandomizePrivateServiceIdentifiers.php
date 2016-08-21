@@ -13,7 +13,6 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -28,28 +27,21 @@ class RandomizePrivateServiceIdentifiers implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        // build id map
+        // mark randomized definitions + build id map
         $this->idMap = array();
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$definition->isPublic()) {
-                $this->idMap[$id] = $this->randomizer ? (string) call_user_func($this->randomizer, $id) : md5(uniqid($id));
+                $this->idMap[$id] = $this->randomizer ? (string) call_user_func($this->randomizer, $id) : hash('sha256', mt_rand().$id);
+                $definition->setOriginId($id);
             }
         }
 
-        // update private definitions + alias map
+        // rename definitions
         $aliases = $container->getAliases();
-        foreach ($this->idMap as $id => $randId) {
-            $definition = $container->getDefinition($id);
-            Definition::markAsPrivateOrigin($id, $definition);
-            $container->setDefinition($randId, $definition);
-            $container->removeDefinition($id);
-            foreach ($aliases as $aliasId => $aliasedId) {
-                if ((string) $aliasedId === $id) {
-                    $aliases[$aliasId] = new Alias($randId, $aliasedId->isPublic());
-                }
-            }
+        foreach ($this->idMap as $oldId => $newId) {
+            $container->setDefinition($newId, $container->getDefinition($oldId));
+            $container->removeDefinition($oldId);
         }
-        $container->setAliases($aliases);
 
         // update referencing definitions
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -59,6 +51,14 @@ class RandomizePrivateServiceIdentifiers implements CompilerPassInterface
             $definition->setFactory($this->processFactory($definition->getFactory()));
             if (null !== ($decorated = $definition->getDecoratedService()) && isset($this->idMap[$decorated[0]])) {
                 $definition->setDecoratedService($this->idMap[$decorated[0]], $decorated[1], $decorated[2]);
+            }
+        }
+
+        // update alias map
+        $aliases = $container->getAliases();
+        foreach ($container->getAliases() as $oldId => $alias) {
+            if(isset($this->idMap[$oldId]) && $oldId === (string) $alias) {
+                $container->setAlias(new Alias($this->idMap[$oldId], $alias->isPublic()), $this->idMap[$oldId]);
             }
         }
     }

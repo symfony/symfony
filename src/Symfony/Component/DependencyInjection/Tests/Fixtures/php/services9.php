@@ -52,6 +52,26 @@ class ProjectServiceContainer extends Container
             'shared_private_dep1' => 'getSharedPrivateDep1Service',
             'shared_private_dep2' => 'getSharedPrivateDep2Service',
         );
+        $this->serviceMetadata = array(
+            'configurator_service' => array(
+                'private' => true,
+            ),
+            'configurator_service_simple' => array(
+                'private' => true,
+            ),
+            'factory_simple' => array(
+                'private' => true,
+            ),
+            'inlined' => array(
+                'private' => true,
+            ),
+            'new_factory' => array(
+                'private' => true,
+            ),
+            'shared_private' => array(
+                'private' => true,
+            ),
+        );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
             'alias_for_foo' => 'foo',

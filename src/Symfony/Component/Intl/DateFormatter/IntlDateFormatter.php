@@ -143,7 +143,7 @@ class IntlDateFormatter
      * @see http://userguide.icu-project.org/formatparse/datetime
      *
      * @throws MethodArgumentValueNotImplementedException When $locale different than "en" or null is passed
-     * @throws MethodArgumentValueNotImplementedException When $calendar different than GREGORIAN is passed
+     * @throws MethodArgumentValueNotImplementedException When $calendar different than GREGORIAN is passed or null is passed
      */
     public function __construct($locale, $datetype, $timetype, $timezone = null, $calendar = self::GREGORIAN, $pattern = null)
     {
@@ -151,7 +151,7 @@ class IntlDateFormatter
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'locale', $locale, 'Only the locale "en" is supported');
         }
 
-        if (self::GREGORIAN !== $calendar) {
+        if (self::GREGORIAN !== $calendar && null !== $calendar) {
             throw new MethodArgumentValueNotImplementedException(__METHOD__, 'calendar', $calendar, 'Only the GREGORIAN calendar is supported');
         }
 

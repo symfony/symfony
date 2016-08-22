@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Templating\TemplateReferenceInterface;
 
 /**
  * Finds all the templates.

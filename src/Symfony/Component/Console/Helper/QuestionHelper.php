@@ -40,7 +40,7 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output   An OutputInterface instance
      * @param Question        $question The question to ask
      *
-     * @return string|array|mixed The user answer
+     * @return mixed A string, the default answer or an array for {@link RepeatedQuestion}
      *
      * @throws RuntimeException If there is no data to read in the input stream
      */
@@ -134,7 +134,7 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output
      * @param Question        $question
      *
-     * @return bool|mixed|null|string|array
+     * @return mixed
      *
      * @throws \Exception
      * @throws \RuntimeException
@@ -156,14 +156,6 @@ class QuestionHelper extends Helper
         return $responses;
     }
 
-    /**
-     * Gets the user answer to a question.
-     *
-     * @return bool|mixed|null|string
-     *
-     * @throws \Exception
-     * @throws \RuntimeException
-     */
     private function getResponse(OutputInterface $output, Question $question)
     {
         $this->prependResponse($output, $question);

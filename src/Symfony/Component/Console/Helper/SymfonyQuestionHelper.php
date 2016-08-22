@@ -110,7 +110,7 @@ class SymfonyQuestionHelper extends QuestionHelper
     }
 
     /**
-     * Prepends the user response.
+     * {@inheritdoc}
      */
     protected function prependResponse(OutputInterface $output, Question $question)
     {

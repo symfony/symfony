@@ -1,0 +1,127 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2016-07-11T15:55:44Z
+
+Tests fails (no related)
+[**OK** Form](https://travis-ci.org/symfony/symfony/jobs/143920165#L3292) Tests
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-07-11T15:58:12Z
+
+This is a fantastic DX improvement! Thanks @yceruto.
+
+👍
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-11T16:23:48Z
+
+Thanks for that feature!
+
+---------------------------------------------------------------------------
+
+by eXtreme at 2016-07-12T07:57:58Z
+
+The other idea for solving this would be to somehow show the number of children errors in parents (maybe with different color than red).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-07-12T17:54:45Z
+
+I just rebased! All tests in green again :smiley:
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-07-12T19:00:02Z
+
+@eXtreme would be another solution but in that case we would have to open each node until the form with error. In this way the form error is in sight :eyes:  ;)
+
+---------------------------------------------------------------------------
+
+by apfelbox at 2016-07-13T07:52:58Z
+
+@eXtreme @yceruto why not both?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-07-14T13:36:40Z
+
+I've found a pain point to make this https://github.com/symfony/symfony/pull/19339#issuecomment-231966139 proposal:
+
+Suppose you have a form with two children, where one of them has the [`error_bubbling`](http://symfony.doc/reference/forms/types/form.html#error-bubbling) property to `true` and both children have an error, right now, the result will be:
+
+```
+- form [1]
+    - child1 <--- error_bubbling = true, so the error is passed to parent form
+    - child2 [1]
+```
+
+If we implement this proposal, the result will be:
+
+```
+- form [1][1]
+    - child1
+    - child2 [1]
+```
+
+Which would be confused IMO, still when we put different colors.
+
+WDYT ?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-07-15T14:37:56Z
+
+@yceruto : I was for both proposals, but I came to the same point you did. So IMHO, your solution is enough. But if we wanted to improve this a little bit, I'd say that's not the number of errors in children forms which is important, but rather showing the path to the error. This is what you do by expanding all nodes with errors, but why not simply highlighting in red the full path ?
+
+```diff
+- form // some children contain errors, red
+    - child1 // No error, grey
+-   - child2 [1] // Has error, red
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-07-15T17:16:24Z
+
+I like your proposal @ogizanagi I say let's do it.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-07-21T13:12:28Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-07-26T03:45:56Z
+
+Updated!
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-07-29T12:23:51Z
+
+I've updated the result screenshot with highlighting error path feature, thanks to @eXtreme, @apfelbox and @ogizanagi by the idea :+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-29T12:27:22Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-11T12:01:39Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-08-22T17:05:54Z
+
+Ready for @symfony/mergers?

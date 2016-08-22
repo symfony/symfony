@@ -71,7 +71,7 @@ class TemplateFinder implements TemplateFinderInterface
      *
      * @return TemplateReferenceInterface[]
      */
-    private function findTemplatesInFolder($dir)
+    protected function findTemplatesInFolder($dir)
     {
         $templates = array();
 

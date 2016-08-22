@@ -24,9 +24,10 @@
         "symfony/property-access": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/cache": "~3.1",
-        "symfony/property-info": "~2.8|~3.0",
+        "symfony/property-info": "~3.1",
         "doctrine/annotations": "~1.0",
-        "doctrine/cache": "~1.0"
+        "doctrine/cache": "~1.0",
+        "phpdocumentor/reflection-docblock": "~3.0"
     },
     "conflict": {
         "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4"

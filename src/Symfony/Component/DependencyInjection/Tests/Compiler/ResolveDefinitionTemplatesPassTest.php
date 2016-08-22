@@ -210,6 +210,36 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->getDefinition('child1')->isLazy());
     }
 
+    public function testSetAutowiredOnServiceHasParent()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'stdClass');
+
+        $container->setDefinition('child1', new DefinitionDecorator('parent'))
+            ->setAutowired(true)
+        ;
+
+        $this->process($container);
+
+        $this->assertTrue($container->getDefinition('child1')->isAutowired());
+    }
+
+    public function testSetAutowiredOnServiceIsParent()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'stdClass')
+            ->setAutowired(true)
+        ;
+
+        $container->setDefinition('child1', new DefinitionDecorator('parent'));
+
+        $this->process($container);
+
+        $this->assertTrue($container->getDefinition('child1')->isAutowired());
+    }
+
     public function testDeepDefinitionsResolving()
     {
         $container = new ContainerBuilder();

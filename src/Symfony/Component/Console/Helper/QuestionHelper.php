@@ -57,6 +57,8 @@ class QuestionHelper extends Helper
 
             $responses = array();
             $generator = $question->getGenerator();
+            // Will throw an exception if already used
+            $generator->rewind();
             while ($generator->valid()) {
                 $generator->send($question->getDefault());
                 $responses[] = $question->getDefault();
@@ -149,6 +151,8 @@ class QuestionHelper extends Helper
 
         $responses = array();
         $generator = $question->getGenerator();
+        // Will throw an exception if already used
+        $generator->rewind();
         while ($generator->valid()) {
             $generator->send($responses[] = $this->getResponse($output, $question));
         }
@@ -200,9 +204,6 @@ class QuestionHelper extends Helper
      */
     protected function prependResponse(OutputInterface $output, Question $question)
     {
-        if ($question instanceof RepeatedQuestion) {
-            $output->writeLn('');
-        }
     }
 
     /**

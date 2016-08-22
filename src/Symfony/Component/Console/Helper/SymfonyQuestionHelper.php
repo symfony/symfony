@@ -97,14 +97,13 @@ class SymfonyQuestionHelper extends QuestionHelper
                 $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $default);
         }
 
-        $output->write($text);
+        $output->writeLn($text);
 
         if ($question instanceof ChoiceQuestion) {
             $width = max(array_map('strlen', array_keys($question->getChoices())));
 
             foreach ($question->getChoices() as $key => $value) {
-                $output->writeLn('');
-                $output->write(sprintf("  [<comment>%-${width}s</comment>] %s", $key, $value));
+                $output->writeLn(sprintf("  [<comment>%-${width}s</comment>] %s", $key, $value));
             }
         }
     }
@@ -114,7 +113,6 @@ class SymfonyQuestionHelper extends QuestionHelper
      */
     protected function prependResponse(OutputInterface $output, Question $question)
     {
-        $output->writeLn('');
         if ($question instanceof RepeatedQuestion && null !== $question->getDefault()) {
             $output->write(sprintf(' [<comment>%s</comment>]', $question->getDefault()));
         }

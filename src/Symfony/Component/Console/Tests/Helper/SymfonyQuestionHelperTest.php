@@ -31,7 +31,8 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
         $inputStream = $this->getInputStream("\nSwimming\n\nClimbing\n\n");
         $this->assertEquals(array('Badminton', 'Swimming', 'Football', 'Climbing', null), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
 
-        $this->assertOutputContains(str_replace("\n", PHP_EOL, " What are your hobbies?:\n [Badminton] > \n [Basket] > \n [Football] > \n > \n > "), $output);
+        $this->assertOutputContains(' What are your hobbies?:', $output);
+        $this->assertOutputContains(' [Badminton] >  [Basket] >  [Football] >  >  > ', $output);
     }
 
     public function testAskChoice()

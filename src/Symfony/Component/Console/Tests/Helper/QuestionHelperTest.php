@@ -19,12 +19,27 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\RepeatedQuestion;
 
 /**
  * @group tty
  */
 class QuestionHelperTest extends AbstractQuestionHelperTest
 {
+    public function testAskRepeatedQuestion()
+    {
+        $question = new RepeatedQuestion('What do you want?', call_user_func(function () {
+            do {
+                $answer = (yield 'default');
+            } while ($answer !== 'default');
+        }));
+        $questionHelper = new QuestionHelper();
+        $inputStream = $this->getInputStream("bar\nfoo\n\n");
+
+        $answers = $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+        $this->assertEquals(array('bar', 'foo', 'default'), $answers);
+    }
+
     public function testAskChoice()
     {
         $questionHelper = new QuestionHelper();
@@ -356,11 +371,21 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         );
     }
 
-    public function testNoInteraction()
+    /**
+     * @dataProvider questionProviderWhenNoInteraction
+     */
+    public function testNoInteraction($question, $expectedOutput)
     {
         $dialog = new QuestionHelper();
-        $question = new Question('Do you have a job?', 'not yet');
-        $this->assertEquals('not yet', $dialog->ask($this->createStreamableInputInterfaceMock(null, false), $this->createOutputInterface(), $question));
+        $this->assertEquals($expectedOutput, $dialog->ask($this->createStreamableInputInterfaceMock(null, false), $this->createOutputInterface(), $question));
+    }
+
+    public function questionProviderWhenNoInteraction()
+    {
+        return array(
+            array(new Question('Do you have a job?', 'not yet'), 'not yet'),
+            array(new RepeatedQuestion('What would you do in Paris?'), array(null)),
+        );
     }
 
     /**

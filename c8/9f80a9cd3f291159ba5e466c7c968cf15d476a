@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-22T09:43:57Z
+
+I tend to think this could theoretically be OK , BUT practically I don't see any reasons to take the risk of breaking something given that the existing `array_key_exists` checks don't hurt performance nor anything else.
+Thus :-1:
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-22T11:54:13Z
+
+What would we break? Only null is affected.. we shouldnt consider people actually relying on this quirk from our side. Imo.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-22T11:56:43Z
+
+Not cleaning up out of fear.. or not knowing about intention of code is :-1: for me.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-22T12:29:38Z
+
+> we shouldnt consider people actually relying on this quirk from our side.
+
+That's where our opinions diverge. By experience, people *do* use extension points to do clever things we can't imagine beforehand.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-22T12:41:04Z
+
+Understand, and i know this is difficult. My point is, this was not intended/designed to be a extension point at all. We make it really hard for ourselves also this way.
+
+This should be considered rationally, do we intend `array_key_exists` or not. Im really curious about that...
+
+My opionion:
+- whatever the user is doing with `$this->services`, doesnt matter
+- `has` is _designed_ to return true when set (hence `isset`)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-22T13:49:56Z
+
+Re-read, removing my :-1:
+Should be on 2.7 btw.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-22T14:04:55Z
+
+Rebased. Diff is the same :-) I cant edit the base branch on github i guess?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-22T14:09:29Z
+
+@ro0NL you can edit it (they deployed this feature 1 week ago)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-22T14:13:42Z
+
+Made my day. Thanks @stof
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-22T14:53:43Z
+
+:+1: :)
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-22T14:54:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-22T15:31:38Z
+
+Indeed, `null` was a significant value before #8582, but it's not anymore.

@@ -123,6 +123,7 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
              'config' => 'foo',
              'default_data' => 'foo',
              'submitted_data' => 'foo',
+             'has_children_error' => false,
              'children' => array(
                  'child' => $childFormData,
              ),
@@ -323,6 +324,7 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
             'config' => 'foo',
             'default_data' => 'foo',
             'submitted_data' => 'foo',
+            'has_children_error' => false,
             'children' => array(
                 'child' => $childFormData,
             ),
@@ -526,6 +528,62 @@ class FormDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $data = $this->dataCollector->getData();
         $this->assertSame(4, $data['nb_errors']);
+    }
+
+    public function testCollectSubmittedDataExpandedFormsErrors()
+    {
+        $child1Form = $this->createForm('child1');
+        $child11Form = $this->createForm('child11');
+        $child2Form = $this->createForm('child2');
+        $child21Form = $this->createForm('child21');
+
+        $child1Form->add($child11Form);
+        $child2Form->add($child21Form);
+        $this->form->add($child1Form);
+        $this->form->add($child2Form);
+
+        $this->dataExtractor
+            ->method('extractConfiguration')
+            ->will($this->returnValue(array()));
+        $this->dataExtractor
+            ->method('extractDefaultData')
+            ->will($this->returnValue(array()));
+        $this->dataExtractor->expects($this->at(10))
+            ->method('extractSubmittedData')
+            ->with($this->form)
+            ->will($this->returnValue(array('errors' => array())));
+        $this->dataExtractor->expects($this->at(11))
+            ->method('extractSubmittedData')
+            ->with($child1Form)
+            ->will($this->returnValue(array('errors' => array())));
+        $this->dataExtractor->expects($this->at(12))
+            ->method('extractSubmittedData')
+            ->with($child11Form)
+            ->will($this->returnValue(array('errors' => array('foo'))));
+        $this->dataExtractor->expects($this->at(13))
+            ->method('extractSubmittedData')
+            ->with($child2Form)
+            ->will($this->returnValue(array('errors' => array())));
+        $this->dataExtractor->expects($this->at(14))
+            ->method('extractSubmittedData')
+            ->with($child21Form)
+            ->will($this->returnValue(array('errors' => array())));
+
+        $this->dataCollector->collectSubmittedData($this->form);
+        $this->dataCollector->buildPreliminaryFormTree($this->form);
+
+        $data = $this->dataCollector->getData();
+        $formData = $data['forms']['name'];
+        $child1Data = $formData['children']['child1'];
+        $child11Data = $child1Data['children']['child11'];
+        $child2Data = $formData['children']['child2'];
+        $child21Data = $child2Data['children']['child21'];
+
+        $this->assertTrue($formData['has_children_error']);
+        $this->assertTrue($child1Data['has_children_error']);
+        $this->assertFalse(isset($child11Data['has_children_error']), 'The leaf data does not contains "has_children_error" property.');
+        $this->assertFalse($child2Data['has_children_error']);
+        $this->assertFalse(isset($child21Data['has_children_error']), 'The leaf data does not contains "has_children_error" property.');
     }
 
     private function createForm($name)

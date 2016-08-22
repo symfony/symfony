@@ -34,22 +34,13 @@ final class RepeatedQuestion extends Question
     }
 
     /**
-     * Pass the last answer to the generator and set the
-     * generator pointer on the next question.
-     */
-    public function addAnswer($answer)
-    {
-        $this->generator->send($answer);
-    }
-
-    /**
-     * Checks whether the generator contains other questions.
+     * Returns the question generator.
      *
-     * @return bool
+     * @return \Generator
      */
-    public function shouldContinue()
+    public function getGenerator()
     {
-        return $this->generator->valid();
+        return $this->generator;
     }
 
     /**

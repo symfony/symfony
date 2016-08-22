@@ -56,8 +56,9 @@ class QuestionHelper extends Helper
             }
 
             $responses = array();
-            while ($question->shouldContinue()) {
-                $question->addAnswer($question->getDefault());
+            $generator = $question->getGenerator();
+            while ($generator->valid()) {
+                $generator->send($question->getDefault());
                 $responses[] = $question->getDefault();
             }
 
@@ -147,9 +148,9 @@ class QuestionHelper extends Helper
         }
 
         $responses = array();
-        while ($question->shouldContinue()) {
-            $responses[] = $response = $this->getResponse($output, $question);
-            $question->addAnswer($response);
+        $generator = $question->getGenerator();
+        while ($generator->valid()) {
+            $generator->send($responses[] = $this->getResponse($output, $question));
         }
 
         return $responses;

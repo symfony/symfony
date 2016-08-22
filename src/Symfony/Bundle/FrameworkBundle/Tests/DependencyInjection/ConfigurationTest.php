@@ -275,7 +275,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'workflows' => array(),
             'php_errors' => array(
-                'log' => false,
+                'log' => true,
                 'throw' => true,
             ),
         );

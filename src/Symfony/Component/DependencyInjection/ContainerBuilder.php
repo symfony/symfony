@@ -401,10 +401,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        if (!$this->compiled) {
-            @trigger_error(sprintf('Calling %s() before compiling the container is deprecated since version 3.2 and will throw an exception in 4.0.', __METHOD__), E_USER_DEPRECATED);
-        }
-
         $id = strtolower($id);
 
         if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
@@ -413,6 +409,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         if (!array_key_exists($id, $this->definitions) && isset($this->aliasDefinitions[$id])) {
             return $this->get($this->aliasDefinitions[$id]);
+        }
+
+        if (!$this->compiled) {
+            @trigger_error(sprintf('Calling %s() before compiling the container is deprecated for non-synthetic services since version 3.2 and will throw an exception in 4.0.', __METHOD__), E_USER_DEPRECATED);
         }
 
         try {

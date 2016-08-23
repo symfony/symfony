@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-23T14:34:54Z
+
+Should be target the 2.7 branch instead of master.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-23T15:00:30Z
+
+hmm, the 2.7 version of Frameworkbundle indeed requires symfony/translation 2.7+, so this is indeed valid.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-08-23T15:41:32Z
+
+:+1:

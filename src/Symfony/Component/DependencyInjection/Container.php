@@ -356,7 +356,7 @@ class Container implements IntrospectableContainerInterface
      */
     public function getServiceIds()
     {
-        $ids = array();
+        $ids = array_keys($this->methodMap + $this->services);
         $reversedMethodMap = array_change_key_case(array_flip($this->methodMap), \CASE_LOWER);
         foreach (get_class_methods($this) as $method) {
             if (preg_match('/^get(.+)Service$/', $method, $match)) {
@@ -369,7 +369,7 @@ class Container implements IntrospectableContainerInterface
         }
         $ids[] = 'service_container';
 
-        return array_values(array_unique(array_merge($ids, array_keys($this->methodMap), array_keys($this->services))));
+        return array_values(array_unique($ids));
     }
 
     /**

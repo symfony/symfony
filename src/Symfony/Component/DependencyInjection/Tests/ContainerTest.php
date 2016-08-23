@@ -123,11 +123,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new Container();
         $sc->set('foo', $obj = new \stdClass());
         $sc->set('bar', $obj = new \stdClass());
-        $this->assertEquals(array('service_container', 'foo', 'bar'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
+        $this->assertEquals(array('foo', 'bar', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('scoped', 'scoped_foo', 'scoped_synchronized_foo', 'inactive', 'mapped_method_id', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'mapped_method_id2', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids resolved from methods, followed by service ids defined by set()');
+        $this->assertEquals(array('mapped_method_id', 'mapped_method_id2', 'foo', 'scoped', 'scoped_foo', 'scoped_synchronized_foo', 'inactive', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids resolved from methods, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -235,7 +235,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent service "bag". Did you mean one of these: "bar", "baz"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
+            $this->assertEquals('You have requested a non-existent service "bag". Did you mean one of these: "baz", "bar"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
         }
     }
 

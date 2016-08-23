@@ -191,7 +191,6 @@ class Container implements ResettableContainerInterface
             if ('service_container' === $id
                 || isset($this->aliases[$id])
                 || isset($this->services[$id])
-                || array_key_exists($id, $this->services)
             ) {
                 return true;
             }
@@ -234,7 +233,7 @@ class Container implements ResettableContainerInterface
                 $id = $this->aliases[$id];
             }
             // Re-use shared service instance if it exists.
-            if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
+            if (isset($this->services[$id])) {
                 return $this->services[$id];
             }
 
@@ -256,10 +255,10 @@ class Container implements ResettableContainerInterface
                     }
 
                     $alternatives = array();
-                    foreach ($this->services as $key => $associatedService) {
-                        $lev = levenshtein($id, $key);
-                        if ($lev <= strlen($id) / 3 || false !== strpos($key, $id)) {
-                            $alternatives[] = $key;
+                    foreach ($this->getServiceIds() as $knownId) {
+                        $lev = levenshtein($id, $knownId);
+                        if ($lev <= strlen($id) / 3 || false !== strpos($knownId, $id)) {
+                            $alternatives[] = $knownId;
                         }
                     }
 
@@ -304,7 +303,7 @@ class Container implements ResettableContainerInterface
             $id = $this->aliases[$id];
         }
 
-        return isset($this->services[$id]) || array_key_exists($id, $this->services);
+        return isset($this->services[$id]);
     }
 
     /**

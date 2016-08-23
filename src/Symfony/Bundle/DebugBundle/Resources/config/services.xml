@@ -22,7 +22,7 @@
         <service id="debug.dump_listener" class="Symfony\Component\HttpKernel\EventListener\DumpListener">
             <tag name="kernel.event_subscriber" />
             <argument type="service" id="var_dumper.cloner" />
-            <argument type="service" id="data_collector.dump" />
+            <argument type="service" id="var_dumper.cli_dumper" />
         </service>
 
         <service id="var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" />

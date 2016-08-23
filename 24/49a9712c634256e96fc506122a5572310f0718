@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-17T12:26:02Z
+
+I think you can go one step further and dump the collected bootstrap dumps in the event listener, by forwarding them to the dumper that is injected there.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-17T12:57:20Z
+
+It's not easy because I need to add new "features" into the DumpDataCollector.
+
+So I propose to merge this one, and I will open a new PR for master with your feature.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-17T12:59:09Z
+
+:+1:

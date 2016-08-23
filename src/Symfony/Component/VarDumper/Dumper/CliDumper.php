@@ -342,13 +342,16 @@ class CliDumper extends AbstractDumper
                     } elseif (0 < strpos($key, "\0", 1)) {
                         $key = explode("\0", substr($key, 1), 2);
 
-                        switch ($key[0]) {
+                        switch ($key[0][0]) {
                             case '+': // User inserted keys
                                 $attr['dynamic'] = true;
                                 $this->line .= '+'.$bin.'"'.$this->style('public', $key[1], $attr).'": ';
                                 break 2;
                             case '~':
                                 $style = 'meta';
+                                if (isset($key[0][1])) {
+                                    $attr['title'] = substr($key[0], 1);
+                                }
                                 break;
                             case '*':
                                 $style = 'protected';

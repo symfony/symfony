@@ -89,6 +89,7 @@ class ExceptionCaster
         $stub->handle = 0;
         $frames = $trace->value;
         $prefix = Caster::PREFIX_VIRTUAL;
+        $format = "\0~Stack level %s.\0%s";
 
         $a = array();
         $j = count($frames);
@@ -124,7 +125,7 @@ class ExceptionCaster
                     $frame->value['args'] = $f[$prefix.'args'];
                 }
             }
-            $a[$prefix.$j.'. '.$label] = $frame;
+            $a[sprintf($format, $j, $label)] = $frame;
 
             $lastCall = ' ==> '.$call;
         }

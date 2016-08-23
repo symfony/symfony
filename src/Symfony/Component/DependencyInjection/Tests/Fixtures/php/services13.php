@@ -45,6 +45,14 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isFrozen()
+    {
+        return true;
+    }
+
+    /**
      * Gets the 'bar' service.
      *
      * This service is shared.

@@ -227,7 +227,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $foo = new \stdClass());
-        $sc->set('bar', $foo = new \stdClass());
         $sc->set('baz', $foo = new \stdClass());
 
         try {

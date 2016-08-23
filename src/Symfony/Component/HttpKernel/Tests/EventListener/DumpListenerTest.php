@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\HttpKernel\EventListener\DumpListener;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
@@ -28,7 +28,7 @@ class DumpListenerTest extends \PHPUnit_Framework_TestCase
     public function testSubscribedEvents()
     {
         $this->assertSame(
-            array(KernelEvents::REQUEST => array('configure', 1024)),
+            array(ConsoleEvents::COMMAND => array('configure', 1024)),
             DumpListener::getSubscribedEvents()
         );
     }

@@ -825,7 +825,7 @@ class FrameworkExtension extends Extension
             $overwriteDir = $container->getParameter('kernel.root_dir').'/Resources/'.$reflection->getShortName();
 
             if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
-                if (is_file($overwriteFile =  $overwriteDir.'/config/validation.xml')) {
+                if (is_file($overwriteFile = $overwriteDir.'/config/validation.xml')) {
                     $file = $overwriteFile;
                 }
                 $files[0][] = realpath($file);
@@ -833,7 +833,7 @@ class FrameworkExtension extends Extension
             }
 
             if (is_file($file = $dirname.'/Resources/config/validation.yml')) {
-                if (is_file($overwriteFile =  $overwriteDir.'/config/validation.yml')) {
+                if (is_file($overwriteFile = $overwriteDir.'/config/validation.yml')) {
                     $file = $overwriteFile;
                 }
                 $files[1][] = realpath($file);

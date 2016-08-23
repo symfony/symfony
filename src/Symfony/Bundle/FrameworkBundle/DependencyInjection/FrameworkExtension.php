@@ -822,10 +822,10 @@ class FrameworkExtension extends Extension
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
             $dirname = dirname($reflection->getFileName());
-            $overwriteDir = $container->getParameter('kernel.root_dir') . '/Resources/' . $reflection->getShortName();
+            $overwriteDir = $container->getParameter('kernel.root_dir').'/Resources/'.$reflection->getShortName();
 
             if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
-                if (is_file($overwriteFile =  $overwriteDir . '/config/validation.xml')) {
+                if (is_file($overwriteFile =  $overwriteDir.'/config/validation.xml')) {
                     $file = $overwriteFile;
                 }
                 $files[0][] = realpath($file);
@@ -833,7 +833,7 @@ class FrameworkExtension extends Extension
             }
 
             if (is_file($file = $dirname.'/Resources/config/validation.yml')) {
-                if (is_file($overwriteFile =  $overwriteDir . '/config/validation.yml')) {
+                if (is_file($overwriteFile =  $overwriteDir.'/config/validation.yml')) {
                     $file = $overwriteFile;
                 }
                 $files[1][] = realpath($file);
@@ -841,8 +841,8 @@ class FrameworkExtension extends Extension
             }
 
             if (is_dir($dir = $dirname.'/Resources/config/validation')) {
-                if (is_dir($overwriteDir . '/config/validation')) {
-                    $dir = $overwriteDir . '/config/validation';
+                if (is_dir($overwriteDir.'/config/validation')) {
+                    $dir = $overwriteDir.'/config/validation';
                 }
                 foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
                     $files[0][] = $file->getRealPath();

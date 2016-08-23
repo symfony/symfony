@@ -30,7 +30,7 @@ class DebugBundle extends Bundle
             // configuration for CLI mode is overridden in HTTP mode on
             // 'kernel.request' event
             VarDumper::setHandler(function ($var) use ($container) {
-                $dumper = $container->get('var_dumper.cli_dumper');
+                $dumper = $container->get('data_collector.dump');
                 $cloner = $container->get('var_dumper.cloner');
                 $handler = function ($var) use ($dumper, $cloner) {
                     $dumper->dump($cloner->cloneVar($var));

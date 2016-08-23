@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-20T14:56:36Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-20T21:13:45Z
+
+This will include possible private services as well, but those are still allowed to `get`.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-20T21:38:35Z
+
+> This will include possible private services as well, but those are still allowed to get.
+
+@ro0NL : And it was already the case anyway, isn't it ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-08-20T21:47:48Z
+
+I guess it depends.. if it was already initialized yes/no. This will include by definition, not by state.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-22T14:33:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-22T14:45:57Z
+
+:+1:

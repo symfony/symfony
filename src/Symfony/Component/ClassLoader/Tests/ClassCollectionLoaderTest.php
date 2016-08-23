@@ -30,14 +30,14 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         $m = $r->getMethod('getOrderedClasses');
         $m->setAccessible(true);
 
-        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', array('CTFoo'));
+        $ordered = $m->invoke(null, array('CTFoo'));
 
         $this->assertEquals(
             array('TD', 'TC', 'TB', 'TA', 'TZ', 'CTFoo'),
             array_map(function ($class) { return $class->getName(); }, $ordered)
         );
 
-        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', array('CTBar'));
+        $ordered = $m->invoke(null, array('CTBar'));
 
         $this->assertEquals(
             array('TD', 'TZ', 'TC', 'TB', 'TA', 'CTBar'),
@@ -61,7 +61,7 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         $m = $r->getMethod('getOrderedClasses');
         $m->setAccessible(true);
 
-        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', $classes);
+        $ordered = $m->invoke(null, $classes);
 
         $this->assertEquals($expected, array_map(function ($class) { return $class->getName(); }, $ordered));
     }
@@ -118,7 +118,7 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         $m = $r->getMethod('getOrderedClasses');
         $m->setAccessible(true);
 
-        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', $classes);
+        $ordered = $m->invoke(null, $classes);
 
         $this->assertEquals($expected, array_map(function ($class) { return $class->getName(); }, $ordered));
     }
@@ -157,7 +157,7 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
         $m = $r->getMethod('getOrderedClasses');
         $m->setAccessible(true);
 
-        $ordered = $m->invoke('Symfony\Component\ClassLoader\ClassCollectionLoader', $classes);
+        $ordered = $m->invoke(null, $classes);
 
         $this->assertEquals($expected, array_map(function ($class) { return $class->getName(); }, $ordered));
     }

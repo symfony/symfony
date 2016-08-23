@@ -222,7 +222,10 @@ class FlattenException
             if (++$count > 1e4) {
                 return array('array', '*SKIPPED over 10000 entries*');
             }
-            if (is_object($value)) {
+            if ($value instanceof \__PHP_Incomplete_Class) {
+                // is_object() returns false on PHP<=7.1
+                $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
+            } elseif (is_object($value)) {
                 $result[$key] = array('object', get_class($value));
             } elseif (is_array($value)) {
                 if ($level > 10) {
@@ -240,9 +243,6 @@ class FlattenException
                 $result[$key] = array('float', $value);
             } elseif (is_resource($value)) {
                 $result[$key] = array('resource', get_resource_type($value));
-            } elseif ($value instanceof \__PHP_Incomplete_Class) {
-                // Special case of object, is_object will return false
-                $result[$key] = array('incomplete-object', $this->getClassNameFromIncomplete($value));
             } else {
                 $result[$key] = array('string', (string) $value);
             }

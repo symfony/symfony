@@ -26,11 +26,6 @@ class LoggingTranslatorPass implements CompilerPassInterface
             return;
         }
 
-        // skip if the symfony/translation version is lower than 2.6
-        if (!interface_exists('Symfony\Component\Translation\TranslatorBagInterface')) {
-            return;
-        }
-
         if ($container->hasParameter('translator.logging') && $container->getParameter('translator.logging')) {
             $translatorAlias = $container->getAlias('translator');
             $definition = $container->getDefinition((string) $translatorAlias);

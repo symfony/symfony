@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-03T23:31:45Z
+
+I don't know if this can actually happen in real life, but those changes won't differentiate anymore the `PHP_AUTH_USER` header being `null` from being absent. Which is probably the reason why it was written as it is (Of course, I agree the situation would be weird).
+
+Otherwise 👍
+
+---------------------------------------------------------------------------
+
+by MacDada at 2016-08-04T09:29:46Z
+
+> those changes won't differentiate anymore the PHP_AUTH_USER header being null from being absent
+
+@ogizanagi Yep. But before changes u cannot differentiate PHP_AUTH_USER header being false from absent xD
+
+So, the real question is: what kind of values can never be there, so that we can treat them as "no values". `null` seems to be a good default one, unless it's somehow special here. I don't know. Tests pass. PR is open ;-)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-15T02:14:33Z
+
+What's the benefit of this change?
+
+---------------------------------------------------------------------------
+
+by MacDada at 2016-08-15T11:06:19Z
+
+> What's the benefit of this change?
+
+Less WTF while reading the code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-23T07:59:26Z
+
+:+1:

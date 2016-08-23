@@ -12,6 +12,8 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use Symfony\Component\VarDumper\Caster\ExceptionCaster;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 class ExceptionCasterTest extends \PHPUnit_Framework_TestCase
@@ -38,14 +40,14 @@ Exception {
   #message: "foo"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 23
+  #line: 25
   -trace: {
-    %d. %sExceptionCasterTest.php:23: {
-      22: {
-      23:     return new \Exception('foo');
-      24: }
+    %sExceptionCasterTest.php:25: {
+      24: {
+      25:     return new \Exception('foo');
+      26: }
     }
-    %d. %sExceptionCasterTest.php:%d: {
+    %sExceptionCasterTest.php:%d: {
       %d: {
       %d:     $e = $this->getTestException(1);
       %d: 
@@ -65,12 +67,12 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 {
-  %d. %sExceptionCasterTest.php:23: {
-    22: {
-    23:     return new \Exception('foo');
-    24: }
+  %sExceptionCasterTest.php:25: {
+    24: {
+    25:     return new \Exception('foo');
+    26: }
   }
-  %d. %sExceptionCasterTest.php:%d: {
+  %sExceptionCasterTest.php:%d: {
     %d: {
     %d:     $e = $this->getTestException(2);
     %d: 
@@ -94,14 +96,14 @@ Exception {
   #message: "foo"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 23
+  #line: 25
   -trace: {
-    %d. %sExceptionCasterTest.php:23: {
-      22: {
-      23:     return new \Exception('foo');
-      24: }
+    %sExceptionCasterTest.php:25: {
+      24: {
+      25:     return new \Exception('foo');
+      26: }
     }
-    %d. %sExceptionCasterTest.php:%d: {
+    %sExceptionCasterTest.php:%d: {
       %d: {
       %d:     $e = $this->getTestException(1);
       %d:     ExceptionCaster::$traceArgs = false;
@@ -122,13 +124,45 @@ Exception {
   #message: "foo"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 23
+  #line: 25
   -trace: {
-    %d. %sExceptionCasterTest.php: 23
-    %d. %sExceptionCasterTest.php: %d
+    %sExceptionCasterTest.php: 25
+    %sExceptionCasterTest.php: %d
 %A
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
+    }
+
+    public function testHtmlDump()
+    {
+        $e = $this->getTestException(1);
+        ExceptionCaster::$srcContext = -1;
+
+        $h = fopen('php://memory', 'r+b');
+        $cloner = new VarCloner();
+        $cloner->setMaxItems(1);
+        $dumper = new HtmlDumper($h);
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $dumper->dump($cloner->cloneVar($e)->withRefHandles(false));
+        $dump = stream_get_contents($h, -1, 0);
+        fclose($h);
+
+        $expectedDump = <<<'EODUMP'
+<foo></foo><bar><span class=sf-dump-note>Exception</span> {<samp>
+  #<span class=sf-dump-protected title="Protected property">message</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
+  #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
+  #<span class=sf-dump-protected title="Protected property">file</span>: "<span class=sf-dump-str title="%d characters">%sExceptionCasterTest.php</span>"
+  #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>25</span>
+  -<span class=sf-dump-private title="Private property defined in class:&#10;`Exception`">trace</span>: {<samp>
+    <span class=sf-dump-meta title="Stack level %d.">%sExceptionCasterTest.php</span>: <span class=sf-dump-num>25</span>
+     &hellip;12
+  </samp>}
+</samp>}
+</bar>
+EODUMP;
+
+        $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 }

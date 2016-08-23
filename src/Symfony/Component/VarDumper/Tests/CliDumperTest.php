@@ -288,23 +288,23 @@ stream resource {@{$ref}
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     -trace: {
-      %d. {$twig}
-      %d. %sTemplate.php:%d: {
+      {$twig}
+      %sTemplate.php:%d: {
         %d: try {
         %d:     \$this->doDisplay(\$context, \$blocks);
         %d: } catch (Twig_Error \$e) {
       }
-      %d. %sTemplate.php:%d: {
+      %sTemplate.php:%d: {
         %d: {
         %d:     \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));
         %d: }
       }
-      %d. %sTemplate.php:%d: {
+      %sTemplate.php:%d: {
         %d: try {
         %d:     \$this->display(\$context);
         %d: } catch (Exception \$e) {
       }
-      %d. %sCliDumperTest.php:{$line}: {
+      %sCliDumperTest.php:{$line}: {
         %d:         }
         {$line}:     };'),
         %d: ));

@@ -445,6 +445,8 @@ EOHTML
             return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $v, $style, substr($v, $c + 1));
         } elseif ('protected' === $style) {
             $style .= ' title="Protected property"';
+        } elseif ('meta' === $style && isset($attr['title'])) {
+            $style .= sprintf(' title="%s"', htmlspecialchars($attr['title'], ENT_QUOTES, 'UTF-8'));
         } elseif ('private' === $style) {
             $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', $attr['class']);
         }

@@ -39,7 +39,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends \PHPUnit_Framework_TestCase
     public function testDenormalize($underscored, $lowerCamelCased)
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter();
-        $this->assertEquals($nameConverter->denormalize($underscored), lcfirst($lowerCamelCased));
+        $this->assertEquals($nameConverter->denormalize($underscored), $lowerCamelCased);
     }
 
     public function attributeProvider()
@@ -48,8 +48,8 @@ class CamelCaseToSnakeCaseNameConverterTest extends \PHPUnit_Framework_TestCase
             array('coop_tilleuls', 'coopTilleuls'),
             array('_kevin_dunglas', '_kevinDunglas'),
             array('this_is_a_test', 'thisIsATest'),
-            array('first_character_no_underscore', 'FirstCharacterNoUnderscore'),
-            array('tim_hovius', 'TimHovius'),
+            array('first_character_no_underscore', 'firstCharacterNoUnderscore'),
+            array('tim_hovius', 'timHovius'),
         );
     }
 }

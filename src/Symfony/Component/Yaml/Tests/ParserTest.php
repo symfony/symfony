@@ -337,7 +337,7 @@ bar: >
 EOF;
         $expected = array(
             'foo' => "one two\n",
-            'bar' => 'one two',
+            'bar' => "one two\n",
         );
         $tests['Folded block chomping clip without trailing newline'] = array($expected, $yaml);
 
@@ -1012,7 +1012,7 @@ EOT;
     public function testBlankLinesAreParsedAsNewLinesInFoldedBlocks()
     {
         $yaml = <<<EOT
-test: >
+test: >-
     <h2>A heading</h2>
 
     <ul>
@@ -1036,7 +1036,7 @@ EOT
     public function testAdditionallyIndentedLinesAreParsedAsNewLinesInFoldedBlocks()
     {
         $yaml = <<<EOT
-test: >
+test: >-
     <h2>A heading</h2>
 
     <ul>

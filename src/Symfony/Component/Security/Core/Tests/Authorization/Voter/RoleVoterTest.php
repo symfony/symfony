@@ -36,6 +36,12 @@ class RoleVoterTest extends \PHPUnit_Framework_TestCase
             array(array('ROLE_FOO'), array('ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
             array(array('ROLE_FOO'), array('FOO', 'ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
             array(array('ROLE_BAR', 'ROLE_FOO'), array('ROLE_FOO'), VoterInterface::ACCESS_GRANTED),
+
+            // Test mixed Types
+            array(array(), array(array()), VoterInterface::ACCESS_ABSTAIN),
+            array(array(), array(new \stdClass()), VoterInterface::ACCESS_ABSTAIN),
+            array(array('ROLE_BAR'), array(new Role('ROLE_BAR')), VoterInterface::ACCESS_GRANTED),
+            array(array('ROLE_BAR'), array(new Role('ROLE_FOO')), VoterInterface::ACCESS_DENIED),
         );
     }
 

@@ -104,6 +104,9 @@ class Application
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
+        putenv('LINES='.$this->terminal->getHeight());
+        putenv('COLUMNS='.$this->terminal->getWidth());
+
         if (null === $input) {
             $input = new ArgvInput();
         }

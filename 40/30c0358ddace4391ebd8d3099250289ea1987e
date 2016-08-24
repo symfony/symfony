@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2016-08-16T14:42:39Z
+
+Updated! both exception class and text message have been improved. @ogizanagi thanks one more time.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-23T19:01:57Z
+
+As it already throws an exception, I think this should be merged in 2.7. ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-08-23T19:34:35Z
+
+@fabpot I should create a separate PR for 2.7 branch?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-23T20:55:33Z
+
+👍 as a bug fix
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-23T21:32:45Z
+
+👍 as a bug fix

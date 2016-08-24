@@ -235,18 +235,25 @@
         }
 
         {% if excluded_ajax_paths is defined %}
-            if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
-                if (window.fetch) {
-                    var oldFetch = window.fetch;
-                    window.fetch = function () {
-                        var promise = oldFetch.apply(null, arguments);
+
+            if (window.fetch) {
+                var oldFetch = window.fetch;
+                window.fetch = function () {
+                    var promise = oldFetch.apply(null, arguments);
+                    if (!arguments[0].match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                        var method = 'GET';
+                        if (arguments[1] && arguments[1].method !== undefined) {
+                            method = arguments[1].method;
+                        }
+
                         var stackElement = {
                             loading: true,
                             error: false,
                             url: arguments[0],
-                            method: arguments[1].method,
+                            method: method,
                             start: new Date()
                         };
+
                         requestStack.push(stackElement);
                         promise.then(function (r) {
                             stackElement.duration = new Date() - stackElement.start;
@@ -256,11 +263,17 @@
                             stackElement.profile = r.headers.get('x-debug-token');
                             stackElement.profilerUrl = r.headers.get('x-debug-token-link');
                             Sfjs.renderAjaxRequests();
+                        }).catch(function(err) {
+                            stackElement.loading = false;
+                            stackElement.error = true;
                         });
                         Sfjs.renderAjaxRequests();
-                        return promise;
-                    };
-                }
+                    }
+
+                    return promise;
+                };
+            }
+            if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
                 var proxied = XMLHttpRequest.prototype.open;
 
                 XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {

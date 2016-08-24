@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-24T05:33:50Z
+
+👍 as bugfix
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-24T09:12:18Z
+
+I think it would still be good to mention the repository class, for the case where they already have a custom one
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-24T09:33:55Z
+
+@stof Updated. As the same repository can be used for several entities, each one potentionnaly having its own provider, I think the entity class/alias is good to know too. WDYT?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-24T11:33:11Z
+
+Added a test case for this method. The tests will need to be updated on other branches. Let me know if I can help by submitting a PR on 2.8 (using `UserLoaderInterface` instead of `UserProviderInterface` everywhere).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-24T13:40:41Z
+
+@fabpot fixed my mistake on the message according to your suggestion.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-24T20:46:39Z
+
+Status: reviewed

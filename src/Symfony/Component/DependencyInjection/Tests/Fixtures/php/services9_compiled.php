@@ -78,7 +78,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        $a = $this->get('foo.baz');
+        $a = $this->get('foo.baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
 
         $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
 
@@ -99,7 +99,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['baz'] = $instance = new \Baz();
 
-        $instance->setFoo($this->get('foo_with_inline'));
+        $instance->setFoo($this->get('foo_with_inline', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false));
 
         return $instance;
     }
@@ -115,7 +115,7 @@ class ProjectServiceContainer extends Container
     protected function getConfiguredServiceService()
     {
         $a = new \ConfClass();
-        $a->setFoo($this->get('baz'));
+        $a->setFoo($this->get('baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false));
 
         $this->services['configured_service'] = $instance = new \stdClass();
 
@@ -194,7 +194,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceService()
     {
-        return $this->services['factory_service'] = $this->get('foo.baz')->getInstance();
+        return $this->services['factory_service'] = $this->get('foo.baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false)->getInstance();
     }
 
     /**
@@ -220,11 +220,11 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        $a = $this->get('foo.baz');
+        $a = $this->get('foo.baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
 
         $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
-        $instance->setBar($this->get('bar'));
+        $instance->setBar($this->get('bar', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false));
         $instance->initialize();
         $instance->foo = 'bar';
         $instance->moo = $a;
@@ -275,7 +275,7 @@ class ProjectServiceContainer extends Container
 
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
-        $a->setBaz($this->get('baz'));
+        $a->setBaz($this->get('baz', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false));
         $a->pub = 'pub';
 
         $instance->setBar($a);
@@ -297,9 +297,9 @@ class ProjectServiceContainer extends Container
 
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
-        $instance->setBar($this->get('foo'));
+        $instance->setBar($this->get('foo', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false));
         $instance->setBar(NULL);
-        $instance->setBar(($this->get("foo")->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
+        $instance->setBar(($this->get("foo", ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false)->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
 
         return $instance;
     }

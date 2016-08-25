@@ -145,6 +145,34 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
     }
 
+    public function testPrivateServices()
+    {
+        $fooDefinition = new Definition('stdClass');
+        $fooDefinition->setProperty('value', 'something');
+        $fooDefinition->setPublic(false);
+
+        $fooUserDefinition = new Definition('stdClass');
+        $fooUserDefinition->setProperty('foo', new Reference('foo'));
+
+        $builder = new ContainerBuilder();
+        $builder->setResourceTracking(false);
+
+        $builder->addDefinitions(array(
+            'foo' => $fooDefinition,
+            'foo_user' => $fooUserDefinition,
+        ));
+
+        $dumper = new PhpDumper($builder);
+        $class = 'Symfony_DI_PhpDumper_Test_Private_Service';
+        eval('?>'.$dumper->dump(array('class' => $class)));
+
+        $container = new $class();
+
+        $expected = new \stdClass();
+        $expected->value = 'something';
+        $this->assertEquals($expected, $container->get('foo_user')->foo);
+    }
+
     public function testAddServiceIdWithUnsupportedCharacters()
     {
         $class = 'Symfony_DI_PhpDumper_Test_Unsupported_Characters';

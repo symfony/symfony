@@ -121,6 +121,29 @@ FrameworkBundle
  * The `Controller::getUser()` method has been removed in favor of the ability
    to typehint the security user object in the action.
 
+HttpFoundation
+---------------
+
+ * Extending the following methods of `Response`
+   is no longer possible (these methods are now `final`):
+
+    - `setDate`/`getDate`
+    - `setExpires`/`getExpires`
+    - `setLastModified`/`getLastModified`
+    - `setProtocolVersion`/`getProtocolVersion`
+    - `setStatusCode`/`getStatusCode`
+    - `setCharset`/`getCharset`
+    - `setPrivate`/`setPublic`
+    - `getAge`
+    - `getMaxAge`/`setMaxAge`
+    - `setSharedMaxAge`
+    - `getTtl`/`setTtl`
+    - `setClientTtl`
+    - `getEtag`/`setEtag`
+    - `hasVary`/`getVary`/`setVary`
+    - `isInvalid`/`isSuccessful`/`isRedirection`/`isClientError`/`isServerError`
+    - `isOk`/`isForbidden`/`isNotFound`/`isRedirect`/`isEmpty`
+
 HttpKernel
 ----------
 

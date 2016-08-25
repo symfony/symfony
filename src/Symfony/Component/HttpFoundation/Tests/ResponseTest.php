@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use Response\DefaultResponse;
+use Response\ExtendedResponse;
+use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -843,6 +846,34 @@ class ResponseTest extends ResponseTestCase
         }
     }
 
+    /**
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
+    public function testNoDeprecations()
+    {
+        ErrorAssert::assertDeprecationsAreTriggered(array(), function () {
+            new DefaultResponse();
+            $this->getMock(Response::class);
+        });
+    }
+
+    /**
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
+    public function testDeprecations()
+    {
+        $deprecationMessages = array();
+        foreach (array('getDate', 'setLastModified') as $method) {
+            $deprecationMessages[] = sprintf('Extending %s::%s() in Response\ExtendedResponse is deprecated', Response::class, $method);
+        }
+        ErrorAssert::assertDeprecationsAreTriggered($deprecationMessages, function () {
+            new ExtendedResponse();
+
+            // Deprecations should not be triggered twice
+            new ExtendedResponse();
+        });
+    }
+
     public function validContentProvider()
     {
         return array(
@@ -889,5 +920,24 @@ class StringableObject
     public function __toString()
     {
         return 'Foo';
+    }
+}
+
+namespace Response;
+
+use Symfony\Component\HttpFoundation\Response;
+
+class DefaultResponse extends Response
+{
+}
+
+class ExtendedResponse extends Response
+{
+    public function setLastModified(\DateTime $date = null)
+    {
+    }
+
+    public function getDate()
+    {
     }
 }

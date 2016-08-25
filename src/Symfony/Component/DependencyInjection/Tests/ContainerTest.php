@@ -126,7 +126,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
+        $this->assertEquals(array('bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
     }
 
     public function testSet()

@@ -345,7 +345,7 @@ class Container implements ResettableContainerInterface
         }
         $ids[] = 'service_container';
 
-        return array_unique(array_merge($ids, array_keys($this->services)));
+        return array_values(array_diff(array_unique(array_merge($ids, array_keys($this->services))), array_keys($this->privates)));
     }
 
     /**

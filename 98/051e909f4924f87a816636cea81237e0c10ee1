@@ -1,0 +1,170 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-18T20:16:24Z
+
+ping @Tobion
+
+---------------------------------------------------------------------------
+
+by c960657 at 2016-08-19T06:46:44Z
+
+I like how this approach is simpler than my own PR #19562. I think UTF-8 is the only reasonable encoding to use for URLs (because this is what browsers use when pretty-printing the URLs in the location field), and I assume most people will use UTF-8 internally in their data and source code, so I like how this patch favours UTF-8 while still allowing people to do otherwise if they want.
+
+I think the auto-detection of UTF-8 patterns is a bit too magic. E.g. whether `.` matches a byte or a character is determined by the whether the pattern contains some of the triggering characters elsewhere. So I am wondering whether we can make a more explicit but backwards-compatible way of enabling/disabling UTF-8.
+
+Here are two examples that are explicit. They are not native PCRE syntax but reuse syntax used in PCRE.
+
+ 1.  PCRE allows enabling UTF-8 mode from within the pattern using `(*UTF8)` (mentioned [here](http://www.pcre.org/pcre.txt). This is only valid at the beginning of the pattern, but we could reuse the syntax for triggering UTF-8 and just strip it when concatenating the pattern.
+ 2.  PCRE allows setting [internal options](http://php.net/manual/en/regexp.reference.internal-options.php) using `(?`, e.g. `(?i)` and `(?-i)`will enable and disable case-insensitivity, respectively. This does not work for the `u` pattern, but perhaps we could reuse the syntax and strip it. This syntax also allows us to make UTF-8 on by default in Symfony 4, so that it has to be explicitly disabled.
+
+According to the [manual](http://php.net/manual/en/regexp.reference.unicode.php), using `\w` is faster than `\pL`, so it would be nice if one could trigger UTF-8 mode without using `\pL`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-19T07:25:01Z
+
+I didn't know about the `(*UTF8)` prefix thanks for the link! I don't think we should target adding the `u` flag by default in 4.0: most of the time, URLs are plain ASCII string. But I agree with you: having magic behavior for `.` is an issue and recommending `\X` or `\PM` to opt into unicode comes with a perf overhead.
+Since unicode should really be enabled at the route level (not at the requirement level), I think we could add a conventional prefix to routes for enabling unicode. I propose `*` for now.
+The current magic that detects unicode could be turned into a deprecation (an exception in 4.0) for warning the user when one uses unicode characters/properties while the `*` prefix is missing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-19T08:35:10Z
+
+The prefix idea doesn't play well with route prefixing as done by loaders...
+The PR now handles a `*` prefix to enable unicode at the requirements level.
+See test cases also.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-19T08:41:47Z
+
+Another solution is to use a route option to opt in unicode mode. Route options are precisely meant to give hints to the route compiler.
+This would be easier to explain and remember than the fact of adding a magical ``(*UTF8)`` needing to be stripped.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-19T08:45:09Z
+
+@stof but that would be a DX nightmare: if you'd use unicode, you'd need to repeat yourself thousands of times. The current way is a bit magic, but really seamless: if you use any unicode chars or any unicode property, unicode is enabled. There is only one special case: the `*` prefix to requirements to force unicode matching for `.` when needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-19T09:09:42Z
+
+Doc PR added: https://github.com/symfony/symfony-docs/pull/6890
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-19T14:59:15Z
+
+I don't really like the `*` convention, but I don't have any better idea, so 👍
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-19T15:01:29Z
+
+@fabpot what about my proposal of using my proposal ?
+
+@nicolas-grekas we could keep the autodetection of unicode. The option would be used instead of using a magic ``*`` (the other question is whether setting the option to false explicitly should disable the autodetection)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-19T15:45:00Z
+
+@stof Indeed, I think an option is better than an obscure convention.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-19T16:28:41Z
+
+updated
+
+---------------------------------------------------------------------------
+
+by c960657 at 2016-08-23T21:05:20Z
+
+The patch uses the term “Unicode” in variable names etc., but wouldn't it be more correct to use “UTF-8” (the specific encoding we are supporting)? “Unicode” is a much wider concept. Note that the Unicode character properties escape sequences, `\p{xx}` etc., works even in non-UTF-8-mode.
+
+Also, I think we disagree a bit on what exactly this feature does:
+```
+    /**
+     * Returns the unicode enforcement status.
+     *
+     * @return bool Whether unicode matching is enforced or not
+     */
+    public function getUnicode()
+```
+In my eyes, this flag enabled UTF-8 support for regular expressions, i.e. basically adds the `u` modifier – nothing else. Do you agree, or could you elaborate what "unicode enforcement" means?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T05:53:19Z
+
+> The patch uses the term “Unicode” in variable names etc., but wouldn't it be more correct to use “UTF-8”
+
+I hesitated on this, and choose Unicode to match what the PCRE doc uses. On the web, Unicode is synonym for UTF-8. Nobody uses any other Unicode encoding there. And the PCRE doc says about "unicode properties", the "unicode" flag, etc. I thought it'd be better to make the vocabularies match.
+
+> Unicode character properties escape sequences, \p{xx} etc., works even in non-UTF-8-mode.
+
+Yes, yet it's undocumented (in the PHP doc at least, where on the contrary it's specifically documented under the "Unicode properties" chapter), and thus nobody knows what it does, esp. when considering high-ASCII chars.
+
+> this flag [...] adds the u modifier – nothing else.
+
+Yes when given `true`. But when given `false`, it doesn't "remove" the `u` modifier. Instead, it then relies on detecting if a Unicode char or prop to also add the `u` modifier.
+Thus this flag "enforces" the `u` modifier, whereas setting this flag to false "turns on" auto-detection.
+
+---------------------------------------------------------------------------
+
+by c960657 at 2016-08-24T19:40:04Z
+
+>I hesitated on this, and choose Unicode to match what the PCRE doc uses
+
+In most places, the PCRE man pages refer to "UTF-8 mode" or "UTF mode" (the library also supports UTF-16 and UTF-32).
+
+>Yes, yet it's undocumented (in the PHP doc at least, where on the contrary it's specifically documented under the "Unicode properties" chapter), and thus nobody knows what it does, esp. when considering high-ASCII chars.
+
+On the [man page](http://linux.die.net/man/3/pcrepattern) it says:
+"When in 8-bit non-UTF-8 mode, these sequences are of course limited to testing characters whose codepoints are less than 256, but they do work in this mode."
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T20:06:51Z
+
+I never read the man page of pcre but I read many times the one on php.net. I guess I'm more like the usual PHP user on this one :)
+
+---------------------------------------------------------------------------
+
+by c960657 at 2016-08-25T05:59:19Z
+
+>I never read the man page of pcre but I read many times the one on php.net.
+
+I'm not sure which parts of the PHP manual you are referring to. I couldn't find any occurrences of the phrase "Unicode mode" outside user comments. "UTF-8 mode" occurs a few places, e.g. in the [description of PREG_BAD_UTF8_OFFSET_ERROR](http://php.net/manual/en/pcre.constants.php).
+
+Unicode mode:
+https://www.google.dk/search?q=%22unicode+mode%22+site%3Aphp.net+inurl%3Amanual
+
+UTF-8 mode:
+https://www.google.dk/search?q=%22utf-8+mode%22+site%3Aphp.net+inurl%3Amanual
+
+Additionally, the work "Unicode" is used in connection with character classes, but as mentioned above they work with and without UTF-8 mode.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-25T08:11:51Z
+
+@c960657 thanks for you input. I've just renamed unicode to utf8 everywhere.
+
+I've also added a deprecation targeting the current magic: I propose to encourage people to explicitly enable the utf8 flag; throw a deprecation when they don't, and throw a LogicException in 4.0.
+
+---------------------------------------------------------------------------
+
+by c960657 at 2016-08-25T08:13:34Z
+
+Sounds like a good solution :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-25T09:18:00Z
+
+:+1:

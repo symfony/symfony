@@ -91,6 +91,16 @@ class RouteCompiler implements RouteCompilerInterface
         $matches = array();
         $pos = 0;
         $defaultSeparator = $isHost ? '.' : '/';
+        $useUtf8 = preg_match('//u', $pattern);
+        $needsUtf8 = $route->getOption('utf8');
+
+        if (!$needsUtf8 && $useUtf8 && preg_match('/[\x80-\xFF]/', $pattern)) {
+            $needsUtf8 = true;
+            @trigger_error(sprintf('Using UTF-8 route patterns without setting the "utf8" option is deprecated since Symfony 3.2 and will throw a LogicException in 4.0. Turn on the "utf8" route option for pattern "%s".', $pattern), E_USER_DEPRECATED);
+        }
+        if (!$useUtf8 && $needsUtf8) {
+            throw new \LogicException(sprintf('Cannot mix UTF-8 requirements with non-UTF-8 pattern "%s".', $pattern));
+        }
 
         // Match all variables enclosed in "{}" and iterate over them. But we only want to match the innermost variable
         // in case of nested "{}", e.g. {foo{bar}}. This in ensured because \w does not match "{" or "}" itself.
@@ -100,7 +110,15 @@ class RouteCompiler implements RouteCompilerInterface
             // get all static text preceding the current variable
             $precedingText = substr($pattern, $pos, $match[0][1] - $pos);
             $pos = $match[0][1] + strlen($match[0][0]);
-            $precedingChar = strlen($precedingText) > 0 ? substr($precedingText, -1) : '';
+
+            if (!strlen($precedingText)) {
+                $precedingChar = '';
+            } elseif ($useUtf8) {
+                preg_match('/.$/u', $precedingText, $precedingChar);
+                $precedingChar = $precedingChar[0];
+            } else {
+                $precedingChar = substr($precedingText, -1);
+            }
             $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
 
             if (is_numeric($varName)) {
@@ -110,8 +128,8 @@ class RouteCompiler implements RouteCompilerInterface
                 throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $varName));
             }
 
-            if ($isSeparator && strlen($precedingText) > 1) {
-                $tokens[] = array('text', substr($precedingText, 0, -1));
+            if ($isSeparator && $precedingText !== $precedingChar) {
+                $tokens[] = array('text', substr($precedingText, 0, -strlen($precedingChar)));
             } elseif (!$isSeparator && strlen($precedingText) > 0) {
                 $tokens[] = array('text', $precedingText);
             }
@@ -126,7 +144,7 @@ class RouteCompiler implements RouteCompilerInterface
                 // If {page} would also match the separating dot, {_format} would never match as {page} will eagerly consume everything.
                 // Also even if {_format} was not optional the requirement prevents that {page} matches something that was originally
                 // part of {_format} when generating the URL, e.g. _format = 'mobile.html'.
-                $nextSeparator = self::findNextSeparator($followingPattern);
+                $nextSeparator = self::findNextSeparator($followingPattern, $useUtf8);
                 $regexp = sprintf(
                     '[^%s%s]+',
                     preg_quote($defaultSeparator, self::REGEX_DELIMITER),
@@ -139,6 +157,16 @@ class RouteCompiler implements RouteCompilerInterface
                     // after it. This optimization cannot be applied when the next char is no real separator or when the next variable is
                     // directly adjacent, e.g. '/{x}{y}'.
                     $regexp .= '+';
+                }
+            } else {
+                if (!preg_match('//u', $regexp)) {
+                    $useUtf8 = false;
+                } elseif (!$needsUtf8 && preg_match('/[\x80-\xFF]|(?<!\\\\)\\\\(?:\\\\\\\\)*+(?-i:X|[pP][\{CLMNPSZ]|x\{[A-Fa-f0-9]{3})/', $regexp)) {
+                    $needsUtf8 = true;
+                    @trigger_error(sprintf('Using UTF-8 route requirements without setting the "utf8" option is deprecated since Symfony 3.2 and will throw a LogicException in 4.0. Turn on the "utf8" route option for variable "%s" in pattern "%s".', $varName, $pattern), E_USER_DEPRECATED);
+                }
+                if (!$useUtf8 && $needsUtf8) {
+                    throw new \LogicException(sprintf('Cannot mix UTF-8 requirement with non-UTF-8 charset for variable "%s" in pattern "%s".', $varName, $pattern));
                 }
             }
 
@@ -168,10 +196,21 @@ class RouteCompiler implements RouteCompilerInterface
         for ($i = 0, $nbToken = count($tokens); $i < $nbToken; ++$i) {
             $regexp .= self::computeRegexp($tokens, $i, $firstOptional);
         }
+        $regexp = self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s'.($isHost ? 'i' : '');
+
+        // enable Utf8 matching if really required
+        if ($needsUtf8) {
+            $regexp .= 'u';
+            for ($i = 0, $nbToken = count($tokens); $i < $nbToken; ++$i) {
+                if ('variable' === $tokens[$i][0]) {
+                    $tokens[$i][] = true;
+                }
+            }
+        }
 
         return array(
             'staticPrefix' => 'text' === $tokens[0][0] ? $tokens[0][1] : '',
-            'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s'.($isHost ? 'i' : ''),
+            'regex' => $regexp,
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
         );
@@ -181,19 +220,25 @@ class RouteCompiler implements RouteCompilerInterface
      * Returns the next static character in the Route pattern that will serve as a separator.
      *
      * @param string $pattern The route pattern
+     * @param bool   $useUtf8 Whether the character is encoded in UTF-8 or not
      *
      * @return string The next static character that functions as separator (or empty string when none available)
      */
-    private static function findNextSeparator($pattern)
+    private static function findNextSeparator($pattern, $useUtf8)
     {
         if ('' == $pattern) {
             // return empty string if pattern is empty or false (false which can be returned by substr)
             return '';
         }
         // first remove all placeholders from the pattern so we can find the next real static character
-        $pattern = preg_replace('#\{\w+\}#', '', $pattern);
+        if ('' === $pattern = preg_replace('#\{\w+\}#', '', $pattern)) {
+            return '';
+        }
+        if ($useUtf8) {
+            preg_match('/^./u', $pattern, $pattern);
+        }
 
-        return isset($pattern[0]) && false !== strpos(static::SEPARATORS, $pattern[0]) ? $pattern[0] : '';
+        return false !== strpos(static::SEPARATORS, $pattern[0]) ? $pattern[0] : '';
     }
 
     /**

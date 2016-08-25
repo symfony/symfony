@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added support for `bool`, `int`, `float`, `string`, `list` and `map` defaults in XML configurations.
+ * Added support for UTF-8 requirements
   
 2.8.0
 -----

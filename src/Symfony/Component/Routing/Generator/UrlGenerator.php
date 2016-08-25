@@ -158,7 +158,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             if ('variable' === $token[0]) {
                 if (!$optional || !array_key_exists($token[3], $defaults) || null !== $mergedParams[$token[3]] && (string) $mergedParams[$token[3]] !== (string) $defaults[$token[3]]) {
                     // check requirement
-                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#', $mergedParams[$token[3]])) {
+                    if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#'.(empty($token[4]) ? '' : 'u'), $mergedParams[$token[3]])) {
                         if ($this->strictRequirements) {
                             throw new InvalidParameterException(strtr($message, array('{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]])));
                         }
@@ -212,7 +212,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 $routeHost = '';
                 foreach ($hostTokens as $token) {
                     if ('variable' === $token[0]) {
-                        if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#i', $mergedParams[$token[3]])) {
+                        if (null !== $this->strictRequirements && !preg_match('#^'.$token[2].'$#i'.(empty($token[4]) ? '' : 'u'), $mergedParams[$token[3]])) {
                             if ($this->strictRequirements) {
                                 throw new InvalidParameterException(strtr($message, array('{parameter}' => $token[3], '{route}' => $name, '{expected}' => $token[2], '{given}' => $mergedParams[$token[3]])));
                             }

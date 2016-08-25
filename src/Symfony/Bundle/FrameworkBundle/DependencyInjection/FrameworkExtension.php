@@ -1151,6 +1151,11 @@ class FrameworkExtension extends Extension
             }
         }
         foreach (array('app', 'system') as $name) {
+            // Default config
+            if (null === $config[$name]) {
+                continue;
+            }
+
             $config['pools']['cache.'.$name] = array(
                 'adapter' => $config[$name],
                 'public' => true,
@@ -1161,7 +1166,9 @@ class FrameworkExtension extends Extension
             $definition->setPublic($pool['public']);
             unset($pool['adapter'], $pool['public']);
 
-            $definition->addTag('cache.pool', $pool);
+            if (0 !== count($pool)) {
+                $definition->addTag('cache.pool', $pool);
+            }
             $container->setDefinition($name, $definition);
         }
 

@@ -28,6 +28,17 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('Name   Method   Scheme   Host   Path', $tester->getDisplay());
     }
 
+    public function testDebugFilteredRoutes()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(array('name' => 'fo'), array('decorated' => false));
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertContains('foo', $tester->getDisplay());
+        $this->assertContains('foe', $tester->getDisplay());
+        $this->assertNotContains('bar', $tester->getDisplay());
+    }
+
     public function testDebugSingleRoute()
     {
         $tester = $this->createCommandTester();
@@ -63,6 +74,8 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
+        $routeCollection->add('foe', new Route('foe'));
+        $routeCollection->add('bar', new Route('bar'));
         $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
         $router
             ->expects($this->any())

@@ -52,7 +52,7 @@ class RouterDebugCommand extends ContainerAwareCommand
         $this
             ->setName('debug:router')
             ->setDefinition(array(
-                new InputArgument('name', InputArgument::OPTIONAL, 'A route name'),
+                new InputArgument('name', InputArgument::OPTIONAL, 'A route name', ''),
                 new InputOption('show-controllers', null, InputOption::VALUE_NONE, 'Show assigned controllers in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
@@ -79,12 +79,7 @@ EOF
         $name = $input->getArgument('name');
         $helper = new DescriptorHelper();
 
-        if ($name) {
-            $route = $this->getContainer()->get('router')->getRouteCollection()->get($name);
-            if (!$route) {
-                throw new \InvalidArgumentException(sprintf('The route "%s" does not exist.', $name));
-            }
-
+        if ($name && $route = $this->getContainer()->get('router')->getRouteCollection()->get($name)) {
             $this->convertController($route);
 
             $helper->describe($io, $route, array(
@@ -104,6 +99,7 @@ EOF
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'show_controllers' => $input->getOption('show-controllers'),
+                'filter' => $name,
                 'output' => $io,
             ));
         }

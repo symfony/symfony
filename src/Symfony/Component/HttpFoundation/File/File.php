@@ -133,4 +133,18 @@ class File extends \SplFileInfo
 
         return $originalName;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSize()
+    {
+        // Since stream wrappers and stream filters can change the file contents as read, the only
+        // reliable way to get the effective size of the file is to actually read it.
+        ob_start();
+        $size = readfile($this->getPathname());
+        ob_end_clean();
+
+        return $size;
+    }
 }

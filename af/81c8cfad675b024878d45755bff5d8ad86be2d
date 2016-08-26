@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by yakobe at 2016-07-26T07:39:42Z
+
+Can we merge this in?
+
+---------------------------------------------------------------------------
+
+by senaria at 2016-08-25T11:59:54Z
+
+Is there any news about this? This possible solution looks like it would really help us out. Would be great if you could have a closer look.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-25T18:04:16Z
+
+@HeahDude Can you have a look at this one?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-25T21:35:18Z
+
+LGTM 👍 @senaria Thank you for submitting this patch :)
+
+Status: reviewed

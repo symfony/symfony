@@ -14,7 +14,7 @@ namespace Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper;
 use ProxyManager\Generator\ClassGenerator;
 use ProxyManager\GeneratorStrategy\BaseGeneratorStrategy;
 use ProxyManager\ProxyGenerator\LazyLoadingValueHolderGenerator;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\StringUtil;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 
@@ -75,7 +75,7 @@ class ProxyDumper implements DumperInterface
             $methodName = func_get_arg(2);
         } else {
             @trigger_error(sprintf('You must use the third argument of %s to define the method to call to construct your service since version 3.1, not using it won\'t be supported in 4.0.', __METHOD__), E_USER_DEPRECATED);
-            $methodName = 'get'.Container::camelize($id).'Service';
+            $methodName = 'get'.StringUtil::camelize($id).'Service';
         }
         $proxyClass = $this->getProxyClassName($definition);
 

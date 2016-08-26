@@ -340,7 +340,7 @@ class Container implements ResettableContainerInterface
         $ids = array();
         foreach (get_class_methods($this) as $method) {
             if (preg_match('/^get(.+)Service$/', $method, $match)) {
-                $ids[] = self::underscore($match[1]);
+                $ids[] = StringUtil::underscore($match[1]);
             }
         }
         $ids[] = 'service_container';
@@ -354,10 +354,14 @@ class Container implements ResettableContainerInterface
      * @param string $id A string to camelize
      *
      * @return string The camelized string
+     *
+     * @deprecated since 3.2. Will be removed in 4.0.
      */
     public static function camelize($id)
     {
-        return strtr(ucwords(strtr($id, array('_' => ' ', '.' => '_ ', '\\' => '_ '))), array(' ' => ''));
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
+
+        return StringUtil::camelize($id);
     }
 
     /**
@@ -366,10 +370,14 @@ class Container implements ResettableContainerInterface
      * @param string $id The string to underscore
      *
      * @return string The underscored string
+     *
+     * @deprecated since 3.2. Will be removed in 4.0.
      */
     public static function underscore($id)
     {
-        return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), str_replace('_', '.', $id)));
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
+
+        return StringUtil::underscore($id);
     }
 
     private function __clone()

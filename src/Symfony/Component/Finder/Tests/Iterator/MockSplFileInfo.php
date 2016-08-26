@@ -95,12 +95,10 @@ class MockSplFileInfo extends \SplFileInfo
         if (is_string($type)) {
             switch ($type) {
                 case 'directory':
-                    $this->type = self::TYPE_DIRECTORY;
                 case 'd':
                     $this->type = self::TYPE_DIRECTORY;
                     break;
                 case 'file':
-                    $this->type = self::TYPE_FILE;
                 case 'f':
                     $this->type = self::TYPE_FILE;
                     break;

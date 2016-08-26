@@ -48,6 +48,7 @@
         "symfony/framework-bundle": "self.version",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
+        "symfony/inflector": "self.version",
         "symfony/intl": "self.version",
         "symfony/ldap": "self.version",
         "symfony/monolog-bridge": "self.version",
@@ -93,6 +94,9 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.0"
+    },
+    "provide": {
+        "psr/cache-implementation": "1.0"
     },
     "autoload": {
         "psr-4": {

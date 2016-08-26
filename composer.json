@@ -94,6 +94,9 @@
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.0"
     },
+    "provides": {
+        "psr/cache-implementation": "1.0"
+    },
     "autoload": {
         "psr-4": {
             "Symfony\\Bridge\\Doctrine\\": "src/Symfony/Bridge/Doctrine/",

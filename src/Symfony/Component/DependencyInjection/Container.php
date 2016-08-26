@@ -355,11 +355,11 @@ class Container implements ResettableContainerInterface
      *
      * @return string The camelized string
      *
-     * @deprecated since 3.3. Will be removed in 4.0.
+     * @deprecated since 3.2. Will be removed in 4.0.
      */
     public static function camelize($id)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.3 and will be removed in 4.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
 
         return StringUtil::camelize($id);
     }
@@ -371,11 +371,11 @@ class Container implements ResettableContainerInterface
      *
      * @return string The underscored string
      *
-     * @deprecated since 3.3. Will be removed in 4.0.
+     * @deprecated since 3.2. Will be removed in 4.0.
      */
     public static function underscore($id)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.3 and will be removed in 4.0.', E_USER_DEPRECATED);
+        @trigger_error('The '.__METHOD__.' method is deprecated since version 3.2 and will be removed in 4.0.', E_USER_DEPRECATED);
 
         return StringUtil::underscore($id);
     }

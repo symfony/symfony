@@ -26,51 +26,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
     }
-
-    /**
-     * @dataProvider dataForTestCamelize
-     */
-    public function testCamelize($id, $expected)
-    {
-        $this->assertEquals($expected, Container::camelize($id), sprintf('Container::camelize("%s")', $id));
-    }
-
-    public function dataForTestCamelize()
-    {
-        return array(
-            array('foo_bar', 'FooBar'),
-            array('foo.bar', 'Foo_Bar'),
-            array('foo.bar_baz', 'Foo_BarBaz'),
-            array('foo._bar', 'Foo_Bar'),
-            array('foo_.bar', 'Foo_Bar'),
-            array('_foo', 'Foo'),
-            array('.foo', '_Foo'),
-            array('foo_', 'Foo'),
-            array('foo.', 'Foo_'),
-            array('foo\bar', 'Foo_Bar'),
-        );
-    }
-
-    /**
-     * @dataProvider dataForTestUnderscore
-     */
-    public function testUnderscore($id, $expected)
-    {
-        $this->assertEquals($expected, Container::underscore($id), sprintf('Container::underscore("%s")', $id));
-    }
-
-    public function dataForTestUnderscore()
-    {
-        return array(
-            array('FooBar', 'foo_bar'),
-            array('Foo_Bar', 'foo.bar'),
-            array('Foo_BarBaz', 'foo.bar_baz'),
-            array('FooBar_BazQux', 'foo_bar.baz_qux'),
-            array('_Foo', '.foo'),
-            array('Foo_', 'foo.'),
-        );
-    }
-
+    
     public function testCompile()
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));

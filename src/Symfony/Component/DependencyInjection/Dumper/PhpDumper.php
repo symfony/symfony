@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\StringUtil;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -1442,7 +1442,7 @@ EOF;
             return $this->serviceIdToMethodNameMap[$id];
         }
 
-        $name = Container::camelize($id);
+        $name = StringUtil::camelize($id);
         $name = preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '', $name);
         $methodName = 'get'.$name.'Service';
         $suffix = 1;

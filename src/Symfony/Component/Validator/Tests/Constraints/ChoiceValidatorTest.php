@@ -32,6 +32,11 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         return array('foo', 'bar');
     }
 
+    public function objectMethodCallback()
+    {
+        return array('foo', 'bar');
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
@@ -112,6 +117,18 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->setObject($this);
 
         $constraint = new Choice(array('callback' => 'staticCallback'));
+
+        $this->validator->validate('bar', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidChoiceCallbackContextObjectMethod()
+    {
+        // search $this for "objectMethodCallback"
+        $this->setObject($this);
+
+        $constraint = new Choice(array('callback' => 'objectMethodCallback'));
 
         $this->validator->validate('bar', $constraint);
 

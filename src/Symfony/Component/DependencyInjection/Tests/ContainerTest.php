@@ -26,7 +26,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));
         $this->assertEquals(array('foo' => 'bar'), $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
     }
-    
+
     public function testCompile()
     {
         $sc = new Container(new ParameterBag(array('foo' => 'bar')));

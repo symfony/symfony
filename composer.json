@@ -94,7 +94,7 @@
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.0"
     },
-    "provides": {
+    "provide": {
         "psr/cache-implementation": "1.0"
     },
     "autoload": {

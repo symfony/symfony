@@ -33,6 +33,13 @@ DependencyInjection
  * Requesting a private service with the `Container::get()` method is no longer
    supported.
 
+ExpressionLanguage
+----------
+
+ * The ability to pass a `ParserCacheInterface` instance to the `ExpressionLanguage`
+   class has been removed. You should use the `CacheItemPoolInterface` interface
+   instead.
+
 Form
 ----
 

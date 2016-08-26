@@ -98,6 +98,19 @@ class OutputFormatter implements OutputFormatterInterface
     }
 
     /**
+     * Adds a new style.
+     *
+     * @param string      $name       The style name
+     * @param string|null $foreground The style foreground color name
+     * @param string|null $background The style background color name
+     * @param array       $options    The style options
+     */
+    public function addStyle($name, $foreground = null, $background = null, array $options = array())
+    {
+        $this->styles[strtolower($name)] = new OutputFormatterStyle($foreground, $background, $options);
+    }
+
+    /**
      * Checks if output formatter has style with specified name.
      *
      * @param string $name

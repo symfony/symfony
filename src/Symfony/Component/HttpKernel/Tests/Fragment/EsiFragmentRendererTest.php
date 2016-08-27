@@ -32,7 +32,7 @@ class EsiFragmentRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderFallbackWithObjectAttributesIsDeprecated()
     {
-        ErrorAssert::assertDeprecationsAreTriggered('Passing objects as part of URI attributes to the ESI and SSI rendering strategies is deprecated', function () {
+        ErrorAssert::assertDeprecationsAreTriggered('Passing non-scalar values as part of URI attributes to the ESI and SSI rendering strategies is deprecated', function () {
             $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true), new UriSigner('foo'));
             $request = Request::create('/');
             $reference = new ControllerReference('main_controller', array('foo' => array('a' => array(), 'b' => new \stdClass())), array());

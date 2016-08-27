@@ -260,7 +260,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseUnquotedScalarStartingWithPercentCharacter()
     {
-        ErrorAssert::assertDeprecationsAreTriggered('Not quoting a scalar starting with the "%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', function () {
+        ErrorAssert::assertDeprecationsAreTriggered('Not quoting the scalar "%foo " starting with the "%" indicator character is deprecated since Symfony 3.1 and will throw a ParseException in 4.0.', function () {
             Inline::parse('{ foo: %foo }');
         });
     }

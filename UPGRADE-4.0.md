@@ -233,8 +233,7 @@ Yaml
  * The `!!php/object` tag to indicate dumped PHP objects was removed in favor of
    the `!php/object` tag.
 
- * Duplicate keys in YAML leads to a `ParseException`.
-
+ * Duplicate mapping keys lead to a `ParseException`.
 
 Validator
 ---------

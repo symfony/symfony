@@ -77,5 +77,6 @@ Yaml
  * Support for silently ignoring duplicate keys in YAML has been deprecated and
    will lead to a `ParseException` in Symfony 4.0.
 
- * Mappings with a colon that is not followed by a space are deprecated and
-   will lead to a `ParseException` in Symfony 4.0.
+ * Mappings with a colon (`:`) that is not followed by a whitespace are deprecated
+   and will lead to a `ParseException` in Symfony 4.0 (e.g. `foo:bar` must be
+   `foo: bar`).

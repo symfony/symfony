@@ -147,8 +147,9 @@ Translation
 Yaml
 ----
 
- * Mappings with a colon that is not followed by a space are are not
-   supported anymore and lead to a `ParseException`.
+ * Mappings with a colon (`:`) that is not followed by a whitespace are not
+   supported anymore and lead to a `ParseException`(e.g. `foo:bar` must be
+   `foo: bar`).
 
  * Starting an unquoted string with `%` leads to a `ParseException`.
 

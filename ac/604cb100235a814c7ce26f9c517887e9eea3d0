@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by wakqasahmed at 2016-08-26T16:22:10Z
+
+@nicolas-grekas
+
+Test Details:
+
+BEFORE
+————
+$ php ./phpunit --filter testConstructorWithoutCalendar IntlDateFormatterTest src/Symfony/Component/Intl/Tests/DateFormatter/IntlDateFormatterTest.php
+PHPUnit 5.1.7 by Sebastian Bergmann and contributors.
+
+Testing Symfony\Component\Intl\Tests\DateFormatter\IntlDateFormatterTest
+E                                                                   1 / 1 (100%)
+
+Time: 49 ms, Memory: 4.50MB
+
+There was 1 error:
+
+1) Symfony\Component\Intl\Tests\DateFormatter\IntlDateFormatterTest::testConstructorWithoutCalendar
+Symfony\Component\Intl\Exception\MethodArgumentValueNotImplementedException: The Symfony\Component\Intl\DateFormatter\IntlDateFormatter::__construct() method's argument $calendar value NULL behavior is not implemented. Only the GREGORIAN calendar is supported.  Please install the "intl" extension for full localization capabilities.
+
+/Users/waqasahmed/Desktop/symfony-2.7/src/Symfony/Component/Intl/DateFormatter/IntlDateFormatter.php:153
+/Users/waqasahmed/Desktop/symfony-2.7/src/Symfony/Component/Intl/Tests/DateFormatter/IntlDateFormatterTest.php:33
+
+FAILURES!
+Tests: 1, Assertions: 0, Errors: 1.
+KO src/Symfony/Component/Intl/Tests/DateFormatter/IntlDateFormatterTest.php
+
+AFTER
+———
+
+$ php ./phpunit --filter testConstructorWithoutCalendar IntlDateFormatterTest src/Symfony/Component/Intl/Tests/DateFormatter/IntlDateFormatterTest.php
+PHPUnit 5.1.7 by Sebastian Bergmann and contributors.
+
+Testing Symfony\Component\Intl\Tests\DateFormatter\IntlDateFormatterTest
+.                                                                   1 / 1 (100%)
+
+Time: 45 ms, Memory: 4.25MB
+
+OK (1 test, 1 assertion)
+OK src/Symfony/Component/Intl/Tests/DateFormatter/IntlDateFormatterTest.php
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-08-27T00:32:19Z
+
+LGTM :+1: as it's in line with http://php.net/manual/en/intldateformatter.create.php
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-27T12:33:27Z
+
+👍
+
+Status: reviewed

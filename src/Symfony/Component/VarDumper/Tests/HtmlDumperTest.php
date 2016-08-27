@@ -120,9 +120,7 @@ EOTXT
         $cloner = new VarCloner();
 
         $data = $cloner->cloneVar($var);
-        $out = fopen('php://memory', 'r+b');
-        $dumper->dump($data, $out);
-        $out = stream_get_contents($out, -1, 0);
+        $out = $dumper->dump($data, true);
 
         $this->assertStringMatchesFormat(
             <<<EOTXT

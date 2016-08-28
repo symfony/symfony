@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-27T16:32:30Z
+
+:+1:
+Now the dumper trait can be simplified ?!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-27T17:55:17Z
+
+More than already done here?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-08-28T09:40:00Z
+
+Looks good!
+
+I also wondered if [these 4 lines of boilerplate code](https://github.com/symfony/symfony/pull/19614/files#diff-1b203840c96e2f4a2f0386788e2765d3R216) can be reduced as well? I've had to use it in a couple places in that PR.

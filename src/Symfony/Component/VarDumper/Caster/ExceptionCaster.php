@@ -67,11 +67,7 @@ class ExceptionCaster
 
         if (isset($a[$xPrefix.'previous'], $a[$xPrefix.'trace'])) {
             $b = (array) $a[$xPrefix.'previous'];
-            array_unshift($b[$xPrefix.'trace'], array(
-                'function' => 'new '.get_class($a[$xPrefix.'previous']),
-                'file' => $b[$prefix.'file'],
-                'line' => $b[$prefix.'line'],
-            ));
+            self::traceUnshift($b[$xPrefix.'trace'], get_class($a[$xPrefix.'previous']), $b[$prefix.'file'], $b[$prefix.'line']);
             $a[$xPrefix.'trace'] = new TraceStub($b[$xPrefix.'trace'], false, 0, -1 - count($a[$xPrefix.'trace']->value));
         }
 
@@ -121,8 +117,8 @@ class ExceptionCaster
                 foreach ($f[$prefix.'src']->value as $label => $frame) {
                     $label = substr_replace($label, "title=Stack level $j.&", 2, 0);
                 }
-                if (isset($f[$prefix.'args']) && $frame instanceof EnumStub) {
-                    $frame->value['args'] = $f[$prefix.'args'];
+                if (isset($f[$prefix.'arguments']) && $frame instanceof EnumStub) {
+                    $frame->value['arguments'] = $f[$prefix.'arguments'];
                 }
             }
             $a[$label] = $frame;
@@ -192,8 +188,8 @@ class ExceptionCaster
                 unset($a[$k]);
             }
         }
-        if ($frame->keepArgs && isset($f['args'])) {
-            $a[$prefix.'args'] = new EnumStub($f['args'], false);
+        if ($frame->keepArgs && !empty($f['args'])) {
+            $a[$prefix.'arguments'] = new ArgsStub($f['args'], $f['function'], $f['class']);
         }
 
         return $a;
@@ -209,11 +205,7 @@ class ExceptionCaster
         }
 
         if (!($filter & Caster::EXCLUDE_VERBOSE)) {
-            array_unshift($trace, array(
-                'function' => $xClass ? 'new '.$xClass : null,
-                'file' => $a[Caster::PREFIX_PROTECTED.'file'],
-                'line' => $a[Caster::PREFIX_PROTECTED.'line'],
-            ));
+            self::traceUnshift($trace, $xClass, $a[Caster::PREFIX_PROTECTED.'file'], $a[Caster::PREFIX_PROTECTED.'line']);
             $a[$xPrefix.'trace'] = new TraceStub($trace, self::$traceArgs);
         }
         if (empty($a[$xPrefix.'previous'])) {
@@ -222,6 +214,18 @@ class ExceptionCaster
         unset($a[$xPrefix.'string'], $a[Caster::PREFIX_DYNAMIC.'xdebug_message'], $a[Caster::PREFIX_DYNAMIC.'__destructorException']);
 
         return $a;
+    }
+
+    private static function traceUnshift(&$trace, $class, $file, $line)
+    {
+        if (isset($trace[0]['file'], $trace[0]['line']) && $trace[0]['file'] === $file && $trace[0]['line'] === $line) {
+            return;
+        }
+        array_unshift($trace, array(
+            'function' => $class ? 'new '.$class : null,
+            'file' => $file,
+            'line' => $line,
+        ));
     }
 
     private static function extractSource(array $srcArray, $line, $srcContext, $title, $lang, $file = null)

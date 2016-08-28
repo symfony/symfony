@@ -259,8 +259,7 @@ EOTXT
 
         $data = $cloner->cloneVar($out);
         $dumper->dump($data, $out);
-        rewind($out);
-        $out = stream_get_contents($out);
+        $out = stream_get_contents($out, -1, 0);
 
         if (method_exists($twig, 'getSource')) {
             $twig = <<<EOTXT
@@ -328,11 +327,8 @@ EOTXT
         $dumper->setColors(false);
         $cloner = new VarCloner();
 
-        $out = fopen('php://memory', 'r+b');
         $data = $cloner->cloneVar($var);
-        $dumper->dump($data, $out);
-        rewind($out);
-        $out = stream_get_contents($out);
+        $out = $dumper->dump($data, true);
 
         $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(

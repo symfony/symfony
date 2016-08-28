@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-27T16:35:08Z
+
+Instead, I would remove the `return $this;`, which is not present in previous versions and not used anywhere else (except for a deprecated method) in this class. What do you think?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-27T17:12:01Z
+
+@fabpot see the description of https://github.com/symfony/symfony/pull/19748 :)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-27T17:29:53Z
+
+@fabpot : I personally don't mind, both are fine to me.
+As reported by @HeahDude, the fluent interface here was intended to ease creating an application in a minimum amount of code. But as we don't use it in other methods, it does not make entirely sense, indeed.
+
+Find the alternative PR here: #19763
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-27T19:51:34Z
+
+To give an opinion, even if I'm globally against fluent interfaces, I think this one makes sense.
+I often write single-command apps and I really like the fact that the app is created and ran without need of any assignment, like in the example given in #19748 description. Most often, it represents the only logic in the whole executable

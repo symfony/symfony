@@ -115,7 +115,7 @@ EOF;
      */
     private function createFile($content)
     {
-        $filename = tempnam(sys_get_temp_dir(), 'sf-');
+        $filename = tempnam(sys_get_temp_dir().'/yml-lint-test', 'sf-');
         file_put_contents($filename, $content);
 
         $this->files[] = $filename;
@@ -152,7 +152,7 @@ EOF;
             ->expects($this->once())
             ->method('locateResource')
             ->with('@AppBundle/Resources')
-            ->willReturn(sys_get_temp_dir());
+            ->willReturn(sys_get_temp_dir().'/yml-lint-test');
 
         $application = $this->getMockBuilder(Application::class)
             ->disableOriginalConstructor()
@@ -184,6 +184,7 @@ EOF;
 
     protected function setUp()
     {
+        @mkdir(sys_get_temp_dir().'/yml-lint-test');
         $this->files = array();
     }
 
@@ -194,5 +195,6 @@ EOF;
                 unlink($file);
             }
         }
+        rmdir(sys_get_temp_dir().'/yml-lint-test');
     }
 }

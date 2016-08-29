@@ -684,7 +684,7 @@ class Inline
 
     private static function isBinaryString($value)
     {
-        return !preg_match('//u', $value) || preg_match('/[^\x09-\x0d\x20-\xff]/', $value);
+        return !preg_match('//u', $value) || preg_match('/[^\x00-\x1f\x20-\xff]/', $value);
     }
 
     /**

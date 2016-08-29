@@ -56,14 +56,17 @@
 }
 .sf-reset .text-exception .open-quote,
 .sf-reset .text-exception .close-quote {
+    font-family: Arial, Helvetica, sans-serif;
     position: absolute;
+    color: #C9C9C9;
+    font-size: 8em;
 }
 .sf-reset .open-quote {
     top: 0;
     left: 0;
 }
 .sf-reset .close-quote {
-    bottom: 0;
+    bottom: -0.5em;
     right: 50px;
 }
 .sf-reset .block-exception p {

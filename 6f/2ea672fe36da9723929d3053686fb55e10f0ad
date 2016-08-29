@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-27T12:44:30Z
+
+👍
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-27T12:49:50Z
+
+Tests are failing on travis due to an outdated assertion, unrelated to these changes.
+See https://github.com/symfony/symfony/pull/19760
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-08-27T13:36:32Z
+
+@chalasr Thanks for the fix. Actually, the tests should have failed before, but didn't because of the implementation inside the `ErrorAssert` that will be fixed by this PR.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-08-29T07:36:36Z
+
+👍

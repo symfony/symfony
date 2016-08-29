@@ -201,19 +201,25 @@ class TextDescriptor extends Descriptor
             $commands = $description->getCommands();
 
             foreach ($description->getNamespaces() as $namespace) {
+                $namespace['commands'] = array_filter($namespace['commands'], function ($name) use ($commands) {
+                    return isset($commands[$name]);
+                });
+
+                if (!$namespace['commands']) {
+                    continue;
+                }
+
                 if (!$describedNamespace && ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {
                     $this->writeText("\n");
                     $this->writeText(' <comment>'.$namespace['id'].'</comment>', $options);
                 }
 
                 foreach ($namespace['commands'] as $name) {
-                    if (isset($commands[$name])) {
-                        $this->writeText("\n");
-                        $spacingWidth = $width - strlen($name);
-                        $command = $commands[$name];
-                        $commandAliases = $this->getCommandAliasesText($command);
-                        $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $commandAliases.$command->getDescription()), $options);
-                    }
+                    $this->writeText("\n");
+                    $spacingWidth = $width - strlen($name);
+                    $command = $commands[$name];
+                    $commandAliases = $this->getCommandAliasesText($command);
+                    $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $commandAliases.$command->getDescription()), $options);
                 }
             }
 
@@ -234,9 +240,9 @@ class TextDescriptor extends Descriptor
 
     /**
      * Formats command aliases to show them in the command description.
-     * 
+     *
      * @param Command $command
-     * 
+     *
      * @return string
      */
     private function getCommandAliasesText($command)

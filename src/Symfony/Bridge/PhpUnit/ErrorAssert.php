@@ -19,8 +19,8 @@ namespace Symfony\Bridge\PhpUnit;
 final class ErrorAssert
 {
     /**
-     * @param string[] $expectedMessages Expected deprecation messages
-     * @param callable $testCode         A callable that is expected to trigger the deprecation messages
+     * @param string[]|string $expectedMessages Expected deprecation messages
+     * @param callable        $testCode         A callable that is expected to trigger the deprecation messages
      */
     public static function assertDeprecationsAreTriggered($expectedMessages, $testCode)
     {
@@ -32,9 +32,9 @@ final class ErrorAssert
     }
 
     /**
-     * @param int      $expectedType     Expected triggered error type (pass one of PHP's E_* constants)
-     * @param string[] $expectedMessages Expected error messages
-     * @param callable $testCode         A callable that is expected to trigger the error messages
+     * @param int             $expectedType     Expected triggered error type (pass one of PHP's E_* constants)
+     * @param string[]|string $expectedMessages Expected error messages
+     * @param callable        $testCode         A callable that is expected to trigger the error messages
      */
     public static function assertErrorsAreTriggered($expectedType, $expectedMessages, $testCode)
     {
@@ -62,6 +62,8 @@ final class ErrorAssert
         if (null !== $e) {
             throw $e;
         }
+
+        $expectedMessages = (array) $expectedMessages;
 
         \PHPUnit_Framework_Assert::assertCount(count($expectedMessages), $triggeredMessages);
 

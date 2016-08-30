@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 
 /**

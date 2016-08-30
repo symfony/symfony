@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\EventListener;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;

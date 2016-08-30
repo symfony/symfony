@@ -34,7 +34,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         }
 
         foreach ($reflection->getParameters() as $param) {
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param));
+            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param), $this->isNullable($param));
         }
 
         return $arguments;
@@ -62,6 +62,23 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     private function hasDefaultValue(\ReflectionParameter $parameter)
     {
         return $parameter->isDefaultValueAvailable();
+    }
+
+    /**
+     * Returns if the argument is allowed to be null but is still mandatory.
+     *
+     * @param \ReflectionParameter $parameter
+     *
+     * @return bool
+     */
+    private function isNullable(\ReflectionParameter $parameter)
+    {
+        if (PHP_VERSION_ID >= 70000) {
+            return null !== ($type = $parameter->getType()) && $type->allowsNull();
+        }
+
+        // fallback for supported php 5.x versions
+        return $this->hasDefaultValue($parameter) && null === $this->getDefaultValue($parameter);
     }
 
     /**

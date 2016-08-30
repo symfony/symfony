@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-08-29T13:49:56Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by pborreli at 2016-08-29T13:55:10Z
+
+👍 for the svg ghost
+👍 for the removal of svg for quotes
+👎 ~~for the style change of quotes (maybe try Arial safe font ?)~~
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-29T17:24:20Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-29T17:33:37Z
+
+On small detail that needs to be fixed before merging: changing the Symfony logo size back to the original one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-29T17:35:06Z
+
+Which one is that, in svg?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-29T17:36:32Z
+
+The only one you changed, the one in the top left corner (as you can see in your before/after screenshots, the new one is smaller and not at the same place).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-29T18:24:36Z
+
+I took the preferred logo from here:
+http://symfony.com/logo
+I'll change for the alt. version then no pb.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-29T19:01:23Z
+
+logo updated
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-08-30T05:41:58Z
+
+Looks good!

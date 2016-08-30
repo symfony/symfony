@@ -365,6 +365,8 @@ class Table
      * @param array  $row
      * @param int    $column
      * @param string $cellFormat
+     *
+     * @return string
      */
     private function renderCell(array $row, $column, $cellFormat)
     {

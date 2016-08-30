@@ -51,7 +51,18 @@ class JsonResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
+     * Factory method for chainability.
+     *
+     * Example:
+     *
+     *     return JsonResponse::create($data, 200)
+     *         ->setSharedMaxAge(300);
+     *
+     * @param mixed $data    The response data
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
+     *
+     * @return JsonResponse
      */
     public static function create($data = null, $status = 200, $headers = array())
     {
@@ -60,10 +71,16 @@ class JsonResponse extends Response
 
     /**
      * Make easier the creation of JsonResponse from raw json.
+     *
+     * @param string $content The response content
+     * @param int    $status  The response status code
+     * @param array  $headers An array of response headers
+     *
+     * @return JsonResponse
      */
-    public static function fromJsonString($data = null, $status = 200, $headers = array())
+    public static function fromJsonString($content = '', $status = 200, $headers = array())
     {
-        return new static($data, $status, $headers, true);
+        return new static($content, $status, $headers, true);
     }
 
     /**

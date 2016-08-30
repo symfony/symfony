@@ -46,7 +46,7 @@ final class ErrorAssert
         $triggeredMessages = array();
 
         try {
-            $prevHandler = set_error_handler(function ($type, $message, $file, $line, $context) use ($expectedType, &$triggeredMessages, &$prevHandler) {
+            set_error_handler(function ($type, $message, $file, $line, $context) use ($expectedType, &$triggeredMessages, &$prevHandler) {
                 if ($expectedType !== $type) {
                     return null !== $prevHandler && call_user_func($prevHandler, $type, $message, $file, $line, $context);
                 }

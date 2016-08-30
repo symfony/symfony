@@ -26,7 +26,7 @@ class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
     {
         $tokenStorage = new TokenStorage();
         $resolver = new SecurityUserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
+        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null, false);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
@@ -39,7 +39,7 @@ class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new SecurityUserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', get_class($mock), false, false, null);
+        $metadata = new ArgumentMetadata('foo', get_class($mock), false, false, null, false);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
@@ -48,7 +48,7 @@ class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
     {
         $tokenStorage = new TokenStorage();
         $resolver = new SecurityUserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', null, false, false, null);
+        $metadata = new ArgumentMetadata('foo', null, false, false, null, false);
 
         $this->assertFalse($resolver->supports(Request::create('/'), $metadata));
     }
@@ -62,7 +62,7 @@ class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
         $tokenStorage->setToken($token);
 
         $resolver = new SecurityUserValueResolver($tokenStorage);
-        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null);
+        $metadata = new ArgumentMetadata('foo', UserInterface::class, false, false, null, false);
 
         $this->assertTrue($resolver->supports(Request::create('/'), $metadata));
         $this->assertSame(array($user), iterator_to_array($resolver->resolve(Request::create('/'), $metadata)));

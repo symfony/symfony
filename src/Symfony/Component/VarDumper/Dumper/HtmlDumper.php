@@ -43,11 +43,13 @@ class HtmlDumper extends CliDumper
         'meta' => 'color:#B729D9',
         'key' => 'color:#56DB3A',
         'index' => 'color:#1299DA',
+        'expanded code.hljs' => 'display:inline; padding:0; background:none',
     );
 
     private $displayOptions = array(
         'maxDepth' => 1,
         'maxStringLength' => 160,
+        'fileLinkFormat' => null,
     );
     private $extraDisplayOptions = array();
 
@@ -184,6 +186,19 @@ function toggle(a, recursive) {
 return function (root, x) {
     root = doc.getElementById(root);
 
+    var indentRx = new RegExp('^('+(root.getAttribute('data-indent-pad') || '  ').replace(rxEsc, '\\$1')+')+', 'm'),
+        options = {$options},
+        elt = root.getElementsByTagName('A'),
+        len = elt.length,
+        i = 0, s, h,
+        t = [];
+
+    while (i < len) t.push(elt[i++]);
+
+    for (i in x) {
+        options[i] = x[i];
+    }
+
     function a(e, f) {
         addEventListener(root, e, function (e) {
             if ('A' == e.target.tagName) {
@@ -201,6 +216,20 @@ return function (root, x) {
             refStyle.innerHTML = '';
         }
     });
+    if (options.fileLinkFormat) {
+        addEventListener(root, 'click', function (e) {
+            e = e.target;
+            while (root != e && 'CODE' != e.tagName) {
+                e = e.parentNode;
+            }
+            if ('CODE' == e.tagName) {
+                var f = e.getAttribute('data-file'), l = e.getAttribute('data-line');
+                if (f && l) {
+                    location.href = options.fileLinkFormat.replace('%f', f).replace('%l', l);
+                }
+            }
+        });
+    }
     a('mouseover', function (a) {
         if (a = idRx.exec(a.className)) {
             try {
@@ -245,19 +274,6 @@ return function (root, x) {
             e.className = e.className.replace(/sf-dump-str-(expand|collapse)/, a.parentNode.className);
         }
     });
-
-    var indentRx = new RegExp('^('+(root.getAttribute('data-indent-pad') || '  ').replace(rxEsc, '\\$1')+')+', 'm'),
-        options = {$options},
-        elt = root.getElementsByTagName('A'),
-        len = elt.length,
-        i = 0, s, h,
-        t = [];
-
-    while (i < len) t.push(elt[i++]);
-
-    for (i in x) {
-        options[i] = x[i];
-    }
 
     elt = root.getElementsByTagName('SAMP');
     len = elt.length;
@@ -369,6 +385,15 @@ pre.sf-dump a {
     border: 0;
     outline: none;
 }
+pre.sf-dump .sf-dump-ellipsis {
+    display: inline-block;
+    overflow: visible;
+    text-overflow: ellipsis;
+    width: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: top;
+}
 .sf-dump-str-collapse .sf-dump-str-collapse {
     display: none;
 }
@@ -452,6 +477,11 @@ EOHTML
         } elseif ('private' === $style) {
             $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', esc($attr['class']));
         }
+        if (isset($attr['ellipsis'])) {
+            $label = esc(substr($value, -$attr['ellipsis']));
+
+            return sprintf('<span class=sf-dump-%s><abbr title="%s" class=sf-dump-ellipsis>%2$s</abbr>%s</span>', $style, substr($v, 0, -strlen($label)), $label);
+        }
 
         $map = static::$controlCharsMap;
         $style = "<span class=sf-dump-{$style}>";
@@ -474,6 +504,13 @@ EOHTML
             $v = substr($v, 0, -strlen($style));
         } else {
             $v .= '</span>';
+        }
+        if (isset($attr['lang'])) {
+            if (isset($attr['file'], $attr['line'])) {
+                $v = sprintf('<code class="%s" data-file="%s" data-line="%d">%s</code>', esc($attr['lang']), esc($attr['file']), $attr['line'], $v);
+            } else {
+                $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);
+            }
         }
 
         return $v;

@@ -155,6 +155,7 @@ class Data
         $firstSeen = true;
 
         if (!$item instanceof Stub) {
+            $cursor->attr = array();
             $type = gettype($item);
         } elseif (Stub::TYPE_REF === $item->type) {
             if ($item->handle) {
@@ -167,6 +168,7 @@ class Data
                 $cursor->hardRefHandle = $this->useRefHandles & $item->handle;
                 $cursor->hardRefCount = $item->refCount;
             }
+            $cursor->attr = $item->attr;
             $type = $item->class ?: gettype($item->value);
             $item = $item->value;
         }
@@ -181,6 +183,7 @@ class Data
             }
             $cursor->softRefHandle = $this->useRefHandles & $item->handle;
             $cursor->softRefCount = $item->refCount;
+            $cursor->attr = $item->attr;
             $cut = $item->cut;
 
             if ($item->position && $firstSeen) {

@@ -20,7 +20,8 @@
         "symfony/http-kernel": "~3.1",
         "symfony/polyfill-php70": "~1.0",
         "symfony/routing": "~2.8|~3.0",
-        "symfony/twig-bridge": "~2.8|~3.0"
+        "symfony/twig-bridge": "~2.8|~3.0",
+        "symfony/var-dumper": "~3.2"
     },
     "require-dev": {
         "symfony/config": "~2.8|~3.0",

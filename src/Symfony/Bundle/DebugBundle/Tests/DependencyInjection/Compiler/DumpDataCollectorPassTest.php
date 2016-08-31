@@ -19,20 +19,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DumpDataCollectorPassTest extends \PHPUnit_Framework_TestCase
 {
-    public function testProcessWithFileLinkFormatParameter()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new DumpDataCollectorPass());
-        $container->setParameter('templating.helper.code.file_link_format', 'file-link-format');
-
-        $definition = new Definition('Symfony\Component\HttpKernel\DataCollector\DumpDataCollector', array(null, null, null, null));
-        $container->setDefinition('data_collector.dump', $definition);
-
-        $container->compile();
-
-        $this->assertSame('file-link-format', $definition->getArgument(1));
-    }
-
     public function testProcessWithoutFileLinkFormatParameter()
     {
         $container = new ContainerBuilder();

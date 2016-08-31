@@ -44,7 +44,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param array|int            $levels           An array map of E_* to LogLevel::* or an integer bit field of E_* constants
      * @param int|null             $throwAt          Thrown errors in a bit field of E_* constants, or null to keep the current value
      * @param bool                 $scream           Enables/disables screaming mode, where even silenced errors are logged
-     * @param string               $fileLinkFormat   The format for links to source files
+     * @param string|array         $fileLinkFormat   The format for links to source files
      * @param bool                 $scope            Enables/disables scoping mode
      */
     public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, $throwAt = E_ALL, $scream = true, $fileLinkFormat = null, $scope = true)
@@ -54,7 +54,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         $this->levels = null === $levels ? E_ALL : $levels;
         $this->throwAt = is_numeric($throwAt) ? (int) $throwAt : (null === $throwAt ? null : ($throwAt ? E_ALL : null));
         $this->scream = (bool) $scream;
-        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->fileLinkFormat = $fileLinkFormat;
         $this->scope = (bool) $scope;
     }
 

@@ -61,7 +61,7 @@ class StubCaster
 
             if ($c->value) {
                 foreach (array_keys($c->value) as $k) {
-                    $keys[] = isset($k[0]) && "\0" !== $k[0] ? Caster::PREFIX_VIRTUAL.$k : $k;
+                    $keys[] = !isset($k[0]) || "\0" !== $k[0] ? Caster::PREFIX_VIRTUAL.$k : $k;
                 }
                 // Preserve references with array_combine()
                 $a = array_combine($keys, $c->value);

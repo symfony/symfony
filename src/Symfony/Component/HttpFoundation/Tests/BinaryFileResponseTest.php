@@ -280,7 +280,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFileExists($realPath);
 
         $response = new BinaryFileResponse($realPath, 200, array('Content-Type' => 'application/octet-stream'));
-        $response->deleteFileAfterSend(true);
+        $response->deleteFileAfterSend();
 
         $response->prepare($request);
         $response->sendContent();

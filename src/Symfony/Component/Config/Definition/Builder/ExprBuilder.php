@@ -98,6 +98,18 @@ class ExprBuilder
     }
 
     /**
+     * Tests if the value is empty.
+     *
+     * @return ExprBuilder
+     */
+    public function ifEmpty()
+    {
+        $this->ifPart = function ($v) { return empty($v); };
+
+        return $this;
+    }
+
+    /**
      * Tests if the value is an array.
      *
      * @return ExprBuilder

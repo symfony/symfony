@@ -38,8 +38,8 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 
     public function __construct()
     {
-        $this->supportsVariadic = method_exists('\ReflectionParameter', 'isVariadic');
-        $this->supportsParameterType = method_exists('\ReflectionParameter', 'getType');
+        $this->supportsVariadic = method_exists('ReflectionParameter', 'isVariadic');
+        $this->supportsParameterType = method_exists('ReflectionParameter', 'getType');
     }
 
     /**

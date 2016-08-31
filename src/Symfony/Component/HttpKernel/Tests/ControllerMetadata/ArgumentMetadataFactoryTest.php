@@ -35,9 +35,9 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature1'));
 
         $this->assertEquals(array(
-            new ArgumentMetadata('foo', self::class, false, false, null, false),
-            new ArgumentMetadata('bar', 'array', false, false, null, false),
-            new ArgumentMetadata('baz', 'callable', false, false, null, false),
+            new ArgumentMetadata('foo', self::class, false, false, null),
+            new ArgumentMetadata('bar', 'array', false, false, null),
+            new ArgumentMetadata('baz', 'callable', false, false, null),
         ), $arguments);
     }
 
@@ -57,8 +57,8 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature3'));
 
         $this->assertEquals(array(
-            new ArgumentMetadata('bar', __NAMESPACE__.'\FakeClassThatDoesNotExist', false, false, null, false),
-            new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, false, null, false),
+            new ArgumentMetadata('bar', __NAMESPACE__.'\FakeClassThatDoesNotExist', false, false, null),
+            new ArgumentMetadata('baz', 'Fake\ImportedAndFake', false, false, null),
         ), $arguments);
     }
 
@@ -67,9 +67,9 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $arguments = $this->factory->createArgumentMetadata(array($this, 'signature4'));
 
         $this->assertEquals(array(
-            new ArgumentMetadata('foo', null, false, true, 'default', false),
-            new ArgumentMetadata('bar', null, false, true, 500, false),
-            new ArgumentMetadata('baz', null, false, true, array(), false),
+            new ArgumentMetadata('foo', null, false, true, 'default'),
+            new ArgumentMetadata('bar', null, false, true, 500),
+            new ArgumentMetadata('baz', null, false, true, array()),
         ), $arguments);
     }
 
@@ -79,7 +79,7 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array(
             new ArgumentMetadata('foo', 'array', false, true, null, true),
-            new ArgumentMetadata('bar', null, false, false, null, false),
+            new ArgumentMetadata('bar', null, false, false, null),
         ), $arguments);
     }
 
@@ -91,8 +91,8 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $arguments = $this->factory->createArgumentMetadata(array(new VariadicController(), 'action'));
 
         $this->assertEquals(array(
-            new ArgumentMetadata('foo', null, false, false, null, false),
-            new ArgumentMetadata('bar', null, true, false, null, false),
+            new ArgumentMetadata('foo', null, false, false, null),
+            new ArgumentMetadata('bar', null, true, false, null),
         ), $arguments);
     }
 
@@ -104,9 +104,9 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $arguments = $this->factory->createArgumentMetadata(array(new BasicTypesController(), 'action'));
 
         $this->assertEquals(array(
-            new ArgumentMetadata('foo', 'string', false, false, null, false),
-            new ArgumentMetadata('bar', 'int', false, false, null, false),
-            new ArgumentMetadata('baz', 'float', false, false, null, false),
+            new ArgumentMetadata('foo', 'string', false, false, null),
+            new ArgumentMetadata('bar', 'int', false, false, null),
+            new ArgumentMetadata('baz', 'float', false, false, null),
         ), $arguments);
     }
 
@@ -121,7 +121,7 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             new ArgumentMetadata('foo', 'string', false, false, null, true),
             new ArgumentMetadata('bar', \stdClass::class, false, false, null, true),
             new ArgumentMetadata('baz', 'string', false, true, 'value', true),
-            new ArgumentMetadata('mandatory', null, false, false, null, false),
+            new ArgumentMetadata('mandatory', null, false, false, null),
         ), $arguments);
     }
 

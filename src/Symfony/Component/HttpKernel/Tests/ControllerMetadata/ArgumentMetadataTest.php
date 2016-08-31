@@ -15,10 +15,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 class ArgumentMetadataTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testWithBcLayerForNullable()
+    public function testWithBcLayerWithDefault()
     {
         $argument = new ArgumentMetadata('foo', 'string', false, true, 'default value');
 

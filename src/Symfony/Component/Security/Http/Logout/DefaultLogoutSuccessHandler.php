@@ -42,7 +42,7 @@ class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
      */
     public function onLogoutSuccess(Request $request)
     {
-        if (! empty($this->targetUrl)) {
+        if (!empty($this->targetUrl)) {
             return $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
         } else {
             return new Response();

@@ -82,11 +82,13 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
     public function setCharset($charset)
     {
         $prev = $this->charset;
-        $this->charsetConverter = 'fallback';
-
         $charset = strtoupper($charset);
         $charset = null === $charset || 'UTF-8' === $charset || 'UTF8' === $charset ? 'CP1252' : $charset;
 
+        if ($prev === $charset) {
+            return $prev;
+        }
+        $this->charsetConverter = 'fallback';
         $supported = true;
         set_error_handler(function () use (&$supported) {$supported = false;});
 

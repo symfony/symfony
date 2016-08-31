@@ -448,6 +448,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array('Il y a 10 pommes', '{0} There are no apples|one: There is one apple|more: There is %count% apples', '{0} Il n\'y a aucune pomme|one: Il y a %count% pomme|more: Il y a %count% pommes', 10, array(), 'fr', ''),
 
             array('Il y a 0 pomme', new StringClass('{0} There are no appless|{1} There is one apple|]1,Inf] There is %count% apples'), '[0,1] Il y a %count% pomme|]1,Inf] Il y a %count% pommes', 0, array(), 'fr', ''),
+
+            // Override %count% with a custom value
+            array('Il y a quelques pommes', 'one: There is one apple|more: There are %count% apples', 'one: Il y a %count% pomme|more: Il y a %count% pommes', 2, array('%count%' => 'quelques'), 'fr', ''),
         );
     }
 

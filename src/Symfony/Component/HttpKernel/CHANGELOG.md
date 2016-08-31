@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+ * Added the `$isNullable` argument to the `ArgumentMetadata` as deprecated optional value, but will no longer be optional as of 4.0.
+
 3.1.0
 -----
  * deprecated passing objects as URI attributes to the ESI and SSI renderers

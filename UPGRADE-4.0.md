@@ -132,6 +132,8 @@ HttpKernel
    have your own `ControllerResolverInterface` implementation, you should
    inject an `ArgumentResolverInterface` instance.
 
+ * The `$isNullable` argument to the `ArgumentMetadata` is no longer optional.
+
 Serializer
 ----------
 

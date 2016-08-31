@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-31T12:36:26Z
+
+Here is a screenshot:
+![capture du 2016-08-31 14-33-04](https://cloud.githubusercontent.com/assets/243674/18128815/fb097b32-6f87-11e6-9a74-d3a0edd31577.png)
+
+Note:
+- the ellipsis, they make lines  shorter while still allowing one to select/copy/paste the full path
+- the tooltip on hover that shows what the ellipsis hide
+- when a fileLinkFormat is provided, the middle line is clickable and opens the IDE
+- (colors are going to change soon don't worry about them :) )

@@ -43,14 +43,14 @@ Exception {
   #line: 25
   -trace: {
     %sExceptionCasterTest.php:25: {
-      24: {
-      25:     return new \Exception('foo');
-      26: }
+      : {
+      :     return new \Exception('foo');
+      : }
     }
     %sExceptionCasterTest.php:%d: {
-      %d: {
-      %d:     $e = $this->getTestException(1);
-      %d: 
+      : {
+      :     $e = $this->getTestException(1);
+      : 
       args: {
         1
       }
@@ -68,14 +68,14 @@ EODUMP;
         $expectedDump = <<<'EODUMP'
 {
   %sExceptionCasterTest.php:25: {
-    24: {
-    25:     return new \Exception('foo');
-    26: }
+    : {
+    :     return new \Exception('foo');
+    : }
   }
   %sExceptionCasterTest.php:%d: {
-    %d: {
-    %d:     $e = $this->getTestException(2);
-    %d: 
+    : {
+    :     $e = $this->getTestException(2);
+    : 
     args: {
       2
     }
@@ -99,14 +99,14 @@ Exception {
   #line: 25
   -trace: {
     %sExceptionCasterTest.php:25: {
-      24: {
-      25:     return new \Exception('foo');
-      26: }
+      : {
+      :     return new \Exception('foo');
+      : }
     }
     %sExceptionCasterTest.php:%d: {
-      %d: {
-      %d:     $e = $this->getTestException(1);
-      %d:     ExceptionCaster::$traceArgs = false;
+      : {
+      :     $e = $this->getTestException(1);
+      :     ExceptionCaster::$traceArgs = false;
     }
 %A
 EODUMP;
@@ -156,7 +156,7 @@ EODUMP;
   #<span class=sf-dump-protected title="Protected property">file</span>: "<span class=sf-dump-str title="%d characters">%sExceptionCasterTest.php</span>"
   #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>25</span>
   -<span class=sf-dump-private title="Private property defined in class:&#10;`Exception`">trace</span>: {<samp>
-    <span class=sf-dump-meta title="Stack level %d.">%sExceptionCasterTest.php</span>: <span class=sf-dump-num>25</span>
+    <span class=sf-dump-meta title="Stack level %d."><abbr title="%sVarDumper%eTests" class=sf-dump-ellipsis>%sVarDumper%eTests</abbr>%eCaster%eExceptionCasterTest.php</span>: <span class=sf-dump-num>25</span>
      &hellip;12
   </samp>}
 </samp>}

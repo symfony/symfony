@@ -28,6 +28,7 @@ class StubCaster
             $stub->value = $c->value;
             $stub->handle = $c->handle;
             $stub->cut = $c->cut;
+            $stub->attr = $c->attr;
 
             return array();
         }
@@ -56,6 +57,7 @@ class StubCaster
             $stub->handle = 0;
             $stub->value = null;
             $stub->cut = $c->cut;
+            $stub->attr = $c->attr;
 
             $a = array();
 

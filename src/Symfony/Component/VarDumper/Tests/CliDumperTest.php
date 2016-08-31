@@ -264,9 +264,9 @@ EOTXT
         if (method_exists($twig, 'getSource')) {
             $twig = <<<EOTXT
 foo.twig:%d: {
-        1: foo bar
-        2:   twig source
-        3: 
+        : foo bar
+        :   twig source
+        : 
       }
 EOTXT;
         } else {
@@ -289,24 +289,24 @@ stream resource {@{$ref}
     -trace: {
       {$twig}
       %sTemplate.php:%d: {
-        %d: try {
-        %d:     \$this->doDisplay(\$context, \$blocks);
-        %d: } catch (Twig_Error \$e) {
+        : try {
+        :     \$this->doDisplay(\$context, \$blocks);
+        : } catch (Twig_Error \$e) {
       }
       %sTemplate.php:%d: {
-        %d: {
-        %d:     \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));
-        %d: }
+        : {
+        :     \$this->displayWithErrorHandling(\$this->env->mergeGlobals(\$context), array_merge(\$this->blocks, \$blocks));
+        : }
       }
       %sTemplate.php:%d: {
-        %d: try {
-        %d:     \$this->display(\$context);
-        %d: } catch (Exception \$e) {
+        : try {
+        :     \$this->display(\$context);
+        : } catch (Exception \$e) {
       }
       %sCliDumperTest.php:{$line}: {
-        %d:         }
-        {$line}:     };'),
-        %d: ));
+        :         }
+        :     };'),
+        : ));
       }
     }
   }

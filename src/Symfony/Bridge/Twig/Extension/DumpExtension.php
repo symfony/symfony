@@ -69,6 +69,7 @@ class DumpExtension extends \Twig_Extension
         }
 
         $dump = fopen('php://memory', 'r+b');
+        $this->dumper->setCharset($env->getCharset());
 
         foreach ($vars as $value) {
             $this->dumper->dump($this->cloner->cloneVar($value), $dump);

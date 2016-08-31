@@ -352,7 +352,7 @@ class ErrorHandler
     /**
      * Handles errors by filtering then logging them according to the configured bit fields.
      *
-     * @param int    $type One of the E_* constants
+     * @param int    $type      One of the E_* constants
      * @param string $message
      * @param string $file
      * @param int    $line
@@ -362,7 +362,7 @@ class ErrorHandler
      * @return bool Returns false when no handling happens so that the PHP engine can handle the error itself
      *
      * @throws ContextErrorException
-     * @throws \ErrorException When $this->thrownErrors requests so
+     * @throws \ErrorException       When $this->thrownErrors requests so
      *
      * @internal
      */

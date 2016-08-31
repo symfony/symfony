@@ -63,6 +63,7 @@ abstract class AbstractFormLoginAuthenticator extends AbstractGuardAuthenticator
      * @param string         $providerKey
      *
      * @return RedirectResponse
+     *
      * @throws \Exception
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)

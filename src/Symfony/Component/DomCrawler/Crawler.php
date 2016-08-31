@@ -595,7 +595,7 @@ class Crawler implements \Countable, \IteratorAggregate
     /**
      * Evaluates an XPath expression.
      *
-     * Since an XPath expression might evaluate to either a simple type or a \DOMDoneList,
+     * Since an XPath expression might evaluate to either a simple type or a \DOMNodeList,
      * this method will return either an array of simple types or a new Crawler instance.
      *
      * @param string $xpath An XPath expression

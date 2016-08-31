@@ -95,7 +95,7 @@ class TranslationExtension extends \Twig_Extension
 
     public function transchoice($message, $count, array $arguments = array(), $domain = null, $locale = null)
     {
-        return $this->translator->transChoice($message, $count, $arguments, $domain, $locale);
+        return $this->translator->transChoice($message, $count, array_merge(array('%count%' => $count), $arguments), $domain, $locale);
     }
 
     /**

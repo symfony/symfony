@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by eXtreme at 2016-08-30T20:22:20Z
+
+@javiereguiluz Well, the flexbox is a tricky one but the thing you have to do is to add  `min-width: 0;` (good old css hacks, but for flexbox) to `#collector-wrapper`.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-08-31T06:17:04Z
+
+@eXtreme your proposal solved the problem brilliantly! Thanks.
+
+So this is now ready to be reviewed and merge/reject it.

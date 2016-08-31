@@ -362,7 +362,7 @@ EOHTML;
             return '';
         }
 
-        $v = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        $v = esc($value);
 
         if ('ref' === $style) {
             if (empty($attr['count'])) {
@@ -373,18 +373,18 @@ EOHTML;
             return sprintf('<a class=sf-dump-ref href=#%s-ref%s title="%d occurrences">%s</a>', $this->dumpId, $r, 1 + $attr['count'], $v);
         }
 
-        if ('const' === $style && array_key_exists('value', $attr)) {
-            $style .= sprintf(' title="%s"', htmlspecialchars(json_encode($attr['value']), ENT_QUOTES, 'UTF-8'));
+        if ('const' === $style && isset($attr['value'])) {
+            $style .= sprintf(' title="%s"', esc(is_scalar($attr['value']) ? $attr['value'] : json_encode($attr['value'])));
         } elseif ('public' === $style) {
             $style .= sprintf(' title="%s"', empty($attr['dynamic']) ? 'Public property' : 'Runtime added dynamic property');
         } elseif ('str' === $style && 1 < $attr['length']) {
-            $style .= sprintf(' title="%s%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
+            $style .= sprintf(' title="%d%s characters"', $attr['length'], $attr['binary'] ? ' binary or non-UTF-8' : '');
         } elseif ('note' === $style && false !== $c = strrpos($v, '\\')) {
             return sprintf('<abbr title="%s" class=sf-dump-%s>%s</abbr>', $v, $style, substr($v, $c + 1));
         } elseif ('protected' === $style) {
             $style .= ' title="Protected property"';
         } elseif ('private' === $style) {
-            $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', $attr['class']);
+            $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', esc($attr['class']));
         }
 
         $map = static::$controlCharsMap;
@@ -460,4 +460,9 @@ EOHTML;
         }
         AbstractDumper::dumpLine($depth);
     }
+}
+
+function esc($str)
+{
+    return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }

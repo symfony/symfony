@@ -205,6 +205,8 @@ return function (root, x) {
                 f(e.target, e);
             } else if ('A' == e.target.parentNode.tagName) {
                 f(e.target.parentNode, e);
+            } else if (e.target.nextElementSibling && 'A' == e.target.nextElementSibling.tagName) {
+                f(e.target.nextElementSibling, e, true);
             }
         });
     };
@@ -238,7 +240,7 @@ return function (root, x) {
             }
         }
     });
-    a('click', function (a, e) {
+    a('click', function (a, e, c) {
         if (/\bsf-dump-toggle\b/.test(a.className)) {
             e.preventDefault();
             if (!toggle(a, isCtrlKey(e))) {
@@ -259,7 +261,8 @@ return function (root, x) {
                 }
             }
 
-            if (doc.getSelection) {
+            if (c) {
+            } else if (doc.getSelection) {
                 try {
                     doc.getSelection().removeAllRanges();
                 } catch (e) {

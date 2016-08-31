@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Logout;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\HttpUtils;
 
 /**
@@ -41,6 +42,10 @@ class DefaultLogoutSuccessHandler implements LogoutSuccessHandlerInterface
      */
     public function onLogoutSuccess(Request $request)
     {
-        return $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
+        if (! empty($this->targetUrl)) {
+            return $this->httpUtils->createRedirectResponse($request, $this->targetUrl);
+        } else {
+            return new Response();
+        }
     }
 }

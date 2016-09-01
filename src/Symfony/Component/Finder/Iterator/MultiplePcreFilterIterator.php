@@ -86,7 +86,7 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
     protected function isRegex($str)
     {
         if (preg_match('/^(.{3,}?)[imsxuADU]*$/', $str, $m)) {
-            $start = substr($m[1], 0, 1);
+            $start = $m[1][0];
             $end = substr($m[1], -1);
 
             if ($start === $end) {

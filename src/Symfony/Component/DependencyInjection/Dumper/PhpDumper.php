@@ -1397,6 +1397,11 @@ EOF;
             return '$this';
         }
 
+        if ($this->container->hasDefinition($id) && !$this->container->getDefinition($id)->isPublic()) {
+            // The following is PHP 5.5 syntax for what could be written as "(\$this->services['$id'] ?? \$this->{$this->generateMethodName($id)}())" on PHP>=7.0
+
+            return "\${(\$_ = isset(\$this->services['$id']) ? \$this->services['$id'] : \$this->{$this->generateMethodName($id)}()) && false ?: '_'}";
+        }
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {

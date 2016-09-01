@@ -110,7 +110,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['configured_service'] = $instance = new \stdClass();
 
-        $this->get('configurator_service')->configureStdClass($instance);
+        ${($_ = isset($this->services['configurator_service']) ? $this->services['configurator_service'] : $this->getConfiguratorServiceService()) && false ?: '_'}->configureStdClass($instance);
 
         return $instance;
     }
@@ -127,7 +127,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['configured_service_simple'] = $instance = new \stdClass();
 
-        $this->get('configurator_service_simple')->configureStdClass($instance);
+        ${($_ = isset($this->services['configurator_service_simple']) ? $this->services['configurator_service_simple'] : $this->getConfiguratorServiceSimpleService()) && false ?: '_'}->configureStdClass($instance);
 
         return $instance;
     }
@@ -211,7 +211,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceSimpleService()
     {
-        return $this->services['factory_service_simple'] = $this->get('factory_simple')->getInstance();
+        return $this->services['factory_service_simple'] = ${($_ = isset($this->services['factory_simple']) ? $this->services['factory_simple'] : $this->getFactorySimpleService()) && false ?: '_'}->getInstance();
     }
 
     /**
@@ -279,7 +279,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
-        $instance->setBar($this->get('inlined'));
+        $instance->setBar(${($_ = isset($this->services['inlined']) ? $this->services['inlined'] : $this->getInlinedService()) && false ?: '_'});
 
         return $instance;
     }
@@ -321,7 +321,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getNewFactoryServiceService()
     {
-        $this->services['new_factory_service'] = $instance = $this->get('new_factory')->getInstance();
+        $this->services['new_factory_service'] = $instance = ${($_ = isset($this->services['new_factory']) ? $this->services['new_factory'] : $this->getNewFactoryService()) && false ?: '_'}->getInstance();
 
         $instance->foo = 'bar';
 

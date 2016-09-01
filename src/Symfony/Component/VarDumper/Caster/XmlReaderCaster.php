@@ -54,7 +54,7 @@ class XmlReaderCaster
             'attributeCount' => $reader->attributeCount,
             'value' => $reader->value,
             'namespaceURI' => $reader->namespaceURI,
-            'baseURI' => $reader->baseURI,
+            'baseURI' => $reader->baseURI ? new LinkStub($reader->baseURI) : $reader->baseURI,
             $props => array(
                 'LOADDTD' => $reader->getParserProperty(\XmlReader::LOADDTD),
                 'DEFAULTATTRS' => $reader->getParserProperty(\XmlReader::DEFAULTATTRS),

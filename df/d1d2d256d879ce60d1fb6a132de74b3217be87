@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-09-01T12:52:53Z
+
+This makes the redirection/forward icon to be closer to the status panel than before ... but it's probably  OK:
+
+| Before | After
+| --- | ---
+| ![before](https://cloud.githubusercontent.com/assets/73419/18167963/a73f9938-7053-11e6-8d64-c8b4f30bae9e.png) | ![after](https://cloud.githubusercontent.com/assets/73419/18167966/a85e9c24-7053-11e6-95e5-f9c965b82d4d.png)
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-09-01T12:57:16Z
+
+Maybe the better solution is to wrap up the optionally displayed SVG and the other elements representing the route in a single element that has the `margin-left`?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-09-01T13:09:35Z
+
+We're always cautious about modifying the HTML structure ... so maybe the following would suffice:
+
+```css
+.sf-toolbar-block-request .sf-toolbar-status + svg {
+    margin-left: 5px;
+}
+```
+
+---------------------------------------------------------------------------
+
+by jameshalsall at 2016-09-01T13:33:24Z
+
+Updated, that fixes both scenarios :)

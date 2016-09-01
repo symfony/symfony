@@ -64,6 +64,13 @@
             </div>
 
             <div class="sf-toolbar-info-piece">
+                <b>Last 10 Requests</b>
+                <span>
+                    <a href="{{ path('_profiler_search_results', { token: token, limit: 10 }) }}">View</a>
+                </span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
                 <b>Has session</b>
                 <span>{% if collector.sessionmetadata|length %}yes{% else %}no{% endif %}</span>
             </div>

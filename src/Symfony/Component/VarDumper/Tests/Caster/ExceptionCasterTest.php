@@ -33,7 +33,7 @@ class ExceptionCasterTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultSettings()
     {
-        $e = $this->getTestException(1);
+        $e = $this->getTestException($this);
 
         $expectedDump = <<<'EODUMP'
 Exception {
@@ -49,10 +49,10 @@ Exception {
     }
     %sExceptionCasterTest.php:%d: {
       : {
-      :     $e = $this->getTestException(1);
+      :     $e = $this->getTestException($this);
       : 
-      args: {
-        1
+      arguments: {
+        Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest {#1 …}
       }
     }
 %A
@@ -76,7 +76,7 @@ EODUMP;
     : {
     :     $e = $this->getTestException(2);
     : 
-    args: {
+    arguments: {
       2
     }
   }

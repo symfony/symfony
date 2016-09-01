@@ -383,7 +383,7 @@ class PhpDumper extends Dumper
 
         $class = $this->dumpValue($class);
 
-        if ("'" === $class[0] && !preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
+        if (0 === strpos($class, "'") && !preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
             throw new InvalidArgumentException(sprintf('"%s" is not a valid class name for the "%s" service.', $class, $id));
         }
 
@@ -538,7 +538,7 @@ class PhpDumper extends Dumper
 
             $class = $this->dumpValue($callable[0]);
             // If the class is a string we can optimize call_user_func away
-            if ("'" === $class[0]) {
+            if (strpos($class, "'") === 0) {
                 return sprintf("        %s::%s(\$%s);\n", $this->dumpLiteralClass($class), $callable[1], $variableName);
             }
 
@@ -571,7 +571,7 @@ class PhpDumper extends Dumper
         if ($definition->isSynthetic()) {
             $return[] = '@throws RuntimeException always since this service is expected to be injected dynamically';
         } elseif ($class = $definition->getClass()) {
-            $return[] = sprintf('@return %s A %s instance', ('%' === $class[0]) ? 'object' : '\\'.ltrim($class, '\\'), ltrim($class, '\\'));
+            $return[] = sprintf('@return %s A %s instance', 0 === strpos($class, '%') ? 'object' : '\\'.ltrim($class, '\\'), ltrim($class, '\\'));
         } elseif ($definition->getFactory()) {
             $factory = $definition->getFactory();
             if (is_string($factory)) {
@@ -719,7 +719,7 @@ EOF;
 
                 $class = $this->dumpValue($callable[0]);
                 // If the class is a string we can optimize call_user_func away
-                if ("'" === $class[0]) {
+                if (strpos($class, "'") === 0) {
                     if ("''" === $class) {
                         throw new RuntimeException(sprintf('Cannot dump definition: The "%s" service is defined to be created by a factory but is missing the service reference, did you forget to define the factory service id or class?', $id));
                     }
@@ -1339,7 +1339,7 @@ EOF;
         if (false !== strpos($class, '$')) {
             throw new RuntimeException('Cannot dump definitions which have a variable class name.');
         }
-        if ("'" !== $class[0] || !preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
+        if (0 !== strpos($class, "'") || !preg_match('/^\'[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\\{2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*\'$/', $class)) {
             throw new RuntimeException(sprintf('Cannot dump definition because of invalid class name (%s)', $class ?: 'n/a'));
         }
 

@@ -43,11 +43,11 @@ class RememberMeFactory implements SecurityFactoryInterface
         // remember me services
         if (isset($config['token_provider'])) {
             $templateId = 'security.authentication.rememberme.services.persistent';
-            $rememberMeServicesId = $templateId.'.'.$id;
         } else {
             $templateId = 'security.authentication.rememberme.services.simplehash';
-            $rememberMeServicesId = $templateId.'.'.$id;
         }
+
+        $rememberMeServicesId = $templateId.'.'.$id;
 
         if ($container->hasDefinition('security.logout_listener.'.$id)) {
             $container

@@ -249,6 +249,12 @@ class SecurityExtension extends Extension
                 ->replaceArgument(2, new Reference($configId))
             ;
 
+            if ($container->hasDefinition('security.authentication.rememberme.services.persistent.'.$name)) {
+                $context->replaceArgument(3, new Reference('security.authentication.rememberme.services.persistent.'.$name));
+            } elseif ($container->hasDefinition('security.authentication.rememberme.services.simplehash.'.$name)) {
+                $context->replaceArgument(3, new Reference('security.authentication.rememberme.services.simplehash.'.$name));
+            }
+
             $map[$contextId] = $matcher;
         }
         $mapDef->replaceArgument(1, $map);

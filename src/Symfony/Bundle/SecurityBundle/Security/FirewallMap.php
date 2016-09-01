@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Symfony\Component\Security\Http\FirewallMapInterface;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -61,6 +62,24 @@ class FirewallMap implements FirewallMapInterface
         }
 
         return $context->getConfig();
+    }
+
+    /**
+     * Gets the remember me services for the given Request.
+     *
+     * @param Request $request
+     *
+     * @return RememberMeServicesInterface|null
+     */
+    public function getRememberMeServices(Request $request)
+    {
+        $context = $this->getFirewallContext($request);
+
+        if (null === $context) {
+            return;
+        }
+
+        return $context->getRememberMeServices();
     }
 
     private function getFirewallContext(Request $request)

@@ -43,7 +43,6 @@ class HtmlDumper extends CliDumper
         'meta' => 'color:#B729D9',
         'key' => 'color:#56DB3A',
         'index' => 'color:#1299DA',
-        'expanded code.hljs' => 'display:inline; padding:0; background:none',
     );
 
     private $displayOptions = array(
@@ -190,13 +189,17 @@ return function (root, x) {
         options = {$options},
         elt = root.getElementsByTagName('A'),
         len = elt.length,
-        i = 0, s, h,
+        i = 0, s, h, fmt,
         t = [];
 
     while (i < len) t.push(elt[i++]);
 
     for (i in x) {
         options[i] = x[i];
+    }
+    fmt = options.fileLinkFormat;
+    if (fmt && 'string' == typeof fmt) {
+        fmt = [fmt];
     }
 
     function a(e, f) {
@@ -218,20 +221,6 @@ return function (root, x) {
             refStyle.innerHTML = '';
         }
     });
-    if (options.fileLinkFormat) {
-        addEventListener(root, 'click', function (e) {
-            e = e.target;
-            while (root != e && 'CODE' != e.tagName) {
-                e = e.parentNode;
-            }
-            if ('CODE' == e.tagName) {
-                var f = e.getAttribute('data-file'), l = e.getAttribute('data-line');
-                if (f && l) {
-                    location.href = options.fileLinkFormat.replace('%f', f).replace('%l', l);
-                }
-            }
-        });
-    }
     a('mouseover', function (a) {
         if (a = idRx.exec(a.className)) {
             try {
@@ -332,6 +321,16 @@ return function (root, x) {
                     }
                 }
             }
+        } else if (fmt && (a = elt.getAttribute('data-file'))) {
+            if (fmt[1]) {
+                for (x in fmt[1]) {
+                    if (0 === a.indexOf(x)) {
+                        a = fmt[1][x] + a.substr(x.length);
+                        break;
+                    }
+                }
+            }
+            elt.href = fmt[0].replace('%l', elt.getAttribute('data-line')).replace('%f', a);
         }
     }
 
@@ -387,6 +386,7 @@ pre.sf-dump a {
     cursor: pointer;
     border: 0;
     outline: none;
+    color: inherit;
 }
 pre.sf-dump .sf-dump-ellipsis {
     display: inline-block;
@@ -396,6 +396,11 @@ pre.sf-dump .sf-dump-ellipsis {
     white-space: nowrap;
     overflow: hidden;
     vertical-align: top;
+}
+pre.sf-dump code {
+    display:inline;
+    padding:0;
+    background:none;
 }
 .sf-dump-str-collapse .sf-dump-str-collapse {
     display: none;
@@ -480,14 +485,15 @@ EOHTML
         } elseif ('private' === $style) {
             $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', esc($attr['class']));
         }
+        $map = static::$controlCharsMap;
+        $style = "<span class=sf-dump-{$style}>";
+
         if (isset($attr['ellipsis'])) {
             $label = esc(substr($value, -$attr['ellipsis']));
 
-            return sprintf('<span class=sf-dump-%s><abbr title="%s" class=sf-dump-ellipsis>%2$s</abbr>%s</span>', $style, substr($v, 0, -strlen($label)), $label);
+            $v = sprintf('</span>%s<abbr title="%s" class=sf-dump-ellipsis>%2$s</abbr>%s</span>%1$s', $style, substr($v, 0, -strlen($label)), $label);
         }
 
-        $map = static::$controlCharsMap;
-        $style = "<span class=sf-dump-{$style}>";
         $v = preg_replace_callback(static::$controlCharsRx, function ($c) use ($map, $style) {
             $s = '</span>';
             $c = $c[$i = 0];
@@ -498,22 +504,23 @@ EOHTML
             return $s.$style;
         }, $v, -1, $cchrCount);
 
-        if ($cchrCount && '<' === $v[0]) {
+        if ('<' === $v[0]) {
             $v = substr($v, 7);
         } else {
             $v = $style.$v;
         }
-        if ($cchrCount && '>' === substr($v, -1)) {
+        if ('>' === substr($v, -1)) {
             $v = substr($v, 0, -strlen($style));
         } else {
             $v .= '</span>';
         }
+        if (isset($attr['file'])) {
+            $v = sprintf('<a data-file="%s" data-line="%d">%s</a>', esc($attr['file']), isset($attr['line']) ? $attr['line'] : 1, $v);
+        } elseif (isset($attr['href'])) {
+            $v = sprintf('<a href="%s">%s</a>', esc($attr['href']), $v);
+        }
         if (isset($attr['lang'])) {
-            if (isset($attr['file'], $attr['line'])) {
-                $v = sprintf('<code class="%s" data-file="%s" data-line="%d">%s</code>', esc($attr['lang']), esc($attr['file']), $attr['line'], $v);
-            } else {
-                $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);
-            }
+            $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);
         }
 
         return $v;

@@ -115,6 +115,10 @@ class SplCaster
             }
         }
 
+        if (isset($a[$prefix.'realPath'])) {
+            $a[$prefix.'realPath'] = new LinkStub($a[$prefix.'realPath']);
+        }
+
         if (isset($a[$prefix.'perms'])) {
             $a[$prefix.'perms'] = new ConstStub(sprintf('0%o', $a[$prefix.'perms']), $a[$prefix.'perms']);
         }

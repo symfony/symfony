@@ -53,7 +53,7 @@ class ReflectionCaster
         }
 
         if ($f = $c->getFileName()) {
-            $a[$prefix.'file'] = $f;
+            $a[$prefix.'file'] = new LinkStub($f, $c->getStartLine());
             $a[$prefix.'line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
 
@@ -287,7 +287,7 @@ class ReflectionCaster
         $x = isset($a[Caster::PREFIX_VIRTUAL.'extra']) ? $a[Caster::PREFIX_VIRTUAL.'extra']->value : array();
 
         if (method_exists($c, 'getFileName') && $m = $c->getFileName()) {
-            $x['file'] = $m;
+            $x['file'] = new LinkStub($m, $c->getStartLine());
             $x['line'] = $c->getStartLine().' to '.$c->getEndLine();
         }
 

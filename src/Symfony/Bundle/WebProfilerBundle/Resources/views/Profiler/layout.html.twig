@@ -68,7 +68,9 @@
                             <dd>{{ status_code }}</dd>
 
                             <dt>IP</dt>
-                            <dd>{{ profile.ip }}</dd>
+                            <dd>
+                                <a href="{{ path('_profiler_search_results', { token: token, limit: 10, ip: profile.ip }) }}">{{ profile.ip }}</a>
+                            </dd>
 
                             <dt>Profiled on</dt>
                             <dd>{{ profile.time|date('r') }}</dd>

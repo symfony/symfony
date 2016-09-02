@@ -278,17 +278,6 @@ class Parser
                         throw $e;
                     }
 
-                    if (is_array($value)) {
-                        $first = reset($value);
-                        if (is_string($first) && 0 === strpos($first, '*')) {
-                            $data = array();
-                            foreach ($value as $alias) {
-                                $data[] = $this->refs[substr($alias, 1)];
-                            }
-                            $value = $data;
-                        }
-                    }
-
                     if (isset($mbEncoding)) {
                         mb_internal_encoding($mbEncoding);
                     }

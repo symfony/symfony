@@ -52,7 +52,7 @@ class JsonResponse extends Response
     /**
      * Factory method for chainability.
      *
-     * Example:.
+     * Example:
      *
      *     return JsonResponse::create($data, 200)
      *         ->setSharedMaxAge(300);

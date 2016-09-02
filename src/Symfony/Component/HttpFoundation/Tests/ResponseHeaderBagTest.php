@@ -253,7 +253,6 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         $headers->set('Location', 'http://www.symfony.com');
         $headers->set('Content-type', 'text/html');
 
-        //invoking to __toString method
         (string) $headers;
 
         $allHeaders = $headers->allPreserveCase();

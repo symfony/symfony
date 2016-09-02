@@ -27,6 +27,9 @@ class LinkStub extends ConstStub
         }
         if (is_string($href)) {
             if (0 === strpos($href, 'file://')) {
+                if ($href === $label) {
+                    $label = substr($label, 7);
+                }
                 $href = substr($href, 7);
             } elseif (false !== strpos($href, '://')) {
                 $this->attr['href'] = $href;
@@ -39,7 +42,7 @@ class LinkStub extends ConstStub
                 }
                 $this->attr['file'] = realpath($href);
 
-                if ($this->attr['file'] === $href && 3 < count($ellipsis = explode(DIRECTORY_SEPARATOR, $href))) {
+                if ($this->attr['file'] === $label && 3 < count($ellipsis = explode(DIRECTORY_SEPARATOR, $href))) {
                     $this->attr['ellipsis'] = 2 + strlen(implode(array_slice($ellipsis, -2)));
                 }
             }

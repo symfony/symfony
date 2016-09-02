@@ -13,6 +13,7 @@ namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use Symfony\Component\VarDumper\Caster\ArgsStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Caster\LinkStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -83,6 +84,26 @@ array:1 [
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $args);
+    }
+
+    public function testLinkStub()
+    {
+        $var = array(new LinkStub(__CLASS__, 0, __FILE__));
+
+        $cloner = new VarCloner();
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $dump = $dumper->dump($cloner->cloneVar($var), true);
+
+        $expectedDump = <<<'EODUMP'
+<foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
+  <span class=sf-dump-index>0</span> => "<a data-file="%sStubCasterTest.php" data-line="1"><span class=sf-dump-str title="%d characters">Symfony\Component\VarDumper\Tests\Caster\StubCasterTest</span></a>"
+</samp>]
+</bar>
+EODUMP;
+
+        $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
     public function testClassStub()

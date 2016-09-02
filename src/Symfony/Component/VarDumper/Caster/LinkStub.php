@@ -18,30 +18,29 @@ namespace Symfony\Component\VarDumper\Caster;
  */
 class LinkStub extends ConstStub
 {
-    public function __construct($file, $line = 0)
+    public function __construct($label, $line = 0, $href = null)
     {
-        $this->value = $file;
+        $this->value = $label;
 
-        if (is_string($file)) {
-            $this->type = self::TYPE_STRING;
-            $this->class = preg_match('//u', $file) ? self::STRING_UTF8 : self::STRING_BINARY;
-
-            if (0 === strpos($file, 'file://')) {
-                $file = substr($file, 7);
-            } elseif (false !== strpos($file, '://')) {
-                $this->attr['href'] = $file;
+        if (null === $href) {
+            $href = $label;
+        }
+        if (is_string($href)) {
+            if (0 === strpos($href, 'file://')) {
+                $href = substr($href, 7);
+            } elseif (false !== strpos($href, '://')) {
+                $this->attr['href'] = $href;
 
                 return;
             }
-            if (file_exists($file)) {
+            if (file_exists($href)) {
                 if ($line) {
                     $this->attr['line'] = $line;
                 }
-                $this->attr['file'] = realpath($file);
+                $this->attr['file'] = realpath($href);
 
-                if ($this->attr['file'] === $file) {
-                    $ellipsis = explode(DIRECTORY_SEPARATOR, $file);
-                    $this->attr['ellipsis'] = 3 < count($ellipsis) ? 2 + strlen(implode(array_slice($ellipsis, -2))) : 0;
+                if ($this->attr['file'] === $href && 3 < count($ellipsis = explode(DIRECTORY_SEPARATOR, $href))) {
+                    $this->attr['ellipsis'] = 2 + strlen(implode(array_slice($ellipsis, -2)));
                 }
             }
         }

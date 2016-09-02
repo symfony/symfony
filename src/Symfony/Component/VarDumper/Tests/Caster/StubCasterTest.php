@@ -12,7 +12,11 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use Symfony\Component\VarDumper\Caster\ArgsStub;
+use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\FooInterface;
 
 class StubCasterTest extends \PHPUnit_Framework_TestCase
 {
@@ -79,5 +83,25 @@ array:1 [
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $args);
+    }
+
+    public function testClassStub()
+    {
+        $var = array(new ClassStub('hello', array(FooInterface::class, 'foo')));
+
+        $cloner = new VarCloner();
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $dump = $dumper->dump($cloner->cloneVar($var), true);
+
+        $expectedDump = <<<'EODUMP'
+<foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
+  <span class=sf-dump-index>0</span> => "<a data-file="%sFooInterface.php" data-line="8"><span class=sf-dump-str title="5 characters">hello</span></a>"
+</samp>]
+</bar>
+EODUMP;
+
+        $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 }

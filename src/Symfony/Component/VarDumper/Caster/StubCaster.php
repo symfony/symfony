@@ -30,6 +30,11 @@ class StubCaster
             $stub->cut = $c->cut;
             $stub->attr = $c->attr;
 
+            if (Stub::TYPE_REF === $c->type && !$c->class && is_string($c->value) && !preg_match('//u', $c->value)) {
+                $stub->type = self::TYPE_STRING;
+                $stub->class = self::STRING_BINARY;
+            }
+
             return array();
         }
     }

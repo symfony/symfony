@@ -26,6 +26,7 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
  * Initializes the context from the request and sets request attributes based on a matching route.
@@ -63,6 +64,7 @@ class RouterListener implements EventSubscriberInterface
         $this->context = $context ?: $matcher->getContext();
         $this->requestStack = $requestStack;
         $this->logger = $logger;
+        $this->useClassStub = class_exists(ClassStub::class);
     }
 
     private function setCurrentRequest(Request $request = null)
@@ -102,8 +104,12 @@ class RouterListener implements EventSubscriberInterface
             } else {
                 $parameters = $this->matcher->match($request->getPathInfo());
             }
+            $request->attributes->add($parameters);
 
             if (null !== $this->logger) {
+                if (isset($parameters['_controller']) && $this->useClassStub) {
+                    $parameters['_controller'] = ClassStub::wrapCallable($parameters['_controller']);
+                }
                 $this->logger->info('Matched route "{route}".', array(
                     'route' => isset($parameters['_route']) ? $parameters['_route'] : 'n/a',
                     'route_parameters' => $parameters,
@@ -112,7 +118,6 @@ class RouterListener implements EventSubscriberInterface
                 ));
             }
 
-            $request->attributes->add($parameters);
             unset($parameters['_route'], $parameters['_controller']);
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {

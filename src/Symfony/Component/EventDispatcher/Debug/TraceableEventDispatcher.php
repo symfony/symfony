@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -32,6 +33,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     private $called;
     private $dispatcher;
     private $wrappedListeners;
+    private $useClassStub;
 
     /**
      * Constructor.
@@ -47,6 +49,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         $this->logger = $logger;
         $this->called = array();
         $this->wrappedListeners = array();
+        $this->useClassStub = class_exists(ClassStub::class);
     }
 
     /**
@@ -261,10 +264,13 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             $this->dispatcher->removeListener($eventName, $listener);
             $this->dispatcher->addListener($eventName, $listener->getWrappedListener(), $priority);
 
-            $info = $this->getListenerInfo($listener->getWrappedListener(), $eventName);
+            if (null !== $this->logger) {
+                $context = $this->getListenerInfo($listener->getWrappedListener(), $eventName);
+                $context = array('event' => $eventName, 'listener' => $this->useClassStub ? new ClassStub($context['pretty'], $listener->getWrappedListener()) : $context['pretty']);
+            }
             if ($listener->wasCalled()) {
                 if (null !== $this->logger) {
-                    $this->logger->debug('Notified event "{event}" to listener "{listener}".', array('event' => $eventName, 'listener' => $info['pretty']));
+                    $this->logger->debug('Notified event "{event}" to listener "{listener}".', $context);
                 }
 
                 if (!isset($this->called[$eventName])) {
@@ -275,12 +281,12 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
             }
 
             if (null !== $this->logger && $skipped) {
-                $this->logger->debug('Listener "{listener}" was not called for event "{event}".', array('listener' => $info['pretty'], 'event' => $eventName));
+                $this->logger->debug('Listener "{listener}" was not called for event "{event}".', $context);
             }
 
             if ($listener->stoppedPropagation()) {
                 if (null !== $this->logger) {
-                    $this->logger->debug('Listener "{listener}" stopped propagation of the event "{event}".', array('listener' => $info['pretty'], 'event' => $eventName));
+                    $this->logger->debug('Listener "{listener}" stopped propagation of the event "{event}".', $context);
                 }
 
                 $skipped = true;

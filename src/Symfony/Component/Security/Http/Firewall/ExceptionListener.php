@@ -112,6 +112,7 @@ class ExceptionListener
 
         try {
             $event->setResponse($this->startAuthentication($event->getRequest(), $exception));
+            $event->allowCustomResponseCode();
         } catch (\Exception $e) {
             $event->setException($e);
         }
@@ -155,6 +156,7 @@ class ExceptionListener
                 $subRequest->attributes->set(Security::ACCESS_DENIED_ERROR, $exception);
 
                 $event->setResponse($event->getKernel()->handle($subRequest, HttpKernelInterface::SUB_REQUEST, true));
+                $event->allowCustomResponseCode();
             }
         } catch (\Exception $e) {
             if (null !== $this->logger) {

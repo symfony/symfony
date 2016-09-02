@@ -177,6 +177,9 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
      */
     protected function utf8Encode($s)
     {
+        if (preg_match('//u', $s)) {
+            return $s;
+        }
         if (false !== $c = @iconv($this->charset, 'UTF-8', $s)) {
             return $c;
         }

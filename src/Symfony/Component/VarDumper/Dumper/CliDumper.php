@@ -148,8 +148,8 @@ class CliDumper extends AbstractDumper
                 break;
 
             default:
-                $attr += array('value' => isset($value[0]) && !preg_match('//u', $value) ? $this->utf8Encode($value) : $value);
-                $value = isset($type[0]) && !preg_match('//u', $type) ? $this->utf8Encode($type) : $type;
+                $attr += array('value' => $this->utf8Encode($value));
+                $value = $this->utf8Encode($type);
                 break;
         }
 
@@ -249,9 +249,7 @@ class CliDumper extends AbstractDumper
     {
         $this->dumpKey($cursor);
 
-        if (!preg_match('//u', $class)) {
-            $class = $this->utf8Encode($class);
-        }
+        $class = $this->utf8Encode($class);
         if (Cursor::HASH_OBJECT === $type) {
             $prefix = $class && 'stdClass' !== $class ? $this->style('note', $class).' {' : '{';
         } elseif (Cursor::HASH_RESOURCE === $type) {

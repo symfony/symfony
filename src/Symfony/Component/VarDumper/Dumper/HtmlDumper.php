@@ -481,9 +481,9 @@ EOHTML
         } elseif ('protected' === $style) {
             $style .= ' title="Protected property"';
         } elseif ('meta' === $style && isset($attr['title'])) {
-            $style .= sprintf(' title="%s"', esc($attr['title']));
+            $style .= sprintf(' title="%s"', esc($this->utf8Encode($attr['title'])));
         } elseif ('private' === $style) {
-            $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', esc($attr['class']));
+            $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', esc($this->utf8Encode($attr['class'])));
         }
         $map = static::$controlCharsMap;
         $style = "<span class=sf-dump-{$style}>";
@@ -515,9 +515,9 @@ EOHTML
             $v .= '</span>';
         }
         if (isset($attr['file'])) {
-            $v = sprintf('<a data-file="%s" data-line="%d">%s</a>', esc($attr['file']), isset($attr['line']) ? $attr['line'] : 1, $v);
+            $v = sprintf('<a data-file="%s" data-line="%d">%s</a>', esc($this->utf8Encode($attr['file'])), isset($attr['line']) ? $attr['line'] : 1, $v);
         } elseif (isset($attr['href'])) {
-            $v = sprintf('<a href="%s">%s</a>', esc($attr['href']), $v);
+            $v = sprintf('<a href="%s">%s</a>', esc($this->utf8Encode($attr['href'])), $v);
         }
         if (isset($attr['lang'])) {
             $v = sprintf('<code class="%s">%s</code>', esc($attr['lang']), $v);

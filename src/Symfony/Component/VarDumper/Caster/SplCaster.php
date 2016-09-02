@@ -36,7 +36,7 @@ class SplCaster
         $b = array(
             $prefix.'flag::STD_PROP_LIST' => (bool) ($flags & \ArrayObject::STD_PROP_LIST),
             $prefix.'flag::ARRAY_AS_PROPS' => (bool) ($flags & \ArrayObject::ARRAY_AS_PROPS),
-            $prefix.'iteratorClass' => $c->getIteratorClass(),
+            $prefix.'iteratorClass' => new ClassStub($c->getIteratorClass()),
             $prefix.'storage' => $c->getArrayCopy(),
         );
 

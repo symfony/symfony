@@ -69,7 +69,7 @@ class RedisCaster
 
         return $a + array(
             $prefix.'hosts' => $c->_hosts(),
-            $prefix.'function' => $c->_function(),
+            $prefix.'function' => ClassStub::wrapCallable($c->_function()),
         );
     }
 }

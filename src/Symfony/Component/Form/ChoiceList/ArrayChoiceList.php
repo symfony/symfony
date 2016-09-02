@@ -183,12 +183,13 @@ class ArrayChoiceList implements ChoiceListInterface
     /**
      * Flattens an array into the given output variables.
      *
-     * @param array    $choices         The array to flatten
-     * @param callable $value           The callable for generating choice values
-     * @param array    $choicesByValues The flattened choices indexed by the
-     *                                  corresponding values
-     * @param array    $keysByValues    The original keys indexed by the
-     *                                  corresponding values
+     * @param array    $choices          The array to flatten
+     * @param callable $value            The callable for generating choice values
+     * @param array    $choicesByValues  The flattened choices indexed by the
+     *                                   corresponding values
+     * @param array    $keysByValues     The original keys indexed by the
+     *                                   corresponding values
+     * @param array    $structuredValues The values indexed by the original keys
      *
      * @internal Must not be used by user-land code
      */

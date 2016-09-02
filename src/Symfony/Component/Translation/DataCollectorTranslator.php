@@ -108,7 +108,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      * @param string|null $locale
      * @param string|null $domain
      * @param string      $id
-     * @param string      $trans
+     * @param string      $translation
      */
     private function collectMessage($locale, $domain, $id, $translation)
     {

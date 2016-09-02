@@ -178,8 +178,6 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
     /**
      * Checks if the pattern contains only a date.
      *
-     * @param string $pattern The input pattern
-     *
      * @return bool
      */
     protected function isPatternDateOnly()

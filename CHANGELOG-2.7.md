@@ -7,6 +7,31 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.17 (2016-09-02)
+
+ * bug #19794 [VarDumper] Various minor fixes & cleanups (nicolas-grekas)
+ * bug #19751 Fixes the calendar in constructor to handle null (wakqasahmed)
+ * bug #19388 [Validator][GroupSequence] fixed GroupSequence validation ignores PropetyMetadata of parent classes (Sandro Hopf)
+ * bug #19601 [FrameworkBundle] Added friendly exception when constraint validator class does not exist (yceruto)
+ * bug #19580 [Validator] fixed duplicate constraints with parent class interfaces (dmaicher)
+ * bug #19647 [Debug] Swap dumper services at bootstrap (lyrixx)
+ * bug #19685 [DI] Include dynamic services in alternatives (ro0NL)
+ * bug #19702 [Debug][HttpKernel][VarDumper] Prepare for committed 7.2 changes (aka "small-bc-breaks") (nicolas-grekas)
+ * bug #19704 [DependencyInjection] PhpDumper::isFrozen inconsistency (allflame)
+ * bug #19666 Verify explicitly that the request IP is a valid IPv4 address (nesk)
+ * bug #19660 Disable CLI color for Windows 10 greater than 10.0.10586 (mlocati)
+ * bug #19663 Exception details break the layout (Dionysis Arvanitis)
+ * bug #19651 [HttpKernel] Fix HttpCache validation HTTP method (tgalopin)
+ * bug #19623 [VarDumper] Fix dumping continuations (nicolas-grekas)
+ * bug #19549 [HttpFoundation] fixed Request::getContent() reusage bug (1ma)
+ * bug #19373 [Form] Skip CSRF validation on form when POST max size is exceeded (jameshalsall)
+ * bug #19541 Fix #19531 [Form] DateType fails parsing when midnight is not a valid time (mbeccati)
+ * bug #19579 [Process] Strengthen Windows pipe files opening (again...) (nicolas-grekas)
+ * bug #19564 Added class existence check if is_subclass_of() fails in compiler passes (SCIF)
+ * bug #19522 [SwiftMailerBridge] Fix flawed deprecation message (chalasr)
+ * bug #19510 [Process] Fix double-fread() when reading unix pipes (nicolas-grekas)
+ * bug #19508 [Process] Fix AbstractPipes::write() for a situation seen on HHVM (at least) (nicolas-grekas)
+
 * 2.7.16 (2016-07-30)
 
  * bug #19470 undefined offset fix (#19406) (ReenExe)

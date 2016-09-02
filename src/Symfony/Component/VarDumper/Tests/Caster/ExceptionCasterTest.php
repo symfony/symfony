@@ -139,15 +139,12 @@ EODUMP;
         $e = $this->getTestException(1);
         ExceptionCaster::$srcContext = -1;
 
-        $h = fopen('php://memory', 'r+b');
         $cloner = new VarCloner();
         $cloner->setMaxItems(1);
-        $dumper = new HtmlDumper($h);
+        $dumper = new HtmlDumper();
         $dumper->setDumpHeader('<foo></foo>');
         $dumper->setDumpBoundaries('<bar>', '</bar>');
-        $dumper->dump($cloner->cloneVar($e)->withRefHandles(false));
-        $dump = stream_get_contents($h, -1, 0);
-        fclose($h);
+        $dump = $dumper->dump($cloner->cloneVar($e)->withRefHandles(false), true);
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>Exception</span> {<samp>

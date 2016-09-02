@@ -339,8 +339,6 @@ class ProgressBar
      * Advances the progress output X steps.
      *
      * @param int $step Number of steps to advance
-     *
-     * @throws LogicException
      */
     public function advance($step = 1)
     {
@@ -361,18 +359,15 @@ class ProgressBar
      * Sets the current progress.
      *
      * @param int $step The current progress
-     *
-     * @throws LogicException
      */
     public function setProgress($step)
     {
         $step = (int) $step;
-        if ($step < $this->step) {
-            throw new LogicException('You can\'t regress the progress bar.');
-        }
 
         if ($this->max && $step > $this->max) {
             $this->max = $step;
+        } elseif ($step < 0) {
+            $step = 0;
         }
 
         $prevPeriod = (int) ($this->step / $this->redrawFreq);

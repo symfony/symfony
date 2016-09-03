@@ -364,7 +364,7 @@ class Application
      * Adds an array of command objects.
      *
      * If a Command is not enabled it will not be added.
-     * 
+     *
      * @param Command[] $commands An array of commands
      */
     public function addCommands(array $commands)

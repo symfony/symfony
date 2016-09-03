@@ -120,11 +120,13 @@ EOF
     /**
      * Iterate over configuration until the last step of the given path.
      *
-     * @param array $config A bundle configuration
+     * @param array  $config A bundle configuration
+     * @param string $path   The configuration option path
+     * @param string $alias  The extension path
+     *
+     * @return mixed If the configuration does not exist
      *
      * @throws LogicException If the configuration does not exist
-     *
-     * @return mixed
      */
     private function getConfigForPath(array $config = array(), $path, $alias)
     {

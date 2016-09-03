@@ -189,6 +189,8 @@ abstract class AbstractCloner implements ClonerInterface
      * @param int   $filter A bit field of Caster::EXCLUDE_* constants
      *
      * @return Data The cloned variable represented by a Data object
+     *
+     * @throws \Exception
      */
     public function cloneVar($var, $filter = 0)
     {

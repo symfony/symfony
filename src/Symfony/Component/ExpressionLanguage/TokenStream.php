@@ -60,6 +60,10 @@ class TokenStream
 
     /**
      * Tests a token.
+     *
+     * @param array|int   $type    The type to test
+     * @param string|null $value   The token value
+     * @param string|null $message The syntax error message
      */
     public function expect($type, $value = null, $message = null)
     {

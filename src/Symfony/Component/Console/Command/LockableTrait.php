@@ -27,6 +27,9 @@ trait LockableTrait
     /**
      * Locks a command.
      *
+     * @param string|null $name     The lock name
+     * @param bool        $blocking Wait until the lock is released
+     *
      * @return bool
      */
     private function lock($name = null, $blocking = false)

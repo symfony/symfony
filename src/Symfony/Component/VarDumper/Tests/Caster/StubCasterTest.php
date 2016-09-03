@@ -125,4 +125,44 @@ EODUMP;
 
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
+
+    public function testClassStubWithNotExistingClass()
+    {
+        $var = array(new ClassStub(NotExisting::class));
+
+        $cloner = new VarCloner();
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $dump = $dumper->dump($cloner->cloneVar($var), true);
+
+        $expectedDump = <<<'EODUMP'
+<foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
+  <span class=sf-dump-index>0</span> => "<span class=sf-dump-str title="52 characters"><abbr title="Symfony\Component\VarDumper\Tests\Caster" class=sf-dump-ellipsis>Symfony\Component\VarDumper\Tests\Caster</abbr>\NotExisting</span>"
+</samp>]
+</bar>
+EODUMP;
+
+        $this->assertStringMatchesFormat($expectedDump, $dump);
+    }
+
+    public function testClassStubWithNotExistingMethod()
+    {
+        $var = array(new ClassStub('hello', array(FooInterface::class, 'missing')));
+
+        $cloner = new VarCloner();
+        $dumper = new HtmlDumper();
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $dump = $dumper->dump($cloner->cloneVar($var), true);
+
+        $expectedDump = <<<'EODUMP'
+<foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
+  <span class=sf-dump-index>0</span> => "<a data-file="%sFooInterface.php" data-line="5"><span class=sf-dump-str title="5 characters">hello</span></a>"
+</samp>]
+</bar>
+EODUMP;
+
+        $this->assertStringMatchesFormat($expectedDump, $dump);
+    }
 }

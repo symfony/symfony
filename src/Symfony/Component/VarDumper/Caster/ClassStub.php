@@ -32,22 +32,34 @@ class ClassStub extends ConstStub
             $this->attr['ellipsis'] = strlen($identifier) - $i;
         }
 
-        if (null !== $callable) {
-            if ($callable instanceof \Closure) {
-                $r = new \ReflectionFunction($callable);
-            } elseif (is_object($callable)) {
-                $r = new \ReflectionMethod($callable, '__invoke');
-            } elseif (is_array($callable)) {
-                $r = new \ReflectionMethod($callable[0], $callable[1]);
-            } elseif (false !== $i = strpos($callable, '::')) {
-                $r = new \ReflectionMethod(substr($callable, 0, $i), substr($callable, 2 + $i));
+        try {
+            if (null !== $callable) {
+                if ($callable instanceof \Closure) {
+                    $r = new \ReflectionFunction($callable);
+                } elseif (is_object($callable)) {
+                    $r = array($callable, '__invoke');
+                } elseif (is_array($callable)) {
+                    $r = $callable;
+                } elseif (false !== $i = strpos($callable, '::')) {
+                    $r = array(substr($callable, 0, $i), substr($callable, 2 + $i));
+                } else {
+                    $r = new \ReflectionFunction($callable);
+                }
+            } elseif (false !== $i = strpos($identifier, '::')) {
+                $r = array(substr($identifier, 0, $i), substr($identifier, 2 + $i));
             } else {
-                $r = new \ReflectionFunction($callable);
+                $r = new \ReflectionClass($identifier);
             }
-        } elseif (false !== $i = strpos($identifier, '::')) {
-            $r = new \ReflectionMethod(substr($identifier, 0, $i), substr($identifier, 2 + $i));
-        } else {
-            $r = new \ReflectionClass($identifier);
+
+            if (is_array($r)) {
+                try {
+                    $r = new \ReflectionMethod($r[0], $r[1]);
+                } catch (\ReflectionException $e) {
+                    $r = new \ReflectionClass($r[0]);
+                }
+            }
+        } catch (\ReflectionException $e) {
+            return;
         }
 
         if ($f = $r->getFileName()) {

@@ -62,6 +62,18 @@ class CheckDefinitionValidityPassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The class "stdClass" used for service "interfaced" must implement interface "Serializable".
+     */
+    public function testProcesDefinitionNotImplementingInterfaceThrowsException()
+    {
+        $container = new ContainerBuilder();
+        $container->register('interfaced', 'stdClass')->setInterface('Serializable');
+
+        $this->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      */
     public function testInvalidTags()
     {

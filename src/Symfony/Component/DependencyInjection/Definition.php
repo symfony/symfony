@@ -38,6 +38,7 @@ class Definition
     private $decoratedService;
     private $autowired = false;
     private $autowiringTypes = array();
+    private $interface;
 
     protected $arguments;
 
@@ -727,5 +728,27 @@ class Definition
     public function hasAutowiringType($type)
     {
         return isset($this->autowiringTypes[$type]);
+    }
+
+    /**
+     * Gets the interface that must be implemented by services definitions extending this one.
+     *
+     * @return string|null
+     */
+    public function getInterface()
+    {
+        return $this->interface;
+    }
+
+    /**
+     * Sets the interface that must be implemented by services definitions extending this one.
+     *
+     * @return string|null
+     */
+    public function setInterface($interface)
+    {
+        $this->interface = $interface;
+
+        return $this;
     }
 }

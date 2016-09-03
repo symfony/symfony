@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * This pass validates each definition individually only taking the information
@@ -56,6 +57,14 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                    .'please add abstract=true, otherwise specify a class to get rid of this error.',
                    $id
                 ));
+            }
+
+            if (($class = $definition->getClass()) && ($interface = $definition->getInterface()) && !is_subclass_of($class, $interface)) {
+                if (!class_exists($class, false)) {
+                    throw new InvalidArgumentException(sprintf('The class "%s" used for service "%s" doesn\'t exist.', $class, $id));
+                }
+
+                throw new RuntimeException(sprintf('The class "%s" used for service "%s" must implement interface "%s".', $class, $id, $interface));
             }
 
             // tag attribute values must be scalars

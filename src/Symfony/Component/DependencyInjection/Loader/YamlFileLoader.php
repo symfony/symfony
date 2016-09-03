@@ -35,6 +35,7 @@ class YamlFileLoader extends FileLoader
 {
     private static $keywords = array(
         'alias' => 'alias',
+        'interface' => 'interface',
         'parent' => 'parent',
         'class' => 'class',
         'shared' => 'shared',
@@ -196,6 +197,10 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['class'])) {
             $definition->setClass($service['class']);
+        }
+
+        if (isset($service['interface'])) {
+            $definition->setInterface($service['interface']);
         }
 
         if (isset($service['shared'])) {

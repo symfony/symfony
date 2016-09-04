@@ -75,6 +75,66 @@ class OutputFormatterStyle implements OutputFormatterStyleInterface
     }
 
     /**
+     * Add additional foreground color option.
+     *
+     * @param string     $name  The color name
+     * @param string|int $color The color code
+     * @param string|int $unset The unset color code
+     *
+     * @throws InvalidArgumentException When the color name is already defined
+     */
+    public static function addForegroundColor($name, $value, $unset = 0)
+    {
+        static::addColor('foreground', $name, (int) $value, (int) $unset);
+    }
+
+    /**
+     * Add additional background color option.
+     *
+     * @param string     $name  The color name
+     * @param string|int $color The color code
+     * @param string|int $unset The unset color code
+     *
+     * @throws InvalidArgumentException When the color name is already defined
+     */
+    public static function addBackgroundColor($name, $value, $unset = 0)
+    {
+        static::addColor('background', $name, (int) $value, (int) $unset);
+    }
+
+    /**
+     * Add additional color option.
+     *
+     * @param string $color The color type
+     * @param int    $color The color code
+     * @param int    $unset The unset color code
+     *
+     * @throws InvalidArgumentException When the color name is already defined
+     */
+    private static function addColor($type, $name, $value, $unset)
+    {
+        $property = 'available'.ucfirst($type).'Colors';
+
+        if (isset(static::${$property}[$name])) {
+            throw new InvalidArgumentException(sprintf(
+                'The specified %s color "%s" is already defined. Expected a different name than (%s)',
+                $type,
+                $name,
+                implode(', ', array_keys(static::${$property}))
+            ));
+        }
+
+        if ($unset === 0) {
+            $unset = static::${$property}['default']['set'];
+        }
+
+        static::${$property}[$name] = array(
+            'set' => $value,
+            'unset' => $unset,
+        );
+    }
+
+    /**
      * Sets style foreground color.
      *
      * @param string|null $color The color name

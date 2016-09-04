@@ -96,4 +96,51 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
             $this->assertContains('Invalid option specified: "foo"', $e->getMessage(), '->unsetOption() throws an \InvalidArgumentException when the option does not exist in the available options');
         }
     }
+
+    public function testAddColorForeground()
+    {
+        OutputFormatterStyle::addForegroundColor('light_gray', 37);
+        OutputFormatterStyle::addForegroundColor('dark_gray', 90, 91);
+        $style = new OutputFormatterStyle();
+
+        $style->setForeground('black');
+        $this->assertEquals("\033[30mfoo\033[39m", $style->apply('foo'));
+
+        $style->setForeground('light_gray');
+        $this->assertEquals("\033[37mfoo\033[39m", $style->apply('foo'));
+
+        $style->setForeground('dark_gray');
+        $this->assertEquals("\033[90mfoo\033[91m", $style->apply('foo'));
+
+        $this->setExpectedException('InvalidArgumentException');
+        $style->setBackground('undefined-color');
+    }
+
+    public function testAddColorBackground()
+    {
+        OutputFormatterStyle::addBackgroundColor('light_gray', 47);
+        OutputFormatterStyle::addBackgroundColor('dark_gray', 100, 101);
+        $style = new OutputFormatterStyle();
+
+        $style->setBackground('black');
+        $this->assertEquals("\033[40mfoo\033[49m", $style->apply('foo'));
+
+        $style->setBackground('light_gray');
+        $this->assertEquals("\033[47mfoo\033[49m", $style->apply('foo'));
+
+        $style->setBackground('dark_gray');
+        $this->assertEquals("\033[100mfoo\033[101m", $style->apply('foo'));
+
+        $this->setExpectedException('InvalidArgumentException');
+        $style->setBackground('undefined-color');
+    }
+
+    public function testAddColorExisting()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        OutputFormatterStyle::addForegroundColor('cyan', 60);
+
+        $this->setExpectedException('InvalidArgumentException');
+        OutputFormatterStyle::addBackgroundColor('cyan', 70);
+    }
 }

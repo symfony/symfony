@@ -436,7 +436,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $service;
         }
 
-        if (!isset($this->definitions[$id]) && isset($this->aliasDefinitions[$id])) {
+        if (!array_key_exists($id, $this->definitions) && isset($this->aliasDefinitions[$id])) {
             return $this->get($this->aliasDefinitions[$id]);
         }
 
@@ -784,7 +784,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasDefinition($id)
     {
-        return isset($this->definitions[strtolower($id)]);
+        return array_key_exists(strtolower($id), $this->definitions);
     }
 
     /**
@@ -800,7 +800,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $id = strtolower($id);
 
-        if (!isset($this->definitions[$id])) {
+        if (!array_key_exists($id, $this->definitions)) {
             throw new ServiceNotFoundException($id);
         }
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -308,7 +307,7 @@ class Container implements IntrospectableContainerInterface
                 unset($this->loading[$id]);
                 unset($this->services[$id]);
 
-                if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                if ($e instanceof RuntimeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
                     return;
                 }
 

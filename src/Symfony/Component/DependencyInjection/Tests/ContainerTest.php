@@ -256,6 +256,15 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sc->get('inactive', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 
+    public function testGetReturnsNullOnSyntheticService()
+    {
+        require_once __DIR__.'/Fixtures/php/services9.php';
+
+        $container = new \ProjectServiceContainer();
+
+        $this->assertNull($container->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
     public function testHas()
     {
         $sc = new ProjectServiceContainer();

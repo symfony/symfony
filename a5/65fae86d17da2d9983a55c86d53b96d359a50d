@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-09-05T06:40:08Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-05T07:40:13Z
+
+It's necessary only for default Marking Store implementations. If you use custom implementations, you may not want this package. A `suggest` entry would be enough WDYT?
+
+---------------------------------------------------------------------------
+
+by OndraM at 2016-09-05T08:57:10Z
+
+@dunglas Hypothetically, yes, however - as a newcomer who wants to use the component, this is either not the best first impression - you install the `symfony/workflow`, implement the Hello world, and it fails on fatal error... And both of the default implementations requires it (so I guess 99% of usages would require it). But I see your point, so the decision whats the best is up to you :).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-05T09:08:21Z
+
+I've no strong opinion about that. It was just some thought. We have basically 2 possibilities:
+
+1. merge this PR
+2. make it clear in the doc that PropertyInfo must also be installed manually to use the default implementation

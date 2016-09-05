@@ -54,8 +54,8 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function provideTransformationsWithGrouping()
     {
         return array(
-            array(1234.5, '1.234,5', 'de_AT'),
-            array(12345.912, '12.345,912', 'de_AT'),
+            array(1234.5, '1.234,5', 'de_DE'),
+            array(12345.912, '12.345,912', 'de_DE'),
             array(1234.5, '1 234,5', 'fr'),
             array(1234.5, '1 234,5', 'ru'),
             array(1234.5, '1 234,5', 'fi'),
@@ -393,10 +393,10 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
     {
-        // Since we test against "de_AT", we need the full implementation
+        // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
 
-        \Locale::setDefault('de_AT');
+        \Locale::setDefault('de_DE');
 
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 
@@ -408,10 +408,10 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep()
     {
-        // Since we test against "de_AT", we need the full implementation
+        // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
 
-        \Locale::setDefault('de_AT');
+        \Locale::setDefault('de_DE');
 
         $transformer = new NumberToLocalizedStringTransformer(null, true);
 

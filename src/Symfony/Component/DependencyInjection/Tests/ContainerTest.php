@@ -256,6 +256,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($sc->get('inactive', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExcepionMessage You have requested a synthetic service ("request"). The DIC does not know how to construct this service.
+     */
+    public function testGetSyntheticServiceAlwaysThrows()
+    {
+        require_once __DIR__.'/Fixtures/php/services9.php';
+
+        $container = new \ProjectServiceContainer();
+        $container->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+    }
+
     public function testHas()
     {
         $sc = new ProjectServiceContainer();
@@ -287,14 +299,17 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $container->addScope(new Scope('foo'));
 
         $container->enterScope('foo');
+        $container->set('foo', new \stdClass(), 'foo');
         $scoped1 = $container->get('scoped');
         $scopedFoo1 = $container->get('scoped_foo');
 
         $container->enterScope('foo');
+        $container->set('foo', new \stdClass(), 'foo');
         $scoped2 = $container->get('scoped');
         $scoped3 = $container->get('SCOPED');
         $scopedFoo2 = $container->get('scoped_foo');
 
+        $container->set('foo', null, 'foo');
         $container->leaveScope('foo');
         $scoped4 = $container->get('scoped');
         $scopedFoo3 = $container->get('scoped_foo');
@@ -639,6 +654,12 @@ class ProjectServiceContainer extends Container
         }
 
         return $this->services['scoped_bar'] = $this->scopedServices['foo']['scoped_bar'] = new \stdClass();
+    }
+
+    protected function synchronizeFooService()
+    {
+        // Typically get the service to pass it to a setter
+        $this->get('foo');
     }
 
     protected function synchronizeScopedSynchronizedFooService()

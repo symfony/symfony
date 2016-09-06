@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-05T19:52:46Z
+
+So, basically, you prevent files with strict types to be inlined (via a require), is that correct?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-05T20:03:20Z
+
+I "inline" them by doing a straight "require" yes. We can't exclude them, because they might be parent classes of non strict classes.

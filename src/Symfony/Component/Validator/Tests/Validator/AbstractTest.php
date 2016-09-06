@@ -37,6 +37,7 @@ abstract class AbstractTest extends AbstractValidatorTest
 
     /**
      * @param MetadataFactoryInterface $metadataFactory
+     * @param array                    $objectInitializers
      *
      * @return ValidatorInterface
      */

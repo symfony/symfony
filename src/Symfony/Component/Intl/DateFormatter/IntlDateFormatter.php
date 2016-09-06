@@ -550,7 +550,7 @@ class IntlDateFormatter
         try {
             $this->dateTimeZone = new \DateTimeZone($timeZoneId);
             if ('GMT' !== $timeZoneId && $this->dateTimeZone->getName() !== $timeZoneId) {
-                $timeZoneId = $timeZone = $this->getTimeZoneId();
+                $timeZone = $this->getTimeZoneId();
             }
         } catch (\Exception $e) {
             $timeZoneId = $timeZone = $this->getTimeZoneId();

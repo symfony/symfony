@@ -166,7 +166,7 @@ class GraphvizDumper extends Dumper
         foreach ($container->getDefinitions() as $id => $definition) {
             $class = $definition->getClass();
 
-            if ('\\' === $class[0]) {
+            if ('\\' === substr($class, 0, 1)) {
                 $class = substr($class, 1);
             }
 

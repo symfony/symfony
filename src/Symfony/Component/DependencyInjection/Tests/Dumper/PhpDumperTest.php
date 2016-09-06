@@ -169,7 +169,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideInvalidFactories
-     * @expectedException Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
      * @expectedExceptionMessage Cannot dump definition
      */
     public function testInvalidFactories($factory)

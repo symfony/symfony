@@ -178,7 +178,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException        UnexpectedValueException
+     * @expectedException        \UnexpectedValueException
      * @expectedExceptionMessage The cookie expiration time "string" is not valid.
      */
     public function testConstructException()

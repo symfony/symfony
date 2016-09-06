@@ -230,6 +230,7 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
             if ('service_container' === $id
                 || isset($this->aliases[$id])
                 || isset($this->services[$id])
+                || array_key_exists($id, $this->services)
             ) {
                 return true;
             }
@@ -272,7 +273,7 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
                 $id = $this->aliases[$id];
             }
             // Re-use shared service instance if it exists.
-            if (isset($this->services[$id])) {
+            if (isset($this->services[$id]) || array_key_exists($id, $this->services)) {
                 return $this->services[$id];
             }
 
@@ -354,7 +355,7 @@ class Container implements IntrospectableContainerInterface, ResettableContainer
             $id = $this->aliases[$id];
         }
 
-        return isset($this->services[$id]);
+        return isset($this->services[$id]) || array_key_exists($id, $this->services);
     }
 
     /**

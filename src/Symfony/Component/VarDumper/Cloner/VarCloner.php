@@ -25,7 +25,6 @@ class VarCloner extends AbstractCloner
     protected function doClone($var)
     {
         $useExt = $this->useExt;
-        $i = 0;                         // Current iteration position in $queue
         $len = 1;                       // Length of $queue
         $pos = 0;                       // Number of cloned items past the first level
         $refsCounter = 0;               // Hard references counter

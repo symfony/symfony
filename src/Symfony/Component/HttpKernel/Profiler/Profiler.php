@@ -78,7 +78,7 @@ class Profiler
      *
      * @param Response $response A Response instance
      *
-     * @return Profile A Profile instance
+     * @return Profile|false A Profile instance
      */
     public function loadProfileFromResponse(Response $response)
     {
@@ -153,7 +153,7 @@ class Profiler
      *
      * @param string $data A data string as exported by the export() method
      *
-     * @return Profile A Profile instance
+     * @return Profile|false A Profile instance
      *
      * @deprecated since Symfony 2.8, to be removed in 3.0.
      */

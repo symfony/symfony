@@ -23,14 +23,8 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  */
 class FormDataExtractor implements FormDataExtractorInterface
 {
-    /**
-     * @var ValueExporter
-     */
     private $valueExporter;
 
-    /**
-     * Constructs a new data extractor.
-     */
     public function __construct(ValueExporter $valueExporter = null)
     {
         $this->valueExporter = $valueExporter ?: new ValueExporter();

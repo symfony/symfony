@@ -80,7 +80,7 @@ class MoFileLoader extends FileLoader
         $messages = array();
 
         for ($i = 0; $i < $count; ++$i) {
-            $singularId = $pluralId = null;
+            $pluralId = null;
             $translated = null;
 
             fseek($stream, $offsetId + $i * 8);

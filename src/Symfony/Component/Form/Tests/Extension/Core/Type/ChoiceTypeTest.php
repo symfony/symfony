@@ -2054,7 +2054,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
             'An empty string empty_value is used if placeholder is also an empty string when required [maintains BC]' => array(false, false, true, '', '', ''),
             'A non-empty string empty_value is used if placeholder is an empty string when required [maintains BC]' => array(false, false, true, '', 'bar', 'bar'),
             'A non-empty string placeholder takes precedence over an empty_value set to false when required' => array(false, false, true, 'foo', false, 'foo'),
-            'A non-empty string placeholder takes precedence over a not set empty_value' => array(false, false, true, 'foo', null, 'foo'),
+            'A non-empty string placeholder takes precedence over a not set empty_value when required' => array(false, false, true, 'foo', null, 'foo'),
             'A non-empty string placeholder takes precedence over an empty string empty_value when required' => array(false, false, true, 'foo', '', 'foo'),
             'A non-empty string placeholder takes precedence over a non-empty string empty_value when required' => array(false, false, true, 'foo', 'bar', 'foo'),
             // single expanded, not required

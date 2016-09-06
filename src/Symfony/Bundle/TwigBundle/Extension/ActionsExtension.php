@@ -52,6 +52,8 @@ class ActionsExtension extends \Twig_Extension
      * @param string $uri     A URI
      * @param array  $options An array of options
      *
+     * @return string|null The Response content or null when the Response is streamed
+     *
      * @see FragmentHandler::render()
      */
     public function renderUri($uri, array $options = array())

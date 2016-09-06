@@ -40,6 +40,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
 
     /**
      * @param MetadataFactoryInterface $metadataFactory
+     * @param array                    $objectInitializers
      *
      * @return ValidatorInterface
      */

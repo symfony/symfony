@@ -39,7 +39,7 @@ class ServiceReferenceGraphEdge
     /**
      * Returns the value of the edge.
      *
-     * @return ServiceReferenceGraphNode
+     * @return string
      */
     public function getValue()
     {

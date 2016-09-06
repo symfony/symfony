@@ -108,8 +108,6 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
     /**
      * Injects the web debug toolbar into the given Response.
-     *
-     * @param Response $response A Response instance
      */
     protected function injectToolbar(Response $response, Request $request)
     {

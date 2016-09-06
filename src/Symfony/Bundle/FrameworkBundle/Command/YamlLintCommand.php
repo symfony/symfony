@@ -85,7 +85,6 @@ EOF
             throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
         }
 
-        $files = array();
         if (is_file($filename)) {
             $files = array($filename);
         } elseif (is_dir($filename)) {

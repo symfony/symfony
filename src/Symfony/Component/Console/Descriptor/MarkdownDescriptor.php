@@ -98,7 +98,7 @@ class MarkdownDescriptor extends Descriptor
             .'* Description: '.($command->getDescription() ?: '<none>')."\n"
             .'* Usage:'."\n\n"
             .array_reduce(array_merge(array($command->getSynopsis()), $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
-                return $carry .= '  * `'.$usage.'`'."\n";
+                return $carry.'  * `'.$usage.'`'."\n";
             })
         );
 

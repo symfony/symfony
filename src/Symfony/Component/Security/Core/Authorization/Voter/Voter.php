@@ -74,7 +74,7 @@ abstract class Voter implements VoterInterface
 
     /**
      * Perform a single access check operation on a given attribute, subject and token.
-     * It is safe to assume that $attribute and $subject pass supports method call.
+     * It is safe to assume that $attribute and $subject already passed the "supports()" method check.
      *
      * @param string         $attribute
      * @param mixed          $subject

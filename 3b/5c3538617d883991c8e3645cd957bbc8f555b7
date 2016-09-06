@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-23T07:25:42Z
+
+@aitboudad any other idea to fix the linked issue that has no bc break inside?
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-08-23T09:51:06Z
+
+Replace `post_max_size_message` with a new option `upload_max_size_message` that return a callable type is an alternative solution, what do you think ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T11:12:27Z
+
+@aitboudad let's try :)
+
+---------------------------------------------------------------------------
+
+by aitboudad at 2016-08-24T12:08:41Z
+
+done
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-24T20:15:54Z
+
+Wow, great! Thanks for that fix!
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-09-06T15:11:51Z
+
+This one is very tricky :)
+
+👍
+
+Status: reviewed

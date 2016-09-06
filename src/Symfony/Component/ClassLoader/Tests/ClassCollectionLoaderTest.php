@@ -216,18 +216,20 @@ class ClassCollectionLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testCommentStripping()
     {
-        if (is_file($file = sys_get_temp_dir().'/bar.php')) {
+        if (is_file($file = __DIR__.'/bar.php')) {
             unlink($file);
         }
         spl_autoload_register($r = function ($class) {
             if (0 === strpos($class, 'Namespaced') || 0 === strpos($class, 'Pearlike_')) {
-                require_once __DIR__.'/Fixtures/'.str_replace(array('\\', '_'), '/', $class).'.php';
+                @require_once __DIR__.'/Fixtures/'.str_replace(array('\\', '_'), '/', $class).'.php';
             }
         });
 
+        $strictTypes = defined('HHVM_VERSION') ? '' : "\nnamespace {require __DIR__.'/Fixtures/Namespaced/WithStrictTypes.php';}";
+
         ClassCollectionLoader::load(
-            array('Namespaced\\WithComments', 'Pearlike_WithComments'),
-            sys_get_temp_dir(),
+            array('Namespaced\\WithComments', 'Pearlike_WithComments', $strictTypes ? 'Namespaced\\WithStrictTypes' : 'Namespaced\\WithComments'),
+            __DIR__,
             'bar',
             false
         );
@@ -267,7 +269,9 @@ public static $loaded = true;
 }
 }
 EOF
-        , str_replace("<?php \n", '', file_get_contents($file)));
+            .$strictTypes,
+            str_replace(array("<?php \n", '\\\\'), array('', '/'), file_get_contents($file))
+        );
 
         unlink($file);
     }

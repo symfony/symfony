@@ -142,6 +142,7 @@ class PhpEngine implements EngineInterface, \ArrayAccess
             throw new \InvalidArgumentException('Invalid parameter (view)');
         }
 
+        // the view variable is exposed to the require file below
         $view = $this;
         if ($this->evalTemplate instanceof FileStorage) {
             extract($this->evalParameters, EXTR_SKIP);

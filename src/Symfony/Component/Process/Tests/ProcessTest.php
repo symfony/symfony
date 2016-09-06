@@ -939,7 +939,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideMethodsThatNeedATerminatedProcess
-     * @expectedException Symfony\Component\Process\Exception\LogicException
+     * @expectedException \Symfony\Component\Process\Exception\LogicException
      * @expectedExceptionMessage Process must be terminated before calling
      */
     public function testMethodsThatNeedATerminatedProcess($method)

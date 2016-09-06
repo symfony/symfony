@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class ValidateRequestListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException
+     * @expectedException \Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException
      */
     public function testListenerThrowsWhenMasterRequestHasInconsistentClientIps()
     {

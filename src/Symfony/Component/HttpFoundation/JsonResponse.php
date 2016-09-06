@@ -27,7 +27,7 @@ class JsonResponse extends Response
     protected $data;
     protected $callback;
 
-    // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be embedded into HTML.
+    // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
     // 15 === JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
     const DEFAULT_ENCODING_OPTIONS = 15;
 
@@ -51,7 +51,18 @@ class JsonResponse extends Response
     }
 
     /**
-     * {@inheritdoc}
+     * Factory method for chainability.
+     *
+     * Example:
+     *
+     *     return JsonResponse::create($data, 200)
+     *         ->setSharedMaxAge(300);
+     *
+     * @param mixed $data    The json response data
+     * @param int   $status  The response status code
+     * @param array $headers An array of response headers
+     *
+     * @return JsonResponse
      */
     public static function create($data = null, $status = 200, $headers = array())
     {

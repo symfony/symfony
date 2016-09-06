@@ -108,10 +108,10 @@ class IntegerToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
 
     public function testReverseTransformWithGrouping()
     {
-        // Since we test against "de_AT", we need the full implementation
+        // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
 
-        \Locale::setDefault('de_AT');
+        \Locale::setDefault('de_DE');
 
         $transformer = new IntegerToLocalizedStringTransformer(null, true);
 

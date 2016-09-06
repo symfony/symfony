@@ -208,6 +208,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExcepionMessage You have requested a synthetic service ("request"). The DIC does not know how to construct this service.
+     */
+    public function testGetSyntheticServiceAlwaysThrows()
+    {
+        require_once __DIR__.'/Fixtures/php/services9.php';
+
+        $container = new \ProjectServiceContainer();
+        $container->get('request', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+    }
+
     public function testHas()
     {
         $sc = new ProjectServiceContainer();

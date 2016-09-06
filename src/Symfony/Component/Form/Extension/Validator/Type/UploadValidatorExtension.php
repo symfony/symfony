@@ -42,9 +42,10 @@ class UploadValidatorExtension extends AbstractTypeExtension
     {
         $translator = $this->translator;
         $translationDomain = $this->translationDomain;
-
-        $resolver->setNormalizer('post_max_size_message', function (Options $options, $errorMessage) use ($translator, $translationDomain) {
-            return $translator->trans($errorMessage, array(), $translationDomain);
+        $resolver->setNormalizer('upload_max_size_message', function (Options $options, $message) use ($translator, $translationDomain) {
+            return function () use ($translator, $translationDomain, $message) {
+                return $translator->trans(call_user_func($message), array(), $translationDomain);
+            };
         });
     }
 

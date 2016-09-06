@@ -269,7 +269,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExcepionMessage You have requested a synthetic service ("request"). The DIC does not know how to construct this service.
+     * @expectedExceptionMessage You have requested a synthetic service ("request"). The DIC does not know how to construct this service.
      */
     public function testGetSyntheticServiceAlwaysThrows()
     {

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * AddConsoleCommandPass.
@@ -30,16 +31,16 @@ class AddConsoleCommandPass implements CompilerPassInterface
             $definition = $container->getDefinition($id);
 
             if ($definition->isAbstract()) {
-                throw new \InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must not be abstract.', $id));
+                throw new InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must not be abstract.', $id));
             }
 
             $class = $container->getParameterBag()->resolveValue($definition->getClass());
             if (!is_subclass_of($class, 'Symfony\\Component\\Console\\Command\\Command')) {
                 if (!class_exists($class, false)) {
-                    throw new \InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+                    throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
                 }
 
-                throw new \InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must be a subclass of "Symfony\\Component\\Console\\Command\\Command".', $id));
+                throw new InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must be a subclass of "Symfony\\Component\\Console\\Command\\Command".', $id));
             }
             $container->setAlias($serviceId = 'console.command.'.strtolower(str_replace('\\', '_', $class)), $id);
             $serviceIds[] = $definition->isPublic() ? $id : $serviceId;

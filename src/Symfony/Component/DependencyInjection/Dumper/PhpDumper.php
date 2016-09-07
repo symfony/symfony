@@ -840,6 +840,7 @@ EOF;
 
         $code .= "\n        \$this->services = array();\n";
         $code .= $this->addMethodMap();
+        $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
 
         $code .= <<<'EOF'
@@ -913,6 +914,8 @@ EOF;
     /**
      * Adds the privates property definition.
      *
+     * This method is intented for BC only.
+     *
      * @return string
      */
     private function addPrivateServices()
@@ -921,12 +924,13 @@ EOF;
             return '';
         }
 
+        $reflectionProperty = new \ReflectionProperty(ContainerBuilder::class, 'privates');
+        $reflectionProperty->setAccessible(true);
+
         $code = '';
         ksort($definitions);
-        foreach ($definitions as $id => $definition) {
-            if (!$definition->isPublic()) {
-                $code .= '            '.var_export($id, true)." => true,\n";
-            }
+        foreach ($reflectionProperty->getValue($this->container) as $originId => $id) {
+            $code .= '            '.var_export($originId, true).' => '.var_export($id, true).",\n";
         }
 
         if (empty($code)) {

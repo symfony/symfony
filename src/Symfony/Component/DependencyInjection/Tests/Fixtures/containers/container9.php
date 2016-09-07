@@ -129,5 +129,14 @@ $container
     ->register('factory_service_simple', 'Bar')
     ->setFactory(array(new Reference('factory_simple'), 'getInstance'))
 ;
+$container
+    ->register('shared_private', 'stdClass')
+    ->setPublic(false);
+$container
+    ->register('shared_private_dep1', 'stdClass')
+    ->setProperty('dep', new Reference('shared_private'));
+$container
+    ->register('shared_private_dep2', 'stdClass')
+    ->setProperty('dep', new Reference('shared_private'));
 
 return $container;

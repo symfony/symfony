@@ -107,5 +107,14 @@ services:
     factory_service_simple:
         class: Bar
         factory: ['@factory_simple', getInstance]
+    shared_private:
+        class: stdClass
+        public: false
+    shared_private_dep1:
+        class: stdClass
+        properties: { dep: '@shared_private' }
+    shared_private_dep2:
+        class: stdClass
+        properties: { dep: '@shared_private' }
     alias_for_foo: '@foo'
     alias_for_alias: '@foo'

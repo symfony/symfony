@@ -43,7 +43,13 @@ class ProjectServiceContainer extends Container
             'method_call1' => 'getMethodCall1Service',
             'new_factory_service' => 'getNewFactoryServiceService',
             'request' => 'getRequestService',
+            'semirandom_shared_private' => 'getSemirandomSharedPrivateService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
+            'shared_private_dep1' => 'getSharedPrivateDep1Service',
+            'shared_private_dep2' => 'getSharedPrivateDep2Service',
+        );
+        $this->privates = array(
+            'shared_private' => 'semirandom_shared_private',
         );
         $this->aliases = array(
             'alias_for_alias' => 'foo',
@@ -338,6 +344,19 @@ class ProjectServiceContainer extends Container
     }
 
     /**
+     * Gets the 'semirandom_shared_private' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getSemirandomSharedPrivateService()
+    {
+        return $this->services['semirandom_shared_private'] = new \stdClass();
+    }
+
+    /**
      * Gets the 'service_from_static_method' service.
      *
      * This service is shared.
@@ -348,6 +367,40 @@ class ProjectServiceContainer extends Container
     protected function getServiceFromStaticMethodService()
     {
         return $this->services['service_from_static_method'] = \Bar\FooClass::getInstance();
+    }
+
+    /**
+     * Gets the 'shared_private_dep1' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getSharedPrivateDep1Service()
+    {
+        $this->services['shared_private_dep1'] = $instance = new \stdClass();
+
+        $instance->dep = $this->get('semirandom_shared_private');
+
+        return $instance;
+    }
+
+    /**
+     * Gets the 'shared_private_dep2' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \stdClass A stdClass instance
+     */
+    protected function getSharedPrivateDep2Service()
+    {
+        $this->services['shared_private_dep2'] = $instance = new \stdClass();
+
+        $instance->dep = $this->get('semirandom_shared_private');
+
+        return $instance;
     }
 
     /**

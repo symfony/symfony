@@ -126,7 +126,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
+        $this->assertEquals(array('internal', 'sharing_internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -319,6 +319,15 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($clone->isPrivate());
     }
 
+    public function testSharedPrivateService()
+    {
+        $c = new ProjectServiceContainer();
+        $expected = new \stdClass();
+        $expected->internal = new \stdClass();
+        $this->assertTrue($c->has('sharing_internal'));
+        $this->assertEquals($expected, $c->get('sharing_internal'), '->get() returns a public service referencing a private service');
+    }
+
     /**
      * @group legacy
      * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
@@ -390,6 +399,7 @@ class ProjectServiceContainer extends Container
     public $__foo_bar;
     public $__foo_baz;
     public $__internal;
+    public $__sharing_internal;
 
     public function __construct()
     {
@@ -399,13 +409,22 @@ class ProjectServiceContainer extends Container
         $this->__foo_bar = new \stdClass();
         $this->__foo_baz = new \stdClass();
         $this->__internal = new \stdClass();
-        $this->privates = array('internal' => true);
+        $this->__sharing_internal = new \stdClass();
         $this->aliases = array('alias' => 'bar');
+        $this->privates = array('internal' => 'semirandom_internal');
     }
 
-    protected function getInternalService()
+    protected function getSemirandomInternalService()
     {
         return $this->__internal;
+    }
+
+    protected function getSharingInternalService()
+    {
+        $instance = $this->__sharing_internal;
+        $instance->internal = $this->get('semirandom_internal'); // simulates dumped behavior
+
+        return $instance;
     }
 
     protected function getBarService()

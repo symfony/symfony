@@ -65,6 +65,10 @@ class PassConfig
             )),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
         ));
+
+        $this->afterRemovingPasses = array(array(
+            new RandomizePrivateServiceIdentifiers(),
+        ));
     }
 
     /**

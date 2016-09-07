@@ -29,16 +29,19 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
 
     protected $outputTimezone;
 
+    protected $immutable;
+
     /**
      * Constructor.
      *
      * @param string $inputTimezone  The name of the input timezone
      * @param string $outputTimezone The name of the output timezone
+     * @param bool   $immutable      Whether to use \DateTimeImmutable instead of \DateTime
      *
      * @throws UnexpectedTypeException  if a timezone is not a string
      * @throws InvalidArgumentException if a timezone is not valid
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $immutable = false)
     {
         if (null !== $inputTimezone && !is_string($inputTimezone)) {
             throw new UnexpectedTypeException($inputTimezone, 'string');
@@ -63,5 +66,12 @@ abstract class BaseDateTimeTransformer implements DataTransformerInterface
         } catch (\Exception $e) {
             throw new InvalidArgumentException(sprintf('Output timezone is invalid: %s.', $this->outputTimezone), $e->getCode(), $e);
         }
+
+        $this->immutable = $immutable;
+    }
+
+    protected function getDateTimeClass()
+    {
+        return true === $this->immutable ? \DateTimeImmutable::class : \DateTime::class;
     }
 }

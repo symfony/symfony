@@ -51,6 +51,7 @@ class DateType extends AbstractType
         $timeFormat = \IntlDateFormatter::NONE;
         $calendar = \IntlDateFormatter::GREGORIAN;
         $pattern = is_string($options['format']) ? $options['format'] : null;
+        $immutable = 'datetimeimmutable' === $options['input'];
 
         if (!in_array($dateFormat, self::$acceptedFormats, true)) {
             throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
@@ -67,7 +68,8 @@ class DateType extends AbstractType
                 $dateFormat,
                 $timeFormat,
                 $calendar,
-                $pattern
+                $pattern,
+                $immutable
             ));
         } else {
             $yearOptions = $monthOptions = $dayOptions = array(
@@ -113,7 +115,7 @@ class DateType extends AbstractType
                 ->add('month', self::$widgets[$options['widget']], $monthOptions)
                 ->add('day', self::$widgets[$options['widget']], $dayOptions)
                 ->addViewTransformer(new DateTimeToArrayTransformer(
-                    $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day')
+                    $options['model_timezone'], $options['view_timezone'], array('year', 'month', 'day'), false, $immutable
                 ))
                 ->setAttribute('formatter', $formatter)
             ;
@@ -254,6 +256,7 @@ class DateType extends AbstractType
 
         $resolver->setAllowedValues('input', array(
             'datetime',
+            'datetimeimmutable',
             'string',
             'timestamp',
             'array',

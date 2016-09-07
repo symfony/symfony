@@ -23,7 +23,10 @@ class DateTimeTypeTest extends TestCase
         parent::setUp();
     }
 
-    public function testSubmitDateTime()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitDateTime($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateTimeType', null, array(
             'model_timezone' => 'UTC',
@@ -31,7 +34,7 @@ class DateTimeTypeTest extends TestCase
             'date_widget' => 'choice',
             'years' => array(2010),
             'time_widget' => 'choice',
-            'input' => 'datetime',
+            'input' => $inputType,
         ));
 
         $form->submit(array(
@@ -46,9 +49,11 @@ class DateTimeTypeTest extends TestCase
             ),
         ));
 
-        $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
+        $dateTime = new $dateTimeClass('2010-06-02 03:04:00 UTC');
+        $data = $form->getData();
 
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $data);
+        $this->assertDateTimeEquals($dateTime, $data);
     }
 
     public function testSubmitString()
@@ -105,7 +110,10 @@ class DateTimeTypeTest extends TestCase
         $this->assertEquals($dateTime->format('U'), $form->getData());
     }
 
-    public function testSubmitWithoutMinutes()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitWithoutMinutes($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateTimeType', null, array(
             'model_timezone' => 'UTC',
@@ -113,11 +121,11 @@ class DateTimeTypeTest extends TestCase
             'date_widget' => 'choice',
             'years' => array(2010),
             'time_widget' => 'choice',
-            'input' => 'datetime',
+            'input' => $inputType,
             'with_minutes' => false,
         ));
 
-        $form->setData(new \DateTime());
+        $form->setData(new $dateTimeClass());
 
         $input = array(
             'date' => array(
@@ -132,10 +140,14 @@ class DateTimeTypeTest extends TestCase
 
         $form->submit($input);
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:00:00 UTC'), $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertDateTimeEquals(new $dateTimeClass('2010-06-02 03:00:00 UTC'), $form->getData());
     }
 
-    public function testSubmitWithSeconds()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitWithSeconds($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateTimeType', null, array(
             'model_timezone' => 'UTC',
@@ -143,11 +155,11 @@ class DateTimeTypeTest extends TestCase
             'date_widget' => 'choice',
             'years' => array(2010),
             'time_widget' => 'choice',
-            'input' => 'datetime',
+            'input' => $inputType,
             'with_seconds' => true,
         ));
 
-        $form->setData(new \DateTime());
+        $form->setData(new $dateTimeClass());
 
         $input = array(
             'date' => array(
@@ -164,7 +176,8 @@ class DateTimeTypeTest extends TestCase
 
         $form->submit($input);
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertDateTimeEquals(new $dateTimeClass('2010-06-02 03:04:05 UTC'), $form->getData());
     }
 
     public function testSubmitDifferentTimezones()
@@ -199,21 +212,25 @@ class DateTimeTypeTest extends TestCase
         $this->assertEquals($dateTime->format('Y-m-d H:i:s'), $form->getData());
     }
 
-    public function testSubmitDifferentTimezonesDateTime()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitDifferentTimezonesDateTime($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateTimeType', null, array(
             'model_timezone' => 'America/New_York',
             'view_timezone' => 'Pacific/Tahiti',
             'widget' => 'single_text',
-            'input' => 'datetime',
+            'input' => $inputType,
         ));
 
-        $outputTime = new \DateTime('2010-06-02 03:04:00 Pacific/Tahiti');
+        $outputTime = new $dateTimeClass('2010-06-02 03:04:00 Pacific/Tahiti');
 
         $form->submit('2010-06-02T03:04:00-10:00');
 
         $outputTime->setTimezone(new \DateTimeZone('America/New_York'));
 
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
         $this->assertDateTimeEquals($outputTime, $form->getData());
         $this->assertEquals('2010-06-02T03:04:00-10:00', $form->getViewData());
     }
@@ -249,23 +266,54 @@ class DateTimeTypeTest extends TestCase
         $this->assertEquals('2010-06-02T03:04:05Z', $form->getViewData());
     }
 
-    public function testSubmitDifferentPattern()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitDifferentPattern($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateTimeType', null, array(
             'date_format' => 'MM*yyyy*dd',
             'date_widget' => 'single_text',
             'time_widget' => 'single_text',
-            'input' => 'datetime',
+            'input' => $inputType,
         ));
 
-        $dateTime = new \DateTime('2010-06-02 03:04');
+        $dateTime = new $dateTimeClass('2010-06-02 03:04');
 
         $form->submit(array(
             'date' => '06*2010*02',
             'time' => '03:04',
         ));
 
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
         $this->assertDateTimeEquals($dateTime, $form->getData());
+    }
+
+    /**
+     * @@dataProvider provideDateTimeClasses
+     */
+    public function testSubmitDifferentPatternWithSingleWidget($dateTimeClass, $inputType)
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateTimeType', null, array(
+            'format' => 'yyyy-MM-dd HH:mm',
+            'widget' => 'single_text',
+            'input' => $inputType,
+        ));
+
+        $dateTime = new $dateTimeClass('2016-09-07 10:00');
+
+        $form->submit('2016-09-07 10:00');
+
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertDateTimeEquals($dateTime, $form->getData());
+    }
+
+    public function provideDateTimeClasses()
+    {
+        return array(
+            array(\DateTime::class, 'datetime'),
+            array(\DateTimeImmutable::class, 'datetimeimmutable'),
+        );
     }
 
     public function testInitializeWithDateTime()

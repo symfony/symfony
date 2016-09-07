@@ -134,6 +134,23 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertEquals($dateTime->format('d.m.Y, H:i'), $transformer->transform($input));
     }
 
+    public function testReverseTransformWithNoConstructorParameters()
+    {
+        $tz = date_default_timezone_get();
+        date_default_timezone_set('Europe/Rome');
+
+        $transformer = new DateTimeToLocalizedStringTransformer();
+
+        $dateTime = new \DateTime('2010-02-03 04:05');
+
+        $this->assertEquals(
+            $dateTime->format('c'),
+            $transformer->reverseTransform('03.02.2010, 04:05')->format('c')
+        );
+
+        date_default_timezone_set($tz);
+    }
+
     public function testTransformWithDifferentPatterns()
     {
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');

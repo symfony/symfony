@@ -7,6 +7,16 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.18 (2016-09-07)
+
+ * bug #19859 [ClassLoader] Fix ClassCollectionLoader inlining with declare(strict_types=1) (nicolas-grekas)
+ * bug #19780 [FrameworkBundle] Incorrect line break in exception message (500 debug page) (pedroresende)
+ * bug #19595 [form] lazy trans `post_max_size_message`. (aitboudad)
+ * bug #19870 [DI] Fix setting synthetic services on ContainerBuilder (nicolas-grekas)
+ * bug #19848 Revert "minor #19689 [DI] Cleanup array_key_exists (ro0NL)" (nicolas-grekas)
+ * bug #19842 [FrameworkBundle] Check for class existence before is_subclass_of (chalasr)
+ * bug #19827 [BrowserKit] Fix cookie expiration on 32 bit systems (jameshalsall)
+
 * 2.7.17 (2016-09-02)
 
  * bug #19794 [VarDumper] Various minor fixes & cleanups (nicolas-grekas)

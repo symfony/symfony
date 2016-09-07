@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-06T11:12:49Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-09-06T13:52:51Z
+
+On a side note, if you have that many virtual roles, I recommend using voters instead of roles.

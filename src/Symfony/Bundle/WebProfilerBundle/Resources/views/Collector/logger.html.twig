@@ -168,7 +168,7 @@
 {% endmacro %}
 
 {% macro render_log_message(category, log_index, log, is_deprecation = false) %}
-    {{ log.message }}
+    {{ log.message|nl2br }}
 
     {% if log.context.errorCount is defined and log.context.errorCount > 1 %}
         <span class="text-small text-bold">({{ log.context.errorCount }} times)</span>

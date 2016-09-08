@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-09-01T10:09:29Z
+
+ping @romqin @skigun :)
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2016-09-01T10:16:53Z
+
+Test would be great for this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-06T10:17:29Z
+
+Looks like this is untested, can you add a test case please?
+The composer.json file misses a requirement for the debug component now (~2.7).
+
+---------------------------------------------------------------------------
+
+by fonsecas72 at 2016-09-06T11:30:31Z
+
+@nicolas-grekas it's done I believe, thanks
+Is there anything else I can do to improve this?
+
+---------------------------------------------------------------------------
+
+by fonsecas72 at 2016-09-07T13:23:21Z
+
+@nicolas-grekas the original exception is being re-throw and tests are updated/fixed now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-08T06:09:07Z
+
+:+1:

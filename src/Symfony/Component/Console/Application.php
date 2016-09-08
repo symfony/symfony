@@ -1019,7 +1019,7 @@ class Application
         }
 
         $alternatives = array_filter($alternatives, function ($lev) use ($threshold) { return $lev < 2 * $threshold; });
-        asort($alternatives);
+        ksort($alternatives);
 
         return array_keys($alternatives);
     }

@@ -224,7 +224,7 @@ class EntityTypeTest extends TypeTestCase
             },
         ));
 
-        $this->assertEquals(array(1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')), $field->createView()->vars['choices']);
+        $this->assertEquals(array(), $field->createView()->vars['choices']);
     }
 
     public function testSetDataSingleNull()

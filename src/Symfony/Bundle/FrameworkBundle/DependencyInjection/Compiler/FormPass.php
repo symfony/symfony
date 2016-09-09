@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -22,6 +23,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class FormPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('form.extension')) {
@@ -47,12 +50,14 @@ class FormPass implements CompilerPassInterface
 
         $typeExtensions = array();
 
-        foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
+        foreach ($this->findAndSortTaggedServices('form.type_extension', $container) as $reference) {
+            $serviceId = (string) $reference;
             $serviceDefinition = $container->getDefinition($serviceId);
             if (!$serviceDefinition->isPublic()) {
                 throw new \InvalidArgumentException(sprintf('The service "%s" must be public as form type extensions are lazy-loaded.', $serviceId));
             }
 
+            $tag = $serviceDefinition->getTag('form.type_extension');
             if (isset($tag[0]['extended_type'])) {
                 $extendedType = $tag[0]['extended_type'];
             } else {

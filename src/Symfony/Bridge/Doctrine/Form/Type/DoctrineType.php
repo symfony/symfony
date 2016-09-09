@@ -133,7 +133,7 @@ abstract class DoctrineType extends AbstractType
     {
         $choiceLoader = function (Options $options) {
             // Unless the choices are given explicitly, load them on demand
-            if (null === $options['choices']) {
+            if (null === $options['choices'] && false !== $options['query_builder']) {
                 $hash = null;
                 $qbParts = null;
 

@@ -138,7 +138,7 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($this->outputTimezone !== $this->inputTimezone) {
+        if ($this->outputTimezone !== $this->inputTimezone || 'UTC' !== $this->inputTimezone) {
             $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
         }
 

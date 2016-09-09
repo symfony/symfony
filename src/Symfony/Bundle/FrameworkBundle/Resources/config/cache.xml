@@ -7,7 +7,7 @@
     <services>
 
         <service id="cache.app" parent="cache.adapter.filesystem">
-            <tag name="cache.pool" />
+            <tag name="cache.pool" clearer="cache.app_clearer" />
         </service>
 
         <service id="cache.system" parent="cache.adapter.system">
@@ -91,6 +91,8 @@
         <service id="cache.default_clearer" class="Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer" public="false">
             <tag name="kernel.cache_clearer" />
         </service>
+
+        <service id="cache.app_clearer" alias="cache.default_clearer" />
 
     </services>
 </container>

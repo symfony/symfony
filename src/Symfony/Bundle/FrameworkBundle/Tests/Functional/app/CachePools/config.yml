@@ -4,5 +4,10 @@ imports:
 framework:
     cache:
         pools:
-            cache.test:
+            cache.pool1:
                 public: true
+            cache.pool2:
+                public: true
+                adapter: cache.pool3
+            cache.pool3:
+                clearer: ~

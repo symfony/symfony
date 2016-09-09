@@ -62,22 +62,28 @@ class CachePoolsTest extends WebTestCase
         static::bootKernel($options);
         $container = static::$kernel->getContainer();
 
-        $pool = $container->get('cache.test');
-        $this->assertInstanceOf($adapterClass, $pool);
+        $pool1 = $container->get('cache.pool1');
+        $this->assertInstanceOf($adapterClass, $pool1);
 
         $key = 'foobar';
-        $pool->deleteItem($key);
-        $item = $pool->getItem($key);
+        $pool1->deleteItem($key);
+        $item = $pool1->getItem($key);
         $this->assertFalse($item->isHit());
 
         $item->set('baz');
-        $pool->save($item);
-        $item = $pool->getItem($key);
+        $pool1->save($item);
+        $item = $pool1->getItem($key);
         $this->assertTrue($item->isHit());
 
+        $pool2 = $container->get('cache.pool2');
+        $pool2->save($item);
+
         $container->get('cache_clearer')->clear($container->getParameter('kernel.cache_dir'));
-        $item = $pool->getItem($key);
+        $item = $pool1->getItem($key);
         $this->assertFalse($item->isHit());
+
+        $item = $pool2->getItem($key);
+        $this->assertTrue($item->isHit());
     }
 
     protected static function createKernel(array $options = array())

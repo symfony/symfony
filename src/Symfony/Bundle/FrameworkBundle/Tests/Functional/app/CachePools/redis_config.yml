@@ -5,5 +5,8 @@ framework:
     cache:
         app: cache.adapter.redis
         pools:
-            cache.test:
+            cache.pool1:
                 public: true
+            cache.pool2:
+                public: true
+                clearer: ~

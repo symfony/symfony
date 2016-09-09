@@ -25,6 +25,7 @@ class RedisAdapter extends AbstractAdapter
     private static $defaultConnectionOptions = array(
         'class' => null,
         'persistent' => 0,
+        'persistent_id' => null,
         'timeout' => 0,
         'read_timeout' => 0,
         'retry_interval' => 0,
@@ -99,9 +100,9 @@ class RedisAdapter extends AbstractAdapter
         $class = null === $params['class'] ? (extension_loaded('redis') ? \Redis::class : \Predis\Client::class) : $params['class'];
 
         if (is_a($class, \Redis::class, true)) {
-            $connect = empty($params['persistent']) ? 'connect' : 'pconnect';
+            $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
             $redis = new $class();
-            @$redis->{$connect}($params['host'], $params['port'], $params['timeout'], null, $params['retry_interval']);
+            @$redis->{$connect}($params['host'], $params['port'], $params['timeout'], $params['persistent_id'], $params['retry_interval']);
 
             if (@!$redis->isConnected()) {
                 $e = ($e = error_get_last()) && preg_match('/^Redis::p?connect\(\): (.*)/', $e['message'], $e) ? sprintf(' (%s)', $e[1]) : '';

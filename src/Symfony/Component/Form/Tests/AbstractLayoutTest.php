@@ -536,6 +536,23 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         );
     }
 
+    public function testSingleChoiceWithoutChoices()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+            'choices' => array(),
+            'multiple' => false,
+            'expanded' => false,
+            'required' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [not(@required)]
+    /em[.="[trans]No choice available[/trans]"]
+'
+        );
+    }
+
     public function testSingleChoiceWithoutTranslation()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', array(
@@ -998,6 +1015,23 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
     [count(./input)=3]
+'
+        );
+    }
+
+    public function testSingleChoiceExpandedWithoutChoices()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, array(
+            'choices' => array(),
+            'multiple' => false,
+            'expanded' => true,
+            'required' => true,
+        ));
+
+        $this->assertWidgetMatchesXpath($form->createView(), array(),
+'/div
+    [not(@required)]
+    /em[.="[trans]No choice available[/trans]"]
 '
         );
     }

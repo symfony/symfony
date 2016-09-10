@@ -2,7 +2,12 @@
 
 {%- block form_widget -%}
     {% if compound %}
-        {{- block('form_widget_compound') -}}
+        {%- if empty_view %}
+            {{- block('empty_row') -}}
+            {{ form_rest(form) }}
+        {%- else -%}
+            {{- block('form_widget_compound') -}}
+        {%- endif -%}
     {% else %}
         {{- block('form_widget_simple') -}}
     {% endif %}
@@ -35,11 +40,15 @@
 {%- endblock textarea_widget -%}
 
 {%- block choice_widget -%}
-    {% if expanded %}
-        {{- block('choice_widget_expanded') -}}
-    {% else %}
-        {{- block('choice_widget_collapsed') -}}
-    {% endif %}
+    {%- if empty_view is defined and empty_view -%}
+        {{- block('empty_row') -}}
+    {%- else -%}
+        {%- if expanded -%}
+            {{- block('choice_widget_expanded') -}}
+        {%- else -%}
+            {{- block('choice_widget_collapsed') -}}
+        {%- endif -%}
+    {%- endif -%}
 {%- endblock choice_widget -%}
 
 {%- block choice_widget_expanded -%}
@@ -329,6 +338,13 @@
         {{- form_row(child) -}}
     {% endfor %}
 {%- endblock form_rows -%}
+
+{%- block empty_row -%}
+    {%- set translation_domain = translation_domain ?: 'sf_form' -%}
+    <div {{ block('widget_container_attributes') }}>
+        <em>{{- translation_domain is same as(false) ? empty_view : empty_view|trans({}, translation_domain) -}}</em>
+    </div>
+{%- endblock empty_row -%}
 
 {%- block widget_attributes -%}
     id="{{ id }}" name="{{ full_name }}"

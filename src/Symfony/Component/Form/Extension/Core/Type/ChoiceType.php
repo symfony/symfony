@@ -234,6 +234,18 @@ class ChoiceType extends AbstractType
                 $childView->vars['full_name'] = $childName;
             }
         }
+
+        // We have to override parent {@link FormType} condition of the empty_view option here,
+        // even if there is no choices the field view may not be empty because:
+        //
+        //  - a select input is not "compound" but should be considered as any empty HTML tag,
+        //
+        //  - when expanded it could hold a placeholder which has been counted as a children,
+        //    we should ignore it in any case since its role is to be a "null" alternative to
+        //    choices, not a choice itself. Think of "Choose something" with no choices.
+        if (array() === $view->vars['choices'] && array() === $view->vars['preferred_choices']) {
+            $view->vars['empty_view'] = $options['empty_view'];
+        }
     }
 
     /**
@@ -317,6 +329,7 @@ class ChoiceType extends AbstractType
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,
+            'empty_view' => 'No choice available',
             'placeholder' => $placeholderDefault,
             'error_bubbling' => false,
             'compound' => $compound,

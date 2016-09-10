@@ -249,6 +249,18 @@
     </div>
 {%- endblock radio_row %}
 
+{# Support #}
+
+{% block empty_row -%}
+    {%- set translation_domain = translation_domain ?: 'sf_form' -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) %}
+    <div {{ block('widget_container_attributes') }}>
+        <p>
+            <em>{{- translation_domain is same as(false) ? empty_view : empty_view|trans({}, translation_domain) -}}</em>
+        </p>
+    </div>
+{%- endblock empty_row %}
+
 {# Errors #}
 
 {% block form_errors -%}

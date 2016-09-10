@@ -42,3 +42,14 @@
         {{- form_rest(form) -}}
     </table>
 {%- endblock form_widget_compound -%}
+
+{%- block empty_row -%}
+    {%- set translation_domain = translation_domain ?: 'sf_form' -%}
+    <table {{ block('widget_container_attributes') }}>
+        <tr>
+            <td colspan="2">
+                <em>{{ translation_domain is same as(false) ? empty_view : empty_view|trans({}, translation_domain) }}</em>
+            </td>
+        </tr>
+    </table>
+{%- endblock empty_row -%}

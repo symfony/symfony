@@ -327,10 +327,15 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
             'entry_type' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
         ));
 
-        $this->assertWidgetMatchesXpath($form->createView(), array(),
+        $this->assertWidgetMatchesXpath($form->createView(), array('id' => 'my&id', 'attr' => array('class' => 'my&class')),
 '/div
-    [./input[@type="hidden"][@id="names__token"]]
+    [@id="my&id"]
+    [@class="my&class"]
+    [
+        /em[.="[trans]No fields[/trans]"]
+    ]
     [count(./div)=0]
+/following-sibling::input[@type="hidden"][@id="names__token"]
 '
         );
     }

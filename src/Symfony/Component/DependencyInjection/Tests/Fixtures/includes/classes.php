@@ -1,5 +1,8 @@
 <?php
 
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
+
 function sc_configure($instance)
 {
     $instance->configure();
@@ -74,5 +77,32 @@ class MethodCallClass
     public function callPassed()
     {
         return $this->callPassed;
+    }
+}
+
+class DummyProxyDumper implements ProxyDumper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function isProxyCandidate(Definition $definition)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProxyFactoryCode(Definition $definition, $id)
+    {
+        return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProxyCode(Definition $definition)
+    {
+        return '';
     }
 }

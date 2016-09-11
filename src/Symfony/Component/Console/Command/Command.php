@@ -210,7 +210,6 @@ class Command
     public function run(InputInterface $input, OutputInterface $output)
     {
         // force the creation of the synopsis before the merge with the app definition
-        $this->getSynopsis(true);
         $this->getSynopsis(false);
 
         // add the application arguments and options

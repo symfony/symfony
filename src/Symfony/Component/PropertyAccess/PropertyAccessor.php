@@ -816,7 +816,7 @@ class PropertyAccessor implements PropertyAccessorInterface
      */
     private function camelize($string)
     {
-        if (!defined('HHVM_VERSION') && PHP_VERSION_ID >= 50516) {
+        if (PHP_VERSION_ID >= 50516 || (defined('HHVM_VERSION') && HHVM_VERSION_ID >= 31200)) {
             return str_replace(array(' ', '_'), '', ucwords($string, ' _'));
         }
 

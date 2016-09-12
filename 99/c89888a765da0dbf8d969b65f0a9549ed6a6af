@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-12T15:17:02Z
+
+I think we need to add some docs to the README about its usage and the env vars that one can define.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-12T15:51:13Z
+
+Doc PR added, tests green.
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-12T16:05:08Z
+
+Needs https://github.com/symfony/symfony/pull/19917 to be green (and reciprocally)

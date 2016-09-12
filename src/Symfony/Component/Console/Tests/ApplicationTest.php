@@ -950,6 +950,62 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('before.foo.caught.after.', $tester->getDisplay());
     }
 
+    /**
+     * @expectedException        \LogicException
+     * @expectedExceptionMessage caught
+     */
+    public function testRunWithErrorAndDispatcher()
+    {
+        $application = new Application();
+        $application->setDispatcher($this->getDispatcher());
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+
+        $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('dym.');
+
+            throw new \Error('dymerr');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'dym'));
+        $this->assertContains('before.dym.caught.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
+    }
+
+    public function testRunDispatchesAllEventsWithError()
+    {
+        $application = new Application();
+        $application->setDispatcher($this->getDispatcher());
+        $application->setAutoExit(false);
+
+        $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('dym.');
+
+            throw new \Error('dymerr');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'dym'));
+        $this->assertContains('before.dym.caught.after.', $tester->getDisplay(), 'The PHP Error did not dispached events');
+    }
+
+    public function testRunWithErrorFailingStatusCode()
+    {
+        $application = new Application();
+        $application->setDispatcher($this->getDispatcher());
+        $application->setAutoExit(false);
+
+        $application->register('dus')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('dus.');
+
+            throw new \Error('duserr');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'dus'));
+        $this->assertSame(1, $tester->getStatusCode(), 'Status code should be 1');
+    }
+
     public function testRunWithDispatcherSkippingCommand()
     {
         $application = new Application();

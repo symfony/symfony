@@ -1,0 +1,9 @@
+#!/usr/bin/env php
+<?php
+
+if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
+    echo "Unable to find the `simple-phpunit` script in `vendor/symfony/phpunit-bridge/bin/`.\nPlease run `composer update` before running this command.\n";
+    exit(1);
+}
+putenv('SYMFONY_PHPUNIT_DIR='.__DIR__.'/.phpunit');
+require __DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit';

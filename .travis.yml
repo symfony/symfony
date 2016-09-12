@@ -64,24 +64,29 @@ before_install:
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = redis.so >> $INI_FILE; fi;
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini || echo "xdebug not available"; fi
     - if [[ ! $skip ]]; then [ -d ~/.composer ] || mkdir ~/.composer; cp .composer/* ~/.composer/; fi
-    - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip ]]; then export PHPUNIT=$(readlink -f ./phpunit); fi
     - if [[ ! $skip ]]; then ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif; fi
     - if [[ ! $skip ]]; then ldapadd -h localhost:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif; fi
 
 install:
+    - if [[ ! $skip && $deps ]]; then cp composer.json composer.json.orig; fi
+    - if [[ ! $skip && $deps ]]; then echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json; fi
     - if [[ ! $skip ]]; then COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi
     # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
-    - if [[ ! $skip && $deps ]]; then git fetch origin $TRAVIS_BRANCH && php .github/travis.php FETCH_HEAD $TRAVIS_BRANCH $COMPONENTS; fi
+    - if [[ ! $skip && $deps ]]; then php .github/build-packages.php HEAD^ $TRAVIS_BRANCH $COMPONENTS; fi
+    - if [[ ! $skip && $deps ]]; then mv composer.json composer.json.phpunit; mv composer.json.orig composer.json; fi
+    - if [[ ! $skip && ! $deps ]]; then php .github/build-packages.php HEAD^ $TRAVIS_BRANCH src/Symfony/Bridge/PhpUnit; fi
     # For the master branch when deps=high, the version before master is checked out and tested with the locally patched components
     - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//); else SYMFONY_VERSION=$(cat composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*'); fi
-    - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then git fetch origin $SYMFONY_VERSION; git checkout -m FETCH_HEAD; COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); ./phpunit install; fi
+    - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then git fetch origin $SYMFONY_VERSION; git checkout -m FETCH_HEAD; COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi
     # Legacy tests are skipped when deps=high and when the current branch version has not the same major version number than the next one
     - if [[ $deps = high && ${SYMFONY_VERSION%.*} != $(git show $(git ls-remote --heads | grep -FA1 /$SYMFONY_VERSION | tail -n 1):composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9]*' | head -n 1) ]]; then LEGACY=,legacy; fi
     - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
-    - if [[ ! $deps ]]; then composer update; else export SYMFONY_DEPRECATIONS_HELPER=weak; fi
-    - if [[ $TRAVIS_BRANCH = master ]]; then export SYMFONY_PHPUNIT_OVERLOAD=1; fi
-    - if [[ ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
+    - if [[ ! $skip && $deps ]]; then export SYMFONY_DEPRECATIONS_HELPER=weak; fi
+    - if [[ ! $skip && $deps ]]; then mv composer.json.phpunit composer.json; fi
+    - if [[ ! $skip ]]; then composer update; fi
+    - if [[ ! $skip ]]; then COMPOSER_ROOT_VERSION= ./phpunit install; fi
+    - if [[ ! $skip && ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi
 
 script:
     - if [[ $skip ]]; then echo -e "\\n\\e[1;34mIntermediate PHP version $PHP is skipped for pull requests.\\e[0m"; fi

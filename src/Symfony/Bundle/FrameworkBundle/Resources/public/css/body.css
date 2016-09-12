@@ -39,7 +39,7 @@ build: 56
     font-family: Georgia, "Times New Roman", Times, serif;
     font-size: 20px;
     color: #313131;
-    word-break: break-all;
+    word-wrap: break-word;
 }
 .sf-reset li {
     padding-bottom: 10px;

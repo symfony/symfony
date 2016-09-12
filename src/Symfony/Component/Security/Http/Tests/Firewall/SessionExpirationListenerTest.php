@@ -124,7 +124,7 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
         $metadataBag
             ->expects($this->once())
             ->method('getLastUsed')
-            ->will($this->returnValue(time()-2));
+            ->will($this->returnValue(time() - 2));
 
         $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session
@@ -167,7 +167,7 @@ class SessionExpirationListenerTest extends \PHPUnit_Framework_TestCase
         $metadataBag
             ->expects($this->once())
             ->method('getLastUsed')
-            ->will($this->returnValue(time()-2));
+            ->will($this->returnValue(time() - 2));
 
         $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
- * SessionExpirationListener controls idle sessions
+ * SessionExpirationListener controls idle sessions.
  *
  * @author Antonio J. García Lagar <aj@garcialagar.es>
  */
@@ -43,7 +43,7 @@ class SessionExpirationListener implements ListenerInterface
     /**
      * Handles expired sessions.
      *
-     * @param  GetResponseEvent  $event A GetResponseEvent instance
+     * @param GetResponseEvent $event A GetResponseEvent instance
      *
      * @throws SessionExpiredException If the session has expired
      */
@@ -90,6 +90,7 @@ class SessionExpirationListener implements ListenerInterface
      * Checks if the given session has expired.
      *
      * @param SessionInterface $session
+     *
      * @return bool
      */
     private function hasSessionExpired(SessionInterface $session)

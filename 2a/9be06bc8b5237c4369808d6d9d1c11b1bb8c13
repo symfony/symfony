@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-12T16:05:16Z
+
+Needs https://github.com/symfony/symfony/pull/19915 to be green (and reciprocally)

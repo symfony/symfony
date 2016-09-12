@@ -11,11 +11,22 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Security\Http\Firewall\SessionExpirationListener;
+
 /**
  * @group functional
+ * @group time-sensitive
  */
 class SessionExpirationTest extends WebTestCase
 {
+    protected function setUp()
+    {
+        parent::setUp();
+
+        ClockMock::register(SessionExpirationListener::class);
+    }
+
     public function testExpiredExceptionRedirectsToTargetUrl()
     {
         $client = $this->createClient(array('test_case' => 'SessionExpiration', 'root_config' => 'config.yml'));
@@ -28,15 +39,15 @@ class SessionExpirationTest extends WebTestCase
         $client->request('GET', '/protected_resource');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
-        sleep(1); //Wait for session to expire
+        sleep(5); //Wait for session to expire
         $client->request('GET', '/protected_resource');
         $this->assertRedirect($client->getResponse(), '/expired');
     }
 
     protected function tearDown()
     {
-        parent::tearDown();
-
         $this->deleteTmpDir('SessionExpiration');
+
+        parent::tearDown();
     }
 }

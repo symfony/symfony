@@ -23,19 +23,10 @@ security:
             form_login:
                 check_path: /login_check
                 default_target_path: /profile
-            logout: ~
             anonymous: ~
             session_expiration:
                 max_idle_time: 1
                 expiration_url: /expired
-
-        # This firewall is here just to check its the logout functionality
-        second_area:
-            http_basic: ~
-            anonymous: ~
-            logout:
-                target: /second/target
-                path: /second/logout
 
     access_control:
         - { path: .*, roles: IS_AUTHENTICATED_FULLY }

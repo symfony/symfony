@@ -1,0 +1,7 @@
+{% extends "::base.html.twig" %}
+
+{% block body %}
+    Hello {{ user.username }}!<br /><br />
+    You're browsing to path "{{ app.request.pathInfo }}".
+
+{% endblock %}

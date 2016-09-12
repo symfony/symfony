@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\FormLoginBundle;
+use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\SimpleLoginBundle\SimpleLoginBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
@@ -10,4 +11,5 @@ return array(
     new SecurityBundle(),
     new TwigBundle(),
     new FormLoginBundle(),
+    new SimpleLoginBundle(),
 );

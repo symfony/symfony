@@ -30,6 +30,9 @@
             "/Tests/"
         ]
     },
+    "bin": [
+        "bin/simple-phpunit"
+    ],
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

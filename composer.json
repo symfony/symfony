@@ -78,6 +78,7 @@
         "monolog/monolog": "~1.11",
         "ircmaxell/password-compat": "~1.0",
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
+        "symfony/phpunit-bridge": "~3.2",
         "egulias/email-validator": "~1.2,>=1.2.1"
     },
     "autoload": {
@@ -98,11 +99,6 @@
         "exclude-from-classmap": [
             "**/Tests/"
         ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Symfony\\Bridge\\PhpUnit\\": "src/Symfony/Bridge/PhpUnit/"
-        }
     },
     "minimum-stability": "dev",
     "extra": {

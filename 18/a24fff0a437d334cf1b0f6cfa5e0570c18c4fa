@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by sstok at 2016-09-13T08:16:40Z
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-09-13T09:32:40Z
+
+@teohhanhui just asking: could this be a BC break for some application?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-09-13T09:37:26Z
+
+I'd see it as a bug, i.e. we were returning the wrong type. But of course, yes, applications might break if they depend on a certain type being returned. (I don't think that should be considered part of our BC promise.)

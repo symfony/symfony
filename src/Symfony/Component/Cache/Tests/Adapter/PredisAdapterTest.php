@@ -39,6 +39,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTest
             'class' => 'Predis\Client',
             'timeout' => 3,
             'persistent' => 0,
+            'persistent_id' => null,
             'read_timeout' => 0,
             'retry_interval' => 0,
             'database' => '1',

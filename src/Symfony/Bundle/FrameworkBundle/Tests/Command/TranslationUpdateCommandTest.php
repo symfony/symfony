@@ -33,7 +33,7 @@ class TranslationUpdateCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testDumpTwoMessagesAndClean()
     {
-        $tester = $this->createCommandTester($this->getContainer(array('foo' => 'foo', 'bar' => 'bar')));
+        $tester = $this->createCommandTester($this->getContainer(array('messages' => array('foo' => 'foo', 'bar' => 'bar'))));
         $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true));
         $this->assertRegExp('/foo/', $tester->getDisplay());
         $this->assertRegExp('/bar/', $tester->getDisplay());
@@ -45,7 +45,7 @@ class TranslationUpdateCommandTest extends \PHPUnit_Framework_TestCase
         $tester = $this->createCommandTester($this->getContainer(array('messages' => array('foo' => 'foo'), 'mydomain' => array('bar' => 'bar'))));
         $tester->execute(array('command' => 'translation:update', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--domain' => 'mydomain'));
         $this->assertRegExp('/bar/', $tester->getDisplay());
-        $this->assertRegExp('/2 messages were successfully extracted/', $tester->getDisplay());
+        $this->assertRegExp('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
     public function testWriteMessages()

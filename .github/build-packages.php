@@ -1,7 +1,7 @@
 <?php
 
-if (4 > $_SERVER['argc']) {
-    echo "Usage: branch version dir1 dir2 ... dirN\n";
+if (3 > $_SERVER['argc']) {
+    echo "Usage: branch dir1 dir2 ... dirN\n";
     exit(1);
 }
 chdir(dirname(__DIR__));
@@ -9,7 +9,6 @@ chdir(dirname(__DIR__));
 $dirs = $_SERVER['argv'];
 array_shift($dirs);
 $mergeBase = trim(shell_exec(sprintf('git merge-base %s HEAD', array_shift($dirs))));
-$version = array_shift($dirs);
 
 $packages = array();
 $flags = PHP_VERSION_ID >= 50400 ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE : 0;
@@ -40,7 +39,11 @@ foreach ($dirs as $k => $dir) {
     }
     passthru("cd $dir && tar -cf package.tar --exclude='package.tar' *");
 
-    $package->version = $version.'.999';
+    if (!isset($package->extra->{'branch-alias'}->{'dev-master'})) {
+        echo "Missing \"dev-master\" branch-alias in composer.json extra.\n";
+        exit(1);
+    }
+    $package->version = str_replace('-dev', '.999', $package->extra->{'branch-alias'}->{'dev-master'});
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 

@@ -72,9 +72,9 @@ install:
     - if [[ ! $skip && $deps ]]; then echo -e '{\n"require":{'"$(grep phpunit-bridge composer.json)"'"php":"*"},"minimum-stability":"dev"}' > composer.json; fi
     - if [[ ! $skip ]]; then COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi
     # Create local composer packages for each patched components and reference them in composer.json files when cross-testing components
-    - if [[ ! $skip && $deps ]]; then php .github/build-packages.php HEAD^ $TRAVIS_BRANCH $COMPONENTS; fi
+    - if [[ ! $skip && $deps ]]; then php .github/build-packages.php HEAD^ $COMPONENTS; fi
     - if [[ ! $skip && $deps ]]; then mv composer.json composer.json.phpunit; mv composer.json.orig composer.json; fi
-    - if [[ ! $skip && ! $deps ]]; then php .github/build-packages.php HEAD^ $TRAVIS_BRANCH src/Symfony/Bridge/PhpUnit; fi
+    - if [[ ! $skip && ! $deps ]]; then php .github/build-packages.php HEAD^ src/Symfony/Bridge/PhpUnit; fi
     # For the master branch when deps=high, the version before master is checked out and tested with the locally patched components
     - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then SYMFONY_VERSION=$(git ls-remote --heads | grep -o '/[1-9].*' | tail -n 1 | sed s/.//); else SYMFONY_VERSION=$(cat composer.json | grep '^ *"dev-master". *"[1-9]' | grep -o '[0-9.]*'); fi
     - if [[ $deps = high && $TRAVIS_BRANCH = master ]]; then git fetch origin $SYMFONY_VERSION; git checkout -m FETCH_HEAD; COMPONENTS=$(find src/Symfony -mindepth 3 -type f -name phpunit.xml.dist -printf '%h\n'); fi

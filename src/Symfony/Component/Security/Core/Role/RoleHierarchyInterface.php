@@ -29,4 +29,16 @@ interface RoleHierarchyInterface
      * @return RoleInterface[] An array of all reachable roles
      */
     public function getReachableRoles(array $roles);
+
+
+    /**
+     * Returns an array of all reachable role names by the given ones.
+     * Reachable roles are the roles directly assigned but also all roles that
+     * are transitively reachable from them in the role hierarchy.
+     *
+     * @param RoleInterface[] $roles An array of directly assigned roles
+     *
+     * @return string[] An array of all reachable role names
+     */
+    public function getReachableRoleNames(array $roles);
 }

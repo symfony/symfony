@@ -52,6 +52,29 @@ class RoleHierarchy implements RoleHierarchyInterface
         return $reachableRoles;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getReachableRoleNames(array $roles)
+    {
+        $reachableRoleNames = array();
+        foreach ($roles as $role) {
+            $reachableRoleNames[] = $role->getRole();
+        }
+
+        foreach ($reachableRoleNames as $roleName) {
+            if (isset($this->map[$roleName]) === false) {
+                continue;
+            }
+
+            foreach ($this->map[$roleName] as $subRoleName) {
+                $reachableRoleNames[] = $subRoleName;
+            }
+        }
+
+        return $reachableRoleNames;
+    }
+
     protected function buildRoleMap()
     {
         $this->map = array();

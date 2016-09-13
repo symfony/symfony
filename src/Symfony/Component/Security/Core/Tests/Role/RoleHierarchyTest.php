@@ -29,4 +29,18 @@ class RoleHierarchyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(new Role('ROLE_FOO'), new Role('ROLE_ADMIN'), new Role('ROLE_USER')), $role->getReachableRoles(array(new Role('ROLE_FOO'), new Role('ROLE_ADMIN'))));
         $this->assertEquals(array(new Role('ROLE_SUPER_ADMIN'), new Role('ROLE_ADMIN'), new Role('ROLE_FOO'), new Role('ROLE_USER')), $role->getReachableRoles(array(new Role('ROLE_SUPER_ADMIN'))));
     }
+
+    public function testGetReachableRoleNames()
+    {
+        $role = new RoleHierarchy(array(
+            'ROLE_ADMIN' => array('ROLE_USER'),
+            'ROLE_SUPER_ADMIN' => array ('ROLE_ADMIN', 'ROLE_FOO'),
+        ));
+
+        $this->assertEquals(array('ROLE_USER'), $role->getReachableRoleNames(array(new Role('ROLE_USER'))));
+        $this->assertEquals(array('ROLE_FOO'), $role->getReachableRoleNames(array(new Role('ROLE_FOO'))));
+        $this->assertEquals(array('ROLE_ADMIN', 'ROLE_USER'), $role->getReachableRoleNames(array(new Role('ROLE_ADMIN'))));
+        $this->assertEquals(array('ROLE_FOO', 'ROLE_ADMIN', 'ROLE_USER'), $role->getReachableRoleNames(array(new Role('ROLE_FOO'), new Role('ROLE_ADMIN'))));
+        $this->assertEquals(array('ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FOO', 'ROLE_USER'), $role->getReachableRoleNames(array(new Role('ROLE_SUPER_ADMIN'))));
+    }
 }

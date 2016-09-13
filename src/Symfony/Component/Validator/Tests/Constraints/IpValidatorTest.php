@@ -216,7 +216,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     {
         return array(
             array('0.0.0.0'),
-            array('224.0.0.1'),
+            array('240.0.0.1'),
             array('255.255.255.255'),
         );
     }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2016-09-13T21:15:14Z
+
+I did actually flag this as a point to be careful with when merging in https://github.com/symfony/symfony/pull/19813#discussion_r77811887. :trollface: :P
+
+---------------------------------------------------------------------------
+
+by GrahamCampbell at 2016-09-13T21:39:28Z
+
+I guess maybe 2.8 is the place to fix this rather than 3.1. :)

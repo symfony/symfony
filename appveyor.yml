@@ -52,7 +52,7 @@ install:
     - IF NOT EXIST composer.phar (appveyor DownloadFile https://getcomposer.org/download/1.2.1/composer.phar)
     - php composer.phar self-update
     - copy /Y .composer\* %APPDATA%\Composer\
-    - php .github/build-packages.php "HEAD^" %APPVEYOR_REPO_BRANCH% src\Symfony\Bridge\PhpUnit
+    - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
     - php composer.phar update --no-progress --ansi
     - SET COMPOSER_ROOT_VERSION=

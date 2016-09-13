@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-13T10:25:46Z
+
+So, only an issue in tests? Shouldn't this be applied on previous branches? Any potential BC break spotted by this failure?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-09-13T10:26:10Z
+
+Not sure why PHP 7 builds are failing here:
+
+```
+Could not load package symfony/framework-bundle in file:///home/travis/build/symfony/symfony: [UnexpectedValueException] Invalid version string "master.999"
+```
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-09-13T10:31:09Z
+
+> So, only an issue in tests? Shouldn't this be applied on previous branches? Any potential BC break spotted by this failure?
+
+Yes, only issue with tests. It's a result of changes made on master.
+
+> #19325 relied on a wrong count of messages, which was fixed by #19878.
+
+The #19325 test is only present in the master branch, so it wasn't a problem until #19878 was merged to master.
+
+> Additionally, the getContainer() method on the master branch expect messages to be indexed by domain.
+
+Again, this is only on master.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-13T10:31:13Z
+
+> Could not load package symfony/framework-bundle
+
+I'll look at this asap, should be related to the changes I made yesterday, that were far from easy :)

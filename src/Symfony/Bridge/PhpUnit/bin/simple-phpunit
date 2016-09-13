@@ -73,6 +73,7 @@ EOPHP
 
 }
 
+$components = array();
 $cmd = array_map('escapeshellarg', $argv);
 $exit = 0;
 
@@ -80,7 +81,20 @@ if (isset($argv[1]) && 'symfony' === $argv[1] && !file_exists('symfony') && file
     $argv[1] = 'src/Symfony';
 }
 if (isset($argv[1]) && is_dir($argv[1]) && !file_exists($argv[1].'/phpunit.xml.dist')) {
-    array_shift($cmd);
+    // Find Symfony components in plain php for Windows portability
+
+    $finder = new RecursiveDirectoryIterator($argv[1], FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
+    $finder = new RecursiveIteratorIterator($finder);
+    $finder->setMaxDepth(getenv('SYMFONY_PHPUNIT_MAX_DEPTH') ?: 3);
+
+    foreach ($finder as $file => $fileInfo) {
+        if ('phpunit.xml.dist' === $file) {
+            $components[] = dirname($fileInfo->getPathname());
+        }
+    }
+    if ($components) {
+        array_shift($cmd);
+    }
 }
 
 $cmd[0] = sprintf('%s %s --colors=always', $PHP, escapeshellarg("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit"));
@@ -92,34 +106,24 @@ if ('\\' === DIRECTORY_SEPARATOR) {
     $cmd .= '%2$s';
 }
 
-if (isset($argv[1]) && is_dir($argv[1]) && !file_exists($argv[1].'/phpunit.xml.dist')) {
-    // Find Symfony components in plain php for Windows portability
-
-    $finder = new RecursiveDirectoryIterator($argv[1], FilesystemIterator::KEY_AS_FILENAME | FilesystemIterator::UNIX_PATHS);
-    $finder = new RecursiveIteratorIterator($finder);
-    $finder->setMaxDepth(getenv('SYMFONY_PHPUNIT_MAX_DEPTH') ?: 3);
-
+if ($components) {
     $skippedTests = isset($_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS']) ? $_SERVER['SYMFONY_PHPUNIT_SKIPPED_TESTS'] : false;
     $runningProcs = array();
 
-    foreach ($finder as $file => $fileInfo) {
-        if ('phpunit.xml.dist' === $file) {
-            $component = dirname($fileInfo->getPathname());
+    foreach ($components as $component) {
+        // Run phpunit tests in parallel
 
-            // Run phpunit tests in parallel
+        if ($skippedTests) {
+            putenv("SYMFONY_PHPUNIT_SKIPPED_TESTS=$component/$skippedTests");
+        }
 
-            if ($skippedTests) {
-                putenv("SYMFONY_PHPUNIT_SKIPPED_TESTS=$component/$skippedTests");
-            }
+        $c = escapeshellarg($component);
 
-            $c = escapeshellarg($component);
-
-            if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), array(), $pipes)) {
-                $runningProcs[$component] = $proc;
-            } else {
-                $exit = 1;
-                echo "\033[41mKO\033[0m $component\n\n";
-            }
+        if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), array(), $pipes)) {
+            $runningProcs[$component] = $proc;
+        } else {
+            $exit = 1;
+            echo "\033[41mKO\033[0m $component\n\n";
         }
     }
 

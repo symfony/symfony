@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-09-12T21:58:22Z
+
+@fabpot fabbot seems to have failed. He wants me to add two spaces after the `|` between json constants.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-12T23:29:56Z
+
+hmmm, I think fabbot drinks too much French wine :) Can you report the issue on FriendsOfPhp/php-cs-fixer?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-12T23:31:15Z
+
+`JSON_UNESCAPED_SLASHES` has been introduced in PHP 5.4, but 2.7 also supports PHP 5.3, so you need to take care of when the constant is not defined.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-09-13T06:39:35Z
+
+@fabpot There is already a check for JSON_PRETTY_PRINT which has been introduced in the same time, I guess it's fine to add the two if one of them is defined, isn't it? :)
+
+> Can you report the issue on FriendsOfPhp/php-cs-fixer?
+
+Sure! See https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/2177
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-13T19:11:14Z
+
+@chalasr indeed, looks good to me.

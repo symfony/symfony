@@ -66,6 +66,16 @@ class DoctrineDummy
     private $simpleArray;
 
     /**
+     * @Column(type="float")
+     */
+    private $float;
+
+    /**
+     * @Column(type="decimal", precision=10, scale=2)
+     */
+    private $decimal;
+
+    /**
      * @Column(type="boolean")
      */
     private $bool;

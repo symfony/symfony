@@ -178,12 +178,12 @@ class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeE
                 return Type::BUILTIN_TYPE_INT;
 
             case DBALType::FLOAT:
-            case DBALType::DECIMAL:
                 return Type::BUILTIN_TYPE_FLOAT;
 
             case DBALType::STRING:
             case DBALType::TEXT:
             case DBALType::GUID:
+            case DBALType::DECIMAL:
                 return Type::BUILTIN_TYPE_STRING;
 
             case DBALType::BOOLEAN:

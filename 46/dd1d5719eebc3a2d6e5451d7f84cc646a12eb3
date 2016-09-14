@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-02T11:58:57Z
+
+This looks very promising ☺ thanks !
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-08-03T12:21:03Z
+
+This is green and ready for intensive review :) .
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-03T13:44:14Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-08-16T18:22:01Z
+
+I updated this PR to fix the potential BC break.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-08-17T13:09:38Z
+
+I fixed the compatibility with older versions of the Serializer. I disabled the cache warmer for old versions of the serializer to avoid problems in cache generation.
+
+I think this PR is reaydy for review :) .
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-17T14:28:48Z
+
+👍, good work!
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-08-18T08:41:53Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-06T09:15:29Z
+
+ping @symfony/deciders

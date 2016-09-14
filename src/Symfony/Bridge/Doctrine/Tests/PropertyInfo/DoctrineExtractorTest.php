@@ -49,6 +49,8 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
                 'time',
                 'json',
                 'simpleArray',
+                'float',
+                'decimal',
                 'bool',
                 'binary',
                 'customFoo',
@@ -73,6 +75,8 @@ class DoctrineExtractorTest extends \PHPUnit_Framework_TestCase
         return array(
             array('id', array(new Type(Type::BUILTIN_TYPE_INT))),
             array('guid', array(new Type(Type::BUILTIN_TYPE_STRING))),
+            array('float', array(new Type(Type::BUILTIN_TYPE_FLOAT))),
+            array('decimal', array(new Type(Type::BUILTIN_TYPE_STRING))),
             array('bool', array(new Type(Type::BUILTIN_TYPE_BOOL))),
             array('binary', array(new Type(Type::BUILTIN_TYPE_RESOURCE))),
             array('json', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true))),

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-05T21:36:15Z
+
+Fabbot error is a false positive (it doesn't support PHP 7.1 yet).
+
+👍 but I propose to wait and see what happens to this feature before the release of 7.1 to merge the PR.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-09-06T02:56:01Z
+
+If we want people to test Symfony with PHP 7.1, we should provide the compatibility. It's already in RC now, so things shouldn't change as much.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-06T07:27:28Z
+
+@teohhanhui see #19817 and related failure

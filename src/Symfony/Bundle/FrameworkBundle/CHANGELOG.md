@@ -6,6 +6,7 @@ CHANGELOG
 
  * The `Controller::getUser()` method has been deprecated and will be removed in
    Symfony 4.0; typehint the security user object in the action instead.
+ * Added possibility to prioritize form type extensions with `'priority'` attribute on tags `form.type_extension` 
 
 3.1.0
 -----

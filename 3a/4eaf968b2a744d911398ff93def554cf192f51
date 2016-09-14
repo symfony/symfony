@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-30T08:10:44Z
+
+IMHO, if we can remove the deprecation, go for 3.1, otherwise, master.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-30T08:45:01Z
+
+@nicolas-grekas alright, re-opening against the master, I can't avoid the argument it seems
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-31T08:56:05Z
+
+Reopened after removing BC break of #19785
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-31T18:10:21Z
+
+Isn't it something that also needs to fixed on 2.7?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-31T18:13:37Z
+
+@fabpot in the controller resolver, yes. Probably in the argument resolver as well (but would like to do that in another patch) Once it's fixed in here, I can probably backport a similar solution
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-31T18:16:12Z
+
+@iltar If possible, I would prefer to have the 2.7 patch so that we can merge it first, merge 2.7 into 2.8 then 3.1, and merge this PR immediately to resolve conflicts.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-31T18:37:50Z
+
+@fabpot sounds like a plan, I'll get it ready when I have some extra time
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-31T18:38:10Z
+
+Thank you.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-07T04:51:10Z
+
+👍

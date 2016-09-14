@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-01T03:11:46Z
+
+I got the use case and it is legitimate, but what do you think about creating a new utility class instead of a trait? It would be easier to test and a cleaner design IMO.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-01T16:09:33Z
+
+@dunglas looks good to me as well :)
+Is it better like that ?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-06T16:26:58Z
+
+Last nitpicking (I hope): why using static methods here? A typical class would be cleaner IMO (even if it has no state).
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-07T09:59:06Z
+
+@dunglas I made it static because it is very unlikely to change and to be extended but a typical class is fine for me as well :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-25T16:59:47Z
+
+@Ener-Getick a static API creates hard coupling, and is harder to evolve in the future because of that. So I would prefer using a normal class here
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-25T17:03:57Z
+
+@stof that's already the case except for the `private` methods which are `static`, i don't even remember why.
+I'll make them normal for consistency.

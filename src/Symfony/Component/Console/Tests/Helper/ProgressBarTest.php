@@ -96,6 +96,77 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testRegress()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->start();
+        $bar->advance();
+        $bar->advance();
+        $bar->advance(-1);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    1 [->--------------------------]').
+            $this->generateOutput('    2 [-->-------------------------]').
+            $this->generateOutput('    1 [->--------------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegressWithStep()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->start();
+        $bar->advance(4);
+        $bar->advance(4);
+        $bar->advance(-2);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    4 [---->-----------------------]').
+            $this->generateOutput('    8 [-------->-------------------]').
+            $this->generateOutput('    6 [------>---------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegressMultipleTimes()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream());
+        $bar->start();
+        $bar->advance(3);
+        $bar->advance(3);
+        $bar->advance(-1);
+        $bar->advance(-2);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    3 [--->------------------------]').
+            $this->generateOutput('    6 [------>---------------------]').
+            $this->generateOutput('    5 [----->----------------------]').
+            $this->generateOutput('    3 [--->------------------------]'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
+    public function testRegressBelowMin()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 10);
+        $bar->setProgress(1);
+        $bar->advance(-1);
+        $bar->advance(-1);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '  1/10 [==>-------------------------]  10%'.
+            $this->generateOutput('  0/10 [>---------------------------]   0%'),
+            stream_get_contents($output->getStream())
+        );
+    }
+
     public function testFormat()
     {
         $expected =
@@ -280,18 +351,6 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         $bar = new ProgressBar($this->getOutputStream());
         $bar->setProgress(15);
         $this->assertNotNull($bar->getStartTime());
-    }
-
-    /**
-     * @expectedException        \LogicException
-     * @expectedExceptionMessage You can't regress the progress bar
-     */
-    public function testRegressProgress()
-    {
-        $bar = new ProgressBar($output = $this->getOutputStream(), 50);
-        $bar->start();
-        $bar->setProgress(15);
-        $bar->setProgress(10);
     }
 
     public function testRedrawFrequency()

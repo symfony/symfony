@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-13T23:57:03Z
+
+Why do you consider this as being a new feature? By the way, you should really use the full template in your PR description :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-14T06:15:47Z
+
+I tend to consider that enhancing exception messages is not a bug fix but a DX enhancement, thus new feature. But OK for merging on 2.7 also of course.

@@ -14,12 +14,11 @@ namespace Symfony\Component\PropertyInfo\Extractor;
 use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
-use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\ContextFactory;
-use phpDocumentor\Reflection\Types\Null_;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Util\PhpDocTypeHelper;
 
 /**
  * Extracts data using a PHPDoc parser.
@@ -47,10 +46,16 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
      */
     private $contextFactory;
 
+    /**
+     * @var PhpDocTypeHelper
+     */
+    private $phpDocTypeHelper;
+
     public function __construct(DocBlockFactoryInterface $docBlockFactory = null)
     {
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
         $this->contextFactory = new ContextFactory();
+        $this->phpDocTypeHelper = new PhpDocTypeHelper();
     }
 
     /**
@@ -123,45 +128,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         $types = array();
         /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
         foreach ($docBlock->getTagsByName($tag) as $tag) {
-            $varType = $tag->getType();
-            $nullable = false;
-
-            if (!$varType instanceof Compound) {
-                if ($varType instanceof Null_) {
-                    $nullable = true;
-                }
-
-                $type = $this->createType((string) $varType, $nullable);
-
-                if (null !== $type) {
-                    $types[] = $type;
-                }
-
-                continue;
-            }
-
-            $typeIndex = 0;
-            $varTypes = array();
-            while ($varType->has($typeIndex)) {
-                $varTypes[] = (string) $varType->get($typeIndex);
-                ++$typeIndex;
-            }
-
-            // If null is present, all types are nullable
-            $nullKey = array_search(Type::BUILTIN_TYPE_NULL, $varTypes);
-            $nullable = false !== $nullKey;
-
-            // Remove the null type from the type if other types are defined
-            if ($nullable && count($varTypes) > 1) {
-                unset($varTypes[$nullKey]);
-            }
-
-            foreach ($varTypes as $varType) {
-                $type = $this->createType($varType, $nullable);
-                if (null !== $type) {
-                    $types[] = $type;
-                }
-            }
+            $types = array_merge($types, $this->phpDocTypeHelper->getTypes($tag->getType()));
         }
 
         if (!isset($types[0])) {
@@ -273,91 +240,5 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         }
 
         return array($this->docBlockFactory->create($reflectionMethod, $this->contextFactory->createFromReflector($reflectionMethod)), $prefix);
-    }
-
-    /**
-     * Creates a {@see Type} from a PHPDoc type.
-     *
-     * @param string $docType
-     * @param bool   $nullable
-     *
-     * @return Type|null
-     */
-    private function createType($docType, $nullable)
-    {
-        // Cannot guess
-        if (!$docType || 'mixed' === $docType) {
-            return;
-        }
-
-        if ($collection = '[]' === substr($docType, -2)) {
-            $docType = substr($docType, 0, -2);
-        }
-
-        $docType = $this->normalizeType($docType);
-        list($phpType, $class) = $this->getPhpTypeAndClass($docType);
-
-        $array = 'array' === $docType;
-
-        if ($collection || $array) {
-            if ($array || 'mixed' === $docType) {
-                $collectionKeyType = null;
-                $collectionValueType = null;
-            } else {
-                $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
-                $collectionValueType = new Type($phpType, false, $class);
-            }
-
-            return new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, $collectionKeyType, $collectionValueType);
-        }
-
-        return new Type($phpType, $nullable, $class);
-    }
-
-    /**
-     * Normalizes the type.
-     *
-     * @param string $docType
-     *
-     * @return string
-     */
-    private function normalizeType($docType)
-    {
-        switch ($docType) {
-            case 'integer':
-                return 'int';
-
-            case 'boolean':
-                return 'bool';
-
-            // real is not part of the PHPDoc standard, so we ignore it
-            case 'double':
-                return 'float';
-
-            case 'callback':
-                return 'callable';
-
-            case 'void':
-                return 'null';
-
-            default:
-                return $docType;
-        }
-    }
-
-    /**
-     * Gets an array containing the PHP type and the class.
-     *
-     * @param string $docType
-     *
-     * @return array
-     */
-    private function getPhpTypeAndClass($docType)
-    {
-        if (in_array($docType, Type::$builtinTypes)) {
-            return array($docType, null);
-        }
-
-        return array('object', substr($docType, 1));
     }
 }

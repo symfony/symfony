@@ -27,13 +27,20 @@ class CodeHelper extends Helper
     /**
      * Constructor.
      *
-     * @param string $fileLinkFormat The format for links to source files
-     * @param string $rootDir        The project root directory
-     * @param string $charset        The charset
+     * @param string|array $fileLinkFormat The format for links to source files
+     * @param string       $rootDir        The project root directory
+     * @param string       $charset        The charset
      */
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
-        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        if ($fileLinkFormat && !is_array($fileLinkFormat)) {
+            $i = max(strpos($fileLinkFormat, '%f'), strpos($fileLinkFormat, '%l'));
+            $i = strpos($fileLinkFormat, '#', $i) ?: strlen($fileLinkFormat);
+            $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
+            parse_str($fileLinkFormat[1], $fileLinkFormat[1]);
+        }
+        $this->fileLinkFormat = $fileLinkFormat;
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';
         $this->charset = $charset;
     }
@@ -186,7 +193,14 @@ class CodeHelper extends Helper
     public function getFileLink($file, $line)
     {
         if ($this->fileLinkFormat && is_file($file)) {
-            return strtr($this->fileLinkFormat, array('%f' => $file, '%l' => $line));
+            foreach ($this->fileLinkFormat[1] as $k => $v) {
+                if (0 === strpos($file, $k)) {
+                    $file = substr_replace($file, $v, 0, strlen($k));
+                    break;
+                }
+            }
+
+            return strtr($this->fileLinkFormat[0], array('%f' => $file, '%l' => $line));
         }
 
         return false;

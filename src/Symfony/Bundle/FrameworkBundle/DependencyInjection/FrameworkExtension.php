@@ -90,6 +90,21 @@ class FrameworkExtension extends Extension
         $container->setParameter('kernel.trusted_proxies', $config['trusted_proxies']);
         $container->setParameter('kernel.default_locale', $config['default_locale']);
 
+        if (!$container->hasParameter('debug.file_link_format')) {
+            if (!$container->hasParameter('templating.helper.code.file_link_format')) {
+                $links = array(
+                    'textmate' => 'txmt://open?url=file://%%f&line=%%l',
+                    'macvim' => 'mvim://open?url=file://%%f&line=%%l',
+                    'emacs' => 'emacs://open?url=file://%%f&line=%%l',
+                    'sublime' => 'subl://open?url=file://%%f&line=%%l',
+                );
+                $ide = $config['ide'];
+
+                $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
+            }
+            $container->setParameter('debug.file_link_format', '%templating.helper.code.file_link_format%');
+        }
+
         if (!empty($config['test'])) {
             $loader->load('test.xml');
         }
@@ -120,7 +135,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['templating'])) {
-            $this->registerTemplatingConfiguration($config['templating'], $config['ide'], $container, $loader);
+            $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
         }
 
         $this->registerValidationConfiguration($config['validation'], $container, $loader);
@@ -431,11 +446,6 @@ class FrameworkExtension extends Extension
         }
 
         $definition->replaceArgument(4, $debug);
-
-        if ($container->hasParameter('templating.helper.code.file_link_format')) {
-            $definition->replaceArgument(5, '%templating.helper.code.file_link_format%');
-        }
-
         $definition->replaceArgument(6, $debug);
     }
 
@@ -553,24 +563,12 @@ class FrameworkExtension extends Extension
      * Loads the templating configuration.
      *
      * @param array            $config    A templating configuration array
-     * @param string           $ide
      * @param ContainerBuilder $container A ContainerBuilder instance
      * @param XmlFileLoader    $loader    An XmlFileLoader instance
      */
-    private function registerTemplatingConfiguration(array $config, $ide, ContainerBuilder $container, XmlFileLoader $loader)
+    private function registerTemplatingConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
         $loader->load('templating.xml');
-
-        if (!$container->hasParameter('templating.helper.code.file_link_format')) {
-            $links = array(
-                'textmate' => 'txmt://open?url=file://%%f&line=%%l',
-                'macvim' => 'mvim://open?url=file://%%f&line=%%l',
-                'emacs' => 'emacs://open?url=file://%%f&line=%%l',
-                'sublime' => 'subl://open?url=file://%%f&line=%%l',
-            );
-
-            $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
-        }
 
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
 

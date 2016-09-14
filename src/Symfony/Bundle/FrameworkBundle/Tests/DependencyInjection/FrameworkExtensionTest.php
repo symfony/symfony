@@ -359,7 +359,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('full');
 
-        $this->assertEquals('file%link%format', $container->getParameter('templating.helper.code.file_link_format'));
+        $this->assertEquals('file%link%format', $container->getParameter('debug.file_link_format'));
     }
 
     public function testValidationAnnotations()

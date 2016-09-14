@@ -44,7 +44,7 @@
 
         <service id="templating.helper.code" class="Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper">
             <tag name="templating.helper" alias="code" />
-            <argument>%templating.helper.code.file_link_format%</argument>
+            <argument>%debug.file_link_format%</argument>
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
         </service>

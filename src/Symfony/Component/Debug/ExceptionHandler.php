@@ -37,9 +37,16 @@ class ExceptionHandler
 
     public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
     {
+        $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        if ($fileLinkFormat && !is_array($fileLinkFormat)) {
+            $i = max(strpos($fileLinkFormat, '%f'), strpos($fileLinkFormat, '%l'));
+            $i = strpos($fileLinkFormat, '#', $i) ?: strlen($fileLinkFormat);
+            $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
+            parse_str($fileLinkFormat[1], $fileLinkFormat[1]);
+        }
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
-        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
+        $this->fileLinkFormat = $fileLinkFormat;
     }
 
     /**
@@ -82,14 +89,22 @@ class ExceptionHandler
     /**
      * Sets the format for links to source files.
      *
-     * @param string $format The format for links to source files
+     * @param string|array $format The format for links to source files
      *
      * @return string The previous file link format
      */
-    public function setFileLinkFormat($format)
+    public function setFileLinkFormat($fileLinkFormat)
     {
         $old = $this->fileLinkFormat;
-        $this->fileLinkFormat = $format;
+        if ($fileLinkFormat && !is_array($fileLinkFormat)) {
+            $i = strpos($fileLinkFormat, '#') ?: strlen($fileLinkFormat);
+            $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
+            parse_str($fileLinkFormat[1], $fileLinkFormat[1]);
+        }
+        $this->fileLinkFormat = $fileLinkFormat;
+        if ($old) {
+            $old = $old[0].($old[1] ? '#'.http_build_query($old[1], '', '&') : '');
+        }
 
         return $old;
     }
@@ -350,16 +365,21 @@ EOF;
 
     private function formatPath($path, $line)
     {
-        $path = $this->escapeHtml($path);
-        $file = preg_match('#[^/\\\\]*$#', $path, $file) ? $file[0] : $path;
+        $file = $this->escapeHtml(preg_match('#[^/\\\\]*+$#', $path, $file) ? $file[0] : $path);
 
-        if ($linkFormat = $this->fileLinkFormat) {
-            $link = strtr($this->escapeHtml($linkFormat), array('%f' => $path, '%l' => (int) $line));
+        if ($fileLinkFormat = $this->fileLinkFormat) {
+            foreach ($fileLinkFormat[1] as $k => $v) {
+                if (0 === strpos($path, $k)) {
+                    $path = substr_replace($path, $v, 0, strlen($k));
+                    break;
+                }
+            }
+            $link = strtr($fileLinkFormat[0], array('%f' => $path, '%l' => (int) $line));
 
-            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $link, $file, $line);
+            return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $this->escapeHtml($link), $file, $line);
         }
 
-        return sprintf(' in <a title="%s line %3$d">%s line %d</a>', $path, $file, $line);
+        return sprintf(' in <a title="%s line %3$d">%s line %d</a>', $this->escapeHtml($path), $file, $line);
     }
 
     /**

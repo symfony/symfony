@@ -17,7 +17,7 @@
             <argument>-1</argument><!-- Log levels map for enabled error levels -->
             <argument>%debug.error_handler.throw_at%</argument>
             <argument>true</argument>
-            <argument>null</argument><!-- %templating.helper.code.file_link_format% -->
+            <argument>%debug.file_link_format%</argument>
             <argument>true</argument>
         </service>
 

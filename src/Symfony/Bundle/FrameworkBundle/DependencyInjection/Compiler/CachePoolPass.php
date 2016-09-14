@@ -37,6 +37,7 @@ class CachePoolPass implements CompilerPassInterface
             }
         }
 
+        $aliases = $container->getAliases();
         $attributes = array(
             'provider',
             'namespace',
@@ -57,7 +58,10 @@ class CachePoolPass implements CompilerPassInterface
                 $tags[0]['namespace'] = $this->getNamespace($namespaceSuffix, $id);
             }
             if (isset($tags[0]['clearer'])) {
-                $clearer = $container->getDefinition($tags[0]['clearer']);
+                $clearer = strtolower($tags[0]['clearer']);
+                while (isset($aliases[$clearer])) {
+                    $clearer = (string) $aliases[$clearer];
+                }
             } else {
                 $clearer = null;
             }
@@ -78,7 +82,7 @@ class CachePoolPass implements CompilerPassInterface
             }
 
             if (null !== $clearer) {
-                $clearer->addMethodCall('addPool', array(new Reference($id)));
+                $pool->addTag('cache.pool', array('clearer' => $clearer));
             }
         }
     }

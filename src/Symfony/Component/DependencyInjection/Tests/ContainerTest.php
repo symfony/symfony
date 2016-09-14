@@ -126,7 +126,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
+        $this->assertEquals(array('internal', 'bar', 'foo_bar', 'foo.baz', 'env_dependent_one', 'env_dependent_two', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -319,6 +319,52 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($clone->isPrivate());
     }
 
+    public function testEnvironmentVariablesFromGetenv()
+    {
+        $c = new ProjectServiceContainer();
+
+        unset($_ENV['SYMFONY_TEST_FOO_ONE']);
+        putenv('SYMFONY_TEST_FOO_ONE=foo');
+
+        $this->assertSame('foo', $c->get('env_dependent_one'));
+        putenv('SYMFONY_TEST_FOO_ONE');
+    }
+
+    public function testEnvironmentVariablesFromEnvGlobal()
+    {
+        $c = new ProjectServiceContainer();
+
+        putenv('SYMFONY_TEST_FOO_ONE');
+        $_ENV['SYMFONY_TEST_FOO_ONE'] = 'bar';
+
+        $this->assertSame('bar', $c->get('env_dependent_one'));
+        unset($_ENV['SYMFONY_TEST_FOO_ONE']);
+    }
+
+    /**
+     * @expectedException Symfony\Component\DependencyInjection\Exception\EnvironmentVariableNotFoundException
+     * @expectedExceptionMessage You have requested a non-existent environment variable "SYMFONY_TEST_FOO_ONE".
+     */
+    public function testEnvironmentVariablesThrowsWhenNotSetWithoutDefault()
+    {
+        $c = new ProjectServiceContainer();
+
+        unset($_ENV['SYMFONY_TEST_FOO_ONE']);
+        putenv('SYMFONY_TEST_FOO_ONE');
+
+        $c->get('env_dependent_one');
+    }
+
+    public function testEnvironmentVariablesReturnsDefaultWhenNotSet()
+    {
+        $c = new ProjectServiceContainer();
+
+        unset($_ENV['SYMFONY_TEST_FOO_TWO']);
+        putenv('SYMFONY_TEST_FOO_TWO');
+
+        $this->assertSame('xyzzy', $c->get('env_dependent_two'));
+    }
+
     /**
      * @group legacy
      * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
@@ -421,6 +467,16 @@ class ProjectServiceContainer extends Container
     protected function getFoo_BazService()
     {
         return $this->__foo_baz;
+    }
+
+    protected function getEnvDependentOneService()
+    {
+        return $this->getEnvironmentVariable('SYMFONY_TEST_FOO_ONE');
+    }
+
+    protected function getEnvDependentTwoService()
+    {
+        return $this->getEnvironmentVariable('SYMFONY_TEST_FOO_TWO', 'xyzzy');
     }
 
     protected function getCircularService()

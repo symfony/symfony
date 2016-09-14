@@ -34,6 +34,7 @@ class NodeBuilder implements NodeParentInterface
             'float' => __NAMESPACE__.'\\FloatNodeDefinition',
             'array' => __NAMESPACE__.'\\ArrayNodeDefinition',
             'enum' => __NAMESPACE__.'\\EnumNodeDefinition',
+            'expression' => __NAMESPACE__.'\\ExpressionNodeDefinition',
         );
     }
 
@@ -133,6 +134,18 @@ class NodeBuilder implements NodeParentInterface
     public function variableNode($name)
     {
         return $this->node($name, 'variable');
+    }
+
+    /**
+     * Creates a child variable node.
+     *
+     * @param string $name The name of the node
+     *
+     * @return VariableNodeDefinition The builder of the child node
+     */
+    public function expressionNode($name)
+    {
+        return $this->node($name, 'expression');
     }
 
     /**

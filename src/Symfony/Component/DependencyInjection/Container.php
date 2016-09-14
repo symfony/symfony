@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Exception\EnvironmentVariableNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
@@ -371,6 +372,23 @@ class Container implements ResettableContainerInterface
     public static function underscore($id)
     {
         return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), str_replace('_', '.', $id)));
+    }
+
+    protected function getEnvironmentVariable($name, $default = null)
+    {
+        if (isset($_ENV[$name])) {
+            return $_ENV[$name];
+        }
+
+        if (false !== $value = getenv($name)) {
+            return $value;
+        }
+
+        if (2 > func_num_args()) {
+            throw new EnvironmentVariableNotFoundException($name);
+        }
+
+        return $default;
     }
 
     private function __clone()

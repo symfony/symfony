@@ -442,14 +442,18 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateServiceWithExpression()
     {
+        putenv('SYMFONY_TEST_ENVIRONMENT_VAR=quux');
+
         $builder = new ContainerBuilder();
         $builder->setParameter('bar', 'bar');
         $builder->register('bar', 'BarClass');
-        $builder->register('foo', 'Bar\FooClass')->addArgument(array('foo' => new Expression('service("bar").foo ~ parameter("bar")')));
+        $builder->register('foo', 'Bar\FooClass')->addArgument(array('foo' => new Expression('service("bar").foo ~ parameter("bar") ~ env("SYMFONY_TEST_ENVIRONMENT_VAR")')));
 
         $builder->compile();
 
-        $this->assertEquals('foobar', $builder->get('foo')->arguments['foo']);
+        $this->assertEquals('foobarquux', $builder->get('foo')->arguments['foo']);
+
+        putenv('SYMFONY_TEST_ENVIRONMENT_VAR');
     }
 
     public function testResolveServices()

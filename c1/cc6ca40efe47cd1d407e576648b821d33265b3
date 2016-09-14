@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T00:20:26Z
+
+I don't understand why quiet and interactive would be tied. I made this decoupling consciously back then. It looks more flexible. So, I'm 👎 for this change.
+
+---------------------------------------------------------------------------
+
+by phansys at 2016-09-14T00:42:24Z
+
+I understand your concern about the responsibilities, but the fact I'm exposing here is that isn't possible to interact with a command when it is executed in quiet mode, given the command isn't able to prompt for any input or provide any kind of response to the user. For this reason, I think a method called `isInteractive()` must return `false` when the command isn't allowed to interact with the user at all.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T20:27:04Z
+
+Ah, understood now. Indeed, if even the questions are not displayed, that does not really make sense to have an interactive quiet command :)

@@ -41,6 +41,29 @@ FrameworkBundle
   * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
     be automatically used when available.
 
+HttpFoundation
+---------------
+
+  * Extending the following methods of `Response`
+    is deprecated (these methods will be `final` in 4.0):
+
+     - `setDate`/`getDate`
+     - `setExpires`/`getExpires`
+     - `setLastModified`/`getLastModified`
+     - `setProtocolVersion`/`getProtocolVersion`
+     - `setStatusCode`/`getStatusCode`
+     - `setCharset`/`getCharset`
+     - `setPrivate`/`setPublic`
+     - `getAge`
+     - `getMaxAge`/`setMaxAge`
+     - `setSharedMaxAge`
+     - `getTtl`/`setTtl`
+     - `setClientTtl`
+     - `getEtag`/`setEtag`
+     - `hasVary`/`getVary`/`setVary`
+     - `isInvalid`/`isSuccessful`/`isRedirection`/`isClientError`/`isServerError`
+     - `isOk`/`isForbidden`/`isNotFound`/`isRedirect`/`isEmpty`
+
 Validator
 ---------
 

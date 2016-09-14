@@ -25,6 +25,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -33,7 +34,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ContainerBuilder extends Container implements TaggedContainerInterface
+class ContainerBuilder extends Container implements TaggedContainerInterface, ContextualizedContainerBuilderInterface
 {
     /**
      * @var ExtensionInterface[]
@@ -89,7 +90,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $usedTags = array();
 
+    private $context;
+
     private $compiled = false;
+
+    /**
+     * @param ParameterBagInterface|null $parameterBag A ParameterBagInterface instance
+     * @param Context|null               $context      A Context instance, or null
+     */
+    public function __construct(ParameterBagInterface $parameterBag = null, Context $context = null)
+    {
+        parent::__construct($parameterBag);
+
+        $this->context = $context ?: Context::create();
+    }
 
     /**
      * Sets the track resources flag.
@@ -1016,6 +1030,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $services;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContext()
+    {
+        return $this->context;
     }
 
     /**

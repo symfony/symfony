@@ -198,6 +198,10 @@ class Translator implements TranslatorInterface, TranslatorBagInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
+        $parameters = array_merge(array(
+            '%count%' => $number,
+        ), $parameters);
+
         if (null === $domain) {
             $domain = 'messages';
         }

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-07-31T12:27:51Z
+
+Anything not related to this new feature should be removed as it would make merging old branches more difficult (and they don't bring any value anyway).
+
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-08-29T17:14:04Z
+
+rebased and all comments addressed

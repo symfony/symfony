@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-31T17:00:07Z
+
+This new behavior can be tested by updating the `TranslatorTest::getTransChoiceTests` and removing `%count%` from the given parameters.
+Also a new tests case should ensure that the `%count%` placeholder is overwritable if passed as parameter :)
+
+---------------------------------------------------------------------------
+
+by bocharsky-bw at 2016-08-31T19:57:24Z
+
+Hey @ogizanagi , thanks for your help!

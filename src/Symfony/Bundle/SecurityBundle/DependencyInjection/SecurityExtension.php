@@ -493,15 +493,8 @@ class SecurityExtension extends Extension
             );
         }
 
-        // message digest encoder
-        return array(
-            'class' => 'Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder',
-            'arguments' => array(
-                $config['algorithm'],
-                $config['encode_as_base64'],
-                $config['iterations'],
-            ),
-        );
+        // run-time configured encoder
+        return $config;
     }
 
     // Parses user providers and returns an array of their ids

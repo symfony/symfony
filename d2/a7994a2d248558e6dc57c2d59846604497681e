@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-07-01T08:23:22Z
+
+Such BC break cannot be done in 3.x
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-07-01T08:27:39Z
+
+@Stof I was unsure about that, as for me this is a serious bug in the current behaviour.
+
+If that is not possible the only way would be option 2 and 3 where I would prefer 2.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-01T08:30:56Z
+
+Could this target 4.x? Not sure this is common.. but master could trigger a deprecation error about changing behavior in 4.x right?
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-07-01T08:32:29Z
+
+master could introduce the deprecation, so option 2 or 3 should be possible.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-07-01T08:38:45Z
+
+Yeah, but option 1 would be ideal right? I.e. option 1 & 2 are practically the same, it just proposes to rename the option.. which isnt necessarily needed imo.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-07-01T08:56:58Z
+
+Yes, it would be great to fix it without the rename, lets see.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-07-10T07:23:43Z
+
+Options 2 or 3 are the only viable solutions, to preserve BC and enable a continuous upgrade path.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-07-10T08:05:48Z
+
+If noone has a good use case for being able to switch the behaviour of the constraint, I would deprecate setting the `strict` option to `false` and change the default value of it in `4.0`.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-07-10T09:43:47Z
+
+Updated accordingly. The open decision is if we want to deprecate the entire option or just the default value and as later still allow setting it to false.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-07-13T05:38:06Z
+
+Should be good to go from my end now.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-08-08T06:52:36Z
+
+Any further feedback?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-08-08T08:02:00Z
+
+Can you update the upgrade file for 4.0 too please? Besides that the changes look good to me.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2016-08-08T09:44:20Z
+
+Updated. Besides that the BC Break can be removed as the current solution does not contain any BC break.

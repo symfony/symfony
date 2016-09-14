@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-13T17:53:50Z
+
+Any update about this one ? Should it rather be considered as a new feature as this implementation is missing since the introduction of the yaml dumper ?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-13T23:49:17Z
+
+As the test is marked as skipped by mentioning specifically that this is not supported, I would say that this is indeed a new feature that needs to be merged in master.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-13T23:49:26Z
+
+Can you update the PR accordingly? Thanks.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-14T08:49:30Z
+
+@fabpot : PR description updated, branch rebased and target changed. Thanks for your answer :)
+
+I guess #19480 may be considered the same way ?
+Then, I'll update the PR once this one is merged in order to resolve conflicts.

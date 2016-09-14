@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-07T11:21:11Z
+
+ping @hboomsma since you wrote this line in #17063: any comment here?
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2016-09-07T11:30:19Z
+
+@nicolas-grekas I original also added the part that would listen to the umask, but that would have been a BC break, so I left it out. I do support the idea of adding it.
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-08T08:45:31Z
+
+@leofeyer can you please rebase so that the merge commit goes away?
+
+---------------------------------------------------------------------------
+
+by leofeyer at 2016-09-08T09:14:36Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-11T09:45:53Z
+
+I'd be :+1: here, looks consistent to me.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-09-12T08:28:13Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by hboomsma at 2016-09-12T09:04:04Z
+
+:+1:

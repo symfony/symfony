@@ -365,7 +365,7 @@ class Application
      * Adds an array of command objects.
      *
      * If a Command is not enabled it will not be added.
-     * 
+     *
      * @param Command[] $commands An array of commands
      */
     public function addCommands(array $commands)
@@ -791,6 +791,7 @@ class Application
 
         if (true === $input->hasParameterOption(array('--quiet', '-q'), true)) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
+            $input->setInteractive(false);
         } else {
             if ($input->hasParameterOption('-vvv', true) || $input->hasParameterOption('--verbose=3', true) || $input->getParameterOption('--verbose', false, true) === 3) {
                 $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);

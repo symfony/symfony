@@ -680,7 +680,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('provider')
                                         ->info('The service name to use as provider when the specified adapter needs one.')
                                     ->end()
-                                    ->scalarNode('clearer')->defaultValue('cache.default_clearer')->end()
+                                    ->scalarNode('clearer')->end()
                                 ->end()
                             ->end()
                             ->validate()

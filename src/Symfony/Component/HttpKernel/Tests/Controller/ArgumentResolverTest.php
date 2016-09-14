@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\VariadicValueResolv
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\NullableController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\VariadicController;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -200,6 +201,32 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('bar', 'foo');
         $controller = array($this, 'controllerWithFooAndDefaultBar');
         $resolver->getArguments($request, $controller);
+    }
+
+    /**
+     * @requires PHP 7.1
+     */
+    public function testGetNullableArguments()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('foo', 'foo');
+        $request->attributes->set('bar', new \stdClass());
+        $request->attributes->set('mandatory', 'mandatory');
+        $controller = array(new NullableController(), 'action');
+
+        $this->assertEquals(array('foo', new \stdClass(), 'value', 'mandatory'), self::$resolver->getArguments($request, $controller));
+    }
+
+    /**
+     * @requires PHP 7.1
+     */
+    public function testGetNullableArgumentsWithDefaults()
+    {
+        $request = Request::create('/');
+        $request->attributes->set('mandatory', 'mandatory');
+        $controller = array(new NullableController(), 'action');
+
+        $this->assertEquals(array(null, null, 'value', 'mandatory'), self::$resolver->getArguments($request, $controller));
     }
 
     public function __invoke($foo, $bar = null)

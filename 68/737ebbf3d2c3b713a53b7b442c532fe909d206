@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-07-30T16:17:22Z
+
+I think this is ready for reviews.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-08-01T11:03:27Z
+
+Updated
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-08-01T12:19:27Z
+
+Added tests for the warmer.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-01T14:49:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2016-08-02T11:35:21Z
+
+@tgalopin only have a question about performances.
+Nicolas said at SymfonyLive that for now doctrine is a little bit more performant than Symfony cache.
+Is this PR intended to improve performance or/and to implement Cache component ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-02T11:41:36Z
+
+@mickaelandrieu I also said that the difference in terms of performance was negligible and that we shouldn't care. In fact, PhpArrayAdapter is faster than Doctrine (for what it means :) ).

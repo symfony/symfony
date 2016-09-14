@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-09-01T12:14:53Z
+
+@dunglas https://3v4l.org/3Vb4g if this is how you would expect it to work, I'd say it's nullable as default as long as it doesn't have a default value.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-01T12:21:37Z
+
+@iltar looks good: https://3v4l.org/rn5gR
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-09-01T12:23:52Z
+
+@dunglas the problem is that it's not really nullable anymore. For the old 2.7, 2.8 and 3.0 it's fine, but for the new variant (argument value resolver) this is not a good solution imo. If I ask if something is nullable, I refer to the `?string` feature, while right now with allows null without type, `$foo = ''` is also nullable, e.g. it won't crash when called with null.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-01T12:26:44Z
+
+@iltar but it will never happen because of https://github.com/symfony/symfony/pull/19811/files#diff-8518ab757bc9acd6d5a874a2e2737502R133 or am I missing something?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-09-01T12:28:53Z
+
+@dunglas no, for this case it's fine, I'm referring to https://github.com/symfony/symfony/pull/19784/files#diff-d298199ac90f557ade8fffe47ab3f755R98
+
+While not directly related to this PR, it's a small detail difference.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-07T04:51:00Z
+
+👍

@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-08-25T16:21:29Z
+
+Regarding mocks, could we skip the warning for common mocking libraries ? At least PHPunit_MockObject and Prophecy are easy to detect, as their doubles are implementing an interface (``\PHPUnit_Framework_MockObject_MockObject`` for PHPUnit and ``\Prophecy\Doubler\DoubleInterface`` for Prophecy). I don't know Mockery, but it may be the same.
+
+This would avoid causing issues for people mocking the Response class for other methods (Prophecy does not allow doing partial mocking for instance).
+
+@symfony/deciders what do you think ?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-25T16:55:21Z
+
+@stof fixed using `get_parent_class` when necessary. For Mockery it looks like its mocks aren't extending the mocked class so it won't change anything.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-26T12:09:56Z
+
+rebase unlocked
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-27T23:44:47Z
+
+@nicolas-grekas i already removed these commits.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-08-29T07:45:37Z
+
+@Ener-Getick could we estimate the performance hit related to the code added in the `Response` class (if any)? Thanks!
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-08-29T09:45:38Z
+
+@javiereguiluz that's hard to benchmark but when I run `ResponseTest` in different conditions, I have no significant results (maybe a difference of 1 or 2ms and it originally took ~50ms).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-31T07:47:22Z
+
+:+1: nice trick for eventually fixing these type hints in 4.0.
+performance shouldn't be an issue: the new code is quick, and Response aren't instantiated that often.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-09-01T10:19:37Z
+
+At the same time, would you like to make `final` other methods of `Response`?
+
+I think we can make final those methods:
+- `setContent`/`getContent`
+- `setProtocolVersion`/`getProtocolVersion`
+- `setStatusCode`/`getStatusCode`
+- `setCharset`/`getCharset`
+- `setPrivate`/`setPublic`
+- `getAge`
+- `getMaxAge`/`setMaxAge`
+- `setSharedMaxAge`
+- `getTtl`/`setTtl`
+- `setClientTtl`
+- `getEtag`/`setEtag`
+- `hasVary`/`getVary`/`setVary`
+- `isInvalid`/`isSuccessful`/`isRedirection`/`isClientError`/`isServerError`
+- `isOk`/`isForbidden`/`isNotFound`/`isRedirect`/`isEmpty`
+
+Or is that too much? I think we can deprecate extending most methods and see if people complain about some deprecations. It won't break any applications and would make bc easier if this methods actually aren't extended (which should be the case as their content is very generic).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-01T17:32:56Z
+
+The Response object is a data object that should be very "stable" (as HTTP is stable). So, I would say that extending most of the methods do not make sense indeed... if someone needs to do that, it's probably a bug that we should fix instead.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-09-01T18:05:07Z
+
+Ok, done.
+The following methods will still be extendable (if you think we should also deprecate extensing some of them):
+- `create`
+- `__clone`
+- `prepare`
+- `send`/`sendHeaders`/`sendContent`
+- `isCacheable`/`isFresh`
+- `isValidateable`/`mustRevalidate`
+- `expire`
+- `setCache`
+- `setNotModified`/`isNotModified`
+- `closeOutputBuffers`
+- `ensureIEOverSSLCompatibility` (maybe this one should be made `@internal`)
+
+Edit: we can't deprecate extending `setContent` and `getContent` as they are extended in symfony's specialized responses.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-09-02T09:46:42Z
+
+@Ener-Getick `setContent()` is also [overridden by laravel](https://github.com/illuminate/http/blob/master/Response.php#L28). Before proceeding with this PR, we should check if there are any popular libraries extending methods you propose to make final.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-09-02T17:08:07Z
+
+Sure i don't think i'll have the time this week-end but maybe next week.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-14T08:38:26Z
+
+I'm :+1: with the updated list

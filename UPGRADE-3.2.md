@@ -94,6 +94,22 @@ Validator
    }
    ```
 
+ * Setting the strict option of the `Choice` Constraint to `false` has been
+   deprecated and the option will be changed to `true` as of 4.0.
+
+   ```php
+   // ...
+   use Symfony\Component\Validator\Constraints as Assert;
+
+   class MyEntity
+   {
+       /**
+        * @Assert\Choice(choices={"MR", "MRS"}, strict=true)
+        */
+       private $salutation;
+   }
+   ```
+
 Yaml
 ----
 

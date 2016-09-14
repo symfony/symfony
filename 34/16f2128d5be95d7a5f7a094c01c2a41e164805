@@ -1,0 +1,184 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-08-30T20:25:21Z
+
+Actually I just realized that the `usort` function is not stable :(
+
+http://www.php.net/manual/en/function.usort.php
+
+`"If two members compare as equal, their relative order in the sorted array is undefined."`
+
+This means we would have to sort differently to be 100% sure there is no BC break?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-30T22:18:05Z
+
+What about using the ~~`PriorityTaggedServiceTrait` ?~~ (or at least a `\SplPriorityQueue` like other passes like the `AddSecurityVotersPass` or `DecoratorServicePass` ones ?)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-08-31T07:15:58Z
+
+It seems that also `\SplPriorityQueue` will not preserve the initial order of elements if the priority is equal (meaning its not a "stable sort"):
+
+http://php.net/manual/de/class.splpriorityqueue.php#117067
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-31T07:30:36Z
+
+@dmaicher There is no stable sorting by default either as it depends on the order of the services registration (which is not predictable unless using a custom pass, not sure it is worth it in that case though), and this is partially responsible for the issue you're trying to solve.
+
+~~I don't see why you shouldn't use the trait.~~
+
+Currently form type extensions cannot rely on other extensions, at least handling priorities will solve this.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-08-31T07:41:28Z
+
+@HeahDude But as you said currently without priorities it depends on the order of service registration. If we introduce a non-stable sorting then it might be a BC break though as the order of service registration is not 100% guaranteed to be used anymore for the form extensions (when all extensions have equal priority 0)?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-31T07:45:25Z
+
+>currently without priorities it depends on the order of service registration
+
+What I'm saying is that this order is not reliable already, so it is an acceptable BC break IMO because it does not change anything unless some extensions rely on each other, which is buggy right now unless using your new feature :)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-08-31T07:47:37Z
+
+@HeahDude Ok now I see what you mean :blush: If this "BC break" is acceptable then I can surely change it :smile:
+
+Other opinions on that?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-31T10:22:25Z
+
+You can still use [the trait][1] as inspiration and maybe play around with the existing function.
+
+[1]: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Compiler/PriorityTaggedServiceTrait.php
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-08-31T17:05:15Z
+
+I changed it to use `\SplPriorityQueue` now :wink:
+
+If all agree this feature is useful as is I could prepare a PR for the docs?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-31T19:11:34Z
+
+Relying on the order is it really something we want to support? Do we have enough real-world use cases? Nobody ever had this issue in the last 5 years, so I'm wondering if we really need to support this.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-08-31T22:53:42Z
+
+Form type extensions are meant to decouple specific configuration, thus may add options to resolve. So on one hand I agree, this is maybe covering edge cases where one need to handle that kind of option globally.
+But on the other hand, the logical solution is to use an extension and in such cases having a full control of the order has a significant importance, otherwise it's just unpredictable.
+
+Actually resolving the form configuration is why we need this composite pattern, and the process works well because it is mainly based on inheritance which do keep an order, so if we can support it for extensions too, I guess we should.
+
+Good things:
+ - DX: user is in full control ([workaround](https://github.com/symfony/symfony/issues/19735#issuecomment-243045540) from @javiereguiluz is good but not enough, and neither is [mine](https://github.com/symfony/symfony/issues/19735#issuecomment-243263371), the option may be undefined and [throw an exception](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/OptionsResolver/OptionsResolver.php#L404) or implies to [define](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/OptionsResolver/OptionsResolver.php#L329) it first which is definitely not user friendly),
+ - Perf: it is handled in the compiler pass so no runtime overhead,
+ - Design: this is consistent with the composite pattern: options, form and view are resolved from the higher parent to lowest priority extension,
+
+Bad things:
+ - This is not a bug fix, so master only :troll face:
+
+Anyway thank you @dmaicher for proposing this feature.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-09-01T07:49:11Z
+
+I would also agree with @HeahDude. I don't see any disadvantages of having this really small (+10, -3 LOC excluding tests) feature. Sure maybe not so many people will use it but currently the behaviour is a bit unpredictable for the order of form type extensions which is quite bad imho :cry:
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-09-03T14:13:37Z
+
+@dmaicher After re-reading this, I still think you should use the trait and change only [this line](https://github.com/symfony/symfony/pull/19790/files#diff-a5475cdc6eb4006880d92f461fba8034R51), you can then keep the same logic as before to handle the indexation by extended type but you'll create the priority job only once which will also use only one instance one `SplPriorityQueue` since anyway by default no extension will have a priority set (keeping the same old unpredictable behavior ;).
+
+I think that is is a good thing too because in the future if there is some issue about extensions overriding each other we will be able to solve it thanks to this feature.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-09-04T08:01:25Z
+
+@HeahDude
+
+with this
+
+```php
+foreach ($this->findAndSortTaggedServices('form.type_extension', $container) as $reference) {
+    ...
+}
+```
+
+I just have a sorted list of service `Reference` objects. How do I get the `extended_type` info then from the tags?
+
+But I think you are right about sorting all extensions globally though :blush: Might make more sense.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-04T09:44:21Z
+
+@dmaicher : The `Reference` instance converted to string gives you the service id. Just get the definition back from it, and access the tags :)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-09-04T10:10:43Z
+
+@HeahDude @ogizanagi changed it :wink: :+1:
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-09-04T10:22:33Z
+
+LGTM Thanks @dmaicher :)
+
+So what the conclusion here? ping __@symfony/deciders__
+
+@dmaicher If this is accepted you'll have to update the framework bundle changelog file as well.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-06T09:31:47Z
+
+@dmaicher can you please update the CHANGELOG file of the component?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-09-08T16:10:57Z
+
+@nicolas-grekas done :wink:  Let me know if I need to change anything else
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-09-08T20:23:19Z
+
+@dmaicher Can you please update the description too (tests are passing now :) and submit a PR in the docs? Thanks again!
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-09-09T16:49:19Z
+
+@HeahDude done :wink:
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-09-09T16:53:35Z
+
+👍
+
+Status: Reviewed

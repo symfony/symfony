@@ -27,6 +27,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -1041,6 +1042,12 @@ class FrameworkExtension extends Extension
 
         if (class_exists(YamlEncoder::class) && defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
             $definition = $container->register('serializer.encoder.yaml', YamlEncoder::class);
+            $definition->setPublic(false);
+            $definition->addTag('serializer.encoder');
+        }
+
+        if (class_exists(CsvEncoder::class)) {
+            $definition = $container->register('serializer.encoder.csv', CsvEncoder::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.encoder');
         }

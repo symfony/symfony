@@ -81,7 +81,23 @@ class ParameterBag implements ParameterBagInterface
                 }
             }
 
-            throw new ParameterNotFoundException($name, null, null, null, $alternatives);
+            $nonNestedAlternative = null;
+            if (!count($alternatives) && false !== strpos($name, '.')) {
+                $namePartsLength = array_map('strlen', explode('.', $name));
+                $key = substr($name, 0, -1 * (1 + array_pop($namePartsLength)));
+                while (count($namePartsLength)) {
+                    if ($this->has($key)) {
+                        if (is_array($this->get($key))) {
+                            $nonNestedAlternative = $key;
+                        }
+                        break;
+                    }
+
+                    $key = substr($key, 0, -1 * (1 + array_pop($namePartsLength)));
+                }
+            }
+
+            throw new ParameterNotFoundException($name, null, null, null, $alternatives, $nonNestedAlternative);
         }
 
         return $this->parameters[$name];

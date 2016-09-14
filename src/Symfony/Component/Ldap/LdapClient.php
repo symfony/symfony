@@ -70,7 +70,8 @@ final class LdapClient implements LdapClientInterface
             $resultEntry = array();
 
             foreach ($entry->getAttributes() as $attribute => $values) {
-                $resultAttribute = $values;
+                $resultAttribute = array();
+                $resultAttribute[] = $values;
 
                 $resultAttribute['count'] = count($values);
                 $resultEntry[] = $resultAttribute;

@@ -231,7 +231,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function extractFromReflectionType(\ReflectionType $reflectionType)
     {
-        $phpTypeOrClass = (string) $reflectionType;
+        $phpTypeOrClass = method_exists($reflectionType, 'getName') ? $reflectionType->getName() : (string) $reflectionType;
         $nullable = $reflectionType->allowsNull();
 
         if ($reflectionType->isBuiltin()) {

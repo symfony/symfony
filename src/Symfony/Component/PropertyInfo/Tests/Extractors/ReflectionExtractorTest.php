@@ -94,6 +94,25 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider php71TypesProvider
+     * @requires PHP 7.1
+     */
+    public function testExtractPhp71Type($property, array $type = null)
+    {
+        $this->assertEquals($type, $this->extractor->getTypes('Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy', $property, array()));
+    }
+
+    public function php71TypesProvider()
+    {
+        return array(
+            array('foo', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true))),
+            array('bar', array(new Type(Type::BUILTIN_TYPE_INT, true))),
+            array('baz', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
+            array('donotexist', null),
+        );
+    }
+
     public function testIsReadable()
     {
         $this->assertFalse($this->extractor->isReadable('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy', 'bar', array()));

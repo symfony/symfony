@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-16T15:13:31Z
+
+@ggottwald Can you update the empty title to something relevant? Thanks.
+
+---------------------------------------------------------------------------
+
+by ggottwald at 2016-08-18T09:07:41Z
+
+https://gist.github.com/ggottwald/07194dc7926ae9093b773ec2297116f3
+The changes will fix a warning with HHVM opening an empty directory. Any other ideas resolving this issue? I will also open an issue at HHVM.
+
+---------------------------------------------------------------------------
+
+by ggottwald at 2016-08-18T09:19:49Z
+
+https://github.com/facebook/hhvm/issues/7281
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-23T07:22:24Z
+
+@ggottwald could you please add a test case?
+
+---------------------------------------------------------------------------
+
+by ggottwald at 2016-08-31T06:25:37Z
+
+Sorry for the late response. Until now I was not able to force a catchable warning in the test.
+In production I got a errorhandler catching the warning and throws an exception. I didn't find a way to reproduce this in the unittest.
+This fix would also only be a workaround of a HHVM bug. Maybe we wait until it's fixed on their side.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-06T10:02:48Z
+
+:+1:
+Status: reviewed

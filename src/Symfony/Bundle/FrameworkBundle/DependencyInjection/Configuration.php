@@ -568,7 +568,7 @@ class Configuration implements ConfigurationInterface
                     ->info('validation configuration')
                     ->canBeEnabled()
                     ->children()
-                        ->scalarNode('cache')->defaultValue('validator.mapping.cache.symfony')->end()
+                        ->scalarNode('cache')->end()
                         ->booleanNode('enable_annotations')->defaultFalse()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(array('loadValidatorMetadata'))

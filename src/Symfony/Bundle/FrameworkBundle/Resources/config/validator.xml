@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="validator.mapping.cache.prefix" />
+        <parameter key="validator.mapping.cache.file">%kernel.cache_dir%/validation.php</parameter>
     </parameters>
 
     <services>
@@ -28,8 +29,21 @@
 
         <service id="validator.mapping.class_metadata_factory" alias="validator" public="false" />
 
-        <service id="validator.mapping.cache.symfony" class="Symfony\Component\Validator\Mapping\Cache\Psr6Cache" public="false">
+        <service id="validator.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer" public="false">
+            <argument type="service" id="validator.builder" />
+            <argument>%validator.mapping.cache.file%</argument>
             <argument type="service" id="cache.validator" />
+            <tag name="kernel.cache_warmer" />
+        </service>
+
+        <service id="validator.mapping.cache.symfony" class="Symfony\Component\Validator\Mapping\Cache\Psr6Cache" public="false">
+            <argument type="service">
+                <service class="Symfony\Component\Cache\Adapter\PhpArrayAdapter">
+                    <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create" />
+                    <argument>%validator.mapping.cache.file%</argument>
+                    <argument type="service" id="cache.validator" />
+                </service>
+            </argument>
         </service>
 
         <service id="validator.mapping.cache.doctrine.apc" class="Symfony\Component\Validator\Mapping\Cache\DoctrineCache" public="false">

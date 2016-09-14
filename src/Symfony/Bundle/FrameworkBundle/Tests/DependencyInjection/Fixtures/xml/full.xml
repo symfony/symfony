@@ -38,7 +38,7 @@
         <framework:translator enabled="true" fallback="fr" logging="true">
             <framework:path>%kernel.root_dir%/Fixtures/translations</framework:path>
         </framework:translator>
-        <framework:validation enabled="true" cache="validator.mapping.cache.doctrine.apc" />
+        <framework:validation enabled="true" />
         <framework:annotations cache="file" debug="true" file-cache-dir="%kernel.cache_dir%/annotations" />
         <framework:serializer enabled="true" enable-annotations="true" name-converter="serializer.name_converter.camel_case_to_snake_case" />
         <framework:property-info />

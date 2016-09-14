@@ -44,7 +44,6 @@ framework:
         paths: ['%kernel.root_dir%/Fixtures/translations']
     validation:
         enabled: true
-        cache:   validator.mapping.cache.doctrine.apc
     annotations:
         cache:   file
         debug:   true

@@ -878,13 +878,17 @@ class FrameworkExtension extends Extension
             }
         }
 
-        if (!$container->getParameter('kernel.debug')) {
+        if (isset($config['cache']) && $config['cache']) {
+            @trigger_error('The "framework.validation.cache" option is deprecated since Symfony 3.2 and will be removed in 4.0. Configure the "cache.validator" service under "framework.cache.pools" instead.', E_USER_DEPRECATED);
+
             $container->setParameter(
                 'validator.mapping.cache.prefix',
                 'validator_'.$this->getKernelRootHash($container)
             );
 
             $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference($config['cache'])));
+        } elseif (!$container->getParameter('kernel.debug')) {
+            $validatorBuilder->addMethodCall('setMetadataCache', array(new Reference('validator.mapping.cache.symfony')));
         }
     }
 

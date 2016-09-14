@@ -137,6 +137,10 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             return $this->rewindable;
         }
 
+        if ('' === $this->getPath()) {
+            return $this->rewindable = false;
+        }
+
         if (false !== $stream = @opendir($this->getPath())) {
             $infos = stream_get_meta_data($stream);
             closedir($stream);

@@ -1,0 +1,239 @@
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-06-28T08:03:06Z
+
+LGTM 👍
+
+---------------------------------------------------------------------------
+
+by gorghoa at 2016-06-28T08:28:10Z
+
+@dunglas , thanks for your work ;)
+
+Still, I may be wrong, but I think this case may be problematic with your implementation:
+
+Given an entity (Person) with an 0,n attribute association (Addresses).
+Then, Person instances may have an array of  Addresses of different length.
+Hence, the length of the results once filled by the flatten method may be different from one row to another.
+Since you are guessing headers form the first row. Headers and rows may be incoherent.
+
+I know it’s a pretty annoying use case but I think that flattening in this is case may be more a con that a pro. A workaround could be a kind of serialization of the related entities and merge them together in one csv column. Not very elegant but maybe more robust in term of cohesion of the generated file.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-28T09:29:42Z
+
+@gorghoa another solution can be to generate something like that:
+
+```csv
+id,name,address.0,address.1,address.2,address.3,address.4,gender
+1,Kévin,A,B,,,,m
+2,Rodrigue,A,B,C,D,E,m
+```
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by gorghoa at 2016-06-28T09:39:27Z
+
+@dunglas , that may work but I still see two flaws:
+
+1st, we’ll need to iterate through all the rows first in order to generate the headers (EDIT, we may compute them during the rows iterations and put them as first line of our file at the end of the loop. Loosing the possibility to stream content as it goes, though).
+
+2nd, If another 0,n attribute (say phones) is present, we can’t use the trick of the last facultatives columns (or we have to fill empty columns with null value).
+
+Finally, I think that, with this dynamic set of column, it will be more complex for consumer systems (apart from excel and associates) to handle the csv representation.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-28T10:31:11Z
+
+It's an implementation detail for 1 and 2 (and I've an idea of how do that, even if it will decrease a bit performances).
+
+IMO this approach is still better - even for naive clients - than generating and output not covered by the RFC (like columns in the column).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-28T11:09:20Z
+
+@gorghoa I've looked at how various projects handle that (Sales Force, Drupal) and they all use a solution similar to yours. So after a thinking again, I'll implement what you suggest.
+
+Probably something like that:
+
+```
+id,name,groups
+1,Kévin,"a,b,c"
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-06-28T11:16:07Z
+
+@dunglas maybe we should also ask for the opinion of Sonata guys (mostly @Soullivaneuh and @greg0ire) because they have experience creating CSV writers (they even have a separate project for that: https://github.com/sonata-project/exporter)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-28T11:29:10Z
+
+IIRC, the Sonata Exporter has no special handling for multiple values. You need to handle this case yourself by adding a special method to the entity returning a string.
+
+---------------------------------------------------------------------------
+
+by gorghoa at 2016-06-28T11:40:22Z
+
+~~@dunglas:  Can’t argue against the RFC argument ;) I’m ok then with the elastic columns set.~~ Sorry, I’ve missed your final comment… 👍
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-06-28T12:13:01Z
+
+> @dunglas maybe we should also ask for the opinion of Sonata guys (mostly @Soullivaneuh and @greg0ire) because they have experience creating CSV writers (they even have a separate project for that: https://github.com/sonata-project/exporter)
+
+Not speaking for @Soullivaneuh here, as far as I'm concerned, I'm just maintaining these writers, I didn't actually create them. I think a good inspiration source could be https://github.com/ddeboer/data-import/blob/master/src/Writer/CsvWriter.php cc @sagikazarmark @Baachi @ddeboer (input from those guys would be great IMO)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-28T12:18:45Z
+
+There is another issue with the solution proposed by @gorghoa. If it's a collection of complex structures (like a collection of associative arrays), it becomes impossible to display it (or it will require to include a full CSV document inside the cell, and it looks bad to me). However, the flatten column solution works as expected:
+
+```csv
+name,address.0.line1,address.0.line2,address.1.line1,address.1.line2
+```
+
+Thought?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-06-29T21:54:57Z
+
+> There is another issue with the solution proposed by @gorghoa. If it's a collection of complex structures (like a collection of associative arrays), it becomes impossible to display it (or it will require to include a full CSV document inside the cell, and it looks bad to me). However, the flatten column solution works as expected:
+
+I think CSV is not the best format to represent deep data structures, and that you should simply throw an exception if the input data goes to deep. If people want to flatten things, they can still do it *before* feeding the result to your writer, which should IMO stay focused on doing one thing and doing it well.
+
+If you still feel a strong need however, then you should probably write a flattener class that would be able to wrap this one (which would be best with a stream friendly serializer :trollface: )
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-01T12:22:39Z
+
+@greg0ire's idea implemented (It's by far the best idea. Thanks.) and other comments fixed.
+
+---------------------------------------------------------------------------
+
+by gorghoa at 2016-07-01T12:31:41Z
+
+Thanks @dunglas, as far as I am concerned: it looks good to me ;)
+
+---------------------------------------------------------------------------
+
+by rybakit at 2016-07-01T12:38:54Z
+
+@dunglas What about [my comment](https://github.com/symfony/symfony/pull/19197#discussion_r69017729) for the case when `$data = []`? The check in line #50 will do comparison against `range(0, -1)` which evaluates into `[0, -1]`.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-07-01T12:54:12Z
+
+> @greg0ire's idea implemented (It's by far the best idea. Thanks.) and other comments fixed.
+
+Thanks! :blush: I'll have a look at it :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-07-01T12:59:58Z
+
+I don't get it… Is it me or is your last push is 4 days old ? :confused: I don't see anything new, but then again github has been having strange caching issues lately.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-07-01T13:28:48Z
+
+@greg0ire he rebased, this is why ^^
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-07-01T13:33:32Z
+
+@greg0ire My guess is that the change is [here](https://github.com/symfony/symfony/pull/19197/files#diff-4de6bbbd40ea769ada711de28fb180c8R65).
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-07-01T13:35:19Z
+
+> @greg0ire he rebased, this is why ^^
+
+Rebasing means you have to push again and rewrite commits, but ok…
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-07-01T13:45:42Z
+
+@greg0ire but rewriting commits can keep the original commit date, and github use the commit date, not the push date.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-07-01T15:03:00Z
+
+> @greg0ire but rewriting commits can keep the original commit date, and github use the commit date, not the push date.
+
+Makes sense :bulb: Thanks!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-01T16:03:13Z
+
+@rybakit
+
+> @dunglas What about [my comment](https://github.com/symfony/symfony/pull/19197#discussion_r69017729) for the case when `$data = []`? The check in line #50 will do comparison against `range(0, -1)` which evaluates into `[0, -1]`.
+
+I've added 2 unit tests for empty arrays and empty documents (and I fixed a bug in the decoder thanks to this test).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-10T08:57:29Z
+
+Rebased.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-17T10:24:50Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-07-27T10:42:50Z
+
+Idea that might be useful - a way of customising the column names.
+In most cases a `Normalizer` would allow you to use custom column names, but for nested columns you will always have the `"."` between the names.
+
+There might be value in being able to pass a mapping of names in the serializer context
+
+An example, you might have had this output:
+
+    name,address.street,address.city
+    Fred,A Street,A City
+
+But with a name mapping:
+
+    [
+       'address.street' = 'Street',
+       'address.city' = 'City
+    ]
+
+Changes to
+
+    name,Street,City
+    Fred,A Street,A City
+
+It would be a simple look up when the headers are set, but allow much more flexible CSV generation.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-16T11:18:24Z
+
+@mcfedr good idea but IMO it deserves its own PR. @symfony/deciders are you ok to merge this one?

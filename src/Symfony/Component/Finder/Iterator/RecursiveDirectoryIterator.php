@@ -137,6 +137,11 @@ class RecursiveDirectoryIterator extends \RecursiveDirectoryIterator
             return $this->rewindable;
         }
 
+        // workaround for an HHVM bug, should be removed when https://github.com/facebook/hhvm/issues/7281 is fixed
+        if ('' === $this->getPath()) {
+            return $this->rewindable = false;
+        }
+
         if (false !== $stream = @opendir($this->getPath())) {
             $infos = stream_get_meta_data($stream);
             closedir($stream);

@@ -43,6 +43,8 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $server['QUERY_STRING'] = $uri->getQuery();
         }
 
+        $server['REQUEST_METHOD'] = $psrRequest->getMethod();
+
         $server = array_replace($server, $psrRequest->getServerParams());
 
         $parsedBody = $psrRequest->getParsedBody();

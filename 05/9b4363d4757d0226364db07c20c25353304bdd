@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-01T12:15:33Z
+
+PR is ready, failure unrelated (composer bug).
+New feature inside: one has now the ability to remap source links by prefix so that container/vm can create links that refer to the host.
+
+E.g. `subl://%f:%l#/foo/=/home/foo/&/bar=/home/bar/` while replace `/foo/...` & `/bar/...` paths by the mapped prefix.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-01T17:45:32Z
+
+Can you make a PR to update the docs?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-01T19:39:31Z
+
+doc PR added

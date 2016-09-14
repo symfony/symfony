@@ -26,6 +26,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
@@ -1031,6 +1032,12 @@ class FrameworkExtension extends Extension
             $definition = $container->register('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -900));
+        }
+
+        if (class_exists(CsvEncoder::class)) {
+            $definition = $container->register('serializer.encoder.csv', CsvEncoder::class);
+            $definition->setPublic(false);
+            $definition->addTag('serializer.encoder');
         }
 
         $loader->load('serializer.xml');

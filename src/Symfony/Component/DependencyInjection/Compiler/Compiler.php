@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 
 /**
  * This class is used to remove circular dependencies between individual passes.
@@ -108,8 +109,29 @@ class Compiler
      */
     public function compile(ContainerBuilder $container)
     {
-        foreach ($this->passConfig->getPasses() as $pass) {
-            $pass->process($container);
+        try {
+            foreach ($this->passConfig->getPasses() as $pass) {
+                $pass->process($container);
+            }
+        } catch (\Exception $e) {
+            $usedEnvs = array();
+            $prev = $e;
+
+            do {
+                $msg = $prev->getMessage();
+
+                if ($msg !== $resolvedMsg = $container->resolveEnvPlaceholders($msg, null, $usedEnvs)) {
+                    $r = new \ReflectionProperty($prev, 'message');
+                    $r->setAccessible(true);
+                    $r->setValue($prev, $resolvedMsg);
+                }
+            } while ($prev = $prev->getPrevious());
+
+            if ($usedEnvs) {
+                $e = new EnvParameterException($usedEnvs, $e);
+            }
+
+            throw $e;
         }
     }
 }

@@ -23,10 +23,6 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        $dir = __DIR__;
-        for ($i = 1; $i <= 5; ++$i) {
-            $this->targetDirs[$i] = $dir = dirname($dir);
-        }
         $this->parameters = $this->getDefaultParameters();
 
         $this->services = array();
@@ -59,11 +55,13 @@ class ProjectServiceContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \stdClass A stdClass instance
+     * @return object A %env(FOO)% instance
      */
     protected function getTestService()
     {
-        return $this->services['test'] = new \stdClass(('wiz'.$this->targetDirs[1]), array(('wiz'.$this->targetDirs[1]) => ($this->targetDirs[2].'/')));
+        $class = $this->getEnv('FOO');
+
+        return $this->services['test'] = new $class($this->getEnv('Bar'), 'foo'.$this->getEnv('FOO').'baz');
     }
 
     /**
@@ -118,8 +116,7 @@ class ProjectServiceContainer extends Container
     }
 
     private $loadedDynamicParameters = array(
-        'foo' => false,
-        'buz' => false,
+        'bar' => false,
     );
     private $dynamicParameters = array();
 
@@ -135,8 +132,7 @@ class ProjectServiceContainer extends Container
     private function getDynamicParameter($name)
     {
         switch ($name) {
-            case 'foo': $value = ('wiz'.$this->targetDirs[1]); break;
-            case 'buz': $value = $this->targetDirs[2]; break;
+            case 'bar': $value = $this->getEnv('FOO'); break;
             default: throw new InvalidArgumentException(sprintf('The dynamic parameter "%s" must be defined.', $name));
         }
         $this->loadedDynamicParameters[$name] = true;
@@ -152,8 +148,7 @@ class ProjectServiceContainer extends Container
     protected function getDefaultParameters()
     {
         return array(
-            'bar' => __DIR__,
-            'baz' => (__DIR__.'/PhpDumperTest.php'),
+            'env(foo)' => 'foo',
         );
     }
 }

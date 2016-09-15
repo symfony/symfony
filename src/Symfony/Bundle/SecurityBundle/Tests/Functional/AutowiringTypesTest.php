@@ -22,6 +22,15 @@ class AutowiringTypesTest extends WebTestCase
         $this->assertInstanceOf('Symfony\Component\Security\Core\Authorization\AccessDecisionManager', $accessDecisionManager);
     }
 
+    public function testDebugAccessDecisionManagerAutowiring()
+    {
+        static::bootKernel(array('debug' => true));
+        $container = static::$kernel->getContainer();
+
+        $accessDecisionManager = $container->get('test.autowiring_types.autowired_services')->getAccessDecisionManager();
+        $this->assertInstanceOf('Symfony\Component\Security\Core\Authorization\AccessDecisionManager', $accessDecisionManager);
+    }
+
     protected static function createKernel(array $options = array())
     {
         return parent::createKernel(array('test_case' => 'AutowiringTypes') + $options);

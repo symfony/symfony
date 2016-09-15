@@ -1,0 +1,340 @@
+---------------------------------------------------------------------------
+
+by dzuelke at 2016-08-20T11:12:02Z
+
+Love it! Ship it!
+
+@stof can you take a look at this too please?
+
+In general, was the issue not that this approach would be problematic with bundles that used the config before the dumping or something? I seem to remember a discussion in this direction. It would be possible to have dynamic variable lookups before dumping, or from the loaded dumped cache, but not both?
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-20T11:25:02Z
+
+This is an interesting approach, but it is not as backwards compatible as one would think. There are bundles out there today, which as a part of their extension actually manipulate parameters. SncRedisBundle e.g. splits DSNs in the extension. Passing one of these parameters there will at best cause some kind of syntax error in the bundle, or at worst cause old environment values to be cached.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-20T11:41:42Z
+
+I don't think bc is the right concept for what you're saying, at least there is no bc break here, unless one already has a parameter named `env(...)`. So unlikely.
+
+But you're right that this strategy is not compatible with any parameter transformations done by DI extensions.
+Yet, this is not a blocker at all to me: if you opt into using an env param at a place that is incompatible with one of your extensions, you'll get a failure from that extension (or it is badly designed), which means an opportunity to fix it. Such extensions are already incompatible with unresolved parameters btw, so there isn't much new here. And I guess you can even workaround the issue most of the time by using several parameters concatenated by the separators that the extension expects.
+The huge benefit of this approach is that it doesn't need any cooperation from DI extensions. It just needs a way to get through them. Which most allow.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-20T11:48:32Z
+
+The problem isn't so much for bundle authors, as you say, they can just fix it, but for users. I'm just worried this will give users weird and possibly subtile errors.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-20T12:03:59Z
+
+That's not to say I'm necessarily -1 though, this sort of approach (where you only have to send PRs to the few bundles that manipulate parameters) will get the entire ecosystem environment variable compatible a lot sooner.
+
+---------------------------------------------------------------------------
+
+by Amo at 2016-08-21T07:37:15Z
+
+Thank you for this ! Much needed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T07:50:04Z
+
+From @iamluc:
+> Is it possible to define "providers" instead of calling getenv directly ? This way, we could use key/value store (like consul, etcd, ...) or even files
+
+The `getEnv()` method is protected. I think that's enough for you to build consul, etcd... integration by just changing the base class of your container, and specialize the implementation of `getEnv()` in your own base class. Not sure we need more nor want in Symfony core.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-24T08:35:20Z
+
+@iamluc I would avoid calling consul during the container's boot. Instead I would use [consul-template](https://github.com/hashicorp/consul-template).
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-24T08:36:27Z
+
+Would it be a good idea to do one of the following:
+
+**A:** Add a `canHandleDynamicParameters(bool $canHandle)` method to `Symfony\Component\Config\Definition\BaseNode`, which we default to false, and deprecate Symfony 3.4, so that we can require all config nodes to support dynamic parameters in Symfony 4.
+
+**B:** Add a `cannotHandleDynamicParameters()` to `Symfony\Component\Config\Definition\BaseNode`, so that Config nodes that are processed in the extension can "opt out" of dynamic parameters, raising an early exception if the user tries to do so. This method could then also be deprecated for 3.4, requiring all Symfony 4 bundles to support dynamic parameters.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T08:52:21Z
+
+Talking with @lyrixx , I reverted the split of the `getEnv()` method. Yet my comment still holds true:
+
+> The getEnv() method is protected. I think that's enough for you to build consul, etcd... integration by just changing the base class of your container, and specialize the implementation of getEnv() in your own base class. Not sure we need nor want more in Symfony core.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T08:54:57Z
+
+@magnusnordlander I'd say no need, bundle authors don't necessarily need to know about that, and shouldn't be allowed to block what a user wants to do if it works for them IMHO. But let's see what others think of your proposal.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-08-24T09:05:49Z
+
+I see no reason to make dynamic parameters configurable like Magnus suggests. It shouldn't matter parameters come from the environment, and it should be totally up to the end user.
+
+I'd only worry if the exception user gets is descriptive enough to see what's wrong.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-24T09:07:01Z
+
+@nicolas-grekas: Bundle authors *do* need to know, because it means that they basically cannot write extensions or compiler passes that inspects the values of configuration (or, basically anything in the DIC).
+
+I don't imagine that bundle authors will block the user out of spite, but rather if the implementation of the extension or a compiler pass *doesn't work* with dynamic parameters. This isn't a hypothetical scenario, there are bundles out there today that *do not work* with this, bundles that by Symfony 3.1 standards do nothing wrong, and I think it's better that the user finds out due to an exception than subtle bugs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T09:15:43Z
+
+> if the implementation of the extension or a compiler pass doesn't work with dynamic parameters
+
+Tell if I'm wrong, but such extensions are already kind of broken, by not allowing unresolved parameters, isn't it? If yes, then nothing new here to me.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-24T09:35:32Z
+
+@nicolas-grekas: To my knowledge, using unresolved parameters has never been possible? Parameters are resolved in `MergeExtensionConfigurationPass`, before `Extension::load` is called. and any non-existent parameters will cause a `Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException` to be thrown.
+
+It's slightly unusual (probably less than 10% of extensions, but not an insignificant number) to do a lot of processing of config values in the extension, but by no means broken according to Symfony 3.1 standards.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-25T12:45:16Z
+
+Do we actually need the env placeholder system ?
+
+If the DI Configuration class accepts any string, the ``%env(...)%`` one is fine.
+
+If it performs validation on the value (boolean field, number field, enum field, string with specific format...), the placeholder will also fail.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-25T12:59:18Z
+
+In fact, resolving `%...%` parameters happens both in ParameterBag and in PhpDumper. Leaving `%env(...)%` asis would mean making an exception to parameter resolving (it's recursive today). Or do you have something else in mind @stof ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-25T16:24:53Z
+
+@stof btw, it's important to me to safe guard placeholders so that one can not mess up with accidentally getting an env var where a plain string was defined. Thus, the random id is required IMO.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-26T00:30:51Z
+
+I'm sorry to be such a negative Nellie here, because I really like the elegance of using a parameter syntax to pull in environment variables, but I've been doing some more research, and I've come to be increasingly certain that this (and any other approach) *is a no-go without adding an opt-in mechanism*.
+
+If you take a look at this file: https://github.com/magnusnordlander/env-issues/blob/070d0ad487175234f031e4997ba71e9113048339/app/config/breakybreaky.yml
+
+This is a number of config settings **in FrameworkBundle** that are incompatible with this PR. All over the spectrum from oddities that'd make you go "Huh, weird, but I can sort of see why that is", to "WTF? I need to do this, why isn't it working, this error message is telling me nothing useful."
+
+And this is in FrameworkBundle alone. I did some digging in the top 5 of the top 30 bundles published a couple of years ago. **All** of the top five have some config parameter that's gonna be confusing to the user if they try to use dynamic environment variables.
+
+In my opinion, any approach allowing dynamic parameters of any kind needs to be opt in, or we'll have *a serious deterioration of DX*.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-26T05:22:48Z
+
+The file you linked is really interesting. But your conclusion comes a bit early to me, sounds like FUD (no offence, I really appreciate your skepticism here, it can only lead to a better system).
+It's really fine to me if env can't be injected everywhere. That's not needed.
+I'd like now to make this system as fail-safe possible. That is, have meaningful error message, and most (if not all) of them at compile time. Give me a bit more time :)
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-26T07:31:14Z
+
+I'm more than happy to be convinced otherwise, just telling you where I stand ATM :)
+
+But yes, reasonable error messages for all of the above situations would absolutely alleviate all of my concerns. I agree completely that env vars don't have to be injectable everywhere.
+
+---------------------------------------------------------------------------
+
+by dzuelke at 2016-08-26T07:37:29Z
+
+I think it's fine if initially, a bundle or two doesn't support this and behaves weirdly. Those bundles can and will catch up. After all, the user will have to explicitly ask for env vars in their config; it's not like existing code will magically blow up.
+
+This feature would be part of a new Symfony release (3.3?), and this is precisely what betas and RCs are for. As long as bundle maintainers can adjust to this new functionality while retaining compatibility with older versions of Symfony, all is well, and it sounds like that will be the case, since all bundles need to do is throw out some aggressive cache-time optimizations (such as parameter splitting) and move it to bundle startup time, the cumulative overhead for which will probably be negligible.
+
+Some docs with best practices would then also be great, to tell bundle developers to not pull crazy stunts that are at odds with this functionality.
+
+We can even submit PRs to bundles out there that are currently incompatible. I'm willing to help with that if needed; I could even devote some work time to it :)
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-26T08:07:56Z
+
+> I think it's fine if initially, a bundle or two doesn't support this and behaves weirdly. Those bundles can and will catch up. After all, the user will have to explicitly ask for env vars in their config; it's not like existing code will magically blow up.
+
+I'm sort of with you here, but from what I've found, we're not talking "a bundle or two". Almost all bundles have configuration nodes where this is not supported. I'm totally fine with not all configuration nodes supporting environment variables, but I'm *not* fine with something so common "behaving weirdly". If it doesn't work, it should error out, with an error message that the user will understand is related to having passed an environment variable,
+
+If you take a look at the file from earlier (https://github.com/magnusnordlander/env-issues/blob/master/app/config/breakybreaky.yml), and look at their corresponding locations within FrameworkExtension, you'll find that none of these cases relate to doing cache time optimizations (though that happens in other bundles). There's a plethora of situations that can cause issues.
+
+Nonetheless, I am cautiously hopeful that Nicolas will be able to get nice error messages to work, in which case this point will be moot :)
+
+---------------------------------------------------------------------------
+
+by jderusse at 2016-08-26T08:23:28Z
+
+IMO the parameters defined in the `parameters.yml` file are the most important (mainly credentials, hosts, ports, dsn). Other parameters are welcome but less critical.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-26T14:45:00Z
+
+PR updated. 2 commits:
+- the first adds better failure management by resolving env placeholders found into any thrown exceptions, wrapping them in an `EnvParameterException`.
+- the second makes loading env parameters lazy to fix the bootstrapping issue identified by @magnusnordlander
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-26T14:50:55Z
+
+Btw, the `framework.cache.default_redis_provider: %env(REDIS_DSN)%` case can't work this way, but works with `framework.cache.default_redis_provider: redis://%env(REDIS_DSN)%`
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-26T20:00:30Z
+
+Cool, definite improvement :) I'm gonna go ahead and keep trying to break this into getting weird errors or weird side-effects, but thus far, this is good :)
+
+Oh, and about `framework.cache.default_redis_provider: %env(REDIS_DSN)%` not working: I think that  if this is merged, that should be fixed in another PR, but that's fine. That's the kind of issues one can expect, and that can be dealt with across the ecosystem by sending PRs to the bundles.
+
+---------------------------------------------------------------------------
+
+by micha149 at 2016-08-29T05:53:27Z
+
+Just tested this PR for a dockerized project and it just works fine. The problem was previously that I  am building an image and the cache warm up is done in this build process. But at this point I have absolutely no knowledge about my database or other services.
+
+With the changes of this PR it was possible to build my image and inject the ENV variables with the database settings later when the container is started.
+
+Why do I the warmup in build process? Because I want to quickly boot up containers without waiting for a cache warmup after the container was booted.
+
+So, please merge 😄
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-30T09:04:06Z
+
+I've been doing some attempts to get weird errors or side-effects using this PR, and while a lot of the cases now have acceptable error messages (i.e. leading the user to believe that perhaps one cannot use an environment variable for that particular config node), I have come up with a couple of cases with weird side effects.
+
+I have updated the file at https://github.com/magnusnordlander/env-issues/blob/e61613269df193a68d2a550d4b11eecfdbfc0e34/app/config/breakybreaky.yml
+
+Of course, not all of these examples are things you'd actually want to do, but they are provided simply as examples of what can go wrong and how it shows, in order to give perspective as to whether this needs to be opt-in/out or not.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-30T17:11:20Z
+
+Thanks @magnusnordlander for your dedication to this topic. We should take our time to get it right. @nicolas-grekas Can you see the new examples to see if we can make them better?
+
+FYI, I plan to merge this one in time for 3.2.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-30T20:19:46Z
+
+Here we are:
+
+>  Invalid type for path ...
+
+these are config keys validated by Configuration, but env placeholders are strings (same as env vars btw). Since it fails early, not an issue to me, we can always patch the config if we really want to pass here. We could also type-hint env vars, but is it really worth it?
+
+the security algo involves a value comparison at compile stage, that fallbacks to the default. I guess the validation could and should be made a bit more strict here.
+
+the base64 issue could be detected by comparing the compiled containers with base64 versions of placeholder, but not sure its worth it, very narrow case.
+
+the swiftmailer `url` case is a config option that is parsed as a dsn in the extension, and has no validation.
+
+I guess we can't do anything here from the pov of this PR.
+What needs to be done is stricter validation by extensions, and using factories instead of compile time logic, for the places where we'd need env injection capabilities.
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-08-30T20:37:03Z
+
+@nicolas-grekas: Just an idea: Would it be possible to somehow detect if an extension has been passed an environment variable in the configuration, but the changes made to the container by the extension does not contain a reference to that environment variable?
+
+If so, perhaps it would be nice to emit a warning in the log if that happens? It's a bit of a roundabout way of handling things, and basically it's just a heuristic, but it would cover the latter three examples to make sure there's at least *something* for the user to find if things aren't working.
+
+As for the first two, I agree that they are not that big of a deal, but it would perhaps be nice to detect if an environment variable is passed, and give a specific error message for that, to avoid the "but my environment variable is an integer!" gotcha.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-31T18:29:36Z
+
+Good idea, we can raise an exception if an env var is read when compiling the container, but not found in the dumper container later on!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-01T17:18:21Z
+
+Check added, more suggestions? :)
+
+---------------------------------------------------------------------------
+
+by magnusnordlander at 2016-09-01T19:21:53Z
+
+Hot diggity daffodil! :)
+
+Well, the encoder example still fails, but I'm not too worried there. It's very much an edge case, and should be uncommon enough that it won't be much of an issue.
+
+I'll take a look at common bundles outside of the standard edition too, but with these latest additions I really don't anticipate a lot of problems.
+
+Great work @nicolas-grekas! Can't wait for this to get merged and for 3.2 to be released! :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-04T09:37:42Z
+
+@magnusnordlander see #19843 for a possible fix for the encoder issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-05T08:35:10Z
+
+I justed figured out that we missed one thing: DI extensions should be allowed to handle env vars on their own if they want. The way to do so is for them to call `$container->resolveEnvPlaceholders()`. But then, the dumper should not report the related env vars as incompatible use. This means we have to merge env placeholder usage counters. Now done. See `ContainerBuilder->merge()`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-10T10:16:55Z
+
+Just pushed an internal implementation change: dynamic parameters are not merged anymore into the `$this->parameters` array to prevent triggering copy-on-write and maximize shm use on php>=7.0.
+Dynamic parameters also now account for parameters that have `__DIR__`-relative values.
+See changes in fixtures.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-10T10:18:54Z
+
+@stof I'm sure we'd be all happy to have your vote / comments here, could you please have a look?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T22:46:04Z
+
+LGMT, can you deprecate the usage of `SYMFONY__` as well?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-15T02:52:24Z
+
+`$this->container->resolveEnvPlaceholders()` restores the initial `%env(...)%` strings by default so we want it in XML&yml dumpers.
+For deprecating `SYMFONY__`, in another PR?

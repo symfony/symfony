@@ -11,8 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
-
 class AutowiringTypesTest extends WebTestCase
 {
     public function testAccessDecisionManagerAutowiring()
@@ -21,7 +19,7 @@ class AutowiringTypesTest extends WebTestCase
         $container = static::$kernel->getContainer();
 
         $accessDecisionManager = $container->get('test.autowiring_types.autowired_services')->getAccessDecisionManager();
-        $this->assertInstanceOf(AccessDecisionManager::class, $accessDecisionManager);
+        $this->assertInstanceOf('Symfony\Component\Security\Core\Authorization\AccessDecisionManager', $accessDecisionManager);
     }
 
     protected static function createKernel(array $options = array())

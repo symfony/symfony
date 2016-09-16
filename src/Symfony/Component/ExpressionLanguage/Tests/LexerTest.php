@@ -86,6 +86,23 @@ class LexerTest extends \PHPUnit_Framework_TestCase
                 array(new Token('string', '#foo', 1)),
                 '"#foo"',
             ),
+            array(
+                array(
+                    new Token('name', 'foo', 1),
+                    new Token('punctuation', '(', 4),
+                    new Token('punctuation', '(', 5),
+                    new Token('name', 'bar', 6),
+                    new Token('punctuation', ',', 9),
+                    new Token('name', 'baz', 11),
+                    new Token('punctuation', ')', 14),
+                    new Token('operator', '->', 16),
+                    new Token('punctuation', '{', 19),
+                    new Token('name', 'baz', 21),
+                    new Token('punctuation', '}', 25),
+                    new Token('punctuation', ')', 26),
+                ),
+                'foo((bar, baz) -> { baz })',
+            ),
         );
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Node;
 
 use Symfony\Component\ExpressionLanguage\Compiler;
+use Symfony\Component\ExpressionLanguage\SafeCallable;
 
 /**
  * @author Christian Sciberras <christian@sciberras.me>
@@ -20,6 +21,11 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class AnonFuncNode extends Node
 {
+    /**
+     * @var SafeCallable
+     */
+    private static $noopSafeCallable;
+    
     /**
      * 
      * @param NameNode[] $parameters
@@ -33,6 +39,10 @@ class AnonFuncNode extends Node
                 'body' => $body,
             )
         );
+        
+        if (!self::$noopSafeCallable) {
+            self::$noopSafeCallable = new SafeCallable(function () {});
+        }
     }
 
     public function compile(Compiler $compiler)
@@ -55,7 +65,7 @@ class AnonFuncNode extends Node
     public function evaluate($functions, $values)
     {
         if (!$this->nodes['body']) {
-            return function () {};
+            return self::$noopSafeCallable;
         }
         
         $paramNames = array();
@@ -65,10 +75,12 @@ class AnonFuncNode extends Node
             $paramNames[] = $nodeData[0];
         }
         
-        return function () use($functions, $paramNames) {
-            $passedValues = array_combine($paramNames, func_get_args());
-            return $this->nodes['body']->evaluate($functions, $passedValues);
-        };
+        return new SafeCallable(
+            function () use($functions, $paramNames) {
+                $passedValues = array_combine($paramNames, func_get_args());
+                return $this->nodes['body']->evaluate($functions, $passedValues);
+            }
+        );
     }
 
     public function toArray()

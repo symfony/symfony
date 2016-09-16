@@ -15,6 +15,7 @@ use Symfony\Component\ExpressionLanguage\Node\AnonFuncNode;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
+use Symfony\Component\ExpressionLanguage\SafeCallable;
 
 class AnonFuncNodeTest extends AbstractNodeTest
 {
@@ -23,10 +24,11 @@ class AnonFuncNodeTest extends AbstractNodeTest
      */
     public function testEvaluate($expectedResult, $node, $variables = array(), $functions = array())
     {
-        $callback = $node->evaluate($functions, $variables);
-        $this->assertTrue(is_callable($callback));
+        $safeCallback = $node->evaluate($functions, $variables);
+        $this->assertInstanceOf(SafeCallable::class, $safeCallback);
+        $this->assertTrue(is_callable($safeCallback->getCallback()));
         
-        $actualResult = call_user_func_array($callback, $variables);
+        $actualResult = $safeCallback->callArray($variables);
         $this->assertSame($expectedResult, $actualResult);
     }
     

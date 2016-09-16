@@ -243,7 +243,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
             if ('cli' !== PHP_SAPI && stripos($h[$i], 'html')) {
                 $this->dumper = new HtmlDumper('php://output', $this->charset);
-                $dumper->setDisplayOptions(array('fileLinkFormat' => $this->fileLinkFormat));
+                $this->dumper->setDisplayOptions(array('fileLinkFormat' => $this->fileLinkFormat));
             } else {
                 $this->dumper = new CliDumper('php://output', $this->charset);
             }

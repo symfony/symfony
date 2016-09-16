@@ -154,6 +154,21 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 'bar',
                 array('foo' => 'bar'),
             ),
+            
+            array(
+                new Node\AnonFuncNode(
+                    array(
+                        new Node\NameNode('foo'),
+                        new Node\NameNode('bar'),
+                    ),
+                    new Node\BinaryNode(
+                        '*',
+                        new Node\NameNode('foo'),
+                        new Node\NameNode('bar')
+                    )
+                ),
+                '(foo, bar) -> { foo * bar }',
+            ),
         );
     }
 

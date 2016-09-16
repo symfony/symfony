@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-15T14:13:48Z
+
+@fabpot : Branch rebased on master and target changed. As #19570, I think this may rather be considered as a new feature than a bug fix. None of the dumpers were supporting it until now.

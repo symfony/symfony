@@ -78,6 +78,20 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
         pass=""
     />
 
+    <!-- prototype -->
+    <cms-page page="cms page page">
+
+        <!-- prototype -->
+        <!-- title: Required -->
+        <!-- path: Required -->
+        <page
+            locale="page locale"
+            title=""
+            path=""
+        />
+
+    </cms-page>
+
 </config>
 
 EOL

@@ -65,6 +65,15 @@ acme_root:
         -
             user:                 ~
             pass:                 ~
+    cms_pages:
+
+        # Prototype
+        page:
+
+            # Prototype
+            locale:
+                title:                ~ # Required
+                path:                 ~ # Required
 
 EOL;
     }

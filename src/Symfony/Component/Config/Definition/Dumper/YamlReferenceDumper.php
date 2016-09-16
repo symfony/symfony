@@ -199,8 +199,14 @@ class YamlReferenceDumper
 
         if ($prototype instanceof ArrayNode) {
             $keyNode = new ArrayNode($key, $node);
+            $children = $prototype->getChildren();
+
+            if ($prototype instanceof PrototypedArrayNode) {
+                $children = $this->getPrototypeChildren($prototype);
+            }
+
             // add children
-            foreach ($prototype->getChildren() as $childNode) {
+            foreach ($children as $childNode) {
                 $keyNode->addChild($childNode);
             }
         } else {

@@ -96,7 +96,10 @@ class XmlReferenceDumper
                     $rootAttributes[$key] = str_replace('-', ' ', $rootName).' '.$key;
                 }
 
-                if ($prototype instanceof ArrayNode) {
+                if ($prototype instanceof PrototypedArrayNode) {
+                    $prototype->setName($key);
+                    $children = array($key => $prototype);
+                } elseif ($prototype instanceof ArrayNode) {
                     $children = $prototype->getChildren();
                 } else {
                     if ($prototype->hasDefaultValue()) {

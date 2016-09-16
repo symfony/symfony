@@ -36,9 +36,9 @@ class CodeHelper extends Helper
         $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !is_array($fileLinkFormat)) {
             $i = max(strpos($fileLinkFormat, '%f'), strpos($fileLinkFormat, '%l'));
-            $i = strpos($fileLinkFormat, '#', $i) ?: strlen($fileLinkFormat);
+            $i = strpos($fileLinkFormat, '#"', $i) ?: strlen($fileLinkFormat);
             $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
-            parse_str($fileLinkFormat[1], $fileLinkFormat[1]);
+            $fileLinkFormat[1] = @json_decode('{'.$fileLinkFormat[1].'}', true) ?: array();
         }
         $this->fileLinkFormat = $fileLinkFormat;
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';

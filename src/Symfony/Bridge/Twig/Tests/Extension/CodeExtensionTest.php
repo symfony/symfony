@@ -64,6 +64,6 @@ class CodeExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getExtension()
     {
-        return new CodeExtension('proto://%f#&line=%l#'.substr(__FILE__, 0, 5).'=foobar', '/root', 'UTF-8');
+        return new CodeExtension('proto://%f#&line=%l#'.json_encode(substr(__FILE__, 0, 5)).':"foobar"', '/root', 'UTF-8');
     }
 }

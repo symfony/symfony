@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -171,8 +172,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         if (!isset($context['cache_key'])) {
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
+
         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
+        $extraAttributes = array();
 
         $reflectionClass = new \ReflectionClass($class);
         $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes, $format);
@@ -183,6 +186,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             if (($allowedAttributes !== false && !in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
+                if (isset($context['allow_extra_attributes']) && !$context['allow_extra_attributes']) {
+                    $extraAttributes[] = $attribute;
+                }
+
                 continue;
             }
 
@@ -192,6 +199,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             } catch (InvalidArgumentException $e) {
                 throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
             }
+        }
+
+        if (!empty($extraAttributes)) {
+            throw new ExtraAttributesException($extraAttributes);
         }
 
         return $object;

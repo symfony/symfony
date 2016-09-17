@@ -1,0 +1,187 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-14T19:55:56Z
+
+@wouterj Looks really interesting. Would it be possible to try to keep the same vertical height as before?
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-08-14T21:04:02Z
+
+ref #18149, #18074
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-08-14T21:12:53Z
+
+ > Would it be possible to try to keep the same vertical height as before?
+
+Yes. I've now updated the styles to accomplish this. The margin, padding and background (for visible correctness) have now been removed. New after screenshot:
+
+![sf-profiler-dumper-vertical-height](https://cloud.githubusercontent.com/assets/749025/17652104/98f5de10-6274-11e6-956b-1b02f334763f.png)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-08-15T13:26:12Z
+
+I don't understand the PHP 7.1 failures.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-08-15T14:13:34Z
+
+If anything helps **"[A non well formed numeric value encountered](https://travis-ci.org/symfony/symfony/jobs/152381584#L3250)"** is a common data conversion error str to time or number format.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-17T16:16:48Z
+
+See suggestions as patch directly in https://github.com/nicolas-grekas/symfony/pull/6
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-08-17T21:13:27Z
+
+Thanks @nicolas-grekas for your patch! I've cherry-picked it into this PR and tried to fix the LoggerDataCollector (not sure if this is what was expected though, will test later this week in a Symfony app).
+
+I hope the PHP 7.1 test failure is suddently fixed as well. I've tested it using PHP 7.1.0-beta2 on my local PC and don't get the error.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-08-17T21:52:06Z
+
+This is great! Is it possible in the component to have the objects dumped in a non-expanded state by default? I was thinking that for things like your contentDocument, it pushes the other content far down on the initial load of the page.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-08-17T22:38:06Z
+
+@weaverryan I've now collapsed all dumps by default (and expanded the first level for the log context).
+
+Also tried to fix the tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-18T12:27:06Z
+
+New suggestions in [the latest commit](https://github.com/nicolas-grekas/symfony/pull/6/commits/97431e805537b53a7ecc3c7907d4f5559258d151) of https://github.com/nicolas-grekas/symfony/pull/6 (needs #19656 to be at its best):
+- add warnings in the "Logs" count, more important now that throwing exceptions in dev can be turned of (see #19568)
+- properly remove sanitizeContext: VarDumper does the job.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-19T17:21:47Z
+
+PR rebased in my fork to benefit from latest VarDumper features. Don't forget to set `framework.php_errors.log` to `true` in `app/config/config.yml` until #19656 is merged.
+This still needs work to put everything together in a nice way but I think my contrib can pause here as the difficult part related to tightly plugging VarDumper should be OK now.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-08-20T13:04:25Z
+
+Discovered a problem with this implementation (with all latest work by @nicolas-grekas): The logger panel is now completely unresponsive in the CMF sandbox (it has 251 debug messages with context that includes a Doctrine mapped document).
+
+Is there anyway to work around this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-20T15:32:24Z
+
+That's one of the reasons why I think this needs more work :) The dumps integration is a bit rough right now, but there is no issue with the base implementation, only more CSS to write and a few JS to fine tune the US. What about adding back the show/hide context button?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-08-24T12:20:49Z
+
+Pushed another big update of this PR. The feature set can now be considered finished.
+
+The tests still need to be updated, but I prefer to first get a +1 for the feature itself, to avoid doing too much work a couple of times (when tweaking the changes).
+
+Changes
+---
+
+ * `ValueExporter` is now deprecated
+ * The Security panel uses the VarDumper for:
+     * Roles *(instead of Yaml array)*
+     * Inherited Roles *(instead of Yaml array)*
+     * Token *(instead of token class)*
+     * Access decision log passed objects *(instead of object class)*
+ * The Request panel uses the VarDumper for:
+     * GET & POST data *(instead of value exporter)*
+     * Request attributes *(instead of value exporter)*
+ * The Form panel uses the VarDumper for:
+     * default data, submitted data, passed options, resolved options and form variables *(instead of value exporter)*
+     * errors *(instead of custom traces display)*
+ * The Log panel uses the VarDumper for:
+     * log context
+     * exception traces
+
+Screenshots
+---
+
+**Request**
+See previous post
+
+**Forms**
+![sf-profiler-dumper-forms](https://cloud.githubusercontent.com/assets/749025/17930330/f28b4db4-6a05-11e6-836d-91ed9ef0a473.png)
+
+**Logger**
+![sf-profiler-dumper-logger-context](https://cloud.githubusercontent.com/assets/749025/17930267/9b3adebc-6a05-11e6-87e3-c55281ea8a20.png)
+![sf-profiler-dumper-logger-traces](https://cloud.githubusercontent.com/assets/749025/17930268/9b402f52-6a05-11e6-9ee6-74afb04ea41d.png)
+
+**Security**
+![sf-profiler-dumper-security](https://cloud.githubusercontent.com/assets/749025/17930269/9b847ae0-6a05-11e6-9f59-1af82e26e721.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T18:56:23Z
+
+Note for @symfony/deciders: in this PR, there is a necessary change in the data structure that is serialized by data collectors: some strings are turned to `Data` objects.
+As far as BC is concerned, this is fine to me.
+
+There is also a necessary change in the structure of the return values of `DebugAccessDecisionManager` and `FormDataExtractor` methods.
+Given that these are really data-collector related things, I think it's OK to do this change, even if not strictly BC. But you might disagree. In which case, we'll need to deprecate the both of them and copy them under a new namespace or class name.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-26T08:41:21Z
+
+The serialized data is fine. We never guaranteed BC on the storage format of the profiler between minor versions (i.e. you cannot load a profile generated with X.Y in a X.Z runtime, you have to clear your profile storage when upgrading, which is done by default as they are stored in the cache).
+
+regarding the DebugAccessDecisionManager and the FormDataExtractor, I think it is fine, as they are mostly meant to be consumed by the profiler collectors.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T19:09:06Z
+
+what's the status of this PR? I would really like to be able to merge it in time for 3.2 (end of dev by the end of the month).
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-09-17T11:09:15Z
+
+With the great help of @nicolas-grekas, I think this PR is now finished and ready for review. I've just tested all changed profiler panels and fixed some small rendering issues.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-17T12:37:25Z
+
+Two glitches:
+- one test needs a fix in DumpDataCollectorTest
+- var-dumper ~3.2 needs to be added to the composer.json of SecurityBundle (require-dev)
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-09-17T14:23:48Z
+
+thanks, applied the changes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-17T14:44:51Z
+
+:+1:

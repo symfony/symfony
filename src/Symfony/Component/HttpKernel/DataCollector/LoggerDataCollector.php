@@ -23,24 +23,6 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
  */
 class LoggerDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private $errorNames = array(
-        E_DEPRECATED => 'E_DEPRECATED',
-        E_USER_DEPRECATED => 'E_USER_DEPRECATED',
-        E_NOTICE => 'E_NOTICE',
-        E_USER_NOTICE => 'E_USER_NOTICE',
-        E_STRICT => 'E_STRICT',
-        E_WARNING => 'E_WARNING',
-        E_USER_WARNING => 'E_USER_WARNING',
-        E_COMPILE_WARNING => 'E_COMPILE_WARNING',
-        E_CORE_WARNING => 'E_CORE_WARNING',
-        E_USER_ERROR => 'E_USER_ERROR',
-        E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
-        E_COMPILE_ERROR => 'E_COMPILE_ERROR',
-        E_PARSE => 'E_PARSE',
-        E_ERROR => 'E_ERROR',
-        E_CORE_ERROR => 'E_CORE_ERROR',
-    );
-
     private $logger;
 
     public function __construct($logger = null)
@@ -94,6 +76,11 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return isset($this->data['deprecation_count']) ? $this->data['deprecation_count'] : 0;
     }
 
+    public function countWarnings()
+    {
+        return isset($this->data['warning_count']) ? $this->data['warning_count'] : 0;
+    }
+
     public function countScreams()
     {
         return isset($this->data['scream_count']) ? $this->data['scream_count'] : 0;
@@ -109,46 +96,31 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
     private function sanitizeLogs($logs)
     {
-        $errorContextById = array();
         $sanitizedLogs = array();
 
         foreach ($logs as $log) {
             if (!$this->isSilencedOrDeprecationErrorLog($log)) {
-                $log['context'] = $this->sanitizeContext($log['context']);
+                $log['context'] = $log['context'] ? $this->cloneVar($log['context']) : $log['context'];
                 $sanitizedLogs[] = $log;
 
                 continue;
             }
 
             $exception = $log['context']['exception'];
+            $errorId = md5("{$exception->getSeverity()}/{$exception->getLine()}/{$exception->getFile()}".($exception instanceof \Exception ? "\0".$exception->getMessage() : ''), true);
 
-            $context = array(
-                'type' => isset($this->errorNames[$exception->getSeverity()]) ? $this->errorNames[$exception->getSeverity()] : $exception->getSeverity(),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-                'errorCount' => 0,
-                'scream' => $exception instanceof SilencedErrorContext,
-            );
+            if (isset($sanitizedLogs[$errorId])) {
+                ++$sanitizedLogs[$errorId]['errorCount'];
+            } else {
+                $log['context'] = $log['context'] ? $this->cloneVar($log['context']) : $log['context'];
 
-            if ($exception instanceof \Exception) {
-                $context['trace'] = array_map(function ($call) {
-                    unset($call['args']);
+                $log += array(
+                    'errorCount' => 1,
+                    'scream' => $exception instanceof SilencedErrorContext,
+                );
 
-                    return $call;
-                }, $exception->getTrace());
+                $sanitizedLogs[$errorId] = $log;
             }
-
-            $errorId = md5("{$context['type']}/{$context['line']}/{$context['file']}\x00{$log['message']}", true);
-
-            if (!isset($errorContextById[$errorId])) {
-                $errorContextById[$errorId] = $context;
-            }
-
-            $context['errorCount'] = ++$errorContextById[$errorId]['errorCount'];
-
-            $log['context'] = $this->sanitizeContext($context);
-
-            $sanitizedLogs[$errorId] = $log;
         }
 
         return array_values($sanitizedLogs);
@@ -173,48 +145,12 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return false;
     }
 
-    private function sanitizeContext($context)
-    {
-        if (is_array($context)) {
-            foreach ($context as $key => $value) {
-                $context[$key] = $this->sanitizeContext($value);
-            }
-
-            return $context;
-        }
-
-        if (is_resource($context)) {
-            return sprintf('Resource(%s)', get_resource_type($context));
-        }
-
-        if ($context instanceof \Exception) {
-            $trace = array_map(function ($call) {
-                unset($call['args']);
-
-                return $call;
-            }, $context->getTrace());
-
-            return array(
-                'class' => get_class($context),
-                'message' => $context->getMessage(),
-                'file' => $context->getFile(),
-                'line' => $context->getLine(),
-                'trace' => $trace,
-            );
-        }
-
-        if (is_object($context)) {
-            return sprintf('Object(%s)', get_class($context));
-        }
-
-        return $context;
-    }
-
     private function computeErrorsCount()
     {
         $count = array(
             'error_count' => $this->logger->countErrors(),
             'deprecation_count' => 0,
+            'warning_count' => 0,
             'scream_count' => 0,
             'priorities' => array(),
         );
@@ -227,6 +163,9 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                     'count' => 1,
                     'name' => $log['priorityName'],
                 );
+            }
+            if ('WARNING' === $log['priorityName']) {
+                ++$count['warning_count'];
             }
 
             if ($this->isSilencedOrDeprecationErrorLog($log)) {

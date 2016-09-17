@@ -38,8 +38,14 @@ Form
 FrameworkBundle
 ---------------
 
-  * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
-    be automatically used when available.
+ * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
+   be automatically used when available.
+
+HttpKernel
+----------
+
+ * `DataCollector::varToString()` is deprecated and will be removed in Symfony
+   4.0. Use the `cloneVar()` method instead.
 
 HttpFoundation
 ---------------

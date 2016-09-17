@@ -363,8 +363,7 @@ return function (root, x) {
 };
 
 })(document);
-</script>
-<style>
+</script><style>
 pre.sf-dump {
     display: block;
     white-space: pre;

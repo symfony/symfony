@@ -152,9 +152,6 @@
             margin-top: -9px;
             margin-left: 6px;
         }
-        .form-type {
-            color: #999;
-        }
         .badge-error {
             float: right;
             background: #B0413E;
@@ -198,7 +195,7 @@
 
         <div id="tree-details-container">
             {% for formName, formData in collector.data.forms %}
-                {{ form_tree_details(formName, formData, collector.data.forms_by_hash) }}
+                {{ form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first) }}
             {% endfor %}
         </div>
     {% else %}
@@ -442,7 +439,7 @@
             {% endif %}
 
             <span {% if has_error or data.has_children_error|default(false) %}class="has-error"{% endif %}>
-                {{ name|default('(no name)') }} {% if data.type_class is defined %}[<abbr title="{{ data.type_class }}">{{ data.type_class|split('\\')|last }}</abbr>]{% endif %}
+                {{ name|default('(no name)') }}
             </span>
         </div>
 
@@ -456,14 +453,11 @@
     </li>
 {% endmacro %}
 
-{% macro form_tree_details(name, data, forms_by_hash) %}
+{% macro form_tree_details(name, data, forms_by_hash, show) %}
     {% import _self as tree %}
-    <div class="tree-details" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
-        <h2>
-            {{ name|default('(no name)') }}
-            {% if data.type_class is defined and data.type is defined %}
-            <span class="form-type">[<abbr title="{{ data.type_class }}">{{ data.type }}</abbr>]</span>
-            {% endif %}
+    <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
+        <h2 class="dump-inline">
+            {{ name|default('(no name)') }} ({{ profiler_dump(data.type_class) }})
         </h2>
 
         {% if data.errors is defined and data.errors|length > 0 %}
@@ -496,29 +490,12 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% for trace in error.trace %}
-                            {% if not loop.first %}
-                                <span class="newline">Caused by:</span>
-                            {% endif %}
-
-                            {% if trace.root is defined %}
-                                <strong class="newline">{{ trace.class }}</strong>
-                                <pre>
-                                    {{- trace.root -}}
-                                    {%- if trace.path is not empty -%}
-                                        {%- if trace.path|first != '[' %}.{% endif -%}
-                                        {{- trace.path -}}
-                                    {%- endif %} = {{ trace.value -}}
-                                </pre>
-                            {% elseif trace.message is defined %}
-                                <strong class="newline">{{ trace.class }}</strong>
-                                <pre>{{ trace.message }}</pre>
-                            {% else %}
-                                <pre>{{ trace }}</pre>
-                            {% endif %}
+                        {% if error.trace %}
+                            <span class="newline">Caused by:</span>
+                            {{ profiler_dump(error.trace, maxDepth=2) }}
                         {% else %}
                             <em>Unknown.</em>
-                        {% endfor %}
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -547,7 +524,7 @@
                         <th class="font-normal" scope="row">Model Format</th>
                         <td>
                             {% if data.default_data.model is defined %}
-                                {{ data.default_data.model }}
+                                {{ profiler_dump(data.default_data.model) }}
                             {% else %}
                                 <em class="font-normal text-muted">same as normalized format</em>
                             {% endif %}
@@ -555,13 +532,13 @@
                     </tr>
                     <tr>
                         <th class="font-normal" scope="row">Normalized Format</th>
-                        <td>{{ data.default_data.norm }}</td>
+                        <td>{{ profiler_dump(data.default_data.norm) }}</td>
                     </tr>
                     <tr>
                         <th class="font-normal" scope="row">View Format</th>
                         <td>
                             {% if data.default_data.view is defined %}
-                                {{ data.default_data.view }}
+                                {{ profiler_dump(data.default_data.view) }}
                             {% else %}
                                 <em class="font-normal text-muted">same as normalized format</em>
                             {% endif %}
@@ -593,7 +570,7 @@
                         <th class="font-normal" scope="row">View Format</th>
                         <td>
                             {% if data.submitted_data.view is defined %}
-                                {{ data.submitted_data.view }}
+                                {{ profiler_dump(data.submitted_data.view) }}
                             {% else %}
                                 <em class="font-normal text-muted">same as normalized format</em>
                             {% endif %}
@@ -601,13 +578,13 @@
                     </tr>
                     <tr>
                         <th class="font-normal" scope="row">Normalized Format</th>
-                        <td>{{ data.submitted_data.norm }}</td>
+                        <td>{{ profiler_dump(data.submitted_data.norm) }}</td>
                     </tr>
                     <tr>
                         <th class="font-normal" scope="row">Model Format</th>
                         <td>
                             {% if data.submitted_data.model is defined %}
-                                {{ data.submitted_data.model }}
+                                {{ profiler_dump(data.submitted_data.model) }}
                             {% else %}
                                 <em class="font-normal text-muted">same as normalized format</em>
                             {% endif %}
@@ -644,12 +621,12 @@
                 {% for option, value in data.passed_options %}
                 <tr>
                     <th>{{ option }}</th>
-                    <td>{{ value }}</td>
+                    <td>{{ profiler_dump(value) }}</td>
                     <td>
-                        {% if data.resolved_options[option] is same as(value) %}
+                        {% if data.resolved_options[option] == value %}
                             <em class="font-normal text-muted">same as passed value</em>
                         {% else %}
-                            {{ data.resolved_options[option] }}
+                            {{ profiler_dump(data.resolved_options[option]) }}
                         {% endif %}
                     </td>
                 </tr>
@@ -683,7 +660,7 @@
                 {% for option, value in data.resolved_options %}
                 <tr>
                     <th scope="row">{{ option }}</th>
-                    <td>{{ value }}</td>
+                    <td>{{ profiler_dump(value) }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -710,7 +687,7 @@
                 {% for variable, value in data.view_vars %}
                 <tr>
                     <th scope="row">{{ variable }}</th>
-                    <td>{{ value }}</td>
+                    <td>{{ profiler_dump(value) }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

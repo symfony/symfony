@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/http-kernel": "~3.1",
+        "symfony/http-kernel": "~3.2",
         "symfony/polyfill-php70": "~1.0",
         "symfony/routing": "~2.8|~3.0",
         "symfony/twig-bridge": "~2.8|~3.0",
@@ -28,6 +28,9 @@
         "symfony/console": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
         "symfony/stopwatch": "~2.8|~3.0"
+    },
+    "conflict": {
+        "symfony/event-dispatcher": "<3.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },

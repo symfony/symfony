@@ -15,6 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -32,6 +34,7 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
     private $called;
     private $dispatcher;
     private $wrappedListeners;
+    private $cloner;
 
     /**
      * Constructor.
@@ -47,6 +50,9 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
         $this->logger = $logger;
         $this->called = array();
         $this->wrappedListeners = array();
+        if (class_exists(ClassStub::class)) {
+            $this->cloner = new VarCloner();
+        }
     }
 
     /**
@@ -344,6 +350,9 @@ class TraceableEventDispatcher implements TraceableEventDispatcherInterface
                 'line' => $line,
                 'pretty' => $class.'::'.$listener[1],
             );
+        }
+        if (null !== $this->cloner) {
+            $info['data'] = $this->cloner->cloneVar(array(new ClassStub($info['pretty'].'()', $listener)))->seek(0);
         }
 
         return $info;

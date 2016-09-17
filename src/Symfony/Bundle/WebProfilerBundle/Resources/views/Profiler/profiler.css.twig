@@ -190,6 +190,9 @@ table tbody ul {
 .block {
     display: block;
 }
+.full-width {
+    width: 100%;
+}
 .hidden {
     display: none;
 }
@@ -806,6 +809,8 @@ tr.status-warning td {
 .tab-content > *:first-child {
     margin-top: 0;
 }
+.tab-navigation li .badge.status-warning { background: {{ colors.warning|raw }}; color: #FFF; }
+.tab-navigation li .badge.status-error { background: {{ colors.error|raw }}; color: #FFF; }
 
 {# Toggles
    ========================================================================= #}
@@ -838,32 +843,8 @@ tr.status-warning td {
 {# Logger panel
    ========================================================================= #}
 table.logs .metadata {
-    color: #777;
     display: block;
     font-size: 12px;
-    padding-top: 4px;
-}
-table.logs .metadata strong {
-    color: #222;
-}
-table.logs .metadata .context {
-    background: #F5F5F5;
-    color: #222;
-}
-table.logs .metadata .context pre {
-    margin: 5px 0;
-    padding: 5px 10px;
-    white-space: pre-wrap;
-}
-
-table.logs .sf-call-stack {
-    margin: 1em 0 1em 1.5em;
-}
-table.logs .sf-call-stack li {
-    margin-bottom: 5px;
-}
-table.logs .sf-call-stack abbr {
-    border: none;
 }
 
 {# Doctrine panel
@@ -889,43 +870,50 @@ table.logs .sf-call-stack abbr {
 #collector-content .sf-dump samp {
     {{ mixins.monospace_font|raw }}
 }
-#collector-content pre.sf-dump {
-    background: #222;
-    line-height: 1.4;
-    margin-top: .5em;
-    padding: 1em;
-}
-#collector-content .sf-dump h3 {
-    font-size: 18px;
-    margin: .5em 0 0;
-}
-#collector-content .sf-dump h3 a {
+#collector-content .sf-dump a {
     cursor: pointer;
+}
+#collector-content .sf-dump pre.sf-dump,
+#collector-content .sf-dump .trace {
+    border: 1px solid #DDD;
+    background: #FFF;
+    padding: 10px;
+    margin: 0.5em 0;
 }
 
 #collector-content pre.sf-dump { color: #CC7832; }
 #collector-content .sf-dump-str { color: #629755; }
 #collector-content .sf-dump-private,
 #collector-content .sf-dump-protected,
-#collector-content .sf-dump-public { color: #E0E0E0; }
+#collector-content .sf-dump-public { color: #262626; }
 #collector-content .sf-dump-note { color: #6897BB; }
-#collector-content .sf-dump-key { color: #A5C261; }
+#collector-content .sf-dump-key { color: #789339; }
+#collector-content .sf-dump-ref { color: #6E6E6E; }
 
-#collector-content .sf-dump .trace {
-    border: 1px solid #DDD;
-    background: #FFF;
-    padding: 10px;
-    margin: 1em 0;
+#collector-content .sf-dump {
+    margin: 0;
+    padding: 0;
+    background: none;
+    line-height: 1.4;
 }
+
+#collector-content .dump-inline .sf-dump {
+    display: inline;
+    white-space: normal;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+#collector-content .dump-inline pre.sf-dump .sf-dump-ellipsis {
+    width: 4em;
+}
+
 #collector-content .sf-dump .trace {
     font-size: 12px;
 }
-#collector-content .sf-dump .trace code {
-    font-size: 14px;
-}
 #collector-content .sf-dump .trace li {
     margin-bottom: 0;
-    padding: 5px 0;
+    padding: 0;
 }
 #collector-content .sf-dump .trace li.selected {
     background: rgba(255, 255, 153, 0.5);

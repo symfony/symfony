@@ -13,9 +13,12 @@ namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
 use Symfony\Component\Debug\Exception\SilencedErrorContext;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
+    private static $data;
+
     /**
      * @dataProvider getCollectTestData
      */
@@ -25,19 +28,17 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
         $logger->expects($this->once())->method('countErrors')->will($this->returnValue($nb));
         $logger->expects($this->exactly(2))->method('getLogs')->will($this->returnValue($logs));
 
-        $c = new LoggerDataCollector($logger);
+        // disable cloning the context, to ease fixtures creation.
+        $c = $this->getMockBuilder(LoggerDataCollector::class)
+            ->setMethods(array('cloneVar'))
+            ->setConstructorArgs(array($logger))
+            ->getMock();
+        $c->expects($this->any())->method('cloneVar')->willReturn(self::$data);
         $c->lateCollect();
-
-        // Remove the trace from the real logs, to ease fixtures creation.
-        $logs = array_map(function ($log) {
-            unset($log['context']['trace'], $log['context']['exception']['trace']);
-
-            return $log;
-        }, $c->getLogs());
 
         $this->assertEquals('logger', $c->getName());
         $this->assertEquals($nb, $c->countErrors());
-        $this->assertEquals($expectedLogs, $logs);
+        $this->assertEquals($expectedLogs, $c->getLogs());
         $this->assertEquals($expectedDeprecationCount, $c->countDeprecations());
         $this->assertEquals($expectedScreamCount, $c->countScreams());
 
@@ -48,6 +49,10 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     public function getCollectTestData()
     {
+        if (null === self::$data) {
+            self::$data = new Data(array());
+        }
+
         yield 'simple log' => array(
             1,
             array(array('message' => 'foo', 'context' => array(), 'priority' => 100, 'priorityName' => 'DEBUG')),
@@ -56,18 +61,10 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
             0,
         );
 
-        yield 'log with a resource' => array(
+        yield 'log with a context' => array(
             1,
-            array(array('message' => 'foo', 'context' => array('foo' => fopen(__FILE__, 'r')), 'priority' => 100, 'priorityName' => 'DEBUG')),
-            array(array('message' => 'foo', 'context' => array('foo' => 'Resource(stream)'), 'priority' => 100, 'priorityName' => 'DEBUG')),
-            0,
-            0,
-        );
-
-        yield 'log with an object' => array(
-            1,
-            array(array('message' => 'foo', 'context' => array('foo' => new \stdClass()), 'priority' => 100, 'priorityName' => 'DEBUG')),
-            array(array('message' => 'foo', 'context' => array('foo' => 'Object(stdClass)'), 'priority' => 100, 'priorityName' => 'DEBUG')),
+            array(array('message' => 'foo', 'context' => array('foo' => 'bar'), 'priority' => 100, 'priorityName' => 'DEBUG')),
+            array(array('message' => 'foo', 'context' => self::$data, 'priority' => 100, 'priorityName' => 'DEBUG')),
             0,
             0,
         );
@@ -84,9 +81,9 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
                 array('message' => 'foo2', 'context' => array('exception' => new \ErrorException('deprecated', 0, E_USER_DEPRECATED)), 'priority' => 100, 'priorityName' => 'DEBUG'),
             ),
             array(
-                array('message' => 'foo3', 'context' => array('exception' => array('file' => __FILE__, 'line' => 82, 'class' => \ErrorException::class, 'message' => 'warning')), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                array('message' => 'foo', 'context' => array('type' => 'E_DEPRECATED', 'file' => __FILE__, 'line' => 83, 'errorCount' => 1, 'scream' => false), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                array('message' => 'foo2', 'context' => array('type' => 'E_USER_DEPRECATED', 'file' => __FILE__, 'line' => 84, 'errorCount' => 1, 'scream' => false), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo3', 'context' => self::$data, 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo', 'context' => self::$data, 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => false),
+                array('message' => 'foo2', 'context' => self::$data, 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => false),
             ),
             2,
             0,
@@ -100,8 +97,8 @@ class LoggerDataCollectorTest extends \PHPUnit_Framework_TestCase
                 array('message' => 'foo3', 'context' => array('exception' => new SilencedErrorContext(E_USER_WARNING, __FILE__, __LINE__)), 'priority' => 100, 'priorityName' => 'DEBUG'),
             ),
             array(
-                array('message' => 'foo3', 'context' => array('exception' => array('file' => __FILE__, 'line' => 99, 'class' => \ErrorException::class, 'message' => 'warning')), 'priority' => 100, 'priorityName' => 'DEBUG'),
-                array('message' => 'foo3', 'context' => array('type' => 'E_USER_WARNING', 'file' => __FILE__, 'line' => 100, 'errorCount' => 1, 'scream' => true), 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo3', 'context' => self::$data, 'priority' => 100, 'priorityName' => 'DEBUG'),
+                array('message' => 'foo3', 'context' => self::$data, 'priority' => 100, 'priorityName' => 'DEBUG', 'errorCount' => 1, 'scream' => true),
             ),
             0,
             1,

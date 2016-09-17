@@ -24,6 +24,7 @@
         <service id="data_collector.form" class="Symfony\Component\Form\Extension\DataCollector\FormDataCollector">
             <tag name="data_collector" template="@WebProfiler/Collector/form.html.twig" id="form" priority="310" />
             <argument type="service" id="data_collector.form.extractor" />
+            <argument>false</argument>
         </service>
     </services>
 </container>

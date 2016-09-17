@@ -23,6 +23,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,8 +32,9 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     {
         $c = new RequestDataCollector();
 
-        $c->collect($this->createRequest(), $this->createResponse());
+        $c->collect($request = $this->createRequest(), $this->createResponse());
 
+        $cloner = new VarCloner();
         $attributes = $c->getRequestAttributes();
 
         $this->assertSame('request', $c->getName());
@@ -42,12 +45,12 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestRequest());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestQuery());
         $this->assertSame('html', $c->getFormat());
-        $this->assertSame('foobar', $c->getRoute());
-        $this->assertSame(array('name' => 'foo'), $c->getRouteParams());
+        $this->assertEquals('foobar', $c->getRoute());
+        $this->assertEquals($cloner->cloneVar(array('name' => 'foo')), $c->getRouteParams());
         $this->assertSame(array(), $c->getSessionAttributes());
         $this->assertSame('en', $c->getLocale());
-        $this->assertRegExp('/Resource\(stream#\d+\)/', $attributes->get('resource'));
-        $this->assertSame('Object(stdClass)', $attributes->get('object'));
+        $this->assertEquals($cloner->cloneVar($request->attributes->get('resource')), $attributes->get('resource'));
+        $this->assertEquals($cloner->cloneVar($request->attributes->get('object')), $attributes->get('object'));
 
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\HeaderBag', $c->getResponseHeaders());
         $this->assertSame('OK', $c->getStatusText());

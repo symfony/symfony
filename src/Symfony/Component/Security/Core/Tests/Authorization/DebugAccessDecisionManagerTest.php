@@ -32,12 +32,12 @@ class DebugAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $object = new \stdClass();
 
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 'NULL', 'result' => false)), null);
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 'boolean (true)', 'result' => false)), true);
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 'string (jolie string)', 'result' => false)), 'jolie string');
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 'integer (12345)', 'result' => false)), 12345);
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 'resource', 'result' => false)), fopen(__FILE__, 'r'));
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 'array', 'result' => false)), array());
-        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => sprintf('stdClass (object hash: %s)', spl_object_hash($object)), 'result' => false)), $object);
+        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => null, 'result' => false)), null);
+        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => true, 'result' => false)), true);
+        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 'jolie string', 'result' => false)), 'jolie string');
+        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => 12345, 'result' => false)), 12345);
+        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $x = fopen(__FILE__, 'r'), 'result' => false)), $x);
+        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $x = array(), 'result' => false)), $x);
+        yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $object, 'result' => false)), $object);
     }
 }

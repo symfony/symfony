@@ -32,6 +32,11 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         return array('foo', 'bar');
     }
 
+    public function nonStaticCallback()
+    {
+        return array('foo', 'bar');
+    }
+
     /**
      * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
      */
@@ -120,12 +125,24 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidChoiceCallbackContextMethod()
+    public function testValidStaticChoiceCallbackContextMethod()
     {
         // search $this for "staticCallback"
         $this->setObject($this);
 
         $constraint = new Choice(array('callback' => 'staticCallback', 'strict' => true));
+
+        $this->validator->validate('bar', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidChoiceCallbackContextMethod()
+    {
+        // search $this for "nonStaticCallback"
+        $this->setObject($this);
+
+        $constraint = new Choice(array('callback' => 'nonStaticCallback', 'strict' => true));
 
         $this->validator->validate('bar', $constraint);
 

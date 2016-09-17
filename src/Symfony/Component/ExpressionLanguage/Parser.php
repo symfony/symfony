@@ -26,11 +26,23 @@ class Parser
     const OPERATOR_LEFT = 1;
     const OPERATOR_RIGHT = 2;
 
+    /** @var TokenStream */
     private $stream;
+
+    /** @var array */
     private $unaryOperators;
+
+    /** @var array */
     private $binaryOperators;
+
+    /** @var array */
     private $functions;
+
+    /** @var string[] */
     private $names;
+
+    /** @var Node\Node[] */
+    private $replacementNodes;
 
     public function __construct(array $functions)
     {
@@ -43,6 +55,7 @@ class Parser
             '+' => array('precedence' => 500),
         );
         $this->binaryOperators = array(
+            '->' => array('precedence' => 5, 'associativity' => self::OPERATOR_LEFT),
             'or' => array('precedence' => 10, 'associativity' => self::OPERATOR_LEFT),
             '||' => array('precedence' => 10, 'associativity' => self::OPERATOR_LEFT),
             'and' => array('precedence' => 15, 'associativity' => self::OPERATOR_LEFT),
@@ -70,6 +83,8 @@ class Parser
             '%' => array('precedence' => 60, 'associativity' => self::OPERATOR_LEFT),
             '**' => array('precedence' => 200, 'associativity' => self::OPERATOR_RIGHT),
         );
+
+        $this->replacementNodes = array();
     }
 
     /**
@@ -94,15 +109,111 @@ class Parser
      */
     public function parse(TokenStream $stream, $names = array())
     {
-        $this->stream = $stream;
         $this->names = $names;
 
+        $stream = $this->preParseAnonFuncs($stream);
+
+        $this->stream = $stream;
         $node = $this->parseExpression();
+
         if (!$stream->isEOF()) {
-            throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s"', $stream->current->type, $stream->current->value), $stream->current->cursor);
+            throw new SyntaxError(
+                sprintf(
+                    'Unexpected token "%s" of value "%s"',
+                    $stream->current->type,
+                    $stream->current->value
+                ),
+                $stream->current->cursor
+            );
         }
 
         return $node;
+    }
+
+    /**
+     * Replaces all anonymous functions with placeholder tokens.
+     *
+     * @param TokenStream $stream
+     * @return TokenStream
+     */
+    protected function preParseAnonFuncs(TokenStream $stream)
+    {
+        while (!$stream->isEOF()) {
+            if ($stream->current->test(Token::OPERATOR_TYPE, '->')) {
+                $operatorPos = $stream->position();
+                $operatorCursor = $stream->current->cursor;
+                $replacementNodeIndex = count($this->replacementNodes);
+                $this->replacementNodes[$replacementNodeIndex] = null;
+
+                // parse parameters
+                $parameterNames = array();
+                $parameterNodes = array();
+                $expectParam = true;
+                $stream->prev();
+                $stream->expectPrev(Token::PUNCTUATION_TYPE, ')', 'Parameter list must end with parenthesis');
+                while (!$stream->current->test(Token::PUNCTUATION_TYPE, '(')) {
+                    if ($expectParam) {
+                        $stream->current->test(Token::NAME_TYPE);
+                        array_unshift($parameterNames, $stream->current->value);
+                        array_unshift($parameterNodes, new Node\NameNode($stream->current->value));
+                        $stream->prev();
+                    } else {
+                        $stream->expectPrev(Token::PUNCTUATION_TYPE, ',', 'Parameters must be separated by a comma');
+                    }
+                    $expectParam = !$expectParam;
+                }
+                $startPos = $stream->position();
+
+                // parse body
+                $stream->seek($operatorPos, SEEK_SET);
+                $stream->next();
+                $stream->expect(Token::PUNCTUATION_TYPE, '{', 'Anonymous function body must start with a curly bracket');
+                $bodyTokens = array();
+                $openingBracketCount = 1;
+                while ($openingBracketCount != 0) {
+                    if ($stream->current->test(Token::PUNCTUATION_TYPE, '{')) {
+                        $openingBracketCount++;
+                    }
+
+                    if ($stream->current->test(Token::PUNCTUATION_TYPE, '}')) {
+                        $openingBracketCount--;
+                    }
+
+                    if (!$openingBracketCount) {
+                        $currentNames = $this->names;
+                        $currentStream = $this->stream;
+
+                        $bodyTokens[] = new Token(Token::EOF_TYPE, null, 0);
+                        $bodyNode = $this->parse(
+                            new TokenStream($bodyTokens),
+                            array_merge($currentNames, $parameterNames)
+                        );
+
+                        $this->names = $currentNames;
+                        $this->stream = $currentStream;
+                        break;
+                    }
+
+                    $bodyTokens[] = $stream->current;
+                    $stream->next();
+                }
+                $stream->expect(Token::PUNCTUATION_TYPE, '}', 'Anonymous function body must end with a curly bracket');
+                $endPos = $stream->position();
+
+                // update token stream
+                $this->replacementNodes[$replacementNodeIndex] = new Node\AnonFuncNode($parameterNodes, $bodyNode);
+                $replacement = new Token(Token::REPLACEMENT_TYPE, $replacementNodeIndex, $operatorCursor);
+                $stream = $stream->splice($startPos, $endPos - $startPos, array($replacement));
+
+                // keep parsing anonymous functions
+                $stream->seek($startPos, SEEK_SET);
+            }
+
+            $stream->next();
+        }
+        $stream->rewind();
+
+        return $stream;
     }
 
     public function parseExpression($precedence = 0)
@@ -220,6 +331,11 @@ class Parser
                 $this->stream->next();
 
                 return new Node\ConstantNode($token->value);
+
+            case Token::REPLACEMENT_TYPE:
+                $this->stream->next();
+
+                return $this->replacementNodes[$token->value];
 
             default:
                 if ($token->test(Token::PUNCTUATION_TYPE, '[')) {

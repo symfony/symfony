@@ -28,6 +28,7 @@ class Token
     const STRING_TYPE = 'string';
     const OPERATOR_TYPE = 'operator';
     const PUNCTUATION_TYPE = 'punctuation';
+    const REPLACEMENT_TYPE = 'replacement';
 
     /**
      * Constructor.

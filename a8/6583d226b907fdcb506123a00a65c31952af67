@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by Bouwdie at 2016-08-26T12:19:48Z
+
+Could the build please be restarted? I squashed a commit on the fork branch.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-08-26T14:24:47Z
+
+@Bouwdie the build is triggered automatically on push. I restarted it nevertheless.
+
+The [failure is legitimate](https://travis-ci.org/symfony/symfony/jobs/155322085#L2836) (it's introduced by this PR).
+
+---------------------------------------------------------------------------
+
+by Bouwdie at 2016-08-26T18:44:12Z
+
+@jakzal thx for restarting them anyway! I should have taken the behaviour of is_callable into account.
+https://3v4l.org/j8CBb. The test opened something up that already occurred if a non-static method was given as callback.
+
+---------------------------------------------------------------------------
+
+by Bouwdie at 2016-08-30T06:14:35Z
+
+@jakzal Everything is working correctly and the build succeeds. Is there anything more i can do to speed the review process?
+
+---------------------------------------------------------------------------
+
+by fraghi at 2016-09-16T10:51:58Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by bdemes at 2016-09-16T10:54:31Z
+
+:+1:

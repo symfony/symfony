@@ -154,7 +154,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 'bar',
                 array('foo' => 'bar'),
             ),
-            
+
             array(
                 new Node\AnonFuncNode(
                     array(
@@ -201,7 +201,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                 ),
                 '(foo, bars) -> { foo * map(bars, (bar) -> { bar * baz }) }',
                 array('baz'),
-                array('map' => 'array_map')
+                array('map' => 'array_map'),
             ),
         );
     }

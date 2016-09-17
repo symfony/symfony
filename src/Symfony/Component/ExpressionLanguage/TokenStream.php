@@ -115,7 +115,7 @@ class TokenStream
      */
     public function seek($offset, $whence)
     {
-        switch($whence){
+        switch ($whence) {
             case SEEK_CUR:
                 $this->position += $offset;
                 break;
@@ -185,9 +185,10 @@ class TokenStream
     /**
      * Returns new TokenStream with tokens replaced by some others.
      *
-     * @param int $offset
-     * @param int $length
+     * @param int   $offset
+     * @param int   $length
      * @param array $replacements
+     *
      * @return \static
      */
     public function splice($offset, $length, $replacements)

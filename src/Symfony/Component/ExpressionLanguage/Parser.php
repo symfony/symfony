@@ -134,6 +134,7 @@ class Parser
      * Replaces all anonymous functions with placeholder tokens.
      *
      * @param TokenStream $stream
+     *
      * @return TokenStream
      */
     protected function preParseAnonFuncs(TokenStream $stream)
@@ -172,11 +173,11 @@ class Parser
                 $openingBracketCount = 1;
                 while ($openingBracketCount != 0) {
                     if ($stream->current->test(Token::PUNCTUATION_TYPE, '{')) {
-                        $openingBracketCount++;
+                        ++$openingBracketCount;
                     }
 
                     if ($stream->current->test(Token::PUNCTUATION_TYPE, '}')) {
-                        $openingBracketCount--;
+                        --$openingBracketCount;
                     }
 
                     if (!$openingBracketCount) {

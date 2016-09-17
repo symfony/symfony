@@ -25,11 +25,10 @@ class AnonFuncNode extends Node
      * @var SafeCallable
      */
     private static $noopSafeCallable;
-    
+
     /**
-     * 
      * @param NameNode[] $parameters
-     * @param Node|null $body
+     * @param Node|null  $body
      */
     public function __construct(array $parameters, Node $body = null)
     {
@@ -39,7 +38,7 @@ class AnonFuncNode extends Node
                 'body' => $body,
             )
         );
-        
+
         if (!self::$noopSafeCallable) {
             self::$noopSafeCallable = new SafeCallable(function () {});
         }
@@ -47,12 +46,12 @@ class AnonFuncNode extends Node
 
     public function compile(Compiler $compiler)
     {
-        $arguments = [];
-        
+        $arguments = array();
+
         foreach ($this->nodes['parameters'] as $parameterNode) {
             $arguments[] = $compiler->subcompile($parameterNode);
         }
-        
+
         $compiler->raw(
             sprintf(
                 'function (%s) { return %s; }',
@@ -67,17 +66,18 @@ class AnonFuncNode extends Node
         if (!$this->nodes['body']) {
             return self::$noopSafeCallable;
         }
-        
+
         $paramNames = array();
-        
+
         foreach ($this->nodes['parameters'] as $parameterNode) {
             $nodeData = $parameterNode->toArray();
             $paramNames[] = $nodeData[0];
         }
-        
+
         return new SafeCallable(
-            function () use($functions, $paramNames) {
+            function () use ($functions, $paramNames) {
                 $passedValues = array_combine($paramNames, func_get_args());
+
                 return $this->nodes['body']->evaluate($functions, $passedValues);
             }
         );

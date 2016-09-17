@@ -27,11 +27,11 @@ class AnonFuncNodeTest extends AbstractNodeTest
         $safeCallback = $node->evaluate($functions, $variables);
         $this->assertInstanceOf(SafeCallable::class, $safeCallback);
         $this->assertTrue(is_callable($safeCallback->getCallback()));
-        
+
         $actualResult = $safeCallback->callArray($variables);
         $this->assertSame($expectedResult, $actualResult);
     }
-    
+
     public function getEvaluateData()
     {
         return array(
@@ -40,7 +40,7 @@ class AnonFuncNodeTest extends AbstractNodeTest
                 new AnonFuncNode(
                     array(),
                     null
-                )
+                ),
             ),
             'one parameter, returned' => array(
                 123,
@@ -48,7 +48,7 @@ class AnonFuncNodeTest extends AbstractNodeTest
                     array(new NameNode('foo')),
                     new NameNode('foo')
                 ),
-                array('foovalue' => 123)
+                array('foovalue' => 123),
             ),
             'two parameters, multiplied and result returned' => array(
                 246,
@@ -56,7 +56,7 @@ class AnonFuncNodeTest extends AbstractNodeTest
                     array(new NameNode('foo'), new NameNode('bar')),
                     new BinaryNode('*', new NameNode('foo'), new NameNode('bar'))
                 ),
-                array('foovalue' => 123, 'barvalue' => 2)
+                array('foovalue' => 123, 'barvalue' => 2),
             ),
             'one unused parameter, returns literal' => array(
                 890,
@@ -64,7 +64,7 @@ class AnonFuncNodeTest extends AbstractNodeTest
                     array(new NameNode('foo')),
                     new ConstantNode(890)
                 ),
-                array('foovalue' => 123)
+                array('foovalue' => 123),
             ),
         );
     }
@@ -77,21 +77,21 @@ class AnonFuncNodeTest extends AbstractNodeTest
                 new AnonFuncNode(
                     array(),
                     null
-                )
+                ),
             ),
             array(
                 'function ($foo) { return $foo; }',
                 new AnonFuncNode(
                     array(new NameNode('foo')),
                     new NameNode('foo')
-                )
+                ),
             ),
             array(
                 'function ($foo, $bar) { return ($foo * $bar); }',
                 new AnonFuncNode(
                     array(new NameNode('foo'), new NameNode('bar')),
                     new BinaryNode('*', new NameNode('foo'), new NameNode('bar'))
-                )
+                ),
             ),
         );
     }
@@ -104,28 +104,28 @@ class AnonFuncNodeTest extends AbstractNodeTest
                 new AnonFuncNode(
                     array(),
                     null
-                )
+                ),
             ),
             array(
                 '(foo) -> {foo}',
                 new AnonFuncNode(
                     array(new NameNode('foo')),
                     new NameNode('foo')
-                )
+                ),
             ),
             array(
                 '(foo) -> {"bar"}',
                 new AnonFuncNode(
                     array(new NameNode('foo')),
                     new ConstantNode('bar')
-                )
+                ),
             ),
             array(
                 '(foo, bar) -> {(foo * bar)}',
                 new AnonFuncNode(
                     array(new NameNode('foo'), new NameNode('bar')),
                     new BinaryNode('*', new NameNode('foo'), new NameNode('bar'))
-                )
+                ),
             ),
         );
     }

@@ -643,6 +643,9 @@ Translation
  * Removed `Symfony\Component\Translation\Writer\TranslationWriter::writeTranslations`, 
    use `Symfony\Component\Translation\Writer\TranslationWriter::write` instead. 
 
+ * Removed support for passing `Symfony\Component\Translation\MessageSelector` as a second argument to the
+   `Translator::__construct()`. You should pass an instance of `Symfony\Component\Translation\Formatter\MessageFormatterInterface` instead.
+
 TwigBundle
 ----------
 

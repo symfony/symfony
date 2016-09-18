@@ -14,9 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Translation\MessageSelector;
 
 class TranslatorTest extends TestCase
 {
@@ -149,7 +149,7 @@ class TranslatorTest extends TestCase
             ->with('kernel.default_locale')
             ->will($this->returnValue('en'))
         ;
-        $translator = new Translator($container, new MessageSelector());
+        $translator = new Translator($container, new MessageFormatter());
 
         $this->assertSame('en', $translator->getLocale());
     }
@@ -162,7 +162,7 @@ class TranslatorTest extends TestCase
     public function testGetDefaultLocaleOmittingLocaleWithPsrContainer()
     {
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $translator = new Translator($container, new MessageSelector());
+        $translator = new Translator($container, new MessageFormatter());
     }
 
     /**
@@ -277,7 +277,7 @@ class TranslatorTest extends TestCase
     public function testGetDefaultLocale()
     {
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $translator = new Translator($container, new MessageSelector(), 'en');
+        $translator = new Translator($container, new MessageFormatter(), 'en');
 
         $this->assertSame('en', $translator->getLocale());
     }
@@ -290,7 +290,7 @@ class TranslatorTest extends TestCase
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
-        (new Translator($container, new MessageSelector(), 'en', array(), array('foo' => 'bar')));
+        (new Translator($container, new MessageFormatter(), 'en', array(), array('foo' => 'bar')));
     }
 
     /** @dataProvider getDebugModeAndCacheDirCombinations */
@@ -468,7 +468,7 @@ class TranslatorTest extends TestCase
         if (null === $defaultLocale) {
             return new $translatorClass(
                 $this->getContainer($loader),
-                new MessageSelector(),
+                new MessageFormatter(),
                 array($loaderFomat => array($loaderFomat)),
                 $options
             );
@@ -476,7 +476,7 @@ class TranslatorTest extends TestCase
 
         return new $translatorClass(
             $this->getContainer($loader),
-            new MessageSelector(),
+            new MessageFormatter(),
             $defaultLocale,
             array($loaderFomat => array($loaderFomat)),
             $options

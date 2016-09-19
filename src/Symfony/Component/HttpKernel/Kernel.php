@@ -537,6 +537,18 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $parameters = array();
         foreach ($_SERVER as $key => $value) {
             if (0 === strpos($key, 'SYMFONY__')) {
+                if (is_numeric($value)) {
+                    $value = is_float($value + 0) ? (float) $value : (int) $value;
+                } elseif ('true' === strtolower($value)) {
+                    $value = true;
+                } elseif ('false' === strtolower($value)) {
+                    $value = false;
+                } elseif ('null' === strtolower($value)) {
+                    $value = null;
+                } elseif (($json = json_decode($value, true)) && json_last_error() === JSON_ERROR_NONE) {
+                    $value = $json;
+                }
+
                 $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
             }
         }

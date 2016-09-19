@@ -149,6 +149,45 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($found);
     }
 
+    public function testEnvParameters()
+    {
+        $method = new \ReflectionMethod(Kernel::class, 'getEnvParameters');
+        $method->setAccessible(true);
+
+        $_SERVER = array(
+            'SYMFONY__PARAMETER_TRUE_1' => 'TRUE',
+            'SYMFONY__PARAMETER_TRUE_2' => 'true',
+            'SYMFONY__PARAMETER_FALSE_1' => 'FALSE',
+            'SYMFONY__PARAMETER_FALSE_2'=> 'false',
+            'SYMFONY__PARAMETER_NULL_1' => 'null',
+            'SYMFONY__PARAMETER_NULL_2' => 'NULL',
+            'SYMFONY__PARAMETER_INT_1' => '314',
+            'SYMFONY__PARAMETER_INT_2' => '2e5',
+            'SYMFONY__PARAMETER_FLOAT_1' => '3.14',
+            'SYMFONY__PARAMETER_STRING_1'  => 'Some string',
+            'SYMFONY__PARAMETER_JSON_1' => '[1, 2, 3]',
+            'SYMFONY__PARAMETER_JSON_2' => '{"int": [1,2,3], "bool": [false, true, null], "assoc":{"a": 1, "b": 2, "c": "some string"}}'
+        );
+        $this->assertSame($method->invoke($this->getKernel()), array(
+            'parameter_true_1' => true,
+            'parameter_true_2' => true,
+            'parameter_false_1' => false,
+            'parameter_false_2' => false,
+            'parameter_null_1' => null,
+            'parameter_null_2' => null,
+            'parameter_int_1' => 314,
+            'parameter_int_2' => 2e5,
+            'parameter_float_1' => 3.14,
+            'parameter_string_1' => 'Some string',
+            'parameter_json_1' => array(1, 2, 3),
+            'parameter_json_2' => array(
+                'int' => array(1, 2, 3),
+                'bool' => array(false, true, null),
+                'assoc' => array('a' => 1, 'b' => 2, 'c' => 'some string')
+            )
+        ));
+    }
+
     public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));

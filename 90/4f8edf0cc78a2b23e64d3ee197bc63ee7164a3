@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-19T04:43:35Z
+
+Note that this does not change the test at all, just that the order of the arrays to compare are not the same on a Mac, so the assertion fails.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-19T05:28:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-09-19T08:26:53Z
+
+👍

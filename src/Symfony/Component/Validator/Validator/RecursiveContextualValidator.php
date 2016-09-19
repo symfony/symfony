@@ -773,7 +773,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         $cascadedGroups = $cascadedGroup ? array($cascadedGroup) : null;
 
         foreach ($groupSequence->groups as $groupInSequence) {
-            $groups = array($groupInSequence);
+            $groups = (array) $groupInSequence;
 
             if ($metadata instanceof ClassMetadataInterface) {
                 $this->validateClassNode(

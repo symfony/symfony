@@ -1212,6 +1212,20 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
                     'Violation in Group 2',
                 ),
             ),
+            array(
+                'sequence' => new GroupSequence(array('Group 1', array('Group 2', 'Group 3'), 'Entity')),
+                'assertViolations' => array(
+                    'Violation in Group 2',
+                    'Violation in Group 3',
+                ),
+            ),
+            array(
+                'sequence' => array('Group 1', array('Group 2', 'Group 3'), 'Entity'),
+                'assertViolations' => array(
+                    'Violation in Group 2',
+                    'Violation in Group 3',
+                ),
+            ),
         );
     }
 }

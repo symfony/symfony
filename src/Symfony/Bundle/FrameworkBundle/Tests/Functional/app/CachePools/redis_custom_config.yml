@@ -6,7 +6,7 @@ services:
         public: false
         class: Redis
         calls:
-            - [connect, [127.0.0.1]]
+            - [connect, ['%redis_host%']]
 
     cache.app:
         parent: cache.adapter.redis

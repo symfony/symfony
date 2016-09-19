@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpFoundation\Tests\File;
 
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\Tests\Fixtures\PaddingStreamWrapper;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,6 +27,21 @@ class FileTest extends \PHPUnit_Framework_TestCase
         MimeTypeGuesser::getInstance()->register($guesser);
 
         $this->assertEquals('image/gif', $file->getMimeType());
+    }
+
+    public function testGetSizeWithStreamFilter()
+    {
+        // @todo Where should these fixture classes go so this isn't necessary?
+        require_once 'Fixtures/PaddingStreamWrapper.php';
+        require_once 'Fixtures/PaddingStreamFilter.php';
+
+        stream_wrapper_register('pad', '\Symfony\Component\HttpFoundation\File\Tests\Fixtures\PaddingStreamWrapper');
+        $path = 'pad://test';
+
+        $filtered_contents = file_get_contents($path);
+        $file = new File($path);
+
+        $this->assertEquals(strlen($filtered_contents), $file->getSize());
     }
 
     public function testGuessExtensionWithoutGuesser()

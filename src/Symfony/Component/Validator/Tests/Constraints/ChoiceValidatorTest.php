@@ -142,7 +142,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
         // search $this for "objectMethodCallback"
         $this->setObject($this);
 
-        $constraint = new Choice(array('callback' => 'objectMethodCallback'));
+        $constraint = new Choice(array('callback' => 'objectMethodCallback', 'strict' => true));
 
         $this->validator->validate('bar', $constraint);
 

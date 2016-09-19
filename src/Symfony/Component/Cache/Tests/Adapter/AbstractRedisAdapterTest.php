@@ -33,7 +33,7 @@ abstract class AbstractRedisAdapterTest extends AdapterTestCase
         if (!extension_loaded('redis')) {
             self::markTestSkipped('Extension redis required.');
         }
-        if (!@((new \Redis())->connect('127.0.0.1'))) {
+        if (!@((new \Redis())->connect(getenv('REDIS_HOST')))) {
             $e = error_get_last();
             self::markTestSkipped($e['message']);
         }

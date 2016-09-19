@@ -12,6 +12,7 @@
             <argument>%data_collector.templates%</argument>
             <argument>%web_profiler.debug_toolbar.position%</argument>
             <argument type="service" id="web_profiler.csp.handler" />
+            <argument>null</argument>
         </service>
 
         <service id="web_profiler.controller.router" class="Symfony\Bundle\WebProfilerBundle\Controller\RouterController">
@@ -41,11 +42,18 @@
                     <argument type="constant">Symfony\Component\VarDumper\Dumper\HtmlDumper::DUMP_LIGHT_ARRAY</argument>
                     <call method="setDisplayOptions">
                         <argument type="collection">
-                            <argument key="fileLinkFormat">%debug.file_link_format%</argument>
+                            <argument key="fileLinkFormat" type="service" id="debug.file_link_formatter"></argument>
                         </argument>
                     </call>
                 </service>
             </argument>
+        </service>
+
+        <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter" public="false">
+            <argument>%debug.file_link_format%</argument>
+            <argument type="service" id="request_stack" on-invalid="ignore" />
+            <argument>null</argument>
+            <argument>/_profiler/open?file=%%f&amp;line=%%l#line%%l</argument>
         </service>
     </services>
 </container>

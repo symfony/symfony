@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Templating\Helper;
 
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -27,18 +28,13 @@ class CodeHelper extends Helper
     /**
      * Constructor.
      *
-     * @param string|array $fileLinkFormat The format for links to source files
-     * @param string       $rootDir        The project root directory
-     * @param string       $charset        The charset
+     * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
+     * @param string                   $rootDir        The project root directory
+     * @param string                   $charset        The charset
      */
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
-        $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
-            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
-        }
-        $this->fileLinkFormat = $fileLinkFormat;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->rootDir = str_replace('\\', '/', $rootDir).'/';
         $this->charset = $charset;
     }
@@ -190,15 +186,8 @@ class CodeHelper extends Helper
      */
     public function getFileLink($file, $line)
     {
-        if ($this->fileLinkFormat && is_file($file)) {
-            for ($i = 1; isset($this->fileLinkFormat[$i]); ++$i) {
-                if (0 === strpos($file, $k = $this->fileLinkFormat[$i++])) {
-                    $file = substr_replace($path, $this->fileLinkFormat[$i], 0, strlen($k));
-                    break;
-                }
-            }
-
-            return strtr($this->fileLinkFormat[0], array('%f' => $file, '%l' => $line));
+        if ($fmt = $this->fileLinkFormat) {
+            return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
         }
 
         return false;

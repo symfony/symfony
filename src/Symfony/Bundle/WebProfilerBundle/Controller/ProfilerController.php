@@ -35,6 +35,7 @@ class ProfilerController
     private $templates;
     private $toolbarPosition;
     private $cspHandler;
+    private $baseDir;
 
     /**
      * Constructor.
@@ -44,8 +45,9 @@ class ProfilerController
      * @param \Twig_Environment     $twig            The twig environment
      * @param array                 $templates       The templates
      * @param string                $toolbarPosition The toolbar position (top, bottom, normal, or null -- use the configuration)
+     * @param string                $baseDir         The project root directory
      */
-    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal', ContentSecurityPolicyHandler $cspHandler = null)
+    public function __construct(UrlGeneratorInterface $generator, Profiler $profiler = null, \Twig_Environment $twig, array $templates, $toolbarPosition = 'normal', ContentSecurityPolicyHandler $cspHandler = null, $baseDir = null)
     {
         $this->generator = $generator;
         $this->profiler = $profiler;
@@ -53,6 +55,7 @@ class ProfilerController
         $this->templates = $templates;
         $this->toolbarPosition = $toolbarPosition;
         $this->cspHandler = $cspHandler;
+        $this->baseDir = $baseDir;
     }
 
     /**
@@ -392,6 +395,39 @@ class ProfilerController
         $phpinfo = ob_get_clean();
 
         return new Response($phpinfo, 200, array('Content-Type' => 'text/html'));
+    }
+
+    /**
+     * Displays the source of a file.
+     *
+     * @return Response A Response instance
+     *
+     * @throws NotFoundHttpException
+     */
+    public function openAction(Request $request)
+    {
+        if (null === $this->baseDir) {
+            throw new NotFoundHttpException('The base dir should be set.');
+        }
+
+        if ($this->profiler) {
+            $this->profiler->disable();
+        }
+
+        $file = $request->query->get('file');
+        $line = $request->query->get('line');
+
+        $filename = $this->baseDir.DIRECTORY_SEPARATOR.$file;
+
+        if (preg_match("'(^|[/\\\\])\.\.?([/\\\\]|$)'", $file) || !is_readable($filename)) {
+            throw new NotFoundHttpException(sprintf('The file "%s" cannot be opened.', $file));
+        }
+
+        return new Response($this->twig->render('@WebProfiler/Profiler/open.html.twig', array(
+            'filename' => $filename,
+            'file' => $file,
+            'line' => $line,
+         )), 200, array('Content-Type' => 'text/html'));
     }
 
     /**

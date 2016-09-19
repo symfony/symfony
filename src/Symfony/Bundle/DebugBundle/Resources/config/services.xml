@@ -14,7 +14,7 @@
         <service id="data_collector.dump" class="Symfony\Component\HttpKernel\DataCollector\DumpDataCollector">
             <tag name="data_collector" id="dump" template="@Debug/Profiler/dump.html.twig" priority="240" />
             <argument type="service" id="debug.stopwatch" on-invalid="ignore" />
-            <argument>%debug.file_link_format%</argument>
+            <argument type="service" id="debug.file_link_formatter"></argument>
             <argument>%kernel.charset%</argument>
             <argument type="service" id="request_stack" />
             <argument>null</argument><!-- var_dumper.cli_dumper when debug.dump_destination is set -->
@@ -38,7 +38,7 @@
             <argument>0</argument> <!-- flags -->
             <call method="setDisplayOptions">
                 <argument type="collection">
-                    <argument key="fileLinkFormat">%debug.file_link_format%</argument>
+                    <argument key="fileLinkFormat" type="service" id="debug.file_link_formatter"></argument>
                 </argument>
             </call>
         </service>

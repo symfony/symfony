@@ -13,6 +13,7 @@ namespace Symfony\Component\Debug;
 
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\Exception\OutOfMemoryException;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 /**
  * ExceptionHandler converts an exception to a Response object.
@@ -37,14 +38,9 @@ class ExceptionHandler
 
     public function __construct($debug = true, $charset = null, $fileLinkFormat = null)
     {
-        $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
-            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
-        }
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
-        $this->fileLinkFormat = $fileLinkFormat;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
     }
 
     /**
@@ -87,21 +83,14 @@ class ExceptionHandler
     /**
      * Sets the format for links to source files.
      *
-     * @param string|array $format The format for links to source files
+     * @param string|FileLinkFormatter $format The format for links to source files
      *
      * @return string The previous file link format
      */
     public function setFileLinkFormat($fileLinkFormat)
     {
         $old = $this->fileLinkFormat;
-        if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
-            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
-        }
         $this->fileLinkFormat = $fileLinkFormat;
-        if ($old) {
-            $old = $old[0].($old[1] ? '#'.http_build_query($old[1], '', '&') : '');
-        }
 
         return $old;
     }
@@ -363,16 +352,9 @@ EOF;
     private function formatPath($path, $line)
     {
         $file = $this->escapeHtml(preg_match('#[^/\\\\]*+$#', $path, $file) ? $file[0] : $path);
+        $fmt = $this->fileLinkFormat;
 
-        if ($fileLinkFormat = $this->fileLinkFormat) {
-            for ($i = 1; isset($fileLinkFormat[$i]); ++$i) {
-                if (0 === strpos($path, $k = $fileLinkFormat[$i++])) {
-                    $path = substr_replace($path, $fileLinkFormat[$i], 0, strlen($k));
-                    break;
-                }
-            }
-            $link = strtr($fileLinkFormat[0], array('%f' => $path, '%l' => (int) $line));
-
+        if ($fmt && $link = is_string($fmt) ? strtr($fmt, array('%f' => $path, '%l' => $line)) : $fmt->format($path, $line)) {
             return sprintf(' in <a href="%s" title="Go to source">%s line %d</a>', $this->escapeHtml($link), $file, $line);
         }
 

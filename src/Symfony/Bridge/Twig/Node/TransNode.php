@@ -97,6 +97,10 @@ class TransNode extends \Twig_Node
 
         foreach ($matches[1] as $var) {
             $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getLine());
+            // @todo condition to be removed the minimum twig/twig version is raised to ^1.25||^2.0 (getFilename will always exist)
+            if (method_exists($key, 'getFilename')) {
+                $key->setAttribute('module_filename', $vars->getFilename());
+            }
             if (!$vars->hasElement($key)) {
                 if ('count' === $var && null !== $this->getNode('count')) {
                     $vars->addElement($this->getNode('count'), $key);

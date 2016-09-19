@@ -78,7 +78,7 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
                 }
             }
         } elseif ($node instanceof TransNode) {
-            if (null === $node->getNode('domain')) {
+            if (!$node->hasNode('domain')) {
                 $node->setNode('domain', $this->scope->get('domain'));
             }
         }

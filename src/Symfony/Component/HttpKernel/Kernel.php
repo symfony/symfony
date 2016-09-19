@@ -672,9 +672,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @param ContainerInterface $container The service container
      *
-     * @throws \InvalidArgumentException When the container is not an instance of ContainerBuilder
-     *
      * @return DelegatingLoader The loader
+     *
+     * @throws \InvalidArgumentException When the container is not an instance of ContainerBuilder
      */
     protected function getContainerLoader(ContainerInterface $container)
     {

@@ -21,6 +21,8 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class ResultIterator implements \Iterator
 {
+    use AttributeCleaner;
+
     private $connection;
     private $search;
     private $current;
@@ -44,6 +46,8 @@ class ResultIterator implements \Iterator
         if (false === $attributes) {
             throw new LdapException(sprintf('Could not fetch attributes: %s', ldap_error($this->connection)));
         }
+
+        $attributes = $this->cleanupAttributes($attributes);
 
         $dn = ldap_get_dn($this->connection, $this->current);
 

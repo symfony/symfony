@@ -20,7 +20,7 @@ use Symfony\Component\Ldap\LdapInterface;
 /**
  * @group legacy
  */
-class LdapClientTest extends \PHPUnit_Framework_TestCase
+class LdapClientTest extends LdapTestCase
 {
     /** @var LdapClient */
     private $client;
@@ -72,13 +72,11 @@ class LdapClientTest extends \PHPUnit_Framework_TestCase
             ->method('getIterator')
             ->will($this->returnValue(new \ArrayIterator(array(
                 new Entry('cn=qux,dc=foo,dc=com', array(
-                    'dn' => array('cn=qux,dc=foo,dc=com'),
                     'cn' => array('qux'),
                     'dc' => array('com', 'foo'),
                     'givenName' => array('Qux'),
                 )),
                 new Entry('cn=baz,dc=foo,dc=com', array(
-                    'dn' => array('cn=baz,dc=foo,dc=com'),
                     'cn' => array('baz'),
                     'dc' => array('com', 'foo'),
                     'givenName' => array('Baz'),
@@ -101,78 +99,44 @@ class LdapClientTest extends \PHPUnit_Framework_TestCase
         $expected = array(
             'count' => 2,
             0 => array(
-                'count' => 4,
-                0 => array(
-                    'count' => 1,
-                    0 => 'cn=qux,dc=foo,dc=com',
-                ),
-                'dn' => array(
-                    'count' => 1,
-                    0 => 'cn=qux,dc=foo,dc=com',
-                ),
-                1 => array(
-                    'count' => 1,
-                    0 => 'qux',
-                ),
+                'count' => 3,
+                0 => 'cn',
                 'cn' => array(
                     'count' => 1,
                     0 => 'qux',
                 ),
-                2 => array(
-                    'count' => 2,
-                    0 => 'com',
-                    1 => 'foo',
-                ),
+                1 => 'dc',
                 'dc' => array(
                     'count' => 2,
                     0 => 'com',
                     1 => 'foo',
                 ),
-                3 => array(
+                2 => 'givenname',
+                'givenname' => array(
                     'count' => 1,
                     0 => 'Qux',
                 ),
-                'givenName' => array(
-                    'count' => 1,
-                    0 => 'Qux',
-                ),
+                'dn' => 'cn=qux,dc=foo,dc=com',
             ),
             1 => array(
-                'count' => 4,
-                0 => array(
-                    'count' => 1,
-                    0 => 'cn=baz,dc=foo,dc=com',
-                ),
-                'dn' => array(
-                    'count' => 1,
-                    0 => 'cn=baz,dc=foo,dc=com',
-                ),
-                1 => array(
-                    'count' => 1,
-                    0 => 'baz',
-                ),
+                'count' => 3,
+                0 => 'cn',
                 'cn' => array(
                     'count' => 1,
                     0 => 'baz',
                 ),
-                2 => array(
-                    'count' => 2,
-                    0 => 'com',
-                    1 => 'foo',
-                ),
+                1 => 'dc',
                 'dc' => array(
                     'count' => 2,
                     0 => 'com',
                     1 => 'foo',
                 ),
-                3 => array(
+                2 => 'givenname',
+                'givenname' => array(
                     'count' => 1,
                     0 => 'Baz',
                 ),
-                'givenName' => array(
-                    'count' => 1,
-                    0 => 'Baz',
-                ),
+                'dn' => 'cn=baz,dc=foo,dc=com',
             ),
         );
         $this->assertEquals($expected, $this->client->find('dc=foo,dc=com', 'bar', 'baz'));
@@ -188,6 +152,25 @@ class LdapClientTest extends \PHPUnit_Framework_TestCase
         $reflMethod->setAccessible(true);
         array_unshift($args, $this->client);
         $this->assertEquals($expected, call_user_func_array(array($reflMethod, 'invoke'), $args));
+    }
+
+    /**
+     * @group functional
+     * @requires extension ldap
+     */
+    public function testLdapClientFunctional()
+    {
+        $config = $this->getLdapConfig();
+        $ldap = new LdapClient($config['host'], $config['port']);
+        $ldap->bind('cn=admin,dc=symfony,dc=com', 'symfony');
+        $result = $ldap->find('dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))');
+
+        $con = @ldap_connect($config['host'], $config['port']);
+        @ldap_bind($con, 'cn=admin,dc=symfony,dc=com', 'symfony');
+        $search = @ldap_search($con, 'dc=symfony,dc=com', '(&(objectclass=person)(ou=Maintainers))', array('*'));
+        $expected = @ldap_get_entries($con, $search);
+
+        $this->assertSame($expected, $result);
     }
 
     public function provideConfig()

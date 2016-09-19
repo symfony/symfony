@@ -20,6 +20,8 @@ use Symfony\Component\Ldap\Exception\LdapException;
  */
 class Collection implements CollectionInterface
 {
+    use AttributeCleaner;
+
     private $connection;
     private $search;
     private $entries;
@@ -105,18 +107,5 @@ class Collection implements CollectionInterface
 
             return new Entry($dn, $attributes);
         }, $entries);
-    }
-
-    private function cleanupAttributes(array $entry = array())
-    {
-        $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + array(
-                'count' => null,
-                'dn' => null,
-            ));
-        array_walk($attributes, function (&$value) {
-            unset($value['count']);
-        });
-
-        return $attributes;
     }
 }

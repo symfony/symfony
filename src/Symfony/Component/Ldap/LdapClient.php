@@ -64,24 +64,34 @@ final class LdapClient implements LdapClientInterface
 
         $query = $this->ldap->query($dn, $query, array('filter' => $filter));
         $entries = $query->execute();
-        $result = array();
+        $result = array(
+            'count' => 0,
+        );
 
         foreach ($entries as $entry) {
             $resultEntry = array();
 
             foreach ($entry->getAttributes() as $attribute => $values) {
-                $resultAttribute = $values;
+                $resultAttribute = array(
+                    'count' => count($values),
+                );
+
+                foreach ($values as $val) {
+                    $resultAttribute[] = $val;
+                }
+                $attributeName = strtolower($attribute);
 
                 $resultAttribute['count'] = count($values);
-                $resultEntry[] = $resultAttribute;
-                $resultEntry[$attribute] = $resultAttribute;
+                $resultEntry[$attributeName] = $resultAttribute;
+                $resultEntry[] = $attributeName;
             }
 
             $resultEntry['count'] = count($resultEntry) / 2;
+            $resultEntry['dn'] = $entry->getDn();
             $result[] = $resultEntry;
         }
 
-        $result['count'] = count($result);
+        $result['count'] = count($result) - 1;
 
         return $result;
     }

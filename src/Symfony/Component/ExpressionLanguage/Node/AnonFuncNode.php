@@ -63,22 +63,26 @@ class AnonFuncNode extends Node
 
     public function evaluate($functions, $values)
     {
-        if (!$this->nodes['body']) {
+        /** @var Node|null $bodyNode */
+        $bodyNode = $this->nodes['body'];
+
+        if (!$bodyNode) {
             return self::$noopSafeCallable;
         }
 
         $paramNames = array();
 
         foreach ($this->nodes['parameters'] as $parameterNode) {
+            /** @var NameNode $parameterNode */
             $nodeData = $parameterNode->toArray();
             $paramNames[] = $nodeData[0];
         }
 
         return new SafeCallable(
-            function () use ($functions, $paramNames) {
+            function () use ($functions, $paramNames, $bodyNode) {
                 $passedValues = array_combine($paramNames, func_get_args());
 
-                return $this->nodes['body']->evaluate($functions, $passedValues);
+                return $bodyNode->evaluate($functions, $passedValues);
             }
         );
     }

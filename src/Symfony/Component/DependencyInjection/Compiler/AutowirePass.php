@@ -218,6 +218,13 @@ class AutowirePass implements CompilerPassInterface
         foreach ($this->container->getDefinitions() as $id => $definition) {
             $this->populateAvailableType($id, $definition);
         }
+
+        foreach ($this->container->getAliases() as $id => $alias) {
+            foreach ($alias->getAutowiringTypes() as $type) {
+                $this->definedTypes[$type] = true;
+                $this->types[$type] = $id;
+            }
+        }
     }
 
     /**

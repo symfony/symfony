@@ -177,11 +177,11 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['alias'])) {
             $public = !array_key_exists('public', $service) || (bool) $service['public'];
-            $this->container->setAlias($id, new Alias($service['alias'], $public));
+            $this->container->setAlias($id, new Alias($service['alias'], $public, $this->parseAutowiringTypes($service, $id, $file)));
 
             foreach ($service as $key => $value) {
-                if (!in_array($key, array('alias', 'public'))) {
-                    @trigger_error(sprintf('The configuration key "%s" is unsupported for alias definition "%s" in "%s". Allowed configuration keys are "alias" and "public". The YamlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $key, $id, $file), E_USER_DEPRECATED);
+                if (!in_array($key, array('alias', 'public', 'autowiring_types'))) {
+                    @trigger_error(sprintf('The configuration key "%s" is unsupported for alias definition "%s" in "%s". Allowed configuration keys are "alias", "public" and "autowiring_types". The YamlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported attributes.', $key, $id, $file), E_USER_DEPRECATED);
                 }
             }
 
@@ -305,23 +305,7 @@ class YamlFileLoader extends FileLoader
             $definition->setAutowired($service['autowire']);
         }
 
-        if (isset($service['autowiring_types'])) {
-            if (is_string($service['autowiring_types'])) {
-                $definition->addAutowiringType($service['autowiring_types']);
-            } else {
-                if (!is_array($service['autowiring_types'])) {
-                    throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be a string or an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
-                }
-
-                foreach ($service['autowiring_types'] as $autowiringType) {
-                    if (!is_string($autowiringType)) {
-                        throw new InvalidArgumentException(sprintf('A "autowiring_types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
-                    }
-
-                    $definition->addAutowiringType($autowiringType);
-                }
-            }
-        }
+        $definition->setAutowiringTypes($this->parseAutowiringTypes($service, $id, $file));
 
         $this->container->setDefinition($id, $definition);
     }
@@ -498,6 +482,29 @@ class YamlFileLoader extends FileLoader
             }
 
             $this->container->loadFromExtension($namespace, $values);
+        }
+    }
+
+    private function parseAutowiringTypes(array $service, $id, $file)
+    {
+        if (!isset($service['autowiring_types'])) {
+            return array();
+        }
+
+        if (is_string($service['autowiring_types'])) {
+            return array($service['autowiring_types']);
+        } else {
+            if (!is_array($service['autowiring_types'])) {
+                throw new InvalidArgumentException(sprintf('Parameter "autowiring_types" must be a string or an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+            }
+
+            foreach ($service['autowiring_types'] as $autowiringType) {
+                if (!is_string($autowiringType)) {
+                    throw new InvalidArgumentException(sprintf('A "autowiring_types" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                }
+            }
+
+            return $service['autowiring_types'];
         }
     }
 

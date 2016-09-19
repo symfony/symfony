@@ -5,5 +5,8 @@
             <autowiring-type>Bar</autowiring-type>
             <autowiring-type>Baz</autowiring-type>
         </service>
+        <service id="router" alias="router.default">
+            <autowiring-type>Router</autowiring-type>
+        </service>
     </services>
 </container>

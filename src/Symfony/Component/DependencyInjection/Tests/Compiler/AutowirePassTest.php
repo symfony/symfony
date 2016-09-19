@@ -535,6 +535,28 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass = new AutowirePass();
         $pass->process($container);
     }
+
+    public function testAutowiringTypesAliasDefinition()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a.default', __NAMESPACE__.'\A');
+        $container->register('a.extra', __NAMESPACE__.'\B');
+        $container->register('c', __NAMESPACE__.'\C')->setAutowired(true);
+        $container->setAlias('a', 'a.extra');
+
+        $container->getAlias('a')->addAutowiringType(__NAMESPACE__.'\A');
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertEquals(
+            array(
+                new Reference('a'),
+            ),
+            $container->getDefinition('c')->getArguments()
+        );
+    }
 }
 
 class Foo

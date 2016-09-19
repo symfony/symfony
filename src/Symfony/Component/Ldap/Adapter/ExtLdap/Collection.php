@@ -24,11 +24,10 @@ class Collection implements CollectionInterface
     private $search;
     private $entries;
 
-    public function __construct(Connection $connection, Query $search, array $entries = array())
+    public function __construct(Connection $connection, Query $search)
     {
         $this->connection = $connection;
         $this->search = $search;
-        $this->entries = array();
     }
 
     /**
@@ -36,78 +35,91 @@ class Collection implements CollectionInterface
      */
     public function toArray()
     {
-        $this->initialize();
+        if (null === $this->entries) {
+            $this->entries = iterator_to_array($this->getIterator(), false);
+        }
 
         return $this->entries;
     }
 
     public function count()
     {
-        $this->initialize();
+        if (false !== $count = ldap_count_entries($this->connection->getResource(), $this->search->getResource())) {
+            return $count;
+        }
 
-        return count($this->entries);
+        throw new LdapException(sprintf('Error while retrieving entry count: %s', ldap_error($this->connection->getResource())));
     }
 
     public function getIterator()
     {
-        return new ResultIterator($this->connection, $this->search);
+        $con = $this->connection->getResource();
+        $search = $this->search->getResource();
+        $current = ldap_first_entry($con, $search);
+
+        if (0 === $this->count()) {
+            return;
+        }
+
+        if (false === $current) {
+            throw new LdapException(sprintf('Could not rewind entries array: %s', ldap_error($con)));
+        }
+
+        yield $this->getSingleEntry($con, $current);
+
+        while (false !== $current = ldap_next_entry($con, $current)) {
+            yield $this->getSingleEntry($con, $current);
+        }
     }
 
     public function offsetExists($offset)
     {
-        $this->initialize();
+        $this->toArray();
 
         return isset($this->entries[$offset]);
     }
 
     public function offsetGet($offset)
     {
+        $this->toArray();
+
         return isset($this->entries[$offset]) ? $this->entries[$offset] : null;
     }
 
     public function offsetSet($offset, $value)
     {
-        $this->initialize();
+        $this->toArray();
 
         $this->entries[$offset] = $value;
     }
 
     public function offsetUnset($offset)
     {
-        $this->initialize();
+        $this->toArray();
 
         unset($this->entries[$offset]);
     }
 
-    private function initialize()
+    private function getSingleEntry($con, $current)
     {
-        if (null === $this->entries) {
-            return;
+        $attributes = ldap_get_attributes($con, $current);
+
+        if (false === $attributes) {
+            throw new LdapException(sprintf('Could not fetch attributes: %s', ldap_error($con)));
         }
 
-        $con = $this->connection->getResource();
+        $attributes = $this->cleanupAttributes($attributes);
 
-        $entries = ldap_get_entries($con, $this->search->getResource());
+        $dn = ldap_get_dn($con, $current);
 
-        if (false === $entries) {
-            throw new LdapException(sprintf('Could not load entries: %s', ldap_error($con)));
+        if (false === $dn) {
+            throw new LdapException(sprintf('Could not fetch DN: %s', ldap_error($con)));
         }
 
-        if (0 === $entries['count']) {
-            return array();
-        }
-
-        unset($entries['count']);
-
-        $this->entries = array_map(function (array $entry) {
-            $dn = $entry['dn'];
-            $attributes = $this->cleanupAttributes($entry);
-
-            return new Entry($dn, $attributes);
-        }, $entries);
+        return new Entry($dn, $attributes);
     }
 
-    private function cleanupAttributes(array $entry = array())
+    private function cleanupAttributes(array $entry)
     {
         $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + array(
                 'count' => null,

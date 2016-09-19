@@ -19,26 +19,28 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
     {
         parent::setupBeforeClass();
         self::$redis = new \Redis();
-        self::$redis->connect('127.0.0.1');
+        self::$redis->connect(getenv('REDIS_HOST'));
     }
 
     public function testCreateConnection()
     {
-        $redis = RedisAdapter::createConnection('redis://localhost');
+        $redisHost = getenv('REDIS_HOST');
+
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost);
         $this->assertInstanceOf(\Redis::class, $redis);
         $this->assertTrue($redis->isConnected());
         $this->assertSame(0, $redis->getDbNum());
 
-        $redis = RedisAdapter::createConnection('redis://localhost/2');
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/2');
         $this->assertSame(2, $redis->getDbNum());
 
-        $redis = RedisAdapter::createConnection('redis://localhost', array('timeout' => 3));
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost, array('timeout' => 3));
         $this->assertEquals(3, $redis->getTimeout());
 
-        $redis = RedisAdapter::createConnection('redis://localhost?timeout=4');
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'?timeout=4');
         $this->assertEquals(4, $redis->getTimeout());
 
-        $redis = RedisAdapter::createConnection('redis://localhost', array('read_timeout' => 5));
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost, array('read_timeout' => 5));
         $this->assertEquals(5, $redis->getReadTimeout());
     }
 

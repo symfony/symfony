@@ -33,6 +33,10 @@
             <argument type="service" id="identity_translator" />
         </service>
 
+        <service id="translator.formatter.intl" class="Symfony\Component\Translation\Formatter\IntlMessageFormatter" public="false" />
+
+        <service id="translator.selector" class="Symfony\Component\Translation\MessageSelector" public="false" />
+
         <service id="translation.loader.php" class="Symfony\Component\Translation\Loader\PhpFileLoader">
             <tag name="translation.loader" alias="php" />
         </service>

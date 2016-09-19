@@ -31,6 +31,9 @@
             <argument type="service" id="translator.selector" />
         </service>
 
+        <service id="translator.formatter.intl" class="Symfony\Component\Translation\Formatter\IntlMessageFormatter" public="false">
+        </service>
+
         <service id="translator.selector" class="Symfony\Component\Translation\MessageSelector" public="false" />
 
         <service id="translation.loader.php" class="Symfony\Component\Translation\Loader\PhpFileLoader">

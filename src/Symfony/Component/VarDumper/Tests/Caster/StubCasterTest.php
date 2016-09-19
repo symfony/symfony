@@ -94,11 +94,12 @@ EODUMP;
         $dumper = new HtmlDumper();
         $dumper->setDumpHeader('<foo></foo>');
         $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $dumper->setDisplayOptions(array('fileLinkFormat' => '%f:%l'));
         $dump = $dumper->dump($cloner->cloneVar($var), true);
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
-  <span class=sf-dump-index>0</span> => "<a data-file="%sStubCasterTest.php" data-line="1"><span class=sf-dump-str title="%d characters">Symfony\Component\VarDumper\Tests\Caster\StubCasterTest</span></a>"
+  <span class=sf-dump-index>0</span> => "<a href="%sStubCasterTest.php:0"><span class=sf-dump-str title="55 characters">Symfony\Component\VarDumper\Tests\Caster\StubCasterTest</span></a>"
 </samp>]
 </bar>
 EODUMP;
@@ -114,11 +115,11 @@ EODUMP;
         $dumper = new HtmlDumper();
         $dumper->setDumpHeader('<foo></foo>');
         $dumper->setDumpBoundaries('<bar>', '</bar>');
-        $dump = $dumper->dump($cloner->cloneVar($var), true);
+        $dump = $dumper->dump($cloner->cloneVar($var), true, array('fileLinkFormat' => '%f:%l'));
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
-  <span class=sf-dump-index>0</span> => "<a data-file="%sFooInterface.php" data-line="8"><span class=sf-dump-str title="5 characters">hello</span></a>"
+  <span class=sf-dump-index>0</span> => "<a href="%sFooInterface.php:8"><span class=sf-dump-str title="5 characters">hello</span></a>"
 </samp>]
 </bar>
 EODUMP;
@@ -138,7 +139,8 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
-  <span class=sf-dump-index>0</span> => "<span class=sf-dump-str title="52 characters"><abbr title="Symfony\Component\VarDumper\Tests\Caster" class=sf-dump-ellipsis>Symfony\Component\VarDumper\Tests\Caster</abbr>\NotExisting</span>"
+  <span class=sf-dump-index>0</span> => "<span class=sf-dump-str title="Symfony\Component\VarDumper\Tests\Caster\NotExisting
+52 characters"><span class=sf-dump-ellipsis>Symfony\Component\VarDumper\Tests\Caster</span>\NotExisting</span>"
 </samp>]
 </bar>
 EODUMP;
@@ -154,11 +156,11 @@ EODUMP;
         $dumper = new HtmlDumper();
         $dumper->setDumpHeader('<foo></foo>');
         $dumper->setDumpBoundaries('<bar>', '</bar>');
-        $dump = $dumper->dump($cloner->cloneVar($var), true);
+        $dump = $dumper->dump($cloner->cloneVar($var), true, array('fileLinkFormat' => '%f:%l'));
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>array:1</span> [<samp>
-  <span class=sf-dump-index>0</span> => "<a data-file="%sFooInterface.php" data-line="5"><span class=sf-dump-str title="5 characters">hello</span></a>"
+  <span class=sf-dump-index>0</span> => "<a href="%sFooInterface.php:5"><span class=sf-dump-str title="5 characters">hello</span></a>"
 </samp>]
 </bar>
 EODUMP;

@@ -150,10 +150,12 @@ EODUMP;
 <foo></foo><bar><span class=sf-dump-note>Exception</span> {<samp>
   #<span class=sf-dump-protected title="Protected property">message</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
   #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
-  #<span class=sf-dump-protected title="Protected property">file</span>: "<a data-file="%sExceptionCasterTest.php" data-line="25"><span class=sf-dump-str title="%d characters"><abbr title="%sTests" class=sf-dump-ellipsis>%sTests</abbr>%eCaster%eExceptionCasterTest.php</span></a>"
+  #<span class=sf-dump-protected title="Protected property">file</span>: "<span class=sf-dump-str title="%sExceptionCasterTest.php
+%d characters"><span class=sf-dump-ellipsis>%sTests</span>%eCaster%eExceptionCasterTest.php</span>"
   #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>25</span>
   -<span class=sf-dump-private title="Private property defined in class:&#10;`Exception`">trace</span>: {<samp>
-    <span class=sf-dump-meta title="Stack level %d."><abbr title="%sVarDumper%eTests" class=sf-dump-ellipsis>%sVarDumper%eTests</abbr>%eCaster%eExceptionCasterTest.php</span>: <span class=sf-dump-num>25</span>
+    <span class=sf-dump-meta title="%sExceptionCasterTest.php
+Stack level %d."><span class=sf-dump-ellipsis>%sVarDumper%eTests</span>%eCaster%eExceptionCasterTest.php</span>: <span class=sf-dump-num>25</span>
      &hellip;12
   </samp>}
 </samp>}

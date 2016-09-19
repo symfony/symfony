@@ -59,6 +59,7 @@ class HtmlDumper extends CliDumper
     {
         AbstractDumper::__construct($output, $charset, $flags);
         $this->dumpId = 'sf-dump-'.mt_rand();
+        $this->displayOptions['fileLinkFormat'] = ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
     }
 
     /**
@@ -189,17 +190,13 @@ return function (root, x) {
         options = {$options},
         elt = root.getElementsByTagName('A'),
         len = elt.length,
-        i = 0, s, h, fmt,
+        i = 0, s, h,
         t = [];
 
     while (i < len) t.push(elt[i++]);
 
     for (i in x) {
         options[i] = x[i];
-    }
-    fmt = options.fileLinkFormat;
-    if (fmt && 'string' == typeof fmt) {
-        fmt = [fmt];
     }
 
     function a(e, f) {
@@ -221,8 +218,10 @@ return function (root, x) {
             refStyle.innerHTML = '';
         }
     });
-    a('mouseover', function (a) {
-        if (a = idRx.exec(a.className)) {
+    a('mouseover', function (a, e, c) {
+        if (c) {
+            e.target.style.cursor = "pointer";
+        } else if (a = idRx.exec(a.className)) {
             try {
                 refStyle.innerHTML = 'pre.sf-dump .'+a[0]+'{background-color: #B729D9; color: #FFF !important; border-radius: 2px}';
             } catch (e) {
@@ -321,16 +320,6 @@ return function (root, x) {
                     }
                 }
             }
-        } else if (fmt && (a = elt.getAttribute('data-file'))) {
-            if (fmt[1]) {
-                for (x in fmt[1]) {
-                    if (0 === a.indexOf(x)) {
-                        a = fmt[1][x] + a.substr(x.length);
-                        break;
-                    }
-                }
-            }
-            elt.href = fmt[0].replace('%l', elt.getAttribute('data-line')).replace('%f', a);
         }
     }
 
@@ -391,7 +380,7 @@ pre.sf-dump .sf-dump-ellipsis {
     display: inline-block;
     overflow: visible;
     text-overflow: ellipsis;
-    width: 50px;
+    width: 5em;
     white-space: nowrap;
     overflow: hidden;
     vertical-align: top;
@@ -411,7 +400,7 @@ EOHTML
         );
 
         foreach ($this->styles as $class => $style) {
-            $line .= 'pre.sf-dump'.('default' !== $class ? ' .sf-dump-'.$class : '').'{'.$style.'}';
+            $line .= 'pre.sf-dump'.('default' === $class ? ', pre.sf-dump' : '').' .sf-dump-'.$class.'{'.$style.'}';
         }
 
         return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
@@ -485,37 +474,27 @@ EOHTML
             $style .= sprintf(' title="Private property defined in class:&#10;`%s`"', esc($this->utf8Encode($attr['class'])));
         }
         $map = static::$controlCharsMap;
-        $style = "<span class=sf-dump-{$style}>";
 
         if (isset($attr['ellipsis'])) {
             $label = esc(substr($value, -$attr['ellipsis']));
-
-            $v = sprintf('</span>%s<abbr title="%s" class=sf-dump-ellipsis>%2$s</abbr>%s</span>%1$s', $style, substr($v, 0, -strlen($label)), $label);
+            $style = str_replace(' title="', " title=\"$v\n", $style);
+            $v = sprintf('<span class=sf-dump-ellipsis>%s</span>%s', substr($v, 0, -strlen($label)), $label);
         }
 
-        $v = preg_replace_callback(static::$controlCharsRx, function ($c) use ($map, $style) {
-            $s = '</span>';
+        $v = "<span class=sf-dump-{$style}>".preg_replace_callback(static::$controlCharsRx, function ($c) use ($map) {
+            $s = '<span class=sf-dump-default>';
             $c = $c[$i = 0];
             do {
                 $s .= isset($map[$c[$i]]) ? $map[$c[$i]] : sprintf('\x%02X', ord($c[$i]));
             } while (isset($c[++$i]));
 
-            return $s.$style;
-        }, $v, -1, $cchrCount);
+            return $s.'</span>';
+        }, $v).'</span>';
 
-        if ('<' === $v[0]) {
-            $v = substr($v, 7);
-        } else {
-            $v = $style.$v;
+        if (isset($attr['file']) && $href = $this->getSourceLink($attr['file'], isset($attr['line']) ? $attr['line'] : 0)) {
+            $attr['href'] = $href;
         }
-        if ('>' === substr($v, -1)) {
-            $v = substr($v, 0, -strlen($style));
-        } else {
-            $v .= '</span>';
-        }
-        if (isset($attr['file'])) {
-            $v = sprintf('<a data-file="%s" data-line="%d">%s</a>', esc($this->utf8Encode($attr['file'])), isset($attr['line']) ? $attr['line'] : 1, $v);
-        } elseif (isset($attr['href'])) {
+        if (isset($attr['href'])) {
             $v = sprintf('<a href="%s">%s</a>', esc($this->utf8Encode($attr['href'])), $v);
         }
         if (isset($attr['lang'])) {
@@ -553,6 +532,31 @@ EOHTML
             AbstractDumper::dumpLine(0);
         }
         AbstractDumper::dumpLine($depth);
+    }
+
+    private function getSourceLink($file, $line)
+    {
+        $fileLinkFormat = $this->extraDisplayOptions + $this->displayOptions;
+
+        if (!$fileLinkFormat = $fileLinkFormat['fileLinkFormat']) {
+            return false;
+        }
+        if (!is_array($fileLinkFormat)) {
+            $i = max(strpos($fileLinkFormat, '%f'), strpos($fileLinkFormat, '%l'));
+            $i = strpos($fileLinkFormat, '#"', $i) ?: strlen($fileLinkFormat);
+            $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
+            $fileLinkFormat[1] = @json_decode('{'.$fileLinkFormat[1].'}', true) ?: array();
+            $this->extraDisplayOptions['fileLinkFormat'] = $fileLinkFormat;
+        }
+
+        foreach ($fileLinkFormat[1] as $k => $v) {
+            if (0 === strpos($file, $k)) {
+                $file = substr_replace($file, $v, 0, strlen($k));
+                break;
+            }
+        }
+
+        return strtr($fileLinkFormat[0], array('%f' => $file, '%l' => $line));
     }
 }
 

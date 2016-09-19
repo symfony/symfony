@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-06T18:21:55Z
+
+Do you see anything else to change ?
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-07-11T21:06:42Z
+
+updated @fabpot
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-06T21:31:18Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-09-19T07:13:19Z
+
+I can see that this compiler pass makes the configuration of services a bit easier and less repetitive when using return types with PHP 7. To me it's fine to do the calls to the reflection API just during compile time and only when the classes haven't been configured explicitly. So I am 👍 on this feature.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-19T08:49:11Z
+
+I also think that it's a nice DX improvement. And it should not hurt as it is an opt-in feature. 👍

@@ -881,7 +881,11 @@ table.logs .metadata {
     margin: 0.5em 0;
 }
 
-#collector-content pre.sf-dump { color: #CC7832; }
+#collector-content pre.sf-dump,
+#collector-content .sf-dump-default {
+    color: #CC7832;
+    background: none;
+}
 #collector-content .sf-dump-str { color: #629755; }
 #collector-content .sf-dump-private,
 #collector-content .sf-dump-protected,
@@ -893,7 +897,6 @@ table.logs .metadata {
 #collector-content .sf-dump {
     margin: 0;
     padding: 0;
-    background: none;
     line-height: 1.4;
 }
 
@@ -902,10 +905,6 @@ table.logs .metadata {
     white-space: normal;
     font-size: inherit;
     line-height: inherit;
-}
-
-#collector-content .dump-inline pre.sf-dump .sf-dump-ellipsis {
-    width: 4em;
 }
 
 #collector-content .sf-dump .trace {

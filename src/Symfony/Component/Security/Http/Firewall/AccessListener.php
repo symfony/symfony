@@ -69,7 +69,7 @@ class AccessListener implements ListenerInterface
         if (!$this->accessDecisionManager->decide($token, $attributes, $request)) {
             $exception = new AccessDeniedException();
             $exception->setAttributes($attributes);
-            $exception->setObject($request);
+            $exception->setSubject($request);
 
             throw $exception;
         }

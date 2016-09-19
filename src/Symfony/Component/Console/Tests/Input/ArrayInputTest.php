@@ -95,6 +95,30 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
                 '->parse() parses long options with a default value',
             ),
             array(
+                array('--bar' => 'baz'),
+                array(new InputOption('foo', 'bar')),
+                array('foo' => 'baz'),
+                '->parse() parses long option shortcuts',
+            ),
+            array(
+                array('--bar-baz' => 'qux'),
+                array(new InputOption('foo', 'bar-baz')),
+                array('foo' => 'qux'),
+                '->parse() parses hyphenated long option shortcuts',
+            ),
+            array(
+                array('--bar' => 'baz'),
+                array(new InputOption('foo', 'bar', InputOption::VALUE_OPTIONAL, '', 'default')),
+                array('foo' => 'baz'),
+                '->parse() parses long option shortcuts with a default value',
+            ),
+            array(
+                array('--bar' => null),
+                array(new InputOption('foo', 'bar', InputOption::VALUE_OPTIONAL, '', 'default')),
+                array('foo' => 'default'),
+                '->parse() parses long option shortcuts with a default value',
+            ),
+            array(
                 array('-f' => 'bar'),
                 array(new InputOption('foo', 'f')),
                 array('foo' => 'bar'),

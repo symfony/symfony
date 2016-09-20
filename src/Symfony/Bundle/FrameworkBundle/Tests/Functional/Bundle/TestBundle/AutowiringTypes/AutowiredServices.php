@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Auto
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 
 class AutowiredServices
@@ -20,12 +21,14 @@ class AutowiredServices
     private $annotationReader;
     private $frameworkBundleEngine;
     private $engine;
+    private $router;
 
-    public function __construct(Reader $annotationReader = null, FrameworkBundleEngineInterface $frameworkBundleEngine, EngineInterface $engine)
+    public function __construct(Reader $annotationReader = null, FrameworkBundleEngineInterface $frameworkBundleEngine, EngineInterface $engine, RouterInterface $router)
     {
         $this->annotationReader = $annotationReader;
         $this->frameworkBundleEngine = $frameworkBundleEngine;
         $this->engine = $engine;
+        $this->router = $router;
     }
 
     public function getAnnotationReader()
@@ -41,5 +44,10 @@ class AutowiredServices
     public function getEngine()
     {
         return $this->engine;
+    }
+
+    public function getRouter()
+    {
+        return $this->router;
     }
 }

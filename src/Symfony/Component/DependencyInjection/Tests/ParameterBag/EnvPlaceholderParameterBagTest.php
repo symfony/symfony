@@ -19,7 +19,7 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testGetThrowsExceptionWithIfEnvNameContainsNonWordCharacters()
+    public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters()
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(%foo%)');

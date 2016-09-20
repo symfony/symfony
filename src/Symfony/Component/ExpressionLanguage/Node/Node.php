@@ -66,11 +66,11 @@ class Node
         }
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate($functions, $values, $strict=true)
     {
         $results = array();
         foreach ($this->nodes as $node) {
-            $results[] = $node->evaluate($functions, $values);
+            $results[] = $node->evaluate($functions, $values, $strict);
         }
 
         return $results;

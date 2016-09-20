@@ -48,11 +48,11 @@ class ArrayNode extends Node
         $compiler->raw(')');
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate($functions, $values, $strict=true)
     {
         $result = array();
         foreach ($this->getKeyValuePairs() as $pair) {
-            $result[$pair['key']->evaluate($functions, $values)] = $pair['value']->evaluate($functions, $values);
+            $result[$pair['key']->evaluate($functions, $values, $strict)] = $pair['value']->evaluate($functions, $values, $strict);
         }
 
         return $result;

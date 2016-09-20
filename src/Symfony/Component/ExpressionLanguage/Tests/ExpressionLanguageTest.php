@@ -138,4 +138,22 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
         $expressionLanguage->compile($expression, array('a', 'B' => 'b'));
         $expressionLanguage->compile($expression, array('B' => 'b', 'a'));
     }
+
+
+    public function testStrictModeOff() {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $obj = new \stdClass();
+        $obj->foo = new \stdClass();
+        $obj->foo->bar = "a";
+        $obj->fooArr = ["a" => "b"];
+        $obj->name = "bar";
+
+        $this->assertEquals("a", $expressionLanguage->evaluate("foo.bar", array ("foo" => array ("bar" => "a")), false));
+        $this->assertEquals("a", $expressionLanguage->evaluate("foo.bar", $obj, false));
+        $this->assertEquals("a", $expressionLanguage->evaluate("foo['bar']", $obj, false));
+        $this->assertEquals("b", $expressionLanguage->evaluate("fooArr.a", $obj, false));
+        $this->assertEquals("a", $expressionLanguage->evaluate("foo[name]", $obj, false));
+    }
+
 }

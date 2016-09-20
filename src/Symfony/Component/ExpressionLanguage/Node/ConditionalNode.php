@@ -40,13 +40,13 @@ class ConditionalNode extends Node
         ;
     }
 
-    public function evaluate($functions, $values)
+    public function evaluate($functions, $values, $strict=true)
     {
-        if ($this->nodes['expr1']->evaluate($functions, $values)) {
-            return $this->nodes['expr2']->evaluate($functions, $values);
+        if ($this->nodes['expr1']->evaluate($functions, $values, $strict)) {
+            return $this->nodes['expr2']->evaluate($functions, $values, $strict);
         }
 
-        return $this->nodes['expr3']->evaluate($functions, $values);
+        return $this->nodes['expr3']->evaluate($functions, $values, $strict);
     }
 
     public function toArray()

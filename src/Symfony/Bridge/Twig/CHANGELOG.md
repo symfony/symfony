@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * added `AppVariable::getToken()`
+
 2.7.0
 -----
 

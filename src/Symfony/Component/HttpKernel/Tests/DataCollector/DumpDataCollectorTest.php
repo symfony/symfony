@@ -87,19 +87,17 @@ class DumpDataCollectorTest extends \PHPUnit_Framework_TestCase
         $file = __FILE__;
         if (PHP_VERSION_ID >= 50400) {
             $xOutput = <<<EOTXT
- <pre class=sf-dump id=sf-dump data-indent-pad="  "><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
+<pre class=sf-dump id=sf-dump data-indent-pad="  "><a href="test://{$file}:{$line}" title="{$file}"><span class=sf-dump-meta>DumpDataCollectorTest.php</span></a> on line <span class=sf-dump-meta>{$line}</span>:
 <span class=sf-dump-num>123</span>
 </pre>
-
 EOTXT;
         } else {
             $len = strlen("DumpDataCollectorTest.php on line {$line}:");
             $xOutput = <<<EOTXT
- <pre class=sf-dump id=sf-dump data-indent-pad="  ">"<span class=sf-dump-str title="{$len} characters">DumpDataCollectorTest.php on line {$line}:</span>"
+<pre class=sf-dump id=sf-dump data-indent-pad="  ">"<span class=sf-dump-str title="{$len} characters">DumpDataCollectorTest.php on line {$line}:</span>"
 </pre>
 <pre class=sf-dump id=sf-dump data-indent-pad="  "><span class=sf-dump-num>123</span>
 </pre>
-
 EOTXT;
         }
 
@@ -111,7 +109,7 @@ EOTXT;
         $output = preg_replace('#<(script|style).*?</\1>#s', '', $output);
         $output = preg_replace('/sf-dump-\d+/', 'sf-dump', $output);
 
-        $this->assertSame($xOutput, $output);
+        $this->assertSame($xOutput, trim($output));
         $this->assertSame(1, $collector->getDumpsCount());
         $collector->serialize();
     }

@@ -168,6 +168,10 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         if (is_object($context)) {
+            if ($context instanceof \Exception) {
+                return sprintf('Exception(%s): %s', get_class($context), $context->getMessage());
+            }
+
             return sprintf('Object(%s)', get_class($context));
         }
 

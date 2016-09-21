@@ -1,6 +1,12 @@
 UPGRADE FROM 3.x to 4.0
 =======================
 
+Console
+-------
+
+ * Setting unknown style options is not supported anymore and throws an
+   exception.
+
 Debug
 -----
 

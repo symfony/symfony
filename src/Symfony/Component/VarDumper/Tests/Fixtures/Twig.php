@@ -31,9 +31,9 @@ class __TwigTemplate_VarDumperFixture_u75a09 extends Twig_Template
 
     public function getSource()
     {
-        return '';
+        return "   foo bar
+     twig source
+
+";
     }
 }
-/*   foo bar*/
-/*     twig source*/
-/* */

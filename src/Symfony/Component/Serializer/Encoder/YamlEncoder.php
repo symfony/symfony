@@ -60,7 +60,7 @@ class YamlEncoder implements EncoderInterface, DecoderInterface
     {
         $context = array_merge($this->defaultContext, $context);
 
-        return Yaml::parse($data, $context['yaml_flags']);
+        return $this->parser->parse($data, $context['yaml_flags']);
     }
 
     /**

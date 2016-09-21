@@ -10,6 +10,12 @@ FrameworkBundle
  * The `Controller::getUser()` method has been deprecated and will be removed in
    Symfony 4.0; typehint the security user object in the action instead.
 
+Console
+-------
+
+ * Setting unknown style options is deprecated and will throw an exception in
+   Symfony 4.0.
+
 DependencyInjection
 -------------------
 

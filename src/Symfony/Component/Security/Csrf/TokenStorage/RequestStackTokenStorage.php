@@ -12,6 +12,8 @@
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Exception\RuntimeException;
+use Symfony\Component\Security\Core\Exception\UnexpectedValueException;
 
 /**
  * Forwards token storage calls to a token storage stored in the master
@@ -67,17 +69,24 @@ class RequestStackTokenStorage extends AbstractTokenStorageProxy
         $request = $this->requestStack->getMasterRequest();
 
         if (!$request) {
-            throw new \RuntimeException('Not in a request context');
+            throw new RuntimeException('Not in a request context');
         }
 
         $storage = $request->attributes->get($this->tokenStorageKey);
 
-        // TODO what if storage is set and not an instance of TokenStorageInterface?
-        // error out? overwrite?
-        if (!$storage instanceof TokenStorageInterface) {
-            $storage = $this->factory->createTokenStorage($request);
-            $request->attributes->set($this->tokenStorageKey, $storage);
+        if ($storage instanceof TokenStorageInterface) {
+            return $storage;
         }
+
+        if ($storage !== null) {
+            throw new UnexpectedValueException(sprintf(
+                'Expected null or an instance of "Symfony\\Component\\Security\\Csrf\\TokenStorage\\TokenStorageInterface", got "%s"',
+                is_object($storage) ? get_class($storage) : gettype($storage)
+            ));
+        }
+
+        $storage = $this->factory->createTokenStorage($request);
+        $request->attributes->set($this->tokenStorageKey, $storage);
 
         return $storage;
     }

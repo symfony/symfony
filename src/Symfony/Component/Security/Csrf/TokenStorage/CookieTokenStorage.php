@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 
 /**
@@ -27,7 +28,7 @@ class CookieTokenStorage implements TokenStorageInterface
     /**
      * @var array
      */
-    private $transientTokens;
+    private $transientTokens = array();
 
     /**
      * @var ParameterBag
@@ -45,7 +46,6 @@ class CookieTokenStorage implements TokenStorageInterface
      */
     public function __construct(ParameterBag $cookies, $secure)
     {
-        $this->transientTokens = [];
         $this->cookies = $cookies;
         $this->secure = (bool) $secure;
     }
@@ -58,8 +58,8 @@ class CookieTokenStorage implements TokenStorageInterface
     {
         $token = $this->resolveToken($tokenId);
 
-        if (!strlen($token)) {
-            throw new TokenNotFoundException;
+        if ('' === $token) {
+            throw new TokenNotFoundException();
         }
 
         return $token;
@@ -71,7 +71,7 @@ class CookieTokenStorage implements TokenStorageInterface
      */
     public function hasToken($tokenId)
     {
-        return strlen($this->resolveToken($tokenId)) > 0;
+        return '' !== $this->resolveToken($tokenId);
     }
 
     /**
@@ -80,8 +80,10 @@ class CookieTokenStorage implements TokenStorageInterface
      */
     public function setToken($tokenId, $token)
     {
-        if (!strlen($token)) {
-            throw new \InvalidArgumentException('Empty tokens are not allowed');
+        $token = (string) $token;
+
+        if ('' === $token) {
+            throw new InvalidArgumentException('Empty tokens are not allowed');
         }
 
         $this->updateToken($tokenId, $token);
@@ -97,7 +99,7 @@ class CookieTokenStorage implements TokenStorageInterface
 
         $this->updateToken($tokenId, '');
 
-        return strlen($token) ? $token : null;
+        return '' === $token ? null : $token;
     }
 
     /**
@@ -113,7 +115,6 @@ class CookieTokenStorage implements TokenStorageInterface
             // the problem is the that the value of deleted cookies get set to
             // the string "deleted" and not the empty string
 
-            // TODO http only?
             $name = $this->generateCookieName($tokenId);
             $cookies[] = new Cookie($name, $token, 0, null, null, $this->secure, true);
         }
@@ -143,7 +144,6 @@ class CookieTokenStorage implements TokenStorageInterface
      */
     protected function updateToken($tokenId, $token)
     {
-        $token = (string) $token;
         $name = $this->generateCookieName($tokenId);
 
         if ($token === $this->cookies->get($name, '')) {

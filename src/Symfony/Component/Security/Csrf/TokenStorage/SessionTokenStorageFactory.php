@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\RuntimeException;
 
 /**
  * Creates CSRF token storages based on the requests session.
@@ -30,7 +31,7 @@ class SessionTokenStorageFactory implements TokenStorageFactoryInterface
      */
     public function __construct($namespace = null)
     {
-        $this->namespace = $namespace === null ? SessionTokenStorage::SESSION_NAMESPACE : $namespace;
+        $this->namespace = $namespace === null ? SessionTokenStorage::SESSION_NAMESPACE : (string) $namespace;
     }
 
     /**
@@ -40,7 +41,7 @@ class SessionTokenStorageFactory implements TokenStorageFactoryInterface
     public function createTokenStorage(Request $request) {
         $session = $request->getSession();
         if (!$session) {
-            throw new \RuntimeException('Request has no session');
+            throw new RuntimeException('Request has no session');
         }
 
         return new SessionTokenStorage($session, $this->namespace);

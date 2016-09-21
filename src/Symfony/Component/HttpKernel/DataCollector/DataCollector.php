@@ -67,6 +67,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
         if (null === $this->cloner) {
             if (class_exists(ClassStub::class)) {
                 $this->cloner = new VarCloner();
+                $this->cloner->setMaxItems(250);
                 $this->cloner->addCasters(array(
                     Stub::class => function (Stub $v, array $a, Stub $s, $isNested) {
                         return $isNested ? $a : StubCaster::castStub($v, $a, $s, true);

@@ -647,19 +647,27 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
 
-        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => 'frag ment'), true);
+        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => 'frag ment'), UrlGeneratorInterface::ABSOLUTE_PATH);
         $this->assertEquals('/app.php/testing#frag%20ment', $url);
 
-        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => '0'), true);
+        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => '0'), UrlGeneratorInterface::ABSOLUTE_PATH);
         $this->assertEquals('/app.php/testing#0', $url);
     }
 
     public function testFragmentsDoNotEscapeValidCharacters()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
-        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => '?/'), true);
+        $url = $this->getGenerator($routes)->generate('test', array('_fragment' => '?/'), UrlGeneratorInterface::ABSOLUTE_PATH);
 
         $this->assertEquals('/app.php/testing#?/', $url);
+    }
+
+    public function testFragmentsCanBeDefinedAsDefaults()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', array('_fragment' => 'fragment')));
+        $url = $this->getGenerator($routes)->generate('test', array(), UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertEquals('/app.php/testing#fragment', $url);
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)

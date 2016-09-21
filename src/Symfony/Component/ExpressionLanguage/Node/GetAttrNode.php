@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\ExpressionLanguage\Node;
 
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\ExpressionLanguage\Compiler;
 
 /**
@@ -40,7 +39,7 @@ class GetAttrNode extends Node
                 $compiler
                     ->compile($this->nodes['node'])
                     ->raw('->')
-                    ->raw($this->nodes['attribute']->attributes['name'])
+                    ->raw($this->nodes['attribute']->attributes['value'])
                 ;
                 break;
 
@@ -48,7 +47,7 @@ class GetAttrNode extends Node
                 $compiler
                     ->compile($this->nodes['node'])
                     ->raw('->')
-                    ->raw($this->nodes['attribute']->attributes['name'])
+                    ->raw($this->nodes['attribute']->attributes['value'])
                     ->raw('(')
                     ->compile($this->nodes['arguments'])
                     ->raw(')')
@@ -78,7 +77,7 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get a property/item on a non-object/non-array.');
                 }
 
-                $property = $this->nodes['attribute']->attributes['name'];
+                $property = $this->nodes['attribute']->attributes['value'];
 
                 if (is_array($obj)) {
                     return $obj[$property];
@@ -92,7 +91,7 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
 
-                return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['name']), $this->nodes['arguments']->evaluate($functions, $values, $strict));
+                return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['value']), $this->nodes['arguments']->evaluate($functions, $values));
 
             case self::ARRAY_CALL:
                 $array = $this->nodes['node']->evaluate($functions, $values, $strict);

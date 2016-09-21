@@ -263,8 +263,15 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         });
 
         // extract fragment
-        $fragment = isset($extra['_fragment']) ? $extra['_fragment'] : '';
-        unset($extra['_fragment']);
+        $fragment = '';
+        if (isset($defaults['_fragment'])) {
+            $fragment = $defaults['_fragment'];
+        }
+
+        if (isset($extra['_fragment'])) {
+            $fragment = $extra['_fragment'];
+            unset($extra['_fragment']);
+        }
 
         if ($extra && $query = http_build_query($extra, '', '&', PHP_QUERY_RFC3986)) {
             // "/" and "?" can be left decoded for better user experience, see

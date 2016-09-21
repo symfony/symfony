@@ -157,7 +157,11 @@ class ReflectionCaster
         ));
 
         if (isset($a[$prefix.'returnType'])) {
-            $a[$prefix.'returnType'] = (string) $a[$prefix.'returnType'];
+            $v = (string) $a[$prefix.'returnType'];
+            $a[$prefix.'returnType'] = new ClassStub($v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
+        }
+        if (isset($a[$prefix.'class'])) {
+            $a[$prefix.'class'] = new ClassStub($a[$prefix.'class']);
         }
         if (isset($a[$prefix.'this'])) {
             $a[$prefix.'this'] = new CutStub($a[$prefix.'this']);
@@ -230,6 +234,10 @@ class ReflectionCaster
             if (preg_match('/^Class ([^ ]++) does not exist$/', $e->getMessage(), $m)) {
                 $a[$prefix.'typeHint'] = $m[1];
             }
+        }
+        if (isset($a[$prefix.'typeHint'])) {
+            $v = $a[$prefix.'typeHint'];
+            $a[$prefix.'typeHint'] = new ClassStub($v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
         }
 
         try {

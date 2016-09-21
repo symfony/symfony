@@ -35,10 +35,12 @@ class SessionTokenStorageFactory implements TokenStorageFactoryInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageFactoryInterface::createTokenStorage()
      */
-    public function createTokenStorage(Request $request) {
+    public function createTokenStorage(Request $request)
+    {
         $session = $request->getSession();
         if (!$session) {
             throw new RuntimeException('Request has no session');

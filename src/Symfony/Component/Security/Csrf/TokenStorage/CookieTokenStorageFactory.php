@@ -21,10 +21,12 @@ use Symfony\Component\HttpFoundation\Request;
 class CookieTokenStorageFactory implements TokenStorageFactoryInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageFactoryInterface::createTokenStorage()
      */
-    public function createTokenStorage(Request $request) {
+    public function createTokenStorage(Request $request)
+    {
         return new CookieTokenStorage($request->cookies, $request->isSecure());
     }
 }

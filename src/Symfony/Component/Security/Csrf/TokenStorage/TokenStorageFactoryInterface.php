@@ -24,6 +24,7 @@ interface TokenStorageFactoryInterface
      * Creates a new token storage for the given request.
      *
      * @param Request $request
+     *
      * @return TokenStorageInterface
      */
     public function createTokenStorage(Request $request);

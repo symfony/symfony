@@ -36,13 +36,13 @@ class CookieTokenStorage implements TokenStorageInterface
     private $cookies;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $secure;
 
     /**
      * @param ParameterBag $cookies
-     * @param boolean $secure
+     * @param bool         $secure
      */
     public function __construct(ParameterBag $cookies, $secure)
     {
@@ -51,7 +51,8 @@ class CookieTokenStorage implements TokenStorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface::getToken()
      */
     public function getToken($tokenId)
@@ -66,7 +67,8 @@ class CookieTokenStorage implements TokenStorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface::hasToken()
      */
     public function hasToken($tokenId)
@@ -75,7 +77,8 @@ class CookieTokenStorage implements TokenStorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface::setToken()
      */
     public function setToken($tokenId, $token)
@@ -90,7 +93,8 @@ class CookieTokenStorage implements TokenStorageInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface::removeToken()
      */
     public function removeToken($tokenId)
@@ -107,7 +111,7 @@ class CookieTokenStorage implements TokenStorageInterface
      */
     public function createCookies()
     {
-        $cookies = [];
+        $cookies = array();
 
         foreach ($this->transientTokens as $tokenId => $token) {
             // FIXME empty tokens are handled by the http foundations cookie class
@@ -124,6 +128,7 @@ class CookieTokenStorage implements TokenStorageInterface
 
     /**
      * @param string $tokenId
+     *
      * @return string
      */
     protected function resolveToken($tokenId)
@@ -140,7 +145,6 @@ class CookieTokenStorage implements TokenStorageInterface
     /**
      * @param string $tokenId
      * @param string $token
-     * @return void
      */
     protected function updateToken($tokenId, $token)
     {
@@ -154,8 +158,8 @@ class CookieTokenStorage implements TokenStorageInterface
     }
 
     /**
-     *
      * @param string $tokenId
+     *
      * @return string
      */
     protected function generateCookieName($tokenId)

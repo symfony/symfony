@@ -45,9 +45,9 @@ class RequestStackTokenStorage extends AbstractTokenStorageProxy
     private $tokenStorageKey;
 
     /**
-     * @param RequestStack $requestStack
+     * @param RequestStack                 $requestStack
      * @param TokenStorageFactoryInterface $factory
-     * @param string|null $tokenStorageKey
+     * @param string|null                  $tokenStorageKey
      */
     public function __construct(
         RequestStack $requestStack,
@@ -60,7 +60,8 @@ class RequestStackTokenStorage extends AbstractTokenStorageProxy
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
      * @see \Symfony\Component\Security\Csrf\TokenStorage\AbstractTokenStorageProxy::getProxiedTokenStorage()
      */
     public function getProxiedTokenStorage()
@@ -90,5 +91,4 @@ class RequestStackTokenStorage extends AbstractTokenStorageProxy
 
         return $storage;
     }
-
 }

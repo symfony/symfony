@@ -41,7 +41,6 @@ class CookieTokenStorageListener
 
     /**
      * @param FilterResponseEvent $event
-     * @return void
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {

@@ -25,7 +25,7 @@
         "symfony/http-foundation": "~2.8|~3.0"
     },
     "suggest": {
-        "symfony/http-foundation": "For using the class SessionTokenStorage."
+        "symfony/http-foundation": "For using SessionTokenStorage, CookieTokenStorage or RequestStackTokenStorage."
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Security\\Csrf\\": "" },

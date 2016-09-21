@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-20T13:19:19Z
+
+Not that this PR will also fix the remaining failure on Travis on 3.1.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-20T15:17:00Z
+
+Now limiting to max-depth=2, which looks more generic than 50 items to me. Internal cache also added to prevent re-cloning the same structures several times. Enhances both perf and serialize payload size.
+See https://blackfire.io/profiles/compare/d8d9804b-1939-4a5f-9f47-4ae33c6fc97a/graph

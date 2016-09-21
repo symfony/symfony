@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2016-09-20T14:24:16Z
+
+It doesn't seem to fix the [SecurityBundle tests](https://travis-ci.org/symfony/symfony/jobs/161308646#L3271) (should it?).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-20T15:46:11Z
+
+@jakzal this is because of per-component tests: the patch here is not used on the SecurityBundle test suite because SecurityBundle is untouched by the PR. This a corner case. But as far as I tested correctly on my machine, it will make tests green yes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-20T15:50:29Z
+
+Oh, and the PR that should fix tests is #19986, not this one :)

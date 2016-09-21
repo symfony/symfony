@@ -24,7 +24,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testTestException()
     {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Dumper;
 
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 /**
  * XliffFileDumper generates xliff files from a message catalogue.
@@ -43,7 +44,7 @@ class XliffFileDumper extends FileDumper
             return $this->dumpXliff2($defaultLocale, $messages, $domain, $options);
         }
 
-        throw new \InvalidArgumentException(sprintf('No support implemented for dumping XLIFF version "%s".', $xliffVersion));
+        throw new InvalidArgumentException(sprintf('No support implemented for dumping XLIFF version "%s".', $xliffVersion));
     }
 
     /**

@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 /**
  * Translator.
@@ -51,7 +52,7 @@ class Translator extends BaseTranslator implements WarmableInterface
      * @param array              $loaderIds An array of loader Ids
      * @param array              $options   An array of options
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(ContainerInterface $container, MessageSelector $selector, $loaderIds = array(), array $options = array())
     {
@@ -60,7 +61,7 @@ class Translator extends BaseTranslator implements WarmableInterface
 
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
-            throw new \InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
+            throw new InvalidArgumentException(sprintf('The Translator does not support the following options: \'%s\'.', implode('\', \'', $diff)));
         }
 
         $this->options = array_merge($this->options, $options);

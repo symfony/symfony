@@ -34,7 +34,7 @@ class MessageSelectorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getNonMatchingMessages
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testThrowExceptionIfMatchingMessageCannotBeFound($id, $number)
     {

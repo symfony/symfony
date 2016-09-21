@@ -20,7 +20,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testConstructorInvalidLocale($locale)
     {
@@ -56,7 +56,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testSetInvalidLocale($locale)
     {
@@ -139,7 +139,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testSetFallbackInvalidLocales($locale)
     {
@@ -170,7 +170,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testAddResourceInvalidLocales($locale)
     {
@@ -263,7 +263,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @expectedException \Symfony\Component\Translation\Exception\RuntimeException
      */
     public function testWhenAResourceHasNoRegisteredLoader()
     {
@@ -307,7 +307,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testTransInvalidLocale($locale)
     {
@@ -357,7 +357,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider      getInvalidLocalesTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Symfony\Component\Translation\Exception\InvalidArgumentException
      */
     public function testTransChoiceInvalidLocale($locale)
     {

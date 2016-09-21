@@ -15,6 +15,7 @@ use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
@@ -202,7 +203,7 @@ class XliffFileLoader implements LoaderInterface
             $schemaSource = file_get_contents(__DIR__.'/schema/dic/xliff-core/xliff-core-2.0.xsd');
             $xmlUri = 'informativeCopiesOf3rdPartySchemas/w3c/xml.xsd';
         } else {
-            throw new \InvalidArgumentException(sprintf('No support implemented for loading XLIFF version "%s".', $xliffVersion));
+            throw new InvalidArgumentException(sprintf('No support implemented for loading XLIFF version "%s".', $xliffVersion));
         }
 
         return $this->fixXmlLocation($schemaSource, $xmlUri);
@@ -267,7 +268,7 @@ class XliffFileLoader implements LoaderInterface
      *
      * @param \DOMDocument $dom
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return string
      */
@@ -283,7 +284,7 @@ class XliffFileLoader implements LoaderInterface
             $namespace = $xliff->attributes->getNamedItem('xmlns');
             if ($namespace) {
                 if (substr_compare('urn:oasis:names:tc:xliff:document:', $namespace->nodeValue, 0, 34) !== 0) {
-                    throw new \InvalidArgumentException(sprintf('Not a valid XLIFF namespace "%s"', $namespace));
+                    throw new InvalidArgumentException(sprintf('Not a valid XLIFF namespace "%s"', $namespace));
                 }
 
                 return substr($namespace, 34);

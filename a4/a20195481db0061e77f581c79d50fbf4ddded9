@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-20T23:26:27Z
+
+Added a second commit that removes a sync script that is not used anymore (since the redesign of the web profiler).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-09-21T07:30:53Z
+
+What about adding this change to the upgrade file? Someone might reference them for whatever reason in their own code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-21T07:51:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-21T14:19:30Z
+
+@xabbuh good idea, I've just added the change to the CHANGELOG file (same in #19997 between).

@@ -20,8 +20,6 @@ abstract class AbstractTokenStorageProxy implements TokenStorageInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface::getToken()
      */
     public function getToken($tokenId)
     {
@@ -30,8 +28,6 @@ abstract class AbstractTokenStorageProxy implements TokenStorageInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface::setToken()
      */
     public function setToken($tokenId, $token)
     {
@@ -41,8 +37,6 @@ abstract class AbstractTokenStorageProxy implements TokenStorageInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface::removeToken()
      */
     public function removeToken($tokenId)
     {
@@ -51,8 +45,6 @@ abstract class AbstractTokenStorageProxy implements TokenStorageInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface::hasToken()
      */
     public function hasToken($tokenId)
     {

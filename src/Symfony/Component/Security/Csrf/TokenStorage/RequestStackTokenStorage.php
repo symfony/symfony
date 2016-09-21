@@ -61,8 +61,6 @@ class RequestStackTokenStorage extends AbstractTokenStorageProxy
 
     /**
      * {@inheritdoc}
-     *
-     * @see \Symfony\Component\Security\Csrf\TokenStorage\AbstractTokenStorageProxy::getProxiedTokenStorage()
      */
     public function getProxiedTokenStorage()
     {

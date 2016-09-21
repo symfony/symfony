@@ -22,8 +22,6 @@ class CookieTokenStorageFactory implements TokenStorageFactoryInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @see \Symfony\Component\Security\Csrf\TokenStorage\TokenStorageFactoryInterface::createTokenStorage()
      */
     public function createTokenStorage(Request $request)
     {

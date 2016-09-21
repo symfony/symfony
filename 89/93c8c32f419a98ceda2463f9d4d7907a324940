@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-20T23:35:01Z
+
+If you are wondering why we did not cleanup this before, that's because those CSSes were shared between the web profiler and the twig exception files, but that's not the case anymore since the redesign of the web profiler.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-21T07:50:32Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-21T14:15:01Z
+
+added the change to the CHANGELOG file

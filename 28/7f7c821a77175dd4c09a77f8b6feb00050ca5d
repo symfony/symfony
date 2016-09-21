@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-21T18:30:57Z
+
+ping @nicolas-grekas @lyrixx
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-21T18:42:07Z
+
+For reference, this was done to ease with dumping AST. With NameNode, `$foo->foo()` is dumped as is.
+With this change, it will be dumped as `$foo->"foo"()`.
+But BC is of paramount importance, so :+1:
+Maybe adjust `Node::dump()` to deal with this case thought?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-21T18:44:16Z
+
+@nicolas-grekas Indeed, tweaking `dump()` to take care of that would be ideal. Can you prepare a patch?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-21T18:53:03Z
+
+Would it be OK to add a new node type that extends `ConstantNode`, to be used in this case? Because unescaping strings while dumping has some code smell to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-21T19:00:51Z
+
+Not sure :)

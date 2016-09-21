@@ -27,11 +27,18 @@ class SessionTokenStorageFactory implements TokenStorageFactoryInterface
     private $namespace;
 
     /**
-     * @param string $namespace The namespace under which the token is stored in the session
+     * @var string
      */
-    public function __construct($namespace = null)
+    private $secureNamespace;
+
+    /**
+     * @param string $namespace       The namespace under which tokens are stored in the session
+     * @param string $secureNamespace The namespace under which tokens are stored in the session for secure connections
+     */
+    public function __construct($namespace = null, $secureNamespace = null)
     {
         $this->namespace = $namespace === null ? SessionTokenStorage::SESSION_NAMESPACE : (string) $namespace;
+        $this->secureNamespace = $secureNamespace === null ? $this->namespace : (string) $secureNamespace;
     }
 
     /**
@@ -44,6 +51,8 @@ class SessionTokenStorageFactory implements TokenStorageFactoryInterface
             throw new RuntimeException('Request has no session');
         }
 
-        return new SessionTokenStorage($session, $this->namespace);
+        $namespace = $request->isSecure() ? $this->secureNamespace : $this->namespace;
+
+        return new SessionTokenStorage($session, $namespace);
     }
 }

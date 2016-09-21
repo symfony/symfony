@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-21T19:43:11Z
+
+`$hasChildren` can be inlined..
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-09-21T20:06:13Z
+
+Why not simply:
+```diff
+public function isRendered()
+{
+-   $hasChildren = 0 < count($this->children);
+
+-   if (true === $this->rendered || !$hasChildren) {
++   if ($this->rendered || !$this->children) {
+        return $this->rendered;
+    }
+
+    // ...
+}
+```
+?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-21T20:10:59Z
+
+https://github.com/symfony/symfony/issues/19182
+
+---------------------------------------------------------------------------
+
+by taueres at 2016-09-21T20:15:59Z
+
+Thanks for the tips! I've updated the PR.

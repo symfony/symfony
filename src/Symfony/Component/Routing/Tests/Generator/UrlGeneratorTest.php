@@ -662,6 +662,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/testing#?/', $url);
     }
 
+    public function testFragmentsCanBeDefinedAsDefaults()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', array('_fragment' => 'fragment')));
+        $url = $this->getGenerator($routes)->generate('test', array(), UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertEquals('/app.php/testing#fragment', $url);
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');

@@ -20,8 +20,11 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class ConstantNode extends Node
 {
-    public function __construct($value)
+    private $isIdentifier;
+
+    public function __construct($value, $isIdentifier = false)
     {
+        $this->isIdentifier = $isIdentifier;
         parent::__construct(
             array(),
             array('value' => $value)
@@ -43,7 +46,9 @@ class ConstantNode extends Node
         $array = array();
         $value = $this->attributes['value'];
 
-        if (true === $value) {
+        if ($this->isIdentifier) {
+            $array[] = $value;
+        } elseif (true === $value) {
             $array[] = 'true';
         } elseif (false === $value) {
             $array[] = 'false';

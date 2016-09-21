@@ -39,7 +39,7 @@ class GetAttrNode extends Node
                 $compiler
                     ->compile($this->nodes['node'])
                     ->raw('->')
-                    ->raw($this->nodes['attribute']->attributes['name'])
+                    ->raw($this->nodes['attribute']->attributes['value'])
                 ;
                 break;
 
@@ -47,7 +47,7 @@ class GetAttrNode extends Node
                 $compiler
                     ->compile($this->nodes['node'])
                     ->raw('->')
-                    ->raw($this->nodes['attribute']->attributes['name'])
+                    ->raw($this->nodes['attribute']->attributes['value'])
                     ->raw('(')
                     ->compile($this->nodes['arguments'])
                     ->raw(')')
@@ -73,7 +73,7 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
 
-                $property = $this->nodes['attribute']->attributes['name'];
+                $property = $this->nodes['attribute']->attributes['value'];
 
                 return $obj->$property;
 
@@ -83,7 +83,7 @@ class GetAttrNode extends Node
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
 
-                return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['name']), $this->nodes['arguments']->evaluate($functions, $values));
+                return call_user_func_array(array($obj, $this->nodes['attribute']->attributes['value']), $this->nodes['arguments']->evaluate($functions, $values));
 
             case self::ARRAY_CALL:
                 $array = $this->nodes['node']->evaluate($functions, $values);

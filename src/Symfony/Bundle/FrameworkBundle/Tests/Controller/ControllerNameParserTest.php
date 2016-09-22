@@ -93,7 +93,7 @@ class ControllerNameParserTest extends TestCase
 
         try {
             $parser->parse($name);
-            $this->fail('->parse() throws a \InvalidArgumentException if the string is in the valid format, but not matching class can be found');
+            $this->fail('->parse() throws a \InvalidArgumentException if the class is found but does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws a \InvalidArgumentException if the class is found but does not exist');
         }
@@ -108,7 +108,6 @@ class ControllerNameParserTest extends TestCase
     }
 
     /**
-     * @expectedException
      * @dataProvider getInvalidBundleNameTests
      */
     public function testInvalidBundleName($bundleName, $suggestedBundleName)
@@ -117,6 +116,7 @@ class ControllerNameParserTest extends TestCase
 
         try {
             $parser->parse($bundleName);
+            $this->fail('->parse() throws a \InvalidArgumentException if the bundle does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws a \InvalidArgumentException if the bundle does not exist');
 

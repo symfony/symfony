@@ -446,7 +446,7 @@ class Command
     {
         return $this->name;
     }
-    
+
     /**
      * Sets if the command should be hidden from application inspection.
      *
@@ -457,7 +457,7 @@ class Command
     public function setHidden($hiddenBool)
     {
         $this->hidden = $hiddenBool;
-        
+
         return $this;
     }
 

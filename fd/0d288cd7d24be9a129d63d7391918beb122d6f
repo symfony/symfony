@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by gharlan at 2016-09-22T12:39:22Z
+
+Thanks! Tested it, it fixes #20020 (and https://github.com/symfony/symfony/issues/19978#issuecomment-248884929)

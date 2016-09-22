@@ -108,7 +108,6 @@ class ControllerNameParserTest extends TestCase
     }
 
     /**
-     * @expectedException
      * @dataProvider getInvalidBundleNameTests
      */
     public function testInvalidBundleName($bundleName, $suggestedBundleName)
@@ -117,6 +116,7 @@ class ControllerNameParserTest extends TestCase
 
         try {
             $parser->parse($bundleName);
+            $this->fail();
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws a \InvalidArgumentException if the bundle does not exist');
 

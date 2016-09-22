@@ -106,6 +106,7 @@ class FrameworkExtension extends Extension
                     'macvim' => 'mvim://open?url=file://%%f&line=%%l',
                     'emacs' => 'emacs://open?url=file://%%f&line=%%l',
                     'sublime' => 'subl://open?url=file://%%f&line=%%l',
+                    'phpstorm' => 'phpstorm://open?url=file://%%f&line=%%l',
                 );
                 $ide = $config['ide'];
 

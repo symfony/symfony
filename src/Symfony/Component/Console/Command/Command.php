@@ -447,11 +447,24 @@ class Command
         return $this->name;
     }
     
+     /**
+     * Sets if the command should be hidden from application inspection.
+     *
+     * @param bool $hiddenBool To show this command or not
+     * 
+     * @return Command The current instance
+     */
     public function setHidden($hiddenBool)
     {
-        return $this->hidden = $hiddenBool;
+        $this->hidden = $hiddenBool;
+        return $this;
     }
 
+    /**
+     * Returns if the command should be hidden from application inspection.
+     *
+     * @return boolean If the command is hidden or not
+     */
     public function isHidden()
     {
         return $this->hidden;

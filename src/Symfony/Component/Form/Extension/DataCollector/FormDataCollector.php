@@ -243,22 +243,30 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         $cloneVar = array($this, 'cloneVar');
 
         foreach ($this->data['forms_by_hash'] as &$form) {
-            if ($form['type_class'] instanceof Data) {
-                continue;
-            }
-            $form['view_vars'] = array_map($cloneVar, $form['view_vars']);
-            $form['type_class'] = $cloneVar($form['type_class'], true);
-            $form['synchronized'] = $cloneVar($form['synchronized']);
-            $form['passed_options'] = array_map($cloneVar, $form['passed_options']);
-            $form['resolved_options'] = array_map($cloneVar, $form['resolved_options']);
-            $form['default_data'] = array_map($cloneVar, $form['default_data']);
-            $form['submitted_data'] = array_map($cloneVar, $form['submitted_data']);
-
-            if (!empty($form['errors'])) {
-                foreach ($form['errors'] as $i => $error) {
-                    if (!empty($error['trace'])) {
-                        $form['errors'][$i]['trace'] = array_map($cloneVar, $error['trace']);
-                    }
+            foreach ($form as $k => $v) {
+                switch ($k) {
+                    case 'type_class':
+                        $form[$k] = $cloneVar($v, true);
+                        break;
+                    case 'synchronized':
+                        $form[$k] = $cloneVar($v);
+                        break;
+                    case 'view_vars':
+                    case 'passed_options':
+                    case 'resolved_options':
+                    case 'default_data':
+                    case 'submitted_data':
+                        if ($v) {
+                            $form[$k] = array_map($cloneVar, $v);
+                        }
+                        break;
+                    case 'errors':
+                        foreach ($v as $i => $e) {
+                            if (!empty($e['trace'])) {
+                                $form['errors'][$i]['trace'] = array_map($cloneVar, $e['trace']);
+                            }
+                        }
+                        break;
                 }
             }
         }
@@ -271,9 +279,13 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      */
     protected function cloneVar($var, $isClass = false)
     {
+        if ($var instanceof Data) {
+            return $var;
+        }
         if (null === $this->cloner) {
             if (class_exists(ClassStub::class)) {
                 $this->cloner = new VarCloner();
+                $this->cloner->setMaxItems(25);
                 $this->cloner->addCasters(array(
                     '*' => function ($v, array $a, Stub $s, $isNested) {
                         if ($isNested && !$v instanceof \DateTimeInterface) {

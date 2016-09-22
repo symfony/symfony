@@ -34,6 +34,7 @@ class Command
     private $processTitle;
     private $aliases = array();
     private $definition;
+    private $hidden;
     private $help;
     private $description;
     private $ignoreValidationErrors = false;
@@ -444,6 +445,16 @@ class Command
     public function getName()
     {
         return $this->name;
+    }
+    
+    public function setHidden($hiddenBool)
+    {
+        return $this->hidden = $hiddenBool;
+    }
+
+    public function isHidden()
+    {
+        return $this->hidden;
     }
 
     /**

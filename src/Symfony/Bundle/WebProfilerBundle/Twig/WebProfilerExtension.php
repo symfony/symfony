@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class WebProfilerExtension extends \Twig_Extension_Profiler
+class WebProfilerExtension extends \Twig_Extension
 {
     /**
      * @var ValueExporter
@@ -32,32 +32,9 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
      */
     private $dumper;
 
-    /**
-     * @var resource
-     */
-    private $output;
-
-    /**
-     * @var int
-     */
-    private $stackLevel = 0;
-
     public function __construct(HtmlDumper $dumper = null)
     {
         $this->dumper = $dumper ?: new HtmlDumper();
-        $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
-    }
-
-    public function enter(\Twig_Profiler_Profile $profile)
-    {
-        ++$this->stackLevel;
-    }
-
-    public function leave(\Twig_Profiler_Profile $profile)
-    {
-        if (0 === --$this->stackLevel) {
-            $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
-        }
     }
 
     /**
@@ -78,13 +55,9 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
     public function dumpData(\Twig_Environment $env, Data $data, $maxDepth = 0)
     {
         $this->dumper->setCharset($env->getCharset());
-        $this->dumper->dump($data, null, array(
+        $dump = $this->dumper->dump($data, true, array(
             'maxDepth' => $maxDepth,
         ));
-
-        $dump = stream_get_contents($this->output, -1, 0);
-        rewind($this->output);
-        ftruncate($this->output, 0);
 
         return str_replace("\n</pre", '</pre', rtrim($dump));
     }

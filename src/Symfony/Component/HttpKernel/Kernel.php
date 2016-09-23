@@ -482,12 +482,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $container->compile();
+            $class = $this->getNextClassVersion($class);
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 
             $fresh = false;
+        } else {
+            $class = $this->getLatestClassVersion($class);
         }
 
-        require_once $cache->getPath();
+        if(!class_exists($class)) {
+            require $cache->getPath();
+        }
 
         $this->container = new $class();
         $this->container->set('kernel', $this);
@@ -495,6 +500,34 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if (!$fresh && $this->container->has('cache_warmer')) {
             $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
+    }
+
+    /**
+     * Returns the first version of the given class name that doesn't yet exist.
+     *
+     * eg. 'MyClass' is the first version, 'MyClass1' the second, 'MyClass2' the second, etc.
+     *
+     * @param string $class
+     * @return string
+     */
+    protected function getNextClassVersion($class)
+    {
+        for ($classVer = 0; class_exists($class . ($classVer ?: '')); $classVer++);
+
+        return $class . ($classVer ?: '');
+    }
+
+    /**
+     * Returns the last version of the given class name that does exist
+     *
+     * @param string $class
+     * @return string
+     */
+    protected function getLatestClassVersion($class)
+    {
+        for ($classVer = 0; class_exists($class . ($classVer ?: '')); $classVer++);
+
+        return $class . ($classVer > 1 ? $classVer - 1 : '');
     }
 
     /**

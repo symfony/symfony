@@ -19,7 +19,7 @@ use Symfony\Component\Cache\CacheItem;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
+class ArrayAdapter implements ContextAwareAdapterInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -27,6 +27,7 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
     private $values = array();
     private $expiries = array();
     private $createCacheItem;
+    private $forks = array();
 
     /**
      * @param int  $defaultLifetime
@@ -115,6 +116,9 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
     public function clear()
     {
         $this->values = $this->expiries = array();
+        foreach ($this->forks as $fork) {
+            $fork->clear();
+        }
 
         return true;
     }
@@ -195,6 +199,24 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
     public function commit()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withContext($context)
+    {
+        CacheItem::validateKey($context);
+
+        if (isset($this->forks[$context])) {
+            return $this->forks[$context];
+        }
+
+        $fork = clone $this;
+        $fork->values = $fork->expiries = array();
+        $this->forks[$context] = $fork;
+
+        return $fork;
     }
 
     private function generateItems(array $keys, $now)

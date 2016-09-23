@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -24,7 +25,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ChainAdapter implements AdapterInterface
+class ChainAdapter implements ContextAwareAdapterInterface
 {
     private $adapters = array();
     private $saveUp;
@@ -222,5 +223,23 @@ class ChainAdapter implements AdapterInterface
         }
 
         return $committed;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withContext($context)
+    {
+        $fork = clone $this;
+        $fork->adapters = array();
+
+        foreach ($this->adapters as $adapter) {
+            if (!$adapter instanceof ContextAwareAdapterInterface) {
+                throw new CacheException(sprintf('%s does not implement ContextAwareAdapterInterface.', get_class($adapter)));
+            }
+            $fork->adapters[] = $adapter->withContext($context);
+        }
+
+        return $fork;
     }
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Adapter;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Symfony\Component\Cache\Exception\CacheException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -25,6 +26,14 @@ class DoctrineAdapter extends AbstractAdapter
         parent::__construct('', $defaultLifetime);
         $this->provider = $provider;
         $provider->setNamespace($namespace);
+    }
+
+    /**
+     * @inheritdoc}
+     */
+    public function withContext($context)
+    {
+        throw new CacheException(sprintf('%s does not implement ContextAwareAdapterInterface.', get_class($this)));
     }
 
     /**

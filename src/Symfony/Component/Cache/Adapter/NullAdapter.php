@@ -17,7 +17,7 @@ use Symfony\Component\Cache\CacheItem;
 /**
  * @author Titouan Galopin <galopintitouan@gmail.com>
  */
-class NullAdapter implements AdapterInterface
+class NullAdapter implements ContextAwareAdapterInterface
 {
     private $createCacheItem;
 
@@ -108,6 +108,14 @@ class NullAdapter implements AdapterInterface
     public function commit()
     {
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withContext($context)
+    {
+        return clone $this;
     }
 
     private function generateItems(array $keys)

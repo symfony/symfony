@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -77,6 +78,19 @@ trait FilesystemAdapterTrait
         }
 
         return $ok;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withContext($context)
+    {
+        CacheItem::validateKey($context);
+
+        $fork = clone $this;
+        $fork->init($context, $this->directory);
+
+        return $fork;
     }
 
     private function write($file, $data, $expiresAt = null)

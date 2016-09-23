@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
+use Symfony\Component\Cache\Adapter\ContextAwareAdapterInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
@@ -70,6 +71,59 @@ abstract class AdapterTestCase extends CachePoolTest
         foreach ($cache->getItems(array('foo')) as $item) {
         }
         $this->assertFalse($item->isHit());
+    }
+
+    public function testContext()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+
+            return;
+        }
+        $cache = $this->createCachePool();
+
+        if (!$cache instanceof ContextAwareAdapterInterface) {
+            $this->markTestSkipped('ContextAwareAdapterInterface not implemented.');
+        }
+
+        $item = $cache->getItem('foo');
+        $cache->save($item->set('foo'));
+
+        $fork = $cache->withContext('ns');
+        $item = $fork->getItem('foo');
+        $this->assertFalse($item->isHit());
+
+        $fork->save($item->set('bar'));
+        $item = $cache->getItem('bar');
+        $this->assertFalse($item->isHit());
+
+        $fork = $cache->withContext('ns');
+        $item = $fork->getItem('foo');
+        $this->assertTrue($item->isHit());
+
+        $cache->clear();
+        $item = $fork->getItem('foo');
+        $this->assertFalse($item->isHit());
+    }
+
+    /**
+     * @expectedException \Psr\Cache\InvalidArgumentException
+     * @dataProvider invalidKeys
+     */
+    public function testBadContext($context)
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+
+            return;
+        }
+        $cache = $this->createCachePool();
+
+        if (!$cache instanceof ContextAwareAdapterInterface) {
+            $this->markTestSkipped('ContextAwareAdapterInterface not implemented.');
+        }
+
+        $cache->withContext($context);
     }
 }
 

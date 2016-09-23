@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-22T16:45:40Z
+
+Redis doesn't have user:password concepts, it only has a single "secret" one, see http://redis.io/commands/AUTH . What if this secret contains a ":"? What are you fixing that doesn't work today?
+
+---------------------------------------------------------------------------
+
+by ErikSaunier at 2016-09-23T10:21:59Z
+
+I'm using Heroku and there Redis add on. The url provided in the connection settings looks like this : `redis://e:password@ec2-23-217-18-82.eu-west-1.compute.amazonaws.com:21039`
+
+As Heroku provide such url it would be nice to support it or report a tricks in the Symfony documentation.
+
+As an exemple, a trick already exist in [snc/SncRedisBundle RedisDsn.php](https://github.com/snc/SncRedisBundle/blob/master/DependencyInjection/Configuration/RedisDsn.php#L160) for this case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-23T11:15:43Z
+
+OK, understood. There is a small potential for bc break if one uses a secret with a `:` inside, but it looks like DSN for Redis have this `:password` convention in many languages, not only PHP. We should adopt it.
+Can you please rebase and change the base branch of this PR to 3.1?
+
+---------------------------------------------------------------------------
+
+by ErikSaunier at 2016-09-23T13:42:08Z
+
+Thank you @nicolas-grekas , it works with `'#^redis://(?:(?:[^:@]*+:)?([^@]*+)@)?#'`.
+There is a very small potential of BC break for users with a `:` in their redis password but I also think we should adopt it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-23T13:46:36Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-09-23T13:54:04Z
+
+:+1:

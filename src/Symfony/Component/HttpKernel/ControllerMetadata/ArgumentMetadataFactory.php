@@ -11,6 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\ControllerMetadata;
 
+use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\Type;
+use phpDocumentor\Reflection\Types\Array_;
+use phpDocumentor\Reflection\Types\ContextFactory;
+use phpDocumentor\Reflection\Types\Object_;
+
 /**
  * Builds {@see ArgumentMetadata} objects based on the given Controller.
  *
@@ -36,6 +42,9 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
      */
     private $supportsParameterType;
 
+    private $docBlockFactory;
+    private $contextFactory;
+
     public function __construct()
     {
         $this->supportsVariadic = method_exists('ReflectionParameter', 'isVariadic');
@@ -58,7 +67,8 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         }
 
         foreach ($reflection->getParameters() as $param) {
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param), $param->allowsNull());
+            $tag = $this->getParamTag($param);
+            $arguments[$param->getName()] = new ArgumentMetadata($param->getName(), $this->getType($param, $tag), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param), $param->allowsNull(), $this->isArray($param, $tag));
         }
 
         return $arguments;
@@ -66,8 +76,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 
     /**
      * Returns whether an argument is variadic.
-     *
-     * @param \ReflectionParameter $parameter
      *
      * @return bool
      */
@@ -79,8 +87,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * Determines whether an argument has a default value.
      *
-     * @param \ReflectionParameter $parameter
-     *
      * @return bool
      */
     private function hasDefaultValue(\ReflectionParameter $parameter)
@@ -89,9 +95,17 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     }
 
     /**
-     * Returns a default value if available.
+     * Returns if the argument is an array.
      *
-     * @param \ReflectionParameter $parameter
+     * @return bool
+     */
+    private function isArray(\ReflectionParameter $parameter, Type $tag = null)
+    {
+        return $parameter->isArray() || ($tag && $tag instanceof Array_);
+    }
+
+    /**
+     * Returns a default value if available.
      *
      * @return mixed|null
      */
@@ -103,15 +117,13 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * Returns an associated type to the given parameter if available.
      *
-     * @param \ReflectionParameter $parameter
-     *
      * @return null|string
      */
-    private function getType(\ReflectionParameter $parameter)
+    private function getType(\ReflectionParameter $parameter, Type $tag = null)
     {
         if ($this->supportsParameterType) {
             if (!$type = $parameter->getType()) {
-                return;
+                return null !== $tag ? $this->extractType($tag) : null;
             }
             $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
             if ('array' === $typeName && !$type->isBuiltin()) {
@@ -124,6 +136,49 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
 
         if (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $parameter, $info)) {
             return $info[1];
+        }
+
+        if (null !== $tag) {
+            return $this->extractType($tag);
+        }
+    }
+
+    /**
+     * @return Type
+     */
+    private function getParamTag(\ReflectionParameter $parameter)
+    {
+        if (!class_exists('phpDocumentor\Reflection\DocBlockFactory')) {
+            return;
+        }
+
+        // try to get type information from @param
+        if (null === $this->docBlockFactory) {
+            $this->docBlockFactory = DocBlockFactory::createInstance();
+            $this->contextFactory = new ContextFactory();
+        }
+        $context = $this->contextFactory->createFromReflector($parameter);
+        $docblock = $this->docBlockFactory->create($parameter->getDeclaringFunction()->getDocComment(), $context);
+
+        $class = null;
+        $isArray = false;
+        foreach ($docblock->getTagsByName('param') as $param) {
+            if ($parameter->getName() != $param->getVariableName()) {
+                continue;
+            }
+
+            return $param->getType();
+        }
+    }
+
+    private function extractType(Type $tag)
+    {
+        if ($tag instanceof Array_) {
+            $tag = $tag->getValueType();
+        }
+
+        if ($tag instanceof Object_) {
+            return ltrim((string) $tag->getFqsen(), '\\');
         }
     }
 }

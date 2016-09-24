@@ -12,6 +12,8 @@
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Checks the request's attributes for a CookieTokenStorage instance. If one is
@@ -22,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  *
  * @author Oliver Hoff <oliver@hofff.com>
  */
-class CookieTokenStorageListener
+class CookieTokenStorageListener implements EventSubscriberInterface
 {
     /**
      * @var string
@@ -53,5 +55,15 @@ class CookieTokenStorageListener
         foreach ($storage->createCookies() as $cookie) {
             $headers->setCookie($cookie);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::RESPONSE => array(array('onKernelResponse', 0)),
+        );
     }
 }

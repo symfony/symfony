@@ -57,7 +57,7 @@ class JsonDecodeTest extends \PHPUnit_Framework_TestCase
     /**
      * @requires function json_last_error_msg
      * @dataProvider decodeProviderException
-     * @expectedException Symfony\Component\Serializer\Exception\UnexpectedValueException
+     * @expectedException \Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
     public function testDecodeWithException($value)
     {

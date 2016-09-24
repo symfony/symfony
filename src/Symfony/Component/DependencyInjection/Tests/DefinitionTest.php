@@ -159,7 +159,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider invalidDeprecationMessageProvider
-     * @expectedException Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
     public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
     {

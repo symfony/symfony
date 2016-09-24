@@ -68,7 +68,7 @@ class ChainDecoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Serializer\Exception\RuntimeException
+     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
      */
     public function testDecodeUnsupportedFormat()
     {

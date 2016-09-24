@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-24T09:53:16Z
+
+It would be nice to have fabbot report these, wdyt? Can you suggest it  on the php-cs-fixer repos?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-24T09:58:59Z
+
+Agree.. there's some discussion already though. But ill try to PR a simple fixer for this..
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-24T11:22:20Z
+
+@nicolas-grekas lets see what happens :)

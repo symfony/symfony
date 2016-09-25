@@ -83,5 +83,13 @@ class ExtensionPass implements CompilerPassInterface
         if (class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
         }
+
+        if (class_exists(Intl::class)) {
+            $container->getDefinition('twig.extension.intl_bridge')->addTag('twig.extension');
+        }
+
+        if ($container->hasParameter('locale')) {
+            $container->getDefinition('twig.extension.intl_bridge')->replaceArgument(0, $container->getParameter('locale'));
+        }
     }
 }

@@ -448,7 +448,7 @@ class Command
     }
 
     /**
-     * Sets if the command should be hidden from application inspection.
+     * To hide the command in application descriptions.
      *
      * @param bool $hidden To show this command or not
      * 
@@ -462,7 +462,7 @@ class Command
     }
 
     /**
-     * Returns if the command should be hidden from application inspection.
+     * Returns if the command should be hidden in application descriptions
      *
      * @return bool If the command is hidden or not
      */

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 
 /**
  * Creates CSRF token storages based on the requests cookies.
@@ -21,10 +22,38 @@ use Symfony\Component\HttpFoundation\Request;
 class CookieTokenStorageFactory implements TokenStorageFactoryInterface
 {
     /**
+     * @var string
+     */
+    private $secret;
+
+    /**
+     * @var int
+     */
+    private $ttl;
+
+    /**
+     * @param string $secret
+     * @param int    $ttl
+     */
+    public function __construct($secret, $ttl = null)
+    {
+        $this->secret = (string) $secret;
+        $this->ttl = $ttl === null ? 60 * 60 : (int) $ttl;
+
+        if ('' === $this->secret) {
+            throw new InvalidArgumentException('Secret must be a non-empty string');
+        }
+
+        if ($this->ttl < 60) {
+            throw new InvalidArgumentException('TTL must be an integer greater than or equal to 60');
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function createTokenStorage(Request $request)
     {
-        return new CookieTokenStorage($request->cookies, $request->isSecure());
+        return new CookieTokenStorage($request->cookies, $request->isSecure(), $this->secret, $this->ttl);
     }
 }

@@ -462,7 +462,7 @@ class Command
     }
 
     /**
-     * Returns if the command is hidden in application descriptions
+     * Returns if the command is hidden in application descriptions.
      *
      * @return bool If the command is hidden or not
      */

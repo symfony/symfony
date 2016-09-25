@@ -450,7 +450,7 @@ class Command
     /**
      * Sets if the command should be hidden from application inspection.
      *
-     * @param bool $hiddenBool To show this command or not
+     * @param bool $hidden To show this command or not
      * 
      * @return Command The current instance
      */

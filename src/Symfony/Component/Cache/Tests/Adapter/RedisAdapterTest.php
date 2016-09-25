@@ -46,7 +46,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
 
     /**
      * @dataProvider provideFailedCreateConnection
-     * @expectedException Symfony\Component\Cache\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Redis connection failed
      */
     public function testFailedCreateConnection($dsn)
@@ -65,7 +65,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTest
 
     /**
      * @dataProvider provideInvalidCreateConnection
-     * @expectedException Symfony\Component\Cache\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Invalid Redis DSN
      */
     public function testInvalidCreateConnection($dsn)

@@ -274,7 +274,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getReservedIndicators
-     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
     public function testParseUnquotedScalarStartingWithReservedIndicator($indicator)
@@ -289,7 +289,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getScalarIndicators
-     * @expectedException Symfony\Component\Yaml\Exception\ParseException
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
      * @expectedExceptionMessage cannot start a plain scalar; you need to quote the scalar.
      */
     public function testParseUnquotedScalarStartingWithScalarIndicator($indicator)

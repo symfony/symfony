@@ -34,6 +34,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\ChoicesToValuesTransfo
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ChoiceType extends AbstractType
 {
@@ -320,6 +321,14 @@ class ChoiceType extends AbstractType
             return $choiceTranslationDomain;
         };
 
+        $choiceAttrNormalizer = function (Options $options, $choiceAttr) {
+            if (is_string($choiceAttr) || $choiceAttr instanceof PropertyPath) {
+                @trigger_error(sprintf('Using "choice_attr" option as a string property path or a "%s" instance is deprecated since version 3.3 and will throw an exception in 4.0. Use a callable instead.', PropertyPath::class), E_USER_DEPRECATED);
+            }
+
+            return $choiceAttr;
+        };
+
         $resolver->setDefaults(array(
             'multiple' => false,
             'expanded' => false,
@@ -346,6 +355,7 @@ class ChoiceType extends AbstractType
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
         $resolver->setNormalizer('choices_as_values', $choicesAsValuesNormalizer);
+        $resolver->setNormalizer('choice_attr', $choiceAttrNormalizer);
 
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));

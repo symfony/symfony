@@ -218,6 +218,7 @@ class PropertyAccessDecorator implements ChoiceListFactoryInterface
             @trigger_error('Passing callable strings is deprecated since version 3.1 and PropertyAccessDecorator will treat them as property paths in 4.0. You should use a "\Closure" instead.', E_USER_DEPRECATED);
         }
 
+        // Deprecated since 3.3 and to be removed in 4.0 with the condition above
         if ($attr instanceof PropertyPath) {
             $attr = function ($choice) use ($accessor, $attr) {
                 return $accessor->getValue($choice, $attr);

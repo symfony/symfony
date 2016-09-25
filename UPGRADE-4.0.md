@@ -233,6 +233,23 @@ Form
    },
    ```
 
+ * Using `choice_attr` option as a string or a `ProprertyPath` instance will
+   throw an exception. Use a `callable` instead.
+
+   Before:
+
+   ```php
+   'choice_attr' => 'htmlAttributes',
+   ```
+
+   After:
+
+   ```php
+   'choice_attr' => function ($choice, $value, $index) {
+       return $choice->getHtmlAttributes();
+   },
+   ```
+
 FrameworkBundle
 ---------------
 

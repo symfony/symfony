@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-25T08:35:37Z
+
+After this.. only 3 issues left in master :+1:
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-09-25T10:42:27Z
+
+@ro0NL I don't understand one thing. How is it possible that the tests were passing without these fixes?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-25T10:47:15Z
+
+@enumag phpunit assumes FQCN by design. Ie. `@expectedException Exception` vs. `@expectedException \Exception` are equal.. however the latter works correct in **editors** (in terms of clickthroughs, at least for PHPStorm).
+
+However _people_ tend to assume name resolution kicks in which causes false positives when doing stuff like
+
+```php
+use Some\LogicException;
+// @expectedException LogicException
+```
+
+This works if `\Some\LogicException extends \LogicException` but is totally false positive.
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-09-25T10:51:08Z
+
+@ro0NL I understand now. Thanks for the explanation! :+1:

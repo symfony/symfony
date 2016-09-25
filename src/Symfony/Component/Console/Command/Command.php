@@ -34,7 +34,7 @@ class Command
     private $processTitle;
     private $aliases = array();
     private $definition;
-    private $hidden;
+    private $hidden = false;
     private $help;
     private $description;
     private $ignoreValidationErrors = false;
@@ -454,9 +454,9 @@ class Command
      * 
      * @return Command The current instance
      */
-    public function setHidden($hiddenBool)
+    public function setHidden($hidden)
     {
-        $this->hidden = $hiddenBool;
+        $this->hidden = $hidden;
 
         return $this;
     }

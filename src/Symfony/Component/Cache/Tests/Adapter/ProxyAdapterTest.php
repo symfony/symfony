@@ -32,7 +32,7 @@ class ProxyAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage OK bar
      */
     public function testProxyfiedItem()

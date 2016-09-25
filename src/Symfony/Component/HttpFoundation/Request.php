@@ -365,7 +365,7 @@ class Request
             case 'DELETE':
                 if (isset($server['content_type'])) {
                     $server['CONTENT_TYPE'] = $server['content_type'];
-                    unset($server['content_type'];
+                    unset($server['content_type']);
                 } else if (!isset($server['CONTENT_TYPE'])) {
                     $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
                 }
@@ -1416,7 +1416,8 @@ class Request
      */
     public function getContentType()
     {
-        return $this->getFormat($this->headers->get('CONTENT_TYPE'));
+        return $this->getFormat($this->headers->get('
+        '));
     }
 
     /**

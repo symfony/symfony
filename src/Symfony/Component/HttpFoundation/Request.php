@@ -363,7 +363,10 @@ class Request
             case 'POST':
             case 'PUT':
             case 'DELETE':
-                if (!isset($server['CONTENT_TYPE'])) {
+                if (isset($server['content_type'])) {
+                    $server['CONTENT_TYPE'] = $server['content_type'];
+                    unset($server['content_type'];
+                } else if (!isset($server['CONTENT_TYPE'])) {
                     $server['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
                 }
                 // no break

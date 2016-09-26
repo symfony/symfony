@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
 
@@ -31,22 +30,22 @@ class CookieTokenStorage implements TokenStorageInterface
     const COOKIE_DELIMITER = '_';
 
     /**
-     * @var array
+     * @var array A map of tokens to be written in the response
      */
     private $transientTokens = array();
 
     /**
-     * @var array
+     * @var array A map of tokens extracted from cookies and verified
      */
-    private $resolvedTokens = array();
+    private $extractedTokens = array();
 
     /**
      * @var array
      */
-    private $refreshTokens = array();
+    private $nonces = array();
 
     /**
-     * @var ParameterBag
+     * @var array
      */
     private $cookies;
 
@@ -66,14 +65,14 @@ class CookieTokenStorage implements TokenStorageInterface
     private $ttl;
 
     /**
-     * @param ParameterBag $cookies
-     * @param bool         $secure
-     * @param string       $secret
-     * @param int          $ttl
+     * @param string $cookies The raw HTTP Cookie header
+     * @param bool   $secure
+     * @param string $secret
+     * @param int    $ttl
      */
-    public function __construct(ParameterBag $cookies, $secure, $secret, $ttl = null)
+    public function __construct($cookies, $secure, $secret, $ttl = null)
     {
-        $this->cookies = $cookies;
+        $this->cookies = self::parseCookieHeader($cookies);
         $this->secure = (bool) $secure;
         $this->secret = (string) $secret;
         $this->ttl = $ttl === null ? 60 * 60 : (int) $ttl;
@@ -120,7 +119,10 @@ class CookieTokenStorage implements TokenStorageInterface
             throw new InvalidArgumentException('Empty tokens are not allowed');
         }
 
-        $this->updateToken($tokenId, $token);
+        // we need to resolve the token first to record the nonces
+        $this->resolveToken($tokenId);
+
+        $this->transientTokens[$tokenId] = $token;
     }
 
     /**
@@ -130,33 +132,28 @@ class CookieTokenStorage implements TokenStorageInterface
     {
         $token = $this->resolveToken($tokenId);
 
-        $this->updateToken($tokenId, '');
+        $this->transientTokens[$tokenId] = '';
 
         return '' === $token ? null : $token;
     }
 
     /**
-     * @return array
+     * @return Cookie[]
      */
     public function createCookies()
     {
         $cookies = array();
 
         foreach ($this->transientTokens as $tokenId => $token) {
-            // FIXME empty tokens are handled by the http foundations cookie class
-            // and are recognized as a "delete" cookie
-            // the problem is the that the value of deleted cookies get set to
-            // the string "deleted" and not the empty string
-            $cookies[] = $this->createTokenCookie($tokenId, $token);
-            $cookies[] = $this->createVerificationCookie($tokenId, $token);
-        }
-
-        foreach ($this->refreshTokens as $tokenId => $token) {
-            if (isset($this->transientTokens[$tokenId])) {
-                continue;
+            if (isset($this->nonces[$tokenId])) {
+                foreach (array_keys($this->nonces[$tokenId]) as $nonce) {
+                    $cookies[] = $this->createDeleteCookie($tokenId, $nonce);
+                }
             }
 
-            $cookies[] = $this->createVerificationCookie($tokenId, $token);
+            if ($token !== '') {
+                $cookies[] = $this->createCookie($tokenId, $token);
+            }
         }
 
         return $cookies;
@@ -164,72 +161,90 @@ class CookieTokenStorage implements TokenStorageInterface
 
     /**
      * @param string $tokenId
-     * @param bool   $excludeTransient
      *
      * @return string
      */
-    protected function resolveToken($tokenId, $excludeTransient = false)
+    protected function resolveToken($tokenId)
     {
-        if (!$excludeTransient && isset($this->transientTokens[$tokenId])) {
+        if (isset($this->transientTokens[$tokenId])) {
             return $this->transientTokens[$tokenId];
         }
 
-        if (isset($this->resolvedTokens[$tokenId])) {
-            return $this->resolvedTokens[$tokenId];
+        if (isset($this->extractedTokens[$tokenId])) {
+            return $this->extractedTokens[$tokenId];
         }
 
-        $this->resolvedTokens[$tokenId] = '';
+        $this->extractedTokens[$tokenId] = '';
 
-        $token = $this->getTokenCookieValue($tokenId);
-        if ('' === $token) {
+        $prefix = $this->generateCookieName($tokenId, '');
+        $prefixLength = strlen($prefix);
+        $cookies = $this->findCookiesByPrefix($prefix);
+
+        // record the nonces used, so we can delete all obsolete cookies of this
+        // token id, if necessary
+        foreach ($cookies as $cookie) {
+            $this->nonces[$tokenId][substr($cookie[0], $prefixLength)] = true;
+        }
+
+        // if there is more than one cookie for the prefix, we get cookie tossed maybe
+        if (count($cookies) != 1) {
             return '';
         }
 
-        $parts = explode(self::COOKIE_DELIMITER, $this->getVerificationCookieValue($tokenId), 2);
-        if (count($parts) != 2) {
+        $parts = explode(self::COOKIE_DELIMITER, $cookies[0][1], 3);
+        if (count($parts) != 3) {
             return '';
         }
+        list($expires, $signature, $token) = $parts;
 
-        list($expires, $hash) = $parts;
+        // expired token
         $time = time();
         if (!ctype_digit($expires) || $expires < $time) {
             return '';
         }
-        if (!hash_equals($this->generateVerificationHash($tokenId, $token, $expires), $hash)) {
+
+        // invalid signature
+        $nonce = substr($cookies[0][0], $prefixLength);
+        if (!hash_equals($this->generateSignature($tokenId, $token, $expires, $nonce), $signature)) {
             return '';
         }
 
         $time += $this->ttl / 2;
         if ($expires < $time) {
-            $this->refreshTokens[$tokenId] = $token;
-        }
-
-        return $this->resolvedTokens[$tokenId] = $token;
-    }
-
-    /**
-     * @param string $tokenId
-     * @param string $token
-     */
-    protected function updateToken($tokenId, $token)
-    {
-        if ($token === $this->resolveToken($tokenId, true)) {
-            unset($this->transientTokens[$tokenId]);
-        } else {
             $this->transientTokens[$tokenId] = $token;
         }
+
+        return $this->extractedTokens[$tokenId] = $token;
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return array
+     */
+    protected function findCookiesByPrefix($prefix)
+    {
+        $cookies = array();
+        foreach ($this->cookies as $cookie) {
+            if (0 === strpos($cookie[0], $prefix)) {
+                $cookies[] = $cookie;
+            }
+        }
+
+        return $cookies;
     }
 
     /**
      * @param string $tokenId
+     * @param string $nonce
      *
-     * @return string
+     * @return Cookie
      */
-    protected function getTokenCookieValue($tokenId)
+    protected function createDeleteCookie($tokenId, $nonce)
     {
-        $name = $this->generateTokenCookieName($tokenId);
+        $name = $this->generateCookieName($tokenId, $nonce);
 
-        return $this->cookies->get($name, '');
+        return new Cookie($name, '', 0, null, null, $this->secure, true);
     }
 
     /**
@@ -238,88 +253,82 @@ class CookieTokenStorage implements TokenStorageInterface
      *
      * @return Cookie
      */
-    protected function createTokenCookie($tokenId, $token)
+    protected function createCookie($tokenId, $token)
     {
-        $name = $this->generateTokenCookieName($tokenId);
+        $expires = time() + $this->ttl;
+        $nonce = self::encodeBase64Url(random_bytes(6));
+        $signature = $this->generateSignature($tokenId, $token, $expires, $nonce);
 
-        return new Cookie($name, $token, 0, null, null, $this->secure, false);
-    }
+        $this->nonces[$tokenId][$nonce] = true;
 
-    /**
-     * @param string $tokenId
-     *
-     * @return string
-     */
-    protected function generateTokenCookieName($tokenId)
-    {
-        $encodedTokenId = rtrim(strtr(base64_encode($tokenId), '+/', '-_'), '=');
-
-        return sprintf('_csrf/%s/%s', $this->secure ? 'secure' : 'insecure', $encodedTokenId);
-    }
-
-    /**
-     * @param string $tokenId
-     *
-     * @return string
-     */
-    protected function getVerificationCookieValue($tokenId)
-    {
-        $name = $this->generateVerificationCookieName($tokenId);
-
-        return $this->cookies->get($name, '');
-    }
-
-    /**
-     * @param string $tokenId
-     * @param string $token
-     *
-     * @return Cookie
-     */
-    protected function createVerificationCookie($tokenId, $token)
-    {
-        $name = $this->generateVerificationCookieName($tokenId);
-        $value = $this->generateVerificationCookieValue($tokenId, $token);
+        $name = $this->generateCookieName($tokenId, $nonce);
+        $value = $expires.self::COOKIE_DELIMITER.$signature.self::COOKIE_DELIMITER.$token;
 
         return new Cookie($name, $value, 0, null, null, $this->secure, true);
     }
 
     /**
      * @param string $tokenId
+     * @param string $nonce
      *
      * @return string
      */
-    protected function generateVerificationCookieName($tokenId)
+    protected function generateCookieName($tokenId, $nonce)
     {
-        return $this->generateTokenCookieName($tokenId).'/verify';
-    }
-
-    /**
-     * @param string $tokenId
-     * @param string $token
-     *
-     * @return string
-     */
-    protected function generateVerificationCookieValue($tokenId, $token)
-    {
-        if ('' === $token) {
-            return '';
-        }
-
-        $expires = time() + $this->ttl;
-        $hash = $this->generateVerificationHash($tokenId, $token, $expires);
-
-        return $expires.self::COOKIE_DELIMITER.$hash;
+        return sprintf(
+            '_csrf_%s_%s_%s',
+            (int) $this->secure,
+            self::encodeBase64Url($tokenId),
+            $nonce
+        );
     }
 
     /**
      * @param string $tokenId
      * @param string $token
      * @param int    $expires
+     * @param string $nonce
      *
      * @return string
      */
-    protected function generateVerificationHash($tokenId, $token, $expires)
+    protected function generateSignature($tokenId, $token, $expires, $nonce)
     {
-        return hash_hmac('sha256', $tokenId.$token.$expires, $this->secret);
+        return hash_hmac('sha256', $tokenId.$token.$expires.$nonce.$this->secure, $this->secret);
+    }
+
+    /**
+     * @param string $header
+     *
+     * @return array
+     */
+    public static function parseCookieHeader($header)
+    {
+        $header = trim((string) $header);
+        if ('' === $header) {
+            return array();
+        }
+
+        $cookies = array();
+        foreach (explode(';', $header) as $cookie) {
+            if (false === strpos($cookie, '=')) {
+                continue;
+            }
+
+            $cookies[] = array_map(function ($item) {
+                return urldecode(trim($item, ' "'));
+            }, explode('=', $cookie, 2));
+        }
+
+        return $cookies;
+    }
+
+    /**
+     * @param string $data
+     *
+     * @return string
+     */
+    public static function encodeBase64Url($data)
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }

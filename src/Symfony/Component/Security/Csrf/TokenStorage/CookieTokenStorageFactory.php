@@ -54,6 +54,6 @@ class CookieTokenStorageFactory implements TokenStorageFactoryInterface
      */
     public function createTokenStorage(Request $request)
     {
-        return new CookieTokenStorage($request->cookies, $request->isSecure(), $this->secret, $this->ttl);
+        return new CookieTokenStorage($request->headers->get('Cookie'), $request->isSecure(), $this->secret, $this->ttl);
     }
 }

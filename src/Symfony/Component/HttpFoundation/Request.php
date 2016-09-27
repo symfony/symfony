@@ -793,7 +793,13 @@ class Request
     public function getClientIps()
     {
         $clientIps = array();
-        $ip = $this->server->get('REMOTE_ADDR');
+        
+        if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+            $this->server->set('REMOTE_ADDR', $_SERVER['HTTP_CF_CONNECTING_IP']);
+            $ip = $this->server->get('REMOTE_ADDR');
+        } else {
+            $ip = $this->server->get('REMOTE_ADDR');
+        }
 
         if (!$this->isFromTrustedProxy()) {
             return array($ip);

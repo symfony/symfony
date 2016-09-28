@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-09-28T08:03:47Z
+
+👍
+
+By the way, I do not think that this change will not be breaking some applications. In my experience there are way to many packages out there that require the FrameworkBundle instead of explicitly listing their dependencies. Probably, not many of them will break because of the missing Asset component, but we will probably have to expect some (a lot of) reports when doing similar changes with other component. Though maybe this helps to educate people to be more explicit with what their packages actually really need without pulling the whole universe.

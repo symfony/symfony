@@ -181,7 +181,7 @@ class ResponseHeaderBag extends HeaderBag
      *
      * @param string $format
      *
-     * @return array
+     * @return array|Cookie[]|Cookie[][][]
      *
      * @throws \InvalidArgumentException When the $format is invalid
      */

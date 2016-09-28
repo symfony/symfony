@@ -4,6 +4,9 @@ UPGRADE FROM 3.1 to 3.2
 FrameworkBundle
 ---------------
 
+ * The `symfony/templating` dependency has been removed; require it via `composer
+   require symfony/templating` if you depend on it and don't already depend on
+   `symfony/symfony`
  * The `symfony/translation` dependency has been removed; require it via `composer
    require symfony/translation` if you depend on it and don't already depend on
    `symfony/symfony`

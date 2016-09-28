@@ -31,7 +31,6 @@
         "symfony/security-core": "~3.2",
         "symfony/security-csrf": "~2.8|~3.0",
         "symfony/stopwatch": "~2.8|~3.0",
-        "symfony/templating": "~2.8|~3.0",
         "doctrine/cache": "~1.0",
         "doctrine/annotations": "~1.0"
     },
@@ -48,6 +47,7 @@
         "symfony/process": "~2.8|~3.0",
         "symfony/serializer": "~2.8|~3.0",
         "symfony/translation": "~2.8|~3.0",
+        "symfony/templating": "~2.8|~3.0",
         "symfony/validator": "~3.2",
         "symfony/yaml": "~3.2",
         "symfony/property-info": "~2.8|~3.0",

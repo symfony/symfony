@@ -4,6 +4,7 @@ CHANGELOG
 3.2.0
 -----
 
+ * Removed `symfony/templating` from the list of required dependencies in `composer.json`
  * Removed `symfony/translation` from the list of required dependencies in `composer.json`
  * Removed `symfony/asset` from the list of required dependencies in `composer.json`
  * The `Resources/public/images/*` files have been removed.

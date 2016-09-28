@@ -148,6 +148,10 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['templating'])) {
+            if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
+                throw new LogicException('Templating support cannot be enabled as the Templating component is not installed.');
+            }
+
             $this->registerTemplatingConfiguration($config['templating'], $container, $loader);
         }
 

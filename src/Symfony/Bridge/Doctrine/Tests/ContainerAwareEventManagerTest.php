@@ -14,52 +14,16 @@ namespace Symfony\Bridge\Doctrine\Tests;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Component\DependencyInjection\Container;
 
-class ContainerAwareEventManagerTest extends \PHPUnit_Framework_TestCase
+class ContainerAwareEventManagerTest extends LazyEventManagerTest
 {
-    private $container;
-    private $evm;
-
-    protected function setUp()
+    protected function createEventManager($id = null, $listener = null)
     {
-        $this->container = new Container();
-        $this->evm = new ContainerAwareEventManager($this->container);
-    }
+        $container = new Container();
 
-    public function testDispatchEvent()
-    {
-        $this->container->set('foobar', $listener1 = new MyListener());
-        $this->evm->addEventListener('foo', 'foobar');
-        $this->evm->addEventListener('foo', $listener2 = new MyListener());
+        if ($id && $listener) {
+            $container->set($id, $listener);
+        }
 
-        $this->evm->dispatchEvent('foo');
-
-        $this->assertTrue($listener1->called);
-        $this->assertTrue($listener2->called);
-    }
-
-    public function testRemoveEventListener()
-    {
-        $this->evm->addEventListener('foo', 'bar');
-        $this->evm->addEventListener('foo', $listener = new MyListener());
-
-        $listeners = array('foo' => array('_service_bar' => 'bar', spl_object_hash($listener) => $listener));
-        $this->assertSame($listeners, $this->evm->getListeners());
-        $this->assertSame($listeners['foo'], $this->evm->getListeners('foo'));
-
-        $this->evm->removeEventListener('foo', $listener);
-        $this->assertSame(array('_service_bar' => 'bar'), $this->evm->getListeners('foo'));
-
-        $this->evm->removeEventListener('foo', 'bar');
-        $this->assertSame(array(), $this->evm->getListeners('foo'));
-    }
-}
-
-class MyListener
-{
-    public $called = false;
-
-    public function foo()
-    {
-        $this->called = true;
+        return new ContainerAwareEventManager($container);
     }
 }

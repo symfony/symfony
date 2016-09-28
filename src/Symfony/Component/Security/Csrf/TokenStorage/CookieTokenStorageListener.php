@@ -29,6 +29,11 @@ class CookieTokenStorageListener implements EventSubscriberInterface
     /**
      * @var string
      */
+    const DEFAULT_TOKEN_STORAGE_KEY = '_csrf_token_storage';
+
+    /**
+     * @var string
+     */
     private $tokenStorageKey;
 
     /**
@@ -36,9 +41,7 @@ class CookieTokenStorageListener implements EventSubscriberInterface
      */
     public function __construct($tokenStorageKey = null)
     {
-        // TODO should this class get its own DEFAULT_TOKEN_STORAGE_KEY constant?
-        // if no, where should the sole constant be put?
-        $this->tokenStorageKey = $tokenStorageKey === null ? RequestStackTokenStorage::DEFAULT_TOKEN_STORAGE_KEY : $tokenStorageKey;
+        $this->tokenStorageKey = null === $tokenStorageKey ? self::DEFAULT_TOKEN_STORAGE_KEY : $tokenStorageKey;
     }
 
     /**

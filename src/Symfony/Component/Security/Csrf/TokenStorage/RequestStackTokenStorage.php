@@ -49,11 +49,8 @@ class RequestStackTokenStorage extends AbstractTokenStorageProxy
      * @param TokenStorageFactoryInterface $factory
      * @param string|null                  $tokenStorageKey
      */
-    public function __construct(
-        RequestStack $requestStack,
-        TokenStorageFactoryInterface $factory,
-        $tokenStorageKey = null
-    ) {
+    public function __construct(RequestStack $requestStack, TokenStorageFactoryInterface $factory, $tokenStorageKey = null)
+    {
         $this->requestStack = $requestStack;
         $this->factory = $factory;
         $this->tokenStorageKey = $tokenStorageKey === null ? self::DEFAULT_TOKEN_STORAGE_KEY : $tokenStorageKey;
@@ -64,7 +61,6 @@ class RequestStackTokenStorage extends AbstractTokenStorageProxy
      */
     public function getProxiedTokenStorage()
     {
-        // TODO use master or current request?
         $request = $this->requestStack->getMasterRequest();
 
         if (!$request) {
@@ -77,11 +73,8 @@ class RequestStackTokenStorage extends AbstractTokenStorageProxy
             return $storage;
         }
 
-        if ($storage !== null) {
-            throw new UnexpectedValueException(sprintf(
-                'Expected null or an instance of "Symfony\\Component\\Security\\Csrf\\TokenStorage\\TokenStorageInterface", got "%s"',
-                is_object($storage) ? get_class($storage) : gettype($storage)
-            ));
+        if (null !== $storage) {
+            throw new UnexpectedValueException(sprintf('Expected null or an implementation of "%s", got "%s"', TokenStorageInterface::class, is_object($storage) ? get_class($storage) : gettype($storage)));
         }
 
         $storage = $this->factory->createTokenStorage($request);

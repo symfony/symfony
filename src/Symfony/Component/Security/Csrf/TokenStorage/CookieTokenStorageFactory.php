@@ -38,7 +38,7 @@ class CookieTokenStorageFactory implements TokenStorageFactoryInterface
     public function __construct($secret, $ttl = null)
     {
         $this->secret = (string) $secret;
-        $this->ttl = $ttl === null ? 60 * 60 : (int) $ttl;
+        $this->ttl = null === $ttl ? 60 * 60 : (int) $ttl;
 
         if ('' === $this->secret) {
             throw new InvalidArgumentException('Secret must be a non-empty string');

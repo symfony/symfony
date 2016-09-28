@@ -75,7 +75,7 @@ class CookieTokenStorage implements TokenStorageInterface
         $this->cookies = self::parseCookieHeader($cookies);
         $this->secure = (bool) $secure;
         $this->secret = (string) $secret;
-        $this->ttl = $ttl === null ? 60 * 60 : (int) $ttl;
+        $this->ttl = null === $ttl ? 60 * 60 : (int) $ttl;
 
         if ('' === $this->secret) {
             throw new InvalidArgumentException('Secret must be a non-empty string');
@@ -151,7 +151,7 @@ class CookieTokenStorage implements TokenStorageInterface
                 }
             }
 
-            if ($token !== '') {
+            if ('' !== $token) {
                 $cookies[] = $this->createCookie($tokenId, $token);
             }
         }

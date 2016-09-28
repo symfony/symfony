@@ -488,14 +488,65 @@ class FormTypeTest extends BaseTypeTest
         $this->assertTrue($view->vars['multipart']);
     }
 
-    public function testViewIsNotRenderedByDefault()
+    public function testViewIsConsideredRenderedForRenderedNonCompoundForms()
     {
-        $view = $this->factory->createBuilder('form')
-                ->add('foo', 'form')
-                ->getForm()
-                ->createView();
+        $view = $this->factory->createBuilder('form', null, array(
+                'compound' => false,
+            ))
+            ->getForm()
+            ->createView();
+
+        $view->setRendered();
+
+        $this->assertTrue($view->isRendered());
+    }
+
+    public function testViewIsNotConsideredRenderedImplicitlyForNonCompoundForms()
+    {
+        $view = $this->factory->createBuilder('form', null, array(
+                'compound' => false,
+            ))
+            ->getForm()
+            ->createView();
 
         $this->assertFalse($view->isRendered());
+    }
+
+    public function testViewIsNotConsideredRenderedImplicitlyForCompoundFormsWithNonCompoundChildren()
+    {
+        $view = $this->factory->createBuilder('form')
+            ->add('foo', 'form', array(
+                'compound' => false,
+            ))
+            ->getForm()
+            ->createView();
+
+        $this->assertFalse($view->isRendered());
+    }
+
+    public function testViewIsConsideredRenderedImplicitlyForCompoundFormsWithRenderedNonCompoundChildren()
+    {
+        $view = $this->factory->createBuilder('form')
+            ->add('foo', 'form', array(
+                'compound' => false,
+            ))
+            ->getForm()
+            ->createView();
+
+        foreach ($view as $child) {
+            $child->setRendered();
+        }
+
+        $this->assertTrue($view->isRendered());
+    }
+
+    public function testViewIsConsideredRenderedImplicitlyForCompoundFormsWithoutChildren()
+    {
+        $view = $this->factory->createBuilder('form')
+            ->getForm()
+            ->createView();
+
+        $this->assertTrue($view->isRendered());
     }
 
     public function testErrorBubblingIfCompound()

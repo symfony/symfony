@@ -1006,6 +1006,10 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        if (!class_exists('Symfony\Component\Security\Csrf\CsrfToken')) {
+            throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed.');
+        }
+
         if (!$this->sessionConfigEnabled) {
             throw new \LogicException('CSRF protection needs sessions to be enabled.');
         }

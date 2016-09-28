@@ -494,6 +494,19 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             require $cache->getPath();
         }
 
+        if(!class_exists($class)) {
+            //the cache file loaded has a different classVersion than we expected, so we need to find the loaded class.
+            foreach (array_reverse(get_declared_classes()) as $declaredClass) {
+                if (rtrim($declaredClass, '0123456789') === $class) {
+                    class_alias($declaredClass, $class);
+                    break;
+                }
+            }
+            if (!class_exists($class)) {
+                throw new \RuntimeException(sprintf("Failed to load the %s container from cache\n", $class));
+            }
+        }
+
         $this->container = new $class();
         $this->container->set('kernel', $this);
 

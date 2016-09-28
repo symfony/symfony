@@ -92,7 +92,7 @@ class NumericNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidDefinitionException
      * @expectedExceptionMessage ->cannotBeEmpty() is not applicable to NumericNodeDefinition.
      */
     public function testCannotBeEmptyThrowsAnException()

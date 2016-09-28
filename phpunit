@@ -129,6 +129,13 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
     }
     chdir($oldPwd);
 
+    if (!$runningProcs) {
+        $h = fopen('php://stderr', 'w');
+        fwrite($h, "Symfony tests are missing, did you get the code from a ZIP file?\n");
+        fwrite($h, "Please use git to fetch the source from https://github.com/symfony/symfony\n");
+        exit(1);
+    }
+
     // Fixes for colors support on appveyor
     // See https://github.com/appveyor/ci/issues/373
     $colorFixes = array(

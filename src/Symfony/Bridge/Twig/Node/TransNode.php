@@ -54,7 +54,7 @@ class TransNode extends \Twig_Node
         $method = !$this->hasNode('count') ? 'trans' : 'transChoice';
 
         $compiler
-            ->write('echo $this->env->getExtension(\'translator\')->getTranslator()->'.$method.'(')
+            ->write('echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->getTranslator()->'.$method.'(')
             ->subcompile($msg)
         ;
 

@@ -19,6 +19,7 @@
         "php": ">=5.3.9",
         "symfony/asset": "~2.7",
         "symfony/twig-bridge": "~2.7",
+        "twig/twig": "~1.26|~2.0",
         "symfony/http-foundation": "~2.5",
         "symfony/http-kernel": "~2.7"
     },

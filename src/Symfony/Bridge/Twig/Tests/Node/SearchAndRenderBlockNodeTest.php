@@ -27,7 +27,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'widget\')',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'widget\')',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -50,7 +50,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'widget\', array("foo" => "bar"))',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'widget\', array("foo" => "bar"))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -70,7 +70,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("label" => "my label"))',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', array("label" => "my label"))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -92,7 +92,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // Otherwise the default label is overwritten with null.
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\')',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\')',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -114,7 +114,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // Otherwise the default label is overwritten with null.
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\')',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\')',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -133,7 +133,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\')',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\')',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -160,7 +160,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar"))',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar"))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -186,7 +186,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -217,7 +217,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -254,7 +254,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in attributes") + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in attributes") + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())

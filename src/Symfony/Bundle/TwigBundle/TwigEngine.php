@@ -49,7 +49,7 @@ class TwigEngine extends BaseEngine implements EngineInterface
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Inject the escaping strategy in the Twig_Environment object instead.', E_USER_DEPRECATED);
 
-        $this->environment->getExtension('escaper')->setDefaultStrategy($strategy);
+        $this->environment->getExtension('Twig_Extension_Escaper')->setDefaultStrategy($strategy);
     }
 
     /**

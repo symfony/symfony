@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
 
 /**
@@ -19,17 +22,39 @@ use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class YamlLintCommand extends BaseLintCommand
+class YamlLintCommand extends Command
 {
+    private $command;
+
     /**
      * {@inheritdoc}
      */
     protected function configure()
     {
-        parent::configure();
+        $this->setName('lint:yaml');
 
-        $this->setHelp(
-            $this->getHelp().<<<EOF
+        if (!$this->isEnabled()) {
+            return;
+        }
+
+        $directoryIteratorProvider = function ($directory, $default) {
+            if (!is_dir($directory)) {
+                $directory = $this->getApplication()->getKernel()->locateResource($directory);
+            }
+
+            return $default($directory);
+        };
+
+        $isReadableProvider = function ($fileOrDirectory, $default) {
+            return 0 === strpos($fileOrDirectory, '@') || $default($fileOrDirectory);
+        };
+
+        $this->command = new BaseLintCommand(null, $directoryIteratorProvider, $isReadableProvider);
+
+        $this
+            ->setDescription($this->command->getDescription())
+            ->setDefinition($this->command->getDefinition())
+            ->setHelp($this->command->getHelp().<<<EOF
 
 Or find all files in a bundle:
 
@@ -39,17 +64,16 @@ EOF
         );
     }
 
-    protected function getDirectoryIterator($directory)
+    /**
+     * {@inheritdoc}
+     */
+    public function isEnabled()
     {
-        if (!is_dir($directory)) {
-            $directory = $this->getApplication()->getKernel()->locateResource($directory);
-        }
-
-        return parent::getDirectoryIterator($directory);
+        return class_exists(BaseLintCommand::class) && parent::isEnabled();
     }
 
-    protected function isReadable($fileOrDirectory)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return 0 === strpos($fileOrDirectory, '@') || parent::isReadable($fileOrDirectory);
+        return $this->command->execute($input, $output);
     }
 }

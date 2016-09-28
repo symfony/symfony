@@ -4,6 +4,7 @@ CHANGELOG
 3.2.0
 -----
 
+ * Removed `symfony/asset` from the list of required dependencies in `composer.json`
  * The `Resources/public/images/*` files have been removed.
  * The `Resources/public/css/*.css` files have been removed (they are now inlined in TwigBundle).
  * The `Controller::getUser()` method has been deprecated and will be removed in

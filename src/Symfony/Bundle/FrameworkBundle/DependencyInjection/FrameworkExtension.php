@@ -134,6 +134,10 @@ class FrameworkExtension extends Extension
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['assets'])) {
+            if (!class_exists('Symfony\Component\Asset\Package')) {
+                throw new LogicException('Asset support cannot be enabled as the Asset component is not installed.');
+            }
+
             $this->registerAssetsConfiguration($config['assets'], $container, $loader);
         }
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-09-24T22:03:59Z
+
+The travis build failed because of an issue with the LDAP test (`src/Symfony/Component/Ldap/Tests/Fixtures/data/base.ldif: No such file or directory`) which occurs in the HHVM environment.
+
+---------------------------------------------------------------------------
+
+by ksom at 2016-09-25T03:56:09Z
+
+@lemoinem Thanks for mentioning me :)

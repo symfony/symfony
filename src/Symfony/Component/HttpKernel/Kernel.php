@@ -479,6 +479,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $class = $this->getContainerClass();
         $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = true;
+        $unversionedClass = $class;
         if (!$cache->isFresh()) {
             $container = $this->buildContainer();
             $container->compile();
@@ -497,7 +498,7 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         if(!class_exists($class)) {
             //the cache file loaded has a different classVersion than we expected, so we need to find the loaded class.
             foreach (array_reverse(get_declared_classes()) as $declaredClass) {
-                if (rtrim($declaredClass, '0123456789') === $class) {
+                if (rtrim($declaredClass, '0123456789') === $unversionedClass) {
                     class_alias($declaredClass, $class);
                     break;
                 }

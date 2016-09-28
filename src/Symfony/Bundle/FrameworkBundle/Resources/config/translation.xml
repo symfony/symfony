@@ -131,5 +131,11 @@
             <argument type="service" id="translator" />
             <tag name="kernel.cache_warmer" />
         </service>
+
+        <service id="translator_listener" class="Symfony\Component\HttpKernel\EventListener\TranslatorListener">
+            <argument type="service" id="translator" />
+            <argument type="service" id="request_stack" />
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 </container>

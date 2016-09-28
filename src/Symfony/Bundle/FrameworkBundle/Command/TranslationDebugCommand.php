@@ -87,6 +87,18 @@ EOF
     /**
      * {@inheritdoc}
      */
+    public function isEnabled()
+    {
+        if (!class_exists('Symfony\Component\Translation\Translator')) {
+            return false;
+        }
+
+        return parent::isEnabled();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);

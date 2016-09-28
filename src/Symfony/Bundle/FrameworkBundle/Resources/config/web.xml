@@ -56,12 +56,6 @@
             <argument type="service" id="router" on-invalid="ignore" />
         </service>
 
-        <service id="translator_listener" class="Symfony\Component\HttpKernel\EventListener\TranslatorListener">
-            <argument type="service" id="translator" />
-            <argument type="service" id="request_stack" />
-            <tag name="kernel.event_subscriber" />
-        </service>
-
         <service id="validate_request_listener" class="Symfony\Component\HttpKernel\EventListener\ValidateRequestListener">
             <tag name="kernel.event_subscriber" />
         </service>

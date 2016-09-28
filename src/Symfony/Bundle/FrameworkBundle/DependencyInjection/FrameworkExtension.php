@@ -70,11 +70,6 @@ class FrameworkExtension extends Extension
         $loader->load('services.xml');
         $loader->load('fragment_renderer.xml');
 
-        // A translator must always be registered (as support is included by
-        // default in the Form component). If disabled, an identity translator
-        // will be used and everything will still work as expected.
-        $loader->load('translation.xml');
-
         // Property access is used by both the Form and the Validator component
         $loader->load('property_access.xml');
 
@@ -83,6 +78,17 @@ class FrameworkExtension extends Extension
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
+
+        // A translator must always be registered (as support is included by
+        // default in the Form component). If disabled, an identity translator
+        // will be used and everything will still work as expected.
+        if (class_exists('Symfony\Component\Translation\Translator') || $this->isConfigEnabled($container, $config['form'])) {
+            if (!class_exists('Symfony\Component\Translation\Translator')) {
+                throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
+            }
+
+            $loader->load('translation.xml');
+        }
 
         if (isset($config['secret'])) {
             $container->setParameter('kernel.secret', $config['secret']);
@@ -762,6 +768,11 @@ class FrameworkExtension extends Extension
         if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
+
+        if (!class_exists('Symfony\Component\Translation\Translator')) {
+            throw new LogicException('Translation support cannot be enabled as the Translator component is not installed.');
+        }
+
         $this->translationConfigEnabled = true;
 
         // Use the "real" translator instead of the identity default

@@ -4,6 +4,9 @@ UPGRADE FROM 3.1 to 3.2
 FrameworkBundle
 ---------------
 
+ * The `symfony/asset` dependency has been removed; require it via `composer
+   require symfony/asset` if you depend on it and don't already depend on
+   `symfony/symfony`
  * The `Resources/public/images/*` files have been removed.
  * The `Resources/public/css/*.css` files have been removed (they are now inlined
    in TwigBundle).

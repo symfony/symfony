@@ -172,7 +172,7 @@ class Application
         if (true === $input->hasParameterOption(array('--help', '-h'))) {
             if (!$name) {
                 $name = 'help';
-                $input = new ArrayInput(array('command' => 'help'));
+                $input = new ArrayInput(array('command_name' => $this->defaultCommand));
             } else {
                 $this->wantHelps = true;
             }

@@ -27,7 +27,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'widget\')',
+                '$this->env->getRuntime(\'Symfony\Bridge\Twig\Extension\FormExtension\')->searchAndRenderBlock(%s, \'widget\')',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -50,7 +50,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'widget\', array("foo" => "bar"))',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'widget\', array("foo" => "bar"))',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'widget\', array("foo" => "bar"))',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -70,7 +78,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', array("label" => "my label"))',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("label" => "my label"))',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'label\', array("label" => "my label"))',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -92,7 +108,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // Otherwise the default label is overwritten with null.
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\')',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'label\')',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'label\')',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -114,7 +138,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // Otherwise the default label is overwritten with null.
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\')',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'label\')',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'label\')',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -133,7 +165,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\')',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'label\')',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'label\')',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -160,7 +200,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar"))',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar"))',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'label\', array("foo" => "bar"))',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -186,7 +234,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -217,7 +273,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'label\', (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
@@ -254,7 +318,15 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             sprintf(
+<<<<<<< HEAD
+<<<<<<< HEAD
                 '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in attributes") + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+=======
+                '$this->env->getRuntime(\'form\')->renderer->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in attributes") + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+>>>>>>> Bumped Twig version to 1.24 and get rid of initRuntime
+=======
+                '$this->env->getRuntime(\'form\')->searchAndRenderBlock(%s, \'label\', array("foo" => "bar", "label" => "value in attributes") + (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
+>>>>>>> removed the form runtime class as it's not needed
                 $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())

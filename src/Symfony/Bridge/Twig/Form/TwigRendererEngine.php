@@ -16,6 +16,8 @@ use Symfony\Component\Form\FormView;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererEngineInterface
 {
@@ -29,12 +31,20 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
      */
     private $template;
 
+    public function __construct(array $defaultThemes = array(), \Twig_Environment $environment)
+    {
+        parent::__construct($defaultThemes);
+
+        $this->environment = $environment;
+    }
+
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Deprecated in 2.8, to be removed in 3.0.
      */
     public function setEnvironment(\Twig_Environment $environment)
     {
-        $this->environment = $environment;
     }
 
     /**

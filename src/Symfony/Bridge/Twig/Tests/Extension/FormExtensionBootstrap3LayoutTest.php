@@ -22,40 +22,38 @@ use Symfony\Component\Form\Tests\AbstractBootstrap3LayoutTest;
 
 class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
 {
-    /**
-     * @var FormExtension
-     */
-    protected $extension;
+    protected $testableFeatures = array(
+        'choice_attr',
+    );
+
+    private $environment;
 
     protected function setUp()
     {
         parent::setUp();
-
-        $rendererEngine = new TwigRendererEngine(array(
-            'bootstrap_3_layout.html.twig',
-            'custom_widgets.html.twig',
-        ));
-        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
-
-        $this->extension = new FormExtension($renderer);
 
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
         ));
 
-        $environment = new \Twig_Environment($loader, array('strict_variables' => true));
-        $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addExtension($this->extension);
+        $this->environment = new \Twig_Environment($loader, array('strict_variables' => true));
+        $this->environment->addExtension(new TranslationExtension(new StubTranslator()));
+        $this->environment->addExtension(new FormExtension());
 
-        $this->extension->initRuntime($environment);
-    }
+        $rendererEngine = new TwigRendererEngine(array(
+            'bootstrap_3_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $this->environment);
+        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
 
-    protected function tearDown()
-    {
-        parent::tearDown();
+        $loader = $this->getMock('Twig_RuntimeLoaderInterface');
+        $loader->expects($this->any())->method('load')->will($this->returnValueMap(array(
+            array('form', $renderer),
+            array('translator', null),
+        )));
 
-        $this->extension = null;
+        $this->environment->registerRuntimeLoader($loader);
     }
 
     public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
@@ -84,7 +82,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
 
     protected function renderForm(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
+        return (string) $this->environment->getRuntime('form')->renderBlock($view, 'form', $vars);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
@@ -93,41 +91,41 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
             $vars += array('label' => $label);
         }
 
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'errors');
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'widget', $vars);
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'row', $vars);
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'rest', $vars);
+        return (string) $this->environment->getRuntime('form')->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function renderStart(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form_start', $vars);
+        return (string) $this->environment->getRuntime('form')->renderBlock($view, 'form_start', $vars);
     }
 
     protected function renderEnd(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form_end', $vars);
+        return (string) $this->environment->getRuntime('form')->renderBlock($view, 'form_end', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
     {
-        $this->extension->renderer->setTheme($view, $themes);
+        $this->environment->getRuntime('form')->setTheme($view, $themes);
     }
 }

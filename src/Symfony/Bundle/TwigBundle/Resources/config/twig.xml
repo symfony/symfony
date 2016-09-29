@@ -12,6 +12,9 @@
                 <argument>app</argument>
                 <argument type="service" id="twig.app_variable" />
             </call>
+            <call method="addRuntimeLoader">
+                <argument type="service" id="twig.runtime_loader" />
+            </call>
             <configurator service="twig.configurator.environment" method="configure" />
         </service>
 
@@ -128,6 +131,7 @@
         <service id="twig.form.renderer" class="Symfony\Bridge\Twig\Form\TwigRenderer" public="false">
             <argument type="service" id="twig.form.engine" />
             <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
+            <tag name="twig.runtime" />
         </service>
 
         <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor">
@@ -159,6 +163,11 @@
             <argument /> <!-- decimals, set in TwigExtension -->
             <argument /> <!-- decimal point, set in TwigExtension -->
             <argument /> <!-- thousands separator, set in TwigExtension -->
+        </service>
+
+        <service id="twig.runtime_loader" class="Symfony\Bundle\TwigBundle\ContainerAwareRuntimeLoader" public="false">
+            <argument type="service" id="service_container" />
+            <argument type="collection" /> <!-- the mapping between class names and service names -->
         </service>
     </services>
 </container>

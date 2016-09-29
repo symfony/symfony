@@ -112,7 +112,7 @@ class ApplicationDescription
 
             /** @var Command $command */
             foreach ($commands as $name => $command) {
-                if (!$command->getName() || $command->isHidden()) {
+                if (!$command->getName() || !$command->isPublic()) {
                     continue;
                 }
 

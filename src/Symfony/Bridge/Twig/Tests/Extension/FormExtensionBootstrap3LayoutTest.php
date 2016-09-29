@@ -22,6 +22,8 @@ use Symfony\Component\Form\Tests\AbstractBootstrap3LayoutTest;
 
 class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
 {
+    use RuntimeLoaderProvider;
+
     /**
      * @var FormExtension
      */
@@ -49,6 +51,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTest
         $environment->addExtension($this->extension);
 
         $this->extension->initRuntime($environment);
+        $this->registerTwigRuntimeLoader($environment, $renderer);
     }
 
     protected function tearDown()

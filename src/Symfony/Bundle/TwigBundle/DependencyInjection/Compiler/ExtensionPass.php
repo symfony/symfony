@@ -79,5 +79,9 @@ class ExtensionPass implements CompilerPassInterface
         if (class_exists('Symfony\Component\Stopwatch\Stopwatch')) {
             $container->getDefinition('twig.extension.debug.stopwatch')->addTag('twig.extension');
         }
+
+        if (class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
+        }
     }
 }

@@ -21,7 +21,7 @@
         "paragonie/random_compat": "~1.0",
         "symfony/polyfill-apcu": "~1.1",
         "symfony/polyfill-mbstring": "~1.1",
-        "twig/twig": "~1.23|~2.0",
+        "twig/twig": "~1.26|~2.0",
         "psr/log": "~1.0"
     },
     "replace": {

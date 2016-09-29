@@ -71,5 +71,9 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('assets.packages')) {
             $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
         }
+
+        if (class_exists('Symfony\Component\Yaml\Parser')) {
+            $container->getDefinition('twig.extension.yaml')->addTag('twig.extension');
+        }
     }
 }

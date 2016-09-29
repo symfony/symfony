@@ -34,13 +34,6 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
     {
         parent::setUp();
 
-        $rendererEngine = new TwigRendererEngine(array(
-            'bootstrap_3_horizontal_layout.html.twig',
-            'custom_widgets.html.twig',
-        ));
-        $this->renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
-        $extension = new FormExtension($this->renderer);
-
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
@@ -48,8 +41,13 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
 
         $environment = new \Twig_Environment($loader, array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addExtension($extension);
-        $extension->initRuntime($environment);
+        $environment->addExtension(new FormExtension());
+
+        $rendererEngine = new TwigRendererEngine(array(
+            'bootstrap_3_horizontal_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $environment);
+        $this->renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 

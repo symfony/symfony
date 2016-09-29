@@ -23,17 +23,26 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
  */
 class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {
-    public function __construct(TwigRendererInterface $renderer)
+    private $renderer;
+
+    public function __construct(TwigRendererInterface $renderer = null)
     {
+        if (null !== $this->renderer) {
+            @trigger_error(sprintf('Passing a Twig Form Renderer to the "%s" constructor is deprecated since version 3.2 and won\'t be possible in 4.0. Pass the Twig_Environment to the TwigRendererEngine constructor instead.', static::class), E_USER_DEPRECATED);
+        }
         $this->renderer = $renderer;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * To be removed in 4.0
      */
     public function initRuntime(\Twig_Environment $environment)
     {
-        $this->renderer->setEnvironment($environment);
+        if (null !== $this->renderer) {
+            $this->renderer->setEnvironment($environment);
+        }
     }
 
     /**

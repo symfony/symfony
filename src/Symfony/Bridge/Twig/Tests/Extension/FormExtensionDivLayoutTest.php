@@ -31,13 +31,6 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
     {
         parent::setUp();
 
-        $rendererEngine = new TwigRendererEngine(array(
-            'form_div_layout.html.twig',
-            'custom_widgets.html.twig',
-        ));
-        $this->renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
-        $extension = new FormExtension($this->renderer);
-
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../Resources/views/Form',
             __DIR__.'/Fixtures/templates/form',
@@ -48,8 +41,13 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTest
         $environment->addGlobal('global', '');
         // the value can be any template that exists
         $environment->addGlobal('dynamic_template_name', 'child_label');
-        $environment->addExtension($extension);
-        $extension->initRuntime($environment);
+        $environment->addExtension(new FormExtension());
+
+        $rendererEngine = new TwigRendererEngine(array(
+            'form_div_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $environment);
+        $this->renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 

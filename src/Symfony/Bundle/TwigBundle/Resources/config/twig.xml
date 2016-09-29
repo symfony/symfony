@@ -104,8 +104,11 @@
 
         <service id="twig.extension.expression" class="Symfony\Bridge\Twig\Extension\ExpressionExtension" public="false" />
 
-        <service id="twig.extension.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelExtension" public="false">
+        <service id="twig.extension.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelExtension" public="false" />
+
+        <service id="twig.runtime.httpkernel" class="Symfony\Bridge\Twig\Extension\HttpKernelRuntime">
             <argument type="service" id="fragment.handler" />
+            <tag name="twig.runtime" />
         </service>
 
         <service id="twig.extension.httpfoundation" class="Symfony\Bridge\Twig\Extension\HttpFoundationExtension" public="false">

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-09-29T20:07:04Z
+
+Seems like the TwigBundle and SecurityBundle are having some difficulties on 5.5, I think their constraints are not solid for 5.5
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-29T21:00:25Z
+
+It was just because Twig 1.x was not merged yet into master, fixed now.

@@ -216,6 +216,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'cache' => 'php_array',
                 'file_cache_dir' => '%kernel.cache_dir%/annotations',
                 'debug' => true,
+                'enabled' => true,
             ),
             'serializer' => array(
                 'enabled' => false,

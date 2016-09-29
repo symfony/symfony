@@ -48,6 +48,7 @@ class FrameworkExtension extends Extension
     private $formConfigEnabled = false;
     private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
+    private $annotationsConfigEnabled = false;
 
     /**
      * @var string|null
@@ -78,6 +79,8 @@ class FrameworkExtension extends Extension
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
+
+        $this->annotationsConfigEnabled = $this->isConfigEnabled($container, $config['annotations']);
 
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator
@@ -891,6 +894,10 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(0, $config['strict_email']);
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"enable_annotations" on the validator cannot be set as Annotations support is disabled.');
+            }
+
             $validatorBuilder->addMethodCall('enableAnnotationMapping', array(new Reference('annotation_reader')));
         }
 
@@ -956,6 +963,14 @@ class FrameworkExtension extends Extension
 
     private function registerAnnotationsConfiguration(array $config, ContainerBuilder $container, $loader)
     {
+        if (!$this->annotationsConfigEnabled) {
+            return;
+        }
+
+        if (!class_exists('Doctrine\Common\Annotations\Annotation')) {
+            throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed.');
+        }
+
         $loader->load('annotations.xml');
 
         if ('none' !== $config['cache']) {
@@ -1080,6 +1095,10 @@ class FrameworkExtension extends Extension
 
         $serializerLoaders = array();
         if (isset($config['enable_annotations']) && $config['enable_annotations']) {
+            if (!$this->annotationsConfigEnabled) {
+                throw new \LogicException('"enable_annotations" on the serializer cannot be set as Annotations support is disabled.');
+            }
+
             $annotationLoader = new Definition(
                 'Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader',
                  array(new Reference('annotation_reader'))

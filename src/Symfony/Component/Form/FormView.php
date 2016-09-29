@@ -65,12 +65,8 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function isRendered()
     {
-        if ($this->rendered) {
-            return true;
-        }
-
-        if (isset($this->vars['compound']) ? !$this->vars['compound'] : 0 === count($this->children)) {
-            return false;
+        if (true === $this->rendered || 0 === count($this->children)) {
+            return $this->rendered;
         }
 
         foreach ($this->children as $child) {

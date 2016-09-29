@@ -45,7 +45,7 @@ class FormThemeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->setTheme(%s, array(0 => "tpl1", 1 => "tpl2"));',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())
@@ -57,7 +57,7 @@ class FormThemeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             sprintf(
-                '$this->env->getExtension(\'form\')->renderer->setTheme(%s, "tpl1");',
+                '$this->env->getExtension(\'Symfony\Bridge\Twig\Extension\FormExtension\')->renderer->setTheme(%s, "tpl1");',
                 $this->getVariableGetter('form')
              ),
             trim($compiler->compile($node)->getSource())

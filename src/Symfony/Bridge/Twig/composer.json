@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "twig/twig": "~1.23|~2.0"
+        "twig/twig": "~1.26|~2.0"
     },
     "require-dev": {
         "symfony/asset": "~2.7|~3.0.0",

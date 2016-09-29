@@ -448,9 +448,7 @@ class Command
     }
 
     /**
-     * To hide the command in application descriptions.
-     *
-     * @param bool $public To show this command or not
+     * @param bool $public Whether the command should be publicly shown or not.
      * 
      * @return Command The current instance
      */
@@ -462,9 +460,7 @@ class Command
     }
 
     /**
-     * Returns if the command is public in application descriptions.
-     *
-     * @return bool If the command is public or not
+     * @return bool Whether the command should be publicly shown or not.
      */
     public function isPublic()
     {

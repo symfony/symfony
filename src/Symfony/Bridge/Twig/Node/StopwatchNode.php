@@ -32,11 +32,11 @@ class StopwatchNode extends \Twig_Node
             ->raw(' = ')
             ->subcompile($this->getNode('name'))
             ->write(";\n")
-            ->write("\$this->env->getExtension('stopwatch')->getStopwatch()->start(")
+            ->write("\$this->env->getExtension('Symfony\Bridge\Twig\Extension\StopwatchExtension')->getStopwatch()->start(")
             ->subcompile($this->getNode('var'))
             ->raw(", 'template');\n")
             ->subcompile($this->getNode('body'))
-            ->write("\$this->env->getExtension('stopwatch')->getStopwatch()->stop(")
+            ->write("\$this->env->getExtension('Symfony\Bridge\Twig\Extension\StopwatchExtension')->getStopwatch()->stop(")
             ->subcompile($this->getNode('var'))
             ->raw(");\n")
         ;

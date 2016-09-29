@@ -37,12 +37,12 @@ class EnvironmentConfigurator
 
     public function configure(\Twig_Environment $environment)
     {
-        $environment->getExtension('core')->setDateFormat($this->dateFormat, $this->intervalFormat);
+        $environment->getExtension('Twig_Extension_Core')->setDateFormat($this->dateFormat, $this->intervalFormat);
 
         if (null !== $this->timezone) {
-            $environment->getExtension('core')->setTimezone($this->timezone);
+            $environment->getExtension('Twig_Extension_Core')->setTimezone($this->timezone);
         }
 
-        $environment->getExtension('core')->setNumberFormat($this->decimals, $this->decimalPoint, $this->thousandsSeparator);
+        $environment->getExtension('Twig_Extension_Core')->setNumberFormat($this->decimals, $this->decimalPoint, $this->thousandsSeparator);
     }
 }

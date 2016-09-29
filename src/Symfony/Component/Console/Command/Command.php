@@ -34,7 +34,7 @@ class Command
     private $processTitle;
     private $aliases = array();
     private $definition;
-    private $hidden = false;
+    private $public = true;
     private $help;
     private $description;
     private $ignoreValidationErrors = false;
@@ -450,25 +450,25 @@ class Command
     /**
      * To hide the command in application descriptions.
      *
-     * @param bool $hidden To show this command or not
+     * @param bool $public To show this command or not
      * 
      * @return Command The current instance
      */
-    public function setHidden($hidden)
+    public function setPublic($public)
     {
-        $this->hidden = $hidden;
+        $this->public = $public;
 
         return $this;
     }
 
     /**
-     * Returns if the command is hidden in application descriptions.
+     * Returns if the command is public in application descriptions.
      *
-     * @return bool If the command is hidden or not
+     * @return bool If the command is public or not
      */
-    public function isHidden()
+    public function isPublic()
     {
-        return $this->hidden;
+        return $this->public;
     }
 
     /**

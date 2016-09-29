@@ -11,9 +11,11 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -62,17 +64,17 @@ class TwigExtensionTest extends TestCase
         $calls = $container->getDefinition('twig')->getMethodCalls();
         $this->assertEquals('app', $calls[0][1][0], '->load() registers services as Twig globals');
         $this->assertEquals(new Reference('twig.app_variable'), $calls[0][1][1]);
-        $this->assertEquals('foo', $calls[1][1][0], '->load() registers services as Twig globals');
-        $this->assertEquals(new Reference('bar'), $calls[1][1][1], '->load() registers services as Twig globals');
-        $this->assertEquals('baz', $calls[2][1][0], '->load() registers variables as Twig globals');
-        $this->assertEquals('@qux', $calls[2][1][1], '->load() allows escaping of service identifiers');
-        $this->assertEquals('pi', $calls[3][1][0], '->load() registers variables as Twig globals');
-        $this->assertEquals(3.14, $calls[3][1][1], '->load() registers variables as Twig globals');
+        $this->assertEquals('foo', $calls[2][1][0], '->load() registers services as Twig globals');
+        $this->assertEquals(new Reference('bar'), $calls[2][1][1], '->load() registers services as Twig globals');
+        $this->assertEquals('baz', $calls[3][1][0], '->load() registers variables as Twig globals');
+        $this->assertEquals('@qux', $calls[3][1][1], '->load() allows escaping of service identifiers');
+        $this->assertEquals('pi', $calls[4][1][0], '->load() registers variables as Twig globals');
+        $this->assertEquals(3.14, $calls[4][1][1], '->load() registers variables as Twig globals');
 
         // Yaml and Php specific configs
         if (in_array($format, array('yml', 'php'))) {
-            $this->assertEquals('bad', $calls[4][1][0], '->load() registers variables as Twig globals');
-            $this->assertEquals(array('key' => 'foo'), $calls[4][1][1], '->load() registers variables as Twig globals');
+            $this->assertEquals('bad', $calls[5][1][0], '->load() registers variables as Twig globals');
+            $this->assertEquals(array('key' => 'foo'), $calls[5][1][1], '->load() registers variables as Twig globals');
         }
 
         // Twig options
@@ -133,7 +135,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $calls = $container->getDefinition('twig')->getMethodCalls();
-        foreach (array_slice($calls, 1) as $call) {
+        foreach (array_slice($calls, 2) as $call) {
             list($name, $value) = each($globals);
             $this->assertEquals($name, $call[1][0]);
             $this->assertSame($value, $call[1][1]);
@@ -209,6 +211,29 @@ class TwigExtensionTest extends TestCase
             'only-debug-enabled' => array(true, false, false),
             'debug-and-stopwatch-disabled' => array(false, false, false),
         );
+    }
+
+    public function testRuntimeLoader()
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig', array());
+        $container->setParameter('kernel.environment', 'test');
+        $container->setParameter('debug.file_link_format', 'test');
+        $container->setParameter('foo', 'FooClass');
+        $container->register('http_kernel', 'FooClass');
+        $container->register('templating.locator', 'FooClass');
+        $container->register('templating.name_parser', 'FooClass');
+        $container->register('foo', '%foo%')->addTag('twig.runtime');
+        $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->getCompilerPassConfig()->setRemovingPasses(array());
+        $container->compile();
+
+        $loader = $container->getDefinition('twig.runtime_loader');
+        $this->assertEquals(array(
+            'Symfony\Bridge\Twig\Form\TwigRenderer' => 'twig.form.renderer',
+            'FooClass' => 'foo',
+        ), $loader->getArgument(1));
     }
 
     private function createContainer()

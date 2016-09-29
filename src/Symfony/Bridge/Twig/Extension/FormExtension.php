@@ -23,14 +23,6 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
  */
 class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {
-    /**
-     * This property is public so that it can be accessed directly from compiled
-     * templates without having to call a getter, which slightly decreases performance.
-     *
-     * @var TwigRendererInterface
-     */
-    public $renderer;
-
     public function __construct(TwigRendererInterface $renderer)
     {
         $this->renderer = $renderer;

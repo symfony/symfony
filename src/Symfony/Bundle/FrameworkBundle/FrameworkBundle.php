@@ -85,10 +85,8 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new AddCacheWarmerPass());
         $container->addCompilerPass(new AddCacheClearerPass());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
-        if (class_exists('Symfony\Component\Translation\Translator')) {
-            $container->addCompilerPass(new TranslationExtractorPass());
-            $container->addCompilerPass(new TranslationDumperPass());
-        }
+        $container->addCompilerPass(new TranslationExtractorPass());
+        $container->addCompilerPass(new TranslationDumperPass());
         $container->addCompilerPass(new FragmentRendererPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new SerializerPass());
         $container->addCompilerPass(new PropertyInfoPass());

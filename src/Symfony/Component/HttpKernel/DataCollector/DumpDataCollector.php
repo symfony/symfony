@@ -42,10 +42,8 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     {
         $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = max(strpos($fileLinkFormat, '%f'), strpos($fileLinkFormat, '%l'));
-            $i = strpos($fileLinkFormat, '#"', $i) ?: strlen($fileLinkFormat);
-            $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
-            $fileLinkFormat[1] = @json_decode('{'.$fileLinkFormat[1].'}', true) ?: array();
+            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
+            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
         }
         $this->stopwatch = $stopwatch;
         $this->fileLinkFormat = $fileLinkFormat;
@@ -268,9 +266,9 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                         $name = strip_tags($this->style('', $name));
                         $file = strip_tags($this->style('', $file));
                         if ($fileLinkFormat) {
-                            foreach ($fileLinkFormat[1] as $k => $v) {
-                                if (0 === strpos($file, $k)) {
-                                    $file = substr_replace($file, $v, 0, strlen($k));
+                            for ($i = 1; isset($fileLinkFormat[$i]); ++$i) {
+                                if (0 === strpos($file, $k = $fileLinkFormat[$i++])) {
+                                    $file = substr_replace($file, $fileLinkFormat[$i], 0, strlen($k));
                                     break;
                                 }
                             }

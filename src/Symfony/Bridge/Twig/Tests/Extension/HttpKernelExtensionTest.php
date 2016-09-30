@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
@@ -71,7 +72,13 @@ class HttpKernelExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new \Twig_Loader_Array(array('index' => $template));
         $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
-        $twig->addExtension(new HttpKernelExtension($renderer));
+        $twig->addExtension(new HttpKernelExtension());
+
+        $loader = $this->getMock('Twig_RuntimeLoaderInterface');
+        $loader->expects($this->any())->method('load')->will($this->returnValueMap(array(
+            array('Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)),
+        )));
+        $twig->addRuntimeLoader($loader);
 
         return $twig->render('index');
     }

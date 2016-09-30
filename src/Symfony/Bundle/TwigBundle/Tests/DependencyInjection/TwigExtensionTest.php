@@ -230,10 +230,11 @@ class TwigExtensionTest extends TestCase
         $container->compile();
 
         $loader = $container->getDefinition('twig.runtime_loader');
-        $this->assertEquals(array(
-            'Symfony\Bridge\Twig\Form\TwigRenderer' => 'twig.form.renderer',
-            'FooClass' => 'foo',
-        ), $loader->getArgument(1));
+        $args = $loader->getArgument(1);
+        $this->assertArrayHasKey('Symfony\Bridge\Twig\Form\TwigRenderer', $args);
+        $this->assertArrayHasKey('FooClass', $args);
+        $this->assertContains('twig.form.renderer', $args);
+        $this->assertContains('foo', $args);
     }
 
     private function createContainer()

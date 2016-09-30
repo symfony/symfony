@@ -31,7 +31,7 @@ class NewCacheWamingTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(file_exists($kernel->getCacheDir().'/twig'));
     }
 
-    public function testCacheIsNotWarmedWhenTemplatingIsDisabled()
+    public function testCacheIsProperlyWarmedWhenTemplatingIsDisabled()
     {
         $kernel = new CacheWarmingKernel(false);
         $kernel->boot();
@@ -40,7 +40,7 @@ class NewCacheWamingTest extends \PHPUnit_Framework_TestCase
         $warmer->enableOptionalWarmers();
         $warmer->warmUp($kernel->getCacheDir());
 
-        $this->assertFalse(file_exists($kernel->getCacheDir().'/twig'));
+        $this->assertTrue(file_exists($kernel->getCacheDir().'/twig'));
     }
 
     protected function setUp()

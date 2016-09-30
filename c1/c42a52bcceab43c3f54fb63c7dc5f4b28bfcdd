@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-09-28T20:28:14Z
+
+The label "BC break" should be removed. With some tests it would be 👍 , thanks!
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-09-28T21:39:39Z
+
+@HeahDude Yes, the label has been added by mistake, I made an error with the PR template... And I can't seem to be able to remove it ;).
+
+Here are the tests, I had to add an Interface so the use case would be adequately represented. I double checked, the tests fail without the patch. I think I'm good for the full review.
+
+The failed tests on appveyor and travis concern the Twig Bridge and Bundle or the SecurityBundle. It's unrelated to this PR.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-09-28T22:20:06Z
+
+@HeahDude I updated the tests to take into account your comments. Thanks for the feedback. The interfaces are now named `EntityInterfaceA` and `EntityInterfaceB`. I think that's the cleanest way to go for Test Fixtures...
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-09-29T05:45:26Z
+
+LGTM 👍, thanks!
+
+Status: Reviewed
+
+Failures unrelated and should now be fixed by #20079.

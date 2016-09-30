@@ -119,20 +119,20 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
         $interfaces = $metadata->getReflectionClass()->getInterfaces();
 
         $interfaces = array_filter($interfaces, function ($interface) use ($parent, $interfaces) {
-                $interfaceName = $interface->getName();
+            $interfaceName = $interface->getName();
 
-                if ($parent && $parent->implementsInterface($interfaceName)) {
+            if ($parent && $parent->implementsInterface($interfaceName)) {
+                return false;
+            }
+
+            foreach ($interfaces as $i) {
+                if ($i !== $interface && $i->implementsInterface($interfaceName)) {
                     return false;
                 }
+            }
 
-                foreach ($interfaces as $i) {
-                    if ($i !== $interface && $i->implementsInterface($interfaceName)) {
-                        return false;
-                    }
-                }
-
-                return true;
-            });
+            return true;
+        });
 
         // Include constraints from all directly implemented interfaces
         foreach ($interfaces as $interface) {

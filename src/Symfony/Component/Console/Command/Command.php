@@ -454,7 +454,7 @@ class Command
      */
     public function setPublic($public)
     {
-        $this->public = $public;
+        $this->public = (bool) $public;
 
         return $this;
     }

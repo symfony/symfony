@@ -29,8 +29,7 @@
         "symfony/finder": "~2.8|~3.0",
         "symfony/routing": "~3.0",
         "symfony/stopwatch": "~2.8|~3.0",
-        "doctrine/cache": "~1.0",
-        "doctrine/annotations": "~1.0"
+        "doctrine/cache": "~1.0"
     },
     "require-dev": {
         "symfony/asset": "~2.8|~3.0",
@@ -51,6 +50,7 @@
         "symfony/validator": "~3.2",
         "symfony/yaml": "~3.2",
         "symfony/property-info": "~2.8|~3.0",
+        "doctrine/annotations": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0",
         "twig/twig": "~1.23|~2.0"
     },

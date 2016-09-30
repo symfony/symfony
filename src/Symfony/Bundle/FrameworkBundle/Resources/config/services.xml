@@ -25,7 +25,6 @@
         <service id="kernel.class_cache.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ClassCacheCacheWarmer">
             <tag name="kernel.cache_warmer" />
             <argument type="collection">
-                <argument>Doctrine\Common\Annotations\AnnotationRegistry</argument>
                 <argument>Symfony\Component\HttpFoundation\ParameterBag</argument>
                 <argument>Symfony\Component\HttpFoundation\HeaderBag</argument>
                 <argument>Symfony\Component\HttpFoundation\FileBag</argument>

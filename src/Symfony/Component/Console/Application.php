@@ -123,25 +123,9 @@ class Application
         try {
             $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
-            if (!$this->catchExceptions) {
-                throw $e;
-            }
-
-            if ($output instanceof ConsoleOutputInterface) {
-                $this->renderException($e, $output->getErrorOutput());
-            } else {
-                $this->renderException($e, $output);
-            }
-
-            $exitCode = $e->getCode();
-            if (is_numeric($exitCode)) {
-                $exitCode = (int) $exitCode;
-                if (0 === $exitCode) {
-                    $exitCode = 1;
-                }
-            } else {
-                $exitCode = 1;
-            }
+            $exitCode = $this->handleCommandRunException($e, $output);
+        } catch (\Throwable $e) {
+            $exitCode = $this->handleCommandRunException($e, $output);
         }
 
         if ($this->autoExit) {
@@ -150,6 +134,39 @@ class Application
             }
 
             exit($exitCode);
+        }
+
+        return $exitCode;
+    }
+
+    /**
+     * Handler command run exception and provides with the exit code in return
+     *
+     * @param \Exception|\Throwable $e
+     * @param OutputInterface $output
+     * @return int|mixed
+     * @throws \Throwable
+     */
+    private function handleCommandRunException($e, OutputInterface $output)
+    {
+        if (!$this->catchExceptions) {
+            throw $e;
+        }
+
+        if ($output instanceof ConsoleOutputInterface) {
+            $this->renderException($e, $output->getErrorOutput());
+        } else {
+            $this->renderException($e, $output);
+        }
+
+        $exitCode = $e->getCode();
+        if (is_numeric($exitCode)) {
+            $exitCode = (int) $exitCode;
+            if (0 === $exitCode) {
+                $exitCode = 1;
+            }
+        } else {
+            $exitCode = 1;
         }
 
         return $exitCode;

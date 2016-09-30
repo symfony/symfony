@@ -11,9 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -21,9 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
-use Symfony\Component\HttpKernel\Tests\Fixtures\KernelWithoutBundles;
 
-class KernelTest extends TestCase
+class KernelTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
@@ -66,7 +63,7 @@ class KernelTest extends TestCase
 
     public function testBootSetsTheContainerToTheBundles()
     {
-        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')->getMock();
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
         $bundle->expects($this->once())
             ->method('setContainer');
 
@@ -87,9 +84,6 @@ class KernelTest extends TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
-    /**
-     * @group legacy
-     */
     public function testClassCacheIsLoaded()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
@@ -103,16 +97,13 @@ class KernelTest extends TestCase
 
     public function testClassCacheIsNotLoadedByDefault()
     {
-        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
+        $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer'));
         $kernel->expects($this->never())
             ->method('doLoadClassCache');
 
         $kernel->boot();
     }
 
-    /**
-     * @group legacy
-     */
     public function testClassCacheIsNotLoadedWhenKernelIsNotBooted()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
@@ -169,7 +160,7 @@ class KernelTest extends TestCase
 
     public function testShutdownCallsShutdownOnAllBundles()
     {
-        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')->getMock();
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
         $bundle->expects($this->once())
             ->method('shutdown');
 
@@ -181,7 +172,7 @@ class KernelTest extends TestCase
 
     public function testShutdownGivesNullContainerToAllBundles()
     {
-        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\Bundle')->getMock();
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
         $bundle->expects($this->at(3))
             ->method('setContainer')
             ->with(null);
@@ -253,7 +244,7 @@ modified';
 $heredoc = <<<HD
 
 
-Heredoc should not be   modified {$a[1+$b]}
+Heredoc should not be   modified
 
 
 HD;
@@ -289,7 +280,7 @@ modified';
 $heredoc = <<<HD
 
 
-Heredoc should not be   modified {$a[1+$b]}
+Heredoc should not be   modified
 
 
 HD;
@@ -695,17 +686,21 @@ EOF;
     public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
     {
         // does not implement TerminableInterface
-        $httpKernel = new TestKernel();
+        $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $httpKernelMock
+            ->expects($this->never())
+            ->method('terminate');
 
         $kernel = $this->getKernel(array('getHttpKernel'));
         $kernel->expects($this->once())
             ->method('getHttpKernel')
-            ->willReturn($httpKernel);
+            ->will($this->returnValue($httpKernelMock));
 
         $kernel->boot();
         $kernel->terminate(Request::create('/'), new Response());
-
-        $this->assertFalse($httpKernel->terminateCalled, 'terminate() is never called if the kernel class does not implement TerminableInterface');
 
         // implements TerminableInterface
         $httpKernelMock = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernel')
@@ -726,16 +721,24 @@ EOF;
         $kernel->terminate(Request::create('/'), new Response());
     }
 
-    public function testKernelWithoutBundles()
+    /**
+     * @group legacy
+     * @expectedDeprecation The support of special environment variables that start with SYMFONY__ (such as "SYMFONY__FOO__BAR") is deprecated as of 3.3 and will be removed in 4.0. Use the %env()% syntax instead to get the value of environment variables in configuration files.
+     */
+    public function testSymfonyEnvironmentVariables()
     {
-        $kernel = new KernelWithoutBundles('test', true);
-        $kernel->boot();
+        $_SERVER['SYMFONY__FOO__BAR'] = 'baz';
 
-        $this->assertTrue($kernel->getContainer()->getParameter('test_executed'));
+        $kernel = $this->getKernel();
+        $method = new \ReflectionMethod($kernel, 'getEnvParameters');
+        $method->setAccessible(true);
+
+        $envParameters = $method->invoke($kernel);
+        $this->assertSame('baz', $envParameters['foo.bar']);
     }
 
     /**
-     * Returns a mock for the BundleInterface.
+     * Returns a mock for the BundleInterface
      *
      * @return BundleInterface
      */
@@ -814,19 +817,5 @@ EOF;
         $p->setValue($kernel, __DIR__.'/Fixtures');
 
         return $kernel;
-    }
-}
-
-class TestKernel implements HttpKernelInterface
-{
-    public $terminateCalled = false;
-
-    public function terminate()
-    {
-        $this->terminateCalled = true;
-    }
-
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
-    {
     }
 }

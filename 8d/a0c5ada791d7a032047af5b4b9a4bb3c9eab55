@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-09-30T00:12:38Z
+
+Although I do understand the plan to reduce the amount of dependencies, and by no means intend to question the direction the symfony team is planning of going toward to.
+
+This said, annotations are currently recommended as Best Practices for Routing, ParamConverter and Doctrine Entities Mapping. They are a huge part of symfony-standard as it is currently used.
+
+Does this change intend to be a precursor of a change in the way the Annotations intend to be used in Symfony, starting at Symfony v4.0, or is it something that is intended only to involve the Framework Bundle when used as a library and not as part of the Symfony full stack and Standard Edition?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-30T00:20:15Z
+
+As you can see, it is still enabled by default. The best practices and recommendations won't change (I'm anyway a big fan of using annotations). But, if we can make it optional for people not using annotations, that's a big win for everyone.

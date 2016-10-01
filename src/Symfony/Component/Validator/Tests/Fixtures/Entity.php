@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  * @Assert\GroupSequence({"Foo", "Entity"})
  * @Assert\Callback({"Symfony\Component\Validator\Tests\Fixtures\CallbackClass", "callback"})
  */
-class Entity extends EntityParent
+class Entity extends EntityParent implements EntityInterfaceB
 {
     /**
      * @Assert\NotNull

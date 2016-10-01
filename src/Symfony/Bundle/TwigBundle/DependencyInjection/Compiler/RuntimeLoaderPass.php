@@ -28,7 +28,17 @@ class RuntimeLoaderPass implements CompilerPassInterface
         $definition = $container->getDefinition('twig.runtime_loader');
         $mapping = array();
         foreach ($container->findTaggedServiceIds('twig.runtime') as $id => $attributes) {
-            $mapping[$container->getDefinition($id)->getClass()] = $id;
+            $def = $container->getDefinition($id);
+
+            if (!$def->isPublic()) {
+                throw new InvalidArgumentException(sprintf('The service "%s" must be public as it can be lazy-loaded.', $id));
+            }
+
+            if ($def->isAbstract()) {
+                throw new InvalidArgumentException(sprintf('The service "%s" must not be abstract as it can be lazy-loaded.', $id));
+            }
+
+            $mapping[$def->getClass()] = $id;
         }
 
         $definition->replaceArgument(1, $mapping);

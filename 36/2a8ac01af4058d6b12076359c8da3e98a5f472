@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-09-29T19:55:18Z
+
+I have the feeling #20092 serves as a base for this PR? I noticed duplicate changes
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-29T19:55:59Z
+
+Yes, I will rebase this one when #20092 is merged (probably in the next hour or so if I don't have any other comments).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-29T21:13:56Z
+
+Rebased now.

@@ -12,8 +12,8 @@
 namespace Symfony\Component\Config\Resource;
 
 /**
- * ClassExistenceResource represents a class availability.
- * Freshness is only evaluated against resource availability.
+ * ClassExistenceResource represents a class existence.
+ * Freshness is only evaluated against resource existence.
  *
  * The resource must be a fully-qualified class name.
  *

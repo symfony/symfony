@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-10-01T10:37:07Z
+
+@fabpot can you check the failures for component-based builds, related to your recent PR removing the doctrine/annotations dependency in FrameworkBundle ? It looks like some packages need it as a dev dependency.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-01T10:37:14Z
+
+:+1: for this change

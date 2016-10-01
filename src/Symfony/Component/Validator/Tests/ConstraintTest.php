@@ -206,4 +206,35 @@ class ConstraintTest extends \PHPUnit_Framework_TestCase
     {
         Constraint::getErrorName(1);
     }
+
+    public function testOptionsAsDefaultOption()
+    {
+        $constraint = new ConstraintA($options = array('value1'));
+
+        $this->assertEquals($options, $constraint->property2);
+
+        $constraint = new ConstraintA($options = array('value1', 'property1' => 'value2'));
+
+        $this->assertEquals($options, $constraint->property2);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The options "0", "5" do not exist
+     */
+    public function testInvalidOptions()
+    {
+        new ConstraintA(array('property2' => 'foo', 'bar', 5 => 'baz'));
+    }
+
+    public function testOptionsWithInvalidInternalPointer()
+    {
+        $options = array('property1' => 'foo');
+        next($options);
+        next($options);
+
+        $constraint = new ConstraintA($options);
+
+        $this->assertEquals('foo', $constraint->property1);
+    }
 }

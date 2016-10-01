@@ -73,7 +73,7 @@ class ReflectionCaster
         $prefix = Caster::PREFIX_VIRTUAL;
 
         $a += array(
-            $prefix.'type' => $c->__toString(),
+            $prefix.'name' => method_exists('ReflectionType', 'getName') ? $c->getName() : $c->__toString(),
             $prefix.'allowsNull' => $c->allowsNull(),
             $prefix.'isBuiltin' => $c->isBuiltin(),
         );
@@ -217,12 +217,13 @@ class ReflectionCaster
             'position' => 'getPosition',
             'isVariadic' => 'isVariadic',
             'byReference' => 'isPassedByReference',
+            'allowsNull' => 'allowsNull',
         ));
 
         try {
             if (method_exists($c, 'hasType')) {
                 if ($c->hasType()) {
-                    $a[$prefix.'typeHint'] = $c->getType()->__toString();
+                    $a[$prefix.'typeHint'] = method_exists('ReflectionType', 'getName') ? $c->getType()->getName() : $c->getType()->__toString();
                 }
             } else {
                 $v = explode(' ', $c->__toString(), 6);
@@ -235,9 +236,14 @@ class ReflectionCaster
                 $a[$prefix.'typeHint'] = $m[1];
             }
         }
+<<<<<<< HEAD
         if (isset($a[$prefix.'typeHint'])) {
             $v = $a[$prefix.'typeHint'];
             $a[$prefix.'typeHint'] = new ClassStub($v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
+=======
+        if (!isset($a[$prefix.'typeHint'])) {
+            unset($a[$prefix.'allowsNull']);
+>>>>>>> 3.1
         }
 
         try {
@@ -245,9 +251,13 @@ class ReflectionCaster
             if (method_exists($c, 'isDefaultValueConstant') && $c->isDefaultValueConstant()) {
                 $a[$prefix.'default'] = new ConstStub($c->getDefaultValueConstantName(), $v);
             }
+            if (null === $v) {
+                unset($a[$prefix.'allowsNull']);
+            }
         } catch (\ReflectionException $e) {
-            if (isset($a[$prefix.'typeHint']) && $c->allowsNull()) {
+            if (isset($a[$prefix.'typeHint']) && $c->allowsNull() && !method_exists('ReflectionType', 'getName')) {
                 $a[$prefix.'default'] = null;
+                unset($a[$prefix.'allowsNull']);
             }
         }
 

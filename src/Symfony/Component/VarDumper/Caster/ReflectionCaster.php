@@ -236,14 +236,13 @@ class ReflectionCaster
                 $a[$prefix.'typeHint'] = $m[1];
             }
         }
-<<<<<<< HEAD
+
         if (isset($a[$prefix.'typeHint'])) {
             $v = $a[$prefix.'typeHint'];
             $a[$prefix.'typeHint'] = new ClassStub($v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
-=======
+        }
         if (!isset($a[$prefix.'typeHint'])) {
             unset($a[$prefix.'allowsNull']);
->>>>>>> 3.1
         }
 
         try {

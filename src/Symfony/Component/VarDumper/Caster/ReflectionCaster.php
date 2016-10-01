@@ -157,8 +157,8 @@ class ReflectionCaster
         ));
 
         if (isset($a[$prefix.'returnType'])) {
-            $v = (string) $a[$prefix.'returnType'];
-            $a[$prefix.'returnType'] = new ClassStub($v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
+            $v = method_exists('ReflectionType', 'getName') ? $a[$prefix.'returnType']->getName() : $a[$prefix.'returnType']->__toString();
+            $a[$prefix.'returnType'] = new ClassStub(($a[$prefix.'returnType']->allowsNull() ? '?' : '').$v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
         }
         if (isset($a[$prefix.'class'])) {
             $a[$prefix.'class'] = new ClassStub($a[$prefix.'class']);
@@ -240,8 +240,7 @@ class ReflectionCaster
         if (isset($a[$prefix.'typeHint'])) {
             $v = $a[$prefix.'typeHint'];
             $a[$prefix.'typeHint'] = new ClassStub($v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
-        }
-        if (!isset($a[$prefix.'typeHint'])) {
+        } else {
             unset($a[$prefix.'allowsNull']);
         }
 

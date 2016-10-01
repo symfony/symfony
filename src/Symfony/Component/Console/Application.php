@@ -127,7 +127,7 @@ class Application
         } catch (\Exception $e) {
             $exception = $e;
         } catch (\Throwable $e) {
-            $exception = new FatalThrowableError($e);;
+            $exception = new FatalThrowableError($e);
         }
 
         if ($exception) {

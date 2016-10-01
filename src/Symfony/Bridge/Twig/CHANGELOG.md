@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * Deprecated the possibility to inject the Form Twig Renderer into the form
+   extension. Inject it on TwigRendererEngine instead.
+
 2.7.0
 -----
 

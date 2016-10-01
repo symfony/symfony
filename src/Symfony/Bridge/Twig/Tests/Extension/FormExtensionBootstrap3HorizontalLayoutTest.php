@@ -22,26 +22,17 @@ use Symfony\Component\Form\Tests\AbstractBootstrap3HorizontalLayoutTest;
 
 class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3HorizontalLayoutTest
 {
-    /**
-     * @var FormExtension
-     */
-    protected $extension;
+    use RuntimeLoaderProvider;
 
     protected $testableFeatures = array(
         'choice_attr',
     );
 
+    private $renderer;
+
     protected function setUp()
     {
         parent::setUp();
-
-        $rendererEngine = new TwigRendererEngine(array(
-            'bootstrap_3_horizontal_layout.html.twig',
-            'custom_widgets.html.twig',
-        ));
-        $renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
-
-        $this->extension = new FormExtension($renderer);
 
         $loader = new StubFilesystemLoader(array(
             __DIR__.'/../../Resources/views/Form',
@@ -50,21 +41,19 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
 
         $environment = new \Twig_Environment($loader, array('strict_variables' => true));
         $environment->addExtension(new TranslationExtension(new StubTranslator()));
-        $environment->addExtension($this->extension);
+        $environment->addExtension(new FormExtension());
 
-        $this->extension->initRuntime($environment);
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        $this->extension = null;
+        $rendererEngine = new TwigRendererEngine(array(
+            'bootstrap_3_horizontal_layout.html.twig',
+            'custom_widgets.html.twig',
+        ), $environment);
+        $this->renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
+        $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 
     protected function renderForm(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form', $vars);
+        return (string) $this->renderer->renderBlock($view, 'form', $vars);
     }
 
     protected function renderLabel(FormView $view, $label = null, array $vars = array())
@@ -73,41 +62,41 @@ class FormExtensionBootstrap3HorizontalLayoutTest extends AbstractBootstrap3Hori
             $vars += array('label' => $label);
         }
 
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'label', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'label', $vars);
     }
 
     protected function renderErrors(FormView $view)
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'errors');
+        return (string) $this->renderer->searchAndRenderBlock($view, 'errors');
     }
 
     protected function renderWidget(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'widget', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'widget', $vars);
     }
 
     protected function renderRow(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'row', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'row', $vars);
     }
 
     protected function renderRest(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->searchAndRenderBlock($view, 'rest', $vars);
+        return (string) $this->renderer->searchAndRenderBlock($view, 'rest', $vars);
     }
 
     protected function renderStart(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form_start', $vars);
+        return (string) $this->renderer->renderBlock($view, 'form_start', $vars);
     }
 
     protected function renderEnd(FormView $view, array $vars = array())
     {
-        return (string) $this->extension->renderer->renderBlock($view, 'form_end', $vars);
+        return (string) $this->renderer->renderBlock($view, 'form_end', $vars);
     }
 
     protected function setTheme(FormView $view, array $themes)
     {
-        $this->extension->renderer->setTheme($view, $themes);
+        $this->renderer->setTheme($view, $themes);
     }
 }

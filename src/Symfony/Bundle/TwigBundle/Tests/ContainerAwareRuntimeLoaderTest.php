@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\TwigBundle\ContainerAwareRuntimeLoader;
 
@@ -27,13 +28,11 @@ class ContainerAwareRuntimeLoaderTest extends TestCase
         $loader->load('FooClass');
     }
 
-    /**
-     * @expectedException        \LogicException
-     * @expectedExceptionMessage Class "BarClass" is not configured as a Twig runtime.
-     */
     public function testLoadWithoutAMatch()
     {
-        $loader = new ContainerAwareRuntimeLoader($this->getMockBuilder(ContainerInterface::class)->getMock(), array());
-        $loader->load('BarClass');
+        $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $logger->expects($this->once())->method('warning')->with('Class "BarClass" is not configured as a Twig runtime. Add the "twig.runtime" tag to the related service in the container.');
+        $loader = new ContainerAwareRuntimeLoader($this->getMockBuilder(ContainerInterface::class)->getMock(), array(), $logger);
+        $this->assertNull($loader->load('BarClass'));
     }
 }

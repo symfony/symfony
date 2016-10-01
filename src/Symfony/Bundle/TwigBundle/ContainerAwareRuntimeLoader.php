@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,11 +23,13 @@ class ContainerAwareRuntimeLoader implements \Twig_RuntimeLoaderInterface
 {
     private $container;
     private $mapping;
+    private $logger;
 
-    public function __construct(ContainerInterface $container, array $mapping)
+    public function __construct(ContainerInterface $container, array $mapping, LoggerInterface $logger = null)
     {
         $this->container = $container;
         $this->mapping = $mapping;
+        $this->logger = $logger;
     }
 
     /**
@@ -34,10 +37,12 @@ class ContainerAwareRuntimeLoader implements \Twig_RuntimeLoaderInterface
      */
     public function load($class)
     {
-        if (!isset($this->mapping[$class])) {
-            throw new \LogicException(sprintf('Class "%s" is not configured as a Twig runtime. Add the "twig.runtime" tag to the related service in the container.', $class));
+        if (isset($this->mapping[$class])) {
+            return $this->container->get($this->mapping[$class]);
         }
 
-        return $this->container->get($this->mapping[$class]);
+        if (null !== $this->logger) {
+            $this->logger->warning(sprintf('Class "%s" is not configured as a Twig runtime. Add the "twig.runtime" tag to the related service in the container.', $class));
+        }
     }
 }

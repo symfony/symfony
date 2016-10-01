@@ -165,6 +165,7 @@
         <service id="twig.runtime_loader" class="Symfony\Bundle\TwigBundle\ContainerAwareRuntimeLoader" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" /> <!-- the mapping between class names and service names -->
+            <argument type="service" id="logger" on-invalid="null" />
         </service>
     </services>
 </container>

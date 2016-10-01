@@ -11,6 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Fixtures;
 
-interface EntityInterface
+interface EntityParentInterface
 {
 }

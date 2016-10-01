@@ -75,7 +75,7 @@ class FrameworkBundle extends Bundle
         // but as late as possible to get resolved parameters
         $container->addCompilerPass(new RegisterListenersPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new TemplatingPass());
-        $container->addCompilerPass(new AddConstraintValidatorsPass());
+        $container->addCompilerPass(new AddConstraintValidatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new AddValidatorInitializersPass());
         $container->addCompilerPass(new AddConsoleCommandPass());
         $container->addCompilerPass(new FormPass());

@@ -25,7 +25,7 @@ class HttpKernelExtension extends \Twig_Extension
         return array(
             new \Twig_SimpleFunction('render', array(HttpKernelRuntime::class, 'renderFragment'), array('is_safe' => array('html'))),
             new \Twig_SimpleFunction('render_*', array(HttpKernelRuntime::class, 'renderFragmentStrategy'), array('is_safe' => array('html'))),
-            new \Twig_SimpleFunction('controller', HttpKernelRuntime::class.'::controller'),
+            new \Twig_SimpleFunction('controller', static::class.'::controller'),
         );
     }
 

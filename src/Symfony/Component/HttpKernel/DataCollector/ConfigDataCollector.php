@@ -68,6 +68,8 @@ class ConfigDataCollector extends DataCollector
             'env' => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
             'debug' => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
             'php_version' => PHP_VERSION,
+            'timezone' => date_default_timezone_get(),
+            'locale' => \Locale::getDefault() ?: 'en',
             'xdebug_enabled' => extension_loaded('xdebug'),
             'eaccel_enabled' => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
             'apc_enabled' => extension_loaded('apc') && ini_get('apc.enabled'),
@@ -140,6 +142,26 @@ class ConfigDataCollector extends DataCollector
     public function getPhpVersion()
     {
         return $this->data['php_version'];
+    }
+
+    /**
+     * Gets the system timezone.
+     *
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->data['timezone'];
+    }
+
+    /**
+     * Gets the system locale.
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->data['locale'];
     }
 
     /**

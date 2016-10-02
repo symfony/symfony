@@ -31,6 +31,7 @@ abstract class Bundle implements BundleInterface
     protected $name;
     protected $extension;
     protected $path;
+    private $namespace;
 
     /**
      * Boots the Bundle.
@@ -106,9 +107,11 @@ abstract class Bundle implements BundleInterface
      */
     public function getNamespace()
     {
-        $class = get_class($this);
+        if (null === $this->namespace) {
+            $this->parseClassName();
+        }
 
-        return substr($class, 0, strrpos($class, '\\'));
+        return $this->namespace;
     }
 
     /**
@@ -142,14 +145,11 @@ abstract class Bundle implements BundleInterface
      */
     final public function getName()
     {
-        if (null !== $this->name) {
-            return $this->name;
+        if (null === $this->name) {
+            $this->parseClassName();
         }
 
-        $name = get_class($this);
-        $pos = strrpos($name, '\\');
-
-        return $this->name = false === $pos ? $name : substr($name, $pos + 1);
+        return $this->name;
     }
 
     /**
@@ -217,5 +217,12 @@ abstract class Bundle implements BundleInterface
         if (class_exists($class = $this->getContainerExtensionClass())) {
             return new $class();
         }
+    }
+
+    private function parseClassName()
+    {
+        $pos = strrpos(static::class, '\\');
+        $this->namespace = false === $pos ? '' : substr(static::class, 0, $pos);
+        $this->name = false === $pos ? static::class : substr(static::class, $pos + 1);
     }
 }

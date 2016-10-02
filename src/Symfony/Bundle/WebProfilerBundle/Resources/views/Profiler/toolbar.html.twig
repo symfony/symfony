@@ -26,6 +26,9 @@
     {% endfor %}
 
     {% if 'normal' != position %}
+        <a href="{{ path('_profiler_search', { limit: 10 }) }}" class="history-button" id="sfToolbarHistoryButton-{{ token }}" title="Show history" tabindex="-1" accesskey="H">
+            {{ include('@WebProfiler/Icon/history.svg') }}
+        </a>
         <a class="hide-button" id="sfToolbarHideButton-{{ token }}" title="Close Toolbar" tabindex="-1" accesskey="D">
             {{ include('@WebProfiler/Icon/close.svg') }}
         </a>

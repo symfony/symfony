@@ -50,7 +50,7 @@
     font: 11px Arial, sans-serif;
     left: 0;
     margin: 0;
-    padding: 0 36px 0 0;
+    padding: 0 72px 0 0;
     position: fixed;
     right: 0;
     text-align: left;
@@ -71,7 +71,8 @@
     display: inline-block;
 }
 
-.sf-toolbarreset .hide-button {
+.sf-toolbarreset .hide-button,
+.sf-toolbarreset .history-button {
     background: #444;
     display: block;
     position: absolute;
@@ -82,7 +83,13 @@
     cursor: pointer;
     text-align: center;
 }
-.sf-toolbarreset .hide-button svg {
+
+.sf-toolbarreset .history-button {
+    right: 36px;
+}
+
+.sf-toolbarreset .hide-button svg,
+.sf-toolbarreset .history-button svg {
     max-height: 18px;
     margin-top: 10px;
 }

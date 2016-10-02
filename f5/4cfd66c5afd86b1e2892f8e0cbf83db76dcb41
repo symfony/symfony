@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-10-01T23:59:21Z
+
+Hey,
+
+Since this is not a bug fix. Shouldn't this be applied against `master`? Or is the performance boost that big?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-02T01:36:37Z
+
+That's definitely for master
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-02T08:34:46Z
+
+> Or is the performance boost that big?
+
+Not sure.. it must gain something i guess :) I thought it was nice little tweak for 2.7 as well.
+
+Ie. imo its not a bug fix nor a new feature (new feature for the user that is). I guess the thing is we should be safe with refactoring.. as things can easily go [wrong](https://github.com/symfony/symfony/pull/19848) :sweat_smile:
+
+Ill target master :+1:

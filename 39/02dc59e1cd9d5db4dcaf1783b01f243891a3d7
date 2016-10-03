@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by xarem at 2016-10-03T11:33:50Z
+
+Hi @javiereguiluz
+
+i found some other usages without more entropy option:
+
+- [PhpArrayAdapter.php](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Cache/Adapter/PhpArrayAdapter.php#L150) on line 150
+- [ProxyDumperTest.php](https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/ProxyManager/Tests/LazyProxy/PhpDumper/ProxyDumperTest.php#L110) on line 110
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-10-03T14:11:54Z
+
+@xarem thanks! I've updated this PR and created another one (#20137) for the change related to the Cache component.

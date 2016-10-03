@@ -106,7 +106,7 @@ class Application
      *
      * @return int 0 if everything went fine, or an error code
      *
-     * @throws \Exception When doRun returns Exception or Throwable
+     * @throws \Exception When doRun returns Exception
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
@@ -120,28 +120,24 @@ class Application
 
         $this->configureIO($input, $output);
 
-        $exception = null;
-        $exitCode = null;
         try {
             $exitCode = $this->doRun($input, $output);
         } catch (\Exception $e) {
-            $exception = $e;
         } catch (\Throwable $e) {
-            $exception = new FatalThrowableError($e);
         }
 
-        if ($exception) {
+        if ($e) {
             if (!$this->catchExceptions) {
-                throw $exception;
+                throw $e;
             }
 
             if ($output instanceof ConsoleOutputInterface) {
-                $this->renderException($exception, $output->getErrorOutput());
+                $this->renderException($e, $output->getErrorOutput());
             } else {
-                $this->renderException($exception, $output);
+                $this->renderException($e, $output);
             }
 
-            $exitCode = $exception->getCode();
+            $exitCode = $e->getCode();
             if (is_numeric($exitCode)) {
                 $exitCode = (int) $exitCode;
                 if (0 === $exitCode) {

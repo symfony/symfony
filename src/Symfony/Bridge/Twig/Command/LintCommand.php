@@ -105,7 +105,7 @@ EOF
                 $template .= fread(STDIN, 1024);
             }
 
-            return $this->display($input, $output, $io, array($this->validate($twig, $template, uniqid('sf_'))));
+            return $this->display($input, $output, $io, array($this->validate($twig, $template, uniqid('sf_', true))));
         }
 
         $filesInfo = $this->getFilesInfo($twig, $filenames);

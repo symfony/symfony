@@ -147,7 +147,7 @@ EOF;
         $dump .= "\n);\n";
         $dump = str_replace("' . \"\\0\" . '", "\0", $dump);
 
-        $tmpFile = uniqid($this->file);
+        $tmpFile = uniqid($this->file, true);
 
         file_put_contents($tmpFile, $dump);
         @chmod($tmpFile, 0666);

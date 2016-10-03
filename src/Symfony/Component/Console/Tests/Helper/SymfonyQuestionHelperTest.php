@@ -6,6 +6,7 @@ use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
@@ -71,6 +72,17 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 
         $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
         $this->assertOutputContains('What is your favorite superhero? [Superman, Batman]', $output);
+    }
+
+    public function testAskReturnsNullIfValidatorAllowsIt()
+    {
+        $questionHelper = new SymfonyQuestionHelper();
+        $questionHelper->setHelperSet(new HelperSet(array(new FormatterHelper())));
+
+        $question = new Question('What is your favorite superhero?');
+        $question->setValidator(function ($value) { return $value; });
+
+        $this->assertNull($questionHelper->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $this->createOutputInterface(), $question));
     }
 
     protected function getInputStream($input)

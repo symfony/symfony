@@ -107,7 +107,7 @@ class ProxyDumperTest extends \PHPUnit_Framework_TestCase
         $definitions = array(
             array(new Definition(__CLASS__), true),
             array(new Definition('stdClass'), true),
-            array(new Definition('foo'.uniqid()), false),
+            array(new Definition(uniqid('foo', true)), false),
             array(new Definition(), false),
         );
 

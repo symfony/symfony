@@ -126,7 +126,7 @@ class Application
         } catch (\Throwable $e) {
         }
 
-        if ($e) {
+        if (isset($e)) {
             if (!$this->catchExceptions) {
                 throw $e;
             }

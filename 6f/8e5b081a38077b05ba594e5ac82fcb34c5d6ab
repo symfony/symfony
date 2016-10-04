@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-04T12:46:21Z
+
+The current code builds on top of a non existing semantical difference between `isNullable` and `allowsNull`. The engine has only one single state for these concepts. As such, we can't build something reliable on side effects of the new notation for nullable types as introduced in PHP 7.1. See e.g. [this comment](https://github.com/php/php-src/pull/2137#issuecomment-248940853) on the topic.
+This PR makes both concepts collapse into a single one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-04T13:06:25Z
+
+Fixes the current failures on 3.1 for HHVM.
+Ping @iltar FYI

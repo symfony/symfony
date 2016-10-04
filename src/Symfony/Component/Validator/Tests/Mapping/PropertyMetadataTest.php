@@ -42,4 +42,14 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($metadata->isPublic($entity));
         $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
     }
+
+    public function testGetPropertyValueFromRemovedProperty()
+    {
+        $entity = new Entity('foobar');
+        $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
+        $metadata->name = 'test';
+
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ValidatorException');
+        $metadata->getPropertyValue($entity);
+    }
 }

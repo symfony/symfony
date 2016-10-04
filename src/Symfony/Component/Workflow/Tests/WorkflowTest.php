@@ -226,6 +226,27 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('t5', $transitions['t5']->getName());
     }
 
+    public function teestGetPossibleTransitions()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+
+        $this->assertEmpty($workflow->getEnabledTransitions($subject));
+
+        $subject->marking = array('d' => true);
+        $transitions = $workflow->getPossibleTransitions($subject);
+        $this->assertCount(2, $transitions);
+        $this->assertSame('t3', $transitions['t3']->getName());
+        $this->assertSame('t4', $transitions['t4']->getName());
+
+        $subject->marking = array('c' => true, 'e' => true);
+        $transitions = $workflow->getPossibleTransitions($subject);
+        $this->assertCount(1, $transitions);
+        $this->assertSame('t5', $transitions['t5']->getName());
+    }
+
     private function createComplexWorkflow()
     {
         $definition = new Definition();

@@ -17,7 +17,7 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Extracts PHP informations using the reflection API.
+ * Extracts data using the reflection API.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

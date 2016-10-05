@@ -124,6 +124,10 @@
                             methodCell.textContent = request.method;
                             row.appendChild(methodCell);
 
+                            var typeCell = document.createElement('td');
+                            typeCell.textContent = request.type;
+                            row.appendChild(typeCell);
+
                             var statusCodeCell = document.createElement('td');
                             var statusCode = document.createElement('span');
                             if (request.statusCode < 300) {
@@ -235,6 +239,45 @@
         }
 
         {% if excluded_ajax_paths is defined %}
+
+            if (window.fetch && window.fetch.polyfill === undefined) {
+                var oldFetch = window.fetch;
+                window.fetch = function () {
+                    var promise = oldFetch.apply(this, arguments);
+                    if (!arguments[0].match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                        var method = 'GET';
+                        if (arguments[1] && arguments[1].method !== undefined) {
+                            method = arguments[1].method;
+                        }
+
+                        var stackElement = {
+                            loading: true,
+                            error: false,
+                            url: arguments[0],
+                            method: method,
+                            type: 'fetch',
+                            start: new Date()
+                        };
+
+                        requestStack.push(stackElement);
+                        promise.then(function (r) {
+                            stackElement.duration = new Date() - stackElement.start;
+                            stackElement.loading = false;
+                            stackElement.error = r.status < 200 || r.status >= 400;
+                            stackElement.statusCode = r.status;
+                            stackElement.profile = r.headers.get('x-debug-token');
+                            stackElement.profilerUrl = r.headers.get('x-debug-token-link');
+                            Sfjs.renderAjaxRequests();
+                        }, function (e){
+                            stackElement.loading = false;
+                            stackElement.error = true;
+                        });
+                        Sfjs.renderAjaxRequests();
+                    }
+
+                    return promise;
+                };
+            }
             if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
                 var proxied = XMLHttpRequest.prototype.open;
 
@@ -258,6 +301,7 @@
                             error: false,
                             url: url,
                             method: method,
+                            type: 'xhr',
                             start: new Date()
                         };
 

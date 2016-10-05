@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-15T23:03:31Z
+
+@javiereguiluz Can you validate this one?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-08-15T23:03:41Z
+
+@robfrawley Can you test it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-23T07:29:43Z
+
+Could anyone please test this one?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-23T07:44:12Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ivoba at 2016-08-24T08:42:00Z
+
+Applied fixes for @stof `s comments.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-24T08:46:21Z
+
+I will review again when the indentation changes are reverted. They make it very hard to see what actually changed (and if I ignored the whitespace changes, I cannot comment on the diff anymore, which is not convenient)
+
+---------------------------------------------------------------------------
+
+by ivoba at 2016-08-24T08:48:32Z
+
+oops how did that happen?
+fix is coming...
+
+---------------------------------------------------------------------------
+
+by ivoba at 2016-08-24T08:50:43Z
+
+@stof done, sorryy
+
+---------------------------------------------------------------------------
+
+by Gadgetdude at 2016-09-27T13:51:38Z
+
+Really looking forward to this fix/feature. Is there any way I can assist?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-10-01T23:02:42Z
+
+@ivoba Do you need help with the templates so you can finish this feature for 3.2? :)

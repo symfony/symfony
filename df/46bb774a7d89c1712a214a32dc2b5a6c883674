@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-10-05T16:08:15Z
+
+@xabbuh you need to rebase your branch so that it starts from 2.7 too. Otherwise, you are asking us to merge the master branch codebase into 2.7, which won't happen
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-05T16:09:36Z
+
+@stof already done (I switched the branch here as I read @fabpot's command in https://github.com/symfony/symfony/pull/20116#issuecomment-250918139 too late)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-05T17:03:34Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-05T17:04:51Z
+
+:+1:

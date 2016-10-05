@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-18T14:00:46Z
+
+This needs to be done on a per case basis? Ie. `case $question instanceof ChoiceQuestion:` requires a different approach right?
+
+edit: consider https://github.com/chalasr/symfony/blob/84779a1b4cde11a83ec6c542ccad2e419d4e3c47/src/Symfony/Component/Console/Question/Question.php#L55 vs. https://github.com/chalasr/symfony/blob/84779a1b4cde11a83ec6c542ccad2e419d4e3c47/src/Symfony/Component/Console/Formatter/OutputFormatter.php#L28
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-09-18T14:41:42Z
+
+I made the change, refactoring a bit btw so we stop duplications.
+If it looks less readable, please say me so I rollback and do the change for each case of the switch that need it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-18T14:45:30Z
+
+Yeah.. i would say revert and escape where needed.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-09-18T15:49:08Z
+
+Reverted.

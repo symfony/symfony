@@ -54,6 +54,7 @@ class YamlFileLoader extends FileLoader
         'decoration_inner_name' => 'decoration_inner_name',
         'decoration_priority' => 'decoration_priority',
         'autowire' => 'autowire',
+        'autowire_setters' => 'autowire_setters',
         'autowiring_types' => 'autowiring_types',
     );
 
@@ -303,6 +304,10 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['autowire'])) {
             $definition->setAutowired($service['autowire']);
+        }
+
+        if (isset($service['autowire_setters'])) {
+            $definition->setAutowiredSetters($service['autowire_setters']);
         }
 
         if (isset($service['autowiring_types'])) {

@@ -161,6 +161,10 @@ class XmlFileLoader extends FileLoader
             $definition->setAutowired(XmlUtils::phpize($value));
         }
 
+        if ($value = $service->getAttribute('autowire-setters')) {
+            $definition->setAutowiredSetters(XmlUtils::phpize($value));
+        }
+
         if ($files = $this->getChildren($service, 'file')) {
             $definition->setFile($files[0]->nodeValue);
         }

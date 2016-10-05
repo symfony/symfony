@@ -114,6 +114,7 @@
     <xsd:attribute name="decoration-inner-name" type="xsd:string" />
     <xsd:attribute name="decoration-priority" type="xsd:integer" />
     <xsd:attribute name="autowire" type="boolean" />
+    <xsd:attribute name="autowire-setters" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="tag">

@@ -101,6 +101,10 @@ class AutowirePass implements CompilerPassInterface
             $this->autowireMethod($id, $definition, $constructor, true);
         }
 
+        if (!$definition->hasAutowiredSetters()) {
+            return;
+        }
+
         $methodsCalled = array();
         foreach ($definition->getMethodCalls() as $methodCall) {
             $methodsCalled[$methodCall[0]] = true;

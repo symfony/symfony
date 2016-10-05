@@ -34,6 +34,7 @@ class Command
     private $processTitle;
     private $aliases = array();
     private $definition;
+    private $public = true;
     private $help;
     private $description;
     private $ignoreValidationErrors = false;
@@ -444,6 +445,26 @@ class Command
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @param bool $public Whether the command should be publicly shown or not.
+     * 
+     * @return Command The current instance
+     */
+    public function setPublic($public)
+    {
+        $this->public = (bool) $public;
+
+        return $this;
+    }
+
+    /**
+     * @return bool Whether the command should be publicly shown or not.
+     */
+    public function isPublic()
+    {
+        return $this->public;
     }
 
     /**

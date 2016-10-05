@@ -6,6 +6,7 @@ use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
@@ -71,6 +72,33 @@ class SymfonyQuestionHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('Superman', 'Batman'), $questionHelper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), $question));
         $this->assertOutputContains('What is your favorite superhero? [Superman, Batman]', $output);
+    }
+
+    public function testAskReturnsNullIfValidatorAllowsIt()
+    {
+        $questionHelper = new SymfonyQuestionHelper();
+        $questionHelper->setInputStream($this->getInputStream("\n"));
+        $question = new Question('What is your favorite superhero?');
+        $question->setValidator(function ($value) { return $value; });
+        $this->assertNull($questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskEscapeDefaultValue()
+    {
+        $helper = new SymfonyQuestionHelper();
+        $helper->setInputStream($this->getInputStream('\\'));
+        $helper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), new Question('Can I have a backslash?', '\\'));
+
+        $this->assertOutputContains('Can I have a backslash? [\]', $output);
+    }
+
+    public function testAskEscapeLabel()
+    {
+        $helper = new SymfonyQuestionHelper();
+        $helper->setInputStream($this->getInputStream('sure'));
+        $helper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), new Question('Do you want a \?'));
+
+        $this->assertOutputContains('Do you want a \?', $output);
     }
 
     protected function getInputStream($input)

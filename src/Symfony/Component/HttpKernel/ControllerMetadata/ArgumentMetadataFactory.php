@@ -58,7 +58,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
         }
 
         foreach ($reflection->getParameters() as $param) {
-            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param), $this->isNullable($param));
+            $arguments[] = new ArgumentMetadata($param->getName(), $this->getType($param), $this->isVariadic($param), $this->hasDefaultValue($param), $this->getDefaultValue($param), $param->allowsNull());
         }
 
         return $arguments;
@@ -89,23 +89,6 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     }
 
     /**
-     * Returns if the argument is allowed to be null but is still mandatory.
-     *
-     * @param \ReflectionParameter $parameter
-     *
-     * @return bool
-     */
-    private function isNullable(\ReflectionParameter $parameter)
-    {
-        if ($this->supportsParameterType) {
-            return null !== ($type = $parameter->getType()) && $type->allowsNull();
-        }
-
-        // fallback for supported php 5.x versions
-        return $this->hasDefaultValue($parameter) && null === $this->getDefaultValue($parameter);
-    }
-
-    /**
      * Returns a default value if available.
      *
      * @param \ReflectionParameter $parameter
@@ -127,7 +110,16 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     private function getType(\ReflectionParameter $parameter)
     {
         if ($this->supportsParameterType) {
-            return $parameter->hasType() ? (string) $parameter->getType() : null;
+            if (!$type = $parameter->getType()) {
+                return;
+            }
+            $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
+            if ('array' === $typeName && !$type->isBuiltin()) {
+                // Special case for HHVM with variadics
+                return;
+            }
+
+            return $typeName;
         }
 
         if ($parameter->isArray()) {

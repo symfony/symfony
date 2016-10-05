@@ -73,10 +73,9 @@ final class KernelEvents
      * The CONTROLLER_ARGUMENTS event occurs once controller arguments have been resolved.
      *
      * This event allows you to change the arguments that will be passed to
-     * the controller. The event listener method receives a
-     * Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent instance.
+     * the controller.
      *
-     * @Event
+     * @Event("Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent")
      *
      * @var string
      */

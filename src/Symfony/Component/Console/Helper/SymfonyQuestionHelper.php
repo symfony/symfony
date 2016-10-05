@@ -18,6 +18,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * Symfony Style Guide compliant question helper.
@@ -35,11 +36,11 @@ class SymfonyQuestionHelper extends QuestionHelper
         $question->setValidator(function ($value) use ($validator) {
             if (null !== $validator) {
                 $value = $validator($value);
-            }
-
-            // make required
-            if (!is_array($value) && !is_bool($value) && 0 === strlen($value)) {
-                throw new LogicException('A value is required.');
+            } else {
+                // make required
+                if (!is_array($value) && !is_bool($value) && 0 === strlen($value)) {
+                    throw new LogicException('A value is required.');
+                }
             }
 
             return $value;
@@ -53,7 +54,7 @@ class SymfonyQuestionHelper extends QuestionHelper
      */
     protected function writePrompt(OutputInterface $output, Question $question)
     {
-        $text = $question->getQuestion();
+        $text = OutputFormatter::escape($question->getQuestion());
         $default = $question->getDefault();
 
         switch (true) {
@@ -75,18 +76,18 @@ class SymfonyQuestionHelper extends QuestionHelper
                     $default[$key] = $choices[trim($value)];
                 }
 
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, implode(', ', $default));
+                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, OutputFormatter::escape(implode(', ', $default)));
 
                 break;
 
             case $question instanceof ChoiceQuestion:
                 $choices = $question->getChoices();
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $choices[$default]);
+                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, OutputFormatter::escape($choices[$default]));
 
                 break;
 
             default:
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $default);
+                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, OutputFormatter::escape($default));
         }
 
         $output->writeln($text);

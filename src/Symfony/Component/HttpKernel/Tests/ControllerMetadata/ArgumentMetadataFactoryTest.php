@@ -121,7 +121,7 @@ class ArgumentMetadataFactoryTest extends \PHPUnit_Framework_TestCase
             new ArgumentMetadata('foo', 'string', false, false, null, true),
             new ArgumentMetadata('bar', \stdClass::class, false, false, null, true),
             new ArgumentMetadata('baz', 'string', false, true, 'value', true),
-            new ArgumentMetadata('mandatory', null, false, false, null),
+            new ArgumentMetadata('mandatory', null, false, false, null, true),
         ), $arguments);
     }
 

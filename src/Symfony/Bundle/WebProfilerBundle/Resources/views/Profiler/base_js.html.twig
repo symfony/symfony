@@ -240,7 +240,7 @@
 
         {% if excluded_ajax_paths is defined %}
 
-            if (window.fetch) {
+            if (window.fetch && window.fetch.polyfill === undefined) {
                 var oldFetch = window.fetch;
                 window.fetch = function () {
                     var promise = oldFetch.apply(this, arguments);

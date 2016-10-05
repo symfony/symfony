@@ -73,7 +73,7 @@ class ReflectionCaster
         $prefix = Caster::PREFIX_VIRTUAL;
 
         $a += array(
-            $prefix.'name' => method_exists('ReflectionType', 'getName') ? $c->getName() : $c->__toString(),
+            $prefix.'name' => $c instanceof \ReflectionNamedType ? $c->getName() : $c->__toString(),
             $prefix.'allowsNull' => $c->allowsNull(),
             $prefix.'isBuiltin' => $c->isBuiltin(),
         );
@@ -157,7 +157,8 @@ class ReflectionCaster
         ));
 
         if (isset($a[$prefix.'returnType'])) {
-            $a[$prefix.'returnType'] = method_exists('ReflectionType', 'getName') ? $a[$prefix.'returnType']->getName() : $a[$prefix.'returnType']->__toString();
+            $v = $a[$prefix.'returnType'];
+            $a[$prefix.'returnType'] = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
         }
         if (isset($a[$prefix.'this'])) {
             $a[$prefix.'this'] = new CutStub($a[$prefix.'this']);
@@ -217,9 +218,9 @@ class ReflectionCaster
         ));
 
         try {
-            if (method_exists($c, 'hasType')) {
-                if ($c->hasType()) {
-                    $a[$prefix.'typeHint'] = method_exists('ReflectionType', 'getName') ? $c->getType()->getName() : $c->getType()->__toString();
+            if (method_exists($c, 'getType')) {
+                if ($v = $c->getType()) {
+                    $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
                 }
             } else {
                 $v = explode(' ', $c->__toString(), 6);
@@ -245,7 +246,7 @@ class ReflectionCaster
                 unset($a[$prefix.'allowsNull']);
             }
         } catch (\ReflectionException $e) {
-            if (isset($a[$prefix.'typeHint']) && $c->allowsNull() && !method_exists('ReflectionType', 'getName')) {
+            if (isset($a[$prefix.'typeHint']) && $c->allowsNull() && !class_exists('ReflectionNamedType', false)) {
                 $a[$prefix.'default'] = null;
                 unset($a[$prefix.'allowsNull']);
             }

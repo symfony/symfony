@@ -635,6 +635,7 @@ abstract class FrameworkExtensionTest extends TestCase
             'kernel.environment' => 'test',
             'kernel.name' => 'kernel',
             'kernel.root_dir' => __DIR__,
+            'kernel.container_class' => 'testContainer',
         ), $data)));
     }
 

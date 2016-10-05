@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-25T20:18:28Z
+
+What about other descriptors ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-25T20:22:39Z
+
+@ogizanagi all formats use `ApplicationDescription::getCommands`. https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Console/Descriptor/JsonDescriptor.php#L67
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-25T20:27:15Z
+
+@ro0NL, @jwdeitch : Oh right. Sorry. PR title & description may be updated I guess then 😉 .
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-09-29T10:21:21Z
+
+Could we change the method names to follow the same notation as for services? Instead of `setHidden()` and `isHidden()` -> `setPublic(true / false)` and `isPublic()` ?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-29T18:45:48Z
+
+Maybe if we run a private command it should give you a heads up in verbose mode..  would that be useful?
+
+---------------------------------------------------------------------------
+
+by jwdeitch at 2016-09-29T18:55:18Z
+
+Good idea. Should we merge this first then address that? Or I can throw it into this PR
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-09-29T18:57:18Z
+
+@jwdeitch : Could you update the test suite (`AbstractDescriptorTest`) by adding a new private command in `DescriptorApplication2` ?

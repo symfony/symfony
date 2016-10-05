@@ -239,6 +239,19 @@ class XmlFileLoader extends FileLoader
             $definition->addAutowiringType($type->textContent);
         }
 
+        $autowireTags = array();
+        foreach ($this->getChildren($service, 'autowire') as $type) {
+            $autowireTags[] = $type->textContent;
+        }
+
+        if ($autowireTags) {
+            if ($service->hasAttribute('autowire')) {
+                throw new InvalidArgumentException(sprintf('The "autowire" attribute cannot be used together with "<autowire>" tags for service "%s" in %s.', (string) $service->getAttribute('id'), $file));
+            }
+
+            $definition->setAutowiredMethods($autowireTags);
+        }
+
         if ($value = $service->getAttribute('decorates')) {
             $renameId = $service->hasAttribute('decoration-inner-name') ? $service->getAttribute('decoration-inner-name') : null;
             $priority = $service->hasAttribute('decoration-priority') ? $service->getAttribute('decoration-priority') : 0;

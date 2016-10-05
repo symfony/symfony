@@ -89,7 +89,10 @@ class JsonResponse extends Response
     public function setCallback($callback = null)
     {
         if (null !== $callback) {
-            // taken from http://www.geekality.net/2011/08/03/valid-javascript-identifier/ and https://github.com/willdurand/JsonpCallbackValidator
+            // partially token from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
+            // partially token from https://github.com/willdurand/JsonpCallbackValidator
+            //      JsonpCallbackValidator is released under the MIT License. See https://github.com/willdurand/JsonpCallbackValidator/blob/v1.1.0/LICENSE for details.
+            //      (c) William Durand <william.durand1@gmail.com>
             $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*(?:\[(?:"(?:\\\.|[^"\\\])*"|\'(?:\\\.|[^\'\\\])*\'|\d+)\])*?$/u';
             $reserved = array(
                 'break', 'do', 'instanceof', 'typeof', 'case', 'else', 'new', 'var', 'catch', 'finally', 'return', 'void', 'continue', 'for', 'switch', 'while',

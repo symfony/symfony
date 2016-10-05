@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-10-02T18:30:05Z
+
+For now I'm 👎  because the replaced feature is minuscule and introducing a new dependency is not worth it (specially now, that Symfony is furiously removing dependencies ... even between its components).
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-10-02T18:36:37Z
+
+To be fair @javiereguiluz the dependency in question is fairly small as well, its scope is the scope of the feature.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-02T18:37:22Z
+
+Understand.. however if im correct the philosophy is to not reinvent the wheel.
+
+Problem is we cant workaround symfony's out-of-the-box validation.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-10-02T18:39:43Z
+
+@ro0NL you can workaround it by overriding it, it's a public method. You're PR is not changing anything in this regard.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-10-02T18:40:22Z
+
+please note that this is introducing an **optional dependency**.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-02T18:40:49Z
+
+@theofidry fair enough :) but still is cumbersome imo.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-02T18:42:21Z
+
+We could also just copy the "right" regex.. i'd prefer the dependency though.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-03T03:36:42Z
+
+IIUC, if you don't install the dependency, the callback is not validated anymore?
+
+Anyway, I don't see why we should depend on an external library for that. Is there any issue with our code? If yes, let's fix it. But as that's not something that changes over time, I don't see the advantage of depending on something else.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-03T10:40:11Z
+
+> if you don't install the dependency, the callback is not validated anymore?
+
+Correct.. I dont mind forcing validation either, but if so, it should be correct. So basically there are 2 viable options;
+- make it a hard dependency
+- copy/fix the regex
+
+Im not sure we should keep patching the regex whenever it shows being incorrect, ie. a stable/tested version is available => https://github.com/willdurand/JsonpCallbackValidator.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-03T14:12:17Z
+
+Let's fix our regex.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-03T14:14:39Z
+
+Shall we just take https://github.com/willdurand/JsonpCallbackValidator/blob/master/src/JsonpCallbackValidator.php#L11 then? (`// taken from ...`) And forget about reserved keywords.. or take those as well?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-03T14:27:03Z
+
+You can take everything (and don't forget to include all the author/license information with it).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-03T15:27:03Z
+
+:+1: ill have a look tonight.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-03T18:28:04Z
+
+@fabpot ready. I kept the unicode support as well.. so basically we only added support for bracket notation.. (taken from willdurand/JsonpCallbackValidator).
+
+https://regex101.com/r/bSdU1i/2
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-05T17:59:22Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-05T19:09:53Z
+
+👍

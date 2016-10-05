@@ -39,10 +39,8 @@ class ExceptionHandler
     {
         $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = max(strpos($fileLinkFormat, '%f'), strpos($fileLinkFormat, '%l'));
-            $i = strpos($fileLinkFormat, '#"', $i) ?: strlen($fileLinkFormat);
-            $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
-            $fileLinkFormat[1] = @json_decode('{'.$fileLinkFormat[1].'}', true) ?: array();
+            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
+            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
         }
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
@@ -97,9 +95,8 @@ class ExceptionHandler
     {
         $old = $this->fileLinkFormat;
         if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = strpos($fileLinkFormat, '#"') ?: strlen($fileLinkFormat);
-            $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
-            $fileLinkFormat[1] = @json_decode('{'.$fileLinkFormat[1].'}', true) ?: array();
+            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
+            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
         }
         $this->fileLinkFormat = $fileLinkFormat;
         if ($old) {
@@ -368,9 +365,9 @@ EOF;
         $file = $this->escapeHtml(preg_match('#[^/\\\\]*+$#', $path, $file) ? $file[0] : $path);
 
         if ($fileLinkFormat = $this->fileLinkFormat) {
-            foreach ($fileLinkFormat[1] as $k => $v) {
-                if (0 === strpos($path, $k)) {
-                    $path = substr_replace($path, $v, 0, strlen($k));
+            for ($i = 1; isset($fileLinkFormat[$i]); ++$i) {
+                if (0 === strpos($path, $k = $fileLinkFormat[$i++])) {
+                    $path = substr_replace($path, $fileLinkFormat[$i], 0, strlen($k));
                     break;
                 }
             }

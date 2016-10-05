@@ -33,10 +33,8 @@ class CodeExtension extends \Twig_Extension
     {
         $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = max(strpos($fileLinkFormat, '%f'), strpos($fileLinkFormat, '%l'));
-            $i = strpos($fileLinkFormat, '#"', $i) ?: strlen($fileLinkFormat);
-            $fileLinkFormat = array(substr($fileLinkFormat, 0, $i), substr($fileLinkFormat, $i + 1));
-            $fileLinkFormat[1] = @json_decode('{'.$fileLinkFormat[1].'}', true) ?: array();
+            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
+            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
         }
         $this->fileLinkFormat = $fileLinkFormat;
         $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, dirname($rootDir)).DIRECTORY_SEPARATOR;
@@ -198,9 +196,9 @@ class CodeExtension extends \Twig_Extension
     public function getFileLink($file, $line)
     {
         if ($this->fileLinkFormat && file_exists($file)) {
-            foreach ($this->fileLinkFormat[1] as $k => $v) {
-                if (0 === strpos($file, $k)) {
-                    $file = substr_replace($file, $v, 0, strlen($k));
+            for ($i = 1; isset($this->fileLinkFormat[$i]); ++$i) {
+                if (0 === strpos($file, $k = $this->fileLinkFormat[$i++])) {
+                    $file = substr_replace($file, $this->fileLinkFormat[$i], 0, strlen($k));
                     break;
                 }
             }

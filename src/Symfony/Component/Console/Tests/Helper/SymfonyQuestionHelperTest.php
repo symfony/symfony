@@ -77,17 +77,17 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskReturnsNullIfValidatorAllowsIt()
     {
         $questionHelper = new SymfonyQuestionHelper();
-        $questionHelper->setInputStream($this->getInputStream("\n"));
         $question = new Question('What is your favorite superhero?');
         $question->setValidator(function ($value) { return $value; });
-        $this->assertNull($questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
+        $input = $this->createStreamableInputInterfaceMock($this->getInputStream("\n"));
+        $this->assertNull($questionHelper->ask($input, $this->createOutputInterface(), $question));
     }
 
     public function testAskEscapeDefaultValue()
     {
         $helper = new SymfonyQuestionHelper();
-        $helper->setInputStream($this->getInputStream('\\'));
-        $helper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), new Question('Can I have a backslash?', '\\'));
+        $input = $this->createStreamableInputInterfaceMock($this->getInputStream('\\'));
+        $helper->ask($input, $output = $this->createOutputInterface(), new Question('Can I have a backslash?', '\\'));
 
         $this->assertOutputContains('Can I have a backslash? [\]', $output);
     }
@@ -95,8 +95,8 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskEscapeLabel()
     {
         $helper = new SymfonyQuestionHelper();
-        $helper->setInputStream($this->getInputStream('sure'));
-        $helper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), new Question('Do you want a \?'));
+        $input = $this->createStreamableInputInterfaceMock($this->getInputStream('sure'));
+        $helper->ask($input, $output = $this->createOutputInterface(), new Question('Do you want a \?'));
 
         $this->assertOutputContains('Do you want a \?', $output);
     }

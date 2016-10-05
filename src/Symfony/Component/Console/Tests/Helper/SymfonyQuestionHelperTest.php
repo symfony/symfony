@@ -83,6 +83,24 @@ class SymfonyQuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
+    public function testAskEscapeDefaultValue()
+    {
+        $helper = new SymfonyQuestionHelper();
+        $helper->setInputStream($this->getInputStream('\\'));
+        $helper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), new Question('Can I have a backslash?', '\\'));
+
+        $this->assertOutputContains('Can I have a backslash? [\]', $output);
+    }
+
+    public function testAskEscapeLabel()
+    {
+        $helper = new SymfonyQuestionHelper();
+        $helper->setInputStream($this->getInputStream('sure'));
+        $helper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), new Question('Do you want a \?'));
+
+        $this->assertOutputContains('Do you want a \?', $output);
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

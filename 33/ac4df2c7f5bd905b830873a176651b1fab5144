@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-05T12:14:38Z
+
+So, we can remove those tests in 4.0 and not lose some code coverage?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-05T12:29:08Z
+
+@nicolas-grekas these tests are covering the deprecated ``ControllerResolver::getArguments``. We have similar tests (in a different file) for the same use case in the new API
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-05T12:29:53Z
+
+Nice, :+1: then!

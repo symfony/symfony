@@ -159,7 +159,7 @@ class ReflectionCaster
         if (isset($a[$prefix.'returnType'])) {
             $v = $a[$prefix.'returnType'];
             $v = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
-            $a[$prefix.'returnType'] = new ClassStub(($a[$prefix.'returnType']->allowsNull() ? '?' : '').$v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
+            $a[$prefix.'returnType'] = new ClassStub($a[$prefix.'returnType']->allowsNull() ? '?'.$v : $v, array(class_exists($v, false) || interface_exists($v, false) || trait_exists($v, false) ? $v : '', ''));
         }
         if (isset($a[$prefix.'class'])) {
             $a[$prefix.'class'] = new ClassStub($a[$prefix.'class']);
@@ -221,21 +221,12 @@ class ReflectionCaster
             'allowsNull' => 'allowsNull',
         ));
 
-        try {
-            if (method_exists($c, 'getType')) {
-                if ($v = $c->getType()) {
-                    $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
-                }
-            } else {
-                $v = explode(' ', $c->__toString(), 6);
-                if (isset($v[5]) && 0 === strspn($v[4], '.&$')) {
-                    $a[$prefix.'typeHint'] = $v[4];
-                }
+        if (method_exists($c, 'getType')) {
+            if ($v = $c->getType()) {
+                $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
             }
-        } catch (\ReflectionException $e) {
-            if (preg_match('/^Class ([^ ]++) does not exist$/', $e->getMessage(), $m)) {
-                $a[$prefix.'typeHint'] = $m[1];
-            }
+        } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $c, $v)) {
+            $a[$prefix.'typeHint'] = $v[1];
         }
 
         if (isset($a[$prefix.'typeHint'])) {

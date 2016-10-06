@@ -18,7 +18,7 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Extracts PHP informations using the reflection API.
+ * Extracts data using the reflection API.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -52,7 +52,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     {
         try {
             $reflectionClass = new \ReflectionClass($class);
-        } catch (\ReflectionException $reflectionException) {
+        } catch (\ReflectionException $e) {
             return;
         }
 
@@ -266,7 +266,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $reflectionProperty = new \ReflectionProperty($class, $property);
 
             return $reflectionProperty->isPublic();
-        } catch (\ReflectionException $reflectionExcetion) {
+        } catch (\ReflectionException $e) {
             // Return false if the property doesn't exist
         }
 
@@ -295,7 +295,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 if (0 === $reflectionMethod->getNumberOfRequiredParameters()) {
                     return array($reflectionMethod, $prefix);
                 }
-            } catch (\ReflectionException $reflectionException) {
+            } catch (\ReflectionException $e) {
                 // Return null if the property doesn't exist
             }
         }
@@ -331,8 +331,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                     if ($reflectionMethod->getNumberOfParameters() >= 1) {
                         return array($reflectionMethod, $prefix);
                     }
-                } catch (\ReflectionException $reflectionException) {
-                    // Try the next one if method does not exist
+                } catch (\ReflectionException $e) {
+                    // Try the next prefix if the method doesn't exist
                 }
             }
         }

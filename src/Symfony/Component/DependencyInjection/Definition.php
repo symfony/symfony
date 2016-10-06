@@ -668,7 +668,7 @@ class Definition
     /**
      * Sets autowired.
      *
-     * @param $autowired
+     * @param bool $autowired
      *
      * @return Definition The current instance
      */

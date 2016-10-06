@@ -122,21 +122,8 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
             return $typeName;
         }
 
-        if ($parameter->isArray()) {
-            return 'array';
+        if (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $parameter, $info)) {
+            return $info[1];
         }
-
-        if ($parameter->isCallable()) {
-            return 'callable';
-        }
-
-        try {
-            $refClass = $parameter->getClass();
-        } catch (\ReflectionException $e) {
-            // mandatory; extract it from the exception message
-            return str_replace(array('Class ', ' does not exist'), '', $e->getMessage());
-        }
-
-        return $refClass ? $refClass->getName() : null;
     }
 }

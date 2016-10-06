@@ -55,7 +55,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pool->save($i3->tag('foo')->tag('baz'));
         $pool->save($foo);
 
-        $pool->invalidateTags('bar');
+        $pool->invalidateTags(array('bar'));
 
         $this->assertFalse($pool->getItem('i0')->isHit());
         $this->assertTrue($pool->getItem('i1')->isHit());
@@ -63,7 +63,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertTrue($pool->getItem('i3')->isHit());
         $this->assertTrue($pool->getItem('foo')->isHit());
 
-        $pool->invalidateTags('foo');
+        $pool->invalidateTags(array('foo'));
 
         $this->assertFalse($pool->getItem('i1')->isHit());
         $this->assertFalse($pool->getItem('i3')->isHit());
@@ -80,7 +80,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $i = $pool->getItem('k');
         $pool->save($i->tag('bar'));
 
-        $pool->invalidateTags('foo');
+        $pool->invalidateTags(array('foo'));
         $this->assertTrue($pool->getItem('k')->isHit());
     }
 
@@ -93,7 +93,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $pool->deleteItem('k');
 
         $pool->save($pool->getItem('k'));
-        $pool->invalidateTags('foo');
+        $pool->invalidateTags(array('foo'));
 
         $this->assertTrue($pool->getItem('k')->isHit());
     }

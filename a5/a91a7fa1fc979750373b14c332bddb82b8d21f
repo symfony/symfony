@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-24T16:04:33Z
+
+Considering this has most likely never worked, I think attributes should be hinted as string instead.
+
+---------------------------------------------------------------------------
+
+by maennchen at 2016-08-24T16:08:07Z
+
+@iltar I don't think that this is a good idea.
+
+I have a use case where i want to check if some operations (attributes) can be applied on an object (subject).
+
+For sure those operations could be flattened into a string, but one would have to parse them in the voter again which is total nonsense.
+
+Type Hinting for string would be a BC break since one can supply objects as attributes already, but only if the objects implements a `__toString()` method.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-08-24T17:31:35Z
+
+I guess implementing `__toString()` is already a debatable feature on its own. For the other cases, you have examples of how this would be used? I can't imagine because it's not how it's documented.
+
+---------------------------------------------------------------------------
+
+by Gladhon at 2016-08-25T07:26:11Z
+
+@iltar i think its basically a good idea to allow objects there, cause in that case you can easy check if your voter is responsible or not. Like ExpressionVoter: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Security/Core/Authorization/Voter/ExpressionVoter.php#L60
+
+Of course you also can do that with strings, and prefix strings, and hope that there are no conflicts ... but who want this?
+
+---------------------------------------------------------------------------
+
+by maennchen at 2016-08-25T09:13:15Z
+
+@iltar I only implemented the `__toString` to maintain backwards compatibility. In my opinion I'd rather remove that.
+
+But there are already examples in Symfony itself using non string values. (See @Gladhon's comment) The `ExpressionVoter` only works because the `Expression` implements `__toString`.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-08-26T11:45:27Z
+
+I think we should not rely on the `__toString()` method because you usually want to use it to return a "display" value. For instance, returning `Administrators` label for an associated `ROLE_ADMIN` role. The security system requires that any objects to be used as a role must implement the `RoleInterface`. So the `RoleVoter` should probably be upgraded to check it the `$attribute` is an instance of `RoleInterface` instance, so that you can convert it to a string with its `getRole()` method.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-08-26T11:46:00Z
+
+Otherwise you must implement your custom voter that support your custom type of attribute.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-08-26T11:48:15Z
+
+Btw, the border between bug and new feature is really close in this case. I think it's better to consider it a new feature and submit the PR against the `master` branch.
+
+---------------------------------------------------------------------------
+
+by maennchen at 2016-08-26T11:49:00Z
+
+@hhamon I'd like your proposed solution. I implemented the `__toString()` thing to avoid BC breaks.
+
+---------------------------------------------------------------------------
+
+by maennchen at 2016-08-26T11:57:30Z
+
+I think that it's definitely a bug since the interface clearly says that mixed is accepted. (Which is currently only if you implement `__toString`.
+Could we implement this as a bug and introduce a new feature for master which cleans the behaviour up?
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-08-26T12:00:58Z
+
+`supportsAttribute` for RoleVoter should only allow a string or Role(Interface) (`Role` is actually the only one that is officially supported, because of the string promise).
+
+But when the attributes of a not supported type, the de decision should be abstained?
+When passing an unsupported attribute it would have failed with an php error, no?
+
+---------------------------------------------------------------------------
+
+by maennchen at 2016-08-26T12:04:21Z
+
+@sstok Two times yes.
+
+---------------------------------------------------------------------------
+
+by maennchen at 2016-08-26T12:05:18Z
+
+Also `supportsAttribute` does not exist anymore in `>= 3.0` I think.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2016-08-26T12:54:13Z
+
+Yes `supportAttributes`  as a "public" method was removed from the `VoterInterface` in Symfony 3.0 because this method was never called by the Security component in Symfony 2. But its piece of logic still resides in the `RoleVoter` class.
+
+---------------------------------------------------------------------------
+
+by maennchen at 2016-09-19T09:18:43Z
+
+Should I change to check if the attribute is instance of RoleInterface instead of __toString? This will be a small BC break.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-20T16:51:41Z
+
+@maennchen why exactly do you want to remove `__toString` support? Imo we should first check for `RoleInterface` then string/string-object.
+
+That would still be a BC break, but personally i consider it a bugfix.
+
+---------------------------------------------------------------------------
+
+by maennchen at 2016-09-21T07:54:28Z
+
+I refactored it with specific checks for `RoleInterface`.
+
+I personally don't really care if there is support for objects having a `__toString()` method. In my opinion it's cleaner just to handle strings & `RoleInterface`, but with `__toString()` support there is no BC break.

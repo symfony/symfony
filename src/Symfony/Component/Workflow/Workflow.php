@@ -173,7 +173,16 @@ class Workflow
     public function getName()
     {
         return $this->name;
+    }    
+    
+    /** 
+    *@return Definition
+    */
+    public function getDefinition()
+    {
+        return $this->definition;
     }
+
 
     private function doCan($subject, Marking $marking, Transition $transition)
     {

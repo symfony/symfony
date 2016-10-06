@@ -59,6 +59,7 @@ before_install:
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini || echo "xdebug not available"; fi
     - if [[ ! $skip ]]; then [ -d ~/.composer ] || mkdir ~/.composer; cp .composer/* ~/.composer/; fi
     - if [[ ! $skip ]]; then export PHPUNIT=$(readlink -f ./phpunit); fi
+    - if [[ ! $skip ]]; then composer global require "hirak/prestissimo:^0.3"; fi
 
 install:
     - if [[ ! $skip && $deps ]]; then cp composer.json composer.json.orig; fi

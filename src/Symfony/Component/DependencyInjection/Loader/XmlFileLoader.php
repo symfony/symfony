@@ -511,7 +511,7 @@ EOF
 
         foreach ($alias->childNodes as $child) {
             if ($child instanceof \DOMElement && $child->namespaceURI === self::NS) {
-                @trigger_error(sprintf('Using the element "%s" is deprecated for alias definition "%s" in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Using the element "%s" is deprecated for the service "%s" which is defined as an alias in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
             }
         }
     }

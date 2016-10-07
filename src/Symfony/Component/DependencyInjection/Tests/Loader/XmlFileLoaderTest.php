@@ -563,9 +563,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testAliasDefinitionContainsUnsupportedElements()
     {
         $deprecations = array(
-            'Using the attribute "class" is deprecated for alias definition "bar"',
-            'Using the element "tag" is deprecated for alias definition "bar"',
-            'Using the element "factory" is deprecated for alias definition "bar"',
+            'Using the attribute "class" is deprecated for the service "bar" which is defined as an alias',
+            'Using the element "tag" is deprecated for the service "bar" which is defined as an alias',
+            'Using the element "factory" is deprecated for the service "bar" which is defined as an alias',
         );
 
         ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {

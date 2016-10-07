@@ -1,6 +1,11 @@
 UPGRADE FROM 3.1 to 3.2
 =======================
 
+BrowserKit
+----------
+
+ * Client HTTP user agent has been changed to 'Symfony BrowserKit' (was 'Symfony2 BrowserKit' before).
+
 FrameworkBundle
 ---------------
 
@@ -70,6 +75,18 @@ HttpKernel
 
  * `DataCollector::varToString()` is deprecated and will be removed in Symfony
    4.0. Use the `cloneVar()` method instead.
+
+ * Surrogate name in a `Surrogate-Capability` HTTP request header has been changed to 'symfony'.
+
+   Before:
+   ```
+   Surrogate-Capability: symfony2="ESI/1.0"
+   ```
+
+   After:
+   ```
+   Surrogate-Capability: symfony="ESI/1.0"
+   ```
 
 HttpFoundation
 ---------------

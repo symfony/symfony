@@ -42,7 +42,7 @@ class StopwatchExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('{% stopwatch "foo" %}something{% endstopwatch %}', 'foo'),
-            array('{% stopwatch "foo" %}symfony2 is fun{% endstopwatch %}{% stopwatch "bar" %}something{% endstopwatch %}', array('foo', 'bar')),
+            array('{% stopwatch "foo" %}symfony is fun{% endstopwatch %}{% stopwatch "bar" %}something{% endstopwatch %}', array('foo', 'bar')),
             array('{% set foo = "foo" %}{% stopwatch foo %}something{% endstopwatch %}', 'foo'),
             array('{% set foo = "foo" %}{% stopwatch foo %}something {% set foo = "bar" %}{% endstopwatch %}', 'foo'),
             array('{% stopwatch "foo.bar" %}something{% endstopwatch %}', 'foo.bar'),

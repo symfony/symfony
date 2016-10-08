@@ -49,6 +49,10 @@ class DumpListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
+        if (!class_exists(ConsoleEvents::class)) {
+            return array();
+        }
+
         // Register early to have a working dump() as early as possible
         return array(ConsoleEvents::COMMAND => array('configure', 1024));
     }

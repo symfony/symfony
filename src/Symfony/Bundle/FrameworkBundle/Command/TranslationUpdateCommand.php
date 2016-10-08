@@ -118,8 +118,9 @@ EOF
         // load any messages from templates
         $extractedCatalogue = new MessageCatalogue($input->getArgument('locale'));
         $output->text('Parsing templates');
+        $prefix = $input->getOption('prefix');
         $extractor = $this->getContainer()->get('translation.extractor');
-        $extractor->setPrefix($input->getOption('prefix'));
+        $extractor->setPrefix(null === $prefix ? '' : $prefix);
         foreach ($transPaths as $path) {
             $path .= 'views';
             if (is_dir($path)) {

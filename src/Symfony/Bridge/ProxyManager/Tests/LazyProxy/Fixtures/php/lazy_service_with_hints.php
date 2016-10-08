@@ -17,6 +17,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
  */
 class LazyServiceProjectServiceContainer extends Container
 {
+    protected $methodMap = array(
+        'foo' => 'getFooService',
+    );
+
     /**
      * Constructor.
      */

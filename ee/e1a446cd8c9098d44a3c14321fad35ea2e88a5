@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-01T07:30:40Z
+
+@stof what handling a method map in `PhpDumper`? Imo  the `Container` becomes way too complex and we make things worse rather then refactoring.
+
+[ref](https://github.com/symfony/symfony/pull/19690#issuecomment-242144605)
+
+edit: sorry too fast.. this actually clean things up in 4.0 (assuming the deprecated code blocks will be removed, not throwing..) :+1:
+
+It's still considerable to deprecate `Container::$methodMap` fully though.
+
+edit2: Fixed tickets #19690 :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-01T09:59:20Z
+
+@ro0NL removing the method map in the base container would force the dumped container to overwrite get has and getServiceIds to add support for it. And this would make the code fragile because there is much more logic in this method and the new code should go in the middle. It would actually make the code more complex.
+
+And yes, the deprecated code will be removed, not replaced by exceptions (a dumper not filling the method map would just end up with a container where services are not found)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-01T10:02:16Z
+
+The deps=high and deps=low failures are caused by #20097, not by my PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-01T11:37:35Z
+
+> And this would make the code fragile because there is much more logic in this method and the new code should go in the middle. It would actually make the code more complex.
+
+@stof the dumper becomes more complex.. but this is also due the fact we concat one big string (opposed to building an AST). The dumped container could extend a special base class that handles most logic which would actually clean things up. Eventually i think the resulting code would give better semantics.
+
+Think
+```php
+abstract class DumpedContainer extends Container {
+   abstract protected function getMethodMap() {}
+   // handle has, get, etc.
+}
+
+class ProjectContainer extends DumpedContainer {
+    // dump getMethodMap + service methods
+}
+```
+
+edit: i'd really like this :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-01T14:47:50Z
+
+tests should be fixed now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-05T12:43:31Z
+
+:+1:, with minor comments
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-05T17:25:24Z
+
+@nicolas-grekas done

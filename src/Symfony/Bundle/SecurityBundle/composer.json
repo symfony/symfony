@@ -24,6 +24,7 @@
     "require-dev": {
         "symfony/asset": "~2.8|~3.0",
         "symfony/browser-kit": "~2.8|~3.0",
+        "symfony/config": "~3.2",
         "symfony/console": "~2.8|~3.0",
         "symfony/css-selector": "~2.8|~3.0",
         "symfony/dom-crawler": "~2.8|~3.0",

@@ -67,11 +67,8 @@ class TagAwareAdapter implements TagAwareAdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function invalidateTags($tags)
+    public function invalidateTags(array $tags)
     {
-        if (!is_array($tags)) {
-            $tags = array($tags);
-        }
         foreach ($tags as $k => $tag) {
             if ('' !== $tag && is_string($tag)) {
                 $tags[$k] = $tag.static::TAGS_PREFIX;

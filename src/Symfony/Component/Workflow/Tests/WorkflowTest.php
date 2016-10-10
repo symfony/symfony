@@ -233,7 +233,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject->marking = null;
         $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
 
-        $this->assertEmpty($workflow->getEnabledTransitions($subject));
+        $transitions = $workflow->getPossibleTransitions($subject);
+        $this->assertCount(1, $transitions);
+        $this->assertSame('t1', $transitions['t1']->getName());
 
         $subject->marking = array('d' => true);
         $transitions = $workflow->getPossibleTransitions($subject);

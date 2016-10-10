@@ -44,6 +44,8 @@ class ChainUserProvider implements UserProviderInterface
      */
     public function loadUserByUsername($username)
     {
+        $e = null;
+
         foreach ($this->providers as $provider) {
             try {
                 return $provider->loadUserByUsername($username);
@@ -52,7 +54,7 @@ class ChainUserProvider implements UserProviderInterface
             }
         }
 
-        $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username));
+        $ex = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $username), 0, $e);
         $ex->setUsername($username);
         throw $ex;
     }

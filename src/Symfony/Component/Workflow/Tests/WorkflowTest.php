@@ -226,7 +226,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('t5', $transitions['t5']->getName());
     }
 
-    public function teestGetPossibleTransitions()
+    public function testGetPossibleTransitions()
     {
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();

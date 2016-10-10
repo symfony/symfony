@@ -161,7 +161,6 @@ class Workflow
         $enabled = array();
         $marking = $this->getMarking($subject);
 
-        /** @var Transition $transition */
         foreach ($this->definition->getTransitions() as $transition) {
             if ($this->doCan($subject, $marking, $transition)) {
                 $enabled[$transition->getName()] = $transition;
@@ -182,7 +181,6 @@ class Workflow
         $marking = $this->getMarking($subject);
         $places = $marking->getPlaces();
 
-        /** @var Transition $transition */
         foreach ($this->definition->getTransitions() as $transition) {
             $diff = array_diff($transition->getFroms(), array_keys($places));
 

@@ -82,6 +82,24 @@ class DecoratorServicePassTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($fooExtendedDefinition->getDecoratedService());
     }
 
+    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setTags(array('name' => 'bar'))
+        ;
+        $container
+            ->register('baz')
+            ->setDecoratedService('foo')
+        ;
+
+        $this->process($container);
+
+        $this->assertEmpty($container->getDefinition('baz.inner')->getTags());
+        $this->assertEquals(array('name' => 'bar'), $container->getDefinition('baz')->getTags());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new DecoratorServicePass();

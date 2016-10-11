@@ -1,6 +1,35 @@
 UPGRADE FROM 2.x to 3.0
 =======================
 
+# Table of Contents
+
+- [ClassLoader](#classloader)
+- [Config](#config)
+- [Console](#console)
+- [DependencyInjection](#dependencyinjection)
+- [DomCrawler](#domcrawler)
+- [DoctrineBridge](#doctrinebridge)
+- [EventDispatcher](#eventdispatcher)
+- [Form](#form)
+- [FrameworkBundle](#frameworkbundle)
+- [HttpKernel](#httpkernel)
+- [Locale](#locale)
+- [PropertyAccess](#propertyaccess)
+- [Routing](#routing)
+- [Security](#security)
+- [SecurityBundle](#securitybundle)
+- [Serializer](#serializer)
+- [Translator](#translator)
+- [Twig Bridge](#twig-bridge)
+- [TwigBundle](#twigbundle)
+- [Validator](#validator)
+- [Yaml](#yaml)
+- [WebProfiler](#webprofiler)
+- [Process](#process)
+- [Monolog Bridge](#monolog-bridge)
+- [Swiftmailer Bridge](#swiftmailer-bridge)
+- [HttpFoundation](#httpfoundation)
+
 ### ClassLoader
 
  * The `UniversalClassLoader` class has been removed in favor of
@@ -381,6 +410,7 @@ UPGRADE FROM 2.x to 3.0
    $form = $this->createForm(MyType::class);
    ```
 
+ * 
  * The alias option of the `form.type_extension` tag was removed in favor of
    the `extended_type`/`extended-type` option.
 

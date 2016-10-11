@@ -30,7 +30,9 @@ class EnvPlaceholderParameterBag extends ParameterBag
             $env = substr($name, 4, -1);
 
             if (isset($this->envPlaceholders[$env])) {
-                return $this->envPlaceholders[$env][0];
+                foreach ($this->envPlaceholders[$env] as $placeholder) {
+                    return $placeholder; // return first result
+                }
             }
             if (preg_match('/\W/', $env)) {
                 throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
@@ -44,7 +46,11 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 }
             }
 
-            return $this->envPlaceholders[$env][] = sprintf('env_%s_%s', $env, md5($name.uniqid(mt_rand(), true)));
+            $uniqueName = md5($name.uniqid(mt_rand(), true));
+            $placeholder = sprintf('env_%s_%s', $env, $uniqueName);
+            $this->envPlaceholders[$env][$placeholder] = $placeholder;
+
+            return $placeholder;
         }
 
         return parent::get($name);

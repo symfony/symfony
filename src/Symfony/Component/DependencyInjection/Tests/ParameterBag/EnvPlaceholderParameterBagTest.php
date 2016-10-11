@@ -23,4 +23,19 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(%foo%)');
     }
+
+    public function testMergeWillNotDuplicateIdenticalParameters()
+    {
+        $originalPlaceholders = array('database_host' => array('localhost'));
+        $firstBag = new EnvPlaceholderParameterBag($originalPlaceholders);
+
+        // initialize placeholders
+        $firstBag->get('env(database_host)');
+        $secondBag = clone $firstBag;
+
+        $firstBag->mergeEnvPlaceholders($secondBag);
+        $mergedPlaceholders = $firstBag->getEnvPlaceholders();
+
+        $this->assertCount(1, $mergedPlaceholders['database_host']);
+    }
 }

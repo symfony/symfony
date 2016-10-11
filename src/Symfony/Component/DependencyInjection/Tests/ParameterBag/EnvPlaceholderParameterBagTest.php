@@ -36,6 +36,6 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
         $firstBag->mergeEnvPlaceholders($secondBag);
         $mergedPlaceholders = $firstBag->getEnvPlaceholders();
 
-        $this->assertEquals(1, count($mergedPlaceholders['database_host']));
+        $this->assertCount(1, $mergedPlaceholders['database_host']);
     }
 }

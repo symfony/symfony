@@ -22,17 +22,6 @@
 
         var noop = function() {};
 
-        var collectionToArray = function (collection) {
-            var length = collection.length || 0,
-                results = new Array(length);
-
-            while (length--) {
-                results[length] = collection[length];
-            }
-
-            return results;
-        };
-
         var profilerStorageKey = 'sf2/profiler/';
 
         var request = function(url, onSuccess, onError, payload, options) {

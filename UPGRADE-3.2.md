@@ -94,6 +94,12 @@ HttpFoundation
      - `isInvalid`/`isSuccessful`/`isRedirection`/`isClientError`/`isServerError`
      - `isOk`/`isForbidden`/`isNotFound`/`isRedirect`/`isEmpty`
 
+TwigBridge
+----------
+
+ * Deprecated the possibility to inject the Form Twig Renderer into the form
+   extension. Inject it into the `TwigRendererEngine` instead.
+
 Validator
 ---------
 

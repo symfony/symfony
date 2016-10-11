@@ -1,6 +1,35 @@
 UPGRADE FROM 2.x to 3.0
 =======================
 
+# Table of Contents
+
+- [ClassLoader](#classloader)
+- [Config](#config)
+- [Console](#console)
+- [DependencyInjection](#dependencyinjection)
+- [DoctrineBridge](#doctrinebridge)
+- [DomCrawler](#domcrawler)
+- [EventDispatcher](#eventdispatcher)
+- [Form](#form)
+- [FrameworkBundle](#frameworkbundle)
+- [HttpFoundation](#httpfoundation)
+- [HttpKernel](#httpkernel)
+- [Locale](#locale)
+- [Monolog Bridge](#monolog-bridge)
+- [Process](#process)
+- [PropertyAccess](#propertyaccess)
+- [Routing](#routing)
+- [Security](#security)
+- [SecurityBundle](#securitybundle)
+- [Serializer](#serializer)
+- [Swiftmailer Bridge](#swiftmailer-bridge)
+- [Translator](#translator)
+- [Twig Bridge](#twig-bridge)
+- [TwigBundle](#twigbundle)
+- [Validator](#validator)
+- [WebProfiler](#webprofiler)
+- [Yaml](#yaml)
+
 ### ClassLoader
 
  * The `UniversalClassLoader` class has been removed in favor of

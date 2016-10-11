@@ -805,7 +805,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][@value="&b"][not(@checked)]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=3]
+    [count(./input)=5]
     [count(./label)=1]
 '
         );
@@ -837,7 +837,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         /following-sibling::label[@for="name_2"][.="[trans]label.&c[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=4]
+    [count(./input)=7]
     [count(./label)=3]
 '
         );
@@ -862,7 +862,7 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
         /following-sibling::input[@type="checkbox"][@name="name[]"][@id="name_1"][@value="&b"][not(@checked)]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=3]
+    [count(./input)=5]
     [count(./label)=1]
 '
         );

@@ -1133,7 +1133,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=4]
+    [count(./input)=7]
 '
         );
     }
@@ -1160,7 +1160,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         /following-sibling::label[@for="name_2"][.="Choice&C"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=4]
+    [count(./input)=7]
 '
         );
     }
@@ -1189,7 +1189,7 @@ abstract class AbstractLayoutTest extends \Symfony\Component\Form\Test\FormInteg
         /following-sibling::label[@for="name_2"][.="[trans]Choice&C[/trans]"]
         /following-sibling::input[@type="hidden"][@id="name__token"]
     ]
-    [count(./input)=4]
+    [count(./input)=7]
 '
         );
     }

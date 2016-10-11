@@ -62,9 +62,17 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
     /**
      * Merges the env placeholders of another EnvPlaceholderParameterBag.
+     *
+     * @param EnvPlaceholderParameterBag $bag
      */
     public function mergeEnvPlaceholders(self $bag)
     {
-        $this->envPlaceholders = array_merge_recursive($this->envPlaceholders, $bag->getEnvPlaceholders());
+        $newPlaceholders = $bag->getEnvPlaceholders();
+
+        foreach ($newPlaceholders as $key => $newEntries) {
+            $existingEntries = isset($this->envPlaceholders[$key]) ? $this->envPlaceholders[$key] : array();
+            $mergedEntries = array_merge($existingEntries, $newEntries);
+            $this->envPlaceholders[$key] = array_unique($mergedEntries);
+        }
     }
 }

@@ -1805,6 +1805,8 @@ UPGRADE FROM 2.x to 3.0
 
 ### HttpFoundation
 
+ * The precedence of parameters returned from `Request::get()` changed from "GET, PATH, BODY" to "PATH, GET, BODY"
+
  * `Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface` no longer implements the `IteratorAggregate` interface. Use the `all()` method instead of iterating over the flash bag.
 
  * Removed the feature that allowed finding deep items in `ParameterBag::get()`.

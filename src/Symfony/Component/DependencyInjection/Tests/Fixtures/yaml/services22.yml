@@ -6,3 +6,7 @@ services:
     baz_service:
         class:            Baz
         autowiring_types: Foo
+
+    router:
+        alias: router.default
+        autowiring_types: Router

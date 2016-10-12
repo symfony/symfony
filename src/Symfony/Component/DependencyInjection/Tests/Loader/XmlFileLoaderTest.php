@@ -545,6 +545,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services22.xml');
 
         $this->assertEquals(array('Bar', 'Baz'), $container->getDefinition('foo')->getAutowiringTypes());
+        $this->assertEquals(array('Router'), $container->getAlias('router')->getAutowiringTypes());
     }
 
     public function testAutowire()

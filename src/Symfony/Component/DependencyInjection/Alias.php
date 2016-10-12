@@ -15,15 +15,17 @@ class Alias
 {
     private $id;
     private $public;
+    private $autowiringTypes = array();
 
     /**
      * @param string $id     Alias identifier
      * @param bool   $public If this alias is public
      */
-    public function __construct($id, $public = true)
+    public function __construct($id, $public = true, $autowiringTypes = array())
     {
         $this->id = strtolower($id);
         $this->public = $public;
+        $this->setAutowiringTypes($autowiringTypes);
     }
 
     /**
@@ -44,6 +46,74 @@ class Alias
     public function setPublic($boolean)
     {
         $this->public = (bool) $boolean;
+    }
+
+    /**
+     * Gets autowiring types that will default to this alias.
+     *
+     * @return string[]
+     */
+    public function getAutowiringTypes()
+    {
+        return array_keys($this->autowiringTypes);
+    }
+
+    /**
+     * Will this alias default for the given type?
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function hasAutowiringType($type)
+    {
+        return isset($this->autowiringTypes[$type]);
+    }
+
+    /**
+     * Adds a type that will default to this alias.
+     *
+     * @param string $type
+     *
+     * @return Alias The current instance
+     */
+    public function addAutowiringType($type)
+    {
+        $this->autowiringTypes[$type] = true;
+
+        return $this;
+    }
+
+    /**
+     * Removes a type.
+     *
+     * @param string $type
+     *
+     * @return Alias The current instance
+     */
+    public function removeAutowiringType($type)
+    {
+        unset($this->autowiringTypes[$type]);
+
+        return $this;
+    }
+
+    /**
+     * Sets types that will default to this alias.
+     *
+     * @param string[] $types
+     *
+     * @return Alias The current instance
+     */
+    public function setAutowiringTypes(array $types)
+    {
+        $this->autowiringTypes = array();
+
+        foreach ($types as $type) {
+            $this->autowiringTypes[$type] = true;
+        }
+
+        return $this;
     }
 
     /**

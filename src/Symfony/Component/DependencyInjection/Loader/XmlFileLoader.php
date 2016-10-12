@@ -139,7 +139,13 @@ class XmlFileLoader extends FileLoader
             if ($publicAttr = $service->getAttribute('public')) {
                 $public = XmlUtils::phpize($publicAttr);
             }
-            $this->container->setAlias((string) $service->getAttribute('id'), new Alias($alias, $public));
+
+            $alias = new Alias($alias, $public);
+            foreach ($this->getChildren($service, 'autowiring-type') as $type) {
+                $alias->addAutowiringType($type->textContent);
+            }
+
+            $this->container->setAlias((string) $service->getAttribute('id'), $alias);
 
             return;
         }
@@ -510,7 +516,7 @@ EOF
         }
 
         foreach ($alias->childNodes as $child) {
-            if ($child instanceof \DOMElement && $child->namespaceURI === self::NS) {
+            if ($child instanceof \DOMElement && $child->namespaceURI === self::NS && $child->tagName !== 'autowiring-type') {
                 @trigger_error(sprintf('Using the element "%s" is deprecated for alias definition "%s" in "%s". The XmlFileLoader will raise an exception in Symfony 4.0, instead of silently ignoring unsupported elements.', $child->localName, $alias->getAttribute('id'), $file), E_USER_DEPRECATED);
             }
         }

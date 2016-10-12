@@ -314,6 +314,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('Foo', 'Bar'), $container->getDefinition('foo_service')->getAutowiringTypes());
         $this->assertEquals(array('Foo'), $container->getDefinition('baz_service')->getAutowiringTypes());
+        $this->assertEquals(array('Router'), $container->getAlias('router')->getAutowiringTypes());
     }
 
     public function testAutowire()

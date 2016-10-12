@@ -175,6 +175,12 @@ Translation
 
  * Removed the backup feature from the file dumper classes.
 
+TwigBridge
+----------
+
+ * The possibility to inject the Form Twig Renderer into the form extension
+   has been removed. Inject it into the `TwigRendererEngine` instead.
+
 Yaml
 ----
 

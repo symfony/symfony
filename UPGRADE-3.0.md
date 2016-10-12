@@ -7,28 +7,28 @@ UPGRADE FROM 2.x to 3.0
 - [Config](#config)
 - [Console](#console)
 - [DependencyInjection](#dependencyinjection)
-- [DomCrawler](#domcrawler)
 - [DoctrineBridge](#doctrinebridge)
+- [DomCrawler](#domcrawler)
 - [EventDispatcher](#eventdispatcher)
 - [Form](#form)
 - [FrameworkBundle](#frameworkbundle)
+- [HttpFoundation](#httpfoundation)
 - [HttpKernel](#httpkernel)
 - [Locale](#locale)
+- [Monolog Bridge](#monolog-bridge)
+- [Process](#process)
 - [PropertyAccess](#propertyaccess)
 - [Routing](#routing)
 - [Security](#security)
 - [SecurityBundle](#securitybundle)
 - [Serializer](#serializer)
+- [Swiftmailer Bridge](#swiftmailer-bridge)
 - [Translator](#translator)
 - [Twig Bridge](#twig-bridge)
 - [TwigBundle](#twigbundle)
 - [Validator](#validator)
-- [Yaml](#yaml)
 - [WebProfiler](#webprofiler)
-- [Process](#process)
-- [Monolog Bridge](#monolog-bridge)
-- [Swiftmailer Bridge](#swiftmailer-bridge)
-- [HttpFoundation](#httpfoundation)
+- [Yaml](#yaml)
 
 ### ClassLoader
 
@@ -410,7 +410,6 @@ UPGRADE FROM 2.x to 3.0
    $form = $this->createForm(MyType::class);
    ```
 
- * 
  * The alias option of the `form.type_extension` tag was removed in favor of
    the `extended_type`/`extended-type` option.
 

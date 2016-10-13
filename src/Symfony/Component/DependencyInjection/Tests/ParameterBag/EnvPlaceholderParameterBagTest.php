@@ -67,4 +67,46 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('string', $placeholder);
         $this->assertContains($envVariableName, $placeholder);
     }
+
+    public function testMergeWherePlaceholderOnlyExistsInSecond()
+    {
+        $uniqueEnvName = 'DB_HOST';
+        $commonEnvName = 'DB_USER';
+
+        $uniqueParamName = sprintf('env(%s)', $uniqueEnvName);
+        $commonParamName = sprintf('env(%s)', $commonEnvName);
+
+        $firstBag = new EnvPlaceholderParameterBag();
+        // initialize common placeholder
+        $firstBag->get($commonParamName);
+        $secondBag = clone $firstBag;
+
+        // initialize unique placeholder
+        $secondBag->get($uniqueParamName);
+
+        $firstBag->mergeEnvPlaceholders($secondBag);
+        $merged = $firstBag->getEnvPlaceholders();
+
+        $this->assertCount(1, $merged[$uniqueEnvName]);
+        // second bag has same placeholder for commonEnvName
+        $this->assertCount(1, $merged[$commonEnvName]);
+    }
+
+    public function testMergeWithDifferentIdentifiersForPlaceholders()
+    {
+        $envName = 'DB_USER';
+        $paramName = sprintf('env(%s)', $envName);
+
+        $firstBag = new EnvPlaceholderParameterBag();
+        $secondBag = new EnvPlaceholderParameterBag();
+        // initialize placeholders
+        $firstPlaceholder = $firstBag->get($paramName);
+        $secondPlaceholder = $secondBag->get($paramName);
+
+        $firstBag->mergeEnvPlaceholders($secondBag);
+        $merged = $firstBag->getEnvPlaceholders();
+
+        $this->assertNotEquals($firstPlaceholder, $secondPlaceholder);
+        $this->assertCount(2, $merged[$envName]);
+    }
 }

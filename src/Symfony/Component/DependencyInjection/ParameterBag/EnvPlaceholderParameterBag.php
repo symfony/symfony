@@ -48,7 +48,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
             $uniqueName = md5($name.uniqid(mt_rand(), true));
             $placeholder = sprintf('env_%s_%s', $env, $uniqueName);
-            $this->envPlaceholders[$env][] = $placeholder;
+            $this->envPlaceholders[$env][$placeholder] = $placeholder;
 
             return $placeholder;
         }
@@ -71,12 +71,12 @@ class EnvPlaceholderParameterBag extends ParameterBag
      */
     public function mergeEnvPlaceholders(self $bag)
     {
-        $newPlaceholders = $bag->getEnvPlaceholders();
+        if ($newPlaceholders = $bag->getEnvPlaceholders()) {
+            $this->envPlaceholders += $newPlaceholders;
 
-        foreach ($newPlaceholders as $key => $newEntries) {
-            $existingEntries = isset($this->envPlaceholders[$key]) ? $this->envPlaceholders[$key] : array();
-            $mergedEntries = array_merge($existingEntries, $newEntries);
-            $this->envPlaceholders[$key] = array_unique($mergedEntries);
+            foreach ($newPlaceholders as $env => $placeholders) {
+                $this->envPlaceholders[$env] += $placeholders;
+            }
         }
     }
 }

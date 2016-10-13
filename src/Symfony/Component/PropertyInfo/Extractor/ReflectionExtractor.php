@@ -45,6 +45,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     public static $arrayMutatorPrefixes = array('add', 'remove');
 
+    private $supportsParameterType;
+
+    public function __construct()
+    {
+        $this->supportsParameterType = method_exists('ReflectionParameter', 'getType');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -139,68 +146,33 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $reflectionParameters = $reflectionMethod->getParameters();
         $reflectionParameter = $reflectionParameters[0];
 
-        $arrayMutator = in_array($prefix, self::$arrayMutatorPrefixes);
-
-        if (method_exists($reflectionParameter, 'getType') && $reflectionType = $reflectionParameter->getType()) {
-            $fromReflectionType = $this->extractFromReflectionType($reflectionType);
-
-            if (!$arrayMutator) {
-                return array($fromReflectionType);
+        if ($this->supportsParameterType) {
+            if (!$reflectionType = $reflectionParameter->getType()) {
+                return;
             }
+            $type = $this->extractFromReflectionType($reflectionType);
 
-            $phpType = Type::BUILTIN_TYPE_ARRAY;
-            $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
-            $collectionValueType = $fromReflectionType;
-        }
-
-        if ($reflectionParameter->isArray()) {
-            $phpType = Type::BUILTIN_TYPE_ARRAY;
-            $collection = true;
-        }
-
-        if ($arrayMutator) {
-            $collection = true;
-            $nullable = false;
-            $collectionNullable = $reflectionParameter->allowsNull();
-        } else {
-            $nullable = $reflectionParameter->allowsNull();
-            $collectionNullable = false;
-        }
-
-        if (!isset($collection)) {
-            $collection = false;
-        }
-
-        if (method_exists($reflectionParameter, 'isCallable') && $reflectionParameter->isCallable()) {
-            $phpType = Type::BUILTIN_TYPE_CALLABLE;
-        }
-
-        if ($typeHint = $reflectionParameter->getClass()) {
-            if ($collection) {
-                $phpType = Type::BUILTIN_TYPE_ARRAY;
-                $collectionKeyType = new Type(Type::BUILTIN_TYPE_INT);
-                $collectionValueType = new Type(Type::BUILTIN_TYPE_OBJECT, $collectionNullable, $typeHint->name);
+            // HHVM reports variadics with "array" but not builtin type hints
+            if (!$reflectionType->isBuiltin() && Type::BUILTIN_TYPE_ARRAY === $type->getBuiltinType()) {
+                return;
+            }
+        } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $reflectionParameter, $info)) {
+            if (Type::BUILTIN_TYPE_ARRAY === $info[1]) {
+                $type = new Type(Type::BUILTIN_TYPE_ARRAY, $reflectionParameter->allowsNull(), null, true);
+            } elseif (Type::BUILTIN_TYPE_CALLABLE === $info[1]) {
+                $type = new Type(Type::BUILTIN_TYPE_CALLABLE, $reflectionParameter->allowsNull());
             } else {
-                $phpType = Type::BUILTIN_TYPE_OBJECT;
-                $typeClass = $typeHint->name;
+                $type = new Type(Type::BUILTIN_TYPE_OBJECT, $reflectionParameter->allowsNull(), $info[1]);
             }
-        }
-
-        // Nothing useful extracted
-        if (!isset($phpType)) {
+        } else {
             return;
         }
 
-        return array(
-            new Type(
-                $phpType,
-                $nullable,
-                isset($typeClass) ? $typeClass : null,
-                $collection,
-                isset($collectionKeyType) ? $collectionKeyType : null,
-                isset($collectionValueType) ? $collectionValueType : null
-            ),
-        );
+        if (in_array($prefix, self::$arrayMutatorPrefixes)) {
+            $type = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), $type);
+        }
+
+        return array($type);
     }
 
     /**
@@ -218,7 +190,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return;
         }
 
-        if (method_exists($reflectionMethod, 'getReturnType') && $reflectionType = $reflectionMethod->getReturnType()) {
+        if ($this->supportsParameterType && $reflectionType = $reflectionMethod->getReturnType()) {
             return array($this->extractFromReflectionType($reflectionType));
         }
 
@@ -236,15 +208,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      */
     private function extractFromReflectionType(\ReflectionType $reflectionType)
     {
-        $phpTypeOrClass = method_exists($reflectionType, 'getName') ? $reflectionType->getName() : (string) $reflectionType;
+        $phpTypeOrClass = $reflectionType instanceof \ReflectionNamedType ? $reflectionType->getName() : $reflectionType->__toString();
         $nullable = $reflectionType->allowsNull();
 
-        if ($reflectionType->isBuiltin()) {
-            if (Type::BUILTIN_TYPE_ARRAY === $phpTypeOrClass) {
-                $type = new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true);
-            } else {
-                $type = new Type($phpTypeOrClass, $nullable);
-            }
+        if (Type::BUILTIN_TYPE_ARRAY === $phpTypeOrClass) {
+            $type = new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true);
+        } elseif ('void' === $phpTypeOrClass) {
+            $type = new Type(Type::BUILTIN_TYPE_NULL, $nullable);
+        } elseif ($reflectionType->isBuiltin()) {
+            $type = new Type($phpTypeOrClass, $nullable);
         } else {
             $type = new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, $phpTypeOrClass);
         }

@@ -1474,6 +1474,16 @@ class Request
     }
 
     /**
+     * Checks whether the method is cachaeble or not.
+     *
+     * @return bool
+     */
+    public function isMethodCacheable()
+    {
+        return in_array($this->getMethod(), array('GET', 'HEAD'));
+    }
+
+    /**
      * Returns the request body content.
      *
      * @param bool $asResource If true, a resource will be returned

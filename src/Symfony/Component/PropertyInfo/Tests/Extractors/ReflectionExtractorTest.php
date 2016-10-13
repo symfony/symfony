@@ -107,6 +107,7 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('foo', array(new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true))),
+            array('buz', array(new Type(Type::BUILTIN_TYPE_NULL))),
             array('bar', array(new Type(Type::BUILTIN_TYPE_INT, true))),
             array('baz', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)))),
             array('donotexist', null),

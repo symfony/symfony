@@ -44,4 +44,27 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('string', $placeholder);
         $this->assertContains($envVariableName, $placeholder);
     }
+
+    public function testMergeWhereFirstBagIsEmptyWillWork()
+    {
+        $envVariableName = 'DB_HOST';
+        $parameter = sprintf('env(%s)', $envVariableName);
+        $firstBag = new EnvPlaceholderParameterBag();
+        $secondBag = new EnvPlaceholderParameterBag();
+
+        // initialize placeholder only in second bag
+        $secondBag->get($parameter);
+
+        $this->assertEmpty($firstBag->getEnvPlaceholders());
+
+        $firstBag->mergeEnvPlaceholders($secondBag);
+        $mergedPlaceholders = $firstBag->getEnvPlaceholders();
+
+        $placeholderForVariable = $mergedPlaceholders[$envVariableName];
+        $placeholder = array_values($placeholderForVariable)[0];
+
+        $this->assertCount(1, $placeholderForVariable);
+        $this->assertInternalType('string', $placeholder);
+        $this->assertContains($envVariableName, $placeholder);
+    }
 }

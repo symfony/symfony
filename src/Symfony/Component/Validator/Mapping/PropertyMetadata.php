@@ -64,7 +64,7 @@ class PropertyMetadata extends MemberMetadata
             $objectOrClassName = get_parent_class($objectOrClassName);
 
             if (false === $objectOrClassName) {
-                throw new ValidatorException(sprintf('Property "%s" does not exist in class "%s"', $this->getName(), $originalClass));
+                throw new ValidatorException(sprintf('Property "%s" does not exist in class "%s".', $this->getName(), $originalClass));
             }
         }
 

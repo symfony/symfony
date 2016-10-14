@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * deprecated `DataCollector::varToString()`, use `cloneVar()` instead
+ * changed surrogate capability name in `AbstractSurrogate::addSurrogateCapability` to 'symfony'
 
 3.1.0
 -----

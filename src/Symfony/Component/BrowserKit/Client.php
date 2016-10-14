@@ -123,7 +123,7 @@ abstract class Client
     public function setServerParameters(array $server)
     {
         $this->server = array_merge(array(
-            'HTTP_USER_AGENT' => 'Symfony2 BrowserKit',
+            'HTTP_USER_AGENT' => 'Symfony BrowserKit',
         ), $server);
     }
 

@@ -39,10 +39,10 @@ class EsiTest extends \PHPUnit_Framework_TestCase
 
         $request = Request::create('/');
         $esi->addSurrogateCapability($request);
-        $this->assertEquals('symfony2="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
+        $this->assertEquals('symfony="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
 
         $esi->addSurrogateCapability($request);
-        $this->assertEquals('symfony2="ESI/1.0", symfony2="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
+        $this->assertEquals('symfony="ESI/1.0", symfony="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
     }
 
     public function testAddSurrogateControl()

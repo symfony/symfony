@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-13T11:44:39Z
+
+Tests must be fixed.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-10-13T17:17:01Z
+
+How to fix that build fail? :blush:
+
+```
+There were 56 errors:
+
+1) Symfony\Component\HttpKernel\Tests\HttpCache\HttpCacheTest::testDoesNotCacheWithAuthorizationRequestHeaderAndNonPublicResponse
+
+Error: Call to undefined method Symfony\Component\HttpFoundation\Request::isMethodCacheable()
+```
+
+I guess I need to update the dependency of `symfony/http-foundation` somehow?
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-10-13T20:24:43Z
+
+tests are passing now (except `deps=high`) :tada:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-13T20:43:11Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-13T22:09:07Z
+
+👍

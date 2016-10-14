@@ -48,9 +48,9 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
             throw new InvalidArgumentException('The object must implement the "\DateTimeInterface".');
         }
 
-        $format = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
+        $dateTimeFormat = isset($context[self::FORMAT_KEY]) ? $context[self::FORMAT_KEY] : $this->format;
 
-        return $object->format($format);
+        return $object->format($dateTimeFormat);
     }
 
     /**

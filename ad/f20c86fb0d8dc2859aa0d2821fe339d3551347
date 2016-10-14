@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by Koc at 2016-10-13T12:03:04Z
+
+What to do if I should check for `custom_value` inside method `configureOptions`?)
+
+```php
+class MyType
+{
+    private $value;
+
+    publuc function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        if ($this->value) {
+            // do something
+        }
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-10-13T12:08:47Z
+
+For example how to handle this case http://symfony.com/doc/current/validation/group_service_resolver.html wich explained in documentation? As you see - `groupResolver` passed via constructor of form type and cann't be passed via options array, because we haven't options array when `configureOptions` method called
+
+// cc @webmozart
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-13T19:52:24Z
+
+@Koc You would register your form type as a service and register the instance you would like to use as the default value. You would then still be able to pass another instance using the option when building the form.

@@ -99,7 +99,21 @@ class UniqueEntityValidator extends ConstraintValidator
             }
         }
 
-        $repository = $em->getRepository(get_class($entity));
+        if (null !== $constraint->entityClass) {
+            /* Retrieve repository from given entity name.
+             * We ensure the retrieved repository can handle the entity
+             * by checking the entity is the same, or subclass of the supported entity.
+             */
+            $repository = $em->getRepository($constraint->entityClass);
+            $supportedClass = $repository->getClassName();
+
+            if (!$entity instanceof $supportedClass) {
+                throw new ConstraintDefinitionException(sprintf('The "%s" entity repository does not support the "%s" entity. The entity should be an instance of or extend "%s".', $constraint->entityClass, $class->getName(), $supportedClass));
+            }
+        } else {
+            $repository = $em->getRepository(get_class($entity));
+        }
+
         $result = $repository->{$constraint->repositoryMethod}($criteria);
 
         if ($result instanceof \IteratorAggregate) {

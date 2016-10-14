@@ -58,8 +58,14 @@ class PropertyMetadata extends MemberMetadata
      */
     protected function newReflectionMember($objectOrClassName)
     {
+        $originalClass = is_string($objectOrClassName) ? $objectOrClassName : get_class($objectOrClassName);
+
         while (!property_exists($objectOrClassName, $this->getName())) {
             $objectOrClassName = get_parent_class($objectOrClassName);
+
+            if (false === $objectOrClassName) {
+                throw new ValidatorException(sprintf('Property "%s" does not exist in class "%s".', $this->getName(), $originalClass));
+            }
         }
 
         $member = new \ReflectionProperty($objectOrClassName, $this->getName());

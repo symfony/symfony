@@ -1,0 +1,197 @@
+---------------------------------------------------------------------------
+
+by lemoinem at 2015-09-15T18:44:59Z
+
+@ogizanagi
+
+Hey, I also hit this bug, very similar use case too... I was in the process of developing a new PR to fix it...
+
+However, I had a slightly different approach in mind, and thought it would be nice to have your feedback regarding this. If you feel like this should be in a separate PR, please, just say so. I will remove my comment and submit it as a separate [RFC] issue. If you’re interested, thank you very much, however (disclaimer) brace yourself, it’s a rather long post! :wink:
+
+PS: Shortcut: I created a RFC (#16969) issue and two PRs (#16978, #16981) to provide a better understanding of my design. If you checked these, you can skip this post entirely.
+
+--
+--
+
+# Suggestion
+On the *naming things is hard* front, I was thinking about using `targetEntity` (or simply `target`) instead of `repository` (because it currently doesn't contain the name of the repository, but of the Entity targeted by the constraint).
+
+I was actually thinking it could be an information many Class Constraints could need. So I was thinking of moving this outside of the Doctrine Bridge and inside the Validator Component itself.
+
+I thought we could create a new `TargetAwareInterface` (in `Symfony\Component\Validator`) which would provide a simple pair of `getTarget`/`setTarget`.
+The setter would be called automatically by the ConstraintLoader (`if ($constraint instanceof TAI) { $constraint->setTarget($className); }`). This means minor adjustments to the XmlLoader, YamlLoader and AnnotationLoader (The AnnotationLoader is actually relying on the Doctrine Annotation Library, so that would be a different PR). And the developer wouldn't need to specify it themself.
+
+Regarding the UniqueEntity Validator, we would, then, use the Constraint ‘s `getTarget` to get the className of the Entity to check. This would be very similar to what you already implemented and match your `current` behavior, all the time.
+
+# Discussion
+
+I think it would provide a more generic approach (any constraint implementing the Interface could get access to its target). This is moreover seamless for the user.
+
+## Transition
+As a transitory method, in case the loader isn't patched yet (or if the StaticMethodLoader is used and the target is not provided). The Validator could fallback to the `get_class` (the `actual` behavior) which is the 2.7 behavior and trigger a deprecation notice (or an exception in 3.0).
+
+## Flexibility
+On the other hand, I can see two slight reductions of flexibility in my approach compared to yours:
+
+### Behaviour
+First, the behaviour, which could be one of `root`, `current`, `real` with your solution, is fixed in mine (always `current`). I didn’t thought it would be an issue, because:
+1. `root` is equivalent to specifying the Constraint on the Root class of the hierarchy (specifying the Constraint on another class and using `root` is addressed later on).
+2. If there are no class inheritance, there is no difference between `current` and `real`.
+3. If there is some class inheritance, `real` doesn’t actually work (which is the source of the original bug).
+
+### Separation between Validated Entities and Target Repository
+Second, my solution doesn’t allow to apply the Constraint on Class A, while targeting instances of Class B (which would be somewhere else in the hierarchy). This covers both an explicit `repository`/`targetEntity` or the `root` behavior, which is just a special case.
+
+I see three possibilities for this combinaison:
+1. B is outside the inheritance line (e.g. Sister/Cousin class) of A (e.g., Constraint is on class `Student`, but `repository` is `Teacher`)
+2. B is a Child class of A (e.g., Constraint is on class `Person`, but `repository` is `Student`)
+3. B is a Parent class of A (e.g., Constraint is on class `Student`, but  `repository` is `Person`, includes the `root` behavior)
+
+IMO, these are not deep issues, If you feel like a long(er) read, here is a detailed analysis of each case, otherwise, you might want to skip the next couple of paragraphs...
+(**TL;DR**: it falls outside the scope of `UniqueEntity`’s semantic and should be addressed with a separate custom Constraint)
+
+In the first case (B is outside the inheritance line of A), it would mean that Students cannot have names used by Teachers, but the other way around wouldn’t be an issue. Additional care is required to ensure Students already existing do not conflict with a new Teacher name. This is a blacklisting semantic. While useful, we could argue this semantic isn’t covered by `UniqueEntity` and should be implemented using a custom Constraint.
+
+In the second case (B is a child class of A), it would mean that Persons cannot have names already used by Students, but names used by Teachers would be OK. This is very similar to the previous case and seems to carry the same Blacklisting semantic. Therefore, it falls outside of `UniqueEntity`’s semantic and requires a custom Constraint.
+
+In the third and last case (B is a child class of A), it would mean that Teachers can have duplicated names, but Students can’t have duplicated names, nor the same name as Teachers. Although the first part of Students’ restrictions seems to be matching the `UniqueEntity`’s semantic, the second part matches the Blacklisting semantic. So, IMO, it should be a combination of both.
+
+## Multiple Table inheritance
+In the case of Multiple Table inheritance, there are a few cases where the current implementation may not crash, since the UNIQUE Index may prove impossible to generate (if the field is represented differently in some subclasses).
+
+This would be another very similar bug. One might argue this to be a border-line use.
+
+If what we need is a per-table UniqueEntity behavior (similar to what separate UNIQUE Indices on separate tables would enforce), this should be enforced by using separate `UniqueEntity` Constraints on each class representing each table.
+
+If what we need is an actual cross-table `UniqueEntity` Constraints, using the Repository of the Root Entity *should* solve this problem. There might be some restrictions in the Repository and Doctrine itself that makes it impractical. However, I think neither of our solution would solve this and that could (and I think, should) be solved by another PR with a stricter scope and more complex implementation using a rather extensive MetaData analysis.
+
+# Conclusion
+What do you think? I know it's a bit of a complex implementation, but the code should be relatively simple and modular. I'm sorry to hijack your PR, but granted we both aim to solve the same issue I thought it would be a better idea to run it by you first. Again, if you think it should be in its own issue, don’t hesitate to tell me so and I’ll extract it from here.
+
+There is also the issue of which solution would be prefered by symfony/deciders.
+
+Thanks for taking the time to read all that if you did. It’s rather long and a bit tedious if I may say so myself. Anyway, all feedback will be welcomed and I hope both our solutions could be seen as complementary.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2015-09-16T07:53:55Z
+
+@lemoinem  Hey ! Very nice and well-written comment to expose your idea.
+I'm glad this feature makes sense and not being the anyone who encountered this. However, it hasn't bothered me since, as I didn't came back to a similar case recently...but still, the current behavior is broken IMO.
+So, I read your suggestion. First, feel free to create a new issue to expose this more widely, or create a PR if you're confident. I think this a well-thought proposal.
+However, I'm not really convinced other constraints would need to access their target (the behavior described with your `TargetAwareInterface`), but why not. In the case of the `UniqueEntity` constraint however, that means it should implements the interface. And IIUC, in 2.8, that means it will match my `current` behavior (i.e: detect the exact class on which the constraint was bound). So it might be a BC break ? (Even if, as you explain, in case of inheritance, the `real` behavior, which is the current one in 2.7 and lower doesn't work as we would expect (the source of the bug mentioned in the above issues)).
+
+> I'm sorry to hijack your PR, but granted we both aim to solve the same issue I thought it would be a better idea to run it by you first. Again, if you think it should be in its own issue, don’t hesitate to tell me so and I’ll extract it from here.
+
+Don't worry. Please, submit a PR if you're confident enough. symfony/deciders will take a decision more easily and it'll give a new visibility to this issue. IMO, it's important, as it is kind of a "bug fix" but requires a feature implementation, and we're one month to the feature freeze.
+
+Also, as a side note to my own PR, I actually think the `repository` option does not really means what I want to, but we definitively cannot name it `useRepositoryOf`. But `target` or `targetEntity` might be a good enough alternative, while not being entirely descriptive on what it achieves within the UniqueEntity constraint.
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2015-12-11T23:58:17Z
+
+@ogizanagi Thank you very much for the feedback.
+
+I created a RFC (#16969) issue and two PRs (#16978, #16981) to provide a better understanding of my design. We'll just have to wait for @symfony/deciders to check on which is chosen ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-29T07:07:32Z
+
+What's the status of this PR?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-06-29T08:40:42Z
+
+@fabpot : @lemoinem's work in #16978 and #16981 looks promising to me, but I'm not sure about the need to expose this new "target aware constraint" feature if the only use case mentioned until now is about solving the "UniqueEntityConstraint with inheritance" issue (#12573, #4087).
+
+On the other hand, I'm not satisfied by the new `repository` option name, and we lack of feedbacks about both suggestions. :/
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-10-02T13:01:33Z
+
+@fabpot Did you (or anyone else from the core team), had time to take a look at theses PRs? It would help if we at least knew which direction is favored. Both implementations are pretty much in a final state (short of rebasing them), and if neither is deemed good enough, a middle ground will surely be reached as @ogizanagi and I have already been collaborating on this. The critical element we need right now would be feedback.
+
+Sorry for the direct ping, but the issue is quite problematic, once one hit it...
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-02T15:42:22Z
+
+Thanks for the ping. Sorry, but I'm no Doctrine expert, so someone else from @symfony/deciders should probably review this one and give you some feedback. @HeahDude might have some opinions as well. I would of course be more than happy to merge this whenever we think this is "good enough" as you wrote.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-07T16:46:00Z
+
+👍 but @chalasr's comment should be taken into account.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-07T16:50:37Z
+
+@xabbuh Does it mean that we favor this PR over the ones proposed by @lemoinem?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-07T18:55:42Z
+
+@fabpot I am not convinced that we need a new general concept like target aware constraints (which seems to be the basis for both #16978 and #16981). I simply fail to see where this could be useful besides the example we are trying to solve here for the `UniqueEntity` constraint.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-10-07T19:54:15Z
+
+Thank you guys for the feedbacks. I'll update this PR very soon. :)
+
+---------------------------------------------------------------------------
+
+by lemoinem at 2016-10-07T20:42:05Z
+
+@xabbuh https://github.com/symfony/symfony/pull/15002#discussion_r82441010 is part of the main reason I came up with my proposal. Having the Constraint extracting "itself" (implicitly) the repository to use seemed ... cleaner from a design standpoint.
+
+Regarding the other use cases for a ConstraintAware, I detailed a few examples in #16969, mostly the idea is to provide constraints validating an instance among the list of existing instances. Other self-referencing mechanisms, White/Blacklisting is the most obvious example. I am afraid I don't a concrete example on hands, and I understand the applications will be limited.
+
+If we could find a way to register implicitly the class the constraint has been declared on, without adding the complexities of my design. I'm sure it would make a great trade-off for this issue. With an explicit way to specify the repository, I'm afraid some might misuse the Constraint and bring around bigger issues regarding compatibility or clarity.
+
+At least, I would insist on adding a note in the documentation to that effect.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-10-07T21:40:58Z
+
+So, I've rebased this branch on master and made the suggested fixes.
+
+I've also renamed the `repository` option to `class`, but I'd like to get a final approval on this, especially regarding the other names that have been suggested during this PR lifecycle:
+
+1. ~~`repository`~~
+1. `class`
+1. `entity`
+1. `entityClass`
+1. `target`
+1. `targetEntity`
+1. `useRepositoryOf`
+
+@lemoinem:
+
+> At least, I would insist on adding a note in the documentation to that effect.
+
+Of course, the new option has to be documented at least on [the UniqueEntity constraint page](https://symfony.com/doc/current/reference/constraints/UniqueEntity.html).
+
+Do you have some suggestions about what the user should be warned ?
+I think simply mentioning the default behavior is to use the current entity instance repository, vs using this option will only use the specified entity repository is enough. But how can we state this clearly ? Maybe you can help on the documentation part :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-07T22:27:16Z
+
+`entityClass` seems the most appropriate to me.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-10-13T17:10:25Z
+
+@fabpot : I've submitted the PR on the documentation repository. I think this is ready. :)

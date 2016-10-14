@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-10-08T08:46:29Z
+
+What about the other occurrences? There's a total of 6 references to symfony2 in the master atm. https://github.com/symfony/symfony/search?utf8=%E2%9C%93&q=symfony2 Might as well take those along while at it ^^
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-08T10:39:03Z
+
+As pointed out by @iltar, ~~the tests corresponding to the classes changed here must be updated~~ (they are already) the `AbstractSurrogate` class too.
+
+The other occurrences being `src/Symfony/Component/BrowserKit/Client.php` and two tests (`src/Symfony/Bridge/Twig/Tests/Extension/StopwatchExtensionTest.php` and `src/Symfony/Component/BrowserKit/Tests/ClientTest.php`) I think they could be fixed here btw.
+
+---------------------------------------------------------------------------
+
+by a-ast at 2016-10-09T13:34:59Z
+
+@iltar, @chalasr, thank you for your comments.
+Originally I debugged ESI, found this surrogate capability with 'symfony2' and decided to update it.
+However, I agree that it make sense to eliminate all 'symfony2' mentions.
+
+I've done that and changed both PR name and description.
+Could you have a look please?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-13T01:46:08Z
+
+@a-ast Can you rebase this PR and squash your commits? Thanks.
+
+---------------------------------------------------------------------------
+
+by a-ast at 2016-10-13T14:07:11Z
+
+I've updated CHANGELOG/UPGRADE files with information about the BrowserKit user agent change.
+Rebased, squashed.
+Should I mark my changes in CHANGELOGs with [BC BREAK] labels?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-13T14:13:42Z
+
+LGTM as is
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-13T22:10:03Z
+
+👍

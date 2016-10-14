@@ -1474,7 +1474,7 @@ class Request
     }
 
     /**
-     * Checks whether the method is cachaeble or not.
+     * Checks whether the method is cacheable or not.
      *
      * @return bool
      */

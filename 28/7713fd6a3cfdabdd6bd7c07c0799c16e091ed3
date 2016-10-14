@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by drm at 2016-07-29T16:51:30Z
+
+This explains the bug a bit more: https://github.com/symfony/symfony/issues/19482
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-14T08:58:30Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-14T08:59:47Z
+
+@muhammedeminakbulut Shouldn't this be fixed in Symfony 2.7 too?
+
+---------------------------------------------------------------------------
+
+by muhammedeminakbulut at 2016-10-14T09:03:06Z
+
+@xabbuh I did not check 2.7 for this bug. 2.7 was out of my scope then
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-14T09:11:04Z
+
+:+1:

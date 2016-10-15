@@ -90,6 +90,21 @@ class ExprBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertFinalizedValueIs('value', $test);
     }
 
+    public function testIfNumericExpression()
+    {
+        $test = $this->getTestBuilder()
+            ->ifNumeric()
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('value', $test);
+
+        $test = $this->getTestBuilder()
+            ->ifNumeric()
+            ->then($this->returnClosure('new_value'))
+        ->end();
+        $this->assertFinalizedValueIs('new_value', $test, array('key' => ('12345')));
+    }
+
     public function testIfArrayExpression()
     {
         $test = $this->getTestBuilder()

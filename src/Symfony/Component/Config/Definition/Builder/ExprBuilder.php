@@ -86,6 +86,18 @@ class ExprBuilder
     }
 
     /**
+     * Tests if the value is numeric.
+     *
+     * @return ExprBuilder
+     */
+    public function ifNumeric()
+    {
+        $this->ifPart = function ($v) { return is_numeric($v); };
+
+        return $this;
+    }
+
+    /**
      * Tests if the value is null.
      *
      * @return ExprBuilder

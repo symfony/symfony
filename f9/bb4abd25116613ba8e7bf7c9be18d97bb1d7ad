@@ -1,0 +1,174 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-27T21:55:52Z
+
+While I do not disagree with your points, I would like to additionally add some comments:
+
+> For the 90% of Symfony project's that user a User entity for their User
+
+This is pretty much a practice because it's a recommended path via the FOSUserBundle, which is more of a pain than a useful bundle lately if you ask me (A lot of questions on `#symfony` are related to this). It makes the security look more complex than it actually is.
+
+I know that @wouterj was trying to phase out the security user completely because of its redundancy in the Token. So maybe phasing out the user completely would definitely be a good option which could indeed revert this feature.
+
+>  this will be weird: I'll receive a UserInterface, that immediately call methods on it that aren't in the interface (and also, your IDE won't give you auto-completion).
+
+100% of the same behavior as `$this->getUser()` so that won't really make a difference imo.
+
+> we can't allow people to type-hint their concrete User class, because this will conflict with SensioFWExtraBundle ParamConverter if there is a user id in the URL
+
+Yet another issue of having your [Entity as Security User][blog post].
+
+> Where we can, let's make controllers and services act more like each other.
+
+The `UserInterface` would give you the ability for a consistent method to retrieve the user regardless of Controller as a Service or simply extending the base controller.
+
+> you can see that it uses security.token_storage - which is how you will get the User object if you need it from within services.
+
+I think this is indeed a fair point (besides of some people not using an IDE and asking this in `#symfony` anyway). While I agree that looking in the code is a good thing to understand what's going on, the `Request` has the same challenge. As long as the documentation explains everything, it should be fine. Symfony has (imo) top quality documentation so it shouldn't be hard for people to find the solution. Even if people manage to find out it's the `security.token_storage`, there's a ton of other challenges they face which may lead to not even getting a token when you expect to have one.
+
+----
+
+So with these comments added, I have no hard feelings if it gets removed. I know that a bunch of people would like the feature, but I don't want it to become more complex for the majority.
+
+[blog post]: http://stovepipe.systems/post/decoupling-your-security-user
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-27T22:36:24Z
+
+>You are only allowed to type-hint the argument with UserInterface
+
+IDE use will use the annotation instead of the type hint for concrete class, I don't think this is really a point.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2016-07-28T11:07:49Z
+
+@HeahDude it will require everyone to use phpdoc to override the type-hint, which is less than practical.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-07-28T11:14:04Z
+
+> This is pretty much a practice because it's a recommended path via the FOSUserBundle, which is more of a pain than a useful bundle lately if you ask me (A lot of questions on #symfony are related to this). It makes the security look more complex than it actually is.
+
+We also have the EntityUserProvider in the core. Storing your users in the database is a very common use case.
+
+> I know that @wouterj was trying to phase out the security user completely because of its redundancy in the Token. So maybe phasing out the user completely would definitely be a good option which could indeed revert this feature.
+
+This would be a major change in the way the component work, so this should be discussed somewhere first (this is the first time I hear about this idea)
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2016-07-28T11:19:14Z
+
+The IDE autocompletion would be the least of your problems. Assume your user entity adds methods not in `UserInterface`:
+```php
+class User implements UserInterface
+{
+    public function extraMethodNotInInterface() {}
+    // All other methods from UserInterface here
+}
+```
+
+Calling `extraMethodNotInInterface` in your controller actions is a fatal error waiting to happen, so you'd need an extra `instanceof` check before calling any method not in `UserInterface`:
+```php
+public function someAction(UserInterface $user)
+{
+    if ($user instanceof User) {
+        $user->extraMethodNotInInterface();
+    }
+}
+```
+
+I think there is too much potential to forget this and run into big issues when changing something in the firewall, so I'd suggest rolling back the original PR.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-28T11:46:27Z
+
+@alcaeus you already have to do this with `getUser` as well
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-07-28T14:05:16Z
+
+I'll propose 2 other issues:
+
+1) **Discoverability** With the type-hint method, the code isn't self-discovering: there is no way that you could know or discover that you need to type-hint the argument to get the User object. You're reliant on documentation. That's a bad experience - we should make coding as "instinctual" as possible when we can. This is definitely true for the Request object, but that doesn't mean we should repeat this for other things :).
+
+2) **Ease for beginners**
+
+First, there's more typing:
+
+```php
+// current
+public function fooAction()
+{
+    $user = $this->getUser();
+}
+
+// new
+use Symfony\Component\Security\Core\User\UserInterface;
+public function fooAction(UserInterface $user)
+{
+}
+```
+
+Second, a beginner needs to know / look up the `use` statement they need. That's a bummer, and it's why we have shortcuts like `createNotFoundException` - so that the user can do common things without needing to look up special classes.
+
+Thanks for the conversation :)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-07-28T14:21:42Z
+
+@weaverryan perhaps removing the deprecation from `getUser()` could be sufficient already, this would still make it possible for controllers as service to utilize it without making a sacrifice for the points you've just mentioned.
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2016-07-28T14:30:14Z
+
+I'm only against to deprecate `getUser()`. SecurityUserValueResolver is a nice feature like ParamConverter, but i don't want to be forced to used it (more or less).
+
+> A controller is a PHP callable you create that takes information from the HTTP request and creates and returns an HTTP response (as a Symfony Response object).
+
+Personally, i like the base concept of a controller: transform a request into a response. in symfony 4 i would now add a trait with "getUser".
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-01T07:36:59Z
+
+@weaverryan would un-deprecating getUser fix all your issues or not?
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2016-08-02T11:17:19Z
+
+> SecurityUserValueResolver is a nice feature like ParamConverter, but i don't want to be forced to used it
+
+Same for me. I want to keep ``$this->getUser()`` **and** this new resolver, even if it's not perfect (and this can't be perfect :) ).
+
+Thank you  @iltar for your contribution and @weaverryan to improve it ^^
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-08-03T12:30:30Z
+
+I don't agree much with (2) of this issue. We decided to deprecate and remove `$this->getRequest()` for the same reasons as `$this->getUser()` is now deprecated: Having 2 ways to achieve the same goal is not great (people have to choose which way to use).
+
+See also the discussion in https://github.com/symfony/symfony/pull/12121 and https://github.com/symfony/symfony/pull/9553
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-10-14T23:48:07Z
+
+Ok, this is ready! This just un-deprecates `Controller::getUser()`.
+
+I think the argument of only having *one* way of doing something is quite sound, but I'm not at all convinced that the new argument-resolver is a better way. Let's have both, and see how it all works out - we have plenty of time to deprecate something before 4.0.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-10-15T07:23:05Z
+
+@weaverryan I agree that this is a nice compromise, we still have roughly a year to see if people use that feature over the other. I will create a PR to document the resolver (I was waiting for this PR decision).

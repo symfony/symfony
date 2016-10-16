@@ -2,6 +2,9 @@
     "config": {
         "preferred-install": {
             "*": "dist"
+        },
+        "prestissimo": {
+            "insecure": true
         }
     }
 }

@@ -57,7 +57,7 @@ before_install:
     - if [[ ! $skip && $PHP = 5.* ]]; then pecl install -f memcached-2.1.0; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = ldap.so >> $INI_FILE; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini || echo "xdebug not available"; fi
-    - if [[ ! $skip ]]; then [ -d ~/.composer ] || mkdir ~/.composer; cp .composer/* ~/.composer/; fi
+    - if [[ ! $skip ]]; then [ -d ~/.composer ] || mkdir ~/.composer; cp .composer/* ~/.composer/; composer global install --no-progress --ansi; fi
     - if [[ ! $skip ]]; then export PHPUNIT=$(readlink -f ./phpunit); fi
 
 install:

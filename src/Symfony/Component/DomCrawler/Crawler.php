@@ -1034,7 +1034,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $inDoubleQuotedString = false;
         $openedBrackets = 0;
         $lastUnion = 0;
-        for ($i = 0; $i < strlen($xpath); $i++) {
+        for ($i = 0; $i < strlen($xpath); ++$i) {
             $char = $xpath[$i];
 
             if ($char === "'" && !$inDoubleQuotedString) {
@@ -1043,9 +1043,9 @@ class Crawler implements \Countable, \IteratorAggregate
                 $inDoubleQuotedString = !$inDoubleQuotedString;
             } elseif (!$inSingleQuotedString && !$inDoubleQuotedString) {
                 if ($char === '[') {
-                    $openedBrackets++;
+                    ++$openedBrackets;
                 } elseif ($char === ']') {
-                    $openedBrackets--;
+                    --$openedBrackets;
                 } elseif ($char === '|' && $openedBrackets === 0) {
                     $unionParts[] = substr($xpath, $lastUnion, $i - $lastUnion);
                     $lastUnion = $i + 1;
@@ -1053,6 +1053,7 @@ class Crawler implements \Countable, \IteratorAggregate
             }
         }
         $unionParts[] = substr($xpath, $lastUnion);
+
         return $unionParts;
     }
 

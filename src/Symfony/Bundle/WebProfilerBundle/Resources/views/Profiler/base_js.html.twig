@@ -230,86 +230,86 @@
         }
 
         {% if excluded_ajax_paths is defined %}
-        if (window.fetch && window.fetch.polyfill === undefined) {
-            var oldFetch = window.fetch;
-            window.fetch = function () {
-                var promise = oldFetch.apply(this, arguments);
-                if (!arguments[0].match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
-                    var method = 'GET';
-                    if (arguments[1] && arguments[1].method !== undefined) {
-                        method = arguments[1].method;
-                    }
-
-                    var stackElement = {
-                        error: false,
-                        url: arguments[0],
-                        method: method,
-                        type: 'fetch',
-                        start: new Date()
-                    };
-
-                    var idx = requestStack.push(stackElement) - 1;
-                    promise.then(function (r) {
-                        stackElement.duration = new Date() - stackElement.start;
-                        stackElement.error = r.status < 200 || r.status >= 400;
-                        stackElement.statusCode = r.status;
-                        stackElement.profile = r.headers.get('x-debug-token');
-                        stackElement.profilerUrl = r.headers.get('x-debug-token-link');
-                        finishAjaxRequest(idx);
-                    }, function (e){
-                        stackElement.error = true;
-                    });
-                    startAjaxRequest(idx);
-                }
-
-                return promise;
-            };
-        }
-        if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
-            var proxied = XMLHttpRequest.prototype.open;
-
-            XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
-                var self = this;
-
-                /* prevent logging AJAX calls to static and inline files, like templates */
-                var path = url;
-                if (url.substr(0, 1) === '/') {
-                    if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
-                        path = url.substr({{ request.basePath|length }});
-                    }
-                }
-                else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
-                    path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
-                }
-
-                if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
-                    var stackElement = {
-                        error: false,
-                        url: url,
-                        method: method,
-                        type: 'xhr',
-                        start: new Date()
-                    };
-
-                    var idx = requestStack.push(stackElement) - 1;
-
-                    this.addEventListener('readystatechange', function() {
-                        if (self.readyState == 4) {
-                            stackElement.duration = new Date() - stackElement.start;
-                            stackElement.error = self.status < 200 || self.status >= 400;
-                            stackElement.statusCode = self.status;
-                            extractHeaders(self, stackElement);
-
-                            finishAjaxRequest(idx);
+            if (window.fetch && window.fetch.polyfill === undefined) {
+                var oldFetch = window.fetch;
+                window.fetch = function () {
+                    var promise = oldFetch.apply(this, arguments);
+                    if (!arguments[0].match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                        var method = 'GET';
+                        if (arguments[1] && arguments[1].method !== undefined) {
+                            method = arguments[1].method;
                         }
-                    }, false);
 
-                    startAjaxRequest(idx);
-                }
+                        var stackElement = {
+                            error: false,
+                            url: arguments[0],
+                            method: method,
+                            type: 'fetch',
+                            start: new Date()
+                        };
 
-                proxied.apply(this, Array.prototype.slice.call(arguments));
-            };
-        }
+                        var idx = requestStack.push(stackElement) - 1;
+                        promise.then(function (r) {
+                            stackElement.duration = new Date() - stackElement.start;
+                            stackElement.error = r.status < 200 || r.status >= 400;
+                            stackElement.statusCode = r.status;
+                            stackElement.profile = r.headers.get('x-debug-token');
+                            stackElement.profilerUrl = r.headers.get('x-debug-token-link');
+                            finishAjaxRequest(idx);
+                        }, function (e){
+                            stackElement.error = true;
+                        });
+                        startAjaxRequest(idx);
+                    }
+
+                    return promise;
+                };
+            }
+            if (window.XMLHttpRequest && XMLHttpRequest.prototype.addEventListener) {
+                var proxied = XMLHttpRequest.prototype.open;
+
+                XMLHttpRequest.prototype.open = function(method, url, async, user, pass) {
+                    var self = this;
+
+                    /* prevent logging AJAX calls to static and inline files, like templates */
+                    var path = url;
+                    if (url.substr(0, 1) === '/') {
+                        if (0 === url.indexOf('{{ request.basePath|e('js') }}')) {
+                            path = url.substr({{ request.basePath|length }});
+                        }
+                    }
+                    else if (0 === url.indexOf('{{ (request.schemeAndHttpHost ~ request.basePath)|e('js') }}')) {
+                        path = url.substr({{ (request.schemeAndHttpHost ~ request.basePath)|length }});
+                    }
+
+                    if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                        var stackElement = {
+                            error: false,
+                            url: url,
+                            method: method,
+                            type: 'xhr',
+                            start: new Date()
+                        };
+
+                        var idx = requestStack.push(stackElement) - 1;
+
+                        this.addEventListener('readystatechange', function() {
+                            if (self.readyState == 4) {
+                                stackElement.duration = new Date() - stackElement.start;
+                                stackElement.error = self.status < 200 || self.status >= 400;
+                                stackElement.statusCode = self.status;
+                                extractHeaders(self, stackElement);
+
+                                finishAjaxRequest(idx);
+                            }
+                        }, false);
+
+                        startAjaxRequest(idx);
+                    }
+
+                    proxied.apply(this, Array.prototype.slice.call(arguments));
+                };
+            }
         {% endif %}
 
         return {

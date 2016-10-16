@@ -275,7 +275,7 @@ class LegacyOptionsTest extends \PHPUnit_Framework_TestCase
         });
 
         $resolved = $this->options->resolve();
-        $this->assertTrue(is_callable($resolved['foo']));
+        $this->assertInternalType('callable', $resolved['foo']);
     }
 
     public function testOverloadCannotBeEvaluatedLazilyWithoutFirstParamTypeHint()
@@ -287,7 +287,7 @@ class LegacyOptionsTest extends \PHPUnit_Framework_TestCase
         });
 
         $resolved = $this->options->resolve();
-        $this->assertTrue(is_callable($resolved['foo']));
+        $this->assertInternalType('callable', $resolved['foo']);
     }
 
     public function testRemoveOptionAndNormalizer()

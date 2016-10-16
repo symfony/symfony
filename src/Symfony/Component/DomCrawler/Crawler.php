@@ -856,13 +856,12 @@ class Crawler extends \SplObjectStorage
     {
         $expressions = array();
 
-        $unionPattern = '/\|(?![^\[]*\])/';
         // An expression which will never match to replace expressions which cannot match in the crawler
         // We cannot simply drop
         $nonMatchingExpression = 'a[name() = "b"]';
 
         // Split any unions into individual expressions.
-        foreach (preg_split($unionPattern, $xpath) as $expression) {
+        foreach ($this->splitUnionParts($xpath) as $expression) {
             $expression = trim($expression);
             $parenthesis = '';
 
@@ -910,6 +909,47 @@ class Crawler extends \SplObjectStorage
         }
 
         return implode(' | ', $expressions);
+    }
+
+    /**
+     * Splits the XPath into parts that are separated by the union operator.
+     *
+     * @param string $xpath
+     *
+     * @return string[]
+     */
+    private function splitUnionParts($xpath)
+    {
+        // Split any unions into individual expressions. We need to iterate
+        // through the string to correctly parse opening/closing quotes and
+        // braces which is not possible with regular expressions.
+        $unionParts = array();
+        $inSingleQuotedString = false;
+        $inDoubleQuotedString = false;
+        $openedBrackets = 0;
+        $lastUnion = 0;
+        $xpathLength = strlen($xpath);
+        for ($i = 0; $i < $xpathLength; ++$i) {
+            $char = $xpath[$i];
+
+            if ($char === "'" && !$inDoubleQuotedString) {
+                $inSingleQuotedString = !$inSingleQuotedString;
+            } elseif ($char === '"' && !$inSingleQuotedString) {
+                $inDoubleQuotedString = !$inDoubleQuotedString;
+            } elseif (!$inSingleQuotedString && !$inDoubleQuotedString) {
+                if ($char === '[') {
+                    ++$openedBrackets;
+                } elseif ($char === ']') {
+                    --$openedBrackets;
+                } elseif ($char === '|' && $openedBrackets === 0) {
+                    $unionParts[] = substr($xpath, $lastUnion, $i - $lastUnion);
+                    $lastUnion = $i + 1;
+                }
+            }
+        }
+        $unionParts[] = substr($xpath, $lastUnion);
+
+        return $unionParts;
     }
 
     /**

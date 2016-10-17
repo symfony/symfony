@@ -13,6 +13,9 @@ namespace Symfony\Bridge\Doctrine\Tests\ExpressionLanguage;
 
 use Symfony\Bridge\Doctrine\ExpressionLanguage\DoctrineParserCache;
 
+/**
+ * @group legacy
+ */
 class DoctrineParserCacheTest extends \PHPUnit_Framework_TestCase
 {
     public function testFetch()

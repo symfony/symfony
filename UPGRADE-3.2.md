@@ -40,6 +40,13 @@ DependencyInjection
  * Calling `get()` on a `ContainerBuilder` instance before compiling the
    container is deprecated and will throw an exception in Symfony 4.0.
 
+ExpressionLanguage
+-------------------
+
+* Passing a `ParserCacheInterface` instance to the `ExpressionLanguage` has been
+  deprecated and will not be supported in Symfony 4.0. You should use the
+  `CacheItemPoolInterface` interface instead.
+
 Form
 ----
 

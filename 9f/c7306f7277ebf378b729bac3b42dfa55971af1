@@ -1,0 +1,246 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-26T09:03:50Z
+
+New features should be submitted on master (but no need to close this PR: you can either rebase then change the base branch yourself in the github UI, or we can do it while merging).
+
+Btw, shouldn't we deprecate `ParserCacheInterface` in favor of `Psr\Cache\CacheItemPoolInterface`?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-26T09:16:18Z
+
+tests are missing btw
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-08-26T16:07:18Z
+
+@nicolas-grekas you're right we should deprecate `ParserCacheInterface` in favor of `Psr\Cache\CacheItemPoolInterface`.
+
+But what does this involve in EL component ?
+
+I can add `@deprecated` tag on `ParserCacheInterface` ? And then, how to stop use of `ParserCacheInterface` in ExpressionLanguage without creating BC break ? I mean, changing type hint on ExpressionLanguage::__construct is not conceivable, right ?
+
+This is my first PR tentative, so be indulgent ^^ hope my questions are not too boring
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-26T16:21:45Z
+
+> add @deprecated tag on ParserCacheInterface
+
+yes
+
+> changing type hint on ExpressionLanguage::__construct
+
+yes! by removing the type hint (not replacing it with CacheItemPoolInterface), then doing dynamic checks in the constructor and triggering a deprecation when required
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-08-28T21:52:54Z
+
+Thanks for your help @nicolas-grekas.
+I've made some changes in order to make cache PSR6 compliant, using adapter pattern.
+
+I have a few other questions :
+
+- I use `Symfony\Component\Cache\Adapter\ArrayAdapter` by default in `ExpressionLanguage.php`. Is it a bad thing to hard coupling with Cache component ? Perhaps it's better to use the existing `ArrayParserCache` with the adapter.
+
+- With PSR6 specifications, some characters are forbidden in keys declarations. For now my sanitize method is not sufficient, but I don't know exactly how to assure unique keys with expressions. Replacing with a hash ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-30T14:01:46Z
+
+we're almost done :)
+could you please also squash your git history and set a proper commit message?
+(we could squash while merging, but the commit message could be made better)
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-08-30T14:04:01Z
+
+I will squash it and rebase it to master :)
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-08-31T13:02:54Z
+
+Squash done, do not hesitate if possible improvements
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-08-31T14:13:34Z
+
+@ReDnAxE looks like your github account not associated with email from what you commited
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-08-31T15:32:53Z
+
+Thank's @Koc, it's fixed.
+I rebased on master and changed the PR target to master.
+@nicolas-grekas I fixed your comments and re squashed commits.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-03T19:14:42Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2016-09-06T13:45:33Z
+
+Good job @ReDnAxE ;)
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-09-29T12:02:56Z
+
+Hi @nicolas-grekas, does this PR will be merged for the 3.2 release (i.e before the feature freeze of 09/2016 ) ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-29T12:13:58Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-09-30T12:55:44Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-09-30T17:13:56Z
+
+Could someone explain me why in the last build `PHP:7 deph=high`, I have 54 errors in `Symfony\Bundle\SecurityBundle\Tests\Functional` ?
+
+Here is the exception thrown all the time :
+`Symfony\Component\DependencyInjection\Exception\LogicException: Asset support cannot be enabled as the Asset component is not installed.`
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-30T18:05:59Z
+
+@ReDnAxE Should be fixed now
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-09-30T18:45:38Z
+
+@stof with a `@trigger_error` in `ParserCache\ParserCacheInterface.php` as you asked, `PHP:7 deph=high` was broken as explained above, I could not explain why.
+@fabpot Builds are ok.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-30T20:03:01Z
+
+I thinkwe should try harder following @stof's advice. The tests don't decide.
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-09-30T20:28:37Z
+
+@nicolas-grekas I agree... This is why I prefer to mention him
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-30T20:41:05Z
+
+Can you add the trigger again so that we can see what's failing in the tests?
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-09-30T21:08:57Z
+
+@nicolas-grekas Why not ! I re-push the `@trigger_error`.
+I confess I do not understand. Now, it's no more the same errors : we have fails in PHP7 dep=high|low in `TwigBundle Test Suite`
+
+With the same `Symfony\Component\DependencyInjection\Exception\LogicException` exception type thrown as before
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-30T21:13:59Z
+
+Not related I guess
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-09-30T21:15:36Z
+
+I rebased my branch to 533c11cf7debce1def2ad588ab8636f29c32f05e (master)
+I will rebase one more time
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-09-30T21:26:36Z
+
+I rebased on 418944bb50a23ccd5e2ce803bf60a8b3c69c8a05
+same errors... uh no, worst, 1 error in appVeyor o_O :
+`Symfony\Component\HttpKernel\Tests\ClientTest::testGetScript
+RuntimeException: OUTPUT:  ERROR OUTPUT: `
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-09-30T22:08:22Z
+
+I know we are in 1 october, so it's probably too late ^^, but I saw master is not stable on the last 418944bb50a23ccd5e2ce803bf60a8b3c69c8a05 commit. Perhaps I would rebase on a older stable master commit ?
+
+EDIT: I'm on c2d8356cb6876142f2761760707f4b6b0cd41dee now. Appveyor recovered..! good night ;)
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-10-03T08:24:28Z
+
+@nicolas-grekas it works better when rebasing on master's clean commit ;)
+I changed deprecation notices versions from "3.2" to "3.3"
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-03T08:50:20Z
+
+Please also add the deprecation in the upgrade files.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-05T13:01:38Z
+
+>  I changed deprecation notices versions from "3.2" to "3.3"
+
+why that? that could still happen for 3.2 , who knows :)
+also please add a note in the upgrade files as suggested by @xabbuh
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-06T00:04:00Z
+
+Indeed, I'd like to include that in 3.2 if possible.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-06T09:17:38Z
+
+👍 from me after the remaining comments have been addressed
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-10-06T09:21:40Z
+
+Thank's ! I'll make thoses changes this afternoon :) I learned that features was freezed for 3.2. This is why I changed to 3.3
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-10-06T15:40:52Z
+
+The changes are done.
+
+---------------------------------------------------------------------------
+
+by ReDnAxE at 2016-10-17T08:14:05Z
+
+ping @nicolas-grekas ;)

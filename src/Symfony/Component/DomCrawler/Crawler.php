@@ -1034,7 +1034,8 @@ class Crawler implements \Countable, \IteratorAggregate
         $inDoubleQuotedString = false;
         $openedBrackets = 0;
         $lastUnion = 0;
-        for ($i = 0; $i < strlen($xpath); ++$i) {
+        $xpathLength = strlen($xpath);
+        for ($i = 0; $i < $xpathLength; ++$i) {
             $char = $xpath[$i];
 
             if ($char === "'" && !$inDoubleQuotedString) {

@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-14T11:32:23Z
+
+👍, can you also open a doc PR?
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-10-14T11:34:33Z
+
+I forgot to add test for invalid cases.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-10-14T11:39:25Z
+
+> can you also open a doc PR?
+
+Where should I add it? I see that the `DateTimeNormalizer` is mentioned in the [Normalizers](https://github.com/symfony/symfony-docs/blob/cea26fc72813c826155338f2a82a7e59af558656/components/serializer.rst#normalizers) section.
+
+/cc @weaverryan
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-14T12:41:20Z
+
+@teohhanhui I think your addition would fit there quite well (as long as there is no dedicated chapter about all the normalizers we have)
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-10-17T07:56:03Z
+
+Documentation added.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-10-17T08:04:51Z
+
+Test case added for denormalize format mismatch.

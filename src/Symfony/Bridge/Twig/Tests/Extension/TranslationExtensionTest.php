@@ -36,7 +36,7 @@ class TranslationExtensionTest extends \PHPUnit_Framework_TestCase
             $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
             $twig->addExtension(new TranslationExtension(new Translator('en', new MessageSelector())));
 
-            echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSource('index'), 'index')))."\n\n";
+            echo $twig->compile($twig->parse($twig->tokenize(new \Twig_Source($twig->getLoader()->getSource('index'), 'index'))))."\n\n";
             $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
         }
 

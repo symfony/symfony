@@ -39,7 +39,7 @@
         "symfony/yaml": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
         "doctrine/doctrine-bundle": "~1.4",
-        "twig/twig": "~1.26|~2.0"
+        "twig/twig": "~1.27|~2.0"
     },
     "suggest": {
         "symfony/security-acl": "For using the ACL functionality of this bundle"

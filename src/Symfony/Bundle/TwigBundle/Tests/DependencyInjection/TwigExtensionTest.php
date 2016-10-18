@@ -111,7 +111,7 @@ class TwigExtensionTest extends TestCase
         $this->compileContainer($container);
 
         $options = $container->getDefinition('twig')->getArgument(1);
-        $this->assertEquals('filename', $options['autoescape']);
+        $this->assertEquals('name', $options['autoescape']);
     }
 
     public function testGlobalsWithDifferentTypesAndValues()

@@ -51,10 +51,12 @@ class DecoratorServicePass implements CompilerPassInterface
                 $public = $alias->isPublic();
                 $container->setAlias($renamedId, new Alias((string) $alias, false));
             } else {
-                $definition = $container->getDefinition($inner);
-                $public = $definition->isPublic();
-                $definition->setPublic(false);
-                $container->setDefinition($renamedId, $definition);
+                $decoratedDefinition = $container->getDefinition($inner);
+                $definition->setTags($decoratedDefinition->getTags(), $definition->getTags());
+                $public = $decoratedDefinition->isPublic();
+                $decoratedDefinition->setPublic(false);
+                $decoratedDefinition->setTags(array());
+                $container->setDefinition($renamedId, $decoratedDefinition);
             }
 
             $container->setAlias($inner, new Alias($id, $public));

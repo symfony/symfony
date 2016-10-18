@@ -120,7 +120,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->variableNode('autoescape')->defaultValue('filename')->end()
+                ->variableNode('autoescape')->defaultValue('name')->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
                 ->scalarNode('base_template_class')->example('Twig_Template')->cannotBeEmpty()->end()

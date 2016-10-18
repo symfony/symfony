@@ -21,7 +21,7 @@
         "symfony/twig-bridge": "~2.8|~3.0",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
-        "twig/twig": "~1.26|~2.0"
+        "twig/twig": "~1.27|~2.0"
     },
     "require-dev": {
         "symfony/stopwatch": "~2.8|~3.0",

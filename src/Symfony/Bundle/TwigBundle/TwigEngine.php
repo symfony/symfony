@@ -54,13 +54,13 @@ class TwigEngine extends BaseEngine implements EngineInterface
 
     /**
      * @deprecated since version 2.7, to be removed in 3.0.
-     *             Use the 'filename' strategy instead.
+     *             Use the 'name' strategy instead.
      */
-    public function guessDefaultEscapingStrategy($filename)
+    public function guessDefaultEscapingStrategy($name)
     {
         @trigger_error('The '.__METHOD__.' method is deprecated since version 2.7 and will be removed in 3.0. Use the Twig_FileExtensionEscapingStrategy::guess method instead.', E_USER_DEPRECATED);
 
-        return \Twig_FileExtensionEscapingStrategy::guess($filename);
+        return \Twig_FileExtensionEscapingStrategy::guess($name);
     }
 
     /**
@@ -73,8 +73,8 @@ class TwigEngine extends BaseEngine implements EngineInterface
         } catch (\Twig_Error $e) {
             if ($name instanceof TemplateReference) {
                 try {
-                    // try to get the real file name of the template where the error occurred
-                    $e->setTemplateFile(sprintf('%s', $this->locator->locate($this->parser->parse($e->getTemplateFile()))));
+                    // try to get the real name of the template where the error occurred
+                    $e->setTemplateName(sprintf('%s', $this->locator->locate($this->parser->parse($e->getTemplateName()))));
                 } catch (\Exception $e2) {
                 }
             }

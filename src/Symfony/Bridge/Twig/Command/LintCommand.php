@@ -142,7 +142,7 @@ EOF
         try {
             $temporaryLoader = new \Twig_Loader_Array(array((string) $file => $template));
             $twig->setLoader($temporaryLoader);
-            $nodeTree = $twig->parse($twig->tokenize($template, (string) $file));
+            $nodeTree = $twig->parse($twig->tokenize(new \Twig_Source($template, (string) $file)));
             $twig->compile($nodeTree);
             $twig->setLoader($realLoader);
         } catch (\Twig_Error $e) {

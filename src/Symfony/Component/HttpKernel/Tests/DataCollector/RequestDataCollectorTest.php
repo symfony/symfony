@@ -70,16 +70,28 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test various types of controller callables.
+     * @dataProvider provideControllerCallables
      */
-    public function testControllerInspection()
+    public function testControllerInspection($name, $callable, $expected)
+    {
+        $c = new RequestDataCollector();
+        $request = $this->createRequest();
+        $response = $this->createResponse();
+        $this->injectController($c, $callable, $request);
+        $c->collect($request, $response);
+
+        $this->assertSame($expected, $c->getController(), sprintf('Testing: %s', $name));
+    }
+
+    public function provideControllerCallables()
     {
         // make sure we always match the line number
         $r1 = new \ReflectionMethod($this, 'testControllerInspection');
         $r2 = new \ReflectionMethod($this, 'staticControllerMethod');
         $r3 = new \ReflectionClass($this);
+
         // test name, callable, expected
-        $controllerTests = array(
+        return array(
             array(
                 '"Regular" callable',
                 array($this, 'testControllerInspection'),
@@ -168,15 +180,6 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
         );
-
-        $c = new RequestDataCollector();
-        $request = $this->createRequest();
-        $response = $this->createResponse();
-        foreach ($controllerTests as $controllerTest) {
-            $this->injectController($c, $controllerTest[1], $request);
-            $c->collect($request, $response);
-            $this->assertSame($controllerTest[2], $c->getController(), sprintf('Testing: %s', $controllerTest[0]));
-        }
     }
 
     protected function createRequest()

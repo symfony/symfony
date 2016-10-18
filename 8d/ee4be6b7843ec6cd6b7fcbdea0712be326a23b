@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-10-18T09:26:41Z
+
+@nicolas-grekas this is a bugfix IMO, because the current code breaks on valid XPath.
+
+Btw, this is a bug affecting Drupal
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-18T10:25:25Z
+
+@nicolas-grekas I updated the gist at https://gist.github.com/stof/5131c79c576600800aac7313b182d44d to include your implementation, as well as an implementation short-circuiting XPath splitting when there is no pipe in the string (the benchmark method fits well the Mink use-case of returning split expressions. The short-circuiting needs to be adapted for BrowserKit here as the loop is also doing the processing directly instead of doing a separate loop over the split XPath for processing).
+the short-circuiting makes it win over the regex implementation when there is no union (which can have a huge impact if the XPath is long, as shown by the third and fourth cases)
+
+---------------------------------------------------------------------------
+
+by klausi at 2016-10-18T10:56:36Z
+
+I can confirm that this PR fixes the issue for Drupal.
+
+Luckily the patch almost applies to Symfony 2.7. It was still a bit hard to actually apply it, for testing locally I did it with this hack (documenting for myself for next time):
+
+```
+$ cd vendor/symfony/dom-crawler/
+$ wget https://patch-diff.githubusercontent.com/raw/symfony/symfony/pull/20235.diff
+$ patch -p3 < 20235.diff
+can't find file to patch at input line 5
+Perhaps you used the wrong -p or --strip option?
+The text leading up to this was:
+--------------------------
+|diff --git a/src/Symfony/Component/DomCrawler/Crawler.php b/src/Symfony/Component/DomCrawler/Crawler.php
+|index 37822e5..df16e21 100644
+|--- a/src/Symfony/Component/DomCrawler/Crawler.php
+|+++ b/src/Symfony/Component/DomCrawler/Crawler.php
+--------------------------
+File to patch: Crawler.php
+patching file Crawler.php
+Hunk #1 succeeded at 853 (offset -3 lines).
+Hunk #2 succeeded at 903 (offset -3 lines).
+Hunk #3 succeeded at 921 (offset -3 lines).
+Hunk #4 succeeded at 929 (offset -3 lines).
+can't find file to patch at input line 103
+Perhaps you used the wrong -p or --strip option?
+The text leading up to this was:
+--------------------------
+|diff --git a/src/Symfony/Component/DomCrawler/Tests/CrawlerTest.php b/src/Symfony/Component/DomCrawler/Tests/CrawlerTest.php
+|index 45bbb2f..65e2a90 100755
+|--- a/src/Symfony/Component/DomCrawler/Tests/CrawlerTest.php
+|+++ b/src/Symfony/Component/DomCrawler/Tests/CrawlerTest.php
+--------------------------
+File to patch: d
+d: No such file or directory
+Skip this patch? [y] y
+Skipping patch.
+3 out of 3 hunks ignored
+```
+
+So the test file was not patched because Drupal removes it, but that is fine for testing with Drupal.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-18T11:19:37Z
+
+@klausi when you install individual components, you indeed need to remap paths to apply the patch, as the patch is for the main repo.
+
+@nicolas-grekas performance for your version is indeed much better than #20229
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-18T11:59:47Z
+
+@stof thanks for the bench! Then this is ready to merge/vote, isn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-18T12:21:24Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-18T12:52:03Z
+
+@nicolas-grekas FYI, I plan to reuse your faster implementation in Mink as well, (as it needs splitting union parts too, and this is where @klausi submitted the implementation proposed here in #20229). You can send the PR yourselves if you prefer. the code is at https://github.com/minkphp/Mink/blob/master/src/Selector/Xpath/Manipulator.php
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-18T12:52:58Z
+
+Please do

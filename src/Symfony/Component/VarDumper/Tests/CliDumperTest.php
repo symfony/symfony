@@ -228,6 +228,9 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=');
     }
 
+    /**
+     * @requires function Twig_Template::getSourceContext
+     */
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+b');
@@ -262,19 +265,6 @@ EOTXT
         rewind($out);
         $out = stream_get_contents($out);
 
-        if (method_exists($twig, 'getSource')) {
-            $twig = <<<EOTXT
-          foo.twig:2: """
-            foo bar\\n
-              twig source\\n
-            \\n
-            """
-
-EOTXT;
-        } else {
-            $twig = '';
-        }
-
         $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -296,7 +286,12 @@ stream resource {@{$ref}
                 throw new \Exception('Foobar');\\n
             }\\n
             """
-{$twig}        }
+          bar.twig:2: """
+            foo bar\\n
+              twig source\\n
+            \\n
+            """
+        }
       }
       %d. Twig_Template->displayWithErrorHandling() ==> __TwigTemplate_VarDumperFixture_u75a09->doDisplay(): {
         src: {

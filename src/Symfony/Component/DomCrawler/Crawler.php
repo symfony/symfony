@@ -860,17 +860,43 @@ class Crawler extends \SplObjectStorage
         // We cannot simply drop
         $nonMatchingExpression = 'a[name() = "b"]';
 
-        // Split any unions into individual expressions.
-        foreach ($this->splitUnionParts($xpath) as $expression) {
-            $expression = trim($expression);
-            $parenthesis = '';
+        $xpathLen = strlen($xpath);
+        $openedBrackets = 0;
+        $startPosition = strspn($xpath, " \t\n\r\0\x0B");
 
-            // If the union is inside some braces, we need to preserve the opening braces and apply
-            // the change only inside it.
-            if (preg_match('/^[\(\s*]+/', $expression, $matches)) {
-                $parenthesis = $matches[0];
-                $expression = substr($expression, strlen($parenthesis));
+        for ($i = $startPosition; $i <= $xpathLen; ++$i) {
+            $i += strcspn($xpath, '"\'[]|', $i);
+
+            if ($i < $xpathLen) {
+                switch ($xpath[$i]) {
+                    case '"':
+                    case "'":
+                        if (false === $i = strpos($xpath, $xpath[$i], $i + 1)) {
+                            return $xpath; // The XPath expression is invalid
+                        }
+                        continue 2;
+                    case '[':
+                        ++$openedBrackets;
+                        continue 2;
+                    case ']':
+                        --$openedBrackets;
+                        continue 2;
+                }
             }
+            if ($openedBrackets) {
+                continue;
+            }
+
+            if ($startPosition < $xpathLen && '(' === $xpath[$startPosition]) {
+                // If the union is inside some braces, we need to preserve the opening braces and apply
+                // the change only inside it.
+                $j = 1 + strspn($xpath, "( \t\n\r\0\x0B", $startPosition + 1);
+                $parenthesis = substr($xpath, $startPosition, $j);
+                $startPosition += $j;
+            } else {
+                $parenthesis = '';
+            }
+            $expression = rtrim(substr($xpath, $startPosition, $i - $startPosition));
 
             // BC for Symfony 2.4 and lower were elements were adding in a fake _root parent
             if (0 === strpos($expression, '/_root/')) {
@@ -880,7 +906,7 @@ class Crawler extends \SplObjectStorage
             }
 
             // add prefix before absolute element selector
-            if (empty($expression)) {
+            if ('' === $expression) {
                 $expression = $nonMatchingExpression;
             } elseif (0 === strpos($expression, '//')) {
                 $expression = 'descendant-or-self::'.substr($expression, 2);
@@ -898,7 +924,7 @@ class Crawler extends \SplObjectStorage
                 // '.' is the fake root element in Symfony 2.4 and lower, which is excluded from results
                 $expression = $nonMatchingExpression;
             } elseif (0 === strpos($expression, 'descendant::')) {
-                $expression = 'descendant-or-self::'.substr($expression, strlen('descendant::'));
+                $expression = 'descendant-or-self::'.substr($expression, 12);
             } elseif (preg_match('/^(ancestor|ancestor-or-self|attribute|following|following-sibling|namespace|parent|preceding|preceding-sibling)::/', $expression)) {
                 // the fake root has no parent, preceding or following nodes and also no attributes (even no namespace attributes)
                 $expression = $nonMatchingExpression;
@@ -906,50 +932,16 @@ class Crawler extends \SplObjectStorage
                 $expression = 'self::'.$expression;
             }
             $expressions[] = $parenthesis.$expression;
-        }
 
-        return implode(' | ', $expressions);
-    }
-
-    /**
-     * Splits the XPath into parts that are separated by the union operator.
-     *
-     * @param string $xpath
-     *
-     * @return string[]
-     */
-    private function splitUnionParts($xpath)
-    {
-        // Split any unions into individual expressions. We need to iterate
-        // through the string to correctly parse opening/closing quotes and
-        // braces which is not possible with regular expressions.
-        $unionParts = array();
-        $inSingleQuotedString = false;
-        $inDoubleQuotedString = false;
-        $openedBrackets = 0;
-        $lastUnion = 0;
-        $xpathLength = strlen($xpath);
-        for ($i = 0; $i < $xpathLength; ++$i) {
-            $char = $xpath[$i];
-
-            if ($char === "'" && !$inDoubleQuotedString) {
-                $inSingleQuotedString = !$inSingleQuotedString;
-            } elseif ($char === '"' && !$inSingleQuotedString) {
-                $inDoubleQuotedString = !$inDoubleQuotedString;
-            } elseif (!$inSingleQuotedString && !$inDoubleQuotedString) {
-                if ($char === '[') {
-                    ++$openedBrackets;
-                } elseif ($char === ']') {
-                    --$openedBrackets;
-                } elseif ($char === '|' && $openedBrackets === 0) {
-                    $unionParts[] = substr($xpath, $lastUnion, $i - $lastUnion);
-                    $lastUnion = $i + 1;
-                }
+            if ($i === $xpathLen) {
+                return implode(' | ', $expressions);
             }
-        }
-        $unionParts[] = substr($xpath, $lastUnion);
 
-        return $unionParts;
+            $i += strspn($xpath, " \t\n\r\0\x0B", $i + 1);
+            $startPosition = $i + 1;
+        }
+
+        return $xpath; // The XPath expression is invalid
     }
 
     /**

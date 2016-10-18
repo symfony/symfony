@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
@@ -182,6 +183,17 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testItIgnoresInvalidCallables()
+    {
+        $request = $this->createRequestWithSession();
+        $response = new RedirectResponse('/');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $response);
+
+        $this->assertSame('n/a', $c->getController());
+    }
+
     protected function createRequest()
     {
         $request = Request::create('http://test.com/foo?bar=baz');
@@ -190,6 +202,16 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $request->attributes->set('_route_params', array('name' => 'foo'));
         $request->attributes->set('resource', fopen(__FILE__, 'r'));
         $request->attributes->set('object', new \stdClass());
+
+        return $request;
+    }
+
+    private function createRequestWithSession()
+    {
+        $request = $this->createRequest();
+        $request->attributes->set('_controller', 'Foo::bar');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $request->getSession()->start();
 
         return $request;
     }

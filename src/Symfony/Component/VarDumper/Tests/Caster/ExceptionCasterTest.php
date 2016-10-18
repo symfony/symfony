@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
 use Symfony\Component\VarDumper\Caster\ExceptionCaster;
+use Symfony\Component\VarDumper\Caster\FrameStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -40,9 +41,9 @@ Exception {
   #message: "foo"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 25
+  #line: 26
   -trace: {
-    %sExceptionCasterTest.php:25: {
+    %sExceptionCasterTest.php:26: {
       : {
       :     return new \Exception('foo');
       : }
@@ -67,7 +68,7 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 {
-  %sExceptionCasterTest.php:25: {
+  %sExceptionCasterTest.php:26: {
     : {
     :     return new \Exception('foo');
     : }
@@ -96,9 +97,9 @@ Exception {
   #message: "foo"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 25
+  #line: 26
   -trace: {
-    %sExceptionCasterTest.php:25: {
+    %sExceptionCasterTest.php:26: {
       : {
       :     return new \Exception('foo');
       : }
@@ -124,9 +125,9 @@ Exception {
   #message: "foo"
   #code: 0
   #file: "%sExceptionCasterTest.php"
-  #line: 25
+  #line: 26
   -trace: {
-    %sExceptionCasterTest.php: 25
+    %sExceptionCasterTest.php: 26
     %sExceptionCasterTest.php: %d
 %A
 EODUMP;
@@ -152,10 +153,10 @@ EODUMP;
   #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
   #<span class=sf-dump-protected title="Protected property">file</span>: "<span class=sf-dump-str title="%sExceptionCasterTest.php
 %d characters"><span class=sf-dump-ellipsis>%sTests</span>%eCaster%eExceptionCasterTest.php</span>"
-  #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>25</span>
+  #<span class=sf-dump-protected title="Protected property">line</span>: <span class=sf-dump-num>26</span>
   -<span class=sf-dump-private title="Private property defined in class:&#10;`Exception`">trace</span>: {<samp>
     <span class=sf-dump-meta title="%sExceptionCasterTest.php
-Stack level %d."><span class=sf-dump-ellipsis>%sVarDumper%eTests</span>%eCaster%eExceptionCasterTest.php</span>: <span class=sf-dump-num>25</span>
+Stack level %d."><span class=sf-dump-ellipsis>%sVarDumper%eTests</span>%eCaster%eExceptionCasterTest.php</span>: <span class=sf-dump-num>26</span>
      &hellip;12
   </samp>}
 </samp>}
@@ -163,5 +164,62 @@ Stack level %d."><span class=sf-dump-ellipsis>%sVarDumper%eTests</span>%eCaster%
 EODUMP;
 
         $this->assertStringMatchesFormat($expectedDump, $dump);
+    }
+
+    /**
+     * @requires function Twig_Template::getSourceContext
+     */
+    public function testFrameWithTwig()
+    {
+        require_once dirname(__DIR__).'/Fixtures/Twig.php';
+
+        $f = array(
+            new FrameStub(array(
+                'file' => dirname(__DIR__).'/Fixtures/Twig.php',
+                'line' => 19,
+                'class' => '__TwigTemplate_VarDumperFixture_u75a09',
+                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem())),
+            )),
+            new FrameStub(array(
+                'file' => dirname(__DIR__).'/Fixtures/Twig.php',
+                'line' => 19,
+                'class' => '__TwigTemplate_VarDumperFixture_u75a09',
+                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem()), null),
+            )),
+        );
+
+        $expectedDump = <<<'EODUMP'
+array:2 [
+  0 => {
+    class: "__TwigTemplate_VarDumperFixture_u75a09"
+    object: __TwigTemplate_VarDumperFixture_u75a09 {
+    %A
+    }
+    src: {
+      bar.twig:2: {
+        : foo bar
+        :   twig source
+        : 
+      }
+    }
+  }
+  1 => {
+    class: "__TwigTemplate_VarDumperFixture_u75a09"
+    object: __TwigTemplate_VarDumperFixture_u75a09 {
+    %A
+    }
+    src: {
+      foo.twig:2: {
+        : foo bar
+        :   twig source
+        : 
+      }
+    }
+  }
+]
+
+EODUMP;
+
+        $this->assertDumpMatchesFormat($expectedDump, $f);
     }
 }

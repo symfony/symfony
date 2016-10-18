@@ -99,11 +99,11 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                     } elseif (isset($trace[$i]['object']) && $trace[$i]['object'] instanceof \Twig_Template) {
                         $template = $trace[$i]['object'];
                         $name = $template->getTemplateName();
-                        $file = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getPath() : false;
                         $src = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : false);
                         $info = $template->getDebugInfo();
-                        if (null !== $src && isset($info[$trace[$i - 1]['line']])) {
+                        if (isset($info[$trace[$i - 1]['line']])) {
                             $line = $info[$trace[$i - 1]['line']];
+                            $file = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getPath() : false;
 
                             if ($src) {
                                 $src = explode("\n", $src);

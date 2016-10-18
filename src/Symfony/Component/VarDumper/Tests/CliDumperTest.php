@@ -228,6 +228,9 @@ EOTXT
         putenv('DUMP_STRING_LENGTH=');
     }
 
+    /**
+     * @requires function Twig_Template::getSourceContext
+     */
     public function testThrowingCaster()
     {
         $out = fopen('php://memory', 'r+b');
@@ -261,18 +264,6 @@ EOTXT
         $dumper->dump($data, $out);
         $out = stream_get_contents($out, -1, 0);
 
-        if (method_exists($twig, 'getSource')) {
-            $twig = <<<EOTXT
-foo.twig:%d: {
-        : foo bar
-        :   twig source
-        : 
-      }
-EOTXT;
-        } else {
-            $twig = '%A';
-        }
-
         $r = defined('HHVM_VERSION') ? '' : '#%d';
         $this->assertStringMatchesFormat(
             <<<EOTXT
@@ -287,7 +278,11 @@ stream resource {@{$ref}
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     -trace: {
-      {$twig}
+      bar.twig:%d: {
+        : foo bar
+        :   twig source
+        : 
+      }
       %sTemplate.php:%d: {
         : try {
         :     \$this->doDisplay(\$context, \$blocks);

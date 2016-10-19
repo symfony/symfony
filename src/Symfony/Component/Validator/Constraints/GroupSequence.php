@@ -57,7 +57,7 @@ class GroupSequence
     /**
      * The groups in the sequence.
      *
-     * @var string[]|GroupSequence[]
+     * @var string[]|array[]|GroupSequence[]
      */
     public $groups;
 

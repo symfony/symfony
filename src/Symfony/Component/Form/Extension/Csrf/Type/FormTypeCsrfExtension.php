@@ -124,7 +124,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
             'csrf_token_manager' => $this->defaultTokenManager,
             'csrf_token_id' => null,
-            'csrf_field_options' => []
+            'csrf_field_options' => array()
         ));
     }
 

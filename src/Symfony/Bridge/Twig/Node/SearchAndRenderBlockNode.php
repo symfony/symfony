@@ -37,7 +37,7 @@ class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
                     // the variables in the third argument
                     $label = $arguments[1];
                     $variables = isset($arguments[2]) ? $arguments[2] : null;
-                    $lineno = $label->getLine();
+                    $lineno = $label->getTemplateLine();
 
                     if ($label instanceof \Twig_Node_Expression_Constant) {
                         // If the label argument is given as a constant, we can either

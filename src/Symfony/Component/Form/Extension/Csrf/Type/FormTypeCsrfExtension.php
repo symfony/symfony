@@ -105,9 +105,9 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             $tokenId = $options['csrf_token_id'] ?: ($form->getName() ?: get_class($form->getConfig()->getType()->getInnerType()));
             $data = (string) $options['csrf_token_manager']->getToken($tokenId);
 
-            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'Symfony\Component\Form\Extension\Core\Type\HiddenType', $data, array(
+            $csrfForm = $factory->createNamed($options['csrf_field_name'], 'Symfony\Component\Form\Extension\Core\Type\HiddenType', $data, array_replace($options['csrf_field_options'], array(
                 'mapped' => false,
-            ));
+            )));
 
             $view->children[$options['csrf_field_name']] = $csrfForm->createView($view);
         }
@@ -124,6 +124,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             'csrf_message' => 'The CSRF token is invalid. Please try to resubmit the form.',
             'csrf_token_manager' => $this->defaultTokenManager,
             'csrf_token_id' => null,
+            'csrf_field_options' => []
         ));
     }
 

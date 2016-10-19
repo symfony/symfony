@@ -50,10 +50,10 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
                 return $node;
             } else {
                 $var = $env->getParser()->getVarName();
-                $name = new \Twig_Node_Expression_AssignName($var, $node->getLine());
-                $this->scope->set('domain', new \Twig_Node_Expression_Name($var, $node->getLine()));
+                $name = new \Twig_Node_Expression_AssignName($var, $node->getTemplateLine());
+                $this->scope->set('domain', new \Twig_Node_Expression_Name($var, $node->getTemplateLine()));
 
-                return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getLine());
+                return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getTemplateLine());
             }
         }
 
@@ -71,7 +71,7 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
             } else {
                 if (!$arguments->hasNode($ind)) {
                     if (!$arguments->hasNode($ind - 1)) {
-                        $arguments->setNode($ind - 1, new \Twig_Node_Expression_Array(array(), $node->getLine()));
+                        $arguments->setNode($ind - 1, new \Twig_Node_Expression_Array(array(), $node->getTemplateLine()));
                     }
 
                     $arguments->setNode($ind, $this->scope->get('domain'));

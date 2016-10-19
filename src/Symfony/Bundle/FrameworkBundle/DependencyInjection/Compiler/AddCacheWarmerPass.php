@@ -24,4 +24,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\AddCacheWarmerPass as BaseA
  */
 class AddCacheWarmerPass extends BaseAddCacheWarmerPass
 {
+    public function __construct()
+    {
+        parent::__construct('cache_warmer', 'kernel.cache_warmer');
+    }
 }

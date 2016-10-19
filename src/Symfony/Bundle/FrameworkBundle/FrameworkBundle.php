@@ -88,8 +88,8 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class);
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new LoggingTranslatorPass());
-        $container->addCompilerPass(new AddCacheWarmerPass());
-        $container->addCompilerPass(new AddCacheClearerPass());
+        $container->addCompilerPass(new AddCacheWarmerPass('cache_warmer', 'kernel.cache_warmer'));
+        $container->addCompilerPass(new AddCacheClearerPass('cache_clearer', 'kernel.cache_clearer'));
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new TranslationExtractorPass());
         $container->addCompilerPass(new TranslationDumperPass());

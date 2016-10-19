@@ -22,20 +22,29 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AddCacheClearerPass implements CompilerPassInterface
 {
+    private $tag;
+    private $serviceName;
+
+    public function __construct($serviceName, $tag)
+    {
+        $this->serviceName = $serviceName;
+        $this->tag = $tag;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('cache_clearer')) {
+        if (!$container->hasDefinition($this->serviceName)) {
             return;
         }
 
         $clearers = array();
-        foreach ($container->findTaggedServiceIds('kernel.cache_clearer') as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds($this->tag) as $id => $attributes) {
             $clearers[] = new Reference($id);
         }
 
-        $container->getDefinition('cache_clearer')->replaceArgument(0, $clearers);
+        $container->getDefinition($this->serviceName)->replaceArgument(0, $clearers);
     }
 }

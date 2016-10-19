@@ -24,4 +24,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\AddCacheClearerPass as Base
  */
 class AddCacheClearerPass extends BaseAddCacheClearerPass
 {
+    public function __construct()
+    {
+        parent::__construct('cache_clearer', 'kernel.cache_clearer');
+    }
 }

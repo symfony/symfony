@@ -48,7 +48,7 @@ class AddCacheWarmerPassTest extends TestCase
                 new Reference('my_cache_warmer_service3'),
             ));
 
-        $addCacheWarmerPass = new AddCacheWarmerPass();
+        $addCacheWarmerPass = new AddCacheWarmerPass('cache_warmer', 'kernel.cache_warmer');
         $addCacheWarmerPass->process($container);
     }
 
@@ -65,7 +65,7 @@ class AddCacheWarmerPassTest extends TestCase
             ->will($this->returnValue(false));
         $definition->expects($this->never())->method('replaceArgument');
 
-        $addCacheWarmerPass = new AddCacheWarmerPass();
+        $addCacheWarmerPass = new AddCacheWarmerPass('cache_warmer', 'kernel.cache_warmer');
         $addCacheWarmerPass->process($container);
     }
 
@@ -85,7 +85,7 @@ class AddCacheWarmerPassTest extends TestCase
 
         $definition->expects($this->never())->method('replaceArgument');
 
-        $addCacheWarmerPass = new AddCacheWarmerPass();
+        $addCacheWarmerPass = new AddCacheWarmerPass('cache_warmer', 'kernel.cache_warmer');
         $addCacheWarmerPass->process($container);
     }
 }

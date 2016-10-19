@@ -24,21 +24,30 @@ class AddCacheWarmerPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
+    private $tag;
+    private $serviceName;
+
+    public function __construct($serviceName, $tag)
+    {
+        $this->serviceName = $serviceName;
+        $this->tag = $tag;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('cache_warmer')) {
+        if (!$container->hasDefinition($this->serviceName)) {
             return;
         }
 
-        $warmers = $this->findAndSortTaggedServices('kernel.cache_warmer', $container);
+        $warmers = $this->findAndSortTaggedServices($this->tag, $container);
 
         if (empty($warmers)) {
             return;
         }
 
-        $container->getDefinition('cache_warmer')->replaceArgument(0, $warmers);
+        $container->getDefinition($this->serviceName)->replaceArgument(0, $warmers);
     }
 }

@@ -109,18 +109,18 @@ class TransNode extends \Twig_Node
         preg_match_all('/(?<!%)%([^%]+)%/', $msg, $matches);
 
         foreach ($matches[1] as $var) {
-            $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getLine());
+            $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getTemplateLine());
             if (!$vars->hasElement($key)) {
                 if ('count' === $var && $this->hasNode('count')) {
                     $vars->addElement($this->getNode('count'), $key);
                 } else {
-                    $varExpr = new \Twig_Node_Expression_Name($var, $body->getLine());
+                    $varExpr = new \Twig_Node_Expression_Name($var, $body->getTemplateLine());
                     $varExpr->setAttribute('ignore_strict_check', $ignoreStrictCheck);
                     $vars->addElement($varExpr, $key);
                 }
             }
         }
 
-        return array(new \Twig_Node_Expression_Constant(str_replace('%%', '%', trim($msg)), $body->getLine()), $vars);
+        return array(new \Twig_Node_Expression_Constant(str_replace('%%', '%', trim($msg)), $body->getTemplateLine()), $vars);
     }
 }

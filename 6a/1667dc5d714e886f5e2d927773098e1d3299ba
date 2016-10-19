@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by enumag at 2016-10-18T11:10:00Z
+
+@fabpot Just found out that conditional validations on subforms are a real pain at the moment since the validation groups can only be defined on root forms. This PR provides a far better solution because then I can override the Default validation group by implementing GroupSequenceProvider.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-19T21:12:06Z
+
+ping @HeahDude
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-10-19T21:54:13Z
+
+Simple and efficient 👍 I really like this parentheses' move feature :)

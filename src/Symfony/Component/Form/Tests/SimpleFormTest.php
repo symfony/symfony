@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -316,13 +315,11 @@ class SimpleFormTest extends AbstractFormTest
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Call Form::isValid() with an unsubmitted form %s.
      */
     public function testNotValidIfNotSubmitted()
     {
-        ErrorAssert::assertDeprecationsAreTriggered(array('Call Form::isValid() with an unsubmitted form'), function () {
-            $this->assertFalse($this->form->isValid());
-        });
+        $this->assertFalse($this->form->isValid());
     }
 
     public function testNotValidIfErrors()

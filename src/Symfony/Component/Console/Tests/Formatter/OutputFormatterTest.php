@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Tests\Formatter;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
@@ -196,17 +195,12 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
     /**
      * @group legacy
      * @dataProvider provideInlineStyleTagsWithUnknownOptions
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Unknown style options are deprecated since version 3.2 and will be removed in 4.0. Exception "Invalid option specified: "%s". Expected one of (bold, underscore, blink, reverse, conceal)".
      */
     public function testInlineStyleOptionsUnknownAreDeprecated($tag, $option)
     {
-        ErrorAssert::assertDeprecationsAreTriggered(
-            array(sprintf('Unknown style options are deprecated since version 3.2 and will be removed in 4.0. Exception "Invalid option specified: "%s". Expected one of (bold, underscore, blink, reverse, conceal)".', $option)),
-            function () use ($tag) {
-                $formatter = new OutputFormatter(true);
-                $formatter->format($tag);
-            }
-        );
+        $formatter = new OutputFormatter(true);
+        $formatter->format($tag);
     }
 
     public function provideInlineStyleTagsWithUnknownOptions()

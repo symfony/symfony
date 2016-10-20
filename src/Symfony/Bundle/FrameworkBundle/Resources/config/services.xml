@@ -7,6 +7,8 @@
     <services>
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
             <argument type="service" id="service_container" />
+            <autowiring-type>Symfony\Component\EventDispatcher\EventDispatcherInterface</autowiring-type>
+            <autowiring-type>Symfony\Component\EventDispatcher\EventDispatcher</autowiring-type>
         </service>
 
         <service id="http_kernel" class="Symfony\Component\HttpKernel\HttpKernel">

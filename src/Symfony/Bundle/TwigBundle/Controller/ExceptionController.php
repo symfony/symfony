@@ -60,16 +60,19 @@ class ExceptionController
 
         $code = $exception->getStatusCode();
 
-        return new Response($this->twig->render(
-            (string) $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
-            array(
-                'status_code' => $code,
-                'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
-                'exception' => $exception,
-                'logger' => $logger,
-                'currentContent' => $currentContent,
-            )
-        ));
+        return new Response(
+            $this->twig->render(
+                (string) $this->findTemplate($request, $request->getRequestFormat(), $code, $showException),
+                array(
+                    'status_code' => $code,
+                    'status_text' => isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '',
+                    'exception' => $exception,
+                    'logger' => $logger,
+                    'currentContent' => $currentContent,
+                )
+            ),
+            $code
+        );
     }
 
     /**

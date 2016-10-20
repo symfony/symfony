@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -558,23 +557,17 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Using the attribute "class" is deprecated for the service "bar" which is defined as an alias %s.
+     * @expectedDeprecation Using the element "tag" is deprecated for the service "bar" which is defined as an alias %s.
+     * @expectedDeprecation Using the element "factory" is deprecated for the service "bar" which is defined as an alias %s.
      */
     public function testAliasDefinitionContainsUnsupportedElements()
     {
-        $deprecations = array(
-            'Using the attribute "class" is deprecated for the service "bar" which is defined as an alias',
-            'Using the element "tag" is deprecated for the service "bar" which is defined as an alias',
-            'Using the element "factory" is deprecated for the service "bar" which is defined as an alias',
-        );
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
 
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
-            $container = new ContainerBuilder();
-            $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('legacy_invalid_alias_definition.xml');
 
-            $loader->load('legacy_invalid_alias_definition.xml');
-
-            $this->assertTrue($container->has('bar'));
-        });
+        $this->assertTrue($container->has('bar'));
     }
 }

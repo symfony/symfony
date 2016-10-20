@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -547,16 +546,17 @@ abstract class FrameworkExtensionTest extends TestCase
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation The "framework.serializer.cache" option is deprecated %s.
      */
     public function testDeprecatedSerializerCacheOption()
     {
-        ErrorAssert::assertDeprecationsAreTriggered('The "framework.serializer.cache" option is deprecated', function () {
-            $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
+        $container = $this->createContainerFromFile('serializer_legacy_cache', array('kernel.debug' => true, 'kernel.container_class' => __CLASS__));
 
-            $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
-            $this->assertEquals(new Reference('foo'), $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1));
-        });
+        $this->assertFalse($container->hasDefinition('serializer.mapping.cache_class_metadata_factory'));
+        $this->assertTrue($container->hasDefinition('serializer.mapping.class_metadata_factory'));
+
+        $cache = $container->getDefinition('serializer.mapping.class_metadata_factory')->getArgument(1);
+        $this->assertEquals(new Reference('foo'), $cache);
     }
 
     public function testAssetHelperWhenAssetsAreEnabled()

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-20T14:09:20Z
+
+There is probably a doc to update somewhere, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-20T17:32:23Z
+
+Just tried with phpunit 5.3, I have a failure locally.
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-21T14:54:38Z
+
+Failing test spotted, fixed in #20265
+Status: needs review

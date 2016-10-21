@@ -30,8 +30,10 @@ class FactoryReturnTypePassTest extends \PHPUnit_Framework_TestCase
         $factory = $container->register('factory');
         $factory->setFactory(array(FactoryDummy::class, 'createFactory'));
 
+        $container->setAlias('alias_factory', 'factory');
+
         $foo = $container->register('foo');
-        $foo->setFactory(array(new Reference('factory'), 'create'));
+        $foo->setFactory(array(new Reference('alias_factory'), 'create'));
 
         $bar = $container->register('bar', __CLASS__);
         $bar->setFactory(array(new Reference('factory'), 'create'));
@@ -99,5 +101,21 @@ class FactoryReturnTypePassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($factory->getClass());
         $this->assertNull($factory2->getClass());
+    }
+
+    public function testCompile()
+    {
+        $container = new ContainerBuilder();
+
+        $factory = $container->register('factory');
+        $factory->setFactory(array(FactoryDummy::class, 'createFactory'));
+
+        if (!method_exists(\ReflectionMethod::class, 'getReturnType')) {
+            $this->setExpectedException(\RuntimeException::class, 'Please add the class to service "factory" even if it is constructed by a factory since we might need to add method calls based on compile-time checks.');
+        }
+
+        $container->compile();
+
+        $this->assertEquals(FactoryDummy::class, $container->getDefinition('factory')->getClass());
     }
 }

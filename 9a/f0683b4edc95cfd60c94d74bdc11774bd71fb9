@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-20T13:34:14Z
+
+![capture du 2016-10-20 15-27-53](https://cloud.githubusercontent.com/assets/243674/19561887/a61394f8-96da-11e6-8d85-269415b530ef.png)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-20T14:14:51Z
+
+I let @xabbuh review this PR.
+
+One remark though: In https://thephp.cc/news/2016/02/questioning-phpunit-best-practices, Sebastian talks about the annotation and "deprecated" it as a best practice. So, I'm wondering if we don't also need to follow along and at least have the option to not use an annotation here, something like `->expectDeprecation(...)` to be consistent with PHPUnit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-20T14:21:03Z
+
+There is no way today to add methods to the base phpunit TestCase class (no `__call()` hook). Which means adding some `$this->expectDeprecation()` needs to be done with a trait, which then needs to be imported with `use`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-20T14:27:56Z
+
+ok, not worth it then.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-21T07:41:23Z
+
+Except for the few comments I much better like this implementation. 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-21T20:39:22Z
+
+This is now mergeable asis: ErrorAssert is not removed in this PR, and still used for deprecations introduced in 3.1. Those are removed in #20268.

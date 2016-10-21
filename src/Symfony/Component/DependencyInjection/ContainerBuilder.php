@@ -759,6 +759,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Adding definition to a frozen container is not allowed');
         }
 
+        if (null === $definition->getClass() && class_exists($id)) {
+            $definition->setClass($id);
+        }
+
         $id = strtolower($id);
 
         unset($this->aliasDefinitions[$id]);

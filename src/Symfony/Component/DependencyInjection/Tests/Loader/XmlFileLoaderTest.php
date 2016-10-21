@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -554,6 +555,15 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services23.xml');
 
         $this->assertTrue($container->getDefinition('bar')->isAutowired());
+    }
+
+    public function testClassFromId()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('class_from_id.xml');
+
+        $this->assertEquals(CaseSensitiveClass::class, $container->getDefinition(CaseSensitiveClass::class)->getClass());
     }
 
     /**

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-10-21T14:56:06Z
+
+does it affect only 3.2 or should such bug fixes be applied to older branches too ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-21T14:58:50Z
+
+ArgsStub on 3.2 only

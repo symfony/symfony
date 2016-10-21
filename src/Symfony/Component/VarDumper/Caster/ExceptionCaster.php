@@ -109,7 +109,7 @@ class ExceptionCaster
                     'type' => isset($f['type']) ? $f['type'] : null,
                     'function' => isset($f['function']) ? $f['function'] : null,
                 ) + $frames[$i - 1],
-                $trace->keepArgs,
+                false,
                 true
             );
             $f = self::castFrameStub($frame, array(), $frame, true);
@@ -117,8 +117,9 @@ class ExceptionCaster
                 foreach ($f[$prefix.'src']->value as $label => $frame) {
                     $label = substr_replace($label, "title=Stack level $j.&", 2, 0);
                 }
-                if (isset($f[$prefix.'arguments']) && $frame instanceof EnumStub) {
-                    $frame->value['arguments'] = $f[$prefix.'arguments'];
+                $f = $frames[$i - 1];
+                if ($trace->keepArgs && !empty($f['args']) && $frame instanceof EnumStub) {
+                    $frame->value['arguments'] = new ArgsStub($f['args'], isset($f['function']) ? $f['function'] : null, isset($f['class']) ? $f['class'] : null);
                 }
             }
             $a[$label] = $frame;

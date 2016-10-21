@@ -11,9 +11,6 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
-use Response\DefaultResponse;
-use Response\ExtendedResponse;
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -846,32 +843,23 @@ class ResponseTest extends ResponseTestCase
         }
     }
 
-    /**
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
-     */
-    public function testNoDeprecations()
+    public function testNoDeprecationsAreTriggered()
     {
-        ErrorAssert::assertDeprecationsAreTriggered(array(), function () {
-            new DefaultResponse();
-            $this->getMock(Response::class);
-        });
+        new DefaultResponse();
+        $this->getMock(Response::class);
     }
 
     /**
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @group legacy
+     * @expectedDeprecation Extending Symfony\Component\HttpFoundation\Response::getDate() in Symfony\Component\HttpFoundation\Tests\ExtendedResponse is deprecated %s.
+     * @expectedDeprecation Extending Symfony\Component\HttpFoundation\Response::setLastModified() in Symfony\Component\HttpFoundation\Tests\ExtendedResponse is deprecated %s.
      */
     public function testDeprecations()
     {
-        $deprecationMessages = array();
-        foreach (array('getDate', 'setLastModified') as $method) {
-            $deprecationMessages[] = sprintf('Extending %s::%s() in Response\ExtendedResponse is deprecated', Response::class, $method);
-        }
-        ErrorAssert::assertDeprecationsAreTriggered($deprecationMessages, function () {
-            new ExtendedResponse();
+        new ExtendedResponse();
 
-            // Deprecations should not be triggered twice
-            new ExtendedResponse();
-        });
+        // Deprecations should not be triggered twice
+        new ExtendedResponse();
     }
 
     public function validContentProvider()
@@ -922,10 +910,6 @@ class StringableObject
         return 'Foo';
     }
 }
-
-namespace Response;
-
-use Symfony\Component\HttpFoundation\Response;
 
 class DefaultResponse extends Response
 {

@@ -166,14 +166,13 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @group legacy
+     * @expectedDeprecation Omitting the space after the colon that follows a mapping key definition is deprecated since version 3.2 and will throw a ParseException in 4.0.
      * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
      */
     public function testParseMappingKeyWithColonNotFollowedBySpace()
     {
-        ErrorAssert::assertDeprecationsAreTriggered('Omitting the space after the colon that follows a mapping key definition is deprecated since version 3.2 and will throw a ParseException in 4.0.', function () {
-            Inline::parse('{1:""}');
-        });
+        Inline::parse('{1:""}');
     }
 
     /**

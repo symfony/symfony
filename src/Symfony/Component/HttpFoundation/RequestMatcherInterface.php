@@ -11,19 +11,15 @@
 
 namespace Symfony\Component\HttpFoundation;
 
+use Symfony\Component\HttpFoundation\RequestMatcher\RequestMatcherInterface as BaseRequestMatcherInterface;
+
+@trigger_error('The '.RequestMatcherInterface::class.' class is deprecated since version 3.2 and will be removed in 4.0. Use the '.BaseRequestMatcherInterface::class.' class instead.', E_USER_DEPRECATED);
+
 /**
  * RequestMatcherInterface is an interface for strategies to match a Request.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-interface RequestMatcherInterface
+interface RequestMatcherInterface extends BaseRequestMatcherInterface
 {
-    /**
-     * Decides whether the rule(s) implemented by the strategy matches the supplied request.
-     *
-     * @param Request $request The request to check for a match
-     *
-     * @return bool true if the request matches, false otherwise
-     */
-    public function matches(Request $request);
 }

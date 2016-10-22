@@ -195,13 +195,11 @@ class SecurityExtension extends Extension
         ));
 
         foreach ($config['access_control'] as $access) {
-            $matcher = $this->createRequestMatcher(
-                $container,
-                $access['path'],
-                $access['host'],
-                $access['methods'],
-                $access['ips']
-            );
+            if (null !== $access['matcher']) {
+                $matcher = new Reference($access['matcher']);
+            } else {
+                $matcher = $this->createRequestMatcher($container, $access['path'], $access['host'], $access['methods'], $access['ips']);
+            }
 
             $attributes = $access['roles'];
             if ($access['allow_if']) {

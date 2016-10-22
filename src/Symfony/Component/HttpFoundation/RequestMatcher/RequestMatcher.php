@@ -57,10 +57,6 @@ class RequestMatcher extends ChainRequestMatcher
      */
     public function matches(Request $request)
     {
-        if (!parent::matches($request)) {
-            return false;
-        }
-
         if ($this->schemes && !in_array($request->getScheme(), $this->schemes)) {
             return false;
         }

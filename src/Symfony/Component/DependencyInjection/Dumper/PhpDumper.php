@@ -1112,7 +1112,7 @@ EOF;
             $export = $this->exportParameters(array($value));
             $export = explode('0 => ', substr(rtrim($export, " )\n"), 7, -1), 2);
 
-            if (preg_match("/\\\$this->(?:getEnv\('\w++'\)|targetDirs\[\d++\])/", $export[1])) {
+            if (preg_match("/\\\$this->(?:getEnv\('(?:\w++:)*+\w++'\)|targetDirs\[\d++\])/", $export[1])) {
                 $dynamicPhp[$key] = sprintf('%scase %s: $value = %s; break;', $export[0], $this->export($key), $export[1]);
             } else {
                 $php[] = sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
@@ -1685,7 +1685,7 @@ EOF;
                 return $dumpedValue;
             }
 
-            if (!preg_match("/\\\$this->(?:getEnv\('\w++'\)|targetDirs\[\d++\])/", $dumpedValue)) {
+            if (!preg_match("/\\\$this->(?:getEnv\('(?:\w++:)*+\w++'\)|targetDirs\[\d++\])/", $dumpedValue)) {
                 return sprintf("\$this->parameters['%s']", $name);
             }
         }
@@ -1880,13 +1880,16 @@ EOF;
     {
         $export = var_export($value, true);
 
-        if ("'" === $export[0] && $export !== $resolvedExport = $this->container->resolveEnvPlaceholders($export, "'.\$this->getEnv('%s').'")) {
+        if ("'" === $export[0] && $export !== $resolvedExport = $this->container->resolveEnvPlaceholders($export, "'.\$this->getEnv('string:%s').'")) {
             $export = $resolvedExport;
-            if ("'" === $export[1]) {
-                $export = substr($export, 3);
-            }
             if (".''" === substr($export, -3)) {
                 $export = substr($export, 0, -3);
+                if ("'" === $export[1]) {
+                    $export = substr_replace($export, '', 18, 7);
+                }
+            }
+            if ("'" === $export[1]) {
+                $export = substr($export, 3);
             }
         }
 

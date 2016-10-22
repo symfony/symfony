@@ -43,6 +43,7 @@ class PassConfig
             100 => array(
                 $resolveClassPass = new ResolveClassPass(),
                 new ResolveInstanceofConditionalsPass(),
+                new RegisterEnvVarProcessorsPass(),
             ),
         );
 

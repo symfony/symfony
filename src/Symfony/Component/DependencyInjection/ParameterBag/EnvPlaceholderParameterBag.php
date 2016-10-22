@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 class EnvPlaceholderParameterBag extends ParameterBag
 {
     private $envPlaceholders = array();
+    private $envReferencedServices = array();
 
     /**
      * {@inheritdoc}
@@ -34,7 +35,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
                     return $placeholder; // return first result
                 }
             }
-            if (preg_match('/\W/', $env)) {
+            if (!preg_match('/^([-.a-zA-Z0-9_\x7f-\xff]++)(?:@([-.a-zA-Z0-9_\x7f-\xff]++))?$/', $env, $match)) {
                 throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
             }
 
@@ -44,6 +45,11 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 if (null !== $defaultValue && !is_scalar($defaultValue)) {
                     throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar or null, but "%s" given to "%s".', gettype($defaultValue), $name));
                 }
+            }
+            if (isset($match[2])) {
+                $serviceId = strtolower($match[2]);
+                $this->envReferencedServices[$serviceId] = $serviceId;
+                $env = $match[1].'@'.$serviceId;
             }
 
             $uniqueName = md5($name.uniqid(mt_rand(), true));
@@ -64,6 +70,16 @@ class EnvPlaceholderParameterBag extends ParameterBag
     public function getEnvPlaceholders()
     {
         return $this->envPlaceholders;
+    }
+
+    /**
+     * Returns the list of services referenced in `env()` parameters.
+     *
+     * @return string[] The list of services referenced in `env()` parameters
+     */
+    public function getEnvReferencedServices()
+    {
+        return $this->envReferencedServices;
     }
 
     /**

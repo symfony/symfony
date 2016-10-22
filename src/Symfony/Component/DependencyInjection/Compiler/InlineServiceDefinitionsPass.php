@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -104,6 +105,10 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass implements Repe
         }
 
         if (count($ids) > 1 && is_array($factory = $definition->getFactory()) && ($factory[0] instanceof Reference || $factory[0] instanceof Definition)) {
+            return false;
+        }
+
+        if (($bag = $this->container->getParameterBag)() instanceof EnvPlaceholderParameterBag && isset($bag->getEnvReferencedServices()[$id])) {
             return false;
         }
 

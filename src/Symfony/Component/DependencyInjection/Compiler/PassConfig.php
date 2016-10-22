@@ -81,6 +81,10 @@ class PassConfig
             new AutowireExceptionPass($autowirePass, $inlinedServicePass),
             new CheckExceptionOnInvalidReferenceBehaviorPass(),
         ));
+
+        $this->afterRemovingPasses = array(array(
+            new CheckEnvReferencedServicesPass(),
+        ));
     }
 
     /**

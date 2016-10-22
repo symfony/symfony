@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\GetEnvInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator;
@@ -344,7 +345,11 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(), '->dump() dumps inline definitions which reference service_container');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services26.php', $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_EnvParameters')), '->dump() dumps inline definitions which reference service_container');
+
+        require self::$fixturesPath.'/php/services26.php';
+        $container = new \Symfony_DI_PhpDumper_Test_EnvParameters();
+        $this->assertSame('BAZ123', $container->getParameter('baz'));
     }
 
     /**
@@ -669,5 +674,13 @@ class PhpDumperTest extends TestCase
         $container = new \Symfony_DI_PhpDumper_Test_Private_Service_Triggers_Deprecation();
 
         $container->get('bar');
+    }
+}
+
+class EnvResolver implements GetEnvInterface
+{
+    public function getEnv($name)
+    {
+        return strtoupper($name).'123';
     }
 }

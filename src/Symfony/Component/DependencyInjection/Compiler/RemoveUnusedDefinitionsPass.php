@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 
 /**
  * Removes unused service definitions from the container.
@@ -38,10 +39,11 @@ class RemoveUnusedDefinitionsPass implements RepeatablePassInterface
     public function process(ContainerBuilder $container)
     {
         $graph = $container->getCompiler()->getServiceReferenceGraph();
+        $envReferencedServices = $container->getParameterBag() instanceof EnvPlaceholderParameterBag ? $container->getParameterBag()->getEnvReferencedServices() : array();
 
         $hasChanged = false;
         foreach ($container->getDefinitions() as $id => $definition) {
-            if ($definition->isPublic()) {
+            if ($definition->isPublic() || isset($envReferencedServices[$id])) {
                 continue;
             }
 

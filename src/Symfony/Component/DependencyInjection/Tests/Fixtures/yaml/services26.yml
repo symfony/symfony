@@ -1,6 +1,7 @@
 parameters:
     env(FOO): foo
     bar: '%env(FOO)%'
+    baz: '%env(Baz@Env_Resolver)%'
 
 services:
     test:
@@ -8,3 +9,6 @@ services:
         arguments:
             - '%env(Bar)%'
             - 'foo%bar%baz'
+    env_resolver:
+        class: 'Symfony\Component\DependencyInjection\Tests\Dumper\EnvResolver'
+        public: false

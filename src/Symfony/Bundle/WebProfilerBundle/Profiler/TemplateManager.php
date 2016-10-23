@@ -127,7 +127,11 @@ class TemplateManager
         }
 
         try {
-            $loader->getSource($template);
+            if ($loader instanceof \Twig_SourceContextLoaderInterface) {
+                $loader->getSourceContext($template);
+            } else {
+                $loader->getSource($template);
+            }
 
             return true;
         } catch (\Twig_Error_Loader $e) {

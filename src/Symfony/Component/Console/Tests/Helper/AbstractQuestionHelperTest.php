@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Helper;
 
 use Symfony\Component\Console\Input\StreamableInputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 
 abstract class AbstractQuestionHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,5 +30,26 @@ abstract class AbstractQuestionHelperTest extends \PHPUnit_Framework_TestCase
         }
 
         return $mock;
+    }
+
+    protected function getInputStream($input)
+    {
+        $stream = fopen('php://memory', 'r+', false);
+        fwrite($stream, $input);
+        rewind($stream);
+
+        return $stream;
+    }
+
+    protected function createOutput()
+    {
+        return new StreamOutput(fopen('php://memory', 'r+', false));
+    }
+
+    protected function assertOutputContains($expected, StreamOutput $output)
+    {
+        rewind($output->getStream());
+        $stream = stream_get_contents($output->getStream());
+        $this->assertContains($expected, $stream);
     }
 }

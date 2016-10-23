@@ -142,6 +142,23 @@ class DecoratorServicePassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('name' => 'bar'), $container->getDefinition('baz')->getTags());
     }
 
+    public function testDecoratingDefinitionInheritsAutowireFromDecoratedDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setAutowired(true)
+        ;
+        $container
+            ->register('baz')
+            ->setDecoratedService('foo')
+        ;
+
+        $this->process($container);
+
+        $this->assertTrue($container->getDefinition('baz')->isAutowired());
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $repeatedPass = new DecoratorServicePass();

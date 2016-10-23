@@ -90,26 +90,6 @@ class AddConsoleCommandPassTest extends \PHPUnit_Framework_TestCase
 
         $container->compile();
     }
-
-    public function testHttpKernelRegisterCommandsIngoreCommandAsAService()
-    {
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddConsoleCommandPass());
-        $definition = new Definition('Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\MyCommand');
-        $definition->addTag('console.command');
-        $container->setDefinition('my-command', $definition);
-        $container->compile();
-
-        $application = $this->getMock('Symfony\Component\Console\Application');
-        // Never called, because it's the
-        // Symfony\Bundle\FrameworkBundle\Console\Application that register
-        // commands as a service
-        $application->expects($this->never())->method('add');
-
-        $bundle = new ExtensionPresentBundle();
-        $bundle->setContainer($container);
-        $bundle->registerCommands($application);
-    }
 }
 
 class MyCommand extends Command

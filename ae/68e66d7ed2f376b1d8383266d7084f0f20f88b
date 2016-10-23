@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-22T08:46:54Z
+
+Status: Reviewed
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-22T09:45:02Z
+
+This patch is for parent/child definitions. Do we have the same issue for service decoration (as handled in the `DecoratorServicePass`)?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-22T10:17:41Z
+
+@xabbuh This patch concerns service decoration, not parent/child (abstract services). In fact the `ResolveDefinitionTemplatesPass` is responsible of resolving/merging definitions for both parent/child and decorated/decorator services, as both are using `DefinitionDecorator`.
+
+Here we are explicitly ignoring abstract services, because only decorated services (corresponding to `%service_id%` in `decorates: %service_id%`) must loose autowiring types, otherwise it is always this one which is used for autowiring services (the decorated instead of the decorator).
+
+Applying this patch to parent/child definitions (removing autowiring types from the abstract parent def) would mean that only the first child of the abstract service inherit the autowiring types, that is not what we want.
+
+Note that this issue is very specific to autowiring types.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-22T10:51:49Z
+
+@xabbuh You are totally right, I was not at the right place. It must indeed be done in the `DecoratorServicePass`. I made the changes and tested the patch on #20260, it works. Thanks!
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-22T12:46:06Z
+
+Failed builds are unrelated (Twig).

@@ -447,7 +447,7 @@ class Response
      * If the status text is null it will be automatically populated for the known
      * status codes and left empty otherwise.
      *
-     * @return Response
+     * @return $this
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      */

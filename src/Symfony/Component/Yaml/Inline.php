@@ -645,7 +645,10 @@ class Inline
                         return (float) str_replace(array(',', '_'), '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
                         if (Yaml::PARSE_DATETIME & $flags) {
-                            return new \DateTime($scalar, new \DateTimeZone('UTC'));
+                            $date = new \DateTime($scalar);
+                            $date->setTimeZone(new \DateTimeZone('UTC'));
+
+                            return $date;
                         }
 
                         $timeZone = date_default_timezone_get();

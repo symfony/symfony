@@ -65,7 +65,7 @@ class DumpNode extends \Twig_Node
                 ->write('\Symfony\Component\VarDumper\VarDumper::dump(array('."\n")
                 ->indent();
             foreach ($values as $node) {
-                $compiler->addIndentation();
+                $compiler->write('');
                 if ($node->hasAttribute('name')) {
                     $compiler
                         ->string($node->getAttribute('name'))

@@ -56,13 +56,23 @@ class DbalSessionHandler implements \SessionHandlerInterface
     /**
      * Constructor.
      *
+     * List of available options:
+     *  * db_id_col: The column where to store the session id [default: sess_id]
+     *  * db_data_col: The column where to store the session data [default: sess_data]
+     *  * db_time_col: The column where to store the timestamp [default: sess_time]
+     *
      * @param Connection $con       A connection
      * @param string     $tableName Table name
+     * @param array      $options   An associative array of options
      */
-    public function __construct(Connection $con, $tableName = 'sessions')
+    public function __construct(Connection $con, $tableName = 'sessions', array $options = [])
     {
         $this->con = $con;
         $this->table = $tableName;
+
+        $this->idCol = isset($options['db_id_col']) ? $options['db_id_col'] : $this->idCol;
+        $this->dataCol = isset($options['db_data_col']) ? $options['db_data_col'] : $this->dataCol;
+        $this->timeCol = isset($options['db_time_col']) ? $options['db_time_col'] : $this->timeCol;
     }
 
     /**

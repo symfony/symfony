@@ -65,7 +65,7 @@ class DbalSessionHandler implements \SessionHandlerInterface
      * @param string     $tableName Table name
      * @param array      $options   An associative array of options
      */
-    public function __construct(Connection $con, $tableName = 'sessions', array $options = [])
+    public function __construct(Connection $con, $tableName = 'sessions', array $options = array())
     {
         $this->con = $con;
         $this->table = $tableName;

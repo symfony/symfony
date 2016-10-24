@@ -7,6 +7,9 @@ CHANGELOG
  * added `AppVariable::getToken()`
  * Deprecated the possibility to inject the Form Twig Renderer into the form
    extension. Inject it on TwigRendererEngine instead.
+ * added `IntlExtension` providing `localized_country`, `localized_currency`,
+   `localized_currency_name`, `currency_symbol`, `localized_date`,
+   `localized_language`, `localized_locale` and `localized_number` filters
 
 2.7.0
 -----

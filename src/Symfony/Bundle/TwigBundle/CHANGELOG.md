@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.2.0
+-----
+
+ * added support for `Symfony\Bridge\Twig\Extension\IntlExtension` as a service
+
 2.7.0
 -----
 

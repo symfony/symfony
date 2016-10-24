@@ -121,6 +121,8 @@
 
         <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false" />
 
+        <service id="twig.extension.intl_bridge" class="Symfony\Bridge\Twig\Extension\IntlExtension" public="false" />
+
         <service id="twig.form.engine" class="Symfony\Bridge\Twig\Form\TwigRendererEngine" public="false">
             <argument>%twig.form.resources%</argument>
             <argument type="service" id="twig" />

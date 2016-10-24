@@ -337,8 +337,11 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
 
         $this->process($container);
 
-        $def = $container->getDefinition('child');
-        $this->assertEquals(array('Foo', 'Bar'), $def->getAutowiringTypes());
+        $childDef = $container->getDefinition('child');
+        $this->assertEquals(array('Foo', 'Bar'), $childDef->getAutowiringTypes());
+
+        $parentDef = $container->getDefinition('parent');
+        $this->assertSame(array('Foo'), $parentDef->getAutowiringTypes());
     }
 
     public function testProcessResolvesAliases()

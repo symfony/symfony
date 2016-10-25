@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-09-20T16:38:43Z
+
+@jeremyFreeAgent can we open this page relatively simple in a modal overlay? Not leaving the current page. Simple iframe loading would be just fine i guess..
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-23T18:14:55Z
+
+I like this. Can you take @nicolas-grekas comments into account?
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2016-10-03T13:08:49Z
+
+I've pushed the changes.
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2016-10-03T13:21:46Z
+
+@ro0NL It could be done in a next PR.
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2016-10-03T13:31:24Z
+
+status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-03T15:45:44Z
+
+Nice job & feature!
+:+1:  (failures unrelated, known composer bug on deps=low)
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2016-10-03T15:47:31Z
+
+Thanks @nicolas-grekas for your time!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-03T16:05:28Z
+
+Can you submit a PR on Silex-WebProfiler to be sure that everything will still work if used outside of the context of the full framework?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-25T13:37:36Z
+
+:+1: (failure unrelated, know composer bug)
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2016-10-25T13:54:12Z
+
+I've made the changes in the Silex WebProfiler PR too.

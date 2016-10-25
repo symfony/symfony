@@ -13,8 +13,12 @@ namespace Symfony\Component\Serializer;
 
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
+use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
+use Symfony\Component\Serializer\Encoder\ContextAwareEncoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -37,7 +41,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Serializer implements SerializerInterface, NormalizerInterface, DenormalizerInterface, EncoderInterface, DecoderInterface
+class Serializer implements SerializerInterface, ContextAwareNormalizerInterface, ContextAwareDenormalizerInterface , ContextAwareEncoderInterface, ContextAwareDecoderInterface
 {
     /**
      * @var Encoder\ChainEncoder
@@ -177,20 +181,16 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null/*, array $context = array()*/)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
-        $context = 3 === func_num_args() ? func_get_arg(2) : array();
-
         return null !== $this->getNormalizer($data, $format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null/*, array $context = array()*/)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
-        $context = 4 === func_num_args() ? func_get_arg(3) : array();
-
         return null !== $this->getDenormalizer($data, $type, $format, $context);
     }
 
@@ -276,20 +276,16 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format/*, array $context = array()*/)
+    public function supportsEncoding($format, array $context = array())
     {
-        $context = 2 === func_num_args() ? func_get_arg(1) : array();
-
         return $this->encoder->supportsEncoding($format, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format/*, array $context = array()*/)
+    public function supportsDecoding($format, array $context = array())
     {
-        $context = 2 === func_num_args() ? func_get_arg(1) : array();
-
         return $this->decoder->supportsDecoding($format, $context);
     }
 }

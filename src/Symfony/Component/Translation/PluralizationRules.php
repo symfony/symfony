@@ -66,7 +66,6 @@ class PluralizationRules
             case 'kn':
             case 'ko':
             case 'ms':
-            case 'th':
             case 'tr':
             case 'vi':
             case 'zh':
@@ -120,6 +119,7 @@ class PluralizationRules
             case 'sw':
             case 'ta':
             case 'te':
+            case 'th':
             case 'tk':
             case 'ur':
             case 'zu':

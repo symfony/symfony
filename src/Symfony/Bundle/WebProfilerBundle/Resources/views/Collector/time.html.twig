@@ -60,10 +60,19 @@
             <span class="label">Symfony initialization</span>
         </div>
 
+        {% if profile.collectors.memory %}
+            <div class="metric">
+                <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MB</span></span>
+                <span class="label">Peak memory usage</span>
+            </div>
+        {% endif %}
+
         {% if profile.children|length > 0 %}
+            <div class="metric-divider"></div>
+
             <div class="metric">
                 <span class="value">{{ profile.children|length }}</span>
-                <span class="label">Sub-Requests</span>
+                <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }}</span>
             </div>
 
             {% set subrequests_time = 0 %}
@@ -73,14 +82,7 @@
 
             <div class="metric">
                 <span class="value">{{ subrequests_time }} <span class="unit">ms</span></span>
-                <span class="label">Sub-Requests time</span>
-            </div>
-        {% endif %}
-
-        {% if profile.collectors.memory %}
-            <div class="metric">
-                <span class="value">{{ '%.2f'|format(profile.collectors.memory.memory / 1024 / 1024) }} <span class="unit">MB</span></span>
-                <span class="label">Peak memory usage</span>
+                <span class="label">Sub-Request{{ profile.children|length > 1 ? 's' }} time</span>
             </div>
         {% endif %}
     </div>

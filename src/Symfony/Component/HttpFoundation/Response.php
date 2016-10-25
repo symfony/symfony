@@ -219,7 +219,7 @@ class Response
      * @param int   $status  The response status code
      * @param array $headers An array of response headers
      *
-     * @return $this
+     * @return static
      */
     public static function create($content = '', $status = 200, $headers = array())
     {

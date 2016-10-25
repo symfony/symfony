@@ -1,0 +1,17 @@
+{% extends '@WebProfiler/Profiler/base.html.twig' %}
+
+{% block head %}
+    <style>
+        {{ include('@WebProfiler/Profiler/open.css.twig') }}
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="header">
+    <a class="doc" href="https://symfony.com/doc/{{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}/reference/configuration/framework.html#ide" rel="help">Open in your IDE?</a>
+    <h1>{{ file }} <small>line {{ line }}</small></h1>
+</div>
+<div class="source">
+    {{ filename|file_excerpt(line, -1) }}
+</div>
+{% endblock %}

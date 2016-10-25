@@ -40,13 +40,8 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
     public function __construct(Stopwatch $stopwatch = null, $fileLinkFormat = null, $charset = null, RequestStack $requestStack = null, DataDumperInterface $dumper = null)
     {
-        $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
-            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
-        }
         $this->stopwatch = $stopwatch;
-        $this->fileLinkFormat = $fileLinkFormat;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->charset = $charset ?: ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8';
         $this->requestStack = $requestStack;
         $this->dumper = $dumper;
@@ -262,23 +257,16 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     private function doDump($data, $name, $file, $line)
     {
         if ($this->dumper instanceof CliDumper) {
-            $contextDumper = function ($name, $file, $line, $fileLinkFormat) {
+            $contextDumper = function ($name, $file, $line, $fmt) {
                 if ($this instanceof HtmlDumper) {
                     if ('' !== $file) {
                         $s = $this->style('meta', '%s');
+                        $f = strip_tags($this->style('', $file));
                         $name = strip_tags($this->style('', $name));
-                        $file = strip_tags($this->style('', $file));
-                        if ($fileLinkFormat) {
-                            for ($i = 1; isset($fileLinkFormat[$i]); ++$i) {
-                                if (0 === strpos($file, $k = $fileLinkFormat[$i++])) {
-                                    $file = substr_replace($file, $fileLinkFormat[$i], 0, strlen($k));
-                                    break;
-                                }
-                            }
-                            $link = strtr(strip_tags($this->style('', $fileLinkFormat[0])), array('%f' => $file, '%l' => (int) $line));
-                            $name = sprintf('<a href="%s" title="%s">'.$s.'</a>', $link, $file, $name);
+                        if ($fmt && $link = is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line)) {
+                            $name = sprintf('<a href="%s" title="%s">'.$s.'</a>', strip_tags($this->style('', $link)), $f, $name);
                         } else {
-                            $name = sprintf('<abbr title="%s">'.$s.'</abbr>', $file, $name);
+                            $name = sprintf('<abbr title="%s">'.$s.'</abbr>', $f, $name);
                         }
                     } else {
                         $name = $this->style('meta', $name);

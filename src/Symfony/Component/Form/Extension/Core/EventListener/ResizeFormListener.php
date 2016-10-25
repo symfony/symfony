@@ -85,15 +85,18 @@ class ResizeFormListener implements EventSubscriberInterface
         }
 
         // First remove all rows
+        $oldOptions = array();
         foreach ($form as $name => $child) {
+            $oldOptions[$name] = $form->get($name)->getConfig()->getOptions();
             $form->remove($name);
         }
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
+            $options = isset($oldOptions[$name]) ? $oldOptions[$name] : $this->options;
             $form->add($name, $this->type, array_replace(array(
                 'property_path' => '['.$name.']',
-            ), $this->options));
+            ), $options));
         }
     }
 

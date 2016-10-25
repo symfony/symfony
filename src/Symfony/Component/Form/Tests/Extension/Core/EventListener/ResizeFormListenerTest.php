@@ -39,14 +39,14 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
         $this->form = null;
     }
 
-    protected function getBuilder($name = 'name')
+    protected function getBuilder($name = 'name', array $options = array())
     {
-        return new FormBuilder($name, null, $this->dispatcher, $this->factory);
+        return new FormBuilder($name, null, $this->dispatcher, $this->factory, $options);
     }
 
-    protected function getForm($name = 'name')
+    protected function getForm($name = 'name', array $options = array())
     {
-        return $this->getBuilder($name)->getForm();
+        return $this->getBuilder($name, $options)->getForm();
     }
 
     /**
@@ -64,8 +64,8 @@ class ResizeFormListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSetDataResizesForm()
     {
-        $this->form->add($this->getForm('0'));
-        $this->form->add($this->getForm('1'));
+        $this->form->add($this->getForm('0', array('attr' => array('maxlength' => 10))));
+        $this->form->add($this->getForm('1', array('attr' => array('maxlength' => 10))));
 
         $this->factory->expects($this->at(0))
             ->method('createNamed')

@@ -63,7 +63,6 @@ class TimeType extends AbstractType
 
                 });
             }
-
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array(
                 'error_bubbling' => true,

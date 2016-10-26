@@ -60,7 +60,21 @@ class Query extends AbstractQuery
 
             $con = $this->connection->getResource();
 
-            $this->search = @ldap_search(
+            switch ($this->options['scope']) {
+                case static::SCOPE_BASE:
+                    $func = 'ldap_read';
+                    break;
+                case static::SCOPE_ONELEVEL:
+                    $func = 'ldap_list';
+                    break;
+                case static::SCOPE_SUBTREE:
+                    $func = 'ldap_search';
+                    break;
+                default:
+                    throw new LdapException(sprintf('Could not search in scope %s', $this->options['scopen']));
+            }
+
+            $this->search = @$func(
                 $con,
                 $this->dn,
                 $this->query,

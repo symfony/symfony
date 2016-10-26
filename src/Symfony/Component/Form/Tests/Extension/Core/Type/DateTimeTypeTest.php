@@ -187,7 +187,7 @@ class DateTimeTypeTest extends TestCase
                 'month' => '6',
                 'year' => '2010',
             ),
-            'time' => '03:04'
+            'time' => '03:04',
         );
 
         $form->submit($input);

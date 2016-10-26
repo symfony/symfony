@@ -136,7 +136,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         if ($this->parseFormat === 'H:i:s|') {
             if (!preg_match('((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9]))', $value) &&
                 preg_match('((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9]))', $value)) {
-                $value = $value . ":00";
+                $value = $value.':00';
             }
         }
 

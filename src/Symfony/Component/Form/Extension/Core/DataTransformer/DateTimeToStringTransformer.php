@@ -132,6 +132,14 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('Expected a string.');
         }
 
+        // handle seconds ignored by user's browser when seconds as single_text is 0
+        if ($this->parseFormat === 'H:i:s|') {
+            if (!preg_match('((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9]))', $value) &&
+                preg_match('((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9]))', $value)) {
+                $value = $value . ":00";
+            }
+        }
+
         $outputTz = new \DateTimeZone($this->outputTimezone);
         $dateTime = \DateTime::createFromFormat($this->parseFormat, $value, $outputTz);
 

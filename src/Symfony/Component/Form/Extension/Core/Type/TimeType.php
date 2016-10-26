@@ -52,15 +52,14 @@ class TimeType extends AbstractType
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
 
-            // handle seconds ignored by user's browser when with_seconds enabled and seconds is 00
+            // handle seconds ignored by user's browser when with_seconds enabled
+            // https://codereview.chromium.org/450533009/
             if ($options['with_seconds']) {
                 $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e) {
-                    if ($data = $e->getData()) {
-                        if (preg_match('/^\d{2}:\d{2}$/', $data)) {
-                            $e->setData($data.':00');
-                        }
+                    $data = $e->getData();
+                    if ($data && preg_match('/^\d{2}:\d{2}$/', $data)) {
+                        $e->setData($data.':00');
                     }
-
                 });
             }
         } else {

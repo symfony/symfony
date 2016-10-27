@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-27T08:52:54Z
+
+For the records, this adds the compatibility with twigphp/twig#2194.
+
+---------------------------------------------------------------------------
+
+by xkobal at 2016-10-27T09:01:02Z
+
+@xabbuh Done
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-27T10:43:09Z
+
+👍 Can we add a test for this too (or did the tests already fail before)?
+
+---------------------------------------------------------------------------
+
+by xkobal at 2016-10-27T11:45:33Z
+
+@xabbuh I have added a new test
+
+---------------------------------------------------------------------------
+
+by xkobal at 2016-10-27T11:46:28Z
+
+There were no failing tests, I have found this bug when I have upgraded my project with the Symfony 3.1.6

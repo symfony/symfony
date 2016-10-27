@@ -254,7 +254,7 @@ stream resource {@{$ref}
     -trace: {
       %d. __TwigTemplate_VarDumperFixture_u75a09->doDisplay() ==> new Exception(): {
         src: {
-          %sTwig.php:19: """
+          %sTwig.php:21: """
                 // line 2\\n
                 throw new \Exception('Foobar');\\n
             }\\n

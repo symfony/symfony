@@ -157,17 +157,15 @@ class ExceptionCaster
                     $template = isset($f['object']) ? $f['object'] : new $f['class'](new \Twig_Environment(new \Twig_Loader_Filesystem()));
 
                     $ellipsis = 0;
-                    $templateName = $template->getTemplateName();
                     $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
                     $templateInfo = $template->getDebugInfo();
                     if (isset($templateInfo[$f['line']])) {
-                        if (method_exists($template, 'getSourceContext')) {
-                            $templateName = $template->getSourceContext()->getPath() ?: $templateName;
-                        }
+                        $templatePath = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getPath() : null;
+
                         if ($templateSrc) {
                             $templateSrc = explode("\n", $templateSrc);
-                            $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, $caller, 'twig');
-                            $srcKey = $templateName.':'.$templateInfo[$f['line']];
+                            $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, $caller, 'twig', $templatePath);
+                            $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
                         }
                     }
                 }

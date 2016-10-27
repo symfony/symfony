@@ -268,13 +268,6 @@ EOTXT
         $this->assertStringMatchesFormat(
             <<<EOTXT
 stream resource {@{$ref}
-%Awrapper_type: "PHP"
-  stream_type: "MEMORY"
-  mode: "%s+b"
-  unread_bytes: 0
-  seekable: true
-  uri: "php://memory"
-%Aoptions: []
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     -trace: {
@@ -305,6 +298,13 @@ stream resource {@{$ref}
       }
     }
   }
+%Awrapper_type: "PHP"
+  stream_type: "MEMORY"
+  mode: "%s+b"
+  unread_bytes: 0
+  seekable: true
+  uri: "php://memory"
+%Aoptions: []
 }
 
 EOTXT

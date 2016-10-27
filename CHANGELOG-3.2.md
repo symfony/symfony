@@ -149,7 +149,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #18869 [Routing] Throw exception when PHP start tag is missing (WouterJ)
  * feature #18781 [Console] Display errors in quiet mode (multi-io)
  * feature #19011 [HttpKernel] Add convenient method ArgumentResolver:: getDefaultArgumentValueResolvers (romainneutron)
- * feature #18977 [PropertyAccess] Add missing arguments to PropertyAccess::createPropertyAccessor() (chalasr)
  * feature #18568 [WebProfilerBundle] Fix bundle usage in Content-Security-Policy context without unsafe-inline (romainneutron)
  * feature #16838 [PropertyAccess] Add PSR-6 cache (dunglas)
  * feature #18790 [Console] Show aliases in command description instead of in different lines in application description (juanmirod)

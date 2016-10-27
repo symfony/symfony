@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-10-27T13:33:29Z
+
+I've tested this PR and the new output is quite different from the one reported in #20320. However, I think that this new output makes it more difficult to understand what's going on (and there are some design issues, such as the different font families applied to the output):
+
+![deprecation_stack_trace](https://cloud.githubusercontent.com/assets/73419/19769159/97083d94-9c5a-11e6-8525-593ebd24d6cf.png)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-27T13:40:29Z
+
+@javiereguiluz please open a new issue or a PR (esp. for the font issue, which is not intentional)

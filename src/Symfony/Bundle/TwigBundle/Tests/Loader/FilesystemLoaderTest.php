@@ -115,4 +115,17 @@ class FilesystemLoaderTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($loader, 'name.format.engine');
     }
+    
+    public function testTwigSoftErrorIfTemplateDoesNotExist()
+    {
+        $parser = $this->getMock('Symfony\Component\Templating\TemplateNameParserInterface');
+        $locator = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+
+        $loader = new FilesystemLoader($locator, $parser);
+        $loader->addPath(__DIR__.'/../DependencyInjection/Fixtures/Resources/views');
+
+        $method = new \ReflectionMethod('Symfony\Bundle\TwigBundle\Loader\FilesystemLoader', 'findTemplate');
+        $method->setAccessible(true);
+        $this->assertFalse($method->invoke($loader, 'name.format.engine', false));
+    }
 }

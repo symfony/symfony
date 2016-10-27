@@ -31,7 +31,7 @@ class Terminal
             self::initDimensions();
         }
 
-        return self::$width;
+        return self::$width ?: 80;
     }
 
     /**
@@ -49,7 +49,7 @@ class Terminal
             self::initDimensions();
         }
 
-        return self::$height;
+        return self::$height ?: 50;
     }
 
     private static function initDimensions()

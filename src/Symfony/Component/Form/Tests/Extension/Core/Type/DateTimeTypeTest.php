@@ -167,34 +167,6 @@ class DateTimeTypeTest extends TestCase
         $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:05 UTC'), $form->getData());
     }
 
-    public function testSubmitWithSecondsAndBrowserOmissionSeconds()
-    {
-        $form = $this->factory->create('datetime', null, array(
-            'model_timezone' => 'UTC',
-            'view_timezone' => 'UTC',
-            'date_widget' => 'choice',
-            'years' => array(2010),
-            'time_widget' => 'single_text',
-            'input' => 'datetime',
-            'with_seconds' => true,
-        ));
-
-        $form->setData(new \DateTime());
-
-        $input = array(
-            'date' => array(
-                'day' => '2',
-                'month' => '6',
-                'year' => '2010',
-            ),
-            'time' => '03:04',
-        );
-
-        $form->submit($input);
-
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 03:04:00 UTC'), $form->getData());
-    }
-
     public function testSubmitDifferentTimezones()
     {
         $form = $this->factory->create('datetime', null, array(

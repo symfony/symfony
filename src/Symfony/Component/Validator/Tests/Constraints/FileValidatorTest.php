@@ -406,6 +406,17 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testAllowEmpty()
+    {
+        ftruncate($this->file, 0);
+
+        $constraint = new File(array('allowEmpty' => true));
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+
+        $this->assertNoViolation();
+    }
+
     /**
      * @dataProvider uploadedFileErrorProvider
      */

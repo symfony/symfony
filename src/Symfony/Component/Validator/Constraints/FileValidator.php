@@ -139,7 +139,7 @@ class FileValidator extends ConstraintValidator
 
         $sizeInBytes = filesize($path);
 
-        if (0 === $sizeInBytes) {
+        if (!$constraint->allowEmpty && 0 === $sizeInBytes) {
             $this->context->buildViolation($constraint->disallowEmptyMessage)
                 ->setParameter('{{ file }}', $this->formatValue($path))
                 ->setCode(File::EMPTY_ERROR)

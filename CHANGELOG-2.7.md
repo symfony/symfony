@@ -7,6 +7,28 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.20 (2016-10-27)
+
+ * bug #20289 Fix edge case with StreamedResponse where headers are sent twice (Nicofuma)
+ * bug #20278 [DependencyInjection] merge tags instead of completely replacing them (xabbuh)
+ * bug #20271 Changes related to Twig 1.27 (fabpot)
+ * bug #20252 Trim constant values in XmlFileLoader (lstrojny)
+ * bug #20253 [TwigBridge] Use non-deprecated Twig_Node::getTemplateLine() (fabpot)
+ * bug #20235 [DomCrawler] Allow pipe (|) character in link tags when using Xpath expressions (klausi, nicolas-grekas)
+ * bug #20224 [Twig] removed deprecations added in Twig 1.27 (fabpot)
+ * bug #19478 fixed Filesystem:makePathRelative and added 2 more testcases (muhammedeminakbulut)
+ * bug #20218 [HttpFoundation] no 304 response if method is not cacheable (xabbuh)
+ * bug #20207 [DependencyInjection] move tags from decorated to decorating service (xabbuh)
+ * bug #20205 [HttpCache] fix: do not cache OPTIONS request (dmaicher)
+ * bug #20146 [Validator] Prevent infinite loop in PropertyMetadata (wesleylancel)
+ * bug #20184 [FrameworkBundle] Convert null prefix to an empty string in translation:update (chalasr)
+ * bug #19725 [Security] $attributes can be anything, but RoleVoter assumes strings (Jonatan Männchen)
+ * bug #20127 [HttpFoundation] JSONP callback validation (ro0NL)
+ * bug #20163 add missing use statement (xabbuh)
+ * bug #19961 [Console] Escape question text and default value in SymfonyStyle::ask() (chalasr)
+ * bug #20141 [Console] Fix validation of empty values using SymfonyQuestionHelper::ask() (chalasr)
+ * bug #20147 [FrameworkBundle] Alter container class instead of kernel name in cache:clear command (nicolas-grekas)
+
 * 2.7.19 (2016-10-03)
 
  * bug #20102 [Validator] Url validator not validating hosts ending in a number (gwkunze)

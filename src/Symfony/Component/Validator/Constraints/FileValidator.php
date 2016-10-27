@@ -35,6 +35,13 @@ class FileValidator extends ConstraintValidator
         self::MIB_BYTES => 'MiB',
     );
 
+    private $allowEmpty;
+
+    public function setAllowEmpty($allowEmpty)
+    {
+        $this->allowEmpty = $allowEmpty;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -138,6 +145,10 @@ class FileValidator extends ConstraintValidator
         }
 
         $sizeInBytes = filesize($path);
+
+        if (null === $constraint->allowEmpty) {
+            $constraint->allowEmpty = $this->allowEmpty;
+        }
 
         if (!$constraint->allowEmpty && 0 === $sizeInBytes) {
             $this->context->buildViolation($constraint->disallowEmptyMessage)

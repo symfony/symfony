@@ -581,6 +581,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
                         ->booleanNode('strict_email')->defaultFalse()->end()
+                        ->booleanNode('allow_empty_file')->defaultFalse()->end()
                     ->end()
                 ->end()
             ->end()

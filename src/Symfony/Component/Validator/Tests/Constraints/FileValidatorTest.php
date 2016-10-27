@@ -406,15 +406,56 @@ abstract class FileValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testAllowEmpty()
+    /**
+     * @dataProvider allowEmptyOptionProvider
+     */
+    public function testAllowEmptyOption($configurationOption, $constraintOption)
     {
         ftruncate($this->file, 0);
 
-        $constraint = new File(array('allowEmpty' => true));
+        $constraint = new File(array('allowEmpty' => $constraintOption));
+        $this->validator->setAllowEmpty($configurationOption);
 
         $this->validator->validate($this->getFile($this->path), $constraint);
 
         $this->assertNoViolation();
+    }
+
+    public static function allowEmptyOptionProvider()
+    {
+        return array(
+            array(true, true),
+            array(true, null),
+            array(false, true),
+        );
+    }
+
+    /**
+     * @dataProvider disallowEmptyOptionProvider
+     */
+    public function testDisallowEmptyOption($configurationOption, $constraintOption)
+    {
+        ftruncate($this->file, 0);
+
+        $constraint = new File(array('allowEmpty' => $constraintOption));
+        $this->validator->setAllowEmpty($configurationOption);
+
+        $this->validator->validate($this->getFile($this->path), $constraint);
+
+        $this
+            ->buildViolation($constraint->disallowEmptyMessage)
+            ->setParameter('{{ file }}', '"'.$this->path.'"')
+            ->setCode(File::EMPTY_ERROR)
+            ->assertRaised();
+    }
+
+    public static function disallowEmptyOptionProvider()
+    {
+        return array(
+            array(false, false),
+            array(false, null),
+            array(true, false),
+        );
     }
 
     /**

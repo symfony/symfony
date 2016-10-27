@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-27T09:16:09Z
+
+Looking more carefully, many realpath calls where not needed at all. Just removing them is enough.
+PR updated, code should be cleaner.

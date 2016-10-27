@@ -40,6 +40,7 @@ class RouteCompiler implements RouteCompilerInterface
         $hostVariables = array();
         $variables = array();
         $hostRegex = null;
+        $hostRegexVariablesAliases = array();
         $hostTokens = array();
 
         if ('' !== $host = $route->getHost()) {
@@ -50,6 +51,7 @@ class RouteCompiler implements RouteCompilerInterface
 
             $hostTokens = $result['tokens'];
             $hostRegex = $result['regex'];
+            $hostRegexVariablesAliases = $result['regex_variables_aliases'];
         }
 
         $path = $route->getPath();
@@ -63,6 +65,7 @@ class RouteCompiler implements RouteCompilerInterface
 
         $tokens = $result['tokens'];
         $regex = $result['regex'];
+        $regexVariablesAliases = $result['regex_variables_aliases'];
 
         return new CompiledRoute(
             $staticPrefix,
@@ -72,7 +75,9 @@ class RouteCompiler implements RouteCompilerInterface
             $hostRegex,
             $hostTokens,
             $hostVariables,
-            array_unique($variables)
+            array_unique($variables),
+            $regexVariablesAliases,
+            $hostRegexVariablesAliases
         );
     }
 
@@ -142,10 +147,12 @@ class RouteCompiler implements RouteCompilerInterface
             $tokens[] = array('text', substr($pattern, $pos));
         }
 
+        $tokensCount = count($tokens);
+
         // find the first optional token
         $firstOptional = PHP_INT_MAX;
         if (!$isHost) {
-            for ($i = count($tokens) - 1; $i >= 0; --$i) {
+            for ($i = $tokensCount - 1; $i >= 0; --$i) {
                 $token = $tokens[$i];
                 if ('variable' === $token[0] && $route->hasDefault($token[3])) {
                     $firstOptional = $i;
@@ -157,8 +164,26 @@ class RouteCompiler implements RouteCompilerInterface
 
         // compute the matching regexp
         $regexp = '';
-        for ($i = 0, $nbToken = count($tokens); $i < $nbToken; ++$i) {
-            $regexp .= self::computeRegexp($tokens, $i, $firstOptional);
+        $regexpVariablesAliases = array();
+        for ($i = 0, $nbToken = $tokensCount; $i < $nbToken; ++$i) {
+            $token = $tokens[$i];
+            switch ($token[0]) {
+                case 'text':
+                    $regexp .= self::computeRegexpForTextToken($token);
+                    break;
+                case 'variable':
+                    list($tokenRegexp, $regexpVariableName) = self::computeRegexpForVariableToken($token, $i, $tokensCount, $firstOptional, $variables);
+                    $regexp .= $tokenRegexp;
+
+                    $variableName = $token[3];
+                    if ($regexpVariableName !== $variableName) {
+                        $regexpVariablesAliases[$regexpVariableName] = $variableName;
+                    }
+
+                    break;
+                default:
+                    throw new \LogicException('The token type should be "text" or "variable".');
+            }
         }
 
         return array(
@@ -166,6 +191,7 @@ class RouteCompiler implements RouteCompilerInterface
             'regex' => self::REGEX_DELIMITER.'^'.$regexp.'$'.self::REGEX_DELIMITER.'s'.($isHost ? 'i' : ''),
             'tokens' => array_reverse($tokens),
             'variables' => $variables,
+            'regex_variables_aliases' => $regexpVariablesAliases,
         );
     }
 
@@ -189,41 +215,59 @@ class RouteCompiler implements RouteCompilerInterface
     }
 
     /**
-     * Computes the regexp used to match a specific token. It can be static text or a subpattern.
+     * Computes the regexp used to match a static text token.
      *
-     * @param array $tokens        The route tokens
-     * @param int   $index         The index of the current token
-     * @param int   $firstOptional The index of the first optional token
+     * @param array $token The static text token
      *
-     * @return string The regexp pattern for a single token
+     * @return string The regexp pattern of the token
      */
-    private static function computeRegexp(array $tokens, $index, $firstOptional)
+    private static function computeRegexpForTextToken(array $token)
     {
-        $token = $tokens[$index];
-        if ('text' === $token[0]) {
-            // Text tokens
-            return preg_quote($token[1], self::REGEX_DELIMITER);
-        } else {
-            // Variable tokens
-            if (0 === $index && 0 === $firstOptional) {
-                // When the only token is an optional variable token, the separator is required
-                return sprintf('%s(?P<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
-            } else {
-                $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $token[3], $token[2]);
-                if ($index >= $firstOptional) {
-                    // Enclose each optional token in a subpattern to make it optional.
-                    // "?:" means it is non-capturing, i.e. the portion of the subject string that
-                    // matched the optional subpattern is not passed back.
-                    $regexp = "(?:$regexp";
-                    $nbTokens = count($tokens);
-                    if ($nbTokens - 1 == $index) {
-                        // Close the optional subpatterns
-                        $regexp .= str_repeat(')?', $nbTokens - $firstOptional - (0 === $firstOptional ? 1 : 0));
-                    }
-                }
+        return preg_quote($token[1], self::REGEX_DELIMITER);
+    }
 
-                return $regexp;
+    /**
+     * Computes the regexp used to match a subpattern token.
+     *
+     * @param array $token         The subpattern token
+     * @param int   $index         The index of the token
+     * @param int   $tokensCount   The total number of tokens of the route
+     * @param int   $firstOptional The index of the first optional token
+     * @param array $variables     All the variables names of the route
+     *
+     * @return array An array containing the regexp pattern of the token, and the variable name that is used in this regexp pattern
+     */
+    private static function computeRegexpForVariableToken(array $token, $index, $tokensCount, $firstOptional, array $variables)
+    {
+        $variableName = $token[3];
+        // 32 is the maximum length for a PCRE subpattern name  => http://pcre.org/current/doc/html/pcre2pattern.html#SEC16
+        if (strlen($variableName) > 32) {
+            $i = 0;
+            do {
+                $variableName = sprintf('variableAlias%s', ++$i);
+            } while (in_array($variableName, $variables));
+        }
+
+        if (0 === $index && 0 === $firstOptional) {
+            // When the only token is an optional variable token, the separator is required
+            $regexp = sprintf('%s(?P<%s>%s)?', preg_quote($token[1], self::REGEX_DELIMITER), $variableName, $token[2]);
+        } else {
+            $regexp = sprintf('%s(?P<%s>%s)', preg_quote($token[1], self::REGEX_DELIMITER), $variableName, $token[2]);
+            if ($index >= $firstOptional) {
+                // Enclose each optional token in a subpattern to make it optional.
+                // "?:" means it is non-capturing, i.e. the portion of the subject string that
+                // matched the optional subpattern is not passed back.
+                $regexp = "(?:$regexp";
+                if ($tokensCount - 1 == $index) {
+                    // Close the optional subpatterns
+                    $regexp .= str_repeat(')?', $tokensCount - $firstOptional - (0 === $firstOptional ? 1 : 0));
+                }
             }
         }
+
+        return array(
+            $regexp,
+            $variableName,
+        );
     }
 }

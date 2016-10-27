@@ -316,9 +316,25 @@ EOF;
             $vars = array();
             if ($hostMatches) {
                 $vars[] = '$hostMatches';
+                foreach ($compiledRoute->getHostRegexVariablesAliases() as $hostRegexVariableAlias => $actualHostRegexVariableName) {
+                    $code .= <<<EOF
+            \$hostMatches['$actualHostRegexVariableName'] = \$hostMatches['$hostRegexVariableAlias'];
+            unset(\$hostMatches['$hostRegexVariableAlias']);
+
+
+EOF;
+                }
             }
             if ($matches) {
                 $vars[] = '$matches';
+                foreach ($compiledRoute->getRegexVariablesAliases() as $regexVariableAlias => $actualRegexVariableName) {
+                    $code .= <<<EOF
+            \$matches['$actualRegexVariableName'] = \$matches['$regexVariableAlias'];
+            unset(\$matches['$regexVariableAlias']);
+
+
+EOF;
+                }
             }
             $vars[] = "array('_route' => '$name')";
 

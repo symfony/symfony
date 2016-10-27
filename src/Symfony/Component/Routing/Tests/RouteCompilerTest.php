@@ -162,6 +162,15 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                     array('text', '/foo'),
                 ),
             ),
+
+            array(
+                'Route with a variable name longer than 32 characters',
+                array('/foo/{pneumonoultramicroscopicsilicovolcanoconiosis}'),
+                '/foo', '#^/foo/(?P<variableAlias1>[^/]++)$#s', array('pneumonoultramicroscopicsilicovolcanoconiosis'), array(
+                    array('variable', '/', '[^/]++', 'pneumonoultramicroscopicsilicovolcanoconiosis'),
+                    array('text', '/foo'),
+                ),
+            ),
         );
     }
 
@@ -260,6 +269,17 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                     array('variable', '.', '[^\.]++', 'tld'),
                     array('text', '.example'),
                     array('variable', '', '[^\.]++', 'locale'),
+                ),
+            ),
+            array(
+                'Route with a variable name longer than 32 characters in the host',
+                array('/hello', array(), array(), array(), 'www.example.{pneumonoultramicroscopicsilicovolcanoconiosis}'),
+                '/hello', '#^/hello$#s', array('pneumonoultramicroscopicsilicovolcanoconiosis'), array(), array(
+                    array('text', '/hello'),
+                ),
+                '#^www\.example\.(?P<variableAlias1>[^\.]++)$#si', array('pneumonoultramicroscopicsilicovolcanoconiosis'), array(
+                    array('variable', '.', '[^\.]++', 'pneumonoultramicroscopicsilicovolcanoconiosis'),
+                    array('text', 'www.example'),
                 ),
             ),
         );

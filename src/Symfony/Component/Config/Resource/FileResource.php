@@ -32,7 +32,7 @@ class FileResource implements ResourceInterface, \Serializable
      */
     public function __construct($resource)
     {
-        $this->resource = realpath($resource);
+        $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
     }
 
     /**

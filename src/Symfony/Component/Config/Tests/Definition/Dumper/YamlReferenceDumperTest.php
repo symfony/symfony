@@ -74,6 +74,10 @@ acme_root:
             locale:
                 title:                ~ # Required
                 path:                 ~ # Required
+    pipou:
+
+        # Prototype
+        name:                 []
 
 EOL;
     }

@@ -458,7 +458,10 @@ class Inline
 
             // key
             $key = self::parseScalar($mapping, $flags, array(':', ' '), array('"', "'"), $i, false);
-            $i = strpos($mapping, ':', $i);
+
+            if (false === $i = strpos($mapping, ':', $i)) {
+                break;
+            }
 
             if (!isset($mapping[$i + 1]) || ' ' !== $mapping[$i + 1]) {
                 @trigger_error('Omitting the space after the colon that follows a mapping key definition is deprecated since version 3.2 and will throw a ParseException in 4.0.', E_USER_DEPRECATED);

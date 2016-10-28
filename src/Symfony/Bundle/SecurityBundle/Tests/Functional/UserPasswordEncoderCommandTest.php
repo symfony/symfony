@@ -140,6 +140,7 @@ class UserPasswordEncoderCommandTest extends WebTestCase
 
     protected function setUp()
     {
+        putenv('COLUMNS=120');
         $kernel = $this->createKernel(array('test_case' => 'PasswordEncode'));
         $kernel->boot();
 

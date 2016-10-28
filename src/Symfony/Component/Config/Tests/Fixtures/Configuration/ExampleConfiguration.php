@@ -80,6 +80,17 @@ class ExampleConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('pipou')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->prototype('array')
+                            ->children()
+                                ->scalarNode('didou')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 

@@ -92,6 +92,14 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
 
     </cms-page>
 
+    <!-- prototype -->
+    <pipou name="pipou name">
+
+        <!-- prototype -->
+        <name didou="" />
+
+    </pipou>
+
 </config>
 
 EOL

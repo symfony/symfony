@@ -244,7 +244,7 @@ final class Intl
      */
     public static function getDataDirectory()
     {
-        return realpath(__DIR__.'/Resources/data');
+        return __DIR__.'/Resources/data';
     }
 
     /**

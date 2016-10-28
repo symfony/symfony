@@ -7,6 +7,36 @@ in 3.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.1.0...v3.1.1
 
+* 3.1.6 (2016-10-27)
+
+ * bug #20291 [Yaml] Fix 7.1 compat (nicolas-grekas)
+ * bug #20289 Fix edge case with StreamedResponse where headers are sent twice (Nicofuma)
+ * bug #20267 [DependencyInjection] A decorated service should not keep the autowiring types (chalasr)
+ * bug #20278 [DependencyInjection] merge tags instead of completely replacing them (xabbuh)
+ * bug #20271 Changes related to Twig 1.27 (fabpot)
+ * bug #20252 Trim constant values in XmlFileLoader (lstrojny)
+ * bug #20239 [HttpKernel] Fix a regression in the RequestDataCollector (jakzal)
+ * bug #20253 [TwigBridge] Use non-deprecated Twig_Node::getTemplateLine() (fabpot)
+ * bug #20243 [WebProfilerBundle][btn-link] add `cursor: pointer` (aitboudad)
+ * bug #20175 [VarDumper] Fix source links with latests Twig versions (nicolas-grekas)
+ * bug #20235 [DomCrawler] Allow pipe (|) character in link tags when using Xpath expressions (klausi, nicolas-grekas)
+ * bug #20224 [Twig] removed deprecations added in Twig 1.27 (fabpot)
+ * bug #19478 fixed Filesystem:makePathRelative and added 2 more testcases (muhammedeminakbulut)
+ * bug #20218 [HttpFoundation] no 304 response if method is not cacheable (xabbuh)
+ * bug #20207 [DependencyInjection] move tags from decorated to decorating service (xabbuh)
+ * bug #20205 [HttpCache] fix: do not cache OPTIONS request (dmaicher)
+ * bug #20146 [Validator] Prevent infinite loop in PropertyMetadata (wesleylancel)
+ * bug #20184 [FrameworkBundle] Convert null prefix to an empty string in translation:update (chalasr)
+ * bug #20154 [PropertyInfo] Fix edge cases in ReflectionExtractor (nicolas-grekas)
+ * bug #19725 [Security] $attributes can be anything, but RoleVoter assumes strings (Jonatan Männchen)
+ * bug #20127 [HttpFoundation] JSONP callback validation (ro0NL)
+ * bug #20163 add missing use statement (xabbuh)
+ * bug #19961 [Console] Escape question text and default value in SymfonyStyle::ask() (chalasr)
+ * bug #20141 [Console] Fix validation of empty values using SymfonyQuestionHelper::ask() (chalasr)
+ * bug #20147 [FrameworkBundle] Alter container class instead of kernel name in cache:clear command (nicolas-grekas)
+ * bug #20156 Fix event annotation for arguments resolving event (Koc)
+ * bug #20152 [HttpKernel] Fix nullable types handling (nicolas-grekas)
+
 * 3.1.5 (2016-10-03)
 
  * bug #20102 [Validator] Url validator not validating hosts ending in a number (gwkunze)

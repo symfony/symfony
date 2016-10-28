@@ -35,7 +35,7 @@ trait FilesystemAdapterTrait
         if (!file_exists($dir = $directory.'/.')) {
             @mkdir($directory, 0777, true);
         }
-        if (false === $dir = realpath($dir)) {
+        if (false === $dir = realpath($dir) ?: (file_exists($dir) ? $dir : false)) {
             throw new InvalidArgumentException(sprintf('Cache directory does not exist (%s)', $directory));
         }
         if (!is_writable($dir .= DIRECTORY_SEPARATOR)) {

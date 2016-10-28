@@ -65,7 +65,7 @@ class FrameworkExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
 
         $loader->load('web.xml');
         $loader->load('services.xml');
@@ -805,7 +805,7 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = dirname($r->getFileName()).'/../Resources/translations';
+            $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
         }
         $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
@@ -938,21 +938,21 @@ class FrameworkExtension extends Extension
             $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
-                $files[0][] = realpath($file);
+                $files[0][] = $file;
                 $container->addResource(new FileResource($file));
             }
 
             if (is_file($file = $dirname.'/Resources/config/validation.yml')) {
-                $files[1][] = realpath($file);
+                $files[1][] = $file;
                 $container->addResource(new FileResource($file));
             }
 
             if (is_dir($dir = $dirname.'/Resources/config/validation')) {
                 foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
-                    $files[0][] = $file->getRealPath();
+                    $files[0][] = $file->getPathname();
                 }
                 foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
-                    $files[1][] = $file->getRealPath();
+                    $files[1][] = $file->getPathname();
                 }
 
                 $container->addResource(new DirectoryResource($dir));
@@ -1115,7 +1115,7 @@ class FrameworkExtension extends Extension
             $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/serialization.xml')) {
-                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array(realpath($file)));
+                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file));
                 $definition->setPublic(false);
 
                 $serializerLoaders[] = $definition;
@@ -1123,7 +1123,7 @@ class FrameworkExtension extends Extension
             }
 
             if (is_file($file = $dirname.'/Resources/config/serialization.yml')) {
-                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array(realpath($file)));
+                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file));
                 $definition->setPublic(false);
 
                 $serializerLoaders[] = $definition;
@@ -1132,13 +1132,13 @@ class FrameworkExtension extends Extension
 
             if (is_dir($dir = $dirname.'/Resources/config/serialization')) {
                 foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
-                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file->getRealPath()));
+                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file->getPathname()));
                     $definition->setPublic(false);
 
                     $serializerLoaders[] = $definition;
                 }
                 foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
-                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file->getRealPath()));
+                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file->getPathname()));
                     $definition->setPublic(false);
 
                     $serializerLoaders[] = $definition;
@@ -1265,7 +1265,7 @@ class FrameworkExtension extends Extension
      */
     public function getXsdValidationBasePath()
     {
-        return __DIR__.'/../Resources/config/schema';
+        return dirname(__DIR__).'/Resources/config/schema';
     }
 
     public function getNamespace()

@@ -31,7 +31,7 @@ class DirectoryResource implements SelfCheckingResourceInterface, \Serializable
      */
     public function __construct($resource, $pattern = null)
     {
-        $this->resource = realpath($resource);
+        $this->resource = realpath($resource) ?: (file_exists($resource) ? $resource : false);
         $this->pattern = $pattern;
 
         if (false === $this->resource || !is_dir($this->resource)) {

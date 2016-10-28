@@ -40,7 +40,7 @@ class LinkStub extends ConstStub
                 if ($line) {
                     $this->attr['line'] = $line;
                 }
-                $this->attr['file'] = realpath($href);
+                $this->attr['file'] = realpath($href) ?: $href;
 
                 if ($this->attr['file'] === $label && 3 < count($ellipsis = explode(DIRECTORY_SEPARATOR, $href))) {
                     $this->attr['ellipsis'] = 2 + strlen(implode(array_slice($ellipsis, -2)));

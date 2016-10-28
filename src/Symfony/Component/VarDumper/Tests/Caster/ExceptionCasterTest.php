@@ -179,15 +179,14 @@ EODUMP;
         $f = array(
             new FrameStub(array(
                 'file' => dirname(__DIR__).'/Fixtures/Twig.php',
-                'line' => 19,
+                'line' => 21,
                 'class' => '__TwigTemplate_VarDumperFixture_u75a09',
-                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem())),
             )),
             new FrameStub(array(
                 'file' => dirname(__DIR__).'/Fixtures/Twig.php',
-                'line' => 19,
+                'line' => 21,
                 'class' => '__TwigTemplate_VarDumperFixture_u75a09',
-                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem()), null),
+                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(null, false),
             )),
         );
 
@@ -195,9 +194,6 @@ EODUMP;
 array:2 [
   0 => {
     class: "__TwigTemplate_VarDumperFixture_u75a09"
-    object: __TwigTemplate_VarDumperFixture_u75a09 {
-    %A
-    }
     src: {
       bar.twig:2: {
         : foo bar

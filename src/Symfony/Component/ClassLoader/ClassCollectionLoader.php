@@ -59,7 +59,7 @@ class ClassCollectionLoader
         if (!is_dir($cacheDir) && !@mkdir($cacheDir, 0777, true) && !is_dir($cacheDir)) {
             throw new \RuntimeException(sprintf('Class Collection Loader was not able to create directory "%s"', $cacheDir));
         }
-        $cacheDir = rtrim(realpath($cacheDir), '/'.DIRECTORY_SEPARATOR);
+        $cacheDir = rtrim(realpath($cacheDir) ?: $cacheDir, '/'.DIRECTORY_SEPARATOR);
         $cache = $cacheDir.DIRECTORY_SEPARATOR.$name.$extension;
 
         // auto-reload

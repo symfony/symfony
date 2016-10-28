@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-28T07:38:22Z
+
+The var line 115 will always be defined, there isn't any bug here to me.
+Anyway, :+1: for the readability improvement then ;)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-10-28T07:53:49Z
+
+Woops !
+Actually the bug is in 3.2... I've digged in the previous versions a bit too fast.
+if you look in 3.2, there is a bug because of a third condition placed just before `$mode` computation

@@ -201,7 +201,7 @@ class YamlReferenceDumper
             $keyNode = new ArrayNode($key, $node);
             $children = $prototype->getChildren();
 
-            if ($prototype instanceof PrototypedArrayNode) {
+            if ($prototype instanceof PrototypedArrayNode && $prototype->getKeyAttribute()) {
                 $children = $this->getPrototypeChildren($prototype);
             }
 

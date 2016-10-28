@@ -98,7 +98,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
                         $info = $template->getDebugInfo();
                         if (isset($info[$trace[$i - 1]['line']])) {
                             $line = $info[$trace[$i - 1]['line']];
-                            $file = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getPath() : false;
+                            $file = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getPath() : null;
 
                             if ($src) {
                                 $src = explode("\n", $src);
@@ -256,7 +256,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         if ($this->dumper instanceof CliDumper) {
             $contextDumper = function ($name, $file, $line, $fileLinkFormat) {
                 if ($this instanceof HtmlDumper) {
-                    if ('' !== $file) {
+                    if ($file) {
                         $s = $this->style('meta', '%s');
                         $name = strip_tags($this->style('', $name));
                         $file = strip_tags($this->style('', $file));

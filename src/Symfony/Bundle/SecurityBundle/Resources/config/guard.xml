@@ -35,6 +35,7 @@
             <argument /> <!-- Provider-shared Key -->
             <argument /> <!-- Authenticator -->
             <argument type="service" id="logger" on-invalid="null" />
+            <argument /> <!-- Break on failure -->
         </service>
     </services>
 </container>

@@ -45,6 +45,10 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
                     ->info('A service id (of one of your authenticators) whose start() method should be called when an anonymous user hits a page that requires authentication')
                     ->defaultValue(null)
                 ->end()
+                ->booleanNode('break_on_failure')
+                    ->info('A boolean determining whether the authentication should break at the first unsatisfied authenticator (default) or continue until the last one.')
+                    ->defaultValue(true)
+                ->end()
                 ->arrayNode('authenticators')
                     ->info('An array of service ids for all of your "authenticators"')
                     ->requiresAtLeastOneElement()
@@ -77,6 +81,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.guard'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, $authenticatorReferences);
+        $listener->replaceArgument(5, $config['break_on_failure']);
 
         // determine the entryPointId to use
         $entryPointId = $this->determineEntryPoint($defaultEntryPoint, $config);

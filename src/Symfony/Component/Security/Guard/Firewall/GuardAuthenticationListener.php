@@ -37,6 +37,7 @@ class GuardAuthenticationListener implements ListenerInterface
     private $guardAuthenticators;
     private $logger;
     private $rememberMeServices;
+    private $breakOnFailure;
 
     /**
      * @param GuardAuthenticatorHandler      $guardHandler          The Guard handler
@@ -44,8 +45,10 @@ class GuardAuthenticationListener implements ListenerInterface
      * @param string                         $providerKey           The provider (i.e. firewall) key
      * @param GuardAuthenticatorInterface[]  $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
      * @param LoggerInterface                $logger                A LoggerInterface instance
+     * @param bool                           $breakOnFailure        Whether the authentication should break at the first unsatisfied
+     *                                                              authenticator or continue until the last one
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, array $guardAuthenticators, LoggerInterface $logger = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, array $guardAuthenticators, LoggerInterface $logger = null, $breakOnFailure = true)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -56,6 +59,7 @@ class GuardAuthenticationListener implements ListenerInterface
         $this->providerKey = $providerKey;
         $this->guardAuthenticators = $guardAuthenticators;
         $this->logger = $logger;
+        $this->breakOnFailure = $breakOnFailure;
     }
 
     /**
@@ -66,15 +70,22 @@ class GuardAuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         if (null !== $this->logger) {
-            $this->logger->debug('Checking for guard authentication credentials.', array('firewall_key' => $this->providerKey, 'authenticators' => count($this->guardAuthenticators)));
+            $this->logger->debug('Checking for guard authentication credentials.', array('firewall_key' => $this->providerKey, 'authenticators' => $countAuthenticators = count($this->guardAuthenticators)));
         }
+
+        $currentExecutedAuthenticator = 0;
 
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {
             // get a key that's unique to *this* guard authenticator
             // this MUST be the same as GuardAuthenticationProvider
             $uniqueGuardKey = $this->providerKey.'_'.$key;
 
-            $this->executeGuardAuthenticator($uniqueGuardKey, $guardAuthenticator, $event);
+            ++$currentExecutedAuthenticator;
+
+            // should onAuthenticationFailure be called for this authenticator?
+            $handleAuthenticationFailure = $this->breakOnFailure || $currentExecutedAuthenticator === $countAuthenticators;
+
+            $this->executeGuardAuthenticator($uniqueGuardKey, $guardAuthenticator, $event, $handleAuthenticationFailure);
 
             if ($event->hasResponse()) {
                 if (null !== $this->logger) {
@@ -86,7 +97,7 @@ class GuardAuthenticationListener implements ListenerInterface
         }
     }
 
-    private function executeGuardAuthenticator($uniqueGuardKey, GuardAuthenticatorInterface $guardAuthenticator, GetResponseEvent $event)
+    private function executeGuardAuthenticator($uniqueGuardKey, GuardAuthenticatorInterface $guardAuthenticator, GetResponseEvent $event, $handleAuthenticationFailure)
     {
         $request = $event->getRequest();
         try {
@@ -120,6 +131,14 @@ class GuardAuthenticationListener implements ListenerInterface
             $this->guardHandler->authenticateWithToken($token, $request);
         } catch (AuthenticationException $e) {
             // oh no! Authentication failed!
+
+            if (false === $handleAuthenticationFailure) {
+                if (null !== $this->logger) {
+                    $this->logger->info('Guard authenticator {authenticator} failed to process the authentication, try the next one.', array('exception' => $e, 'authenticator' => get_class($guardAuthenticator)));
+                }
+
+                return;
+            }
 
             if (null !== $this->logger) {
                 $this->logger->info('Guard authentication failed.', array('exception' => $e, 'authenticator' => get_class($guardAuthenticator)));

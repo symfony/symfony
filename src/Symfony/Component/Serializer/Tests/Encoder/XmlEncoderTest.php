@@ -141,7 +141,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
     public function testContext()
     {
         $array = array('person' => array('name' => 'George Abitbol'));
-        $expected = <<<XML
+        $expected = <<<'XML'
 <?xml version="1.0"?>
 <response>
   <person>
@@ -255,7 +255,7 @@ XML;
         $serializer = new Serializer(array(new CustomNormalizer()), array('xml' => new XmlEncoder()));
         $this->encoder->setSerializer($serializer);
 
-        $expected = <<<XML
+        $expected = <<<'XML'
 <?xml version="1.0"?>
 <response><foo>normalizedFoo</foo><bar>normalizedBar</bar></response>
 
@@ -366,7 +366,7 @@ XML;
 
     public function testDecodeIgnoreWhiteSpace()
     {
-        $source = <<<XML
+        $source = <<<'XML'
 <?xml version="1.0"?>
 <people>
     <person>

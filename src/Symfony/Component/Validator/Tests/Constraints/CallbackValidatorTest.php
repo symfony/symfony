@@ -186,6 +186,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+
     /**
      * @group legacy
      */
@@ -202,6 +203,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+
     /**
      * @group legacy
      */
@@ -218,6 +220,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+
     /**
      * @group legacy
      */
@@ -236,6 +239,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+
     /**
      * @group legacy
      */
@@ -256,6 +260,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+
     /**
      * @group legacy
      */
@@ -274,6 +279,7 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
     }
 
     // BC with Symfony < 2.4
+
     /**
      * @group legacy
      */

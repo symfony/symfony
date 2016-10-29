@@ -8,7 +8,7 @@ Test symfony_zval_info API
 $int = 42;
 $float = 42.42;
 $str = "foobar";
-$object = new StdClass;
+$object = new StdClass();
 $array = array('foo', 'bar');
 $resource = tmpfile();
 $null = null;

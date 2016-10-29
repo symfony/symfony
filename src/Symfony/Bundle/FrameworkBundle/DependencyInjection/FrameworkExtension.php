@@ -112,6 +112,10 @@ class FrameworkExtension extends Extension
                     'phpstorm' => 'phpstorm://open?url=file://%%f&line=%%l',
                 );
                 $ide = $config['ide'];
+                $i = strpos($ide, '&');
+                if (false !== $i && isset($links[$link = substr($ide, 0, $i)])) {
+                    $ide = $links[$link].substr($ide, $i);
+                }
 
                 $container->setParameter('templating.helper.code.file_link_format', str_replace('%', '%%', ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format')) ?: (isset($links[$ide]) ? $links[$ide] : $ide));
             }

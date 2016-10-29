@@ -17,15 +17,17 @@ $bool = true;
 $anotherint = 42;
 $refcount2 = &$anotherint;
 
-$var = array('int' => $int,
-			 'float' => $float,
-			 'str' => $str,
-			 'object' => $object,
-			 'array' => $array,
-			 'resource' => $resource,
-			 'null' => $null,
-			 'bool' => $bool,
-			 'refcount' => &$refcount2);
+$var = array(
+    'int' => $int,
+    'float' => $float,
+    'str' => $str,
+    'object' => $object,
+    'array' => $array,
+    'resource' => $resource,
+    'null' => $null,
+    'bool' => $bool,
+    'refcount' => &$refcount2,
+);
 
 var_dump(symfony_zval_info('int', $var));
 var_dump(symfony_zval_info('float', $var));

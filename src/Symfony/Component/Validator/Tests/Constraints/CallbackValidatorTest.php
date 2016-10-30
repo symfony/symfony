@@ -185,8 +185,6 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    // BC with Symfony < 2.4
-
     /**
      * @group legacy
      */
@@ -202,8 +200,6 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    // BC with Symfony < 2.4
-
     /**
      * @group legacy
      */
@@ -218,8 +214,6 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', 'foobar')
             ->assertRaised();
     }
-
-    // BC with Symfony < 2.4
 
     /**
      * @group legacy
@@ -237,8 +231,6 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', 'baz')
             ->assertRaised();
     }
-
-    // BC with Symfony < 2.4
 
     /**
      * @group legacy
@@ -259,8 +251,6 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
-    // BC with Symfony < 2.4
-
     /**
      * @group legacy
      */
@@ -277,8 +267,6 @@ class CallbackValidatorTest extends AbstractConstraintValidatorTest
             ->setParameter('{{ value }}', 'foobar')
             ->assertRaised();
     }
-
-    // BC with Symfony < 2.4
 
     /**
      * @group legacy

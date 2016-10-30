@@ -226,6 +226,20 @@ class ProcessBuilder
     }
 
     /**
+     * Sets proc_open options.
+     *
+     * @param array $options Key value pair of options
+     *
+     * @return ProcessBuilder
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array_unique(array_merge($this->options, $options));
+
+        return $this;
+    }
+
+    /**
      * Disables fetching output and error output from the underlying process.
      *
      * @return ProcessBuilder

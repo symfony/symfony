@@ -20,6 +20,24 @@ class TemplateReference implements TemplateReferenceInterface
 {
     protected $parameters;
 
+    /**
+     * Implements var_export support
+     *
+     * @param array $data
+     *
+     * @return static
+     */
+    public static function __set_state(array $data)
+    {
+        $template = new static();
+
+        foreach ($data['parameters'] as $parameter => $value) {
+            $template->set($parameter, $value);
+        }
+
+        return $template;
+    }
+
     public function __construct($name = null, $engine = null)
     {
         $this->parameters = array(

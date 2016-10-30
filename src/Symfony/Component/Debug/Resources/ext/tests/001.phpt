@@ -1,13 +1,13 @@
 --TEST--
 Test symfony_zval_info API
 --SKIPIF--
-<?php if (!extension_loaded("symfony_debug")) print "skip"; ?>
+<?php if (!extension_loaded('symfony_debug')) print 'skip'; ?>
 --FILE--
 <?php
 
 $int = 42;
 $float = 42.42;
-$str = "foobar";
+$str = 'foobar';
 $object = new StdClass;
 $array = array('foo', 'bar');
 $resource = tmpfile();

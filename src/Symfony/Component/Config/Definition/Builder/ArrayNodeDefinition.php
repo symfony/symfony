@@ -428,7 +428,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 $node->setKeyAttribute($this->key, $this->removeKeyItem);
             }
 
-            if (true === $this->atLeastOne) {
+            if (true === $this->atLeastOne || false === $this->allowEmptyValue) {
                 $node->setMinNumberOfElements(1);
             }
 
@@ -487,6 +487,12 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         if (null !== $this->key) {
             throw new InvalidDefinitionException(
                 sprintf('->useAttributeAsKey() is not applicable to concrete nodes at path "%s"', $path)
+            );
+        }
+
+        if (false === $this->allowEmptyValue) {
+            throw new InvalidDefinitionException(
+                sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s"', $path)
             );
         }
 

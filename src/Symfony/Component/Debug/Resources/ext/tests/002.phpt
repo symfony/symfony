@@ -18,7 +18,6 @@ function foo()
 function bt()
 {
     print_r(symfony_debug_backtrace());
-
 }
 
 register_shutdown_function('bt');

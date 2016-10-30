@@ -436,7 +436,6 @@ class FormTypeTest extends BaseTypeTest
         $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
             function ($value) { // reverseTransform
-
                 return 'foobar';
             }
         ));
@@ -462,7 +461,6 @@ class FormTypeTest extends BaseTypeTest
         $builder->get('referenceCopy')->addViewTransformer(new CallbackTransformer(
             function () {},
             function ($value) use ($ref2) { // reverseTransform
-
                 return $ref2;
             }
         ));

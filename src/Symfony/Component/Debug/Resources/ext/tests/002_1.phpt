@@ -13,7 +13,6 @@ function bar()
 function bt()
 {
     print_r(symfony_debug_backtrace());
-
 }
 
 bar();

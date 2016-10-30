@@ -138,7 +138,6 @@ abstract class DoctrineType extends AbstractType
         $type = $this;
 
         $choiceLoader = function (Options $options) use ($choiceListFactory, &$choiceLoaders, $type) {
-
             // Unless the choices are given explicitly, load them on demand
             if (null === $options['choices']) {
                 $hash = null;

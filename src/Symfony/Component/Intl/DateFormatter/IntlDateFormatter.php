@@ -167,8 +167,8 @@ class IntlDateFormatter
      * @param int    $datetype Type of date formatting, one of the format type constants
      * @param int    $timetype Type of time formatting, one of the format type constants
      * @param string $timezone Timezone identifier
-     * @param int    $calendar Calendar to use for formatting or parsing; default is Gregorian
-     *                         One of the calendar constants.
+     * @param int    $calendar calendar to use for formatting or parsing; default is Gregorian
+     *                         One of the calendar constants
      * @param string $pattern  Optional pattern to use when formatting
      *
      * @return IntlDateFormatter
@@ -524,9 +524,9 @@ class IntlDateFormatter
     /**
      * Set the formatter's timezone identifier.
      *
-     * @param string $timeZoneId The time zone ID string of the time zone to use
+     * @param string $timeZoneId the time zone ID string of the time zone to use
      *                           If NULL or the empty string, the default time zone for the
-     *                           runtime is used.
+     *                           runtime is used
      *
      * @return bool true on success or false on failure
      *

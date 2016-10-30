@@ -58,10 +58,10 @@ class OrderedHashMapIterator implements \Iterator
     /**
      * Creates a new iterator.
      *
-     * @param array $elements       The elements of the map, indexed by their
-     *                              keys.
-     * @param array $orderedKeys    The keys of the map in the order in which
-     *                              they should be iterated.
+     * @param array $elements       the elements of the map, indexed by their
+     *                              keys
+     * @param array $orderedKeys    the keys of the map in the order in which
+     *                              they should be iterated
      * @param array $managedCursors An array from which to reference the
      *                              iterator's cursor as long as it is alive.
      *                              This array is managed by the corresponding

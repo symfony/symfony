@@ -46,8 +46,8 @@ interface BundleEntryReaderInterface extends BundleReaderInterface
      *                           (i.e. array or \ArrayAccess) or cannot be found
      *                           in the requested locale.
      *
-     * @return mixed Returns an array or {@link \ArrayAccess} instance for
-     *               complex data and a scalar value for simple data.
+     * @return mixed returns an array or {@link \ArrayAccess} instance for
+     *               complex data and a scalar value for simple data
      *
      * @throws MissingResourceException If the indices cannot be accessed
      */

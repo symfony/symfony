@@ -151,7 +151,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException                    when a given parameter has a type problem.
+     * @throws RuntimeException                    when a given parameter has a type problem
      */
     public function resolveValue($value, array $resolving = array())
     {
@@ -181,7 +181,7 @@ class ParameterBag implements ParameterBagInterface
      *
      * @throws ParameterNotFoundException          if a placeholder references a parameter that does not exist
      * @throws ParameterCircularReferenceException if a circular reference if detected
-     * @throws RuntimeException                    when a given parameter has a type problem.
+     * @throws RuntimeException                    when a given parameter has a type problem
      */
     public function resolveString($value, array $resolving = array())
     {

@@ -35,8 +35,8 @@ if (!function_exists('intl_is_failure')) {
      *
      * @author Bernhard Schussek <bschussek@gmail.com>
      *
-     * @return bool The error code of the last intl function call or
-     *              IntlGlobals::U_ZERO_ERROR if no error occurred.
+     * @return bool the error code of the last intl function call or
+     *              IntlGlobals::U_ZERO_ERROR if no error occurred
      *
      * @see IntlGlobals::getErrorCode()
      */
@@ -51,8 +51,8 @@ if (!function_exists('intl_is_failure')) {
      *
      * @author Bernhard Schussek <bschussek@gmail.com>
      *
-     * @return bool The error message of the last intl function call or
-     *              "U_ZERO_ERROR" if no error occurred.
+     * @return bool the error message of the last intl function call or
+     *              "U_ZERO_ERROR" if no error occurred
      *
      * @see IntlGlobals::getErrorMessage()
      */

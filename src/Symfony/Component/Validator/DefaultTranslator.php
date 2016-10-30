@@ -129,8 +129,8 @@ class DefaultTranslator implements TranslatorInterface
      *
      * @return string The translated string
      *
-     * @throws InvalidArgumentException If the message id does not have the format
-     *                                  "singular|plural".
+     * @throws InvalidArgumentException if the message id does not have the format
+     *                                  "singular|plural"
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {

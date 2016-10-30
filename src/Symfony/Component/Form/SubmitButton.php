@@ -39,7 +39,7 @@ class SubmitButton extends Button implements ClickableInterface
      *
      * @return SubmitButton The button instance
      *
-     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
+     * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
     public function submit($submittedData, $clearMissing = true)
     {

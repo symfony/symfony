@@ -500,8 +500,8 @@ class ChoiceType extends AbstractType
      * "choice_label" closure by default.
      *
      * @param array|\Traversable $choices      The choice labels indexed by choices
-     * @param object             $choiceLabels The object that receives the choice labels
-     *                                         indexed by generated keys.
+     * @param object             $choiceLabels the object that receives the choice labels
+     *                                         indexed by generated keys
      * @param int                $nextKey      The next generated key
      *
      * @return array The choices in a normalized array with labels replaced by generated keys

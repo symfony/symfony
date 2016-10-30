@@ -27,9 +27,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
-     * @throws Exception\LogicException            When trying to set a parent for a form with
-     *                                             an empty name.
+     * @throws Exception\AlreadySubmittedException if the form has already been submitted
+     * @throws Exception\LogicException            when trying to set a parent for a form with
+     *                                             an empty name
      */
     public function setParent(FormInterface $parent = null);
 
@@ -49,9 +49,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
-     * @throws Exception\LogicException            When trying to add a child to a non-compound form.
-     * @throws Exception\UnexpectedTypeException   If $child or $type has an unexpected type.
+     * @throws Exception\AlreadySubmittedException if the form has already been submitted
+     * @throws Exception\LogicException            when trying to add a child to a non-compound form
+     * @throws Exception\UnexpectedTypeException   if $child or $type has an unexpected type
      */
     public function add($child, $type = null, array $options = array());
 
@@ -62,7 +62,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The child form
      *
-     * @throws \OutOfBoundsException If the named child does not exist.
+     * @throws \OutOfBoundsException if the named child does not exist
      */
     public function get($name);
 
@@ -82,7 +82,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
+     * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
     public function remove($name);
 
@@ -112,7 +112,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
+     * @throws Exception\AlreadySubmittedException if the form has already been submitted
      * @throws Exception\LogicException            If listeners try to call setData in a cycle. Or if
      *                                             the view data does not match the expected type
      *                                             according to {@link FormConfigInterface::getDataClass}.
@@ -129,9 +129,9 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the normalized data of the field.
      *
-     * @return mixed When the field is not submitted, the default data is returned
+     * @return mixed when the field is not submitted, the default data is returned
      *               When the field is submitted, the normalized submitted data is
-     *               returned if the field is valid, null otherwise.
+     *               returned if the field is valid, null otherwise
      */
     public function getNormData();
 
@@ -270,13 +270,13 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * Submits data to the form, transforms and validates it.
      *
      * @param null|string|array $submittedData The submitted data
-     * @param bool              $clearMissing  Whether to set fields to NULL
+     * @param bool              $clearMissing  whether to set fields to NULL
      *                                         when they are missing in the
-     *                                         submitted data.
+     *                                         submitted data
      *
      * @return FormInterface The form instance
      *
-     * @throws Exception\AlreadySubmittedException If the form has already been submitted.
+     * @throws Exception\AlreadySubmittedException if the form has already been submitted
      */
     public function submit($submittedData, $clearMissing = true);
 

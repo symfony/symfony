@@ -187,7 +187,7 @@ class Question
      *
      * @return Question The current instance
      *
-     * @throws \InvalidArgumentException In case the number of attempts is invalid.
+     * @throws \InvalidArgumentException in case the number of attempts is invalid
      */
     public function setMaxAttempts($attempts)
     {

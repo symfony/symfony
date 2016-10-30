@@ -101,7 +101,7 @@ class InMemoryUserProvider implements UserProviderInterface
      *
      * @return User
      *
-     * @throws UsernameNotFoundException If user whose given username does not exist.
+     * @throws UsernameNotFoundException if user whose given username does not exist
      */
     private function getUser($username)
     {

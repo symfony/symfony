@@ -213,8 +213,8 @@ interface FormConfigInterface
     /**
      * Returns whether the form should be initialized upon creation.
      *
-     * @return bool Returns true if the form should be initialized
-     *              when created, false otherwise.
+     * @return bool returns true if the form should be initialized
+     *              when created, false otherwise
      */
     public function getAutoInitialize();
 

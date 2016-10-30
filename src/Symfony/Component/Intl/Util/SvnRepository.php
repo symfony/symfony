@@ -44,7 +44,7 @@ class SvnRepository
      *
      * @return SvnRepository The directory where the data is stored
      *
-     * @throws RuntimeException If an error occurs during the download.
+     * @throws RuntimeException if an error occurs during the download
      */
     public static function download($url, $targetDir)
     {
@@ -119,7 +119,7 @@ class SvnRepository
      *
      * @return \SimpleXMLElement The XML result from the "svn info" command
      *
-     * @throws RuntimeException If the "svn info" command failed.
+     * @throws RuntimeException if the "svn info" command failed
      */
     private function getSvnInfo()
     {

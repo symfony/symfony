@@ -80,8 +80,8 @@ class ObjectChoiceList extends ChoiceList
      *                                                    by calling the getter on the object. If the
      *                                                    path is NULL, the object's __toString() method
      *                                                    is used instead.
-     * @param array                     $preferredChoices A flat array of choices that should be
-     *                                                    presented to the user with priority.
+     * @param array                     $preferredChoices a flat array of choices that should be
+     *                                                    presented to the user with priority
      * @param string                    $groupPath        A property path pointing to the property used
      *                                                    to group the choices. Only allowed if
      *                                                    the choices are given as flat array.
@@ -109,8 +109,8 @@ class ObjectChoiceList extends ChoiceList
      * @param array              $labels           Ignored
      * @param array              $preferredChoices The choices to display with priority
      *
-     * @throws InvalidArgumentException When passing a hierarchy of choices and using
-     *                                  the "groupPath" option at the same time.
+     * @throws InvalidArgumentException when passing a hierarchy of choices and using
+     *                                  the "groupPath" option at the same time
      */
     protected function initialize($choices, array $labels, array $preferredChoices)
     {

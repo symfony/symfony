@@ -67,8 +67,8 @@ class Version
      * @param int|null $precision The number of components to include. Pass
      *                            NULL to return the version unchanged.
      *
-     * @return string|null The normalized version or NULL if it couldn't be
-     *                     normalized.
+     * @return string|null the normalized version or NULL if it couldn't be
+     *                     normalized
      */
     public static function normalize($version, $precision)
     {

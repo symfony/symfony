@@ -13,6 +13,8 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Factory\CachingFactoryDecorator;
+use Symfony\Component\Form\ChoiceList\Factory\FilteredChoiceListFactoryInterface;
+use Symfony\Component\Form\ChoiceList\Factory\FilteringFactoryDecorator;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
@@ -46,9 +48,11 @@ class ChoiceType extends AbstractType
 
     public function __construct(ChoiceListFactoryInterface $choiceListFactory = null)
     {
-        $this->choiceListFactory = $choiceListFactory ?: new CachingFactoryDecorator(
-            new PropertyAccessDecorator(
-                new DefaultChoiceListFactory()
+        $this->choiceListFactory = $choiceListFactory ?: new FilteringFactoryDecorator(
+            new CachingFactoryDecorator(
+                new PropertyAccessDecorator(
+                    new DefaultChoiceListFactory()
+                )
             )
         );
     }
@@ -309,6 +313,7 @@ class ChoiceType extends AbstractType
             'expanded' => false,
             'choices' => array(),
             'choices_as_values' => null, // deprecated since 3.1
+            'choice_filter' => null,
             'choice_loader' => null,
             'choice_label' => null,
             'choice_name' => null,
@@ -333,6 +338,7 @@ class ChoiceType extends AbstractType
 
         $resolver->setAllowedTypes('choices', array('null', 'array', '\Traversable'));
         $resolver->setAllowedTypes('choice_translation_domain', array('null', 'bool', 'string'));
+        $resolver->setAllowedTypes('choice_filter', array('null', 'callable'));
         $resolver->setAllowedTypes('choice_loader', array('null', 'Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface'));
         $resolver->setAllowedTypes('choice_label', array('null', 'bool', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
         $resolver->setAllowedTypes('choice_name', array('null', 'callable', 'string', 'Symfony\Component\PropertyAccess\PropertyPath'));
@@ -408,14 +414,27 @@ class ChoiceType extends AbstractType
     private function createChoiceList(array $options)
     {
         if (null !== $options['choice_loader']) {
-            return $this->choiceListFactory->createListFromLoader(
-                $options['choice_loader'],
-                $options['choice_value']
-            );
+            if (is_callable($options['choice_filter']) && $this->choiceListFactory instanceof FilteredChoiceListFactoryInterface) {
+                return $this->choiceListFactory->createFilteredListFromLoader(
+                    $options['choice_loader'],
+                    $options['choice_value'],
+                    $options['choice_filter']
+                );
+            }
+
+            return $this->choiceListFactory->createListFromLoader($options['choice_loader'], $options['choice_value']);
         }
 
         // Harden against NULL values (like in EntityType and ModelType)
         $choices = null !== $options['choices'] ? $options['choices'] : array();
+
+        if (!empty($choices) && is_callable($options['choice_filter']) && $this->choiceListFactory instanceof FilteredChoiceListFactoryInterface) {
+            return $this->choiceListFactory->createFilteredListFromChoices(
+                $choices,
+                $options['choice_value'],
+                $options['choice_filter']
+            );
+        }
 
         return $this->choiceListFactory->createListFromChoices($choices, $options['choice_value']);
     }

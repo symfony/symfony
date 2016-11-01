@@ -136,7 +136,7 @@ class QuestionHelper extends Helper
             if (false === $ret) {
                 $ret = fgets($inputStream, 4096);
                 if (false === $ret) {
-                    throw new \RuntimeException('Aborted');
+                    throw new RuntimeException('Aborted');
                 }
                 $ret = trim($ret);
             }

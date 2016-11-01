@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * The onKernelResponse method must be connected to the kernel.response event.
  *
- * The WDT is only injected on well-formed HTML (with a proper </body> tag).
+ * The WDT is only injected on well-formed HTML (with a proper <title> tag).
  * This means that the WDT is never included in sub-requests or ESI requests.
  *
  * @author Fabien Potencier <fabien@symfony.com>
@@ -112,21 +112,24 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected function injectToolbar(Response $response, Request $request)
     {
         $content = $response->getContent();
-        $pos = strripos($content, '</body>');
+        $injectToolbarAt = strripos($content, '</body>') ?: strripos($content, '</html>');
+        $canInjectToolbar = $injectToolbarAt || stripos($content, '<title>');
 
-        if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
-                '@WebProfiler/Profiler/toolbar_js.html.twig',
-                array(
-                    'position' => $this->position,
-                    'excluded_ajax_paths' => $this->excludedAjaxPaths,
-                    'token' => $response->headers->get('X-Debug-Token'),
-                    'request' => $request,
-                )
-            ))."\n";
-            $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
-            $response->setContent($content);
+        if (!$canInjectToolbar) {
+            return;
         }
+
+        $toolbar = "\n".str_replace("\n", '', $this->twig->render(
+            '@WebProfiler/Profiler/toolbar_js.html.twig',
+            array(
+                'position' => $this->position,
+                'excluded_ajax_paths' => $this->excludedAjaxPaths,
+                'token' => $response->headers->get('X-Debug-Token'),
+                'request' => $request,
+            )
+        ))."\n";
+        $content = substr_replace($content, $toolbar, $injectToolbarAt ?: strlen($content), 0);
+        $response->setContent($content);
     }
 
     public static function getSubscribedEvents()

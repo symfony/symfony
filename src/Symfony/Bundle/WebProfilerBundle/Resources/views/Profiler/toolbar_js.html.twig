@@ -1,7 +1,12 @@
 <div id="sfwdt{{ token }}" class="sf-toolbar" style="display: none"></div>
 {% include '@WebProfiler/Profiler/base_js.html.twig' %}
 <script>/*<![CDATA[*/
-    (function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        var sfwdt = document.createElement('div');
+        sfwdt.id = 'sfwdt{{ token }}';
+        sfwdt.className = 'sf-toolbar';
+        sfwdt.style.display = 'none';
+
         {% if 'top' == position %}
             var sfwdt = document.getElementById('sfwdt{{ token }}');
             document.body.insertBefore(
@@ -63,5 +68,5 @@
             },
             {'maxTries': 5}
         );
-    })();
+    });
 /*]]>*/</script>

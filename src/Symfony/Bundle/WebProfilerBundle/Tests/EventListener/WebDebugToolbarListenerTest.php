@@ -38,18 +38,17 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
     public function getInjectToolbarTests()
     {
         return array(
-            array('<html><head></head><body></body></html>', "<html><head></head><body>\nWDT\n</body></html>"),
-            array('<html>
-            <head></head>
-            <body>
-            <textarea><html><head></head><body></body></html></textarea>
-            </body>
-            </html>', "<html>
-            <head></head>
-            <body>
-            <textarea><html><head></head><body></body></html></textarea>
-            \nWDT\n</body>
-            </html>"),
+            array('<!DOCTYPE html><title>title</title>', "<!DOCTYPE html><title>title</title>\nWDT\n"),
+            array('<!DOCTYPE html><title>title</title><body></body>', "<!DOCTYPE html><title>title</title><body>\nWDT\n</body>"),
+            array('<!DOCTYPE html><html><title>title</title></html>', "<!DOCTYPE html><html><title>title</title>\nWDT\n</html>"),
+            array('<!DOCTYPE html><html><title>title</title><body></body></html>', "<!DOCTYPE html><html><title>title</title><body>\nWDT\n</body></html>"),
+            array('<html></html>', "<html>\nWDT\n</html>"),
+            array('<body></body>', "<body>\nWDT\n</body>"),
+            array('<html><body></body></html>', "<html><body>\nWDT\n</body></html>"),
+            array(
+                '<!DOCTYPE html><html><title>title</title><body><script>/*<![CDATA[*/<title></body></html>/*]]>*/</script></body></html>',
+                "<!DOCTYPE html><html><title>title</title><body><script>/*<![CDATA[*/<title></body></html>/*]]>*/</script>\nWDT\n</body></html>",
+            ),
         );
     }
 
@@ -71,7 +70,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testToolbarIsInjected()
     {
-        $response = new Response('<html><head></head><body></body></html>');
+        $response = new Response('<!DOCTYPE html><title>title</title>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
@@ -79,7 +78,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
+        $this->assertEquals("<!DOCTYPE html><title>title</title>\nWDT\n", $response->getContent());
     }
 
     /**
@@ -87,14 +86,14 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testToolbarIsNotInjectedOnContentDispositionAttachment()
     {
-        $response = new Response('<html><head></head><body></body></html>');
+        $response = new Response('<!DOCTYPE html><title>title</title>');
         $response->headers->set('Content-Disposition', 'attachment; filename=test.html');
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(false, 'html'), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+        $this->assertEquals('<!DOCTYPE html><title>title</title>', $response->getContent());
     }
 
     /**
@@ -103,14 +102,14 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testToolbarIsNotInjectedOnRedirection($statusCode, $hasSession)
     {
-        $response = new Response('<html><head></head><body></body></html>', $statusCode);
+        $response = new Response('<!DOCTYPE html><title>title</title>', $statusCode);
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(false, 'html', $hasSession), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+        $this->assertEquals('<!DOCTYPE html><title>title</title>', $response->getContent());
     }
 
     public function provideRedirects()
@@ -128,14 +127,14 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testToolbarIsNotInjectedWhenThereIsNoNoXDebugTokenResponseHeader()
     {
-        $response = new Response('<html><head></head><body></body></html>');
+        $response = new Response('<!DOCTYPE html><title>title</title>');
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::MASTER_REQUEST, $response);
 
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+        $this->assertEquals('<!DOCTYPE html><title>title</title>', $response->getContent());
     }
 
     /**
@@ -143,7 +142,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testToolbarIsNotInjectedWhenOnSubRequest()
     {
-        $response = new Response('<html><head></head><body></body></html>');
+        $response = new Response('<!DOCTYPE html><title>title</title>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(), HttpKernelInterface::SUB_REQUEST, $response);
@@ -151,7 +150,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+        $this->assertEquals('<!DOCTYPE html><title>title</title>', $response->getContent());
     }
 
     /**
@@ -175,7 +174,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testToolbarIsNotInjectedOnXmlHttpRequests()
     {
-        $response = new Response('<html><head></head><body></body></html>');
+        $response = new Response('<!DOCTYPE html><title>title</title>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(true), HttpKernelInterface::MASTER_REQUEST, $response);
@@ -183,7 +182,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+        $this->assertEquals('<!DOCTYPE html><title>title</title>', $response->getContent());
     }
 
     /**
@@ -191,7 +190,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testToolbarIsNotInjectedOnNonHtmlRequests()
     {
-        $response = new Response('<html><head></head><body></body></html>');
+        $response = new Response('<!DOCTYPE html><title>title</title>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
 
         $event = new FilterResponseEvent($this->getKernelMock(), $this->getRequestMock(false, 'json'), HttpKernelInterface::MASTER_REQUEST, $response);
@@ -199,7 +198,7 @@ class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $listener->onKernelResponse($event);
 
-        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+        $this->assertEquals('<!DOCTYPE html><title>title</title>', $response->getContent());
     }
 
     public function testXDebugUrlHeader()

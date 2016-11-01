@@ -46,11 +46,12 @@ class ControllerNameParser
      */
     public function parse($controller)
     {
-        $originalController = $controller;
-        if (3 !== count($parts = explode(':', $controller))) {
+        $parts = explode(':', $controller);
+        if (3 !== count($parts) || in_array('', $parts, true)) {
             throw new \InvalidArgumentException(sprintf('The "%s" controller is not a valid "a:b:c" controller string.', $controller));
         }
 
+        $originalController = $controller;
         list($bundle, $controller, $action) = $parts;
         $controller = str_replace('/', '\\', $controller);
         $bundles = array();

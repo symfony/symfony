@@ -402,6 +402,37 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $dialog->ask($this->createInputInterfaceMock(), $output, $question);
     }
 
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted
+     */
+    public function testAskThrowsExceptionOnMissingInput()
+    {
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream(''));
+
+        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), new Question('What\'s your name?'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted
+     */
+    public function testAskThrowsExceptionOnMissingInputWithValidator()
+    {
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream(''));
+
+        $question = new Question('What\'s your name?');
+        $question->setValidator(function () {
+            if (!$value) {
+                throw new \Exception('A value is required.');
+            }
+        });
+
+        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

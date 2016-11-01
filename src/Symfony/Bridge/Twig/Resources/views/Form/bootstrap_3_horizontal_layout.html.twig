@@ -26,10 +26,12 @@ col-sm-2
 
 {% block form_row -%}
     <div class="form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
-        {{- form_label(form) -}}
-        <div class="{{ block('form_group_class') }}">
-            {{- form_widget(form) -}}
-            {{- form_errors(form) -}}
+        <div class="row">
+            {{- form_label(form) -}}
+            <div class="{{ block('form_group_class') }}">
+                {{- form_widget(form) -}}
+                {{- form_errors(form) -}}
+            </div>
         </div>
 {##}</div>
 {%- endblock form_row %}
@@ -45,10 +47,12 @@ col-sm-2
 {% block checkbox_radio_row -%}
 {% spaceless %}
     <div class="form-group{% if not valid %} has-error{% endif %}">
-        <div class="{{ block('form_label_class') }}"></div>
-        <div class="{{ block('form_group_class') }}">
-            {{ form_widget(form) }}
-            {{ form_errors(form) }}
+        <div class="row">
+            <div class="{{ block('form_label_class') }}"></div>
+            <div class="{{ block('form_group_class') }}">
+                {{ form_widget(form) }}
+                {{ form_errors(form) }}
+            </div>
         </div>
     </div>
 {% endspaceless %}
@@ -57,9 +61,11 @@ col-sm-2
 {% block submit_row -%}
 {% spaceless %}
     <div class="form-group">
-        <div class="{{ block('form_label_class') }}"></div>
-        <div class="{{ block('form_group_class') }}">
-            {{ form_widget(form) }}
+        <div class="row">
+            <div class="{{ block('form_label_class') }}"></div>
+            <div class="{{ block('form_group_class') }}">
+                {{ form_widget(form) }}
+            </div>
         </div>
     </div>
 {% endspaceless %}
@@ -68,9 +74,11 @@ col-sm-2
 {% block reset_row -%}
 {% spaceless %}
     <div class="form-group">
-        <div class="{{ block('form_label_class') }}"></div>
-        <div class="{{ block('form_group_class') }}">
-            {{ form_widget(form) }}
+        <div class="row">
+            <div class="{{ block('form_label_class') }}"></div>
+            <div class="{{ block('form_group_class') }}">
+                {{ form_widget(form) }}
+            </div>
         </div>
     </div>
 {% endspaceless %}

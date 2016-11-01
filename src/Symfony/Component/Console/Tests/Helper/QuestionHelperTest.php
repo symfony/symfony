@@ -402,6 +402,18 @@ class QuestionHelperTest extends \PHPUnit_Framework_TestCase
         $dialog->ask($this->createInputInterfaceMock(), $output, $question);
     }
 
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted
+     */
+    public function testAskThrowsExceptionOnMissingInput()
+    {
+        $dialog = new QuestionHelper();
+        $dialog->setInputStream($this->getInputStream(''));
+
+        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), new Question('What\'s your name?'));
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Client;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class WebTestCase extends KernelTestCase
+abstract class WebTestCase extends ContainerAwareTestCase
 {
     /**
      * Creates a Client.
@@ -30,9 +30,7 @@ abstract class WebTestCase extends KernelTestCase
      */
     protected static function createClient(array $options = array(), array $server = array())
     {
-        static::bootKernel($options);
-
-        $client = static::$kernel->getContainer()->get('test.client');
+        $client = static::getContainer($options)->get('test.client');
         $client->setServerParameters($server);
 
         return $client;

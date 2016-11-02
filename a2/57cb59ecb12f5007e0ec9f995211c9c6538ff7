@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-10-28T11:37:06Z
+
+BTW my PR already [fixes that](https://github.com/symfony/symfony/pull/19750/files#diff-b60d32b35c3a2ab2d7c1b76df7ab6f60R494) but does a lot of stuff at the same time.
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2016-10-30T08:49:05Z
+
+As we're already in a release candidate status for 3.2, adding new features is not possible. If you have a better fix, just let me know @Ener-Getick . This patch solves an issue in the current version
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-10-30T08:57:43Z
+
+~~Then let's wait for 3.3, but i don't think making invalid something that should be valid is a solution.~~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T12:57:51Z
+
+:+1:
+at least we won't miserably fail with a PHP Warning :)
+and throwing a parse error for a syntax not supported by the current parser is fine for now IMHO.
+
+---------------------------------------------------------------------------
+
+by Ener-Getick at 2016-11-02T13:19:39Z
+
+I reviewed your pr again and it looks like indeed that the input you test resulted at least in a warning as @nicolas-grekas said.
+So i'm 👍 for this, it can't hurt (it should probably be merged in 2.7).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T13:37:21Z
+
+Checked: this is for master only, 2.7 already fails properly here, the strpos is new to 3.2.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T13:45:45Z
+
+See #20388 on 2.7

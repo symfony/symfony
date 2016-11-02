@@ -30,7 +30,7 @@ abstract class WebTestCase extends ContainerAwareTestCase
      */
     protected static function createClient(array $options = array(), array $server = array())
     {
-        $client = static::getContainer($options)->get('test.client');
+        $client = static::createContainer($options)->get('test.client');
         $client->setServerParameters($server);
 
         return $client;

@@ -22,34 +22,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ContainerAwareTestCase extends KernelTestCase
 {
     /**
-     * @var ContainerInterface
-     */
-    private static $container;
-
-    /**
-     * Returns the service container.
+     * Returns a fresh instance of the service container.
+     *
+     * Note that every invocation of this method will create a fresh container instance and also discard and
+     * reboot the underlying kernel instance in static::$kernel.
      *
      * @param array $options Options to pass to the KernelTestCase::createKernel() method. May contain the
      *                       'environment' and 'debug' keys that will be used to create the underlying kernel.
      *
      * @return ContainerInterface
      */
-    public static function getContainer(array $options = array())
+    public static function createContainer(array $options = array())
     {
-        if (null === self::$container) {
-            static::bootKernel($options);
-            self::$container = static::$kernel->getContainer();
-        }
+        static::bootKernel($options);
 
-        return self::$container;
-    }
-
-    /**
-     * Release container after test.
-     */
-    protected function tearDown()
-    {
-        self::$container = null;
-        parent::tearDown();
+        return static::$kernel->getContainer();
     }
 }

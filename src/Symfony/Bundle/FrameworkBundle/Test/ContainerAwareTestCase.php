@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ContainerAwareTestCase extends KernelTestCase
 {
     /**
-     * Returns the service container
+     * Returns the service container.
      *
      * @param array $options Options to pass to the KernelTestCase::createKernel() method. May contain the
      *                       'environment' and 'debug' keys that will be used to create the underlying kernel.

@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-10-28T09:06:17Z
+
+Don't know if we should consider this an issue or not, but this new behavior, coupled with #19973 allow to easily access files like the `app/config/parameters.yml`, simply by:
+
+1. Appending a query param to the uri: `http://myapp.dev?uri=/srv/app/config/parameters.yml`
+1. Going to the profiler Request panel, and click on the query parameter.
+
+Of course it should not be a real issue, as it only work with the web profiler enabled, but deploying by mistake the `app_dev.php` front controller is still a common thing I've seen on many apps... and this would ease the access to potential sensitive informations.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-28T09:09:20Z
+
+In fact, #19973 alone is enough to get access to any file under the project root, no help needed from the DataCollector: just write the URL to the file in your browser bar: `/_profiler/open?file=app/config/parameters.yml`.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-10-28T11:31:51Z
+
+@nicolas-grekas : Do you know why the https://travis-ci.org/symfony/symfony/builds/171330048 travis build didn't fail, whereas it does locally through the warning, and what should be done about it in order for the test case to be relevant ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T12:55:30Z
+
+:+1:

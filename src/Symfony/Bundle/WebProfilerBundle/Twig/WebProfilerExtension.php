@@ -107,7 +107,7 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
     }
 
     /**
-     * @deprecated since 3.2, to be removed in 4.0. Use the dumpData() method instead.
+     * @deprecated since 3.2, to be removed in 4.0. Use the dumpData() method instead
      */
     public function dumpValue($value)
     {

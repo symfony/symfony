@@ -25,8 +25,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * The onKernelResponse method must be connected to the kernel.response event.
  *
- * The WDT is only injected on well-formed HTML (with a proper </body> tag).
- * This means that the WDT is never included in sub-requests or ESI requests.
+ * The WDT is only injected on well-formed HTML (with a proper <title> tag).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -117,7 +116,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected function injectToolbar(Response $response, Request $request, array $nonces)
     {
         $content = $response->getContent();
-        $pos = strripos($content, '</body>');
+        $pos = stripos($content, '<title>');
 
         if (false !== $pos) {
             $toolbar = "\n".str_replace("\n", '', $this->twig->render(

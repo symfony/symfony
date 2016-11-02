@@ -1,13 +1,14 @@
-<div id="sfwdt{{ token }}" class="sf-toolbar sf-display-none"></div>
 {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
 <script{% if csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>/*<![CDATA[*/
-    (function () {
+    Sfjs.addEventListener(document, 'DOMContentLoaded', function () {
+        var sfwdt = document.createElement('div');
+        sfwdt.id = 'sfwdt{{ token }}';
+        sfwdt.className = 'sf-toolbar sf-display-none';
+
         {% if 'top' == position %}
-            var sfwdt = document.getElementById('sfwdt{{ token }}');
-            document.body.insertBefore(
-                document.body.removeChild(sfwdt),
-                document.body.firstChild
-            );
+            document.body.insertBefore(sfwdt, document.body.firstChild);
+        {% else %}
+            document.body.appendChild(sfwdt);
         {% endif %}
 
         Sfjs.load(
@@ -97,5 +98,5 @@
             },
             { maxTries: 5 }
         );
-    })();
+    });
 /*]]>*/</script>

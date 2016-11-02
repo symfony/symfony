@@ -181,6 +181,7 @@ abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
             if ($container instanceof ResettableContainerInterface) {
                 $container->reset();
             }
+            static::$kernel = null;
         }
     }
 

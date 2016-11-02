@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @author Matthias Pigulla <mp@webfactory.de>
  */
-class ContainerAwareTestCase extends KernelTestCase
+abstract class ContainerAwareTestCase extends KernelTestCase
 {
     /**
      * Returns a fresh instance of the service container.

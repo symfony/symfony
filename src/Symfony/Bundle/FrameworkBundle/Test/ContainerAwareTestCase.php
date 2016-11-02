@@ -22,6 +22,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ContainerAwareTestCase extends KernelTestCase
 {
     /**
+     * @var ContainerInterface
+     */
+    private static $container;
+
+    /**
      * Returns the service container.
      *
      * @param array $options Options to pass to the KernelTestCase::createKernel() method. May contain the
@@ -31,8 +36,21 @@ class ContainerAwareTestCase extends KernelTestCase
      */
     public static function getContainer(array $options = array())
     {
-        static::bootKernel($options);
+        if (null === static::$container) {
+            static::bootKernel($options);
+            static::$container = static::$kernel->getContainer();
+        }
 
-        return static::$kernel->getContainer();
+        return static::$container;
     }
+
+    /**
+     * Release container after test
+     */
+    protected function tearDown()
+    {
+        static::$container = null;
+        parent::tearDown();
+    }
+
 }

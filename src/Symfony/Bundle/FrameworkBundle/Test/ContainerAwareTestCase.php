@@ -36,12 +36,12 @@ class ContainerAwareTestCase extends KernelTestCase
      */
     public static function getContainer(array $options = array())
     {
-        if (null === static::$container) {
+        if (null === self::$container) {
             static::bootKernel($options);
-            static::$container = static::$kernel->getContainer();
+            self::$container = static::$kernel->getContainer();
         }
 
-        return static::$container;
+        return self::$container;
     }
 
     /**
@@ -49,7 +49,7 @@ class ContainerAwareTestCase extends KernelTestCase
      */
     protected function tearDown()
     {
-        static::$container = null;
+        self::$container = null;
         parent::tearDown();
     }
 

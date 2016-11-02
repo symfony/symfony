@@ -130,7 +130,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
                     return new ClassStub($var);
                 }
             }
-            if (false !== strpos($var, DIRECTORY_SEPARATOR) && file_exists($var)) {
+            if (false !== strpos($var, DIRECTORY_SEPARATOR) && false === strpos($var, '://') && file_exists($var)) {
                 return new LinkStub($var);
             }
         }

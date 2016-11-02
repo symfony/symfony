@@ -42,6 +42,7 @@
                     <argument type="constant">Symfony\Component\VarDumper\Dumper\HtmlDumper::DUMP_LIGHT_ARRAY</argument>
                     <call method="setDisplayOptions">
                         <argument type="collection">
+                            <argument key="maxStringLength">4096</argument>
                             <argument key="fileLinkFormat" type="service" id="debug.file_link_formatter"></argument>
                         </argument>
                     </call>

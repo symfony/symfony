@@ -1,0 +1,93 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-07-30T12:30:08Z
+
+I've left some minor comments but that's a really nice PR, thanks!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-07-30T12:36:04Z
+
+Thank you @HeahDude, especially for your inputs about what it could be nice to see. I let you know when I made changes.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-07-30T14:23:30Z
+
+@HeahDude I did the changes and updated the description accordingly.
+Hope I didn't forget anything.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-02T18:09:29Z
+
+I made the change and updated the description accordingly (screenshots).
+Thanks to reviewers!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-02T18:29:14Z
+
+Tests have been updated.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-03T09:57:58Z
+
+Changes related to line notes have been made.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-15T10:25:06Z
+
+This PR and the base one are good to merge (or close).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-09-21T23:28:44Z
+
+Updated after #19614
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-09-25T15:12:09Z
+
+I made the changes for using `profiler_dump()` properly and updated the description accordingly.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-04T12:50:46Z
+
+@fabpot I think this one is ready
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2016-10-25T07:40:47Z
+
+This one would be great, because it also would allow to add a "user logout link" to the profiler. Before this PR the required firewall wasn't available. Also see #17037 for a poc.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-02T18:38:46Z
+
+Imho Security is the most complex thing for beginners. The fact we don't provide informations about it (i.e. the current firewall and all the logic behind it) involves that any security issue requires to look deeper in the core, which leads to misunderstandings and lots of support issues (just answered [one](https://github.com/lexik/LexikJWTAuthenticationBundle/issues/263#issuecomment-257547939) by saying to the user to change the order on which firewalls are defined, it would have been easy to debug with this in the profiler).
+
+The lack of feedbacks is too bad here. Shall I close this?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-02T18:44:51Z
+
+@chalasr please don't close it! You are right about the poor contents of the security profiler panel and debug toolbar.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-02T22:52:41Z
+
+Can you rebase now that the related PR is merged?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-02T23:30:55Z
+
+Rebased

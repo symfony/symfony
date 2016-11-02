@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-07-21T11:01:25Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-07-25T22:54:19Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-08-02T18:08:00Z
+
+I made the changes.
+Thanks @ogizanagi @HeahDude.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-09-11T09:37:17Z
+
+Could we take a decision on this one? The value object added is mostly intended to be consumed by the profiler data collector (see #19490) as other existing ones and btw solve the issue of being able to get informations of the current firewall, adding some value to the `FirewallContext` class.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-02T22:45:51Z
+
+👍

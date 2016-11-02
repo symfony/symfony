@@ -45,12 +45,11 @@ class ContainerAwareTestCase extends KernelTestCase
     }
 
     /**
-     * Release container after test
+     * Release container after test.
      */
     protected function tearDown()
     {
         self::$container = null;
         parent::tearDown();
     }
-
 }

@@ -654,4 +654,13 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             'misplaced equals character' => array('!!binary "SGVsbG8gd29ybG=Q"', '/The base64 encoded data \(.*\) contains invalid characters/'),
         );
     }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Malformed inline YAML string {this, is not, yaml}
+     */
+    public function testStringOffsetCastError()
+    {
+        Inline::parse('{this, is not, yaml}');
+    }
 }

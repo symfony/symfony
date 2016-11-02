@@ -23,6 +23,9 @@ abstract class WebTestCase extends ContainerAwareTestCase
     /**
      * Creates a Client.
      *
+     * Note: When this method is called multiple times to create different client instances,
+     * each client will be using a new, fresh kernel and container instance.
+     *
      * @param array $options An array of options to pass to the KernelTestCase::createKernel method
      * @param array $server  An array of server parameters
      *
@@ -30,7 +33,9 @@ abstract class WebTestCase extends ContainerAwareTestCase
      */
     protected static function createClient(array $options = array(), array $server = array())
     {
-        $client = static::getContainer($options)->get('test.client');
+        static::bootKernel($options);
+
+        $client = static::$kernel->getContainer()->get('test.client');
         $client->setServerParameters($server);
 
         return $client;

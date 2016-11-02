@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-11-02T11:14:06Z
+
+👍
+We need some time to mature the setter autowiring, so let's delay it for 3.3
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-02T12:44:13Z
+
+👍
+
+The fabbot error isn't related but should be fixed in another PR.

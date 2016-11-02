@@ -101,7 +101,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
  * feature #19325 [FrameworkBundle] Allow to specify a domain when updating translations (antograssiot)
  * feature #19277 [Serializer] Argument objects (theofidry, dunglas)
  * feature #19322 [HttpFoundation] Add Request::isMethodIdempotent method (dunglas)
- * feature #17608 [DependencyInjection] Autowiring: add setter injection support (dunglas)
  * feature #18510 Added a SecurityUserValueResolver for controllers (iltar)
  * feature #19203 [Bridge/Doctrine] Reset the EM lazy-proxy instead of the EM service (nicolas-grekas)
  * feature #19236 [FrameworkBundle] Deprecate the service serializer.mapping.cache.doctrine.apc (Ener-Getick)

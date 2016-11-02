@@ -4,7 +4,6 @@ CHANGELOG
 3.2.0
 -----
 
- * added support for setter autowiring
  * allowed to prioritize compiler passes by introducing a third argument to `PassConfig::addPass()`, to `Compiler::addPass` and to `ContainerBuilder::addCompilerPass()`
  * added support for PHP constants in YAML configuration files
  * deprecated the ability to set or unset a private service with the `Container::set()` method

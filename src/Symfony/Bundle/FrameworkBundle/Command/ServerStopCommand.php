@@ -36,7 +36,7 @@ class ServerStopCommand extends ServerCommand
             ))
             ->setName('server:stop')
             ->setDescription('Stops PHP\'s built-in web server that was started with the server:start command')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> stops PHP's built-in web server:
 
   <info>php %command.full_name%</info>

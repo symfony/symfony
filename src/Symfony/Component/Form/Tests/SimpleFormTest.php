@@ -641,10 +641,10 @@ class SimpleFormTest extends AbstractFormTest
         $form = $this->getBuilder()
             ->setEmptyData('foo')
             ->addViewTransformer(new FixedDataTransformer(array(
-            '' => '',
-            // direction is reversed!
-            'bar' => 'foo',
-        )))
+                '' => '',
+                // direction is reversed!
+                'bar' => 'foo',
+            )))
             ->getForm();
 
         $form->submit('');
@@ -657,17 +657,17 @@ class SimpleFormTest extends AbstractFormTest
         $test = $this;
         $form = $this->getBuilder()
             ->setEmptyData(function ($form) use ($test) {
-            // the form instance is passed to the closure to allow use
-            // of form data when creating the empty value
-            $test->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+                // the form instance is passed to the closure to allow use
+                // of form data when creating the empty value
+                $test->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
 
-            return 'foo';
-        })
+                return 'foo';
+            })
             ->addViewTransformer(new FixedDataTransformer(array(
-            '' => '',
-            // direction is reversed!
-            'bar' => 'foo',
-        )))
+                '' => '',
+                // direction is reversed!
+                'bar' => 'foo',
+            )))
             ->getForm();
 
         $form->submit('');

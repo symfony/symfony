@@ -132,7 +132,7 @@ EOTXT
         $out = stream_get_contents($out, -1, 0);
 
         $this->assertStringMatchesFormat(
-            <<<EOTXT
+            <<<'EOTXT'
 <foo></foo><bar>b"<span class=sf-dump-str title="7 binary or non-UTF-8 characters">&#1057;&#1083;&#1086;&#1074;&#1072;&#1088;&#1100;</span>"
 </bar>
 

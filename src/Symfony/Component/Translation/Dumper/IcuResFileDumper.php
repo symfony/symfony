@@ -44,7 +44,7 @@ class IcuResFileDumper extends FileDumper
 
         foreach ($messages->all($domain) as $source => $target) {
             $indexes .= pack('v', strlen($data) + 28);
-            $data    .= $source."\0";
+            $data .= $source."\0";
         }
 
         $data .= $this->writePadding($data);

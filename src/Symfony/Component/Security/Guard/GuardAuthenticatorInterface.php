@@ -39,7 +39,7 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
      * Whatever value you return here will be passed to getUser() and checkCredentials()
      *
      * For example, for a form login, you might:
-     * 
+     *
      *      if ($request->request->has('_username')) {
      *          return array(
      *              'username' => $request->request->get('_username'),
@@ -87,7 +87,7 @@ interface GuardAuthenticatorInterface extends AuthenticationEntryPointInterface
      *
      * @param mixed         $credentials
      * @param UserInterface $user
-     * 
+     *
      * @return bool
      *
      * @throws AuthenticationException

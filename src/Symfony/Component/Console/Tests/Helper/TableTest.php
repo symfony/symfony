@@ -96,7 +96,7 @@ class TableTest extends \PHPUnit_Framework_TestCase
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 'default',
-<<<TABLE
+<<<'TABLE'
 +---------------+--------------------------+------------------+
 | ISBN          | Title                    | Author           |
 +---------------+--------------------------+------------------+
@@ -112,7 +112,7 @@ TABLE
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 'compact',
-<<<TABLE
+<<<'TABLE'
  ISBN          Title                    Author           
  99921-58-10-7 Divine Comedy            Dante Alighieri  
  9971-5-0210-0 A Tale of Two Cities     Charles Dickens  
@@ -125,7 +125,7 @@ TABLE
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 'borderless',
-<<<TABLE
+<<<'TABLE'
  =============== ========================== ================== 
   ISBN            Title                      Author            
  =============== ========================== ================== 
@@ -146,7 +146,7 @@ TABLE
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +---------------+--------------------------+------------------+
 | ISBN          | Title                    |                  |
 +---------------+--------------------------+------------------+
@@ -167,7 +167,7 @@ TABLE
                     array('80-902734-1-6', 'And Then There Were None', 'Agatha Christie'),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +---------------+--------------------------+------------------+
 | 99921-58-10-7 | Divine Comedy            | Dante Alighieri  |
 | 9971-5-0210-0 |                          |                  |
@@ -186,7 +186,7 @@ TABLE
                     array('960-425-059-0', 'The Lord of the Rings', "J. R. R.\nTolkien"),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +---------------+----------------------------+-----------------+
 | ISBN          | Title                      | Author          |
 +---------------+----------------------------+-----------------+
@@ -206,7 +206,7 @@ TABLE
                 array('ISBN', 'Title'),
                 array(),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +------+-------+
 | ISBN | Title |
 +------+-------+
@@ -226,7 +226,7 @@ TABLE
                     array('9971-5-0210-0', 'A Tale of Two Cities', '<info>Charles Dickens</>'),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +---------------+----------------------+-----------------+
 | ISBN          | Title                | Author          |
 +---------------+----------------------+-----------------+
@@ -243,7 +243,7 @@ TABLE
                     array('9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens'),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +----------------------------------+----------------------+-----------------+
 | ISBN                             | Title                | Author          |
 +----------------------------------+----------------------+-----------------+
@@ -275,7 +275,7 @@ TABLE
                     ),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +-------------------------------+-------------------------------+-----------------------------+
 | ISBN                          | Title                         | Author                      |
 +-------------------------------+-------------------------------+-----------------------------+
@@ -308,7 +308,7 @@ TABLE
                     array('80-902734-1-7', 'Test'),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +---------------+----------------------+-----------------+
 | ISBN          | Title                | Author          |
 +---------------+----------------------+-----------------+
@@ -341,7 +341,7 @@ TABLE
                     array('J. R. R'),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +------------------+---------+-----------------+
 | ISBN             | Title   | Author          |
 +------------------+---------+-----------------+
@@ -376,7 +376,7 @@ TABLE
                     ),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +-----------------+-------+-----------------+
 | ISBN            | Title | Author          |
 +-----------------+-------+-----------------+
@@ -413,7 +413,7 @@ TABLE
                     array('Charles Dickens'),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +-----------------+-------+-----------------+
 | ISBN            | Title | Author          |
 +-----------------+-------+-----------------+
@@ -440,7 +440,7 @@ TABLE
                     array('Charles Dickens'),
                 ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +---------------+-----------------+
 | ISBN          | Author          |
 +---------------+-----------------+
@@ -458,7 +458,7 @@ TABLE
                 ),
                 array(),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +------+-------+--------+
 | Main title            |
 +------+-------+--------+
@@ -478,7 +478,7 @@ TABLE
                     ),
         ),
                 'default',
-<<<TABLE
+<<<'TABLE'
 +---+--+--+---+--+---+--+---+--+
 | 1       | 2    | 3    | 4    |
 +---+--+--+---+--+---+--+---+--+
@@ -499,7 +499,7 @@ TABLE
         $table->render();
 
         $expected =
-<<<TABLE
+<<<'TABLE'
 +------+
 | ■■   |
 +------+
@@ -529,7 +529,7 @@ TABLE;
         $table->render();
 
         $expected =
-<<<TABLE
+<<<'TABLE'
 .......
 . Foo .
 .......
@@ -556,7 +556,7 @@ TABLE;
         $table->render();
 
         $expected =
-<<<TABLE
+<<<'TABLE'
 +------+
 | Foo  |
 +------+

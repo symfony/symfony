@@ -6,7 +6,7 @@ if (is_file($file)) {
 }
 
 $phar = new Phar($file, 0, 'ProjectWithXsdExtensionInPhar.phar');
-$phar->addFromString('ProjectWithXsdExtensionInPhar.php', <<<EOT
+$phar->addFromString('ProjectWithXsdExtensionInPhar.php', <<<'EOT'
 <?php
 
 class ProjectWithXsdExtensionInPhar extends ProjectExtension
@@ -28,7 +28,7 @@ class ProjectWithXsdExtensionInPhar extends ProjectExtension
 }
 EOT
 );
-$phar->addFromString('schema/project-1.0.xsd', <<<EOT
+$phar->addFromString('schema/project-1.0.xsd', <<<'EOT'
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <xsd:schema xmlns="http://www.example.com/schema/projectwithxsdinphar"

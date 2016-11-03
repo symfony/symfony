@@ -20,7 +20,7 @@ class NodeTest extends \PHPUnit_Framework_TestCase
     {
         $node = new Node(array(new ConstantNode('foo')));
 
-        $this->assertEquals(<<<EOF
+        $this->assertEquals(<<<'EOF'
 Node(
     ConstantNode(value: 'foo')
 )

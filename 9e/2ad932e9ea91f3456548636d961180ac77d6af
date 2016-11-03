@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-10-18T06:47:04Z
+
+👍
+
+It can be debatable to merge it in 2.7 or master ... but to me this is a bugfix, so it should stay in 2.7.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-18T06:59:24Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-18T14:55:10Z
+
+:+1: for 2.7 also
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-18T18:10:29Z
+
+@fabpot can you test with `on`, `off`, `yes`, `no`... i think this can get problematic ;-) The BC break is real: https://3v4l.org/bW8P0
+
+edit: also constants/nulls are affected
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-18T18:20:28Z
+
+@ro0NL Not sure I understand your concern. Can you be more precise?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-18T18:22:31Z
+
+This breaks configuration like
+```ini
+[parameters]
+   is_this_enabled = yes ; comment
+```
+
+right? AFAIK this is not covered by `XmlUtils::phpize` nor this PR...
+
+Before `string("1") => bool(true)`, after `string("yes ")`
+
+edit: comments are just buggy with INI_SCANNER_RAW :) https://3v4l.org/7pV3u
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-18T19:39:52Z
+
+@fabpot perhaps more serious, no escaping is applied: https://3v4l.org/oGJqj
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T13:57:41Z
+
+@ro0NL is right, we need to polyfill `INI_SCANNER_TYPED`...
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-02T20:12:55Z
+
+@nicolas-grekas we basically already doing that with `INI_SCANNER_NORMAL + XmlUtils::phpize`.
+
+Imo a
+
+> more generic phpize class
+
+would be sufficient.
+
+or simply patch the current ini loader on numerics, etc.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-03T20:38:39Z
+
+I've updated this PR to take into account how the scanner type convert values, and added some more tests. As for the failure on PHP 7.1, not sure what changed. Is it better now?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-03T20:52:01Z
+
+I propose to merge it into master instead of 2.7 as it's more complex than anticipated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-03T20:53:41Z
+
+Using `INI_SCANNER_TYPED` when possible would be a great way to ensure the polyfill behaves as expected
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-03T20:55:42Z
+
+@nicolas-grekas Not really possible as our behavior is not exactly the same (we must be as close as possible to it but also be closed to what XmlUtils does to be consistent with the other formats).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-03T23:22:56Z
+
+Rebased on master

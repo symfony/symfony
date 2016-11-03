@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-30T09:42:54Z
+
+Could you please merge all your CS PRs in one PR per branch?
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-10-30T09:46:16Z
+
+Easier to discuss when they are separated, also some are bigger ones (like https://github.com/symfony/symfony/pull/20352/files), I don't want to make 1k lines PR :|
+maybe check and approve first, then combine if needed ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-30T09:51:31Z
+
+As GitHub supports reviewing commits one by one having one big PR shouldn't be an issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-30T09:57:00Z
+
+Review done, all look fine to me, see minor comments.
+There are some trailing spaces remaining in the code also if you'd like to look at them.
+Good to merge in one PR :)
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-10-30T09:57:27Z
+
+Thank you both ;)
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-10-30T10:29:19Z
+
+would be all for now
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T07:41:55Z
+
+:+1:

@@ -386,11 +386,10 @@ class MainConfiguration implements ConfigurationInterface
             ->children()
                 ->arrayNode('encoders')
                     ->example(array(
-                        'Acme\DemoBundle\Entity\User1' => 'sha512',
-                        'Acme\DemoBundle\Entity\User2' => array(
-                            'algorithm' => 'sha512',
-                            'encode_as_base64' => 'true',
-                            'iterations' => 5000,
+                        'AppBundle\Entity\User1' => 'bcrypt',
+                        'AppBundle\Entity\User2' => array(
+                            'algorithm' => 'bcrypt',
+                            'cost' => 13,
                         ),
                     ))
                     ->requiresAtLeastOneElement()

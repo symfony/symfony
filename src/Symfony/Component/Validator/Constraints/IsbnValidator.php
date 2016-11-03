@@ -112,14 +112,14 @@ class IsbnValidator extends ConstraintValidator
             // If we test the length before the loop, we get an ERROR_TOO_SHORT
             // when actually an ERROR_INVALID_CHARACTERS is wanted, e.g. for
             // "0-45122_5244" (typo)
-            if (!isset($isbn{$i})) {
+            if (!isset($isbn[$i])) {
                 return Isbn::TOO_SHORT_ERROR;
             }
 
-            if ('X' === $isbn{$i}) {
+            if ('X' === $isbn[$i]) {
                 $digit = 10;
-            } elseif (ctype_digit($isbn{$i})) {
-                $digit = $isbn{$i};
+            } elseif (ctype_digit($isbn[$i])) {
+                $digit = $isbn[$i];
             } else {
                 return Isbn::INVALID_CHARACTERS_ERROR;
             }
@@ -127,7 +127,7 @@ class IsbnValidator extends ConstraintValidator
             $checkSum += $digit * (10 - $i);
         }
 
-        if (isset($isbn{$i})) {
+        if (isset($isbn[$i])) {
             return Isbn::TOO_LONG_ERROR;
         }
 
@@ -158,11 +158,11 @@ class IsbnValidator extends ConstraintValidator
         $checkSum = 0;
 
         for ($i = 0; $i < 13; $i += 2) {
-            $checkSum += $isbn{$i};
+            $checkSum += $isbn[$i];
         }
 
         for ($i = 1; $i < 12; $i += 2) {
-            $checkSum += $isbn{$i}
+            $checkSum += $isbn[$i]
             * 3;
         }
 

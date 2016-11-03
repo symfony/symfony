@@ -273,8 +273,6 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     */
     public function testSetCurrentBeforeStarting()
     {
         $bar = new ProgressBar($this->getOutputStream());
@@ -582,7 +580,6 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
         rewind($output->getStream());
         $this->assertEquals(
-
                 " \033[44;37m Starting the demo... fingers crossed  \033[0m\n".
                 '  0/15 '.$progress.str_repeat($empty, 26)."   0%\n".
                 " \xf0\x9f\x8f\x81  < 1 sec                        \033[44;37m 0 B \033[0m"

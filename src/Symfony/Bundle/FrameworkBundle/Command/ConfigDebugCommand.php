@@ -36,7 +36,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
                 new InputArgument('name', InputArgument::OPTIONAL, 'The bundle name or the extension alias'),
             ))
             ->setDescription('Dumps the current configuration for an extension')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the current configuration for an
 extension/bundle.
 

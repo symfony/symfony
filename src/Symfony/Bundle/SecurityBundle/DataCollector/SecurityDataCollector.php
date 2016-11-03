@@ -104,7 +104,7 @@ class SecurityDataCollector extends DataCollector
                 'token_class' => get_class($token),
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
-                'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles),
+                'roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $assignedRoles),
                 'inherited_roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );

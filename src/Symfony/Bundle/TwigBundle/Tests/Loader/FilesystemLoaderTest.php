@@ -115,7 +115,7 @@ class FilesystemLoaderTest extends TestCase
         $method->setAccessible(true);
         $method->invoke($loader, 'name.format.engine');
     }
-    
+
     public function testTwigSoftErrorIfTemplateDoesNotExist()
     {
         $parser = $this->getMock('Symfony\Component\Templating\TemplateNameParserInterface');

@@ -118,8 +118,6 @@ class Reader
         $this->position += $length;
     }
 
-    /**
-     */
     public function moveToEnd()
     {
         $this->position = $this->length;

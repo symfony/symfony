@@ -74,7 +74,7 @@ class TranslationUpdateCommandTest extends \PHPUnit_Framework_TestCase
             ->method('extract')
             ->will(
                 $this->returnCallback(function ($path, $catalogue) use ($extractedMessages) {
-                  $catalogue->add($extractedMessages);
+                    $catalogue->add($extractedMessages);
                 })
             );
 
@@ -84,7 +84,7 @@ class TranslationUpdateCommandTest extends \PHPUnit_Framework_TestCase
             ->method('loadMessages')
             ->will(
                 $this->returnCallback(function ($path, $catalogue) use ($loadedMessages) {
-                  $catalogue->add($loadedMessages);
+                    $catalogue->add($loadedMessages);
                 })
             );
 

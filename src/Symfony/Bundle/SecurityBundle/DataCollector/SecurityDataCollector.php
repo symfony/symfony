@@ -81,7 +81,7 @@ class SecurityDataCollector extends DataCollector
                 'authenticated' => $token->isAuthenticated(),
                 'token_class' => get_class($token),
                 'user' => $token->getUsername(),
-                'roles' => array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles),
+                'roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $assignedRoles),
                 'inherited_roles' => array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );

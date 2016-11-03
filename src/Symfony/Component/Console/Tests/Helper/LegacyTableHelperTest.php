@@ -112,7 +112,7 @@ TABLE
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 TableHelper::LAYOUT_COMPACT,
-<<<TABLE
+<<<'TABLE'
  ISBN          Title                    Author           
  99921-58-10-7 Divine Comedy            Dante Alighieri  
  9971-5-0210-0 A Tale of Two Cities     Charles Dickens  
@@ -125,7 +125,7 @@ TABLE
                 array('ISBN', 'Title', 'Author'),
                 $books,
                 TableHelper::LAYOUT_BORDERLESS,
-<<<TABLE
+<<<'TABLE'
  =============== ========================== ================== 
   ISBN            Title                      Author            
  =============== ========================== ================== 

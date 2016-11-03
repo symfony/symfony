@@ -1,7 +1,7 @@
 --TEST--
 Test symfony_debug_backtrace in case of fatal error
 --SKIPIF--
-<?php if (!extension_loaded("symfony_debug")) print "skip"; ?>
+<?php if (!extension_loaded('symfony_debug')) print 'skip'; ?>
 --FILE--
 <?php
 
@@ -18,7 +18,6 @@ function foo()
 function bt()
 {
     print_r(symfony_debug_backtrace());
-
 }
 
 register_shutdown_function('bt');

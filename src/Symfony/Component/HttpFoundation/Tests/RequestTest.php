@@ -1090,7 +1090,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('put'),
             array('delete'),
             array('patch'),
-
         );
     }
 

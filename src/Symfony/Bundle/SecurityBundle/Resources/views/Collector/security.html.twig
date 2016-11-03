@@ -49,6 +49,12 @@
             <div class="sf-toolbar-info-piece">
                 <span>You are not authenticated.</span>
             </div>
+            {% if collector.firewall %}
+            <div class="sf-toolbar-info-piece">
+                <b>Firewall name</b>
+                <span>{{ collector.firewall.name }}</span>
+            </div>
+            {% endif %}
         {% else %}
             <div class="sf-toolbar-info-piece">
                 <span>The security is disabled.</span>

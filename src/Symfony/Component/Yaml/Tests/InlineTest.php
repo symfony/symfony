@@ -657,10 +657,10 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Malformed inline YAML string {this, is not, yaml}
+     * @expectedExceptionMessage Malformed inline YAML string: {this, is not, supported}.
      */
-    public function testStringOffsetCastError()
+    public function testNotSupportedMissingValue()
     {
-        Inline::parse('{this, is not, yaml}');
+        Inline::parse('{this, is not, supported}');
     }
 }

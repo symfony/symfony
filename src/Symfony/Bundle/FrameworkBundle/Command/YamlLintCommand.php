@@ -54,7 +54,7 @@ class YamlLintCommand extends Command
         $this
             ->setDescription($this->command->getDescription())
             ->setDefinition($this->command->getDefinition())
-            ->setHelp($this->command->getHelp().<<<EOF
+            ->setHelp($this->command->getHelp().<<<'EOF'
 
 Or find all files in a bundle:
 

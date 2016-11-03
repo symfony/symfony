@@ -234,9 +234,9 @@ class TextDescriptor extends Descriptor
 
     /**
      * Formats command aliases to show them in the command description.
-     * 
+     *
      * @param Command $command
-     * 
+     *
      * @return string
      */
     private function getCommandAliasesText($command)

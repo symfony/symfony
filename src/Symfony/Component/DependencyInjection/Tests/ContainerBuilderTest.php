@@ -782,12 +782,11 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $loader = new ClosureLoader($container = new ContainerBuilder());
         $loader->load(function (ContainerBuilder $container) {
-                $container->set('a', new \BazClass());
-                $definition = new Definition('BazClass');
-                $definition->setLazy(true);
-                $container->setDefinition('a', $definition);
-            }
-        );
+            $container->set('a', new \BazClass());
+            $definition = new Definition('BazClass');
+            $definition->setLazy(true);
+            $container->setDefinition('a', $definition);
+        });
 
         $container->setResourceTracking(true);
 

@@ -442,7 +442,7 @@ EOF;
 
     public function testObjectSupportEnabled()
     {
-        $input = <<<EOF
+        $input = <<<'EOF'
 foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
@@ -454,7 +454,7 @@ EOF;
      */
     public function testObjectSupportEnabledPassingTrue()
     {
-        $input = <<<EOF
+        $input = <<<'EOF'
 foo: !php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
@@ -466,7 +466,7 @@ EOF;
      */
     public function testObjectSupportEnabledWithDeprecatedTag()
     {
-        $input = <<<EOF
+        $input = <<<'EOF'
 foo: !!php/object:O:30:"Symfony\Component\Yaml\Tests\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
@@ -502,7 +502,7 @@ EOF;
     {
         $tests = array();
 
-        $yaml = <<<EOF
+        $yaml = <<<'EOF'
 foo:
     fiz: [cat]
 EOF;
@@ -523,7 +523,7 @@ EOF;
         $expected->baz = 'foobar';
         $tests['object-for-map-is-applied-after-parsing'] = array($yaml, $expected);
 
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 array:
   - key: one
   - key: two
@@ -536,7 +536,7 @@ EOT;
         $expected->array[1]->key = 'two';
         $tests['nest-map-and-sequence'] = array($yaml, $expected);
 
-        $yaml = <<<YAML
+        $yaml = <<<'YAML'
 map:
   1: one
   2: two
@@ -547,7 +547,7 @@ YAML;
         $expected->map->{2} = 'two';
         $tests['numeric-keys'] = array($yaml, $expected);
 
-        $yaml = <<<YAML
+        $yaml = <<<'YAML'
 map:
   0: one
   1: two
@@ -582,11 +582,11 @@ YAML;
 
     public function invalidDumpedObjectProvider()
     {
-        $yamlTag = <<<EOF
+        $yamlTag = <<<'EOF'
 foo: !!php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
-        $localTag = <<<EOF
+        $localTag = <<<'EOF'
 foo: !php/object:O:30:"Symfony\Tests\Component\Yaml\B":1:{s:1:"b";s:3:"foo";}
 bar: 1
 EOF;
@@ -688,7 +688,7 @@ EOF
 
     public function testSequenceInMappingStartedBySingleDashLine()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 a:
 -
   b:
@@ -716,7 +716,7 @@ EOT;
 
     public function testSequenceFollowedByCommentEmbeddedInMapping()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 a:
     b:
         - c
@@ -752,7 +752,7 @@ EOF
      */
     public function testScalarInSequence()
     {
-        Yaml::parse(<<<EOF
+        Yaml::parse(<<<'EOF'
 foo:
     - bar
 "missing colon"
@@ -774,7 +774,7 @@ EOF
      */
     public function testMappingDuplicateKeyBlock()
     {
-        $input = <<<EOD
+        $input = <<<'EOD'
 parent:
     child: first
     child: duplicate
@@ -795,7 +795,7 @@ EOD;
      */
     public function testMappingDuplicateKeyFlow()
     {
-        $input = <<<EOD
+        $input = <<<'EOD'
 parent: { child: first, child: duplicate }
 parent: { child: duplicate, child: duplicate }
 EOD;
@@ -1060,7 +1060,7 @@ EOF;
      */
     public function testColonInMappingValueException()
     {
-        $yaml = <<<EOF
+        $yaml = <<<'EOF'
 foo: bar: baz
 EOF;
 
@@ -1069,7 +1069,7 @@ EOF;
 
     public function testColonInMappingValueExceptionNotTriggeredByColonInComment()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 foo:
     bar: foobar # Note: a comment after a colon
 EOT;
@@ -1170,7 +1170,7 @@ EOT
         );
         $tests[] = array($yaml, $expected);
 
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 foo:
   bar:
     scalar-block: >
@@ -1213,7 +1213,7 @@ EOT;
 
     public function testBlankLinesAreParsedAsNewLinesInFoldedBlocks()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 test: >
     <h2>A heading</h2>
 
@@ -1225,7 +1225,7 @@ EOT;
 
         $this->assertSame(
             array(
-                'test' => <<<EOT
+                'test' => <<<'EOT'
 <h2>A heading</h2>
 <ul> <li>a list</li> <li>may be a good example</li> </ul>
 EOT
@@ -1237,7 +1237,7 @@ EOT
 
     public function testAdditionallyIndentedLinesAreParsedAsNewLinesInFoldedBlocks()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 test: >
     <h2>A heading</h2>
 
@@ -1249,7 +1249,7 @@ EOT;
 
         $this->assertSame(
             array(
-                'test' => <<<EOT
+                'test' => <<<'EOT'
 <h2>A heading</h2>
 <ul>
   <li>a list</li>
@@ -1277,13 +1277,13 @@ EOT
             'enclosed with single quotes' => array("data: !!binary 'SGVsbG8gd29ybGQ='"),
             'containing spaces' => array('data: !!binary  "SGVs bG8gd 29ybGQ="'),
             'in block scalar' => array(
-                <<<EOT
+                <<<'EOT'
 data: !!binary |
     SGVsbG8gd29ybGQ=
 EOT
     ),
             'containing spaces in block scalar' => array(
-                <<<EOT
+                <<<'EOT'
 data: !!binary |
     SGVs bG8gd 29ybGQ=
 EOT
@@ -1309,7 +1309,7 @@ EOT
             'too many equals characters' => array('data: !!binary "SGVsbG8gd29yb==="', '/The base64 encoded data \(.*\) contains invalid characters/'),
             'misplaced equals character' => array('data: !!binary "SGVsbG8gd29ybG=Q"', '/The base64 encoded data \(.*\) contains invalid characters/'),
             'length not a multiple of four in block scalar' => array(
-                <<<EOT
+                <<<'EOT'
 data: !!binary |
     SGVsbG8d29ybGQ=
 EOT
@@ -1317,7 +1317,7 @@ EOT
                 '/The normalized base64 encoded data \(data without whitespace characters\) length must be a multiple of four \(\d+ bytes given\)/',
             ),
             'invalid characters in block scalar' => array(
-                <<<EOT
+                <<<'EOT'
 data: !!binary |
     SGVsbG8#d29ybGQ=
 EOT
@@ -1325,7 +1325,7 @@ EOT
                 '/The base64 encoded data \(.*\) contains invalid characters/',
             ),
             'too many equals characters in block scalar' => array(
-                <<<EOT
+                <<<'EOT'
 data: !!binary |
     SGVsbG8gd29yb===
 EOT
@@ -1333,7 +1333,7 @@ EOT
                 '/The base64 encoded data \(.*\) contains invalid characters/',
             ),
             'misplaced equals character in block scalar' => array(
-                <<<EOT
+                <<<'EOT'
 data: !!binary |
     SGVsbG8gd29ybG=Q
 EOT
@@ -1345,7 +1345,7 @@ EOT
 
     public function testParseDateAsMappingValue()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 date: 2002-12-14
 EOT;
         $expectedDate = new \DateTime();
@@ -1376,7 +1376,7 @@ EOT;
         return array(
             array(
                 4,
-                <<<YAML
+                <<<'YAML'
 foo:
     -
         # bar
@@ -1385,7 +1385,7 @@ YAML
             ),
             array(
                 5,
-                <<<YAML
+                <<<'YAML'
 foo:
     -
         # bar
@@ -1395,7 +1395,7 @@ YAML
             ),
             array(
                 8,
-                <<<YAML
+                <<<'YAML'
 foo:
     -
         # foobar
@@ -1408,7 +1408,7 @@ YAML
             ),
             array(
                 10,
-                <<<YAML
+                <<<'YAML'
 foo:
     -
         # foobar

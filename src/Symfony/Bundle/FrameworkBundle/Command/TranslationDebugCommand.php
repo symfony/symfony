@@ -50,7 +50,7 @@ class TranslationDebugCommand extends ContainerAwareCommand
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
             ))
             ->setDescription('Displays translation messages information')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command helps finding unused or missing translation
 messages and comparing them with the fallback ones by inspecting the
 templates and translation files of a given bundle or the app folder.

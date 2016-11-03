@@ -309,6 +309,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         return array($groups);
     }
+
     /**
      * Validates an object against the constraints defined for its class.
      *

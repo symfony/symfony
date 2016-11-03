@@ -41,7 +41,7 @@ class ServerStartCommand extends ServerCommand
             ))
             ->setName('server:start')
             ->setDescription('Starts PHP built-in web server in the background')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> runs PHP's built-in web server:
 
   <info>php %command.full_name%</info>

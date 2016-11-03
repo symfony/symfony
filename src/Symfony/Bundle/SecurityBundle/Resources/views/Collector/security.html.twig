@@ -16,39 +16,41 @@
     {% endset %}
 
     {% set text %}
-        {% if collector.token %}
-            <div class="sf-toolbar-info-piece">
-                <b>Logged in as</b>
-                <span>{{ collector.user }}</span>
-            </div>
+        {% if collector.enabled %}
+            {% if collector.token %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Logged in as</b>
+                    <span>{{ collector.user }}</span>
+                </div>
 
-            <div class="sf-toolbar-info-piece">
-                <b>Authenticated</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'red' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
-            </div>
+                <div class="sf-toolbar-info-piece">
+                    <b>Authenticated</b>
+                    <span class="sf-toolbar-status sf-toolbar-status-{{ is_authenticated ? 'green' : 'red' }}">{{ is_authenticated ? 'Yes' : 'No' }}</span>
+                </div>
 
-            {% if collector.token != null %}
-            <div class="sf-toolbar-info-piece">
-                <b>Token class</b>
-                <span>{{ collector.tokenClass|abbr_class }}</span>
-            </div>
+                <div class="sf-toolbar-info-piece">
+                    <b>Token class</b>
+                    <span>{{ collector.tokenClass|abbr_class }}</span>
+                </div>
+            {% else %}
+                <div class="sf-toolbar-info-piece">
+                    <span>You are not authenticated.</span>
+                </div>
             {% endif %}
+
             {% if collector.firewall %}
-            <div class="sf-toolbar-info-piece">
-                <b>Firewall name</b>
-                <span>{{ collector.firewall.name }}</span>
-            </div>
+                <div class="sf-toolbar-info-piece">
+                    <b>Firewall name</b>
+                    <span>{{ collector.firewall.name }}</span>
+                </div>
             {% endif %}
-            {% if collector.logoutUrl %}
-            <div class="sf-toolbar-info-piece">
-                <b>Actions</b>
-                <span><a href="{{ collector.logoutUrl }}">Logout</a></span>
-            </div>
+
+            {% if collector.token and collector.logoutUrl %}
+                <div class="sf-toolbar-info-piece">
+                    <b>Actions</b>
+                    <span><a href="{{ collector.logoutUrl }}">Logout</a></span>
+                </div>
             {% endif %}
-        {% elseif collector.enabled %}
-            <div class="sf-toolbar-info-piece">
-                <span>You are not authenticated.</span>
-            </div>
         {% else %}
             <div class="sf-toolbar-info-piece">
                 <span>The security is disabled.</span>

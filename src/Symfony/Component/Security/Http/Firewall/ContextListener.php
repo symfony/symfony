@@ -166,13 +166,13 @@ class ContextListener implements ListenerInterface
 
                 return $token;
             } catch (UnsupportedUserException $e) {
-                // let's try the next user provider
+                continue;
             } catch (UsernameNotFoundException $e) {
                 if (null !== $this->logger) {
                     $this->logger->warning('Username could not be found in the selected user provider.', array('username' => $e->getUsername(), 'provider' => get_class($provider)));
                 }
 
-                return;
+                continue;
             }
         }
 

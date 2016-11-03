@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\Security\Http\FirewallMapInterface;
-use Symfony\Bundle\SecurityBundle\Security\FirewallMAp;
+use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 
 /**
  * SecurityDataCollector.

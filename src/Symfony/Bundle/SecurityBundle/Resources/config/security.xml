@@ -122,9 +122,9 @@
             <argument />                   <!-- provider -->
             <argument />                   <!-- context -->
             <argument />                   <!-- entry_point -->
-            <argument />                   <!-- user_checker -->
             <argument />                   <!-- access_denied_handler -->
             <argument />                   <!-- access_denied_url -->
+            <argument />                   <!-- user_checker -->
             <argument type="collection" /> <!-- listeners -->
         </service>
 

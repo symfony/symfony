@@ -28,6 +28,19 @@ class FirewallConfig
     private $userChecker;
     private $listeners;
 
+    /**
+     * @param string      $name
+     * @param string      $requestMatcher
+     * @param bool        $securityEnabled
+     * @param bool        $stateless
+     * @param string|null $provider
+     * @param string|null $context
+     * @param string|null $entryPoint
+     * @param string|null $accessDeniedHandler
+     * @param string|null $accessDeniedUrl
+     * @param string|null $userChecker
+     * @param string[]    $listeners
+     */
     public function __construct($name, $requestMatcher, $securityEnabled = true, $stateless = false, $provider = null, $context = null, $entryPoint = null, $accessDeniedHandler = null, $accessDeniedUrl = null, $userChecker = null, $listeners = array())
     {
         $this->name = $name;
@@ -72,7 +85,7 @@ class FirewallConfig
     }
 
     /**
-     * @return string The provider service id
+     * @return string|null The provider service id
      */
     public function getProvider()
     {
@@ -80,7 +93,7 @@ class FirewallConfig
     }
 
     /**
-     * @return string The context key
+     * @return string|null The context key (will be null if the firewall is stateless)
      */
     public function getContext()
     {
@@ -88,7 +101,7 @@ class FirewallConfig
     }
 
     /**
-     * @return string The entry_point service id
+     * @return string|null The entry_point service id if configured, null otherwise
      */
     public function getEntryPoint()
     {
@@ -104,20 +117,23 @@ class FirewallConfig
     }
 
     /**
-     * @return string The access_denied_handler service id
+     * @return string|null The access_denied_handler service id if configured, null otherwise
      */
     public function getAccessDeniedHandler()
     {
         return $this->accessDeniedHandler;
     }
 
+    /**
+     * @return string|null The access_denied_handler URL if configured, null otherwise
+     */
     public function getAccessDeniedUrl()
     {
         return $this->accessDeniedUrl;
     }
 
     /**
-     * @return array An array of listener keys
+     * @return string[] An array of listener keys
      */
     public function getListeners()
     {

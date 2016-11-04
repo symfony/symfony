@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-26T19:39:41Z
+
+Btw, shouldnt this remove the margin bottom from `.metrics`, to avoid double margins here
+
+![image](https://cloud.githubusercontent.com/assets/1047696/19742291/a2930e78-9bc4-11e6-9a68-63d46ad38191.png)
+
+and here
+
+![image](https://cloud.githubusercontent.com/assets/1047696/19742297/aad7d80c-9bc4-11e6-9126-f8eb8a87f13d.png)
+
+The extra space for sub requests to me looks weird, and semi out of place;
+![image](https://cloud.githubusercontent.com/assets/1047696/19742415/45b57e10-9bc5-11e6-99e6-99234e64b9b7.png)
+
+Imo. separating groups (of metrics) should look different.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-10-30T19:25:24Z
+
+@ro0NL you are right about the excessive bottom margin. It has been fixed now. Thanks!
+
+About the horizontal divider, I don't agree with you ... but this is design and not code, so people can say opposite things and both be right :)
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-10-30T19:29:29Z
+
+@ro0NL @javiereguiluz I think the added horizontal space (divider) separation is sensible and clean. :+1:

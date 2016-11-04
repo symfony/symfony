@@ -14,7 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-class FirewallConfig
+final class FirewallConfig
 {
     private $name;
     private $requestMatcher;

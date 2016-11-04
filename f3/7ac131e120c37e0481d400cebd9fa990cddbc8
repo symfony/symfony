@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-02T07:51:46Z
+
+You should pick 2.7 as base branch for bug fixes, as the others are not supported any more. It could then possibly be merged upwards to 2.8, 3.1 and dev-master/3.2-dev
+
+---------------------------------------------------------------------------
+
+by klandaika at 2016-11-02T12:50:02Z
+
+Changed the base to 2.7 as requested.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-02T14:17:08Z
+
+sounds reasonnable

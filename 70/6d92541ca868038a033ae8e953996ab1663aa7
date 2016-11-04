@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-04T10:14:34Z
+
+The SecurityDataCollectorTest needs to be updated due to the argument becoming mandatory. If you want, I can do this change and btw reorder the arguments, so you just correct the doc here.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-04T10:36:29Z
+
+@chalasr I reverted the change to not allowing `null` anymore for the user checker argument. Do you wanna create an additional PR with that change?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-04T10:51:12Z
+
+@xabbuh see #20407 (sorry for the spam, looks like github is buggy today)

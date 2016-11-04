@@ -280,14 +280,15 @@ class SecurityExtension extends Extension
         }
 
         $config->replaceArgument(1, (string) $matcher);
-        $config->replaceArgument(2, $firewall['security']);
+        $config->replaceArgument(2, $firewall['user_checker']);
+        $config->replaceArgument(3, $firewall['security']);
 
         // Security disabled?
         if (false === $firewall['security']) {
             return array($matcher, array(), null);
         }
 
-        $config->replaceArgument(3, $firewall['stateless']);
+        $config->replaceArgument(4, $firewall['stateless']);
 
         // Provider id (take the first registered provider if none defined)
         if (isset($firewall['provider'])) {
@@ -296,7 +297,7 @@ class SecurityExtension extends Extension
             $defaultProvider = reset($providerIds);
         }
 
-        $config->replaceArgument(4, $defaultProvider);
+        $config->replaceArgument(5, $defaultProvider);
 
         // Register listeners
         $listeners = array();
@@ -312,7 +313,7 @@ class SecurityExtension extends Extension
                 $contextKey = $firewall['context'];
             }
 
-            $config->replaceArgument(5, $contextKey);
+            $config->replaceArgument(6, $contextKey);
 
             $listeners[] = new Reference($this->createContextListener($container, $contextKey));
         }
@@ -382,7 +383,7 @@ class SecurityExtension extends Extension
         // Authentication listeners
         list($authListeners, $defaultEntryPoint) = $this->createAuthenticationListeners($container, $id, $firewall, $authenticationProviders, $defaultProvider, $configuredEntryPoint);
 
-        $config->replaceArgument(6, $configuredEntryPoint ?: $defaultEntryPoint);
+        $config->replaceArgument(7, $configuredEntryPoint ?: $defaultEntryPoint);
 
         $listeners = array_merge($listeners, $authListeners);
 
@@ -399,14 +400,13 @@ class SecurityExtension extends Extension
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
 
         if (isset($firewall['access_denied_handler'])) {
-            $config->replaceArgument(7, $firewall['access_denied_handler']);
+            $config->replaceArgument(8, $firewall['access_denied_handler']);
         }
         if (isset($firewall['access_denied_url'])) {
-            $config->replaceArgument(8, $firewall['access_denied_url']);
+            $config->replaceArgument(9, $firewall['access_denied_url']);
         }
 
         $container->setAlias(new Alias('security.user_checker.'.$id, false), $firewall['user_checker']);
-        $config->replaceArgument(9, $firewall['user_checker']);
 
         foreach ($this->factories as $position) {
             foreach ($position as $factory) {

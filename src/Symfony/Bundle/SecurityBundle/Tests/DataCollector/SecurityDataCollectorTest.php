@@ -78,7 +78,7 @@ class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFirewall()
     {
-        $firewallConfig = new FirewallConfig('dummy', 'security.request_matcher.dummy');
+        $firewallConfig = new FirewallConfig('dummy', 'security.request_matcher.dummy', 'security.user_checker.dummy');
         $request = $this->getRequest();
 
         $firewallMap = $this

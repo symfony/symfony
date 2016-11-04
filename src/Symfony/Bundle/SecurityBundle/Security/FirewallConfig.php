@@ -18,6 +18,7 @@ final class FirewallConfig
 {
     private $name;
     private $requestMatcher;
+    private $userChecker;
     private $securityEnabled;
     private $stateless;
     private $provider;
@@ -25,12 +26,12 @@ final class FirewallConfig
     private $entryPoint;
     private $accessDeniedHandler;
     private $accessDeniedUrl;
-    private $userChecker;
     private $listeners;
 
     /**
      * @param string      $name
      * @param string      $requestMatcher
+     * @param string      $userChecker
      * @param bool        $securityEnabled
      * @param bool        $stateless
      * @param string|null $provider
@@ -38,13 +39,13 @@ final class FirewallConfig
      * @param string|null $entryPoint
      * @param string|null $accessDeniedHandler
      * @param string|null $accessDeniedUrl
-     * @param string|null $userChecker
      * @param string[]    $listeners
      */
-    public function __construct($name, $requestMatcher, $securityEnabled = true, $stateless = false, $provider = null, $context = null, $entryPoint = null, $accessDeniedHandler = null, $accessDeniedUrl = null, $userChecker = null, $listeners = array())
+    public function __construct($name, $requestMatcher, $userChecker, $securityEnabled = true, $stateless = false, $provider = null, $context = null, $entryPoint = null, $accessDeniedHandler = null, $accessDeniedUrl = null, $listeners = array())
     {
         $this->name = $name;
         $this->requestMatcher = $requestMatcher;
+        $this->userChecker = $userChecker;
         $this->securityEnabled = $securityEnabled;
         $this->stateless = $stateless;
         $this->provider = $provider;
@@ -52,7 +53,6 @@ final class FirewallConfig
         $this->entryPoint = $entryPoint;
         $this->accessDeniedHandler = $accessDeniedHandler;
         $this->accessDeniedUrl = $accessDeniedUrl;
-        $this->userChecker = $userChecker;
         $this->listeners = $listeners;
     }
 

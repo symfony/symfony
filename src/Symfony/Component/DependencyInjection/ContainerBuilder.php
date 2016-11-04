@@ -310,9 +310,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return ContainerBuilder The current instance
      */
-    public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION/**, $priority = 0*/)
+    public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION/*, $priority = 0*/)
     {
-        // For BC
         if (func_num_args() >= 3) {
             $priority = func_get_arg(2);
         } else {

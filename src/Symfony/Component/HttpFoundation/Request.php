@@ -1203,7 +1203,7 @@ class Request
      *
      * @return string
      *
-     * @throws InvalidHostException when the host name is invalid
+     * @throws InvalidHostException   when the host name is invalid
      * @throws UntrustedHostException when the host is not trusted
      */
     public function getHost()

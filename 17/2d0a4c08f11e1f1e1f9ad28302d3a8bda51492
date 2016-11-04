@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-04T11:02:09Z
+
+So, regarding https://github.com/symfony/symfony/pull/20291#discussion_r86390433
+you propose: wait and see?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-04T11:18:02Z
+
+Yeah, I think it doesn't hurt to wait what HHVM will do in the future. We can still adapt the test then if needed.

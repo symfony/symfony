@@ -19,7 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
  * The QuestionHelper class provides helpers to interact with the user.

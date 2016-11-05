@@ -1948,7 +1948,7 @@ class Request
                 throw new \UnexpectedValueException(
                     sprintf(
                         'The Request factory must return an instance of %s. Got %s.',
-                        Request::class, is_object($request) ? get_class($request) : (null === $request ? 'null' : gettype($request))
+                        self::class, is_object($request) ? get_class($request) : (null === $request ? 'null' : gettype($request))
                     )
                 );
             }

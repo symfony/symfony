@@ -16,9 +16,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
  * Form type for use with the Security component's form-based authentication
@@ -29,11 +28,11 @@ use Symfony\Component\Security\Core\Security;
  */
 class UsernamePasswordType extends AbstractType
 {
-    private $requestStack;
+    private $authenticationUtils;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(AuthenticationUtils $authenticationUtils)
     {
-        $this->requestStack = $requestStack;
+        $this->authenticationUtils = $authenticationUtils;
     }
 
     /**
@@ -47,26 +46,18 @@ class UsernamePasswordType extends AbstractType
             ->add('_target_path', 'Symfony\Component\Form\Extension\Core\Type\HiddenType')
         ;
 
-        $request = $this->requestStack->getCurrentRequest();
-
         /* Note: since the Security component's form login listener intercepts
          * the POST request, this form will never really be bound to the
          * request; however, we can match the expected behavior by checking the
          * session for an authentication error and last username.
          */
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request) {
-            if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
-                $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
-            } else {
-                $error = $request->getSession()->get(Security::AUTHENTICATION_ERROR);
-            }
-
-            if ($error) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            if (null !== $error = $this->authenticationUtils->getLastAuthenticationError()) {
                 $event->getForm()->addError(new FormError($error->getMessage()));
             }
 
             $event->setData(array_replace((array) $event->getData(), array(
-                '_username' => $request->getSession()->get(Security::LAST_USERNAME),
+                '_username' => $this->authenticationUtils->getLastUsername(),
             )));
         });
     }

@@ -7,7 +7,7 @@
     <services>
         <service id="form.security.user_login" class="Symfony\Bundle\SecurityBundle\Form\Type\UsernamePasswordType">
             <tag name="form.type" />
-            <argument type="service" id="request_stack"/>
+            <argument type="service" id="security.authentication_utils"/>
         </service>
     </services>
 </container>

@@ -46,6 +46,28 @@ class CsrfFormLoginTest extends WebTestCase
     /**
      * @dataProvider getConfigs
      */
+    public function testFormLoginWithBadCredentialsAndCsrfTokens($config)
+    {
+        $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'wrong';
+        $client->submit($form);
+
+        $this->assertRedirect($client->getResponse(), '/login');
+
+        $crawler = $client->followRedirect();
+
+        $this->assertContains('Bad credentials.', $crawler->text());
+
+        $usernameInput = $crawler->filter('[name="_username"]');
+        $this->assertSame('johannes', $usernameInput->attr('value'));
+    }
+
+    /**
+     * @dataProvider getConfigs
+     */
     public function testFormLoginWithInvalidCsrfToken($config)
     {
         $client = $this->createClient(array('test_case' => 'CsrfFormLogin', 'root_config' => $config));

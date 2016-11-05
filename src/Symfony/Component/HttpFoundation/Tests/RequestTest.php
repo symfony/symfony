@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use Symfony\Component\HttpFoundation\Exception\InvalidHostException;
 use Symfony\Component\HttpFoundation\Exception\UntrustedHostException;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -1937,7 +1938,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame($expectedPort, $request->getPort());
             }
         } else {
-            $this->setExpectedException('Symfony\Component\HttpFoundation\Exception\InvalidHostException', 'Invalid host');
+            $this->setExpectedException(InvalidHostException::class, 'Invalid host');
             $request->getHost();
         }
     }

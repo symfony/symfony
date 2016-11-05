@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\InvalidHostException;
-use Symfony\Component\HttpFoundation\Exception\InvalidTrustedHeaderException;
 use Symfony\Component\HttpFoundation\Exception\UntrustedHostException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -605,12 +604,12 @@ class Request
      * @param string $key   The header key
      * @param string $value The header name
      *
-     * @throws InvalidTrustedHeaderException
+     * @throws \InvalidArgumentException
      */
     public static function setTrustedHeaderName($key, $value)
     {
         if (!array_key_exists($key, self::$trustedHeaders)) {
-            throw new InvalidTrustedHeaderException($key, $value, sprintf('Unable to set the trusted header name for key "%s".', $key));
+            throw new \InvalidArgumentException(sprintf('Unable to set the trusted header name for key "%s".', $key));
         }
 
         self::$trustedHeaders[$key] = $value;
@@ -623,12 +622,12 @@ class Request
      *
      * @return string The header name
      *
-     * @throws InvalidTrustedHeaderException
+     * @throws \InvalidArgumentException
      */
     public static function getTrustedHeaderName($key)
     {
         if (!array_key_exists($key, self::$trustedHeaders)) {
-            throw new InvalidTrustedHeaderException($key, null, sprintf('Unable to get the trusted header name for key "%s".', $key));
+            throw new \InvalidArgumentException(sprintf('Unable to get the trusted header name for key "%s".', $key));
         }
 
         return self::$trustedHeaders[$key];
@@ -1949,7 +1948,7 @@ class Request
                 throw new \UnexpectedValueException(
                     sprintf(
                         'The Request factory must return an instance of %s. Got %s.',
-                        __CLASS__, is_object($request) ? get_class($request) : (null === $request ? 'null' : gettype($request))
+                        Request::class, is_object($request) ? get_class($request) : (null === $request ? 'null' : gettype($request))
                     )
                 );
             }

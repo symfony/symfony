@@ -59,6 +59,7 @@ class SecurityExtension extends Extension
         // load services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security.xml');
+        $loader->load('form.xml');
         $loader->load('security_listeners.xml');
         $loader->load('security_rememberme.xml');
         $loader->load('templating_php.xml');

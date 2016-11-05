@@ -22,7 +22,7 @@ class LoginController implements ContainerAwareInterface
 
     public function loginAction()
     {
-        $form = $this->container->get('form.factory')->create('Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form\UserLoginType');
+        $form = $this->container->get('form.factory')->createNamed('', 'Symfony\Bundle\SecurityBundle\Form\Type\UsernamePasswordType');
 
         return $this->container->get('templating')->renderResponse('CsrfFormLoginBundle:Login:login.html.twig', array(
             'form' => $form->createView(),

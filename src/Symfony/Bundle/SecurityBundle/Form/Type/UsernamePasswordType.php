@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Form;
+namespace Symfony\Bundle\SecurityBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Security;
  * @author Henrik Bjornskov <henrik@bjrnskov.dk>
  * @author Jeremy Mikola <jmikola@gmail.com>
  */
-class UserLoginType extends AbstractType
+class UsernamePasswordType extends AbstractType
 {
     private $requestStack;
 
@@ -42,8 +42,8 @@ class UserLoginType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('password', 'Symfony\Component\Form\Extension\Core\Type\PasswordType')
+            ->add('_username', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('_password', 'Symfony\Component\Form\Extension\Core\Type\PasswordType')
             ->add('_target_path', 'Symfony\Component\Form\Extension\Core\Type\HiddenType')
         ;
 
@@ -66,7 +66,7 @@ class UserLoginType extends AbstractType
             }
 
             $event->setData(array_replace((array) $event->getData(), array(
-                'username' => $request->getSession()->get(Security::LAST_USERNAME),
+                '_username' => $request->getSession()->get(Security::LAST_USERNAME),
             )));
         });
     }
@@ -81,6 +81,7 @@ class UserLoginType extends AbstractType
          */
 
         $resolver->setDefaults(array(
+            'csrf_field_name' => '_csrf_token',
             'csrf_token_id' => 'authenticate',
         ));
     }

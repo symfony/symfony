@@ -1280,6 +1280,22 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $request->initialize(array(), array(), array(), array(), array(), $server);
 
         $this->assertEquals('/path%20test/info', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '/path/info';
+        $server['PATH_INFO'] = '/info';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/info', $request->getPathInfo());
+
+        $server = array();
+        $server['REQUEST_URI'] = '/app.php/path/info';
+        $server['SCRIPT_FILENAME'] = '/webroot/web/app.php';
+        $server['SCRIPT_NAME'] = '/web/app.php';
+        $server['PHP_SELF'] = '/web/app.php';
+        $request->initialize(array(), array(), array(), array(), array(), $server);
+
+        $this->assertEquals('/path/info', $request->getPathInfo());
     }
 
     public function testGetParameterPrecedence()

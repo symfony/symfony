@@ -1851,7 +1851,9 @@ class Request
      */
     protected function preparePathInfo()
     {
-        $baseUrl = $this->getBaseUrl();
+        if ($pathInfo = $this->server->get('PATH_INFO')) {
+            return $pathInfo;
+        }
 
         if (null === ($requestUri = $this->getRequestUri())) {
             return '/';
@@ -1862,12 +1864,28 @@ class Request
             $requestUri = substr($requestUri, 0, $pos);
         }
 
-        $pathInfo = substr($requestUri, strlen($baseUrl));
-        if (null !== $baseUrl && (false === $pathInfo || '' === $pathInfo)) {
+        if (null === ($baseUrl = $this->getBaseUrl())) {
+            return $requestUri;
+        }
+
+        $pathInfo = $requestUri;
+        $baseLength = strlen($baseUrl);
+
+        // Backtrack the path to handle potential rewrites
+        for ($i = 0; false !== $i; $i = strpos($baseUrl, '/', $i + 1)) {
+            if (substr($requestUri, 0, $baseLength - $i) === substr($baseUrl, $i)) {
+                $pathInfo = substr($requestUri, $baseLength - $i);
+                break;
+            }
+
+            if ($baseLength === $i) {
+                break;
+            }
+        }
+
+        if (false === $pathInfo || '' === $pathInfo) {
             // If substr() returns false then PATH_INFO is set to an empty string
             return '/';
-        } elseif (null === $baseUrl) {
-            return $requestUri;
         }
 
         return (string) $pathInfo;

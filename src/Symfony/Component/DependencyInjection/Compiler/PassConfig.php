@@ -96,10 +96,16 @@ class PassConfig
      */
     public function addPass(CompilerPassInterface $pass, $type = self::TYPE_BEFORE_OPTIMIZATION/*, $priority = 0*/)
     {
-        // For BC
         if (func_num_args() >= 3) {
             $priority = func_get_arg(2);
         } else {
+            if (__CLASS__ !== get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a third `$priority = 0` argument in version 4.0. Not defining it is deprecated since 3.2.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+
             $priority = 0;
         }
 

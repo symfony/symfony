@@ -289,7 +289,18 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes/*, $format = null*/)
     {
-        $format = func_num_args() >= 6 ? func_get_arg(5) : null;
+        if (func_num_args() >= 6) {
+            $format = func_get_arg(5);
+        } else {
+            if (__CLASS__ !== get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a 6th `$format = null` argument in version 4.0. Not defining it is deprecated since 3.2.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+
+            $format = null;
+        }
 
         if (
             isset($context[static::OBJECT_TO_POPULATE]) &&

@@ -597,7 +597,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->atPath('property.path.name')
             ->setInvalidValue('Foo')
             ->setCode('23bd9dbf-6b9b-41cd-a99e-4844bcf3077f')
-            ->setParameters(array('{{ value }}' => 'Foo'))
+            ->setParameters(array('{{ value }}' => '"Foo"'))
             ->assertRaised();
     }
 

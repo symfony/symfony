@@ -24,6 +24,9 @@ class SingleIntIdEntity
     /** @Column(type="string", nullable=true) */
     public $name;
 
+    /** @Column(type="array", nullable=true) */
+    public $phoneNumbers = array();
+
     public function __construct($id, $name)
     {
         $this->id = $id;

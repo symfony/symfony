@@ -149,7 +149,7 @@ class QuestionHelper extends Helper
             if (false === $ret) {
                 $ret = fgets($inputStream, 4096);
                 if (false === $ret) {
-                    throw new \RuntimeException('Aborted');
+                    throw new RuntimeException('Aborted');
                 }
                 $ret = trim($ret);
             }
@@ -412,6 +412,8 @@ class QuestionHelper extends Helper
 
             try {
                 return call_user_func($question->getValidator(), $interviewer());
+            } catch (RuntimeException $e) {
+                throw $e;
             } catch (\Exception $error) {
             }
         }

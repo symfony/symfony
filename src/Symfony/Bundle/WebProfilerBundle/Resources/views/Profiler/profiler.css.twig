@@ -254,12 +254,12 @@ table tbody ul {
 {# Metrics
    ------------------------------------------------------------------------- #}
 .metrics {
-    margin: 1em 0;
+    margin: 1em 0 0;
     overflow: auto;
 }
 .metrics .metric {
     float: left;
-    margin-right: 1em;
+    margin: 0 1em 1em 0;
 }
 
 .metric {
@@ -312,6 +312,12 @@ table tbody ul {
     margin: 0;
     padding-left: 4px;
     vertical-align: middle;
+}
+
+.metric-divider {
+    float: left;
+    margin: 0 1em;
+    min-height: 1px; {# required to apply 'margin' to an empty 'div' #}
 }
 
 {# Cards

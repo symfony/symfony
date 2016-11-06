@@ -101,6 +101,18 @@ class SymfonyQuestionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertOutputContains('Do you want a \?', $output);
     }
 
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted
+     */
+    public function testAskThrowsExceptionOnMissingInput()
+    {
+        $dialog = new SymfonyQuestionHelper();
+
+        $dialog->setInputStream($this->getInputStream(''));
+        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), new Question('What\'s your name?'));
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

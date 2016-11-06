@@ -170,6 +170,28 @@ class Workflow
         return $enabled;
     }
 
+    /**
+     * @param object $subject A subject
+     *
+     * @return Transition[] All possible transitions
+     */
+    public function getPossibleTransitions($subject)
+    {
+        $possibles = array();
+        $marking = $this->getMarking($subject);
+        $places = $marking->getPlaces();
+
+        foreach ($this->definition->getTransitions() as $transition) {
+            $diff = array_diff($transition->getFroms(), array_keys($places));
+
+            if (empty($diff)) {
+                $possibles[$transition->getName()] = $transition;
+            }
+        }
+
+        return $possibles;
+    }
+
     public function getName()
     {
         return $this->name;

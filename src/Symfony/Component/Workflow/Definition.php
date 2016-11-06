@@ -46,6 +46,9 @@ class Definition
         return $this->places;
     }
 
+    /**
+     * @return Transition[]
+     */
     public function getTransitions()
     {
         return $this->transitions;

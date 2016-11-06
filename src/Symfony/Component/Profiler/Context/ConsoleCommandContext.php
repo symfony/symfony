@@ -40,7 +40,7 @@ class ConsoleCommandContext implements ContextInterface
 
     public function getName()
     {
-        return sprintf('command => %s', $this->command->getName());
+        return $this->command->getName();
     }
 
     public function getStatusCode()

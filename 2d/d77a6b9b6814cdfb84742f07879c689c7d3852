@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-04T22:29:49Z
+
+Green on CI.
+On a project that exhibited the wrong behavior, now fixed:
+
+![capture du 2016-11-04 22-47-23](https://cloud.githubusercontent.com/assets/243674/20023506/bf7fefb0-a2e0-11e6-991a-b1ca5a94097c.png)

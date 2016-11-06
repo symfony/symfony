@@ -751,9 +751,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskThrowsExceptionOnMissingInput()
     {
         $dialog = new QuestionHelper();
-        $dialog->setInputStream($this->getInputStream(''));
-
-        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), new Question('What\'s your name?'));
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
     }
 
     /**
@@ -763,7 +761,6 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskThrowsExceptionOnMissingInputWithValidator()
     {
         $dialog = new QuestionHelper();
-        $dialog->setInputStream($this->getInputStream(''));
 
         $question = new Question('What\'s your name?');
         $question->setValidator(function () {
@@ -772,7 +769,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
             }
         });
 
-        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question);
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
     }
 
     protected function getInputStream($input)

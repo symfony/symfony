@@ -108,9 +108,7 @@ class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
     public function testAskThrowsExceptionOnMissingInput()
     {
         $dialog = new SymfonyQuestionHelper();
-
-        $dialog->setInputStream($this->getInputStream(''));
-        $dialog->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), new Question('What\'s your name?'));
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
     }
 
     protected function getInputStream($input)

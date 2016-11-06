@@ -71,7 +71,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      */
     public function close()
     {
-        return $this->memcache->close();
+        return true;
     }
 
     /**

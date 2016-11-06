@@ -6,11 +6,11 @@
  * Time: 10:27 PM
  */
 
-namespace Symfony\Component\Profiler\Data;
+namespace Symfony\Component\Profiler\Context;
 
 use Symfony\Component\Console\Command\Command;
 
-class ConsoleCommandData implements DataInterface
+class ConsoleCommandContext implements ContextInterface
 {
     protected $exception;
     protected $exitCode;
@@ -44,7 +44,7 @@ class ConsoleCommandData implements DataInterface
     /**
      * @return null|string
      */
-    public function getUri()
+    public function getName()
     {
         return sprintf('command=>%s', $this->command->getName());
     }

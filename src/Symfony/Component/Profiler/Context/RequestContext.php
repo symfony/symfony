@@ -6,12 +6,12 @@
  * Time: 10:18 PM
  */
 
-namespace Symfony\Component\Profiler\Data;
+namespace Symfony\Component\Profiler\Context;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class RequestData implements DataInterface
+class RequestContext implements ContextInterface
 {
     protected $exception;
     protected $request;
@@ -33,7 +33,7 @@ class RequestData implements DataInterface
         return $this->exception;
     }
 
-    public function getUri()
+    public function getName()
     {
         return $this->request->getUri();
     }

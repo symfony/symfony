@@ -150,7 +150,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             'data' => $profile->getCollectors(),
             'ip' => $profile->getIp(),
             'method' => $profile->getMethod(),
-            'url' => $profile->getUrl(),
+            'url' => $profile->getName(),
             'time' => $profile->getTime(),
             'status_code' => $profile->getStatusCode(),
         );
@@ -169,7 +169,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 $profile->getToken(),
                 $profile->getIp(),
                 $profile->getMethod(),
-                $profile->getUrl(),
+                $profile->getName(),
                 $profile->getTime(),
                 $profile->getParentToken(),
                 $profile->getStatusCode(),
@@ -258,7 +258,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $profile = new Profile($token);
         $profile->setIp($data['ip']);
         $profile->setMethod($data['method']);
-        $profile->setUrl($data['url']);
+        $profile->setName($data['url']);
         $profile->setTime($data['time']);
         $profile->setStatusCode($data['status_code']);
         $profile->setCollectors($data['data']);

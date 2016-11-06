@@ -13,7 +13,7 @@ namespace Symfony\Component\Profiler;
 
 use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Profiler\Data\DataInterface;
+use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
 use Symfony\Component\Profiler\DataCollector\LateDataCollectorInterface;
 
@@ -146,10 +146,10 @@ class Profiler
     /**
      * Collects data for the given response.
      *
-     * @param DataInterface $data
+     * @param ContextInterface $data
      * @return null|Profile A Profile instance or null if the profiler is disabled
      */
-    public function collectData(DataInterface $data)
+    public function collectData(ContextInterface $data)
     {
         if (false === $this->enabled) {
             return null;
@@ -157,7 +157,7 @@ class Profiler
 
         $profile = new Profile(substr(hash('sha256', uniqid(mt_rand(), true)), 0, 6));
         $profile->setTime(time());
-        $profile->setUrl($data->getUri());
+        $profile->setName($data->getName());
         $profile->setStatusCode($data->getStatusCode());
 
         foreach ($this->collectors as $collector) {
@@ -227,7 +227,7 @@ class Profiler
      */
     public function get($name)
     {
-        if (!isset($this->collectors[$name])) {
+        if (!$this->has($name)) {
             throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
         }
 

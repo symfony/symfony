@@ -12,9 +12,9 @@
 namespace Symfony\Component\Profiler\DataCollector;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Profiler\Data\DataInterface;
+use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
-use Symfony\Component\Profiler\Data\RequestData;
+use Symfony\Component\Profiler\Context\RequestContext;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -140,15 +140,15 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    public function collectData(DataInterface $data, Profile $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         // Sub-requests and programmatic calls stay in the collected profile.
         if ($this->dumper) {
             return true;
         }
 
-        if ($data instanceof RequestData) {
-            $request = $data->getRequest();
+        if ($context instanceof RequestContext) {
+            $request = $context->getRequest();
 
             if (($this->requestStack && $this->requestStack->getMasterRequest() !== $request) || $request->isXmlHttpRequest() || $request->headers->has('Origin')) {
                 return true;
@@ -156,15 +156,15 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
 
         // In all other conditions that remove the web debug toolbar, dumps are written on the output.
-        if (!$data instanceof RequestData
+        if (!$context instanceof RequestContext
             || !$this->requestStack
-            || !$data->getResponse()->headers->has('X-Debug-Token')
-            || $data->getResponse()->isRedirection()
-            || ($data->getResponse()->headers->has('Content-Type') && false === strpos($data->getResponse()->headers->get('Content-Type'), 'html'))
-            || 'html' !== $data->getRequest()->getRequestFormat()
-            || false === strripos($data->getResponse()->getContent(), '</body>')
+            || !$context->getResponse()->headers->has('X-Debug-Token')
+            || $context->getResponse()->isRedirection()
+            || ($context->getResponse()->headers->has('Content-Type') && false === strpos($context->getResponse()->headers->get('Content-Type'), 'html'))
+            || 'html' !== $context->getRequest()->getRequestFormat()
+            || false === strripos($context->getResponse()->getContent(), '</body>')
         ) {
-            if ($data instanceof RequestData && $data->getResponse()->headers->has('Content-Type') && false !== strpos($data->getResponse()->headers->get('Content-Type'), 'html')) {
+            if ($context instanceof RequestContext && $context->getResponse()->headers->has('Content-Type') && false !== strpos($context->getResponse()->headers->get('Content-Type'), 'html')) {
                 $this->dumper = new HtmlDumper('php://output', $this->charset);
                 $this->dumper->setDisplayOptions(array('fileLinkFormat' => $this->fileLinkFormat));
             } else {

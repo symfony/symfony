@@ -20,9 +20,9 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Profiler\Data\DataInterface;
+use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
-use Symfony\Component\Profiler\Data\RequestData;
+use Symfony\Component\Profiler\Context\RequestContext;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -43,14 +43,14 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function collectData(DataInterface $data, Profile $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
-        if (!$data instanceof RequestData) {
+        if (!$context instanceof RequestContext) {
             return false;
         }
 
-        $response = $data->getResponse();
-        $request = $data->getRequest();
+        $response = $context->getResponse();
+        $request = $context->getRequest();
         $profile->setMethod($request->getMethod());
         try {
             $profile->setIp($request->getClientIp());

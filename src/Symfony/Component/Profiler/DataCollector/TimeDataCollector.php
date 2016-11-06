@@ -13,9 +13,9 @@ namespace Symfony\Component\Profiler\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Profiler\Data\DataInterface;
+use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
-use Symfony\Component\Profiler\Data\RequestData;
+use Symfony\Component\Profiler\Context\RequestContext;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -37,13 +37,13 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collectData(DataInterface $data, Profile $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         if (null !== $this->kernel) {
             $startTime = $this->kernel->getStartTime();
         } else {
-            if ($data instanceof RequestData) {
-                $request = $data->getRequest();
+            if ($context instanceof RequestContext) {
+                $request = $context->getRequest();
             } else {
                 $request = Request::createFromGlobals();
             }

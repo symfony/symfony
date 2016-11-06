@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Profiler\DataCollector;
 
-use Symfony\Component\Profiler\Data\DataInterface;
+use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
 
 /**
@@ -32,7 +32,7 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function collectData(DataInterface $data, Profile $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         $this->updateMemoryUsage();
         return true;

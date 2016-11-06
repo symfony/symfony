@@ -6,9 +6,9 @@
  * Time: 5:06 PM
  */
 
-namespace Symfony\Component\Profiler\Data;
+namespace Symfony\Component\Profiler\Context;
 
-interface DataInterface
+interface ContextInterface
 {
     /**
      * @return \Exception|\Throwable|null
@@ -18,7 +18,7 @@ interface DataInterface
     /**
      * @return null|string
      */
-    public function getUri();
+    public function getName();
 
     /**
      * @return null|string

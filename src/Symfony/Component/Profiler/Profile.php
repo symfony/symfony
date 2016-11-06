@@ -29,7 +29,7 @@ class Profile
 
     private $ip;
     private $method;
-    private $url;
+    private $name;
     private $time;
     private $statusCode;
 
@@ -143,14 +143,14 @@ class Profile
      *
      * @return string The URL
      */
-    public function getUrl()
+    public function getName()
     {
-        return $this->url;
+        return $this->name;
     }
 
-    public function setUrl($url)
+    public function setName($name)
     {
-        $this->url = $url;
+        $this->name = $name;
     }
 
     /**

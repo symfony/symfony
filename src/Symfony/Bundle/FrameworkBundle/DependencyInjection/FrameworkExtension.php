@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -468,6 +469,12 @@ class FrameworkExtension extends Extension
 
         $definition->replaceArgument(4, $debug);
         $definition->replaceArgument(6, $debug);
+
+        if ($debug && class_exists(DebugProcessor::class)) {
+            $definition = new Definition(DebugProcessor::class);
+            $definition->setPublic(false);
+            $container->setDefinition('debug.log_processor', $definition);
+        }
     }
 
     /**

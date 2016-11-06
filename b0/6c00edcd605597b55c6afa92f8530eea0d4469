@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-06T13:21:51Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by msheakoski at 2016-11-06T13:51:24Z
+
+@aitboudad thank you for fixing this. I noticed that the patch is on the 2.7 branch, but I was actually experiencing the issue on 3.1.6 when submitting the bug.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-06T14:02:18Z
+
+@msheakoski We always merge bugfixes into the oldest maintained branch and merge everything up to master from there on a regular basis.
+
+---------------------------------------------------------------------------
+
+by msheakoski at 2016-11-06T15:06:00Z
+
+@xabbuh Ahh, got it! 👍 I was not familiar with the process.

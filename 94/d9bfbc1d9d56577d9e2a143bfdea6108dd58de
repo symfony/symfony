@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-02T07:27:14Z
+
+👍  the change looks solid and your explanation was perfect. Thanks!
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-02T07:49:07Z
+
+To be honest, I would expect `1.0` to be shown here:
+```html
+  <option value="1">Mid</option>
+```
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-02T14:04:27Z
+
+@iltar there aren't differences as float numbers in JavaScript, so no matter.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-02T15:37:30Z
+
+It's a matter of consistency
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-02T16:33:50Z
+
+You are right, but this can't be solved from PHP, because we can't differentiate between `1.0` and `1.00` (as floats) at all, so IMHO the inconsistency is irrelevant in this case.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-06T13:05:11Z
+
+👍

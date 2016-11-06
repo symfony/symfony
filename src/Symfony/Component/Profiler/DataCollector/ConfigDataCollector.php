@@ -13,11 +13,8 @@ namespace Symfony\Component\Profiler\DataCollector;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Profiler\DataInterface;
+use Symfony\Component\Profiler\Data\DataInterface;
 use Symfony\Component\Profiler\Profile;
-use Symfony\Component\Profiler\RequestData;
 
 /**
  * ConfigDataCollector.

@@ -6,7 +6,7 @@
  * Time: 10:27 PM
  */
 
-namespace Symfony\Component\Profiler;
+namespace Symfony\Component\Profiler\Data;
 
 use Symfony\Component\Console\Command\Command;
 
@@ -55,21 +55,5 @@ class ConsoleCommandData implements DataInterface
     public function getStatusCode()
     {
         return $this->exitCode;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getMethod()
-    {
-        return null;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getClientIp()
-    {
-        return null;
     }
 }

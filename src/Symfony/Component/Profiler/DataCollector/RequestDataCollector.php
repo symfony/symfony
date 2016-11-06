@@ -11,18 +11,18 @@
 
 namespace Symfony\Component\Profiler\DataCollector;
 
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Profiler\DataInterface;
+use Symfony\Component\Profiler\Data\DataInterface;
 use Symfony\Component\Profiler\Profile;
-use Symfony\Component\Profiler\RequestData;
+use Symfony\Component\Profiler\Data\RequestData;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -51,6 +51,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         $response = $data->getResponse();
         $request = $data->getRequest();
+        $profile->setMethod($request->getMethod());
+        try {
+            $profile->setIp($request->getClientIp());
+        } catch (ConflictingHeadersException $e) {
+            $profile->setIp('Unknown');
+        }
         $responseHeaders = $response->headers->all();
         $cookies = array();
         foreach ($response->headers->getCookies() as $cookie) {

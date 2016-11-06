@@ -6,7 +6,7 @@
  * Time: 5:06 PM
  */
 
-namespace Symfony\Component\Profiler;
+namespace Symfony\Component\Profiler\Data;
 
 interface DataInterface
 {
@@ -24,14 +24,4 @@ interface DataInterface
      * @return null|string
      */
     public function getStatusCode();
-
-    /**
-     * @return null|string
-     */
-    public function getMethod();
-
-    /**
-     * @return null|string
-     */
-    public function getClientIp();
 }

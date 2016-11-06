@@ -13,6 +13,7 @@ namespace Symfony\Component\Profiler;
 
 use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Profiler\Data\DataInterface;
 use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
 use Symfony\Component\Profiler\DataCollector\LateDataCollectorInterface;
 
@@ -157,12 +158,10 @@ class Profiler
         $profile = new Profile(substr(hash('sha256', uniqid(mt_rand(), true)), 0, 6));
         $profile->setTime(time());
         $profile->setUrl($data->getUri());
-        $profile->setMethod($data->getMethod());
         $profile->setStatusCode($data->getStatusCode());
-        $profile->setIp($data->getClientIp());
 
         foreach ($this->collectors as $collector) {
-            if ($collector->collectData($data,)) {
+            if ($collector->collectData($data, $profile)) {
                 // we need to clone for sub-requests
                 $profile->addCollector(clone $collector);
             }

@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\Profiler\DataCollector;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
-use Symfony\Component\Profiler\DataInterface;
+use Symfony\Component\Profiler\Data\DataInterface;
 use Symfony\Component\Profiler\Profile;
 
 /**

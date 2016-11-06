@@ -49,8 +49,9 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find($ip, $url, $limit, $method, $statusCode, $start = null, $end = null)
+    public function find(array $criteria, $limit, $start = null, $end = null)
     {
+        $criteria = $this->normalizeCriteria($criteria);
         $file = $this->getIndexFilename();
 
         if (!file_exists($file)) {
@@ -63,10 +64,10 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $result = array();
         while (count($result) < $limit && $line = $this->readLineFromFile($file)) {
             $values = str_getcsv($line);
-            list($csvToken, $csvIp, $csvMethod, $csvUrl, $csvTime, $csvParent, $csvStatusCode) = $values;
+            list($csvToken, $csvIp, $csvMethod, $csvName, $csvTime, $csvParent, $csvStatusCode) = $values;
             $csvTime = (int) $csvTime;
 
-            if ($ip && false === strpos($csvIp, $ip) || $url && false === strpos($csvUrl, $url) || $method && false === strpos($csvMethod, $method) || $statusCode && false === strpos($csvStatusCode, $statusCode)) {
+            if ($criteria['ip'] && false === strpos($csvIp, $criteria['ip']) || $criteria['name'] && false === strpos($csvName, $criteria['name']) || $criteria['method'] && false === strpos($csvMethod, $criteria['method']) || $criteria['status_code'] && false === strpos($csvStatusCode, $criteria['status_code'])) {
                 continue;
             }
 
@@ -82,7 +83,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
                 'token' => $csvToken,
                 'ip' => $csvIp,
                 'method' => $csvMethod,
-                'url' => $csvUrl,
+                'name' => $csvName,
                 'time' => $csvTime,
                 'parent' => $csvParent,
                 'status_code' => $csvStatusCode,
@@ -150,7 +151,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
             'data' => $profile->getCollectors(),
             'ip' => $profile->getIp(),
             'method' => $profile->getMethod(),
-            'url' => $profile->getName(),
+            'name' => $profile->getName(),
             'time' => $profile->getTime(),
             'status_code' => $profile->getStatusCode(),
         );
@@ -258,7 +259,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         $profile = new Profile($token);
         $profile->setIp($data['ip']);
         $profile->setMethod($data['method']);
-        $profile->setName($data['url']);
+        $profile->setName($data['name']);
         $profile->setTime($data['time']);
         $profile->setStatusCode($data['status_code']);
         $profile->setCollectors($data['data']);
@@ -280,5 +281,26 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
 
         return $profile;
+    }
+
+    public function getSearchableKeys()
+    {
+        return array(
+            'ip',
+            'name',
+            'method',
+            'status_code',
+        );
+    }
+
+    private function normalizeCriteria(array $criteria)
+    {
+        return array_merge(
+            array_combine(
+                $this->getSearchableKeys(),
+                array_fill(0, count($this->getSearchableKeys()), null)
+            ),
+            $criteria
+        );
     }
 }

@@ -140,9 +140,9 @@ class Profile
     }
 
     /**
-     * Returns the URL.
+     * Returns the name.
      *
-     * @return string The URL
+     * @return string The name
      */
     public function getName()
     {
@@ -304,6 +304,6 @@ class Profile
 
     public function __sleep()
     {
-        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode');
+        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'time', 'statusCode', 'name');
     }
 }

@@ -21,16 +21,13 @@ interface ProfilerStorageInterface
     /**
      * Finds profiler tokens for the given criteria.
      *
-     * @param string $ip The IP
-     * @param string $url The URL
+     * @param array $criteria
      * @param string $limit The maximum number of tokens to return
-     * @param string $method The request method
-     * @param null $statusCode
      * @param int|null $start The start date to search from
      * @param int|null $end The end date to search to
      * @return array An array of tokens
      */
-    public function find($ip, $url, $limit, $method, $statusCode, $start = null, $end = null);
+    public function find(array $criteria, $limit, $start = null, $end = null);
 
     /**
      * Reads data associated with the given token.
@@ -56,4 +53,9 @@ interface ProfilerStorageInterface
      * Purges all data from the database.
      */
     public function purge();
+
+    /**
+     * @return array list of keys you can search by in the find method
+     */
+    public function getSearchableKeys();
 }

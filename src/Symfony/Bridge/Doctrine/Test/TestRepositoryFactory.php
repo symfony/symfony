@@ -22,8 +22,6 @@ use Doctrine\ORM\Repository\RepositoryFactory;
 final class TestRepositoryFactory implements RepositoryFactory
 {
     /**
-     * The list of EntityRepository instances.
-     *
      * @var ObjectRepository[]
      */
     private $repositoryList = array();
@@ -42,11 +40,6 @@ final class TestRepositoryFactory implements RepositoryFactory
         return $this->repositoryList[$repositoryHash] = $this->createRepository($entityManager, $entityName);
     }
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @param string                 $entityName
-     * @param ObjectRepository       $repository
-     */
     public function setRepository(EntityManagerInterface $entityManager, $entityName, ObjectRepository $repository)
     {
         $repositoryHash = $this->getRepositoryHash($entityManager, $entityName);
@@ -55,29 +48,17 @@ final class TestRepositoryFactory implements RepositoryFactory
     }
 
     /**
-     * Create a new repository instance for an entity class.
-     *
-     * @param EntityManagerInterface $entityManager The EntityManager instance.
-     * @param string                 $entityName    The name of the entity.
-     *
      * @return ObjectRepository
      */
     private function createRepository(EntityManagerInterface $entityManager, $entityName)
     {
         /* @var $metadata ClassMetadata */
         $metadata = $entityManager->getClassMetadata($entityName);
-        $repositoryClassName = $metadata->customRepositoryClassName
-            ?: $entityManager->getConfiguration()->getDefaultRepositoryClassName();
+        $repositoryClassName = $metadata->customRepositoryClassName ?: $entityManager->getConfiguration()->getDefaultRepositoryClassName();
 
         return new $repositoryClassName($entityManager, $metadata);
     }
 
-    /**
-     * @param EntityManagerInterface $entityManager
-     * @param string                 $entityName
-     *
-     * @return string
-     */
     private function getRepositoryHash(EntityManagerInterface $entityManager, $entityName)
     {
         return $entityManager->getClassMetadata($entityName)->getName().spl_object_hash($entityManager);

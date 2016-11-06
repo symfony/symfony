@@ -33,27 +33,26 @@ class ConsoleCommandContext implements ContextInterface
         $this->command = $command;
     }
 
-    /**
-     * @return \Exception|\Throwable|null
-     */
     public function getException()
     {
         return $this->exception;
     }
 
-    /**
-     * @return null|string
-     */
     public function getName()
     {
-        return sprintf('command=>%s', $this->command->getName());
+        return sprintf('command => %s', $this->command->getName());
     }
 
-    /**
-     * @return null|string
-     */
     public function getStatusCode()
     {
         return $this->exitCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return Types::COMMAND;
     }
 }

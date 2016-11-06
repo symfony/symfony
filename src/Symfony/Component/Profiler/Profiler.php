@@ -146,10 +146,10 @@ class Profiler
     /**
      * Collects data for the given response.
      *
-     * @param ContextInterface $data
+     * @param ContextInterface $context
      * @return null|Profile A Profile instance or null if the profiler is disabled
      */
-    public function collectData(ContextInterface $data)
+    public function collectData(ContextInterface $context)
     {
         if (false === $this->enabled) {
             return null;
@@ -157,11 +157,12 @@ class Profiler
 
         $profile = new Profile(substr(hash('sha256', uniqid(mt_rand(), true)), 0, 6));
         $profile->setTime(time());
-        $profile->setName($data->getName());
-        $profile->setStatusCode($data->getStatusCode());
+        $profile->setName($context->getName());
+        $profile->setStatusCode($context->getStatusCode());
+        $profile->setType($context->getType());
 
         foreach ($this->collectors as $collector) {
-            if ($collector->collectData($data, $profile)) {
+            if ($collector->collectData($context, $profile)) {
                 // we need to clone for sub-requests
                 $profile->addCollector(clone $collector);
             }

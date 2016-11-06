@@ -16,12 +16,17 @@ interface ContextInterface
     public function getException();
 
     /**
-     * @return null|string
+     * @return string
      */
     public function getName();
 
     /**
-     * @return null|string
+     * @return string
+     */
+    public function getType();
+
+    /**
+     * @return null|int
      */
     public function getStatusCode();
 }

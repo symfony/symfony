@@ -58,4 +58,12 @@ class RequestContext implements ContextInterface
     {
         return $this->response;
     }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return Types::REQUEST;
+    }
 }

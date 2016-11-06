@@ -32,6 +32,7 @@ class Profile
     private $name;
     private $time;
     private $statusCode;
+    private $type;
 
     /**
      * @var Profile
@@ -196,6 +197,22 @@ class Profile
     public function getChildren()
     {
         return $this->children;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
     }
 
     /**

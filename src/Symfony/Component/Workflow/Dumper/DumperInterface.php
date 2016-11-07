@@ -26,8 +26,8 @@ interface DumperInterface
      * Dumps a workflow definition.
      *
      * @param DefinitionInterface $definition A Definition instance
-     * @param Marking|null $marking A Marking instance
-     * @param array $options An array of options
+     * @param Marking|null        $marking    A Marking instance
+     * @param array               $options    An array of options
      *
      * @return string The representation of the workflow
      */

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Workflow\Validator;
 
-use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DefinitionInterface;
 
 /**

@@ -1,6 +1,15 @@
 <?php
-namespace Symfony\Component\Workflow;
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Workflow;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -8,14 +17,14 @@ namespace Symfony\Component\Workflow;
 interface DefinitionInterface
 {
     /**
-     * Get the initial place
+     * Get the initial place.
      *
      * @return string
      */
     public function getInitialPlace();
 
     /**
-     * Get all the places
+     * Get all the places.
      *
      * @return string[]
      */

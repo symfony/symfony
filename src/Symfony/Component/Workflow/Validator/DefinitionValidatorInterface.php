@@ -22,7 +22,7 @@ interface DefinitionValidatorInterface
 {
     /**
      * @param DefinitionInterface $definition
-     * @param string     $name
+     * @param string              $name
      *
      * @return bool
      *

@@ -1,0 +1,681 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-08-16T16:18:51Z
+
+shouldn't state machines be implemented with transitions having a single starting place, instead of making a OR between places, which changes the meaning of the transition ?
+
+I'm quite sure that your state machine doing a OR between starting places of a given transition should actually be implemented as several transitions with a single starting place each.
+So for me, it is a :-1: for now.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-08-16T17:12:15Z
+
+Thank you for the feedback and for challenging the theory behind this. I appreciate that.
+
+> shouldn't state machines be implemented with transitions having a single starting place, instead of making a OR between places, which changes the meaning of the transition ?
+
+(I assume that "starting place"="input place" and not "initial place")
+Both yes and no. A state machine transition must have exactly one input place and output place, that is correct. But the name of the transition does not have to be unique (in theory, only in the current implementation). Which means that the following two examples are valid state machines.
+
+```php
+// Example 1                             Could be considered the same as
+// a -> t1 -> b                           a -> t1 -> b
+//            ↑                                ↑
+// c -> t1 -> ⅃                                c
+```
+
+```php
+// Example 2
+// a -> t1 -> b
+//
+// c -> t1 -> d
+```
+
+The output state for `t1` depends on the current state. See [Moore machines](https://en.wikipedia.org/wiki/Moore_machine).
+
+Here is an example of the doors of an elevator (source [Wikipedia](https://en.wikipedia.org/wiki/Finite-state_machine))
+![screen shot 2016-08-16 at 19 00 33](https://cloud.githubusercontent.com/assets/1275206/17708094/bec407fa-63e3-11e6-9212-1fa344e1b2c4.png)
+
+> I'm quite sure that your state machine doing a OR between starting places of a given transition should actually be implemented as several transitions with a single starting place each.
+
+Yes, it does a OR but as stated above that is okey. The alternative implementation of this is to rewrite `Definition::$transitions` to support multiple transitions with the same name/id. That will be slower than the array that is currently used and it will require more configuration by the user, *but it will not change the behavior*.
+
+Rewriting `Definition::$transitions` might be the only way to go if we also want to support Example 2.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-16T17:41:42Z
+
+Well, in your state machine, I consider that you have multiple transitions being labelled as ``open``, not a single transition handling many different changes in the graph.
+
+IMO, requiring transition names to be unique is the actual issue in your case. Your proposal is actually changing the Workflow component to implement a weird thing. Your state machine above indeed has 6 transitions in your schema above
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-08-16T18:01:00Z
+
+> IMO, requiring transition names to be unique is the actual issue in your case. Your proposal is actually changing the Workflow component to implement a weird thing. Your state machine above indeed has 6 transitions in your schema above
+
+You may be right. I have taken a shortcut here. We discussed non-unique transition names in https://github.com/symfony/symfony/issues/19605 as well. I'll see if I can find a better solution.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-08-16T18:25:57Z
+
+@lyrixx [idea's was indeed going toward this](https://github.com/symfony/symfony/issues/19605#issuecomment-239666231).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-08-16T20:13:06Z
+
+I've update the PR now. I've made sure that the transition name can be non-unique. There is no shortcut, there is actually no decreased performance (I was wrong before) and the model is a better mapping of the state machine.
+
+Please give it another review.
+
+Note: This will be a BC break because `Workflow::getEnabledTransitions` and `Definition::getTransitions` will not return an assoc array anymore.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-17T08:35:53Z
+
+Hello.
+
+Unfortunately the transition name in a petri name should be unique.
+
+Anyway, it's simpler to add a new attribute `Transition::title` to fix your issue.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-08-17T08:55:19Z
+
+Hey.
+
+I can't find any documentations about petri nets that says that the transition name has to be unique. Can you provide a reference?
+
+> Anyway, it's simpler to add a new attribute Transition::title to fix your issue.
+
+So the Transition::name will be an unique id and the Transition::title would be... used as an id when you do `Workflow::can` and `Workflow::apply`?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-17T10:02:44Z
+
+no, with `can` and `apply` you have to give the full `name`. But you can use the `title` in the UI. everything is hidden for the end user after that. For example, the only line to update is [this one](https://github.com/lyrixx/SFLive-Paris2016-Workflow/blob/c7d4262372603e388033682fa8e032b0159d1bc6/app/Resources/views/article/show.html.twig#L35).
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-08-17T10:18:45Z
+
+> no, with can and apply you have to give the full name.
+
+Then what is the point of adding a `title`? Consider the elevator example above. I want to be able to do `$workflow->apply($elevator, 'close')`. I do not care if the elevator is in status `opened` or `opening`.
+
+If I still need the full `name` I have to:
+```php
+try {
+    $workflow->apply($elevator, 'close_if_opened');
+} catch ( .. ) {
+    try {
+        $workflow->apply($elevator, 'close_if_opening');
+    } catch (...) { ... }
+}
+```
+-----
+> Unfortunately the transition name in a petri name should be unique.
+>> I can't find any documentations about petri nets that says that the transition name has to be unique. Can you provide a reference?
+
+I have not found anything yet. Have you had any success?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-17T11:40:57Z
+
+the point of adding a title is you hide the potential complexity of the workflow. You display to the end user a simple action like close. Then, because some transitions will not be available, the workflow will display only the close (close_if_opened) transition. and so you never had to hardcode close_if_opened.
+
+Do you see what i'm trying to say ? If you can, I show you in with the example on my repo.
+
+> I have not found anything yet. Have you had any success?
+
+In https://en.wikipedia.org/wiki/Petri_net#Formal_definition_and_basic_terminology:
+
+> Definition 1. A net is a triple {\displaystyle N=(P,T,F)} N = (P, T, F) where:
+>  P and  T are disjoint finite sets of places and transitions, respectively.
+
+And a set is a:
+
+> In mathematics, a set is a collection of distinct objects, considered as an object in its own right
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-08-17T12:03:46Z
+
+I see what you mean by using a title. In your case it does make sense. But in my application I do not show the places/states to the end users. For example: I use a state machine to determent what emails to send. I do something like:
+
+```php
+if ($workflow->can($object, 'send_type1')) {
+  // Do send
+  $workflow->apply(...)
+}
+```
+
+"send_type1" could move the state from `a`, `b` and `c` to state `d`. That is why I do not want to do `send_type1_from_a`, `send_type1_from_b`  and `send_type1_from_c`.
+
+-----
+
+> P and T are disjoint finite sets of places and transitions, respectively.
+
+Yes, T is a set of disjoint objects. But it does not say anything about the name/title attributes of those objects that must be unique. In fact, the name of the object has nothing to do with the mathematical model.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-17T12:31:55Z
+
+About your exemple, you can simply use $workflow->getEnabledTransitions to get the list of all available transition ?
+
+> Yes, T is a set of disjoint objects. But it does not say anything about the name/title attributes of those objects that must be unique. In fact, the name of the object has nothing to do with the mathematical model.
+
+I guess I / You miss something because to me it's clear it should be unique.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-08-17T12:44:16Z
+
+Yeah, but Im not interested in getting a list what is enabled and then parse that list. I know the name of the action I want to do. I just want to check if I can do it or not.
+
+Agreed. I think we intrepid the definition differently. For be it is clear that the transitions should be separate objects but the attributes of those objects do not have any restrictions.
+
+Do you see any issues with the workflow net that two transitions share the same name?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-17T12:58:46Z
+
+> Do you see any issues with the workflow net that two transitions share the same name?
+
+Right now, no. But I have a bad feeling about it. :/
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-08-17T13:04:29Z
+
+Please elaborate. Im happy to challenge this PR.
+
+This PR brings more flexibility. We *could* make sure to restrict us by forcing the transitions names to be unique whenever we add transition to the `Definition`. Say we (in the future) create a `TransitionNamesMustBeUniqueDefintion`.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-08-23T13:36:47Z
+
+(One week later) I still don't know what to think about this PR. It looks good to me but I'm still a bit afraid of potential side effect that I'm not able to see now.
+
+@stof What do you think?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-08-23T14:24:36Z
+
+@lyrixx  Well, transition names must be unique among transition sharing a starting place (otherwise asking to perform a transition would be ambiguous). But I don't see a need to make them unique in the whole graph (except maybe because of your feature about event being dispatched as you use the name in them, but the impact should be evaluated).
+
+Regarding this PR, what I don't like is that it changes totally what a transition means in the workflow depending on some other thing. We should not have a ``UniqueTransitionInputInterface``.
+
+If we want to be able to enforce a state machine workflow, we should probably have a feature validating a workflow instance to enforce some rules. Here are a few ideas about what can be validated at this level:
+- enforcing uniqueness of the names of transitions starting at each node (always enabled IMO)
+- enforcing that transitions have a single starting place and a single end place (i.e. your workflow is a state machine)
+But we should not rely on an interface on the marking store to determine that. Enforcing a state machine workflow should not change anything to the marking store (except maybe adding a feature validating the fact that a marking store marks a single place initially, but even this PR does not do it)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T21:18:09Z
+
+So, what do we do here?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-09-15T09:47:14Z
+
+I feel that we all want to support state machines. The question is HOW.
+
+I like the idea by @stof to enforce some rules. What if we introduced a StateMachine class.
+
+```php
+class PetriNet {
+  // ...
+}
+
+class Workflow extends PetriNet {
+  public function __construct($definition, ...) {
+    // Validate that the definition is a valid Workflow
+  }
+}
+
+class StateMachine extends PetriNet (Or WorkFlow) {
+  public function __construct($definition, ...) {
+    // Validate that the definition is a valid StateMachine
+  }
+}
+```
+
+This would enforce the rules, remove the need for `UniqueTransitionInputInterface` and this inheritance makes a lot of sense if you considering the domain.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-09-19T09:47:27Z
+
+Indeed I would be nice to support state machine out of the box. But I don't really like the current implementation, and I totally approve stof's comment.
+
+It looks like the previous comment could be a better approach.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-09-27T16:35:06Z
+
+I introduced the PetriNet and StateMachine classes.
+
+Since StateMachines and Workflows are both subtypes of PetriNet I made sure our classes reflects that. The rules @stof suggests are enforced in the constructors.
+
+I would like to have some feedback before I continue with this PR.
+
+Questions:
+- Do we like this approach?
+- What more rules should be applied for StateMachines/Workflows?
+
+TODO:
+- Add more tests. For PetriNet (move from Workflow), Workflow and StateMachine
+- Review exception messages. As of now they say "Workflow" a lot.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-09-27T20:53:02Z
+
+I agree with @stof comment about the validation in constructors. (not related, I'm a bit lost in the new GH interface. I did not find the "reaction" on his comment)
+I think the best way is to create new class that are able to valide a definition. And to use them in the `FrameworkExtension` extension. Like that, people using only the component will be able to re-use the validator.
+
+About your questions:
+
+> Do we like this approach?
+
+Yes
+
+> What more rules should be applied for StateMachines/Workflows?
+
+In the worflow net, there are some rules:
+
+* Only one starting place. IMHO this is needed
+* Only one ending place. IMHO this not needed.
+
+We could also validate all place are reachable. This harder to validate. I think I have a piece of code to achieve it, so I could open a PR later ;)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-09-28T15:28:33Z
+
+Check out the new `DefinitionValidator` interface. I added 3 validators. One for Workflows, One for workflow that have a marking store that implements `UniqueTransitionOutputInterface` and one for StateMachines. I want to run the validators in the FrameworkExtension, but that might be tricky since I do not have any services/classes, only definitions. I propose to create a compiler pass and run the validation there.
+
+When I moved the validation away from the constructor it seams like we could remove the StateMachine class all together, right? Or do we see any value in having it there?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-10-07T09:40:26Z
+
+> One for workflow that have a marking store that implements UniqueTransitionOutputInterface
+
+UniqueTransitionOutputInterface was an incomplete attempt at supporting state machines. IMO, we should drop it entirely before the 3.2 release (if we release it, we will be stuck with it for BC)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-10-07T10:03:44Z
+
+> UniqueTransitionOutputInterface was an incomplete attempt at supporting state machines. IMO, we should drop it entirely before the 3.2 release (if we release it, we will be stuck with it for BC)
+
+:+1
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-24T19:53:58Z
+
+@lyrixx Can you take some time to review this one as this is your domain of expertise ;) Thanks.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-10-25T07:25:24Z
+
+I've rebased this PR and all the tests passes.
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2016-10-25T08:39:37Z
+
+Probably it'll need some commit-squashing too? 👍
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-10-25T08:41:19Z
+
+@rvanlaak no need to waste time on squashing commits. We merge PRs with a tool that squashes everything automatically.
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2016-10-25T08:47:58Z
+
+@javiereguiluz that's great, missed that. Now I see docs were changed in 2015 already: https://github.com/symfony/symfony-docs/commit/e4463169c98355dc315c0fd45113b8cb1764c615
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-04T10:16:11Z
+
+@stof @lyrixx, What do you think?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-04T13:58:18Z
+
+We need to decide now what to do with this PR. I mean, before the next beta/RC version of 3.2.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-04T13:59:21Z
+
+Hello. I'm super busy right now, But I will have a look today!
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2016-11-07T11:57:29Z
+
+See @javiereguiluz added this PR to the `3.3` milestone, did hope this to appear with `3.2` though.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-07T11:59:44Z
+
+@rvanlaak we are supper late in the Symfony 3.2 cycle (the final release is in around 20 days) so we can only merge new features if they look rock-solid, they are not huge and there is an unanimous agreement about it.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-07T12:09:39Z
+
+Is this such PR?
+It has some BC breaking changes like removal of `UniqueTransitionOutputInterface`. I would hate to see us keeping that around for all 3.x versions.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-07T15:00:07Z
+
+To be clear, the only options are: reverting the Workflow component for 3.2 and wait for 3.3 to reintroduce it or merge this PR for 3.2.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-07T15:03:52Z
+
+> To be clear, the only options are: reverting the Workflow component for 3.2 and wait for 3.3 to reintroduce it or merge this PR for 3.2.
+
+Okey. Good. Im fine with either of those. But I would appreciate (of course) if the workflow component was introduced in 3.2.
+
+---------------------------------------------------------------------------
+
+by rufinus at 2016-11-07T15:11:25Z
+
+Even if i dont have a saying in this.
+
+I really looked forward to the workflow component, but without the state-machine extension it is just not usable (and i bet the most common use case for your userbase will be the state-machine).
+
+The only thing needed for 3.2 is the changed return value (which would be a BC break after 3.2). So the state-machine itself could be added in a 3.2.1.
+
+Of course, i would really love to see this in 3.2.0. But if I need to wait for 3.3.0 (which is 6 months away) I'm forced to use a different integration.
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2016-11-07T15:38:38Z
+
+Is there a list of actionables for this PR to be merged already?
+
+> So the state-machine itself could be added in a 3.2.1.
+
+Ghehe, that won't happen ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-07T15:42:08Z
+
+> The only thing needed for 3.2 is the changed return value (which would be a BC break after 3.2). So the state-machine itself could be added in a 3.2.1.
+
+@rufinus new features are never added in patch releases
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-07T15:57:27Z
+
+@lyrixx I think we're waiting for your final approval here :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-07T19:00:58Z
+
+Here we go ;)
+
+First, thanks a lot for your work on this PR. It's really cool.
+
+For me the design is good and we could merge this one in master (3.2)
+
+I tested this PR against my demo app, and I also tested the new state machine. Everything is in the [new branch](https://github.com/lyrixx/SFLive-Paris2016-Workflow/tree/new). **Warning**: If you want to tests this project, you have to **manually** updated symfony vendor to use this PR.
+
+Finally, I made some modification in this PR to enhance few things. I have attached the patch to this PR.
+
+patch:
+```diff
+commit ef075134f64a9b31e4d4c7ab7fc14d6c37b172bb
+Author: Grégoire Pineau <lyrixx@lyrixx.info>
+Date:   Mon Nov 7 18:57:54 2016 +0100
+
+    Patch
+
+diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/ValidateWorkflowsPass.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/ValidateWorkflowsPass.php
+index 4f1024e..09ad3dd 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/ValidateWorkflowsPass.php
++++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/ValidateWorkflowsPass.php
+@@ -35,13 +35,13 @@ class ValidateWorkflowsPass implements CompilerPassInterface
+         foreach ($taggedServices as $id => $tags) {
+             $definition = $container->get($id);
+             foreach ($tags as $tag) {
+-                if (empty($tag['name'])) {
++                if (!array_key_exists('name', $tag)) {
+                     throw new RuntimeException(sprintf('The "name" for the tag "workflow.definition" of service "%s" must be set.', $id));
+                 }
+-                if (empty($tag['type'])) {
++                if (!array_key_exists('type', $tag)) {
+                     throw new RuntimeException(sprintf('The "type" for the tag "workflow.definition" of service "%s" must be set.', $id));
+                 }
+-                if (empty($tag['marking_store'])) {
++                if (!array_key_exists('marking_store', $tag)) {
+                     throw new RuntimeException(sprintf('The "marking_store" for the tag "workflow.definition" of service "%s" must be set.', $id));
+                 }
+
+diff --git a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
+index 3a1f0f0..b7cdb63 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
++++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
+@@ -425,7 +425,7 @@ class FrameworkExtension extends Extension
+                 foreach ($workflow['marking_store']['arguments'] as $argument) {
+                     $markingStoreDefinition->addArgument($argument);
+                 }
+-            } else {
++            } elseif (isset($workflow['marking_store']['service'])) {
+                 $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
+             }
+
+@@ -438,7 +438,9 @@ class FrameworkExtension extends Extension
+
+             $workflowDefinition = new DefinitionDecorator(sprintf('%s.abstract', $type));
+             $workflowDefinition->replaceArgument(0, $definitionDefinition);
+-            $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
++            if (isset($markingStoreDefinition)) {
++                $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
++            }
+             $workflowDefinition->replaceArgument(3, $name);
+
+             $workflowId = sprintf('%s.%s', $type, $name);
+diff --git a/src/Symfony/Bundle/FrameworkBundle/Resources/config/workflow.xml b/src/Symfony/Bundle/FrameworkBundle/Resources/config/workflow.xml
+index cb8c132..1314be8 100644
+--- a/src/Symfony/Bundle/FrameworkBundle/Resources/config/workflow.xml
++++ b/src/Symfony/Bundle/FrameworkBundle/Resources/config/workflow.xml
+@@ -7,13 +7,13 @@
+     <services>
+         <service id="workflow.abstract" class="Symfony\Component\Workflow\Workflow" abstract="true">
+             <argument /> <!-- workflow definition -->
+-            <argument /> <!-- marking store -->
++            <argument type="constant">null</argument> <!-- marking store -->
+             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
+             <argument /> <!-- name -->
+         </service>
+         <service id="state_machine.abstract" class="Symfony\Component\Workflow\StateMachine" abstract="true">
+             <argument /> <!-- workflow definition -->
+-            <argument /> <!-- marking store -->
++            <argument type="constant">null</argument> <!-- marking store -->
+             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
+             <argument /> <!-- name -->
+         </service>
+diff --git a/src/Symfony/Component/Workflow/Tests/WorkflowTest.php b/src/Symfony/Component/Workflow/Tests/WorkflowTest.php
+index 6144de1..4a7ea56 100644
+--- a/src/Symfony/Component/Workflow/Tests/WorkflowTest.php
++++ b/src/Symfony/Component/Workflow/Tests/WorkflowTest.php
+@@ -113,7 +113,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
+         $subject = new \stdClass();
+         $subject->marking = null;
+         $eventDispatcher = new EventDispatcher();
+-        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) { $event->setBlocked(true); });
++        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
++            $event->setBlocked(true);
++        });
+         $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
+
+         $this->assertFalse($workflow->can($subject, 't1'));
+@@ -188,7 +190,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
+         $subject = new \stdClass();
+         $subject->marking = null;
+         $eventDispatcher = new EventDispatcher();
+-        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) { $event->setBlocked(true); });
++        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
++            $event->setBlocked(true);
++        });
+         $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
+
+         $this->assertEmpty($workflow->getEnabledTransitions($subject));
+diff --git a/src/Symfony/Component/Workflow/Validator/StateMachineValidator.php b/src/Symfony/Component/Workflow/Validator/StateMachineValidator.php
+index 57dc632..6f34c1f 100644
+--- a/src/Symfony/Component/Workflow/Validator/StateMachineValidator.php
++++ b/src/Symfony/Component/Workflow/Validator/StateMachineValidator.php
+@@ -53,7 +53,7 @@ class StateMachineValidator implements DefinitionValidatorInterface
+             if (isset($transitionFromNames[$from][$transition->getName()])) {
+                 throw new InvalidDefinitionException(
+                     sprintf(
+-                        'A transition from a place/state must have an unique name. Multiple transition named "%s" from place/state "%s" where found on StateMachine "%s". ',
++                        'A transition from a place/state must have an unique name. Multiple transitions named "%s" from place/state "%s" where found on StateMachine "%s". ',
+                         $transition->getName(),
+                         $from,
+                         $name
+diff --git a/src/Symfony/Component/Workflow/Workflow.php b/src/Symfony/Component/Workflow/Workflow.php
+index 4e83778..348b3b9 100644
+--- a/src/Symfony/Component/Workflow/Workflow.php
++++ b/src/Symfony/Component/Workflow/Workflow.php
+@@ -16,6 +16,7 @@ use Symfony\Component\Workflow\Event\Event;
+ use Symfony\Component\Workflow\Event\GuardEvent;
+ use Symfony\Component\Workflow\Exception\LogicException;
+ use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
++use Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore;
+
+ /**
+  * @author Fabien Potencier <fabien@symfony.com>
+@@ -29,10 +30,10 @@ class Workflow
+     private $dispatcher;
+     private $name;
+
+-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
++    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
+     {
+         $this->definition = $definition;
+-        $this->markingStore = $markingStore;
++        $this->markingStore = $markingStore ?: new PropertyAccessorMarkingStore();
+         $this->dispatcher = $dispatcher;
+         $this->name = $name;
+     }
+@@ -163,7 +164,7 @@ class Workflow
+      * @param Marking    $marking
+      * @param Transition $transition
+      *
+-     * @return bool|void boolean true if this transition is guarded, ie you cannot use it.
++     * @return bool|void boolean true if this transition is guarded, ie you cannot use it
+      */
+     private function guardTransition($subject, Marking $marking, Transition $transition)
+     {
+@@ -253,25 +254,21 @@ class Workflow
+     {
+         $transitions = $this->definition->getTransitions();
+
+-        $namedTransitions = array_filter(
+-            $transitions,
+-            function (Transition $transition) use ($transitionName) {
+-                return $transitionName === $transition->getName();
+-            }
+-        );
++        $transitions = array_filter($transitions, function (Transition $transition) use ($transitionName) {
++            return $transitionName === $transition->getName();
++        });
+
+-        if (empty($namedTransitions)) {
+-            throw new LogicException(
+-                sprintf('Transition "%s" does not exist for workflow "%s".', $transitionName, $this->name)
+-            );
++        if (!$transitions) {
++            throw new LogicException(sprintf('Transition "%s" does not exist for workflow "%s".', $transitionName, $this->name));
+         }
+
+-        return $namedTransitions;
++        return $transitions;
+     }
+
+     /**
+-     * Return the first Transition in $transitions that is valid for the $subject and $marking. null is returned when
+-     * you cannot do any Transition in $transitions on the $subject.
++     * Return the first Transition in $transitions that is valid for the
++     * $subject and $marking. null is returned when you cannot do any Transition
++     * in $transitions on the $subject.
+      *
+      * @param object       $subject
+      * @param Marking      $marking
+@@ -292,7 +289,5 @@ class Workflow
+                 return $transition;
+             }
+         }
+-
+-        return;
+     }
+ }
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-07T19:07:31Z
+
+Thank you. Excellent news.  =)
+
+Do you want to apply the patch your self (I've given you permissions) or do you want me to do it now?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-07T19:09:11Z
+
+@Nyholm Thanks. I just pushed my patch in your fork. And so my commit just land in this pr ;)
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-07T19:14:17Z
+
+I just rebased the PR and squashed all your commits.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-07T19:14:29Z
+
+Thank you

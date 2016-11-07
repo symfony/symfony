@@ -113,7 +113,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) { $event->setBlocked(true); });
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
+            $event->setBlocked(true);
+        });
         $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $this->assertFalse($workflow->can($subject, 't1'));
@@ -188,7 +190,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) { $event->setBlocked(true); });
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
+            $event->setBlocked(true);
+        });
         $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $this->assertEmpty($workflow->getEnabledTransitions($subject));

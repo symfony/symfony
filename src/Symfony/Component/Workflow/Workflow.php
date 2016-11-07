@@ -16,6 +16,7 @@ use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
+use Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -29,10 +30,10 @@ class Workflow
     private $dispatcher;
     private $name;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
+    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
     {
         $this->definition = $definition;
-        $this->markingStore = $markingStore;
+        $this->markingStore = $markingStore ?: new PropertyAccessorMarkingStore();
         $this->dispatcher = $dispatcher;
         $this->name = $name;
     }
@@ -163,7 +164,7 @@ class Workflow
      * @param Marking    $marking
      * @param Transition $transition
      *
-     * @return bool|void boolean true if this transition is guarded, ie you cannot use it.
+     * @return bool|void boolean true if this transition is guarded, ie you cannot use it
      */
     private function guardTransition($subject, Marking $marking, Transition $transition)
     {
@@ -253,25 +254,21 @@ class Workflow
     {
         $transitions = $this->definition->getTransitions();
 
-        $namedTransitions = array_filter(
-            $transitions,
-            function (Transition $transition) use ($transitionName) {
-                return $transitionName === $transition->getName();
-            }
-        );
+        $transitions = array_filter($transitions, function (Transition $transition) use ($transitionName) {
+            return $transitionName === $transition->getName();
+        });
 
-        if (empty($namedTransitions)) {
-            throw new LogicException(
-                sprintf('Transition "%s" does not exist for workflow "%s".', $transitionName, $this->name)
-            );
+        if (!$transitions) {
+            throw new LogicException(sprintf('Transition "%s" does not exist for workflow "%s".', $transitionName, $this->name));
         }
 
-        return $namedTransitions;
+        return $transitions;
     }
 
     /**
-     * Return the first Transition in $transitions that is valid for the $subject and $marking. null is returned when
-     * you cannot do any Transition in $transitions on the $subject.
+     * Return the first Transition in $transitions that is valid for the
+     * $subject and $marking. null is returned when you cannot do any Transition
+     * in $transitions on the $subject.
      *
      * @param object       $subject
      * @param Marking      $marking
@@ -292,7 +289,5 @@ class Workflow
                 return $transition;
             }
         }
-
-        return;
     }
 }

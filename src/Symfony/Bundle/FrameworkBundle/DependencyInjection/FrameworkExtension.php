@@ -425,7 +425,7 @@ class FrameworkExtension extends Extension
                 foreach ($workflow['marking_store']['arguments'] as $argument) {
                     $markingStoreDefinition->addArgument($argument);
                 }
-            } else {
+            } elseif (isset($workflow['marking_store']['service'])) {
                 $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
             }
 
@@ -438,7 +438,9 @@ class FrameworkExtension extends Extension
 
             $workflowDefinition = new DefinitionDecorator(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, $definitionDefinition);
-            $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
+            if (isset($markingStoreDefinition)) {
+                $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
+            }
             $workflowDefinition->replaceArgument(3, $name);
 
             $workflowId = sprintf('%s.%s', $type, $name);

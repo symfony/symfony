@@ -53,7 +53,7 @@ class StateMachineValidator implements DefinitionValidatorInterface
             if (isset($transitionFromNames[$from][$transition->getName()])) {
                 throw new InvalidDefinitionException(
                     sprintf(
-                        'A transition from a place/state must have an unique name. Multiple transition named "%s" from place/state "%s" where found on StateMachine "%s". ',
+                        'A transition from a place/state must have an unique name. Multiple transitions named "%s" from place/state "%s" where found on StateMachine "%s". ',
                         $transition->getName(),
                         $from,
                         $name

@@ -11,7 +11,7 @@ use Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore;
  */
 class StateMachine extends Workflow
 {
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
+    public function __construct(DefinitionInterface $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
     {
         parent::__construct($definition, $markingStore ?: new ScalarMarkingStore(), $dispatcher, $name);
     }

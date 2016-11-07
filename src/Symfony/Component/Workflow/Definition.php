@@ -18,7 +18,7 @@ use Symfony\Component\Workflow\Exception\LogicException;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class Definition
+class Definition implements DefinitionInterface
 {
     private $places = array();
     private $transitions = array();

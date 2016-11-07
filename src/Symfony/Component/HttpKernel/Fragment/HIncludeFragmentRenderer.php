@@ -136,12 +136,16 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         }
 
         $loader = $this->templating->getLoader();
-        if ($loader instanceof \Twig_ExistsLoaderInterface) {
+        if ($loader instanceof \Twig_ExistsLoaderInterface || method_exists($loader, 'exists')) {
             return $loader->exists($template);
         }
 
         try {
-            $loader->getSource($template);
+            if (method_exists($loader, 'getSourceContext')) {
+                $loader->getSourceContext($template);
+            } else {
+                $loader->getSource($template);
+            }
 
             return true;
         } catch (\Twig_Error_Loader $e) {

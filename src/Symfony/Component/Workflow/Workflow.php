@@ -30,7 +30,7 @@ class Workflow
     private $dispatcher;
     private $name;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
+    public function __construct(DefinitionInterface $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
     {
         $this->definition = $definition;
         $this->markingStore = $markingStore ?: new PropertyAccessorMarkingStore();

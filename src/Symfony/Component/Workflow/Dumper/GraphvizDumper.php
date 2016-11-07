@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Workflow\Dumper;
 
-use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\DefinitionInterface;
 use Symfony\Component\Workflow\Marking;
 
 /**
@@ -43,7 +43,7 @@ class GraphvizDumper implements DumperInterface
      *  * node: The default options for nodes (places + transitions)
      *  * edge: The default options for edges
      */
-    public function dump(Definition $definition, Marking $marking = null, array $options = array())
+    public function dump(DefinitionInterface $definition, Marking $marking = null, array $options = array())
     {
         $places = $this->findPlaces($definition, $marking);
         $transitions = $this->findTransitions($definition);
@@ -58,7 +58,7 @@ class GraphvizDumper implements DumperInterface
             .$this->endDot();
     }
 
-    private function findPlaces(Definition $definition, Marking $marking = null)
+    private function findPlaces(DefinitionInterface $definition, Marking $marking = null)
     {
         $places = array();
 
@@ -79,7 +79,7 @@ class GraphvizDumper implements DumperInterface
         return $places;
     }
 
-    private function findTransitions(Definition $definition)
+    private function findTransitions(DefinitionInterface $definition)
     {
         $transitions = array();
 
@@ -123,7 +123,7 @@ class GraphvizDumper implements DumperInterface
         return $code;
     }
 
-    private function findEdges(Definition $definition)
+    private function findEdges(DefinitionInterface $definition)
     {
         $dotEdges = array();
 

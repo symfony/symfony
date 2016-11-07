@@ -12,6 +12,7 @@
 namespace Symfony\Component\Workflow\Validator;
 
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\DefinitionInterface;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
 /**
@@ -19,7 +20,7 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
  */
 class StateMachineValidator implements DefinitionValidatorInterface
 {
-    public function validate(Definition $definition, $name)
+    public function validate(DefinitionInterface $definition, $name)
     {
         $transitionFromNames = array();
         foreach ($definition->getTransitions() as $transition) {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Workflow\Validator;
 
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\DefinitionInterface;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
 /**
@@ -21,7 +22,7 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
  */
 class SinglePlaceWorkflowValidator extends WorkflowValidator
 {
-    public function validate(Definition $definition, $name)
+    public function validate(DefinitionInterface $definition, $name)
     {
         foreach ($definition->getTransitions() as $transition) {
             if (1 < count($transition->getTos())) {

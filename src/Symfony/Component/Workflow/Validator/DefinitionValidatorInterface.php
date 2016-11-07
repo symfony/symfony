@@ -12,6 +12,7 @@
 namespace Symfony\Component\Workflow\Validator;
 
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\DefinitionInterface;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 
 /**
@@ -20,12 +21,12 @@ use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 interface DefinitionValidatorInterface
 {
     /**
-     * @param Definition $definition
+     * @param DefinitionInterface $definition
      * @param string     $name
      *
      * @return bool
      *
      * @throws InvalidDefinitionException on invalid definition
      */
-    public function validate(Definition $definition, $name);
+    public function validate(DefinitionInterface $definition, $name);
 }

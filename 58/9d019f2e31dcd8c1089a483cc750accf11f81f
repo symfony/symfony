@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-07T13:58:08Z
+
+👍
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-07T14:58:07Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-07T14:58:33Z
+
+@javiereguiluz why adding the 3.2 milestone ? This targets the 2.7 branch, as this is where the buggy patch was merged
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-07T15:08:38Z
+
+@stof you are right. The idea of the "3.2" milestone is *"PRs to be merged before the release of Symfony 3.2"* and not *"PRs to be merged exclusively for Symfony 3.2"*.  It'd be sad to release 3.2.0 with well-known bugs that already have a solution and had to wait for 3.2.1.

@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Marking;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class ScalarMarkingStore implements MarkingStoreInterface, UniqueTransitionOutputInterface
+class ScalarMarkingStore implements MarkingStoreInterface
 {
     private $property;
     private $propertyAccessor;

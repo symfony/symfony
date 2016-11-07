@@ -55,7 +55,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $definition = new Definition($places, array($transition));
 
         $this->assertCount(1, $definition->getTransitions());
-        $this->assertSame($transition, $definition->getTransitions()['name']);
+        $this->assertSame($transition, $definition->getTransitions()[0]);
     }
 
     /**

@@ -35,6 +35,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TranslationDumpe
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\UnusedTagsPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ValidateWorkflowsPass;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -93,6 +94,7 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new PropertyInfoPass());
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
         $container->addCompilerPass(new CachePoolPass());
+        $container->addCompilerPass(new ValidateWorkflowsPass());
         $container->addCompilerPass(new CachePoolClearerPass(), PassConfig::TYPE_AFTER_REMOVING);
 
         if ($container->getParameter('kernel.debug')) {

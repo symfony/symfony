@@ -46,6 +46,9 @@ class Definition
         return $this->places;
     }
 
+    /**
+     * @return Transition[]
+     */
     public function getTransitions()
     {
         return $this->transitions;
@@ -103,6 +106,6 @@ class Definition
             }
         }
 
-        $this->transitions[$name] = $transition;
+        $this->transitions[] = $transition;
     }
 }

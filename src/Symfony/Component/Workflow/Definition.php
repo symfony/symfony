@@ -32,18 +32,17 @@ final class Definition
      * @param Transition[] $transitions
      * @param string       $initialPlace
      */
-    public function __construct(array $places, array $transitions, $initialPlace)
+    public function __construct(array $places, array $transitions, $initialPlace = null)
     {
         $this->addPlaces($places);
         $this->setInitialPlace($initialPlace);
-
         foreach ($transitions as $transition) {
             $this->addTransition($transition);
         }
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getInitialPlace()
     {
@@ -68,6 +67,10 @@ final class Definition
 
     private function setInitialPlace($place)
     {
+        if (null === $place) {
+            return;
+        }
+
         if (!isset($this->places[$place])) {
             throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
         }

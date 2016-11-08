@@ -39,4 +39,16 @@ class DefinitionBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($transition0, $definition->getTransitions()[0]);
         $this->assertSame($transition1, $definition->getTransitions()[1]);
     }
+
+    public function testAddPlace()
+    {
+        $builder = new DefinitionBuilder(array('a'), array());
+        $builder->addPlace('b');
+
+        $definition = $builder->build();
+
+        $this->assertCount(2, $definition->getPlaces());
+        $this->assertEquals('a', $definition->getPlaces()['a']);
+        $this->assertEquals('b', $definition->getPlaces()['b']);
+    }
 }

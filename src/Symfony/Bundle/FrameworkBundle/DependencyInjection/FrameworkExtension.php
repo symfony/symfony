@@ -407,7 +407,7 @@ class FrameworkExtension extends Extension
             $type = $workflow['type'];
 
             // Create a DefinitionBuilder
-            $definitionBuilderDefinition = new DefinitionDecorator('workflow.definition_builder.abstract');
+            $definitionBuilderDefinition = new Definition(Workflow\DefinitionBuilder::class);
             $definitionBuilderDefinition->addMethodCall('addPlaces', array($workflow['places']));
             foreach ($workflow['transitions'] as $transitionName => $transition) {
                 if ($type === 'workflow') {
@@ -423,6 +423,7 @@ class FrameworkExtension extends Extension
 
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);
+            $definitionDefinition->setPublic(false);
             $definitionDefinition->setFactory(array($definitionBuilderDefinition, 'build'));
             $definitionDefinition->addTag('workflow.definition', array(
                 'name' => $name,
@@ -451,6 +452,7 @@ class FrameworkExtension extends Extension
             // Store to container
             $workflowId = sprintf('%s.%s', $type, $name);
             $container->setDefinition($workflowId, $workflowDefinition);
+            $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
 
             // Add workflow to Registry
             foreach ($workflow['supports'] as $supportedClass) {

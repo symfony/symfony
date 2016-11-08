@@ -4,6 +4,7 @@ namespace Symfony\Component\Workflow\Tests;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
+use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
@@ -21,7 +22,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow(new Definition(), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
+        $workflow = new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
 
         $workflow->getMarking($subject);
     }
@@ -34,7 +35,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow(new Definition(), new PropertyAccessorMarkingStore());
+        $workflow = new Workflow(new Definition(array(), array()), new PropertyAccessorMarkingStore());
 
         $workflow->getMarking($subject);
     }
@@ -48,7 +49,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $subject->marking = array('nope' => true);
-        $workflow = new Workflow(new Definition(), new PropertyAccessorMarkingStore());
+        $workflow = new Workflow(new Definition(array(), array()), new PropertyAccessorMarkingStore());
 
         $workflow->getMarking($subject);
     }
@@ -211,18 +212,18 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     protected function createComplexWorkflow()
     {
-        $definition = new Definition();
+        $builder = new DefinitionBuilder();
 
-        $definition->addPlaces(range('a', 'g'));
+        $builder->addPlaces(range('a', 'g'));
 
-        $definition->addTransition(new Transition('t1', 'a', array('b', 'c')));
-        $definition->addTransition(new Transition('t2', array('b', 'c'), 'd'));
-        $definition->addTransition(new Transition('t3', 'd', 'e'));
-        $definition->addTransition(new Transition('t4', 'd', 'f'));
-        $definition->addTransition(new Transition('t5', 'e', 'g'));
-        $definition->addTransition(new Transition('t6', 'f', 'g'));
+        $builder->addTransition(new Transition('t1', 'a', array('b', 'c')));
+        $builder->addTransition(new Transition('t2', array('b', 'c'), 'd'));
+        $builder->addTransition(new Transition('t3', 'd', 'e'));
+        $builder->addTransition(new Transition('t4', 'd', 'f'));
+        $builder->addTransition(new Transition('t5', 'e', 'g'));
+        $builder->addTransition(new Transition('t6', 'f', 'g'));
 
-        return $definition;
+        return $builder->build();
 
         // The graph looks like:
         //

@@ -160,6 +160,14 @@ class Workflow
     }
 
     /**
+     * @return Definition
+     */
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
+
+    /**
      * @param object     $subject
      * @param Marking    $marking
      * @param Transition $transition

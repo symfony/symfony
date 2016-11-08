@@ -17,6 +17,7 @@
             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
             <argument /> <!-- name -->
         </service>
+        <service id="workflow.definition_builder.abstract" class="Symfony\Component\Workflow\DefinitionBuilder" abstract="true" />
 
         <service id="workflow.marking_store.property_accessor" class="Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore" abstract="true" />
         <service id="workflow.marking_store.scalar" class="Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore" abstract="true" />

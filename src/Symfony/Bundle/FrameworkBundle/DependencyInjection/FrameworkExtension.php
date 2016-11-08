@@ -406,20 +406,31 @@ class FrameworkExtension extends Extension
         foreach ($workflows as $name => $workflow) {
             $type = $workflow['type'];
 
-            $definitionDefinition = new Definition(Workflow\Definition::class);
-            $definitionDefinition->addMethodCall('addPlaces', array($workflow['places']));
+            // Create a DefinitionBuilder
+            $definitionBuilderDefinition = new DefinitionDecorator('workflow.definition_builder.abstract');
+            $definitionBuilderDefinition->addMethodCall('addPlaces', array($workflow['places']));
             foreach ($workflow['transitions'] as $transitionName => $transition) {
                 if ($type === 'workflow') {
-                    $definitionDefinition->addMethodCall('addTransition', array(new Definition(Workflow\Transition::class, array($transitionName, $transition['from'], $transition['to']))));
+                    $definitionBuilderDefinition->addMethodCall('addTransition', array(new Definition(Workflow\Transition::class, array($transitionName, $transition['from'], $transition['to']))));
                 } elseif ($type === 'state_machine') {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
-                            $definitionDefinition->addMethodCall('addTransition', array(new Definition(Workflow\Transition::class, array($transitionName, $from, $to))));
+                            $definitionBuilderDefinition->addMethodCall('addTransition', array(new Definition(Workflow\Transition::class, array($transitionName, $from, $to))));
                         }
                     }
                 }
             }
 
+            // Create a Definition
+            $definitionDefinition = new Definition(Workflow\Definition::class);
+            $definitionDefinition->setFactory(array($definitionBuilderDefinition, 'build'));
+            $definitionDefinition->addTag('workflow.definition', array(
+                'name' => $name,
+                'type' => $type,
+                'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
+            ));
+
+            // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {
                 $markingStoreDefinition = new DefinitionDecorator('workflow.marking_store.'.$workflow['marking_store']['type']);
                 foreach ($workflow['marking_store']['arguments'] as $argument) {
@@ -429,13 +440,7 @@ class FrameworkExtension extends Extension
                 $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
             }
 
-            $definitionDefinition->addTag('workflow.definition', array(
-                'name' => $name,
-                'type' => $type,
-                'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
-            ));
-            $definitionDefinition->setPublic(false);
-
+            // Create Workflow
             $workflowDefinition = new DefinitionDecorator(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, $definitionDefinition);
             if (isset($markingStoreDefinition)) {
@@ -443,11 +448,11 @@ class FrameworkExtension extends Extension
             }
             $workflowDefinition->replaceArgument(3, $name);
 
+            // Store to container
             $workflowId = sprintf('%s.%s', $type, $name);
-
-            $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
             $container->setDefinition($workflowId, $workflowDefinition);
 
+            // Add workflow to Registry
             foreach ($workflow['supports'] as $supportedClass) {
                 $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $supportedClass));
             }

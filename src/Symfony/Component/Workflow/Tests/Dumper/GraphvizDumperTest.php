@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
-use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Marking;

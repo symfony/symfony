@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
-use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Transition;
 
@@ -15,6 +14,7 @@ class DefinitionBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new DefinitionBuilder(array('a"', 'b'));
     }
+
     public function testSetInitialPlace()
     {
         $builder = new DefinitionBuilder(array('a', 'b'));

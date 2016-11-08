@@ -27,7 +27,6 @@ class DefinitionBuilder
     private $initialPlace;
 
     /**
-     *
      * @param string[]     $places
      * @param Transition[] $transitions
      */

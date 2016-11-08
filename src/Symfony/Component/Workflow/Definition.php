@@ -32,15 +32,13 @@ final class Definition
      * @param Transition[] $transitions
      * @param string       $initialPlace
      */
-    public function __construct(array $places, array $transitions, $initialPlace = null)
+    public function __construct(array $places, array $transitions, $initialPlace)
     {
         $this->addPlaces($places);
+        $this->setInitialPlace($initialPlace);
+
         foreach ($transitions as $transition) {
             $this->addTransition($transition);
-        }
-
-        if ($initialPlace !== null) {
-            $this->setInitialPlace($initialPlace);
         }
     }
 

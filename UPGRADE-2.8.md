@@ -628,7 +628,7 @@ HttpFoundation
    After:
 
    ```php
-   $request->query->get('foo')[bar];
+   $request->query->get('foo')['bar'];
    ```
 
 Routing

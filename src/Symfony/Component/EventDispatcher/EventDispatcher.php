@@ -72,6 +72,9 @@ class EventDispatcher implements EventDispatcherInterface
             }
         }
 
+        // Prevents hasListeners() behaves incorrectly when empty array for certain events is remaining.
+        // (i.e. when all listeners for the event have been removed)
+        // See https://github.com/symfony/symfony/pull/11475
         return array_filter($this->sorted);
     }
 

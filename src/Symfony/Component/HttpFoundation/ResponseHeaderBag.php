@@ -75,7 +75,11 @@ class ResponseHeaderBag extends HeaderBag
      */
     public function allPreserveCase()
     {
-        return array_combine($this->headerNames, $this->headers);
+        $headerNames = $this->headerNames;
+        $headers = $this->headers;
+        ksort($headerNames);
+        ksort($headers);
+        return array_combine($headerNames, $headers);
     }
 
     /**

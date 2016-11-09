@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Console\Tests\Formatter;
 
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Formatter\OutputFormatterStyleInterface;
+use Symfony\Component\Console\Formatter\OutputFormatterStyleStack;
 
 class OutputFormatterTest extends \PHPUnit_Framework_TestCase
 {
@@ -218,6 +221,30 @@ class OutputFormatterTest extends \PHPUnit_Framework_TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals("\033[32msome \033[39m\033[32m<tag>\033[39m\033[32m \033[39m\033[32m<setting=value>\033[39m\033[32m styled \033[39m\033[32m<p>\033[39m\033[32msingle-char tag\033[39m\033[32m</p>\033[39m", $formatter->format('<info>some <tag> <setting=value> styled <p>single-char tag</p></info>'));
+    }
+
+    public function testGetNonExistingStyle()
+    {
+        $formatter = new OutputFormatter();
+
+        $this->setExpectedException(InvalidArgumentException::class);
+        $formatter->getStyle('missing style');
+    }
+
+    public function testStyleStack()
+    {
+        $formatter = new OutputFormatter();
+
+        $this->assertInstanceOf(OutputFormatterStyleStack::class, $formatter->getStyleStack());
+    }
+
+    public function testStylesViaConstructor()
+    {
+        $formatter = new OutputFormatter(false, [
+            'short' => new OutputFormatterStyle(),
+        ]);
+
+        $this->assertInstanceOf(OutputFormatterStyleInterface::class, $formatter->getStyle('short'));
     }
 
     public function testFormatLongString()

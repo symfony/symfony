@@ -67,4 +67,13 @@ class OutputFormatterStyleStackTest extends \PHPUnit_Framework_TestCase
         $stack->push(new OutputFormatterStyle('white', 'black'));
         $stack->pop(new OutputFormatterStyle('yellow', 'blue'));
     }
+
+    public function testEmptyStyle()
+    {
+        $stack = new OutputFormatterStyleStack();
+        $style = new OutputFormatterStyle();
+        $stack->setEmptyStyle($style);
+
+        $this->assertSame($style, $stack->getEmptyStyle());
+    }
 }

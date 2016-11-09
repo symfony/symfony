@@ -40,6 +40,9 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
         $style->setForeground('default');
         $this->assertEquals("\033[39mfoo\033[39m", $style->apply('foo'));
 
+        $style->setForeground(null);
+        $this->assertEquals('foo', $style->apply('foo'));
+
         $this->setExpectedException('InvalidArgumentException');
         $style->setForeground('undefined-color');
     }
@@ -56,6 +59,9 @@ class OutputFormatterStyleTest extends \PHPUnit_Framework_TestCase
 
         $style->setBackground('default');
         $this->assertEquals("\033[49mfoo\033[49m", $style->apply('foo'));
+
+        $style->setBackground(null);
+        $this->assertEquals('foo', $style->apply('foo'));
 
         $this->setExpectedException('InvalidArgumentException');
         $style->setBackground('undefined-color');

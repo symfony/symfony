@@ -15,6 +15,7 @@ use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Helper\ProcessHelper;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class ProcessHelperTest extends \PHPUnit_Framework_TestCase
@@ -101,6 +102,21 @@ EOT;
             array($successOutputProcessDebug, array('php', '-r', 'echo 42;'), StreamOutput::VERBOSITY_DEBUG, null),
             array($successOutputDebug, new Process('php -r "echo 42;"'), StreamOutput::VERBOSITY_DEBUG, null),
         );
+    }
+
+    public function testMustRun()
+    {
+        $helper = new ProcessHelper();
+        $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
+
+        $output = $this->getOutputStream(StreamOutput::VERBOSITY_NORMAL);
+        $process = $helper->mustRun($output, 'php -r "echo 42;"');
+
+        $this->assertInstanceOf(Process::class, $process);
+        $this->assertSame('42', $process->getOutput());
+
+        $this->setExpectedException(ProcessFailedException::class);
+        $helper->mustRun($output, 'failure');
     }
 
     private function getOutputStream($verbosity)

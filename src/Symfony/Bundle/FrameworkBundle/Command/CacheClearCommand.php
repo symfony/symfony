@@ -162,6 +162,7 @@ EOF
         }
 
         // remove temp kernel file after cache warmed up
+        $tempKernel->getContainer()->get('session')->save();
         @unlink($tempKernelFile);
     }
 

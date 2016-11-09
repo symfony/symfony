@@ -42,6 +42,9 @@ foreach ($dirs as $dir) {
     $versions = json_decode($versions);
 
     foreach ($versions->package->versions as $version => $package) {
+        if ('dev_master' !== $version) {
+            unset($package['extra']['branch-alias']);
+        }
         $packages[$package->name] += array($version => $package);
     }
 }

@@ -38,15 +38,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class SwitchUserListener implements ListenerInterface
 {
-    private $securityContext;
-    private $provider;
-    private $userChecker;
-    private $providerKey;
-    private $accessDecisionManager;
-    private $usernameParameter;
-    private $role;
-    private $logger;
-    private $dispatcher;
+    protected $securityContext;
+    protected $provider;
+    protected $userChecker;
+    protected $providerKey;
+    protected $accessDecisionManager;
+    protected $usernameParameter;
+    protected $role;
+    protected $logger;
+    protected $dispatcher;
 
     /**
      * Constructor.
@@ -109,7 +109,7 @@ class SwitchUserListener implements ListenerInterface
      * @throws \LogicException
      * @throws AccessDeniedException
      */
-    private function attemptSwitchUser(Request $request)
+    protected function attemptSwitchUser(Request $request)
     {
         $token = $this->securityContext->getToken();
         $originalToken = $this->getOriginalToken($token);
@@ -157,7 +157,7 @@ class SwitchUserListener implements ListenerInterface
      *
      * @throws AuthenticationCredentialsNotFoundException
      */
-    private function attemptExitUser(Request $request)
+    protected function attemptExitUser(Request $request)
     {
         if (false === $original = $this->getOriginalToken($this->securityContext->getToken())) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
@@ -179,7 +179,7 @@ class SwitchUserListener implements ListenerInterface
      *
      * @return TokenInterface|false The original TokenInterface instance, false if the current TokenInterface is not switched
      */
-    private function getOriginalToken(TokenInterface $token)
+    protected function getOriginalToken(TokenInterface $token)
     {
         foreach ($token->getRoles() as $role) {
             if ($role instanceof SwitchUserRole) {

@@ -33,7 +33,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
 
             $container
                 ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
-                ->setArguments(array($username, (string) $user['password'], $user['roles']))
+                ->setArguments(array($username, (string) $user['password'], $user['roles']), $user['enabled'])
             ;
 
             $definition->addMethodCall('createUser', array(new Reference($userId)));
@@ -59,6 +59,7 @@ class InMemoryFactory implements UserProviderFactoryInterface
                                 ->beforeNormalization()->ifString()->then(function ($v) { return preg_split('/\s*,\s*/', $v); })->end()
                                 ->prototype('scalar')->end()
                             ->end()
+                            ->booleanNode('enabled')->defaultTrue()->end()
                         ->end()
                     ->end()
                 ->end()

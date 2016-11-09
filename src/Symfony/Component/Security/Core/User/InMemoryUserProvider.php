@@ -24,6 +24,9 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
  */
 class InMemoryUserProvider implements UserProviderInterface
 {
+    /**
+     * @var User[]
+     */
     private $users;
 
     /**

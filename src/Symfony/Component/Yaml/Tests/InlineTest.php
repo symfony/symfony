@@ -22,6 +22,23 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testParseInlinePhpObject()
+    {
+        $parsed = Inline::parse('{ key: "value", date: !!php/object:O:8:"DateTime":3:{s:4:"date";s:19:"2012-12-25 00:00:00";s:13:"timezone_type";i:3;s:8:"timezone";s:13:"Europe/London";}, foo: "another value" }', true, true);
+        $expectedDatetime = new \DateTime('2012-12-25 00:00:00', new \DateTimeZone('Europe/London'));
+        $this->assertSame('value', $parsed['key']);
+        $this->assertEquals($expectedDatetime, $parsed['date']);
+        $this->assertSame('another value', $parsed['foo']);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     */
+    public function testParseInlinePhpObjectThrowsExceptionWhenObjectParsingIsDisabled()
+    {
+        Inline::parse('{ key: "value", date: !!php/object:O:8:"DateTime":3:{s:4:"date";s:19:"2012-12-25 00:00:00";s:13:"timezone_type";i:3;s:8:"timezone";s:13:"Europe/London";}, foo: "another value" }', true);
+    }
+
     public function testDump()
     {
         $testsForDump = $this->getTestsForDump();

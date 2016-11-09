@@ -72,8 +72,8 @@ router script using <info>--router</info> option:
 
   <info>%command.full_name% --router=app/config/router.php</info>
 
-Specifing a router script is required when the used environment is not "dev" or
-"prod".
+Specifing a router script is required when the used environment is not "dev",
+"prod", or "test".
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 EOF

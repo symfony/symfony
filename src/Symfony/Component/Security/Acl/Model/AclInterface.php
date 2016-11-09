@@ -97,9 +97,9 @@ interface AclInterface extends \Serializable
      * @param array $securityIdentities
      * @param bool  $administrativeMode
      *
-     * @throws NoAceFoundException when no ACE was applicable for this request
-     *
      * @return bool
+     *
+     * @throws NoAceFoundException when no ACE was applicable for this request
      */
     public function isGranted(array $masks, array $securityIdentities, $administrativeMode = false);
 

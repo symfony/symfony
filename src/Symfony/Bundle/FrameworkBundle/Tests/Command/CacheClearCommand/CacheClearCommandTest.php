@@ -33,7 +33,7 @@ class CacheClearCommandTest extends TestCase
     {
         $this->fs = new Filesystem();
         $this->kernel = new TestAppKernel('test', true);
-        $this->rootDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('sf2_cache_', true);
+        $this->rootDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('sf3_cache_', true);
         $this->kernel->setRootDir($this->rootDir);
         $this->fs->mkdir($this->rootDir);
     }

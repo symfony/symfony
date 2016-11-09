@@ -21,7 +21,7 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tmpDir = sys_get_temp_dir().'/sf2_profiler_file_storage';
+        $this->tmpDir = sys_get_temp_dir().'/sf3_profiler_file_storage';
         if (is_dir($this->tmpDir)) {
             self::cleanDir();
         }

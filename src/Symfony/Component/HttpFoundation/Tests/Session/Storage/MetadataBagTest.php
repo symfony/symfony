@@ -78,7 +78,7 @@ class MetadataBagTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStorageKey()
     {
-        $this->assertEquals('_sf2_meta', $this->bag->getStorageKey());
+        $this->assertEquals('_sf3_meta', $this->bag->getStorageKey());
     }
 
     public function testGetLifetime()

@@ -61,7 +61,7 @@ class ProfilerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tmp = tempnam(sys_get_temp_dir(), 'sf2_profiler');
+        $this->tmp = tempnam(sys_get_temp_dir(), 'sf3_profiler');
         if (file_exists($this->tmp)) {
             @unlink($this->tmp);
         }

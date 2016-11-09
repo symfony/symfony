@@ -39,7 +39,7 @@ class FlashBag implements FlashBagInterface
      *
      * @param string $storageKey The key used to store flashes in the session
      */
-    public function __construct($storageKey = '_sf2_flashes')
+    public function __construct($storageKey = '_sf3_flashes')
     {
         $this->storageKey = $storageKey;
     }

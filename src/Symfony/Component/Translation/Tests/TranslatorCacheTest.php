@@ -23,7 +23,7 @@ class TranslatorCacheTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tmpDir = sys_get_temp_dir().'/sf2_translation';
+        $this->tmpDir = sys_get_temp_dir().'/sf3_translation';
         $this->deleteTmpDir();
     }
 

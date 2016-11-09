@@ -108,6 +108,8 @@ class SecurityExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('security_acl.xml');
 
+        $container->setParameter('security.acl.permission_granting_strategy.class', $config['granting_strategy']);
+
         if (isset($config['cache']['id'])) {
             $container->setAlias('security.acl.cache', $config['cache']['id']);
         }

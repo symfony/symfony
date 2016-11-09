@@ -105,6 +105,7 @@ class MainConfiguration implements ConfigurationInterface
                                 ->scalarNode('prefix')->defaultValue('sf2_acl_')->end()
                             ->end()
                         ->end()
+                        ->scalarNode('granting_strategy')->defaultValue('Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy')->end()
                         ->scalarNode('provider')->end()
                         ->arrayNode('tables')
                             ->addDefaultsIfNotSet()

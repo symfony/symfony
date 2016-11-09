@@ -143,6 +143,10 @@ abstract class DoctrineType extends AbstractType
         };
 
         $emNormalizer = function (Options $options, $em) use ($registry) {
+            if ($em instanceof ObjectManager) {
+                return $em;
+            }
+            
             /* @var ManagerRegistry $registry */
             if (null !== $em) {
                 return $registry->getManager($em);

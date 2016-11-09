@@ -143,9 +143,29 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new ContainerBuilder();
         $builder->set('bar', $bar = new \stdClass());
+
+        $this->assertSame($bar, $builder->get('bar'), '->get() returns the service associated with the id before compilation');
+
         $builder->compile();
 
-        $this->assertSame($bar, $builder->get('bar'), '->get() returns the service associated with the id');
+        $this->assertSame($bar, $builder->get('bar'), '->get() returns the service associated with the id after compilation');
+    }
+
+    /**
+     * @group legacy
+     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     */
+    public function testGetReturnsRegisteredServiceFromDefinitionBeforeCompilationIsDeprecated()
+    {
+        $deprecations = array(
+            'Calling Symfony\Component\DependencyInjection\ContainerBuilder::get() before compiling the container is deprecated for non-synthetic services since version 3.2 and will throw an exception in 4.0.',
+        );
+
+        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
+            $builder = new ContainerBuilder();
+            $builder->register('foo', 'stdClass');
+            $this->assertEquals(new \stdClass(), $builder->get('foo'));
+        });
     }
 
     public function testRegisterDoesNotOverrideExistingService()

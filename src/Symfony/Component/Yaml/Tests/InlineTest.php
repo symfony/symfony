@@ -573,7 +573,10 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             $expected->setTime($hour, $minute, $second);
         }
 
-        $this->assertEquals($expected, Inline::parse($yaml, Yaml::PARSE_DATETIME));
+        $actual = Inline::parse($yaml, Yaml::PARSE_DATETIME);
+        $actual->setTimezone(new \DateTimeZone('UTC'));
+
+        $this->assertEquals($expected->getTimestamp(), $actual->getTimestamp());
     }
 
     public function getTimestampTests()

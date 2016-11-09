@@ -1294,6 +1294,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($request->hasPreviousSession());
     }
 
+    public function testHasPreviousSessionWithoutCookies()
+    {
+        $request = new Request();
+
+        // Backup old values
+        $useOnlyCookies = ini_get('session.use_only_cookies');
+        $useCookies = ini_get('session.use_cookies');
+
+        ini_set('session.use_only_cookies', 0);
+        ini_set('session.use_cookies', 0);
+
+        $this->assertFalse($request->hasPreviousSession());
+        $request->query->set('MOCKSESSID', 'foo');
+        $this->assertFalse($request->hasPreviousSession());
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $this->assertTrue($request->hasPreviousSession());
+
+        ini_set('session.use_only_cookies', $useOnlyCookies);
+        ini_set('session.use_cookies', $useCookies);
+    }
+
     public function testToString()
     {
         $request = new Request();

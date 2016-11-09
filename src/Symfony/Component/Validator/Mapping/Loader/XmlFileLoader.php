@@ -83,7 +83,7 @@ class XmlFileLoader extends FileLoader
                 } else {
                     $options = array();
                 }
-            } elseif (strlen((string) $node) > 0) {
+            } elseif ('' !== (string) $node) {
                 $options = trim($node);
             } else {
                 $options = null;

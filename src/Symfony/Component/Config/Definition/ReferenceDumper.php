@@ -162,7 +162,7 @@ class ReferenceDumper
      */
     private function writeLine($text, $indent = 0)
     {
-        $indent = strlen($text) + $indent;
+        $indent += strlen($text);
         $format = '%'.$indent.'s';
 
         $this->reference .= sprintf($format, $text)."\n";

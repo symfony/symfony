@@ -297,6 +297,17 @@ EOF
         }
     }
 
+    public function testMissingAttrValueIsNull()
+    {
+        $crawler = new Crawler();
+        $crawler->addContent('<html><div non-empty-attr="sample value" empty-attr=""></div></html>', 'text/html; charset=UTF-8');
+        $div = $crawler->filterXPath('//div');
+
+        $this->assertEquals('sample value', $div->attr('non-empty-attr'), '->attr() reads non-empty attributes correctly');
+        $this->assertEquals('', $div->attr('empty-attr'), '->attr() reads empty attributes correctly');
+        $this->assertNull($div->attr('missing-attr'), '->attr() reads missing attributes correctly');
+    }
+
     public function testText()
     {
         $this->assertEquals('One', $this->createTestCrawler()->filterXPath('//li')->text(), '->text() returns the node value of the first element of the node list');

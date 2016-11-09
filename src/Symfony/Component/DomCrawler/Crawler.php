@@ -496,7 +496,9 @@ class Crawler extends \SplObjectStorage
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return $this->getNode(0)->getAttribute($attribute);
+        $node = $this->getNode(0);
+
+        return $node->hasAttribute($attribute) ? $node->getAttribute($attribute) : null;
     }
 
     /**

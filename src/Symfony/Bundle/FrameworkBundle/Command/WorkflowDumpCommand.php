@@ -66,23 +66,13 @@ EOF
             throw new \InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $serviceId));
         }
 
-        $definition = $this->getProperty($workflow, 'definition');
-
         $dumper = new GraphvizDumper();
-
         $marking = new Marking();
+
         foreach ($input->getArgument('marking') as $place) {
             $marking->mark($place);
         }
 
-        $output->writeln($dumper->dump($definition, $marking));
-    }
-
-    private function getProperty($object, $property)
-    {
-        $reflectionProperty = new \ReflectionProperty(Workflow::class, $property);
-        $reflectionProperty->setAccessible(true);
-
-        return $reflectionProperty->getValue($object);
+        $output->writeln($dumper->dump($workflow->getDefinition(), $marking));
     }
 }

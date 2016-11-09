@@ -559,7 +559,7 @@ class FrameworkExtension extends Extension
                 $dirs[] = dirname($r->getFileName()).'/../Resources/translations';
             } else {
                 // in Symfony 2.3, translations are located in the symfony/security package
-                $dirs[] = dirname($r->getFileName()).'/../../Resources/translations';
+                $dirs[] = dirname($r->getFileName()).'/../Resources/translations';
             }
         }
         $rootDir = $container->getParameter('kernel.root_dir');

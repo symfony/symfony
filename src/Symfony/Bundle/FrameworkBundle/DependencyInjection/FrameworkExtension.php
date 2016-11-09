@@ -241,12 +241,16 @@ class FrameworkExtension extends Extension
         if (isset($config['matcher'])) {
             if (isset($config['matcher']['service'])) {
                 $container->setAlias('profiler.request_matcher', $config['matcher']['service']);
-            } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path'])) {
+            } elseif (isset($config['matcher']['ip']) || isset($config['matcher']['path']) || isset($config['matcher']['ips'])) {
                 $definition = $container->register('profiler.request_matcher', 'Symfony\\Component\\HttpFoundation\\RequestMatcher');
                 $definition->setPublic(false);
 
                 if (isset($config['matcher']['ip'])) {
                     $definition->addMethodCall('matchIp', array($config['matcher']['ip']));
+                }
+
+                if (isset($config['matcher']['ips'])) {
+                    $definition->addMethodCall('matchIps', array($config['matcher']['ips']));
                 }
 
                 if (isset($config['matcher']['path'])) {

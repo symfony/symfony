@@ -55,7 +55,7 @@ class DefinitionBuilder
             throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $place));
         }
 
-        if (!count($this->places)) {
+        if (!$this->places) {
             $this->initialPlace = $place;
         }
 

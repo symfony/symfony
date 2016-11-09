@@ -39,7 +39,7 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     public function provideWorkflowDefinitionWithMarking()
     {
         yield array(
-            $this->createprovideComplexWorkflowDefinition(),
+            $this->provideComplexWorkflowDefinition(),
             new Marking(array('b' => 1)),
             $this->createComplexWorkflowDumpWithMarking(),
         );
@@ -53,11 +53,11 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
     public function provideWorkflowDefinitionWithoutMarking()
     {
-        yield array($this->createprovideComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking());
+        yield array($this->provideComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking());
         yield array($this->provideSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking());
     }
 
-    public function createprovideComplexWorkflowDefinition()
+    public function provideComplexWorkflowDefinition()
     {
         $builder = new DefinitionBuilder();
 

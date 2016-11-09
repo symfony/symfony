@@ -306,6 +306,151 @@ class Crawler extends \SplObjectStorage
     }
 
     /**
+     * Removes DomElements from the DomDocument.
+     *
+     * Example:
+     *
+     *     // Filter out the #content element block.
+     *     $crawler = $crawler->filter('#content');
+     *
+     *     try {
+     *         // Remove all instances of <script> and <tag class="element">
+     *         $crawler->remove(array('script', '.element'));
+     *
+     *         // Remove instaces of <script> directly descended <tag class="element">
+     *         $crawler->remove(array('.element > script'));
+     *     } catch (Exception $e) {
+     *         echo 'Caught exception: ',  $e->getMessage(), "\n";
+     *     }
+     *
+     * @param Array $jquerySelectors List of jQuery Selectors for removal.
+     *
+     * @api
+     * @todo Write tests.
+     */
+    public function remove($jquerySelectors)
+    {
+        $actions = array(
+            'CheckForCssSelectorClass' => array(),
+            'DomDocumentRootReconstruct' => array(),
+        );
+        $document = $this->domcrawlerHelper($actions);
+
+        foreach ($jquerySelectors as $selector) {
+            $crawlerInverse = $document['domxpath']->query(CssSelector::toXPath($selector));
+            foreach ($crawlerInverse as $elementToRemove) {
+                $elementToRemove->parentNode->removeChild($elementToRemove);
+            }
+        }
+        $this->clear();
+        $this->add($document['DOMDocument']);
+    }
+
+    /**
+     * Creates a new attribute when it does not exists or replaces their
+     * values when they already exist.
+     *
+     * Example:
+     *
+     *     // Filter out the #content element block.
+     *     $crawler = $crawler->filter('#content');
+     *
+     *     try {
+     *         // Set a value of 'http://www.example.com' for all instances of <a href>.
+     *         $crawler->setAttribute(array('a'), array('href' => 'http://www.example.com'));
+     *     catch (Exception $e) {
+     *         echo 'Caught exception: ',  $e->getMessage(), "\n";
+     *     }
+     *
+     * @param Array $jquerySelectors List of jQuery Selector elements to pin down.
+     * @param Array $attributeValues List of key value pair of attributes to be set or replaced.
+     *
+     * @api
+     * @todo Write tests.
+     */
+    public function setAttribute($jquerySelectors, $attributeValues)
+    {
+        $actions = array(
+            'CheckForCssSelectorClass' => array(),
+            'DomDocumentRootReconstruct' => array(),
+        );
+        $document = $this->domcrawlerHelper($actions);
+
+        foreach ($jquerySelectors as $selector) {
+            $crawlerInverse = $document['domxpath']->query(CssSelector::toXPath($selector));
+            foreach ($crawlerInverse as $elementToRemove) {
+                if ($elementToRemove instanceof \DOMElement) {
+                    foreach ($attributeValues as $attrName => $attrValue) {
+                        $elementToRemove->setAttribute($attrName, $attrValue);
+                    }
+                }
+            }
+        }
+        $this->clear();
+        $this->add($document['DOMDocument']);
+    }
+
+    /**
+     * Internal helper function. Facilitates the upgrade of reuseble code.
+     *
+     * Example of $actions:
+     *
+     *   // Send no parameters.
+     *   $actions => array(
+     *       'MyActionName' => array(),
+     *   );
+     *
+     *   // Send parameters.
+     *   $actions => array(
+     *       'MyActionName' => array(
+     *           'MyActionNameParameterOne' => 'ParameterValue',
+     *           'MyActionNameParameterTwo' => 'ParameterValue',
+     *       ),
+     *   );
+     *
+     * @param Array $actions Associative ( Action | Parameters ) list of actions to be performed.
+     */
+    private function domcrawlerHelper($actions)
+    {
+        if (!is_array($actions)) {
+            // @codeCoverageIgnoreStart
+            throw new \RuntimeException('$actions must be an associative array.');
+            // @codeCoverageIgnoreEnd
+        }
+        foreach ($actions as $action => $action_parameters) {
+            if (!is_array($action_parameters)) {
+                // @codeCoverageIgnoreStart
+                throw new \RuntimeException("$action_parameters must be an array.");
+                // @codeCoverageIgnoreEnd
+            }
+            switch($action) {
+                case 'CheckForCssSelectorClass':
+                    if (!class_exists('Symfony\\Component\\CssSelector\\CssSelector')) {
+                        // @codeCoverageIgnoreStart
+                        $message = 'Unable to convert CSS selector to XPath as the Symfony CssSelector is not installed.';
+                        if (isset($action_parameters['ExceptionMessage'])) {
+                            $message = $action_parameters['ExceptionMessage'];
+                        }
+                        throw new \RuntimeException($message);
+                        // @codeCoverageIgnoreEnd
+                    }
+                break;
+                case 'DomDocumentRootReconstruct':
+                    $document = array(
+                        'DOMDocument' => new \DOMDocument('1.0', 'UTF-8'),
+                     );
+                    $root = $document['DOMDocument']->appendChild($document['DOMDocument']->createElement('_root'));
+                    $this->rewind();
+                    $root->appendChild($document['DOMDocument']->importNode($this->current(), true));
+                    $document['domxpath'] = new \DOMXPath($document['DOMDocument']);
+
+                    return $document;
+                break;
+            }
+        }
+    }
+
+    /**
      * Returns a node given its position in the node list.
      *
      * @param int $position The position

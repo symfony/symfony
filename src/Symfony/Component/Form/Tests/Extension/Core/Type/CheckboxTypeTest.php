@@ -12,8 +12,9 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Test\TypeTestCase;
 
-class CheckboxTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
+class CheckboxTypeTest extends TypeTestCase
 {
     public function testDataIsFalseByDefault()
     {

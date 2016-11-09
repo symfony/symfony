@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests;
 
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -88,6 +89,25 @@ class HttpKernelTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('301', $response->getStatusCode());
         $this->assertEquals('/login', $response->headers->get('Location'));
+    }
+
+    public function testHandleWhenAnAccessDeniedHttpExceptionIsThrownByAListener()
+    {
+        $dispatcher = new EventDispatcher();
+
+        $dispatcher->addListener(KernelEvents::REQUEST, function ($event) {
+            throw new AccessDeniedHttpException();
+        });
+
+        $dispatcher->addListener(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) {
+            $event->setResponse(new Response('foo', $event->getException()->getStatusCode()));
+        });
+
+        $kernel = new HttpKernel($dispatcher, $this->getResolver(function () { return new Response(); }));
+        $response = $kernel->handle(new Request());
+
+        $this->assertEquals('foo', $response->getContent());
+        $this->assertEquals('403', $response->getStatusCode());
     }
 
     public function testHandleHttpException()

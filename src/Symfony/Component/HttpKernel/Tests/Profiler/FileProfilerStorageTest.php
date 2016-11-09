@@ -127,6 +127,20 @@ class FileProfilerStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $this->storage->find('127.0._.1', '', 10, 'GET'), '->find() does not interpret a "_" as a wildcard in the IP');
     }
 
+    public function testRetrieveByStatusCode()
+    {
+        $profile200 = new Profile('statuscode200');
+        $profile200->setStatusCode(200);
+        $this->storage->write($profile200);
+
+        $profile404 = new Profile('statuscode404');
+        $profile404->setStatusCode(404);
+        $this->storage->write($profile404);
+
+        $this->assertCount(1, $this->storage->find(null, null, 10, null, null, null, '200'), '->find() retrieve a record by Status code 200');
+        $this->assertCount(1, $this->storage->find(null, null, 10, null, null, null, '404'), '->find() retrieve a record by Status code 404');
+    }
+
     public function testRetrieveByUrl()
     {
         $profile = new Profile('simple_quote');

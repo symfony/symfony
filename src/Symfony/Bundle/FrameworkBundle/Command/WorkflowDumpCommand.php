@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Workflow;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -55,7 +56,16 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $workflow = $this->getContainer()->get('workflow.'.$input->getArgument('name'));
+        $container = $this->getContainer();
+        $serviceId = $input->getArgument('name');
+        if ($container->has('workflow.'.$serviceId)) {
+            $workflow = $container->get('workflow.'.$serviceId);
+        } elseif ($container->has('state_machine.'.$serviceId)) {
+            $workflow = $container->get('state_machine.'.$serviceId);
+        } else {
+            throw new \InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $serviceId));
+        }
+
         $definition = $this->getProperty($workflow, 'definition');
 
         $dumper = new GraphvizDumper();
@@ -70,7 +80,7 @@ EOF
 
     private function getProperty($object, $property)
     {
-        $reflectionProperty = new \ReflectionProperty(get_class($object), $property);
+        $reflectionProperty = new \ReflectionProperty(Workflow::class, $property);
         $reflectionProperty->setAccessible(true);
 
         return $reflectionProperty->getValue($object);

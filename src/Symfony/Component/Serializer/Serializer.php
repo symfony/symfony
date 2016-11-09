@@ -40,7 +40,17 @@ class Serializer implements SerializerInterface, NormalizerInterface, Denormaliz
     protected $encoder;
     protected $decoder;
     protected $normalizers = array();
+
+    /**
+     * @deprecated since 2.3.37
+     * @see https://github.com/symfony/symfony/pull/17140
+     */
     protected $normalizerCache = array();
+
+    /**
+     * @deprecated since 2.3.37
+     * @see https://github.com/symfony/symfony/pull/17140
+     */
     protected $denormalizerCache = array();
 
     public function __construct(array $normalizers = array(), array $encoders = array())

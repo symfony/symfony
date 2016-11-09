@@ -84,7 +84,7 @@ class CachePoolPass implements CompilerPassInterface
 
     private function getNamespace($namespaceSuffix, $id)
     {
-        return substr(str_replace('/', '-', base64_encode(md5($id.$namespaceSuffix, true))), 0, 10);
+        return substr(str_replace('/', '-', base64_encode(hash('sha256', $id.$namespaceSuffix, true))), 0, 10);
     }
 
     /**

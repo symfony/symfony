@@ -53,7 +53,7 @@ class TimeTypeTest extends TestCase
 
         $form->submit($input);
 
-        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04', $form->getData());
         $this->assertEquals($input, $form->getViewData());
     }
 
@@ -201,7 +201,7 @@ class TimeTypeTest extends TestCase
 
         $form->submit('03:04');
 
-        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04', $form->getData());
         $this->assertEquals('03:04', $form->getViewData());
     }
 
@@ -217,8 +217,24 @@ class TimeTypeTest extends TestCase
 
         $form->submit('03');
 
-        $this->assertEquals('03:00:00', $form->getData());
+        $this->assertEquals('03', $form->getData());
         $this->assertEquals('03', $form->getViewData());
+    }
+
+    public function testSubmitStringSingleTextWithSeconds()
+    {
+        $form = $this->factory->create('time', null, array(
+            'data_timezone' => 'UTC',
+            'user_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_seconds' => true,
+        ));
+
+        $form->bind('03:04:05');
+
+        $this->assertEquals('03:04:05', $form->getData());
+        $this->assertEquals('03:04:05', $form->getViewData());
     }
 
     public function testSetDataWithoutMinutes()

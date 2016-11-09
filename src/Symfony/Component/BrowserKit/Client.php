@@ -74,6 +74,16 @@ abstract class Client
     }
 
     /**
+     * Returns whether client automatically follows redirects or not.
+     *
+     * @return bool
+     */
+    public function isFollowingRedirects()
+    {
+        return $this->followRedirects;
+    }
+
+    /**
      * Sets the maximum number of requests that crawler can follow.
      *
      * @param int $maxRedirects
@@ -82,6 +92,16 @@ abstract class Client
     {
         $this->maxRedirects = $maxRedirects < 0 ? -1 : $maxRedirects;
         $this->followRedirects = -1 != $this->maxRedirects;
+    }
+
+    /**
+     * Returns the maximum number of requests that crawler can follow.
+     *
+     * @return int
+     */
+    public function getMaxRedirects()
+    {
+        return $this->maxRedirects;
     }
 
     /**

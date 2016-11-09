@@ -402,10 +402,11 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *  - the bundles property maps a bundle name to the bundle instance,
      *  - the bundleMap property maps a bundle name to the bundle inheritance hierarchy (most derived bundle first).
      *
-     * @throws \LogicException if two bundles share a common name
-     * @throws \LogicException if a bundle tries to extend a non-registered bundle
-     * @throws \LogicException if a bundle tries to extend itself
-     * @throws \LogicException if two bundles extend the same ancestor
+     * @throws \RuntimeException if bundle does not implement BundleInterface
+     * @throws \LogicException   if two bundles share a common name
+     * @throws \LogicException   if a bundle tries to extend a non-registered bundle
+     * @throws \LogicException   if a bundle tries to extend itself
+     * @throws \LogicException   if two bundles extend the same ancestor
      */
     protected function initializeBundles()
     {
@@ -415,6 +416,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $directChildren = array();
 
         foreach ($this->registerBundles() as $bundle) {
+            if (!$bundle instanceof BundleInterface) {
+                throw new \RuntimeException(sprintf('Bundle "%s" must implement BundleInterface', get_class($bundle)));
+            }
             $name = $bundle->getName();
             if (isset($this->bundles[$name])) {
                 throw new \LogicException(sprintf('Trying to register two bundles with the same name "%s"', $name));

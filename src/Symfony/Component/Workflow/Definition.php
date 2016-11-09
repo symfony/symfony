@@ -30,7 +30,7 @@ final class Definition
      *
      * @param string[]     $places
      * @param Transition[] $transitions
-     * @param string       $initialPlace
+     * @param string|null  $initialPlace
      */
     public function __construct(array $places, array $transitions, $initialPlace = null)
     {

@@ -115,6 +115,13 @@ interface SessionStorageInterface
     public function clear();
 
     /**
+     * Checks that storage has previous session
+     *
+     * @return boolean True if previous session exiting, false otherwise.
+     */
+    public function hasPreviousSession();
+
+    /**
      * Gets a SessionBagInterface by name.
      *
      * @param string $name

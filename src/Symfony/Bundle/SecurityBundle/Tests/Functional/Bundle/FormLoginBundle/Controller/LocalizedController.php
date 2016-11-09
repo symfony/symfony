@@ -23,6 +23,8 @@ class LocalizedController implements ContainerAwareInterface
 
     public function loginAction(Request $request)
     {
+        $this->container->get('request')->getSession()->start();
+
         // get the login error if there is one
         if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
             $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);

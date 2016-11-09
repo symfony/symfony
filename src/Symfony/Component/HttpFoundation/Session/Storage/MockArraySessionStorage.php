@@ -216,6 +216,14 @@ class MockArraySessionStorage implements SessionStorageInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasPreviousSession()
+    {
+        return !empty($this->id);
+    }
+
+    /**
      * Sets the MetadataBag.
      *
      * @param MetadataBag $bag

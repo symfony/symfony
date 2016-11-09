@@ -82,6 +82,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         // tests defaults
         $this->assertNull($this->session->get('foo'));
         $this->assertEquals(1, $this->session->get('foo', 1));
+        $this->assertFalse($this->session->isStarted());
     }
 
     /**
@@ -91,6 +92,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $this->session->set($key, $value);
         $this->assertEquals($value, $this->session->get($key));
+        $this->assertTrue($this->session->isStarted());
     }
 
     /**
@@ -98,6 +100,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
      */
     public function testHas($key, $value)
     {
+        $this->assertFalse($this->session->has($key.'_lazy_start'));
+        $this->assertFalse($this->session->isStarted());
+
         $this->session->set($key, $value);
         $this->assertTrue($this->session->has($key));
         $this->assertFalse($this->session->has($key.'non_value'));
@@ -106,6 +111,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     public function testReplace()
     {
         $this->session->replace(array('happiness' => 'be good', 'symfony' => 'awesome'));
+        $this->assertTrue($this->session->isStarted());
         $this->assertEquals(array('happiness' => 'be good', 'symfony' => 'awesome'), $this->session->all());
         $this->session->replace(array());
         $this->assertEquals(array(), $this->session->all());
@@ -116,6 +122,10 @@ class SessionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAll($key, $value, $result)
     {
+        $this->assertEquals(array(), $this->session->all());
+        $this->session->all();
+        $this->assertFalse($this->session->isStarted());
+
         $this->session->set($key, $value);
         $this->assertEquals($result, $this->session->all());
     }
@@ -129,6 +139,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set($key, $value);
         $this->session->clear();
         $this->assertEquals(array(), $this->session->all());
+        $this->assertTrue($this->session->isStarted());
     }
 
     public function setProvider()
@@ -149,6 +160,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set($key, $value);
         $this->session->remove($key);
         $this->assertEquals(array('hi.world' => 'have a nice day'), $this->session->all());
+        $this->assertTrue($this->session->isStarted());
     }
 
     public function testInvalidate()
@@ -156,6 +168,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set('invalidate', 123);
         $this->session->invalidate();
         $this->assertEquals(array(), $this->session->all());
+        $this->assertTrue($this->session->isStarted());
     }
 
     public function testMigrate()
@@ -163,6 +176,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set('migrate', 321);
         $this->session->migrate();
         $this->assertEquals(321, $this->session->get('migrate'));
+        $this->assertTrue($this->session->isStarted());
     }
 
     public function testMigrateDestroy()
@@ -170,6 +184,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->session->set('migrate', 333);
         $this->session->migrate(true);
         $this->assertEquals(333, $this->session->get('migrate'));
+        $this->assertTrue($this->session->isStarted());
     }
 
     public function testSave()
@@ -208,6 +223,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCount()
     {
+        $this->assertEquals(0, count($this->session));
+        $this->assertFalse($this->session->isStarted());
+
         $this->session->set('hello', 'world');
         $this->session->set('symfony', 'rocks');
 

@@ -313,8 +313,7 @@ class Container implements IntrospectableContainerInterface
             try {
                 $service = $this->$method();
             } catch (\Exception $e) {
-                unset($this->loading[$id]);
-                unset($this->services[$id]);
+                unset($this->loading[$id], $this->services[$id]);
 
                 if ($e instanceof InactiveScopeException && self::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
                     return;

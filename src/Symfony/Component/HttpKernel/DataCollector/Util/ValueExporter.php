@@ -32,7 +32,7 @@ class ValueExporter
         }
 
         if (is_object($value)) {
-            if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+            if ($value instanceof \DateTimeInterface) {
                 return sprintf('Object(%s) - %s', get_class($value), $value->format(\DateTime::ISO8601));
             }
 

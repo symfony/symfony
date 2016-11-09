@@ -136,7 +136,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     protected function formatValue($value, $format = 0)
     {
-        $isDateTime = $value instanceof \DateTime || $value instanceof \DateTimeInterface;
+        $isDateTime = $value instanceof \DateTimeInterface;
 
         if (($format & self::PRETTY_DATE) && $isDateTime) {
             if (class_exists('IntlDateFormatter')) {

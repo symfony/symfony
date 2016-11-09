@@ -12,6 +12,7 @@
 namespace Symfony\Component\Finder\Iterator;
 
 use Symfony\Component\Finder\Expression\Expression;
+use Symfony\Component\Finder\Expression\Regex;
 
 /**
  * MultiplePcreFilterIterator filters files using patterns (regexps, globs or strings).
@@ -32,15 +33,8 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
      */
     public function __construct(\Iterator $iterator, array $matchPatterns, array $noMatchPatterns)
     {
-        $this->matchRegexps = array();
-        foreach ($matchPatterns as $pattern) {
-            $this->matchRegexps[] = $this->toRegex($pattern);
-        }
-
-        $this->noMatchRegexps = array();
-        foreach ($noMatchPatterns as $pattern) {
-            $this->noMatchRegexps[] = $this->toRegex($pattern);
-        }
+        $this->matchRegexps = $this->buildRegexps($matchPatterns);
+        $this->noMatchRegexps = $this->buildRegexps($noMatchPatterns);
 
         parent::__construct($iterator);
     }
@@ -65,4 +59,28 @@ abstract class MultiplePcreFilterIterator extends FilterIterator
      * @return string regexp corresponding to a given string
      */
     abstract protected function toRegex($str);
+
+    private function buildRegexps($patterns)
+    {
+        $rxs = array();
+        $regexps = array();
+
+        foreach ($patterns as $pattern) {
+            $regex = Regex::create($this->toRegex($pattern))->render();
+
+            if (preg_match('/\W([imsxUXJ]*)$/', $regex, $match) && !preg_match('/\\\\[1-9]|\(\?P/', $regex)) {
+                $rxs[] = '(?'.$match[1].':'.substr($regex, 1, -strlen($match[0])).')';
+            } else {
+                $regexps[] = $regex;
+            }
+        }
+        if (1 < count($rxs)) {
+            $regexps[] = Regex::BOUNDARY.implode('|', $rxs).Regex::BOUNDARY;
+        } elseif ($rxs) {
+            $rxs = explode(':', substr($rxs[0], 2, -1), 2);
+            $regexps[] = Regex::BOUNDARY.$rxs[1].Regex::BOUNDARY.$rxs[0];
+        }
+
+        return $regexps;
+    }
 }

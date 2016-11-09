@@ -61,7 +61,7 @@ class Regex implements ValueInterface
      */
     public static function create($expr)
     {
-        if (preg_match('/^(.{3,}?)([imsxuADU]*)$/', $expr, $m)) {
+        if (preg_match('/^(.{2,}?)([imsxuADU]*)$/', $expr, $m)) {
             $start = substr($m[1], 0, 1);
             $end = substr($m[1], -1);
 

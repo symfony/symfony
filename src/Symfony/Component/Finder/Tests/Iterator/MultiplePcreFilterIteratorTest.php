@@ -31,7 +31,7 @@ class MultiplePcreFilterIteratorTest extends \PHPUnit_Framework_TestCase
             array(' foo ', false, '" " is not a valid delimiter'),
             array('\\foo\\', false, '"\\" is not a valid delimiter'),
             array('afooa', false, '"a" is not a valid delimiter'),
-            array('//', false, 'the pattern should contain at least 1 character'),
+            array('//', true, 'valid empty regex'),
             array('/a/', true, 'valid regex'),
             array('/foo/', true, 'valid regex'),
             array('/foo/i', true, 'valid regex with a single modifier'),

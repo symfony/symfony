@@ -117,6 +117,9 @@ class ValidatorTypeGuesser implements FormTypeGuesserInterface
             case 'Symfony\Component\Validator\Constraints\Country':
                 return new TypeGuess('country', array(), Guess::HIGH_CONFIDENCE);
 
+            case 'Symfony\Component\Validator\Constraints\Currency':
+                return new TypeGuess('currency', array(), Guess::HIGH_CONFIDENCE);
+
             case 'Symfony\Component\Validator\Constraints\Date':
                 return new TypeGuess('date', array('input' => 'string'), Guess::HIGH_CONFIDENCE);
 

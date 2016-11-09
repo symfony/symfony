@@ -51,6 +51,21 @@ class ArrayNodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests that extra keys are not removed when
+     * ignoreExtraKeys second option is set to false.
+     *
+     * Related to testExceptionThrownOnUnrecognizedChild
+     */
+    public function testIgnoreExtraKeysNotRemoved()
+    {
+        $node = new ArrayNode('roo');
+        $node->setIgnoreExtraKeys(true, false);
+
+        $data = array('foo' => 'bar');
+        $this->assertSame($data, $node->normalize($data));
+    }
+
+    /**
      * @dataProvider getPreNormalizationTests
      */
     public function testPreNormalize($denormalized, $normalized)

@@ -21,17 +21,17 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
     /**
      * @var \Memcache Memcache driver.
      */
-    private $memcache;
+    protected $memcache;
 
     /**
      * @var int Time to live in seconds
      */
-    private $ttl;
+    protected $ttl;
 
     /**
      * @var string Key prefix for shared environments.
      */
-    private $prefix;
+    protected $prefix;
 
     /**
      * Constructor.

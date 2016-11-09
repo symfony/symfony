@@ -271,4 +271,34 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($id, $storage->getId(), 'Same session ID after restarting');
         $this->assertSame(7, $storage->getBag('attributes')->get('lucky'), 'Data still available');
     }
+
+    public function testRegisterBagBeforeStarting()
+    {
+        $storage = $this->getStorage();
+        $bag = new AttributeBag('test_bag');
+        $bag->setName('test_bag');
+        $storage->registerBag($bag);
+
+        $storage->start();
+
+        // variable is set after session start, as the session handler overwrites $_SESSION
+        $_SESSION['test_bag']['some_key'] = 'some_value';
+
+        $this->assertSame('some_value', $bag->get('some_key'));
+    }
+
+    public function testRegisterBagAfterStarting()
+    {
+        $storage = $this->getStorage();
+        $storage->start();
+
+        // variable is set after session start, as the session handler overwrites $_SESSION
+        $_SESSION['test_bag']['some_key'] = 'some_value';
+
+        $bag = new AttributeBag('test_bag');
+        $bag->setName('test_bag');
+        $storage->registerBag($bag);
+
+        $this->assertSame('some_value', $bag->get('some_key'));
+    }
 }

@@ -76,9 +76,9 @@ class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
                 'Namespaced\\Foo' => realpath(__DIR__).'/Fixtures/Namespaced/Foo.php',
                 'Namespaced\\Baz' => realpath(__DIR__).'/Fixtures/Namespaced/Baz.php',
                 'Namespaced\\WithComments' => realpath(__DIR__).'/Fixtures/Namespaced/WithComments.php',
-                'Namespaced\WithStrictTypes' => realpath(__DIR__).'/Fixtures/Namespaced/WithStrictTypes.php',
-                ),
-            ),
+                'Namespaced\\WithStrictTypes' => realpath(__DIR__).'/Fixtures/Namespaced/WithStrictTypes.php',
+                'Namespaced\\WithHaltCompiler' => realpath(__DIR__).'/Fixtures/Namespaced/WithHaltCompiler.php',
+            )),
             array(__DIR__.'/Fixtures/beta/NamespaceCollision', array(
                 'NamespaceCollision\\A\\B\\Bar' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Bar.php',
                 'NamespaceCollision\\A\\B\\Foo' => realpath(__DIR__).'/Fixtures/beta/NamespaceCollision/A/B/Foo.php',

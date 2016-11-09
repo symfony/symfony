@@ -106,6 +106,7 @@ class ClassCollectionLoader
 
         $c = '(?:\s*+(?:(?:#|//)[^\n]*+\n|/\*(?:(?<!\*/).)++)?+)*+';
         $strictTypesRegex = str_replace('.', $c, "'^<\?php\s.declare.\(.strict_types.=.1.\).;'is");
+        $haltCompilerRegex = str_replace('.', $c, "'\b__halt_compiler.\(.\)'is");
 
         $cacheDir = explode(DIRECTORY_SEPARATOR, $cacheDir);
         $files = array();
@@ -118,7 +119,7 @@ class ClassCollectionLoader
             $files[] = $file = $class->getFileName();
             $c = file_get_contents($file);
 
-            if (preg_match($strictTypesRegex, $c)) {
+            if (preg_match($strictTypesRegex, $c) || preg_match($haltCompilerRegex, $c)) {
                 $file = explode(DIRECTORY_SEPARATOR, $file);
 
                 for ($i = 0; isset($file[$i], $cacheDir[$i]); ++$i) {

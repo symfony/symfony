@@ -409,8 +409,6 @@ abstract class AbstractDivLayoutTest extends AbstractLayoutTest
                 /following-sibling::input[@type="hidden"][@id="name__token"]
             ]
             [count(.//input)=3]
-            [@id="my&id"]
-            [@class="my&class"]
     ]
     [@method="post"]
     [@action="http://example.com"]

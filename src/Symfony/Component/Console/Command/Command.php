@@ -579,6 +579,13 @@ class Command
         return $descriptor->describe($this, array('as_dom' => $asDom));
     }
 
+    /**
+     * It validates that the given string is valid as a command name.
+     *
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException If it's not valid as a command name
+     */
     private function validateName($name)
     {
         if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {

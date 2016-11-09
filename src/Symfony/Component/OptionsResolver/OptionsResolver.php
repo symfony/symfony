@@ -316,6 +316,12 @@ class OptionsResolver implements OptionsResolverInterface
      */
     private function validateOptionTypes(array $options)
     {
+        $typeAliases = array(
+            'boolean' => 'bool',
+            'integer' => 'int',
+            'double' => 'float',
+        );
+
         foreach ($this->allowedTypes as $option => $allowedTypes) {
             if (!array_key_exists($option, $options)) {
                 continue;
@@ -325,6 +331,8 @@ class OptionsResolver implements OptionsResolverInterface
             $allowedTypes = (array) $allowedTypes;
 
             foreach ($allowedTypes as $type) {
+                $type = isset($typeAliases[$type]) ? $typeAliases[$type] : $type;
+
                 $isFunction = 'is_'.$type;
 
                 if (function_exists($isFunction) && $isFunction($value)) {

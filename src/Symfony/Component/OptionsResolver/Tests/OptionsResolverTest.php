@@ -58,6 +58,21 @@ class OptionsResolverTest extends \PHPUnit_Framework_TestCase
         ), $this->resolver->resolve(array()));
     }
 
+    public function testTypeAliasesForAllowedTypes()
+    {
+        $this->resolver->setDefaults(array(
+            'force' => false,
+        ));
+
+        $this->resolver->setAllowedTypes(array(
+            'force' => 'boolean',
+        ));
+
+        $this->resolver->resolve(array(
+            'force' => true,
+        ));
+    }
+
     public function testResolveLazyDependencyOnOptional()
     {
         $this->resolver->setDefaults(array(

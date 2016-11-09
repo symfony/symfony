@@ -170,6 +170,11 @@ class JsonResponse extends Response
             $this->headers->set('Content-Type', 'application/json');
         }
 
+        // Prevent XSS attack
+        if (!$this->headers->has('X-Content-Type-Options')) {
+            $this->headers->set('X-Content-Type-Options', 'nosniff');
+        }
+
         return $this->setContent($this->data);
     }
 

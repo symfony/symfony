@@ -182,4 +182,11 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
     {
         JsonResponse::create("\xB1\x31");
     }
+
+    public function testXContentTypeOptionsHeader()
+    {
+        $response = new JsonResponse(array('test' => true));
+
+        $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+    }
 }

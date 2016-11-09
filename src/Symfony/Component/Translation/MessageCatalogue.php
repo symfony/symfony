@@ -120,9 +120,7 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
      */
     public function replace($messages, $domain = 'messages')
     {
-        $this->messages[$domain] = array();
-
-        $this->add($messages, $domain);
+        $this->messages[$domain] = $messages;
     }
 
     /**

@@ -91,6 +91,7 @@ EOF;
     {
         \$allow = array();
         \$pathinfo = rawurldecode(\$pathinfo);
+        \$pathWithoutTrailingSlash = rtrim(\$pathinfo, '/');
 
 $code
 
@@ -213,7 +214,7 @@ EOF;
 
         if (!count($compiledRoute->getPathVariables()) && false !== preg_match('#^(.)\^(?P<url>.*?)\$\1#', $compiledRoute->getRegex(), $m)) {
             if ($supportsTrailingSlash && substr($m['url'], -1) === '/') {
-                $conditions[] = sprintf("rtrim(\$pathinfo, '/') === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
+                $conditions[] = sprintf("\$pathWithoutTrailingSlash === %s", var_export(rtrim(str_replace('\\', '', $m['url']), '/'), true));
                 $hasTrailingSlash = true;
             } else {
                 $conditions[] = sprintf('$pathinfo === %s', var_export(str_replace('\\', '', $m['url']), true));

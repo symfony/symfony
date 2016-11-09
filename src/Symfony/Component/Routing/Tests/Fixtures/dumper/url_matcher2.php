@@ -24,6 +24,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
     {
         $allow = array();
         $pathinfo = rawurldecode($pathinfo);
+        $pathWithoutTrailingSlash = rtrim($pathinfo, '/');
 
         // foo
         if (0 === strpos($pathinfo, '/foo') && preg_match('#^/foo/(?P<bar>baz|symfony)$#s', $pathinfo, $matches)) {
@@ -68,7 +69,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
                 }
 
                 // baz3
-                if (rtrim($pathinfo, '/') === '/test/baz3') {
+                if ($pathWithoutTrailingSlash === '/test/baz3') {
                     if (substr($pathinfo, -1) !== '/') {
                         return $this->redirect($pathinfo.'/', 'baz3');
                     }
@@ -172,7 +173,7 @@ class ProjectUrlMatcher extends Symfony\Component\Routing\Tests\Fixtures\Redirec
             }
 
             // hey
-            if (rtrim($pathinfo, '/') === '/multi/hey') {
+            if ($pathWithoutTrailingSlash === '/multi/hey') {
                 if (substr($pathinfo, -1) !== '/') {
                     return $this->redirect($pathinfo.'/', 'hey');
                 }

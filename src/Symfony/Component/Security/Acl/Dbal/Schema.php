@@ -18,10 +18,12 @@ use Doctrine\DBAL\Connection;
  * The schema used for the ACL system.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * @author Daniel Oliveira <daniel@headdev.com.br>
  */
 final class Schema extends BaseSchema
 {
     protected $options;
+    private $schemaStrategy;
 
     /**
      * Constructor.
@@ -36,6 +38,18 @@ final class Schema extends BaseSchema
         parent::__construct(array(), array(), $schemaConfig);
 
         $this->options = $options;
+        $databasePlatform = null;
+
+        if ($connection) {
+            $databasePlatform = $connection->getDatabasePlatform()->getName();
+        }
+
+        switch ($databasePlatform) {
+            case 'mssql':
+                $this->schemaStrategy = new MssqlTables($this);
+            default:
+                $this->schemaStrategy = new DefaultTables($this);
+        }
 
         $this->addClassTable();
         $this->addSecurityIdentitiesTable();
@@ -65,11 +79,7 @@ final class Schema extends BaseSchema
      */
     protected function addClassTable()
     {
-        $table = $this->createTable($this->options['class_table_name']);
-        $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
-        $table->addColumn('class_type', 'string', array('length' => 200));
-        $table->setPrimaryKey(array('id'));
-        $table->addUniqueIndex(array('class_type'));
+        $this->schemaStrategy->addClassTable();
     }
 
     /**
@@ -77,27 +87,7 @@ final class Schema extends BaseSchema
      */
     protected function addEntryTable()
     {
-        $table = $this->createTable($this->options['entry_table_name']);
-
-        $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
-        $table->addColumn('class_id', 'integer', array('unsigned' => true));
-        $table->addColumn('object_identity_id', 'integer', array('unsigned' => true, 'notnull' => false));
-        $table->addColumn('field_name', 'string', array('length' => 50, 'notnull' => false));
-        $table->addColumn('ace_order', 'smallint', array('unsigned' => true));
-        $table->addColumn('security_identity_id', 'integer', array('unsigned' => true));
-        $table->addColumn('mask', 'integer');
-        $table->addColumn('granting', 'boolean');
-        $table->addColumn('granting_strategy', 'string', array('length' => 30));
-        $table->addColumn('audit_success', 'boolean');
-        $table->addColumn('audit_failure', 'boolean');
-
-        $table->setPrimaryKey(array('id'));
-        $table->addUniqueIndex(array('class_id', 'object_identity_id', 'field_name', 'ace_order'));
-        $table->addIndex(array('class_id', 'object_identity_id', 'security_identity_id'));
-
-        $table->addForeignKeyConstraint($this->getTable($this->options['class_table_name']), array('class_id'), array('id'), array('onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'));
-        $table->addForeignKeyConstraint($this->getTable($this->options['oid_table_name']), array('object_identity_id'), array('id'), array('onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'));
-        $table->addForeignKeyConstraint($this->getTable($this->options['sid_table_name']), array('security_identity_id'), array('id'), array('onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'));
+        $this->schemaStrategy->addEntryTable();
     }
 
     /**
@@ -105,19 +95,7 @@ final class Schema extends BaseSchema
      */
     protected function addObjectIdentitiesTable()
     {
-        $table = $this->createTable($this->options['oid_table_name']);
-
-        $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
-        $table->addColumn('class_id', 'integer', array('unsigned' => true));
-        $table->addColumn('object_identifier', 'string', array('length' => 100));
-        $table->addColumn('parent_object_identity_id', 'integer', array('unsigned' => true, 'notnull' => false));
-        $table->addColumn('entries_inheriting', 'boolean');
-
-        $table->setPrimaryKey(array('id'));
-        $table->addUniqueIndex(array('object_identifier', 'class_id'));
-        $table->addIndex(array('parent_object_identity_id'));
-
-        $table->addForeignKeyConstraint($table, array('parent_object_identity_id'), array('id'));
+        $this->schemaStrategy->addObjectIdentitiesTable();
     }
 
     /**
@@ -125,16 +103,7 @@ final class Schema extends BaseSchema
      */
     protected function addObjectIdentityAncestorsTable()
     {
-        $table = $this->createTable($this->options['oid_ancestors_table_name']);
-
-        $table->addColumn('object_identity_id', 'integer', array('unsigned' => true));
-        $table->addColumn('ancestor_id', 'integer', array('unsigned' => true));
-
-        $table->setPrimaryKey(array('object_identity_id', 'ancestor_id'));
-
-        $oidTable = $this->getTable($this->options['oid_table_name']);
-        $table->addForeignKeyConstraint($oidTable, array('object_identity_id'), array('id'), array('onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'));
-        $table->addForeignKeyConstraint($oidTable, array('ancestor_id'), array('id'), array('onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'));
+        $this->schemaStrategy->addObjectIdentityAncestorsTable();
     }
 
     /**
@@ -142,13 +111,15 @@ final class Schema extends BaseSchema
      */
     protected function addSecurityIdentitiesTable()
     {
-        $table = $this->createTable($this->options['sid_table_name']);
+        $this->schemaStrategy->addSecurityIdentitiesTable();
+    }
 
-        $table->addColumn('id', 'integer', array('unsigned' => true, 'autoincrement' => 'auto'));
-        $table->addColumn('identifier', 'string', array('length' => 200));
-        $table->addColumn('username', 'boolean');
-
-        $table->setPrimaryKey(array('id'));
-        $table->addUniqueIndex(array('identifier', 'username'));
+    /**
+     * @param $key
+     * @return mixed
+     */
+    public function getOptions($key)
+    {
+        return $this->options[$key];
     }
 }

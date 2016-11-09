@@ -62,32 +62,28 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->getValue($array, 'firstName');
     }
 
-    public function testGetValueReadsZeroIndex()
+    /**
+     * @dataProvider provideValueReads
+     */
+    public function testGetValueReads($propertyPath, $expectedValue, $testedData)
     {
-        $array = array('Bernhard');
-
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[0]'));
+        $this->assertEquals($expectedValue, $this->propertyAccessor->getValue($testedData, $propertyPath));
     }
 
-    public function testGetValueReadsIndexWithSpecialChars()
+    public function provideValueReads()
     {
-        $array = array('%!@$§.' => 'Bernhard');
+        return array(
+            array('%!@$§', 'Bernhard', (object) array('%!@$§' => 'Bernhard')),
+            array('[0]', 'Bernhard', array('Bernhard')),
+            array('[%!@$§.]', 'Bernhard', array('%!@$§.' => 'Bernhard')),
 
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[%!@$§.]'));
-    }
+            array('[root][%!@$§.]', 'Bernhard', array('root' => array('%!@$§.' => 'Bernhard'))),
+            array('[child][index][firstName]', 'Bernhard', array('child' => array('index' => array('firstName' => 'Bernhard')))),
 
-    public function testGetValueReadsNestedIndexWithSpecialChars()
-    {
-        $array = array('root' => array('%!@$§.' => 'Bernhard'));
-
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[root][%!@$§.]'));
-    }
-
-    public function testGetValueReadsArrayWithCustomPropertyPath()
-    {
-        $array = array('child' => array('index' => array('firstName' => 'Bernhard')));
-
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '[child][index][firstName]'));
+            array('[@name]', 'Thunderer', array('@name' => 'Thunderer')),
+            array('@name', 'Thunderer', (object) array('@name' => 'Thunderer')),
+            array('_name', 'Thunderer', (object) array('_name' => 'Thunderer')),
+        );
     }
 
     public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()
@@ -114,13 +110,6 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->propertyAccessor->getValue($object, 'firstName[1]'));
         $this->assertSame(array('Bernhard'), $object->firstName);
-    }
-
-    public function testGetValueReadsPropertyWithSpecialCharsExceptDot()
-    {
-        $array = (object) array('%!@$§' => 'Bernhard');
-
-        $this->assertEquals('Bernhard', $this->propertyAccessor->getValue($array, '%!@$§'));
     }
 
     public function testGetValueReadsPropertyWithCustomPropertyPath()

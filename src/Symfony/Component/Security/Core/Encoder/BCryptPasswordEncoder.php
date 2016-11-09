@@ -76,7 +76,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder
 
         $options = array('cost' => $this->cost);
 
-        if ($salt) {
+        if ($salt && PHP_VERSION_ID < 70000) {
             $options['salt'] = $salt;
         }
 

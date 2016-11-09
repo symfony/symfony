@@ -146,9 +146,9 @@ class Glob implements ValueInterface
                 }
 
                 continue;
-            } else {
+            }  
                 $regex .= $car;
-            }
+            
             $escaping = false;
         }
 

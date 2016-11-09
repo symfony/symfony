@@ -190,7 +190,7 @@ class DialogHelper extends Helper
                     }
 
                     continue;
-                } else {
+                }  
                     $output->write($c);
                     $ret .= $c;
                     ++$i;
@@ -204,7 +204,7 @@ class DialogHelper extends Helper
                             $matches[$numMatches++] = $value;
                         }
                     }
-                }
+                
 
                 // Erase characters from cursor to end of line
                 $output->write("\033[K");

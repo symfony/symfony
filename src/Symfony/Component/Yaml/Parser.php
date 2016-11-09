@@ -396,9 +396,9 @@ class Parser
                 $this->moveToPreviousLine();
 
                 break;
-            } else {
+            }  
                 throw new ParseException('Indentation problem.', $this->getRealCurrentLineNb() + 1, $this->currentLine);
-            }
+            
         }
 
         return implode("\n", $data);

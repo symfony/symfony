@@ -418,10 +418,10 @@ class ProgressHelper extends Helper
                 if (count($format) == 2) {
                     $text = $format[1];
                     break;
-                } else {
+                }  
                     $text = ceil($secs / $format[2]).' '.$format[1];
                     break;
-                }
+                
             }
         }
 

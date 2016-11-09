@@ -307,10 +307,19 @@ class Response
      */
     public function send()
     {
+        $hasFinishRequest = function_exists('fastcgi_finish_request');
+
+        if (!$hasFinishRequest && false !== $this->getContent()) {
+            $this->headers->add(array(
+                'Connection' => 'close',
+                'Content-Length' => strlen($this->getContent()),
+            ));
+        }
+
         $this->sendHeaders();
         $this->sendContent();
 
-        if (function_exists('fastcgi_finish_request')) {
+        if ($hasFinishRequest) {
             fastcgi_finish_request();
         } elseif ('cli' !== PHP_SAPI) {
             // ob_get_level() never returns 0 on some Windows configurations, so if

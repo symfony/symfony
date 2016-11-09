@@ -1,0 +1,142 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-08T19:48:07Z
+
+Im done with this implementation now.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-09T09:23:05Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-09T09:24:21Z
+
+Actually, I have one question: I don't really like the idea to define the Definition as a service. What about adding `Workflow::getDefinition()` and to remove it from the DIC?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-09T09:33:38Z
+
+The definition is not a service... or not a public service. (https://github.com/symfony/symfony/pull/20451/files#diff-0e793081ceb720201745c982a568903fR426)
+
+I agree with your arguments before saying that the definition is an value object.
+
+> What about adding Workflow::getDefinition() and to remove it from the DIC?
+
+I agree. I did not add it here because I thought that would be a separate PR. But I add it now.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-09T13:19:40Z
+
+From design point of view, the idea of DI-service `DefinitionBuilder` is dangerous.
+
+If you really want to have a builder, why not just instantiate new builder every time you want to build `Definition`:
+```php
+$builder = new DefinitionBuilder();
+$definition = $builder->...->build();
+```
+This logic is static in fact (that's why it perfectly can be moved to the `Definition` class itself).
+
+I call this idea dangerous, because it makes mutable service.
+Just imagine case, when you need to make very complex building like that:
+```php
+$this->builder->reset();
+$this->builder->addState('foo')->addState($this->stateProvider->getBar())->build();
+```
+What if `stateProvider` uses for some reason `builder` inside and resets it? It introduces a bug.
+Moreover, user can simply forget to call `reset` somewhere (but he has to do it every time).
+
+After all, what's the benefit of this complexity?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-09T13:21:45Z
+
+Hello @unkind
+
+I'm not sure to understand your comment, and what you propose.
+
+> After all, what's the benefit of this complexity?
+
+Which complexity are you talking about?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-09T13:22:35Z
+
+The builder is not a public service so you can not use it like in your examples.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-09T13:26:50Z
+
+> The builder is not a public service so you can not use it like in your examples.
+
+Ah, you mean it is inlined? My bad.
+
+> Which complexity are you talking about?
+
+I'm talking about introducing new entity rather than moving this logic to the `Definition` class itself:
+```php
+$definition = Definition::withInitialState(..., 'bar');
+$definition = $definition->withNewState('foo');
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-09T13:30:05Z
+
+@unkind using methods returning a new mutated instance rather than mutating the existing one makes things harder for the DIC registration, as we still need to have a way to build the whole object without having to replace it by a different object in the meantime (unless we want to build a chain of private services being the factory for the next one, which becomes a nightmare)
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-09T13:38:08Z
+
+> as we still need to have a way to build the whole object without having to replace it by a different object in the meantime
+
+You still can have a factory just for DIC:
+
+```php
+public function createDefinition()
+{
+    $definition = ...;
+
+    foreach ($this->transitions as ...) {
+        $definition = ...;
+    }
+
+    return $definition;
+}
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-09T13:58:09Z
+
+@unkind I really prefer the build way here. And as @stof said, it's much easier with the DIC.
+
+@Nyholm Sorry, but I just merge https://github.com/symfony/symfony/pull/20460 so you have to rebase and fix `WorkflowDumpCommand`.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-09T14:04:04Z
+
+I missed that PR. Good!
+
+I've rebased my PR now.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-09T14:18:33Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-09T15:19:21Z
+
+👍

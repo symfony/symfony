@@ -452,7 +452,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
     {
-        $transformer = new NumberToLocalizedStringTransformer(null, true);
+        $transformer = new NumberToLocalizedStringTransformer(null, ',');
 
         $transformer->reverseTransform('1,234,5');
     }
@@ -462,7 +462,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsCommaWithNoGroupSep()
     {
-        $transformer = new NumberToLocalizedStringTransformer(null, true);
+        $transformer = new NumberToLocalizedStringTransformer(null, ',');
 
         $transformer->reverseTransform('1234,5');
     }

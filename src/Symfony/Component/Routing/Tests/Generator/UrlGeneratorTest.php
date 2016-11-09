@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Generator;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\UrlGenerator;
@@ -27,11 +28,38 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('http://localhost/app.php/testing', $url);
     }
 
+    public function testAbsoluteUrlWithEmptyPort()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $request_context = new RequestContext('/app.php');
+        $request_context->setHttpPort('');
+
+        $generator = $this->getGenerator($routes);
+        $generator->setContext($request_context);
+
+        $url = $generator->generate('test', array(), true);
+        $this->assertEquals('http://localhost/app.php/testing', $url);
+    }
+
     public function testAbsoluteSecureUrlWithPort443()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));
         $url = $this->getGenerator($routes, array('scheme' => 'https'))->generate('test', array(), UrlGeneratorInterface::ABSOLUTE_URL);
 
+        $this->assertEquals('https://localhost/app.php/testing', $url);
+    }
+
+    public function testAbsoluteSecureUrlWithEmptyPort()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing'));
+        $request_context = new RequestContext('/app.php');
+        $request_context->setHttpsPort('');
+
+        $generator = $this->getGenerator($routes, array('scheme' => 'https'));
+        $request_context->setScheme('https');
+        $generator->setContext($request_context);
+
+        $url = $generator->generate('test', array(), true);
         $this->assertEquals('https://localhost/app.php/testing', $url);
     }
 

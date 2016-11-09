@@ -25,6 +25,8 @@ matrix:
           env: deps=high
         - php: 7.0
           env: deps=low
+    allow_failures:
+        - php: 7
     fast_finish: true
 
 cache:

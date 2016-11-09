@@ -68,7 +68,7 @@
     </form>
 
     <h3>
-        {{ profile.parent ? "Request" : "Main Request" }}
+        {{ profile.parent ? 'Request' : 'Main Request' }}
         <small>
             - {{ collector.events.__section__.duration }} ms
             {% if profile.parent %}
@@ -397,7 +397,7 @@
         }
 
         var requests_data = {
-            "max": {{ "%F"|format(collector.events.__section__.endtime) }},
+            "max": {{ '%F'|format(collector.events.__section__.endtime) }},
             "requests": [
 {{ dump_request_data(token, profile, collector.events, collector.events.__section__.origin) }}
 
@@ -447,7 +447,7 @@
 {% from _self import dump_events %}
                 {
                     "id": "{{ token }}",
-                    "left": {{ "%F"|format(events.__section__.origin - origin) }},
+                    "left": {{ '%F'|format(events.__section__.origin - origin) }},
                     "events": [
 {{ dump_events(events) }}
                     ]
@@ -462,14 +462,14 @@
                         {
                             "name": "{{ name }}",
                             "category": "{{ event.category }}",
-                            "origin": {{ "%F"|format(event.origin) }},
-                            "starttime": {{ "%F"|format(event.starttime) }},
-                            "endtime": {{ "%F"|format(event.endtime) }},
-                            "duration": {{ "%F"|format(event.duration) }},
-                            "memory": {{ "%.1F"|format(event.memory / 1024 / 1024) }},
+                            "origin": {{ '%F'|format(event.origin) }},
+                            "starttime": {{ '%F'|format(event.starttime) }},
+                            "endtime": {{ '%F'|format(event.endtime) }},
+                            "duration": {{ '%F'|format(event.duration) }},
+                            "memory": {{ '%.1F'|format(event.memory / 1024 / 1024) }},
                             "periods": [
                                 {%- for period in event.periods -%}
-                                    {"start": {{ "%F"|format(period.starttime) }}, "end": {{ "%F"|format(period.endtime) }}}{{ loop.last ? '' : ', ' }}
+                                    {"start": {{ '%F'|format(period.starttime) }}, "end": {{ '%F'|format(period.endtime) }}}{{ loop.last ? '' : ', ' }}
                                 {%- endfor -%}
                             ]
                         }{{ loop.last ? '' : ',' }}

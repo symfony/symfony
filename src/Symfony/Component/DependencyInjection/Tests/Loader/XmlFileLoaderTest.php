@@ -577,4 +577,15 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->getDefinition('bar')->isAutowired());
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessageRegExp /Unable to parse file ".+.xml"/
+     */
+    public function testParsingServiceWithNonValidIdThrowsException()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services25.xml');
+    }
 }

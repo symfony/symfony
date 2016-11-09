@@ -96,6 +96,38 @@ class ObjectChoiceList extends ChoiceList
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getValuesForChoices(array $choices)
+    {
+        if ($this->valuePath) {
+            $choices = $this->fixChoices($choices);
+            $values = array();
+
+            $availableValues = $this->getValues();
+            foreach ($this->getChoices() as $i => $choice) {
+                foreach ($choices as $j => $givenChoice) {
+                    if (
+                        (is_array($givenChoice) || is_object($givenChoice))
+                        && $this->createValue($choice) === $this->createValue($givenChoice)
+                    ) {
+                        $values[] = $availableValues[$i];
+                        unset($choices[$j]);
+
+                        if (0 === count($choices)) {
+                            break 2;
+                        }
+                    }
+                }
+            }
+
+            return $values;
+        }
+
+        return parent::getValuesForChoices($choices);
+    }
+
+    /**
      * Initializes the list with choices.
      *
      * Safe to be called multiple times. The list is cleared on every call.

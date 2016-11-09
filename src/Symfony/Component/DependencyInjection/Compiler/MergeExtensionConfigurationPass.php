@@ -31,7 +31,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
         $aliases = $container->getAliases();
         $exprLangProviders = $container->getExpressionLanguageProviders();
 
-        foreach ($container->getExtensions() as $extension) {
+        foreach (array_reverse($container->getExtensions()) as $extension) {
             if ($extension instanceof PrependExtensionInterface) {
                 $extension->prepend($container);
             }

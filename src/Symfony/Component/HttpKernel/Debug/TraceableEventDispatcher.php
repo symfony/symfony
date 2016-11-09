@@ -120,6 +120,25 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
     }
 
     /**
+     * Gets the listener priority for a specific event.
+     *
+     * Returns null if the event or the listener does not exist, or if the
+     * underlying EventDispatcher does not implement getListenerPriority().
+     *
+     * @param string   $eventName The name of the event
+     * @param callable $listener  The listener
+     *
+     * @return int|null The event listener priority
+     */
+    public function getListenerPriority($eventName, $listener)
+    {
+        // For BC reaons, getListenerPriority() is not defined on EventDispatcherInterface.
+        if (method_exists($this->dispatcher, 'getListenerPriority')) {
+            return $this->dispatcher->getListenerPriority($eventName, $listener);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function hasListeners($eventName = null)
@@ -396,10 +415,11 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         $listeners = $this->dispatcher->getListeners($eventName);
 
         foreach ($listeners as $listener) {
+            $priority = $this->getListenerPriority($eventName, $listener);
             $this->dispatcher->removeListener($eventName, $listener);
             $wrapped = $this->wrapListener($eventName, $eventId, $listener);
             $this->wrappedListeners[$eventId][$wrapped] = $listener;
-            $this->dispatcher->addListener($eventName, $wrapped);
+            $this->dispatcher->addListener($eventName, $wrapped, $priority);
         }
 
         switch ($eventName) {
@@ -459,8 +479,10 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
         }
 
         foreach ($this->wrappedListeners[$eventId] as $wrapped) {
+            $listener = $this->wrappedListeners[$eventId][$wrapped];
+            $priority = $this->getListenerPriority($eventName, $wrapped);
             $this->dispatcher->removeListener($eventName, $wrapped);
-            $this->dispatcher->addListener($eventName, $this->wrappedListeners[$eventId][$wrapped]);
+            $this->dispatcher->addListener($eventName, $listener, $priority);
         }
 
         unset($this->wrappedListeners[$eventId]);

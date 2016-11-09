@@ -58,6 +58,23 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($tdispatcher->hasListeners('foo'));
     }
 
+    public function testGetListenerPriority()
+    {
+        $dispatcher = new EventDispatcher();
+        $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
+
+        $tdispatcher->addListener('foo', function () {}, 123);
+
+        $listeners = $dispatcher->getListeners('foo');
+        $this->assertSame(123, $tdispatcher->getListenerPriority('foo', $listeners[0]));
+
+        // Verify that priority is preserved when listener is removed and re-added
+        // in preProcess() and postProcess().
+        $tdispatcher->dispatch('foo', new Event());
+        $listeners = $dispatcher->getListeners('foo');
+        $this->assertSame(123, $tdispatcher->getListenerPriority('foo', $listeners[0]));
+    }
+
     public function testAddRemoveSubscriber()
     {
         $dispatcher = new EventDispatcher();

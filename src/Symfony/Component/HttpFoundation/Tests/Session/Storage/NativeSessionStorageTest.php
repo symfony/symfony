@@ -239,7 +239,7 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testStartedOutside()
+    public function testStarted()
     {
         $storage = $this->getStorage();
 

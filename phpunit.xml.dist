@@ -18,6 +18,72 @@
             <directory>./src/Symfony/Bridge/*/Tests/</directory>
             <directory>./src/Symfony/Component/*/Tests/</directory>
             <directory>./src/Symfony/Bundle/*/Tests/</directory>
+            <directory>../src/*/*Bundle/Tests</directory>
+            <directory>../src/*/Bundle/*Bundle/Tests</directory>
+            <directory>../vendor/doctrine/annotations/tests/Doctrine/Tests</directory>            
+            <directory>../vendor/doctrine/doctrine-bundle/Doctrine/Bundle/DoctrineBundle/Tests</directory>
+            <directory>../vendor/doctrine/inflector/tests/Doctrine/Tests</directory>
+            <directory>../vendor/doctrine/collections/tests/Doctrine/Tests</directory>
+            <directory>../vendor/doctrine/annotations/tests/Doctrine/Tests</directory>
+            <directory>../vendor/doctrine/cache/tests/Doctrine/Tests</directory>
+            <directory>../vendor/doctrine/common/tests/Doctrine/Tests</directory>
+            <directory>../vendor/symfony/monolog-bundle/Symfony/Bundle/MonologBundle/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bundle/SecurityBundle/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bundle/TwigBundle/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bundle/WebProfilerBundle/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bridge/Twig/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bridge/Monolog/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bridge/ProxyManager/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bridge/Doctrine/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Bridge/Propel1/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Security/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Security/Core/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Filesystem/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Locale/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Form/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Yaml/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/HttpFoundation/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/CssSelector/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/DependencyInjection/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Finder/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Validator/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Translation/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Templating/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/ClassLoader/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/HttpKernel/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Routing/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/BrowserKit/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Config/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/EventDispatcher/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Stopwatch/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Process/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Serializer/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/DomCrawler/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Intl/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/PropertyAccess/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/OptionsResolver/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Debug/Tests</directory>
+            <directory>../vendor/symfony/symfony/src/Symfony/Component/Console/Tests</directory>
+            <directory>../vendor/symfony/assetic-bundle/Symfony/Bundle/AsseticBundle/Tests</directory>
+            <directory>../vendor/symfony/swiftmailer-bundle/Symfony/Bundle/SwiftmailerBundle/Tests</directory>
+            <directory>../vendor/symfony/icu/Symfony/Component/Icu/Tests</directory>
+            <directory>../vendor/sensio/framework-extra-bundle/Sensio/Bundle/FrameworkExtraBundle/Tests</directory>
+            <directory>../vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/Tests</directory>
+            <directory>../vendor/incenteev/composer-parameter-handler/Incenteev/ParameterHandler/Tests</directory>
+            <directory>../vendor/twig/extensions/test/Twig/Tests</directory>
+            <directory>../vendor/twig/twig/test/Twig/Tests</directory>
+            <directory>../vendor/doctrine/inflector/tests</directory>
+            <directory>../vendor/doctrine/collections/tests</directory>
+            <directory>../vendor/doctrine/annotations/tests</directory>
+            <directory>../vendor/doctrine/cache/tests</directory>
+            <directory>../vendor/doctrine/common/tests</directory>
+            <directory>../vendor/swiftmailer/swiftmailer/tests</directory>
+            <directory>../vendor/sensio/generator-bundle/Sensio/Bundle/GeneratorBundle/Resources/skeleton/crud/tests</directory>
+            <directory>../vendor/monolog/monolog/tests</directory>
+            <directory>../vendor/jdorn/sql-formatter/tests</directory>
+            <directory>../vendor/twig/twig/doc/tests</directory>
+            <directory>../vendor/twig/twig/test/Twig/Tests/Fixtures/tests</directory>
         </testsuite>
     </testsuites>
 

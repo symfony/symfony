@@ -21,6 +21,7 @@ use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Form represents a form.
@@ -509,6 +510,10 @@ class Form implements \IteratorAggregate, FormInterface
     {
         if ($this->submitted) {
             throw new AlreadySubmittedException('A form can only be submitted once');
+        }
+
+        if ($submittedData instanceof Request) {
+            return $this->handleRequest($submittedData);
         }
 
         // Initialize errors in the very beginning so that we don't lose any

@@ -909,6 +909,44 @@ class SimpleFormTest extends AbstractFormTest
         $this->assertSame($form, $form->handleRequest('REQUEST'));
     }
 
+    /**
+     * Shall be removed in 3.0.
+     */
+    public function testSubmitForwardsToRequestHandlerUsingRequestArgument()
+    {
+        $handler = $this->getMock('Symfony\Component\Form\RequestHandlerInterface');
+
+        $form = $this->getBuilder()
+            ->setRequestHandler($handler)
+            ->getForm();
+
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+
+        $handler->expects($this->once())
+            ->method('handleRequest')
+            ->with($this->identicalTo($form), $request);
+        $this->assertSame($form, $form->submit($request));
+    }
+
+    /**
+     * Shall be removed in 3.0.
+     */
+    public function testBindForwardsToRequestHandler()
+    {
+        $handler = $this->getMock('Symfony\Component\Form\RequestHandlerInterface');
+
+        $form = $this->getBuilder()
+        ->setRequestHandler($handler)
+        ->getForm();
+
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+
+        $handler->expects($this->once())
+        ->method('handleRequest')
+        ->with($this->identicalTo($form), $request);
+        $this->assertSame($form, $form->bind($request));
+    }
+
     public function testFormInheritsParentData()
     {
         $child = $this->getBuilder('child')

@@ -183,7 +183,13 @@ if (isset($argv[1]) && 'symfony' === $argv[1]) {
     // Run regular phpunit in a subprocess
 
     $errFile = tempnam(sys_get_temp_dir(), 'phpunit.stderr.');
-    if ($proc = proc_open(sprintf($cmd, '', ' 2> '.ProcessUtils::escapeArgument($errFile)), array(1 => array('pipe', 'w')), $pipes)) {
+    $env = null;
+
+    if (is_file(__DIR__.'/.phpunit.php')) {
+        $env = require __DIR__.'/.phpunit.php';
+    }
+
+    if ($proc = proc_open(sprintf($cmd, '', ' 2> '.ProcessUtils::escapeArgument($errFile)), array(1 => array('pipe', 'w')), $pipes, null, $env)) {
         stream_copy_to_stream($pipes[1], STDOUT);
         fclose($pipes[1]);
         $exit = proc_close($proc);

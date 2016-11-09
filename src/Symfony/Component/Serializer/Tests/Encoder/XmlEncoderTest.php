@@ -41,6 +41,58 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }
 
+    public function testSelectNodeType()
+    {
+        $class = 'Symfony\Component\Serializer\Encoder\XmlEncoder';
+        $encoder = new XmlEncoder();
+
+        // Force-set private context.
+        $rpContext = new \ReflectionProperty($class, 'context');
+        $rpContext->setAccessible(true);
+        $rpContext->setValue($encoder, []);
+
+        // Force-set private serializer.
+        $rpSerializer = new \ReflectionProperty($class, 'serializer');
+        $rpSerializer->setAccessible(true);
+        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')
+          ->disableOriginalConstructor()
+          ->getMock();
+        $serializer->method('normalize')->willReturn([]);
+        $rpSerializer->setValue($encoder, $serializer);
+
+        // Force-invoke private dom creation method.
+        $rmCreate = new \ReflectionMethod($class, 'createDomDocument');
+        $rmCreate->setAccessible(true);
+        /* @var \DOMDocument $dom */
+        $dom = $rmCreate->invoke($encoder, []);
+
+        // Force-set private dom.
+        $rpDom = new \ReflectionProperty($class, 'dom');
+        $rpDom->setAccessible(true);
+        $rpDom->setValue($encoder, $dom);
+
+        // Create an outer root element.
+        $parent = $dom->createElement('root', '');
+        $dom->appendChild($parent);
+
+        // Create a sub-document to insert into the root.
+        $child = new \DOMElement('child', '<childDoc />');
+
+        // Force-invoke private method adding the child into the outer element.
+        $rmSelect = new \ReflectionMethod($class, 'selectNodeType');
+        $rmSelect->setAccessible(true);
+        $rmSelect->invoke($encoder, $parent, $child);
+
+        // Assert results.
+        $actual = $dom->saveXML();
+        $expected = <<<EOT
+<?xml version="1.0"?>
+<root><child>&lt;childDoc /&gt;</child></root>
+
+EOT;
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testSetRootNodeName()
     {
         $obj = new ScalarDummy();

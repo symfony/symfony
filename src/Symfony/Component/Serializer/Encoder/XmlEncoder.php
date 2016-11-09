@@ -471,6 +471,9 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         } elseif ($val instanceof \SimpleXMLElement) {
             $child = $this->dom->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);
+        } elseif ($val instanceof \DOMNode) {
+            $child = $this->dom->importNode($val, true);
+            $node->appendChild($child);
         } elseif ($val instanceof \Traversable) {
             $this->buildXml($node, $val);
         } elseif (is_object($val)) {
@@ -483,9 +486,6 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $this->appendText($node, $val);
         } elseif (is_bool($val)) {
             return $this->appendText($node, (int) $val);
-        } elseif ($val instanceof \DOMNode) {
-            $child = $this->dom->importNode($val, true);
-            $node->appendChild($child);
         }
 
         return true;

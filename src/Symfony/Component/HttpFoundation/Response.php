@@ -1135,6 +1135,18 @@ class Response
     }
 
     /**
+     * Was there a server or client side error?
+     *
+     * @return Boolean
+     *
+     * @api
+     */
+    public function isError()
+    {
+        return $this->statusCode >= 400 && $this->statusCode < 600;
+    }
+
+    /**
      * Is the response OK?
      *
      * @return bool

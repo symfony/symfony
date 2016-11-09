@@ -773,6 +773,15 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isOk());
     }
 
+    public function testIsError()
+    {
+        $response = new Response('', 404);
+        $this->assertTrue($response->isError());
+
+        $response = new Response('', 500);
+        $this->assertTrue($response->isError());
+    }
+
     public function testIsServerOrClientError()
     {
         $response = new Response('', 404);

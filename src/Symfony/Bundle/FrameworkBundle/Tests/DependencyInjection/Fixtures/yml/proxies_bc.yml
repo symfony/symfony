@@ -1,0 +1,3 @@
+framework:
+    secret: s3cr3t
+    trusted_proxies: ['127.0.0.1', '10.0.0.1']

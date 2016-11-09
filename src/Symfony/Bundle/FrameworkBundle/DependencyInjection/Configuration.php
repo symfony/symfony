@@ -33,6 +33,8 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('framework');
 
         $rootNode
+            ->fixXmlConfig('trusted_proxy', 'trusted_proxies')
+            ->fixXmlConfig('trusted_host')
             ->children()
                 ->scalarNode('secret')->end()
                 ->scalarNode('http_method_override')
@@ -153,7 +155,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
                         ->scalarNode('username')->defaultValue('')->end()
                         ->scalarNode('password')->defaultValue('')->end()
-                        ->scalarNode('lifetime')->defaultValue(86400)->end()
+                        ->integerNode('lifetime')->defaultValue(86400)->end()
                         ->arrayNode('matcher')
                             ->canBeUnset()
                             ->performNoDeepMerging()

@@ -75,12 +75,4 @@ EOF
 
         $output->writeln($dumper->dump($workflow->getDefinition(), $marking));
     }
-
-    private function getProperty($object, $property)
-    {
-        $reflectionProperty = new \ReflectionProperty(Workflow::class, $property);
-        $reflectionProperty->setAccessible(true);
-
-        return $reflectionProperty->getValue($object);
-    }
 }

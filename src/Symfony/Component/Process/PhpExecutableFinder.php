@@ -85,6 +85,11 @@ class PhpExecutableFinder
             $arguments[] = '-qrr';
         }
 
+        // Pass on memory_limit in case this was specified on current command
+        if ($memoryLimit = ini_get('memory_limit')) {
+            $arguments[] = '-d memory_limit=' . $memoryLimit;
+        }
+
         return $arguments;
     }
 }

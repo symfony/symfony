@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-09T13:45:56Z
+
+I like this change. It makes it easier to understand the differences between the two.
+
+👍
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-11-09T13:51:23Z
+
+👍 Lot more descriptive (still a bit confused by "MarkingStore" but it's probably more correct if you're into the workflow nets)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-09T14:00:10Z
+
+The term is "marking" from the Petri net and that is something we should not change. But "store".. if we are not happy with it we can maybe could consider renaming it to "Strategy"
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-09T14:03:19Z
+
+Actually, I made the `marking_store` configuration optional.
+
+So this is the minimal config:
+
+Workflow:
+```yml
+framework:
+    workflows:
+        article:
+            supports:
+                - AppBundle\Entity\Article
+            places:
+                - draft
+                - wait_for_journalist
+                - approved_by_journalist
+                - wait_for_spellchecker
+                - approved_by_spellchecker
+                - published
+            transitions:
+                request_review:
+                    from: draft
+                    to:
+                        - wait_for_journalist
+                        - wait_for_spellchecker
+                journalist_approval:
+                    from: wait_for_journalist
+                    to: approved_by_journalist
+                spellchecker_approval:
+                    from: wait_for_spellchecker
+                    to: approved_by_spellchecker
+                publish:
+                    from:
+                        - approved_by_journalist
+                        - approved_by_spellchecker
+                    to: published
+```
+
+state machine:
+```yaml
+        task:
+            type: state_machine
+            supports:
+                - AppBundle\Entity\Task
+            places:
+                - backlog
+                - in_progress
+                - done
+            transitions:
+                processing:
+                    from: backlog
+                    to: in_progress
+                done:
+                    from: in_progress
+                    to: done
+```
+
+As you can see, we never talk about the marking store.
+
+---
+
+About the class name: it really save / get the Marking from a POPO. So I prefer MarkingStore to MarkingStrategy.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-11-09T14:06:19Z
+
+Im also fine with "store". I just tried to consider the alternatives because Wouter pointed it out.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-09T14:22:35Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-09T15:16:48Z
+
+👍

@@ -183,6 +183,9 @@ class Crawler extends \SplObjectStorage
 
         restore_error_handler();
 
+        // Remove NULL characters to prevent DOMDocument::loadHTML() from stopping the document parsing
+        $content = str_replace("\x00", '', $content);
+
         if ('' !== trim($content)) {
             @$dom->loadHTML($content);
         }

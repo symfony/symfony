@@ -8,7 +8,7 @@ use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
-use Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
@@ -35,7 +35,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow(new Definition(array(), array()), new PropertyAccessorMarkingStore());
+        $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
 
         $workflow->getMarking($subject);
     }
@@ -49,7 +49,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $subject->marking = array('nope' => true);
-        $workflow = new Workflow(new Definition(array(), array()), new PropertyAccessorMarkingStore());
+        $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
 
         $workflow->getMarking($subject);
     }
@@ -59,7 +59,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $marking = $workflow->getMarking($subject);
 
@@ -74,7 +74,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $subject->marking = array('b' => 1, 'c' => 1);
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $marking = $workflow->getMarking($subject);
 
@@ -92,7 +92,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $workflow->can($subject, 'foobar');
     }
@@ -102,7 +102,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $this->assertTrue($workflow->can($subject, 't1'));
         $this->assertFalse($workflow->can($subject, 't2'));
@@ -117,7 +117,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
             $event->setBlocked(true);
         });
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $this->assertFalse($workflow->can($subject, 't1'));
     }
@@ -131,7 +131,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $workflow->apply($subject, 't2');
     }
@@ -141,7 +141,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $marking = $workflow->apply($subject, 't1');
 
@@ -157,7 +157,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcherMock();
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $eventNameExpected = array(
             'workflow.guard',
@@ -194,7 +194,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
             $event->setBlocked(true);
         });
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $this->assertEmpty($workflow->getEnabledTransitions($subject));
 

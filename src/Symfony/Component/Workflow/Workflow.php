@@ -16,7 +16,7 @@ use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
-use Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -33,7 +33,7 @@ class Workflow
     public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
     {
         $this->definition = $definition;
-        $this->markingStore = $markingStore ?: new PropertyAccessorMarkingStore();
+        $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
         $this->dispatcher = $dispatcher;
         $this->name = $name;
     }

@@ -3,16 +3,16 @@
 namespace Symfony\Component\Workflow\Tests\MarkingStore;
 
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 
-class PropertyAccessorMarkingStoreTest extends \PHPUnit_Framework_TestCase
+class MultipleStateMarkingStoreTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetSetMarking()
     {
         $subject = new \stdClass();
         $subject->myMarks = null;
 
-        $markingStore = new PropertyAccessorMarkingStore('myMarks');
+        $markingStore = new MultipleStateMarkingStore('myMarks');
 
         $marking = $markingStore->getMarking($subject);
 

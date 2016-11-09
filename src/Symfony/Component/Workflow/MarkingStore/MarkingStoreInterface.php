@@ -14,7 +14,11 @@ namespace Symfony\Component\Workflow\MarkingStore;
 use Symfony\Component\Workflow\Marking;
 
 /**
- * MarkingStoreInterface.
+ * MarkingStoreInterface is the interface between the Workflow Component and a
+ * plain old PHP object: the subject.
+ *
+ * It converts the Marking into something understandable by the subject and vice
+ * versa.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */

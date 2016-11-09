@@ -16,17 +16,20 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Workflow\Marking;
 
 /**
- * PropertyAccessorMarkingStore.
+ * SingleStateMarkingStore stores the marking into a property of the subject.
+ *
+ * This store deals with a "single state" Marking. It means a subject can be in
+ * one and only state at the same time.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class PropertyAccessorMarkingStore implements MarkingStoreInterface
+class SingleStateMarkingStore implements MarkingStoreInterface
 {
     private $property;
     private $propertyAccessor;
 
     /**
-     * PropertyAccessorMarkingStore constructor.
+     * SingleStateMarkingStore constructor.
      *
      * @param string                         $property
      * @param PropertyAccessorInterface|null $propertyAccessor
@@ -42,7 +45,13 @@ class PropertyAccessorMarkingStore implements MarkingStoreInterface
      */
     public function getMarking($subject)
     {
-        return new Marking($this->propertyAccessor->getValue($subject, $this->property) ?: array());
+        $placeName = $this->propertyAccessor->getValue($subject, $this->property);
+
+        if (!$placeName) {
+            return new Marking();
+        }
+
+        return new Marking(array($placeName => 1));
     }
 
     /**
@@ -50,6 +59,6 @@ class PropertyAccessorMarkingStore implements MarkingStoreInterface
      */
     public function setMarking($subject, Marking $marking)
     {
-        $this->propertyAccessor->setValue($subject, $this->property, $marking->getPlaces());
+        $this->propertyAccessor->setValue($subject, $this->property, key($marking->getPlaces()));
     }
 }

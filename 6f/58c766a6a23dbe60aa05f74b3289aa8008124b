@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-07T09:04:29Z
+
+👍
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-07T14:27:52Z
+
+This is not fool proof though, what about an approach such as here?
+https://github.com/hostnet/path-composer-plugin-lib
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-07T22:04:05Z
+
+@iltar Can you explain in which circumstances it would not work?
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-08T07:28:53Z
+
+If I understand this PR correctly, it will traverse down until it find a `composer.json` (based on the kernel root). What if my composer.json is in (e.g.) `%kernel.root_dir%/.composer` or my kernel is shared between repositories and installed globally? Edge, case would be a weird situation but not impossible, possible not probable. With `--working-dir`, you can have a `composer.json` in any location of your system, it doesn't have to be in your repository.
+
+There are just some cases that make this a bit difficult to ensure this would work.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-08T07:50:52Z
+
+I suggest using the common prefix between the vendor dir and the kernel.root_dir, as done in
+https://github.com/symfony/symfony/blob/b376d92320aa12778a35c04437e1cf16fbf31450/src/Symfony/Bundle/WebProfilerBundle/DependencyInjection/WebProfilerExtension.php#L56-L66
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-09T16:18:56Z
+
+@nicolas-grekas I prefer my strategy. Storing the `composer.json` (which should be in your repository) elsewhere than the root directory is I think not something we need to support (and a nightmare for anyone doing this). But the `vendor` directory can be anywhere (there is even a configuration for that in `composer.json`: `vendor-dir`). As the `vendor` should not be in your repo, and because this is just a read-only artifact, I can easily see people storing that somewhere else.
+
+@iltar I don't want to support the edge cases you mention, they are non standard and I don't see why it would be a good idea in the first place. Supporting bad practices is not a goal.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-09T16:57:46Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-11-09T17:37:22Z
+
+👍

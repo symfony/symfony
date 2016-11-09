@@ -201,7 +201,7 @@ class ProjectServiceContainer extends Container
         $this->services['method_call1'] = $instance = new \FooClass();
 
         $instance->setBar($this->get('foo'));
-        $instance->setBar(NULL);
+        $instance->setBar(null);
 
         return $instance;
     }

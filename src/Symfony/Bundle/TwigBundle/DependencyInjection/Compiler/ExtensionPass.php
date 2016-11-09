@@ -66,6 +66,7 @@ class ExtensionPass implements CompilerPassInterface
 
         if (!$container->has('templating')) {
             $loader = $container->getDefinition('twig.loader.native_filesystem');
+            $loader->replaceArgument(1, $this->getComposerRootDir($container->getParameter('kernel.root_dir')));
             $loader->addTag('twig.loader');
             $loader->setMethodCalls($container->getDefinition('twig.loader.filesystem')->getMethodCalls());
 
@@ -90,5 +91,19 @@ class ExtensionPass implements CompilerPassInterface
         if (class_exists(ExpressionLanguage::class)) {
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
         }
+    }
+
+    private function getComposerRootDir($rootDir)
+    {
+        $dir = $rootDir;
+        while (!file_exists($dir.'/composer.json')) {
+            if ($dir === dirname($dir)) {
+                return $rootDir;
+            }
+
+            $dir = dirname($dir);
+        }
+
+        return $dir;
     }
 }

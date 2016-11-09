@@ -239,6 +239,10 @@ class DialogHelper extends Helper
      */
     public function askConfirmation(OutputInterface $output, $question, $default = true)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $answer = 'z';
         while ($answer && !in_array(strtolower($answer[0]), array('y', 'n'))) {
             $answer = $this->ask($output, $question);
@@ -345,6 +349,10 @@ class DialogHelper extends Helper
      */
     public function askAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $default = null, array $autocomplete = null)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $that = $this;
 
         $interviewer = function () use ($output, $question, $default, $autocomplete, $that) {
@@ -374,6 +382,10 @@ class DialogHelper extends Helper
      */
     public function askHiddenResponseAndValidate(OutputInterface $output, $question, $validator, $attempts = false, $fallback = true)
     {
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
         $that = $this;
 
         $interviewer = function () use ($output, $question, $fallback, $that) {

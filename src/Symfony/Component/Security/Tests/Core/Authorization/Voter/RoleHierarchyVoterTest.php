@@ -33,4 +33,19 @@ class RoleHierarchyVoterTest extends RoleVoterTest
             array(array('ROLE_FOO'), array('ROLE_FOOBAR'), VoterInterface::ACCESS_GRANTED),
         ));
     }
+
+    /**
+     * @dataProvider getVoteWithEmptyHierarchyTests
+     */
+    public function testVoteWithEmptyHierarchy($roles, $attributes, $expected)
+    {
+        $voter = new RoleHierarchyVoter(new RoleHierarchy(array()));
+
+        $this->assertSame($expected, $voter->vote($this->getToken($roles), null, $attributes));
+    }
+
+    public function getVoteWithEmptyHierarchyTests()
+    {
+        return parent::getVoteTests();
+    }
 }

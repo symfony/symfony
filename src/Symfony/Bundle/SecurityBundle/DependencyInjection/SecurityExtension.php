@@ -157,7 +157,7 @@ class SecurityExtension extends Extension
      */
     private function createRoleHierarchy($config, ContainerBuilder $container)
     {
-        if (!isset($config['role_hierarchy'])) {
+        if (!isset($config['role_hierarchy']) || 0 === count($config['role_hierarchy'])) {
             $container->removeDefinition('security.access.role_hierarchy_voter');
 
             return;

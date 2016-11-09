@@ -179,7 +179,7 @@ class Container implements IntrospectableContainerInterface
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         if (self::SCOPE_PROTOTYPE === $scope) {
-            throw new InvalidArgumentException(sprintf('You cannot set service "%s" of scope "prototype".', $id));
+            throw new InvalidArgumentException(sprintf('You cannot set service "%s" of scope "%s".', $id, self::SCOPE_PROTOTYPE));
         }
 
         $id = strtolower($id);

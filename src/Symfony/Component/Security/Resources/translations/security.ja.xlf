@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>アカウントはロックされています。</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>ユーザ名またはパスワードが間違っています.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

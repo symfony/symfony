@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Zárolt fiók.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Helytelen felhasználónév vagy jelszó.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Account is geblokkeerd.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Gebruikersnaam of wachtwoord ongeldig.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

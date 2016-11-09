@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Račun je zaključan.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Krivo korisničko ime ili lozinka.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

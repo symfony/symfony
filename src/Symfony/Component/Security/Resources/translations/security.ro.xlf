@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Contul este blocat.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Nume de utilizator sau parolă greșită.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

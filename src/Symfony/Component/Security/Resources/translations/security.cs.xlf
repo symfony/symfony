@@ -66,6 +66,10 @@
                 <source>Account is locked.</source>
                 <target>Účet je zablokovaný.</target>
             </trans-unit>
+            <trans-unit id="17">
+                <source>Bad credentials</source>
+                <target>Neplatné přihlašovací údaje.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

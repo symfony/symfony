@@ -38,7 +38,7 @@ class ClassNode extends AbstractNode
     public function __construct(NodeInterface $selector, $name)
     {
         $this->selector = $selector;
-        $this->name = $name;
+        $this->name = str_replace('\\', '', $name);
     }
 
     /**

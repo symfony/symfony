@@ -38,7 +38,7 @@ class HashNode extends AbstractNode
     public function __construct(NodeInterface $selector, $id)
     {
         $this->selector = $selector;
-        $this->id = $id;
+        $this->id = str_replace('\\', '', $id);
     }
 
     /**

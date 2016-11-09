@@ -414,7 +414,7 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
             return $this->namespace.$key;
         }
         if (strlen($id = $this->namespace.$key) > $this->maxIdLength) {
-            $id = $this->namespace.substr_replace(base64_encode(md5($key, true)), ':', -2);
+            $id = $this->namespace.substr_replace(base64_encode(hash('sha256', $key, true)), ':', -22);
         }
 
         return $id;

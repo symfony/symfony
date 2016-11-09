@@ -84,6 +84,24 @@ class InlineTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Object support is not supported in the inline YAML syntax.
+     */
+    public function testParseInlinePhpObject()
+    {
+        Inline::parse('{ key: "value", date: !!php/object:O:8:"DateTime":3:{s:4:"date";s:19:"2012-12-25 00:00:00";s:13:"timezone_type";i:3;s:8:"timezone";s:13:"Europe/London";}, foo: "another value" }', true, true);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Object support when parsing a YAML file has been disabled.
+     */
+    public function testParseInlinePhpObjectThrowsExceptionWhenObjectParsingIsDisabled()
+    {
+        Inline::parse('{ key: "value", date: !!php/object:O:8:"DateTime":3:{s:4:"date";s:19:"2012-12-25 00:00:00";s:13:"timezone_type";i:3;s:8:"timezone";s:13:"Europe/London";}, foo: "another value" }', true);
+    }
+
+    /**
      * @dataProvider getTestsForDump
      */
     public function testDump($yaml, $value)

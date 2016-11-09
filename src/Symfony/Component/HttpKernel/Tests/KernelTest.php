@@ -424,6 +424,35 @@ EOF;
         $this->assertEquals('Fixtures', $kernel->getName());
     }
 
+    public function getGetNameWithWeirdDirectoryTests()
+    {
+        return array(
+            array('appDevProjectContainer', 'dev', 'app'),
+            array('appFoobarProjectContainer', 'foo bar', 'app'),
+            array('appProjectContainer', '..**..', 'app'),
+            array('ProjectContainer', '..**..', '12345'),
+            array('DevProjectContainer', 'dev', 12345),
+            array('ApplicationDevProjectContainer', 'dev', '12345Application'),
+            array('Application12345DevProjectContainer', 'dev', 'Application12345'),
+            array('Application12345DevProjectContainer', 'dev', '12345Application12345'),
+        );
+    }
+
+    /** @dataProvider getGetNameWithWeirdDirectoryTests */
+    public function testGetContainerClass($expected, $environment, $rootDir)
+    {
+        $kernel = new KernelForTest($environment, false);
+
+        $p = new \ReflectionProperty($kernel, 'name');
+        $p->setAccessible(true);
+        $p->setValue($kernel, $rootDir);
+
+        $m = new \ReflectionMethod($kernel, 'getContainerClass');
+        $m->setAccessible(true);
+
+        $this->assertEquals($expected, $m->invoke($kernel));
+    }
+
     public function testOverrideGetName()
     {
         $kernel = new KernelForOverrideName('test', true);

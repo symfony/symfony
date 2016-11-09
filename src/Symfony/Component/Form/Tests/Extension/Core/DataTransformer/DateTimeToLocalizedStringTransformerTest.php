@@ -178,6 +178,22 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         //$transformer->transform(1.5);
     }
 
+    public function testTimezoneICUCorrect()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer(
+            'Europe/Kiev',
+            'Europe/Kiev',
+            \IntlDateFormatter::MEDIUM,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::GREGORIAN,
+            'yyyy-MM-dd'
+        );
+
+        $date = new \DateTime('2014-03-04');
+        $date->setTimezone(new \DateTimeZone('Europe/Kiev'));
+        $this->assertDateTimeEquals($date, $transformer->reverseTransform('2014-03-04'));
+    }
+
     /**
      * @dataProvider dataProvider
      */

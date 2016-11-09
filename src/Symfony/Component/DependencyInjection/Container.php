@@ -236,9 +236,9 @@ class Container implements IntrospectableContainerInterface
             }
             if (--$i && $id !== $lcId = strtolower($id)) {
                 $id = $lcId;
-            } else {
-                return method_exists($this, 'get'.strtr($id, $this->underscoreMap).'Service');
             }
+
+            return method_exists($this, 'get'.strtr($id, $this->underscoreMap).'Service');
         }
     }
 
@@ -286,9 +286,7 @@ class Container implements IntrospectableContainerInterface
             } elseif (--$i && $id !== $lcId = strtolower($id)) {
                 $id = $lcId;
                 continue;
-            } elseif (method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
-                // $method is set to the right value, proceed
-            } else {
+            } elseif (!method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
                 if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
                     if (!$id) {
                         throw new ServiceNotFoundException($id);

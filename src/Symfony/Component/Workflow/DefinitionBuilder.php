@@ -44,6 +44,16 @@ class DefinitionBuilder
         return new Definition($this->places, $this->transitions, $this->initialPlace);
     }
 
+    /**
+     * Clear all data in the builder.
+     */
+    public function reset()
+    {
+        $this->places = array();
+        $this->transitions = array();
+        $this->initialPlace = null;
+    }
+
     public function setInitialPlace($place)
     {
         $this->initialPlace = $place;

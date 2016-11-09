@@ -43,6 +43,7 @@ class IntegerType extends AbstractType
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode' => \NumberFormatter::ROUND_DOWN,
             'compound' => false,
+            'invalid_message' => 'Integer value provided is invalid.',
         ));
 
         $resolver->setAllowedValues(array(

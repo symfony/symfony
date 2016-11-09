@@ -35,6 +35,7 @@ class PercentType extends AbstractType
             'precision' => 0,
             'type' => 'fractional',
             'compound' => false,
+            'invalid_message' => 'Percent value provided is invalid.',
         ));
 
         $resolver->setAllowedValues(array(

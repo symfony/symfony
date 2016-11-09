@@ -56,6 +56,7 @@ class MoneyType extends AbstractType
             'divisor' => 1,
             'currency' => 'EUR',
             'compound' => false,
+            'invalid_message' => 'Money value provided is invalid.',
         ));
     }
 

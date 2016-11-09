@@ -24,6 +24,7 @@ class CurrencyType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => Intl::getCurrencyBundle()->getCurrencyNames(),
+            'invalid_message' => 'Currency provided is invalid.',
         ));
     }
 

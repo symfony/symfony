@@ -219,6 +219,7 @@ class DateType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'invalid_message' => 'Date provided is invalid.',
         ));
 
         $resolver->setNormalizers(array(

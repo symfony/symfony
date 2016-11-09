@@ -24,6 +24,7 @@ class LocaleType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => Intl::getLocaleBundle()->getLocaleNames(),
+            'invalid_message' => 'Locale provided is invalid.',
         ));
     }
 

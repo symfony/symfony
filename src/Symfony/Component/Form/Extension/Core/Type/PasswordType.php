@@ -36,6 +36,7 @@ class PasswordType extends AbstractType
         $resolver->setDefaults(array(
             'always_empty' => true,
             'trim' => false,
+            'invalid_message' => 'Password provided is invalid.',
         ));
     }
 

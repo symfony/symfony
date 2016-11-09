@@ -232,6 +232,7 @@ class DateTimeType extends AbstractType
             // this option.
             'data_class' => null,
             'compound' => $compound,
+            'invalid_message' => 'DateTime provided is invalid.',
         ));
 
         // Don't add some defaults in order to preserve the defaults

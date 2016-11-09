@@ -24,6 +24,7 @@ class LanguageType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => Intl::getLanguageBundle()->getLanguageNames(),
+            'invalid_message' => 'Language provided is invalid.',
         ));
     }
 

@@ -98,6 +98,7 @@ class FormType extends BaseType
             'compound' => $form->getConfig()->getCompound(),
             'method' => $form->getConfig()->getMethod(),
             'action' => $form->getConfig()->getAction(),
+            'invalid_message' => 'Form is invalid.',
         ));
     }
 

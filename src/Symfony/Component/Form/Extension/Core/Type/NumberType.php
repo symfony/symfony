@@ -41,6 +41,7 @@ class NumberType extends AbstractType
             'grouping' => false,
             'rounding_mode' => \NumberFormatter::ROUND_HALFUP,
             'compound' => false,
+            'invalid_message' => 'Number value provided is invalid.',
         ));
 
         $resolver->setAllowedValues(array(

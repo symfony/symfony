@@ -30,6 +30,7 @@ class TimezoneType extends AbstractType
     {
         $resolver->setDefaults(array(
             'choices' => self::getTimezones(),
+            'invalid_message' => 'Timezone provided is invalid.',
         ));
     }
 

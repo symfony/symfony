@@ -153,6 +153,7 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(123, $bag->getInt('digits'), '->getInt() gets a value of parameter as integer');
         $this->assertEquals(0, $bag->getInt('unknown'), '->getInt() returns zero if a parameter is not defined');
+        $this->assertSame(null, $bag->getInt('unknown', null), '->getInt() returns the default value if a parameter is not defined');
     }
 
     public function testFilter()

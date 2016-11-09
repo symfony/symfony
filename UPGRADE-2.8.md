@@ -1,4 +1,4 @@
-﻿UPGRADE FROM 2.7 to 2.8
+UPGRADE FROM 2.7 to 2.8
 =======================
 
 All components
@@ -17,6 +17,31 @@ All components
 
 Form
 ----
+
+ * Parsing `FormType` instances in the `FormBuilder` is deprecated.
+   
+   Before:
+
+   ```php
+   $someVar = new SomeVar('acme');
+   $form = $this->createForm(new MyType($someVar), $entity);
+   ```
+   
+   After:
+
+   ```php
+   $form = $this->createForm(MyType::class, $entity, ['someVar' => $someVar]);
+   ```
+
+   And in MyType:
+
+   ```php
+   public function configureOptions(OptionsResolver $resolver)
+   {
+       $resolver->setRequired(['someVar']);
+       $resolver->setAllowedType('someVar', '\App\Bundle\SomeVar'); 
+   }
+   ```
 
  * The `intention` option was deprecated and will be removed in 3.0 in favor
    of the new `csrf_token_id` option.

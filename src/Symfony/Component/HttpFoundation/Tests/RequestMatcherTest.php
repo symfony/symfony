@@ -127,4 +127,17 @@ class RequestMatcherTest extends \PHPUnit_Framework_TestCase
         $matcher->matchAttribute('foo', 'babar');
         $this->assertFalse($matcher->matches($request));
     }
+
+    function testAttributeWithNonStringValue()
+    {
+        $matcher = new RequestMatcher();
+
+        $request = Request::create('/admin/foo');
+        $request->attributes->set('_foo', function () {
+            return 'bar';
+        });
+
+        $matcher->matchAttribute('_foo', 'bar');
+        $this->assertFalse($matcher->matches($request));
+    }
 }

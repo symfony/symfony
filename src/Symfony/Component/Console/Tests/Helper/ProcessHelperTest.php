@@ -103,6 +103,21 @@ EOT;
         );
     }
 
+    public function testMustRun()
+    {
+        $helper = new ProcessHelper();
+        $helper->setHelperSet(new HelperSet(array(new DebugFormatterHelper())));
+
+        $output = $this->getOutputStream(StreamOutput::VERBOSITY_NORMAL);
+        $process = $helper->mustRun($output, 'php -r "echo 42;"');
+
+        $this->assertInstanceOf(Process::class, $process);
+        $this->assertSame('42', $process->getOutput());
+
+        $this->setExpectedException('Symfony\Component\Process\Exception\ProcessFailedException');
+        $helper->mustRun($output, 'failure');
+    }
+
     private function getOutputStream($verbosity)
     {
         return new StreamOutput(fopen('php://memory', 'r+', false), $verbosity, false);

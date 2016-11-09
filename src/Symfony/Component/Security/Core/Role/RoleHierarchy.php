@@ -24,7 +24,7 @@ class RoleHierarchy implements RoleHierarchyInterface
     /**
      * Constructor.
      *
-     * @param array $hierarchy An array defining the hierarchy
+     * @param RoleInterface[] $hierarchy An array defining the hierarchy
      */
     public function __construct(array $hierarchy)
     {

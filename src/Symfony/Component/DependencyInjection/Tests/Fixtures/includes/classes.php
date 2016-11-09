@@ -19,6 +19,10 @@ class BarClass
     {
         return $this->baz;
     }
+
+    public static function __set_state($an_array)
+    {
+    }
 }
 
 class BazClass

@@ -28,6 +28,8 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures/');
+
+        require_once self::$fixturesPath.'/includes/classes.php';
     }
 
     public function testDump()
@@ -135,7 +137,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\Symfony\Component\DependencyInjection\Exception\RuntimeException', $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
-            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+            $this->assertEquals('Unable to dump a service container if a parameter is an object without __set_state magic method.', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
         }
     }
 

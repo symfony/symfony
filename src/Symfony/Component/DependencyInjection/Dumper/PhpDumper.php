@@ -1417,8 +1417,10 @@ EOF;
 
                 return $code;
             }
-        } elseif (is_object($value) || is_resource($value)) {
-            throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
+        } elseif (is_object($value) && !method_exists(get_class($value), '__set_state')) {
+            throw new RuntimeException('Unable to dump a service container if a parameter is an object without __set_state magic method.');
+        } elseif (is_resource($value)) {
+            throw new RuntimeException('Unable to dump a service container if a parameter is a resource.');
         } else {
             return $this->export($value);
         }

@@ -17,6 +17,9 @@
       <parameter type="string">true</parameter>
       <parameter type="string">false</parameter>
       <parameter type="string">null</parameter>
-    </parameter>
+	</parameter>
+	<parameter key="object">BarClass::__set_state(array(
+   'baz' =&gt; NULL,
+))</parameter>
   </parameters>
 </container>

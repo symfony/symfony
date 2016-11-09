@@ -9,6 +9,7 @@ $container = new ContainerBuilder(new ParameterBag(array(
     'bar' => 'foo is %%foo bar',
     'escape' => '@escapeme',
     'values' => array(true, false, null, 0, 1000.3, 'true', 'false', 'null'),
+    'object' => new BarClass()
 )));
 
 return $container;

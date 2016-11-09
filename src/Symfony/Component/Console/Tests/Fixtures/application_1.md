@@ -87,7 +87,7 @@ To display the list of available commands, please use the <info>list</info> comm
 
 * Name: `--verbose`
 * Shortcut: `-v|-vv|-vvv`
-* Accept value: no
+* Accept value: yes
 * Is value required: no
 * Is multiple: no
 * Description: Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug

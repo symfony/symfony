@@ -78,10 +78,8 @@ class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
     public function reverseTransformExpectsStringOrNullProvider()
     {
         return array(
-            array(0),
-            array(true),
-            array(false),
             array(array()),
+            array(new \stdClass()),
         );
     }
 

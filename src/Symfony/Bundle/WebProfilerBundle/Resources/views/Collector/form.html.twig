@@ -42,7 +42,7 @@
 {% block head %}
     {{ parent() }}
 
-    <style>
+    <style{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
         #tree-menu {
             float: left;
             padding-right: 10px;
@@ -204,7 +204,7 @@
         </div>
     {% endif %}
 
-    <script>
+    <script{% if csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>
     function Toggler(storage) {
         "use strict";
 

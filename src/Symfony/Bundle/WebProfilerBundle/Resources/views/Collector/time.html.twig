@@ -138,7 +138,7 @@
         {% endfor %}
     {% endif %}
 
-    <script>{% autoescape 'js' %}//<![CDATA[
+    <script{% if csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}>{% autoescape 'js' %}//<![CDATA[
         /**
          * In-memory key-value cache manager
          */

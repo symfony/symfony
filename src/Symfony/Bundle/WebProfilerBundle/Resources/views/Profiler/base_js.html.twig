@@ -1,4 +1,4 @@
-<script>/*<![CDATA[*/
+<script{% if csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>/*<![CDATA[*/
     {# Caution: the contents of this file are processed by Twig before loading
                 them as JavaScript source code. Always use '/*' comments instead
                 of '//' comments to avoid impossible-to-debug side-effects #}
@@ -41,6 +41,12 @@
                 options.maxTries = options.maxTries || 0;
                 xhr.open(options.method || 'GET', url, true);
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                if (options.scriptNonce) {
+                    xhr.setRequestHeader('X-SymfonyProfiler-Script-Nonce', options.scriptNonce);
+                }
+                if (options.styleNonce) {
+                    xhr.setRequestHeader('X-SymfonyProfiler-Style-Nonce', options.styleNonce);
+                }
                 xhr.onreadystatechange = function(state) {
                     if (4 !== xhr.readyState) {
                         return null;

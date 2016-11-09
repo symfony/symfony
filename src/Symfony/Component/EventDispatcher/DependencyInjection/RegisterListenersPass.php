@@ -57,6 +57,12 @@ class RegisterListenersPass implements CompilerPassInterface
 
         $definition = $container->findDefinition($this->dispatcherService);
 
+        $definitionRefClass = new \ReflectionClass($definition->getClass());
+        $eventDispatcherClass = 'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher';
+        if ($definition->getClass() != $eventDispatcherClass && !$definitionRefClass->isSubclassOf($eventDispatcherClass)) {
+            throw new \RuntimeException(sprintf('RegisterListenersPass requires class "%s" for the "%s" dispatcher.', $eventDispatcherClass, $this->dispatcherService));
+        }
+
         foreach ($container->findTaggedServiceIds($this->listenerTag) as $id => $events) {
             $def = $container->getDefinition($id);
             if (!$def->isPublic()) {

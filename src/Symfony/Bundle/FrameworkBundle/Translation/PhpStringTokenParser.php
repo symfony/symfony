@@ -80,9 +80,9 @@ class PhpStringTokenParser
                 array('\\', '\''),
                 substr($str, $bLength + 1, -1)
             );
-        } else {
-            return self::parseEscapeSequences(substr($str, $bLength + 1, -1), '"');
         }
+
+        return self::parseEscapeSequences(substr($str, $bLength + 1, -1), '"');
     }
 
     /**
@@ -114,9 +114,9 @@ class PhpStringTokenParser
             return self::$replacements[$str];
         } elseif ('x' === $str[0] || 'X' === $str[0]) {
             return chr(hexdec($str));
-        } else {
-            return chr(octdec($str));
         }
+
+        return chr(octdec($str));
     }
 
     /**

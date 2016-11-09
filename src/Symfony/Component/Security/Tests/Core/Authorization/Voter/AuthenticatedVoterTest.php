@@ -71,8 +71,8 @@ class AuthenticatedVoterTest extends \PHPUnit_Framework_TestCase
             return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         } elseif ('remembered' === $authenticated) {
             return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\RememberMeToken', array('setPersistent'), array(), '', false);
-        } else {
-            return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken', null, array('', ''));
         }
+
+        return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\AnonymousToken', null, array('', ''));
     }
 }

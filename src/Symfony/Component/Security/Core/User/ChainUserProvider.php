@@ -79,9 +79,9 @@ class ChainUserProvider implements UserProviderInterface
             $e = new UsernameNotFoundException(sprintf('There is no user with name "%s".', $user->getUsername()));
             $e->setUsername($user->getUsername());
             throw $e;
-        } else {
-            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
         }
+
+        throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
     }
 
     /**

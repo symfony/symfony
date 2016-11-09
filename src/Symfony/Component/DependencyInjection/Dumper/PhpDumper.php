@@ -901,9 +901,9 @@ EOF;
         if (!$aliases = $this->container->getAliases()) {
             if ($this->container->isFrozen()) {
                 return "\n        \$this->aliases = array();\n";
-            } else {
-                return '';
             }
+
+            return '';
         }
 
         $code = "        \$this->aliases = array(\n";
@@ -1231,9 +1231,9 @@ EOF;
                     $service = $this->dumpValue($value->getFactoryService());
 
                     return sprintf('%s->%s(%s)', 0 === strpos($service, '$') ? sprintf('$this->get(%s)', $service) : $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
-                } else {
-                    throw new RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
                 }
+
+                throw new RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
             }
 
             $class = $value->getClass();
@@ -1261,21 +1261,21 @@ EOF;
                 // we do this to deal with non string values (Boolean, integer, ...)
                 // the preg_replace_callback converts them to strings
                 return $this->dumpParameter(strtolower($match[1]));
-            } else {
-                $that = $this;
-                $replaceParameters = function ($match) use ($that) {
-                    return "'.".$that->dumpParameter(strtolower($match[2])).".'";
-                };
-
-                $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
-
-                return $code;
             }
+
+            $that = $this;
+            $replaceParameters = function ($match) use ($that) {
+                return "'.".$that->dumpParameter(strtolower($match[2])).".'";
+            };
+
+            $code = str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $this->export($value)));
+
+            return $code;
         } elseif (is_object($value) || is_resource($value)) {
             throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
-        } else {
-            return $this->export($value);
         }
+
+        return $this->export($value);
     }
 
     /**
@@ -1310,13 +1310,13 @@ EOF;
 
         if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
             return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
-        } else {
-            if ($this->container->hasAlias($id)) {
-                $id = (string) $this->container->getAlias($id);
-            }
-
-            return sprintf('$this->get(\'%s\')', $id);
         }
+
+        if ($this->container->hasAlias($id)) {
+            $id = (string) $this->container->getAlias($id);
+        }
+
+        return sprintf('$this->get(\'%s\')', $id);
     }
 
     /**

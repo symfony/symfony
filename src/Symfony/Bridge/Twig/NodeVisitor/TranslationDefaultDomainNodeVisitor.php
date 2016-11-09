@@ -48,13 +48,13 @@ class TranslationDefaultDomainNodeVisitor extends \Twig_BaseNodeVisitor
                 $this->scope->set('domain', $node->getNode('expr'));
 
                 return $node;
-            } else {
-                $var = $env->getParser()->getVarName();
-                $name = new \Twig_Node_Expression_AssignName($var, $node->getLine());
-                $this->scope->set('domain', new \Twig_Node_Expression_Name($var, $node->getLine()));
-
-                return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getLine());
             }
+
+            $var = $env->getParser()->getVarName();
+            $name = new \Twig_Node_Expression_AssignName($var, $node->getLine());
+            $this->scope->set('domain', new \Twig_Node_Expression_Name($var, $node->getLine()));
+
+            return new \Twig_Node_Set(false, new \Twig_Node(array($name)), new \Twig_Node(array($node->getNode('expr'))), $node->getLine());
         }
 
         if (!$this->scope->has('domain')) {

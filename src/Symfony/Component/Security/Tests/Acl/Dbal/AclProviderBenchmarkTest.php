@@ -125,9 +125,9 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
             ++$id;
 
             return $id - 1;
-        } else {
-            return rand(1000, $id - 1);
         }
+
+        return rand(1000, $id - 1);
     }
 
     protected function generateAcl($classId, $parentId, $ancestors)
@@ -166,9 +166,9 @@ class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
             ++$id;
 
             return $id - 1;
-        } else {
-            return rand(1000, $id - 1);
         }
+
+        return rand(1000, $id - 1);
     }
 
     protected function generateAces($classId, $objectId)

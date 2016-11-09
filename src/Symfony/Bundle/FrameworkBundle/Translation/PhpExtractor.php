@@ -167,9 +167,9 @@ class PhpExtractor implements ExtractorInterface
                     } elseif (self::MESSAGE_TOKEN == $item) {
                         $message = $this->getMessage($tokenIterator);
                         break;
-                    } else {
-                        break;
                     }
+
+                    break;
                 }
 
                 if ($message) {

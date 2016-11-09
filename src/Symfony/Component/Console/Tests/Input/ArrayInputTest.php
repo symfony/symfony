@@ -24,7 +24,7 @@ class ArrayInputTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($input->getFirstArgument(), '->getFirstArgument() returns null if no argument were passed');
         $input = new ArrayInput(array('name' => 'Fabien'));
         $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
-        $input = new ArrayInput(array('--foo' => 'bar', 'name' => 'Fabien'));
+        $input = new ArrayInput(array('--foo' => 'bar', 'names' => array('Fabien'), 'name' => 'Fabien'));
         $this->assertEquals('Fabien', $input->getFirstArgument(), '->getFirstArgument() returns the first passed argument');
     }
 

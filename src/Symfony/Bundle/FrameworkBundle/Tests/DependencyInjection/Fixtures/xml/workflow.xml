@@ -10,7 +10,7 @@
         <framework:workflows>
             <framework:workflow name="my_workflow">
                 <framework:marking-store>
-                    <framework:type>property_accessor</framework:type>
+                    <framework:type>multiple_state</framework:type>
                     <framework:arguments>a</framework:arguments>
                     <framework:arguments>a</framework:arguments>
                 </framework:marking-store>

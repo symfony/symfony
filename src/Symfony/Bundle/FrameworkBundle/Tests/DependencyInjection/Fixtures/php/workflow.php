@@ -6,7 +6,7 @@ $container->loadFromExtension('framework', array(
     'workflows' => array(
         'my_workflow' => array(
             'marking_store' => array(
-                'type' => 'property_accessor',
+                'type' => 'multiple_state',
             ),
             'supports' => array(
                 FrameworkExtensionTest::class,

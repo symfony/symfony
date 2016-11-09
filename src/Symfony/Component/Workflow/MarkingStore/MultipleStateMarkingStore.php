@@ -16,17 +16,21 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Workflow\Marking;
 
 /**
- * ScalarMarkingStore.
+ * MultipleStateMarkingStore stores the marking into a property of the
+ * subject.
+ *
+ * This store deals with a "multiple state" Marking. It means a subject can be
+ * in many state at the same time.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class ScalarMarkingStore implements MarkingStoreInterface
+class MultipleStateMarkingStore implements MarkingStoreInterface
 {
     private $property;
     private $propertyAccessor;
 
     /**
-     * ScalarMarkingStore constructor.
+     * MultipleStateMarkingStore constructor.
      *
      * @param string                         $property
      * @param PropertyAccessorInterface|null $propertyAccessor
@@ -42,13 +46,7 @@ class ScalarMarkingStore implements MarkingStoreInterface
      */
     public function getMarking($subject)
     {
-        $placeName = $this->propertyAccessor->getValue($subject, $this->property);
-
-        if (!$placeName) {
-            return new Marking();
-        }
-
-        return new Marking(array($placeName => 1));
+        return new Marking($this->propertyAccessor->getValue($subject, $this->property) ?: array());
     }
 
     /**
@@ -56,6 +54,6 @@ class ScalarMarkingStore implements MarkingStoreInterface
      */
     public function setMarking($subject, Marking $marking)
     {
-        $this->propertyAccessor->setValue($subject, $this->property, key($marking->getPlaces()));
+        $this->propertyAccessor->setValue($subject, $this->property, $marking->getPlaces());
     }
 }

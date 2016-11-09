@@ -2,7 +2,7 @@ framework:
     workflows:
         my_workflow:
             marking_store:
-                type: property_accessor
+                type: multiple_state
             supports:
                 - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
             places:

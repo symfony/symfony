@@ -111,4 +111,18 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response);
         $this->assertEquals(204, $response->getStatusCode());
     }
+
+    public function testSetNotModified()
+    {
+        $response = new StreamedResponse();
+        $response->setNotModified();
+        $responseSend = $response->send();
+        $this->assertObjectHasAttribute('headers', $responseSend);
+        $this->assertObjectHasAttribute('content', $responseSend);
+        $this->assertObjectHasAttribute('version', $responseSend);
+        $this->assertObjectHasAttribute('statusCode', $responseSend);
+        $this->assertObjectHasAttribute('statusText', $responseSend);
+        $this->assertObjectHasAttribute('charset', $responseSend);
+        $this->assertEquals(304, $responseSend->getStatusCode());
+    }
 }

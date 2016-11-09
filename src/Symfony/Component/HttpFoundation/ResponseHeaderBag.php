@@ -288,7 +288,7 @@ class ResponseHeaderBag extends HeaderBag
         }
 
         $header = $this->getCacheControlHeader();
-        if (isset($this->cacheControl['public']) || isset($this->cacheControl['private'])) {
+        if (isset($this->cacheControl['public']) || isset($this->cacheControl['private']) || isset($this->cacheControl['no-cache'])) {
             return $header;
         }
 

@@ -37,6 +37,10 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
                 array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache')),
             ),
             array(
+                array('fOo' => 'BAR', 'Cache-Control' => array('no-cache')),
+                array('fOo' => array('BAR'), 'Cache-Control' => array('no-cache')),
+            ),
+            array(
                 array('ETag' => 'xyzzy'),
                 array('ETag' => array('xyzzy'), 'Cache-Control' => array('private, must-revalidate')),
             ),
@@ -61,6 +65,14 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
                 array('X-XSS-Protection' => array('1; mode=block'), 'Cache-Control' => array('no-cache')),
             ),
         );
+    }
+
+    public function testHeadersArePreserved()
+    {
+        $bag1 = new ResponseHeaderBag(array('test'));
+        $bag2 = new ResponseHeaderBag($bag1->allPreserveCase());
+
+        $this->assertEquals($bag1->allPreserveCase(), $bag2->allPreserveCase());
     }
 
     public function testCacheControlHeader()

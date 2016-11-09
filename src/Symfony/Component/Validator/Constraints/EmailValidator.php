@@ -63,7 +63,12 @@ class EmailValidator extends ConstraintValidator
      */
     private function checkMX($host)
     {
-        return checkdnsrr($host, 'MX');
+        static $cache = array();
+        if (!isset($cache[$host])) {
+            $cache[$host] = checkdnsrr($host, 'MX');
+        }
+
+        return $cache[$host];
     }
 
     /**

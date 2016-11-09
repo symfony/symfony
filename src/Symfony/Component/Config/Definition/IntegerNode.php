@@ -26,7 +26,12 @@ class IntegerNode extends NumericNode
     protected function validateType($value)
     {
         if (!is_int($value)) {
-            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected int, but got %s.', $this->getPath(), gettype($value)));
+            // INF is valid
+            if (is_float($value) && is_infinite($value)) {
+                return;
+            }
+
+            $ex = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected int or infinity, but got %s.', $this->getPath(), gettype($value)));
             $ex->setPath($this->getPath());
 
             throw $ex;

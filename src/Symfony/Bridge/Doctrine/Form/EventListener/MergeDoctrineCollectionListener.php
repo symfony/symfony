@@ -31,10 +31,10 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
     {
         // Higher priority than core MergeCollectionListener so that this one
         // is called before
-        return array(FormEvents::SUBMIT => array('onBind', 10));
+        return array(FormEvents::SUBMIT => array('onSubmit', 10));
     }
 
-    public function onBind(FormEvent $event)
+    public function onSubmit(FormEvent $event)
     {
         $collection = $event->getForm()->getData();
         $data = $event->getData();
@@ -44,5 +44,16 @@ class MergeDoctrineCollectionListener implements EventSubscriberInterface
         if ($collection instanceof Collection && count($data) === 0) {
             $collection->clear();
         }
+    }
+
+    /**
+     * Alias of {@link onSubmit()}.
+     *
+     * @deprecated Deprecated since version 2.3, to be removed in 3.0. Use
+     *             {@link onSubmit()} instead.
+     */
+    public function onBind(FormEvent $event)
+    {
+        $this->onSubmit($event);
     }
 }

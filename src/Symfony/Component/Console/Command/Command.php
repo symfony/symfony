@@ -579,10 +579,19 @@ class Command
         return $descriptor->describe($this, array('as_dom' => $asDom));
     }
 
-    private function validateName($name)
+    /**
+     * Validates a command name.
+     *
+     * It must be non-empty and parts can optionally be separated by ":".
+     *
+     * @param string $name
+     *
+     * @throws \InvalidArgumentException When the name is invalid
+     */
+    private function validateName( $name )
     {
-        if (!preg_match('/^[^\:]+(\:[^\:]+)*$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
+        if ( !preg_match('/^[^\:]+(\:[^\:]+)*$/', $name) ) {
+            throw new     \InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }
     }
 }

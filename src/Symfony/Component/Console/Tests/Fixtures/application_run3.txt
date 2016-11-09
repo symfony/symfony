@@ -1,3 +1,6 @@
+Description:
+ Lists commands
+
 Usage:
  list [--xml] [--raw] [--format="..."] [namespace]
 

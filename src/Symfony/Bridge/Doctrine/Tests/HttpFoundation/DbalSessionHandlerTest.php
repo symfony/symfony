@@ -29,10 +29,9 @@ class DbalSessionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testConstructWithTableNameAndOptions()
     {
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
-        $options = ['db_id_col' => 'id', 'db_data_col' => 'data', 'db_time_col' => 'time'];
+        $options = array('db_id_col' => 'id', 'db_data_col' => 'data', 'db_time_col' => 'time');
         $table = 'sessions';
 
         $handler = new DbalSessionHandler($connection, $table, $options);
-
     }
 }

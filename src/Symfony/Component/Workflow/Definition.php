@@ -26,8 +26,6 @@ final class Definition
     private $initialPlace;
 
     /**
-     * Definition constructor.
-     *
      * @param string[]     $places
      * @param Transition[] $transitions
      * @param string|null  $initialPlace

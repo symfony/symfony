@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Marking;
  * subject.
  *
  * This store deals with a "multiple state" Marking. It means a subject can be
- * in many state at the same time.
+ * in many states at the same time.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
@@ -30,8 +30,6 @@ class MultipleStateMarkingStore implements MarkingStoreInterface
     private $propertyAccessor;
 
     /**
-     * MultipleStateMarkingStore constructor.
-     *
      * @param string                         $property
      * @param PropertyAccessorInterface|null $propertyAccessor
      */

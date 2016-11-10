@@ -26,8 +26,6 @@ class Event extends BaseEvent
     private $transition;
 
     /**
-     * Event constructor.
-     *
      * @param object     $subject
      * @param Marking    $marking
      * @param Transition $transition

@@ -19,7 +19,7 @@ use Symfony\Component\Workflow\Marking;
  * SingleStateMarkingStore stores the marking into a property of the subject.
  *
  * This store deals with a "single state" Marking. It means a subject can be in
- * one and only state at the same time.
+ * one and only one state at the same time.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
@@ -29,8 +29,6 @@ class SingleStateMarkingStore implements MarkingStoreInterface
     private $propertyAccessor;
 
     /**
-     * SingleStateMarkingStore constructor.
-     *
      * @param string                         $property
      * @param PropertyAccessorInterface|null $propertyAccessor
      */

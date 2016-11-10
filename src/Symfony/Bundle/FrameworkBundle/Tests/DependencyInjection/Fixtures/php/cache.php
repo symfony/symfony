@@ -6,6 +6,7 @@ $container->loadFromExtension('framework', array(
             'cache.foo' => array(
                 'adapter' => 'cache.adapter.apcu',
                 'default_lifetime' => 30,
+                'namespace' => 'foo_',
             ),
             'cache.bar' => array(
                 'adapter' => 'cache.adapter.doctrine',
@@ -19,6 +20,7 @@ $container->loadFromExtension('framework', array(
             'cache.foobar' => array(
                 'adapter' => 'cache.adapter.psr6',
                 'default_lifetime' => 10,
+                'namespace' => 'foobar_',
                 'provider' => 'app.cache_pool',
             ),
             'cache.def' => array(

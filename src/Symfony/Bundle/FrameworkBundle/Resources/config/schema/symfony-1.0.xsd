@@ -224,6 +224,7 @@
         <xsd:attribute name="adapter" type="xsd:string" />
         <xsd:attribute name="public" type="xsd:boolean" />
         <xsd:attribute name="default-lifetime" type="xsd:integer" />
+        <xsd:attribute name="namespace" type="xsd:string" />
         <xsd:attribute name="provider" type="xsd:string" />
         <xsd:attribute name="clearer" type="xsd:string" />
     </xsd:complexType>

@@ -680,6 +680,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('adapter')->defaultValue('cache.app')->end()
                                     ->booleanNode('public')->defaultFalse()->end()
                                     ->integerNode('default_lifetime')->end()
+                                    ->scalarNode('namespace')->end()
                                     ->scalarNode('provider')
                                         ->info('The service name to use as provider when the specified adapter needs one.')
                                     ->end()

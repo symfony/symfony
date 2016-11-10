@@ -103,7 +103,7 @@ class RouteCompiler implements RouteCompilerInterface
             $precedingChar = strlen($precedingText) > 0 ? substr($precedingText, -1) : '';
             $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
 
-            // A PCRE subpattern name must start with a non-digit. Also a PHP variable cannot start a digit so the
+            // A PCRE subpattern name must start with a non-digit. Also a PHP variable cannot start with a digit so the
             // variable would not be usable as a Controller action argument.
             if (preg_match('/^\d/', $varName)) {
                 throw new \DomainException(sprintf('Variable name "%s" cannot start with a digit in route pattern "%s". Please use a different name.', $varName, $pattern));

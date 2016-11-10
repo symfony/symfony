@@ -23,8 +23,13 @@
             <argument type="service" id="serializer.property_accessor" />
             <argument type="service" id="property_info" on-invalid="ignore" />
 
-            <!-- Run after all custom serializers -->
+            <!-- Run after all custom normalizers -->
             <tag name="serializer.normalizer" priority="-1000" />
+        </service>
+
+        <service id="serializer.denormalizer.array" class="Symfony\Component\Serializer\Normalizer\ArrayDenormalizer" public="false">
+            <!-- Run before the object normalizer -->
+            <tag name="serializer.normalizer" priority="-990" />
         </service>
 
         <!-- Loader -->

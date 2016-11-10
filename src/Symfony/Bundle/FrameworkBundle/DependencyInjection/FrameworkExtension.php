@@ -406,16 +406,14 @@ class FrameworkExtension extends Extension
         foreach ($workflows as $name => $workflow) {
             $type = $workflow['type'];
 
-            // Create a DefinitionBuilder
-            $definitionBuilderDefinition = new Definition(Workflow\DefinitionBuilder::class);
-            $definitionBuilderDefinition->addMethodCall('addPlaces', array($workflow['places']));
+            $transitions = [];
             foreach ($workflow['transitions'] as $transitionName => $transition) {
                 if ($type === 'workflow') {
-                    $definitionBuilderDefinition->addMethodCall('addTransition', array(new Definition(Workflow\Transition::class, array($transitionName, $transition['from'], $transition['to']))));
+                    $transitions[] = new Definition(Workflow\Transition::class, array($transitionName, $transition['from'], $transition['to']));
                 } elseif ($type === 'state_machine') {
                     foreach ($transition['from'] as $from) {
                         foreach ($transition['to'] as $to) {
-                            $definitionBuilderDefinition->addMethodCall('addTransition', array(new Definition(Workflow\Transition::class, array($transitionName, $from, $to))));
+                            $transitions[] = new Definition(Workflow\Transition::class, array($transitionName, $from, $to));
                         }
                     }
                 }
@@ -424,7 +422,8 @@ class FrameworkExtension extends Extension
             // Create a Definition
             $definitionDefinition = new Definition(Workflow\Definition::class);
             $definitionDefinition->setPublic(false);
-            $definitionDefinition->setFactory(array($definitionBuilderDefinition, 'build'));
+            $definitionDefinition->addArgument($workflow['places']);
+            $definitionDefinition->addArgument($transitions);
             $definitionDefinition->addTag('workflow.definition', array(
                 'name' => $name,
                 'type' => $type,

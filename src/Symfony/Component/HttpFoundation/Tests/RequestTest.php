@@ -1875,7 +1875,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             $request->getHost();
             $this->fail('Request::getHost() should throw an exception when host is not trusted.');
         } catch (UntrustedHostException $e) {
-            $this->assertEquals('Untrusted host "evil.com".', $e->getMessage());
+            $this->assertEquals('Untrusted Host "evil.com".', $e->getMessage());
         }
 
         // trusted hosts
@@ -1938,7 +1938,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame($expectedPort, $request->getPort());
             }
         } else {
-            $this->setExpectedException(InvalidHostException::class, 'Invalid host');
+            $this->setExpectedException(InvalidHostException::class, 'Invalid Host');
             $request->getHost();
         }
     }

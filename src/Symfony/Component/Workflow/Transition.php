@@ -24,8 +24,6 @@ class Transition
     private $tos;
 
     /**
-     * Transition constructor.
-     *
      * @param string          $name
      * @param string|string[] $froms
      * @param string|string[] $tos

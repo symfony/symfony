@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests;
 
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCompiler;
 
 class RouteCompilerTest extends \PHPUnit_Framework_TestCase
 {
@@ -176,16 +177,16 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getNumericVariableNames
+     * @dataProvider getVariableNamesStartingWithADigit
      * @expectedException \DomainException
      */
-    public function testRouteWithNumericVariableName($name)
+    public function testRouteWithVariableNameStartingWithADigit($name)
     {
         $route = new Route('/{'.$name.'}');
         $route->compile();
     }
 
-    public function getNumericVariableNames()
+    public function getVariableNamesStartingWithADigit()
     {
         return array(
            array('09'),
@@ -263,5 +264,14 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
         );
+    }
+
+    /**
+     * @expectedException \DomainException
+     */
+    public function testRouteWithTooLongVariableName()
+    {
+        $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
+        $route->compile();
     }
 }

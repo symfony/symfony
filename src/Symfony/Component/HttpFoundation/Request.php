@@ -1225,7 +1225,7 @@ class Request
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         if ($host && '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)) {
-            throw new InvalidHostException($host, sprintf('Invalid host "%s".', $host));
+            throw new InvalidHostException($host, sprintf('Invalid Host "%s".', $host));
         }
 
         if (count(self::$trustedHostPatterns) > 0) {
@@ -1243,7 +1243,7 @@ class Request
                 }
             }
 
-            throw new UntrustedHostException($host, sprintf('Untrusted host "%s".', $host));
+            throw new UntrustedHostException($host, sprintf('Untrusted Host "%s".', $host));
         }
 
         return $host;

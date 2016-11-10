@@ -71,11 +71,13 @@ class ParameterBagTest extends \PHPUnit_Framework_TestCase
      */
     public function testGet()
     {
-        $bag = new ParameterBag(array('foo' => 'bar', 'null' => null));
+        $bag = new ParameterBag(array('foo' => 'bar', 'null' => null, 'user' => array('name' => 'rebecca')));
 
         $this->assertEquals('bar', $bag->get('foo'), '->get() gets the value of a parameter');
         $this->assertEquals('default', $bag->get('unknown', 'default'), '->get() returns second argument as default if a parameter is not defined');
         $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
+        $this->assertEquals('rebecca', $bag->get('user[name]', 'default', true), '->get() returns the value of the key in if the deep search was enabled');
+        $this->assertEquals('default', $bag->get('user[title]', 'default', true), '->get() returns second argument as default if key was not defined, for the deep array search');
     }
 
     public function testGetDoesNotUseDeepByDefault()

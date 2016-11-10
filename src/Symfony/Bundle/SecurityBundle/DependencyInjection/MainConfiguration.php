@@ -165,7 +165,7 @@ class MainConfiguration implements ConfigurationInterface
                         ->fixXmlConfig('method')
                         ->fixXmlConfig('role')
                         ->children()
-                            ->scalarNode('matcher')->defaultNUll()->end()
+                            ->scalarNode('matcher')->defaultNull()->end()
                             ->scalarNode('requires_channel')->defaultNull()->end()
                             ->scalarNode('path')
                                 ->defaultNull()

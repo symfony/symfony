@@ -126,9 +126,9 @@ class Workflow
 
         $this->enter($subject, $transition, $marking);
 
-        $this->announce($subject, $transition, $marking);
-
         $this->markingStore->setMarking($subject, $marking);
+
+        $this->announce($subject, $transition, $marking);
 
         return $marking;
     }

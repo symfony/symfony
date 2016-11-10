@@ -30,7 +30,7 @@ class RouteCompiler implements RouteCompilerInterface
 
     /**
      * The maximum supported length of a PCRE subpattern name
-     * http://pcre.org/current/doc/html/pcre2pattern.html#SEC16
+     * http://pcre.org/current/doc/html/pcre2pattern.html#SEC16.
      *
      * @var int
      */
@@ -41,7 +41,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @throws \LogicException  If a variable is referenced more than once
      * @throws \DomainException If a variable name starts with a digit or if it is too long to be successfully used as
-     *                           a PCRE subpattern.
+     *                          a PCRE subpattern.
      */
     public static function compile(Route $route)
     {

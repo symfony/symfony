@@ -34,11 +34,15 @@ final class Definition
      */
     public function __construct(array $places, array $transitions, $initialPlace = null)
     {
-        $this->addPlaces($places);
-        $this->setInitialPlace($initialPlace);
+        foreach ($places as $place) {
+            $this->addPlace($place);
+        }
+
         foreach ($transitions as $transition) {
             $this->addTransition($transition);
         }
+
+        $this->setInitialPlace($initialPlace);
     }
 
     /**
@@ -89,13 +93,6 @@ final class Definition
         }
 
         $this->places[$place] = $place;
-    }
-
-    private function addPlaces(array $places)
-    {
-        foreach ($places as $place) {
-            $this->addPlace($place);
-        }
     }
 
     private function addTransition(Transition $transition)

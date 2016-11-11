@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-11-10T15:37:32Z
+
+Not sure if this should be treated as a bugfix, people could use some specific array denormalizers, adding the generic one could make their application use it instead of their specific denormalizers leading to bugs.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-10T16:10:07Z
+
+This is very unlikely because:
+
+* framework's array denormalizer has a low priority
+* the suffix `[]` is not commonly used in denormalizers
+
+However the bug is real and annoying. Anytime you try to deserialize a document containing an embedded collection, Symfony fails with a an error hard to understand for newcomers (`The property "foo" must be of type "Foo\Bar[]", "array" instead`).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-11T08:48:21Z
+
+👍 I always registered this one on my own in my applications, but having this done for me in core is much nicer.
+
+Status: Reviewed

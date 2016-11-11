@@ -23,7 +23,7 @@ interface DefinitionValidatorInterface
      * @param Definition $definition
      * @param string     $name
      *
-     * @return bool
+     * @return void
      *
      * @throws InvalidDefinitionException on invalid definition
      */

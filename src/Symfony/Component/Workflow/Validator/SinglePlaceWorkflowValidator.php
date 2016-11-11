@@ -36,6 +36,6 @@ class SinglePlaceWorkflowValidator extends WorkflowValidator
             }
         }
 
-        return parent::validate($definition, $name);
+        parent::validate($definition, $name);
     }
 }

@@ -12,7 +12,9 @@
 namespace Symfony\Component\HttpFoundation\Exception;
 
 /**
- * THe HTTP request contains incorrect host data.
+ * The HTTP request contains incorrect host data.
+ *
+ * @internal
  *
  * @author SpacePossum
  */

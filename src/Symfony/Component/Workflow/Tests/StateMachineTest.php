@@ -3,12 +3,21 @@
 namespace Symfony\Component\Workflow\Tests;
 
 use Symfony\Component\Workflow\Definition;
-use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\MarkingStore\PropertyAccessMarkingStore;
 use Symfony\Component\Workflow\StateMachine;
 use Symfony\Component\Workflow\Transition;
 
 class StateMachineTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
+     * @expectedExceptionMessage "Symfony\Component\Workflow\StateMachine" class only supports strategy "single_state" for marking, but got "multiple_state". Consider using the "Symfony\Component\Workflow\Workflow" class instead.
+     */
+    public function testWithInvalidMarkingStoreStore()
+    {
+        $stateMachine = new StateMachine(new Definition(array(), array()), new PropertyAccessMarkingStore());
+    }
+
     public function testCan()
     {
         $places = array('a', 'b', 'c', 'd');

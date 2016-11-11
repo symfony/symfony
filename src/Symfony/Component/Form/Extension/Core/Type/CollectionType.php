@@ -100,6 +100,7 @@ class CollectionType extends AbstractType
         ));
 
         $resolver->setNormalizer('entry_options', $entryOptionsNormalizer);
+        $resolver->setAllowedTypes('delete_empty', array('bool', 'callable'));
     }
 
     /**

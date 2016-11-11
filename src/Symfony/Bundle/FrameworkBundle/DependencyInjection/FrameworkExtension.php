@@ -429,6 +429,9 @@ class FrameworkExtension extends Extension
                 'type' => $type,
                 'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
             ));
+            if (isset($workflow['initial_place'])) {
+                $definitionDefinition->addArgument($workflow['initial_place']);
+            }
 
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {

@@ -281,6 +281,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                            ->scalarNode('initial_place')->defaultNull()->end()
                             ->arrayNode('places')
                                 ->isRequired()
                                 ->requiresAtLeastOneElement()

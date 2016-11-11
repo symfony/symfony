@@ -242,6 +242,7 @@
             <xsd:element name="transitions" type="transitions" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="initial-place" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="marking_store">

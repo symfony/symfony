@@ -52,22 +52,29 @@ class DateTypeTest extends TestCase
         ));
     }
 
-    public function testSubmitFromSingleTextDateTimeWithDefaultFormat()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitFromSingleTextDateTimeWithDefaultFormat($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
-            'input' => 'datetime',
+            'input' => $inputType,
         ));
 
         $form->submit('2010-06-02');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertDateTimeEquals(new $dateTimeClass('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('2010-06-02', $form->getViewData());
     }
 
-    public function testSubmitFromSingleTextDateTime()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitFromSingleTextDateTime($dateTimeClass, $inputType)
     {
         // we test against "de_AT", so we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -79,12 +86,13 @@ class DateTypeTest extends TestCase
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
-            'input' => 'datetime',
+            'input' => $inputType,
         ));
 
         $form->submit('2.6.2010');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertDateTimeEquals(new $dateTimeClass('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
@@ -159,12 +167,16 @@ class DateTypeTest extends TestCase
         $this->assertEquals('02.06.2010', $form->getViewData());
     }
 
-    public function testSubmitFromText()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitFromText($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'text',
+            'input' => $inputType,
         ));
 
         $text = array(
@@ -175,19 +187,22 @@ class DateTypeTest extends TestCase
 
         $form->submit($text);
 
-        $dateTime = new \DateTime('2010-06-02 UTC');
-
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertDateTimeEquals(new $dateTimeClass('2010-06-02 UTC'), $form->getData());
         $this->assertEquals($text, $form->getViewData());
     }
 
-    public function testSubmitFromChoice()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitFromChoice($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'choice',
             'years' => array(2010),
+            'input' => $inputType,
         ));
 
         $text = array(
@@ -198,9 +213,8 @@ class DateTypeTest extends TestCase
 
         $form->submit($text);
 
-        $dateTime = new \DateTime('2010-06-02 UTC');
-
-        $this->assertDateTimeEquals($dateTime, $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertDateTimeEquals(new $dateTimeClass('2010-06-02 UTC'), $form->getData());
         $this->assertEquals($text, $form->getViewData());
     }
 
@@ -225,19 +239,23 @@ class DateTypeTest extends TestCase
         $this->assertEquals($text, $form->getViewData());
     }
 
-    public function testSubmitFromInputDateTimeDifferentPattern()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitFromInputDateTimeDifferentPattern($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'format' => 'MM*yyyy*dd',
             'widget' => 'single_text',
-            'input' => 'datetime',
+            'input' => $inputType,
         ));
 
         $form->submit('06*2010*02');
 
-        $this->assertDateTimeEquals(new \DateTime('2010-06-02 UTC'), $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertDateTimeEquals(new $dateTimeClass('2010-06-02 UTC'), $form->getData());
         $this->assertEquals('06*2010*02', $form->getViewData());
     }
 
@@ -418,7 +436,10 @@ class DateTypeTest extends TestCase
         $this->assertEquals('01.06.2010', $form->getViewData());
     }
 
-    public function testSetDataWithNegativeTimezoneOffsetDateTimeInput()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSetDataWithNegativeTimezoneOffsetDateTimeInput($dateTimeClass, $inputType)
     {
         // we test against "de_AT", so we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -429,18 +450,28 @@ class DateTypeTest extends TestCase
             'format' => \IntlDateFormatter::MEDIUM,
             'model_timezone' => 'UTC',
             'view_timezone' => 'America/New_York',
-            'input' => 'datetime',
+            'input' => $inputType,
             'widget' => 'single_text',
         ));
 
-        $dateTime = new \DateTime('2010-06-02 UTC');
+        $dateTime = new $dateTimeClass('2010-06-02 UTC');
 
         $form->setData($dateTime);
+
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
 
         // 2010-06-02 00:00:00 UTC
         // 2010-06-01 20:00:00 UTC-4
         $this->assertDateTimeEquals($dateTime, $form->getData());
         $this->assertEquals('01.06.2010', $form->getViewData());
+    }
+
+    public function provideDateTimeClasses()
+    {
+        return array(
+            array(\DateTime::class, 'datetime'),
+            array(\DateTimeImmutable::class, 'datetimeimmutable'),
+        );
     }
 
     public function testYearsOption()

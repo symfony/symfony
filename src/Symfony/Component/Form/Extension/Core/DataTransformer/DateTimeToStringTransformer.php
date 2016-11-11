@@ -58,12 +58,13 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      * @param string $outputTimezone The name of the output timezone
      * @param string $format         The date format
      * @param bool   $parseUsingPipe Whether to parse by appending a pipe "|" to the parse format
+     * @param bool   $immutable      Whether to use \DateTimeImmutable instead of \DateTime
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s', $parseUsingPipe = true)
+    public function __construct($inputTimezone = null, $outputTimezone = null, $format = 'Y-m-d H:i:s', $parseUsingPipe = true, $immutable = false)
     {
-        parent::__construct($inputTimezone, $outputTimezone);
+        parent::__construct($inputTimezone, $outputTimezone, $immutable);
 
         $this->generateFormat = $this->parseFormat = $format;
         $this->parseUsingPipe = $parseUsingPipe || null === $parseUsingPipe;
@@ -115,7 +116,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
      *
      * @param string $value A value as produced by PHP's date() function
      *
-     * @return \DateTime An instance of \DateTime
+     * @return \DateTimeInterface An instance of \DateTime
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       or could not be transformed
@@ -130,10 +131,12 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('Expected a string.');
         }
 
-        $outputTz = new \DateTimeZone($this->outputTimezone);
-        $dateTime = \DateTime::createFromFormat($this->parseFormat, $value, $outputTz);
+        $dateTimeClass = $this->getDateTimeClass();
 
-        $lastErrors = \DateTime::getLastErrors();
+        $outputTz = new \DateTimeZone($this->outputTimezone);
+        $dateTime = $dateTimeClass::createFromFormat($this->parseFormat, $value, $outputTz);
+
+        $lastErrors = $dateTimeClass::getLastErrors();
 
         if (0 < $lastErrors['warning_count'] || 0 < $lastErrors['error_count']) {
             throw new TransformationFailedException(

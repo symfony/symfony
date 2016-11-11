@@ -87,6 +87,7 @@ class DateTimeType extends AbstractType
         $timeFormat = self::DEFAULT_TIME_FORMAT;
         $calendar = \IntlDateFormatter::GREGORIAN;
         $pattern = is_string($options['format']) ? $options['format'] : null;
+        $immutable = 'datetimeimmutable' === $options['input'];
 
         if (!in_array($dateFormat, self::$acceptedFormats, true)) {
             throw new InvalidOptionsException('The "date_format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
@@ -96,7 +97,8 @@ class DateTimeType extends AbstractType
             if (self::HTML5_FORMAT === $pattern) {
                 $builder->addViewTransformer(new DateTimeToRfc3339Transformer(
                     $options['model_timezone'],
-                    $options['view_timezone']
+                    $options['view_timezone'],
+                    $immutable
                 ));
             } else {
                 $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
@@ -105,7 +107,8 @@ class DateTimeType extends AbstractType
                     $dateFormat,
                     $timeFormat,
                     $calendar,
-                    $pattern
+                    $pattern,
+                    $immutable
                 ));
             }
         } else {
@@ -155,7 +158,7 @@ class DateTimeType extends AbstractType
 
             $builder
                 ->addViewTransformer(new DataTransformerChain(array(
-                    new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts),
+                    new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, false, $immutable),
                     new ArrayToPartsTransformer(array(
                         'date' => $dateParts,
                         'time' => $timeParts,
@@ -255,6 +258,7 @@ class DateTimeType extends AbstractType
 
         $resolver->setAllowedValues('input', array(
             'datetime',
+            'datetimeimmutable',
             'string',
             'timestamp',
             'array',

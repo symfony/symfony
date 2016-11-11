@@ -34,7 +34,7 @@ abstract class TypeTestCase extends FormIntegrationTestCase
         $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
     }
 
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+    public static function assertDateTimeEquals(\DateTimeInterface $expected, \DateTimeInterface $actual)
     {
         self::assertEquals($expected->format('c'), $actual->format('c'));
     }

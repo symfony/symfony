@@ -53,7 +53,7 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
      *
      * @param string $rfc3339 Formatted string
      *
-     * @return \DateTime Normalized date
+     * @return \DateTimeInterface Normalized date
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the value could not be transformed
@@ -68,8 +68,10 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
             return;
         }
 
+        $dateTimeClass = $this->getDateTimeClass();
+
         try {
-            $dateTime = new \DateTime($rfc3339);
+            $dateTime = new $dateTimeClass($rfc3339);
         } catch (\Exception $e) {
             throw new TransformationFailedException($e->getMessage(), $e->getCode(), $e);
         }

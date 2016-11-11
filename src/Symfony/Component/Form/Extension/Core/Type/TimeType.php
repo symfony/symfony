@@ -52,8 +52,10 @@ class TimeType extends AbstractType
             $parts[] = 'second';
         }
 
+        $immutable = 'datetimeimmutable' === $options['input'];
+
         if ('single_text' === $options['widget']) {
-            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
+            $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format, true, $immutable));
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array(
                 'error_bubbling' => true,
@@ -117,7 +119,7 @@ class TimeType extends AbstractType
                 $builder->add('second', self::$widgets[$options['widget']], $secondOptions);
             }
 
-            $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget']));
+            $builder->addViewTransformer(new DateTimeToArrayTransformer($options['model_timezone'], $options['view_timezone'], $parts, 'text' === $options['widget'], $immutable));
         }
 
         if ('string' === $options['input']) {
@@ -239,6 +241,7 @@ class TimeType extends AbstractType
 
         $resolver->setAllowedValues('input', array(
             'datetime',
+            'datetimeimmutable',
             'string',
             'timestamp',
             'array',

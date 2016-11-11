@@ -33,12 +33,13 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      * @param string $outputTimezone The output timezone
      * @param array  $fields         The date fields
      * @param bool   $pad            Whether to use padding
+     * @param bool   $immutable      Whether to use \DateTimeImmutable instead of \DateTime
      *
      * @throws UnexpectedTypeException if a timezone is not a string
      */
-    public function __construct($inputTimezone = null, $outputTimezone = null, array $fields = null, $pad = false)
+    public function __construct($inputTimezone = null, $outputTimezone = null, array $fields = null, $pad = false, $immutable = false)
     {
-        parent::__construct($inputTimezone, $outputTimezone);
+        parent::__construct($inputTimezone, $outputTimezone, $immutable);
 
         if (null === $fields) {
             $fields = array('year', 'month', 'day', 'hour', 'minute', 'second');
@@ -108,7 +109,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
      *
      * @param array $value Localized date
      *
-     * @return \DateTime Normalized date
+     * @return \DateTimeInterface Normalized date
      *
      * @throws TransformationFailedException If the given value is not an array,
      *                                       if the value could not be transformed
@@ -170,7 +171,8 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
         }
 
         try {
-            $dateTime = new \DateTime(sprintf(
+            $dateTimeClass = $this->getDateTimeClass();
+            $dateTime = new $dateTimeClass(sprintf(
                 '%s-%s-%s %s:%s:%s',
                 empty($value['year']) ? '1970' : $value['year'],
                 empty($value['month']) ? '1' : $value['month'],

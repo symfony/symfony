@@ -17,12 +17,15 @@ use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 
 class TimeTypeTest extends TestCase
 {
-    public function testSubmitDateTime()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitDateTime($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
-            'input' => 'datetime',
+            'input' => $inputType,
         ));
 
         $input = array(
@@ -32,9 +35,8 @@ class TimeTypeTest extends TestCase
 
         $form->submit($input);
 
-        $dateTime = new \DateTime('1970-01-01 03:04:00 UTC');
-
-        $this->assertEquals($dateTime, $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertEquals(new $dateTimeClass('1970-01-01 03:04:00 UTC'), $form->getData());
         $this->assertEquals($input, $form->getViewData());
     }
 
@@ -97,34 +99,42 @@ class TimeTypeTest extends TestCase
         $this->assertEquals($input, $form->getViewData());
     }
 
-    public function testSubmitDatetimeSingleText()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitDatetimeSingleText($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
-            'input' => 'datetime',
+            'input' => $inputType,
             'widget' => 'single_text',
         ));
 
         $form->submit('03:04');
 
-        $this->assertEquals(new \DateTime('1970-01-01 03:04:00 UTC'), $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertEquals(new $dateTimeClass('1970-01-01 03:04:00 UTC'), $form->getData());
         $this->assertEquals('03:04', $form->getViewData());
     }
 
-    public function testSubmitDatetimeSingleTextWithoutMinutes()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSubmitDatetimeSingleTextWithoutMinutes($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
-            'input' => 'datetime',
+            'input' => $inputType,
             'widget' => 'single_text',
             'with_minutes' => false,
         ));
 
         $form->submit('03');
 
-        $this->assertEquals(new \DateTime('1970-01-01 03:00:00 UTC'), $form->getData());
+        $this->assertInstanceOf($dateTimeClass, $form->getData());
+        $this->assertEquals(new $dateTimeClass('1970-01-01 03:00:00 UTC'), $form->getData());
         $this->assertEquals('03', $form->getViewData());
     }
 
@@ -221,32 +231,46 @@ class TimeTypeTest extends TestCase
         $this->assertEquals('03', $form->getViewData());
     }
 
-    public function testSetDataWithoutMinutes()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSetDataWithoutMinutes($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
-            'input' => 'datetime',
+            'input' => $inputType,
             'with_minutes' => false,
         ));
 
-        $form->setData(new \DateTime('03:04:05 UTC'));
+        $form->setData(new $dateTimeClass('03:04:05 UTC'));
 
         $this->assertEquals(array('hour' => 3), $form->getViewData());
     }
 
-    public function testSetDataWithSeconds()
+    /**
+     * @dataProvider provideDateTimeClasses
+     */
+    public function testSetDataWithSeconds($dateTimeClass, $inputType)
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
-            'input' => 'datetime',
+            'input' => $inputType,
             'with_seconds' => true,
         ));
 
-        $form->setData(new \DateTime('03:04:05 UTC'));
+        $form->setData(new $dateTimeClass('03:04:05 UTC'));
 
         $this->assertEquals(array('hour' => 3, 'minute' => 4, 'second' => 5), $form->getViewData());
+    }
+
+    public function provideDateTimeClasses()
+    {
+        return array(
+            array(\DateTime::class, 'datetime'),
+            array(\DateTimeImmutable::class, 'datetimeimmutable'),
+        );
     }
 
     public function testSetDataDifferentTimezones()

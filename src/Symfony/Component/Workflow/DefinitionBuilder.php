@@ -27,8 +27,10 @@ class DefinitionBuilder
     private $initialPlace;
 
     /**
-     * @param string[]     $places
-     * @param Transition[] $transitions
+     * @param string[]             $places
+     * @param (Transition|array)[] $transitions Nested values can be either instances of Transition or
+     *                                          arrays with three values: the transition name, and two
+     *                                          to pass string or arrays of string for froms and todos
      */
     public function __construct(array $places = array(), array $transitions = array())
     {
@@ -79,16 +81,34 @@ class DefinitionBuilder
         }
     }
 
+    /**
+     * @param (Transition|array)[] $transitions Nested values can be either instances of Transition or
+     *                                          arrays with three values: the transition name, and two
+     *                                          to pass string or arrays of string for froms and todos
+     */
     public function addTransitions(array $transitions)
     {
         foreach ($transitions as $transition) {
-            list($name, $froms, $tos) = $transition;
-            $this->addTransition($name, $froms, $tos);
+            if ($transition instanceof Transition) {
+                $this->addTransition($transition);
+            } else {
+                list($name, $froms, $tos) = $transition;
+                $this->addTransition($name, $froms, $tos);
+            }
         }
     }
 
-    public function addTransition($name, $froms, $tos)
+    /**
+     * @param Transition|string    $transition
+     * @param string[]|string|null $froms
+     * @param string[]|string|null $tos
+     */
+    public function addTransition($transition, $froms = null, $tos = null)
     {
-        $this->transitions[] = new Transition($name, (array) $froms, (array) $tos);
+        if ($transition instanceof Transition) {
+            $this->transitions[] = $transition;
+        } else {
+            $this->transitions[] = new Transition($transition, $froms, $tos);
+        }
     }
 }

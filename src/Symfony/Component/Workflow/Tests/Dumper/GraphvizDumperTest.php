@@ -5,7 +5,6 @@ namespace Symfony\Component\Workflow\Tests\Dumper;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\Transition;
 
 class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -63,12 +62,14 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
         $builder->addPlaces(range('a', 'g'));
 
-        $builder->addTransition('t1', 'a', array('b', 'c'));
-        $builder->addTransition('t2', array('b', 'c'), 'd');
-        $builder->addTransition('t3', 'd', 'e');
-        $builder->addTransition('t4', 'd', 'f');
-        $builder->addTransition('t5', 'e', 'g');
-        $builder->addTransition('t6', 'f', 'g');
+        $builder->addTransitions(array(
+            array('t1', 'a', array('b', 'c')),
+            array('t2', array('b', 'c'), 'd'),
+            array('t3', 'd', 'e'),
+            array('t4', 'd', 'f'),
+            array('t5', 'e', 'g'),
+            array('t6', 'f', 'g'),
+        ));
 
         return $builder->build();
     }
@@ -79,8 +80,10 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
         $builder->addPlaces(range('a', 'c'));
 
-        $builder->addTransition('t1', 'a', 'b');
-        $builder->addTransition('t2', 'b', 'c');
+        $builder->addTransitions(array(
+            array('t1', 'a', 'b'),
+            array('t2', 'b', 'c'),
+        ));
 
         return $builder->build();
     }

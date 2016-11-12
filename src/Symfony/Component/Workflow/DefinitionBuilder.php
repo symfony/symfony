@@ -82,12 +82,13 @@ class DefinitionBuilder
     public function addTransitions(array $transitions)
     {
         foreach ($transitions as $transition) {
-            $this->addTransition($transition);
+            list($name, $froms, $tos) = $transition;
+            $this->addTransition($name, $froms, $tos);
         }
     }
 
-    public function addTransition(Transition $transition)
+    public function addTransition($name, $froms, $tos)
     {
-        $this->transitions[] = $transition;
+        $this->transitions[] = new Transition($name, (array) $froms, (array) $tos);
     }
 }

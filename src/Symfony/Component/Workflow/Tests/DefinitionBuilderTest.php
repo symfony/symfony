@@ -26,18 +26,20 @@ class DefinitionBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testAddTransition()
     {
+        $name0 = 'name0';
+        $name1 = 'name1';
         $places = range('a', 'b');
 
-        $transition0 = new Transition('name0', $places[0], $places[1]);
-        $transition1 = new Transition('name1', $places[0], $places[1]);
+        $transition0 = array($name0, $places[0], $places[1]);
         $builder = new DefinitionBuilder($places, array($transition0));
-        $builder->addTransition($transition1);
+
+        $builder->addTransition($name1, $places[0], $places[1]);
 
         $definition = $builder->build();
 
         $this->assertCount(2, $definition->getTransitions());
-        $this->assertSame($transition0, $definition->getTransitions()[0]);
-        $this->assertSame($transition1, $definition->getTransitions()[1]);
+        $this->assertEquals(new Transition($name0, $places[0], $places[1]), $definition->getTransitions()[0]);
+        $this->assertEquals(new Transition($name1, $places[0], $places[1]), $definition->getTransitions()[1]);
     }
 
     public function testAddPlace()

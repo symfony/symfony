@@ -107,6 +107,26 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($workflow->can($subject, 't2'));
     }
 
+    public function testCannotHaveManyTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1, 'c' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore());
+
+        $this->assertFalse($workflow->can($subject, 't1'));
+    }
+
+    public function testCanUsingTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1, 'c' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, null, true);
+
+        $this->assertTrue($workflow->can($subject, 't1'));
+    }
+
     public function testCanWithGuard()
     {
         $definition = $this->createComplexWorkflow();
@@ -184,6 +204,40 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
+    public function testApplyWithoutTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name');
+
+        foreach ($workflow->getEnabledTransitions($subject) as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('d' => 1), $subject->marking);
+    }
+
+    public function testApplyWithTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('f' => 2);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name', true);
+
+        foreach ($workflow->getEnabledTransitions($subject) as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('f' => 1, 'g' => 1), $subject->marking);
+
+        foreach ($workflow->getEnabledTransitions($subject) as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('g' => 2), $subject->marking);
+    }
+
     public function testGetEnabledTransitions()
     {
         $definition = $this->createComplexWorkflow();
@@ -207,6 +261,52 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(1, $transitions);
         $this->assertSame('t5', $transitions[0]->getName());
+    }
+
+    public function testGetEnabledTransitionDoesNotExceedOneToken()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => true, 'b' => true, 'c' => true);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name');
+
+        $transitions = $workflow->getEnabledTransitions($subject);
+        // "a" cannot go in "b" or "c" as they're already marked
+        $this->assertCount(1, $transitions);
+    }
+
+    public function testGetEnabledTransitionUsingTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1, 'c' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name', true);
+
+        $transitions = $workflow->getEnabledTransitions($subject);
+        $this->assertCount(2, $transitions);
+
+        foreach ($transitions as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('b' => 1, 'c' => 1, 'd' => 1), $subject->marking);
+    }
+
+    public function testGetEnabledTransitionUsingTokensWithMultipleTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('b' => 2, 'c' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name', true);
+
+        $transitions = $workflow->getEnabledTransitions($subject);
+        $this->assertCount(1, $transitions);
+
+        foreach ($transitions as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('b' => 1, 'd' => 1), $subject->marking);
     }
 
     protected function createComplexWorkflow()

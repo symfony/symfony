@@ -88,5 +88,35 @@ class PropertyAccessMarkingStoreTest extends MarkingStoreTest
         $marking3 = $markingStore->getMarking($subject);
 
         $this->assertEquals($marking2, $marking3);
+
+        $marking3->mark('second_place');
+
+        $markingStore->setMarking($subject, $marking3);
+
+        $this->assertSame(array('first_place' => 1, 'second_place' => 2), $subject->myMarks);
+
+        $marking4 = $markingStore->getMarking($subject);
+
+        $this->assertEquals($marking3, $marking4);
+
+        $marking4->unmark('second_place');
+
+        $markingStore->setMarking($subject, $marking4);
+
+        $this->assertSame(array('first_place' => 1, 'second_place' => 1), $subject->myMarks);
+
+        $marking5 = $markingStore->getMarking($subject);
+
+        $this->assertEquals($marking4, $marking5);
+
+        $marking5->unmark('first_place');
+
+        $markingStore->setMarking($subject, $marking5);
+
+        $this->assertSame(array('second_place' => 1), $subject->myMarks);
+
+        $marking6 = $markingStore->getMarking($subject);
+
+        $this->assertEquals($marking5, $marking6);
     }
 }

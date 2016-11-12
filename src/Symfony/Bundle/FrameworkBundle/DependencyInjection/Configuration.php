@@ -282,6 +282,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                             ->end()
+                            ->booleanNode('use_tokens')->defaultFalse()->end()
                             ->arrayNode('places')
                                 ->isRequired()
                                 ->requiresAtLeastOneElement()

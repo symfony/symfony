@@ -25,7 +25,9 @@ class MultipleStateMarking extends Marking
     public function __construct(array $representation = array())
     {
         foreach ($representation as $place => $nbToken) {
-            $this->mark($place);
+            for ($i = 0; $i < $nbToken; ++$i) {
+                $this->mark($place);
+            }
         }
     }
 
@@ -34,9 +36,13 @@ class MultipleStateMarking extends Marking
      */
     public function mark($place)
     {
-        if (!isset($this->places[$place])) {
-            $this->places[$place] = 1;
+        if (isset($this->places[$place])) {
+            $this->places[$place] += 1;
+
+            return;
         }
+
+        $this->places[$place] = 1;
     }
 
     /**
@@ -44,6 +50,12 @@ class MultipleStateMarking extends Marking
      */
     public function unmark($place)
     {
+        if (isset($this->places[$place]) && $this->places[$place] > 1) {
+            $this->places[$place] -= 1;
+
+            return;
+        }
+
         unset($this->places[$place]);
     }
 }

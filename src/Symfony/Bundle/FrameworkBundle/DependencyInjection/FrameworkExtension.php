@@ -450,6 +450,9 @@ class FrameworkExtension extends Extension
                 $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
             }
             $workflowDefinition->replaceArgument(3, $name);
+            if ('workflow' === $type) {
+                $workflowDefinition->replaceArgument(4, $workflow['use_tokens']);
+            }
 
             // Store to container
             $workflowId = sprintf('%s.%s', $type, $name);

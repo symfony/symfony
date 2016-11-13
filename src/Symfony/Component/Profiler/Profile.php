@@ -18,7 +18,7 @@ use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Profile implements ProfileInterface
+class Profile
 {
     private $token;
 
@@ -35,12 +35,12 @@ class Profile implements ProfileInterface
     private $type;
 
     /**
-     * @var ProfileInterface
+     * @var Profile
      */
     private $parent;
 
     /**
-     * @var ProfileInterface[]
+     * @var Profile[]
      */
     private $children = array();
 
@@ -77,9 +77,9 @@ class Profile implements ProfileInterface
     /**
      * Sets the parent token.
      *
-     * @param ProfileInterface $parent The parent Profile
+     * @param Profile $parent The parent Profile
      */
-    public function setParent(ProfileInterface $parent)
+    public function setParent(Profile $parent)
     {
         $this->parent = $parent;
     }

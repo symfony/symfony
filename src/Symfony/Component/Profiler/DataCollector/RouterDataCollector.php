@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Context\RequestContext;
-use Symfony\Component\Profiler\ProfileInterface;
+use Symfony\Component\Profiler\Profile;
 
 /**
  * RouterDataCollector.
@@ -41,7 +41,7 @@ class RouterDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collectData(ContextInterface $context, ProfileInterface $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         if (!$context instanceof RequestContext) {
             return false;

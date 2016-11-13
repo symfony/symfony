@@ -14,7 +14,7 @@ namespace Symfony\Component\Profiler\DataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Profiler\Context\ContextInterface;
-use Symfony\Component\Profiler\ProfileInterface;
+use Symfony\Component\Profiler\Profile;
 
 /**
  * ConfigDataCollector.
@@ -56,7 +56,7 @@ class ConfigDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collectData(ContextInterface $context, ProfileInterface $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         $this->data = array(
             'app_name' => $this->name,

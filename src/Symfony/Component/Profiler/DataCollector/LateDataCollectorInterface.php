@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Profiler\DataCollector;
 
-use Symfony\Component\Profiler\ProfileInterface;
+use Symfony\Component\Profiler\Profile;
 
 /**
  * LateDataCollectorInterface.
@@ -22,8 +22,8 @@ interface LateDataCollectorInterface
 {
     /**
      * Collects data as late as possible.
-     * @param ProfileInterface $profile
+     * @param Profile $profile
      * @return
      */
-    public function lateCollect(ProfileInterface $profile);
+    public function lateCollect(Profile $profile);
 }

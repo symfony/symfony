@@ -13,7 +13,7 @@ namespace Symfony\Component\Profiler\DataCollector;
 
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Profiler\Context\ContextInterface;
-use Symfony\Component\Profiler\ProfileInterface;
+use Symfony\Component\Profiler\Profile;
 
 /**
  * ExceptionDataCollector.
@@ -25,7 +25,7 @@ class ExceptionDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collectData(ContextInterface $context, ProfileInterface $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         if (null !== $context->getException()) {
             $this->data = array(

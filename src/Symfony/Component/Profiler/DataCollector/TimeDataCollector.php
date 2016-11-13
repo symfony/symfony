@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Context\RequestContext;
-use Symfony\Component\Profiler\ProfileInterface;
+use Symfony\Component\Profiler\Profile;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -37,7 +37,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function collectData(ContextInterface $context, ProfileInterface $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         if (null !== $this->kernel) {
             $startTime = $this->kernel->getStartTime();
@@ -62,7 +62,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function lateCollect(ProfileInterface $profile)
+    public function lateCollect(Profile $profile)
     {
         if (null !== $this->stopwatch && isset($this->data['token'])) {
             $this->setEvents($this->stopwatch->getSectionEvents($this->data['token']));

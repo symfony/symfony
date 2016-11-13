@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
 use Symfony\Component\Profiler\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\Profiler\Profile;
 use Symfony\Component\Profiler\Storage\ProfilerStorageInterface;
 
 /**
@@ -97,7 +98,7 @@ class Profiler
         // late collect
         foreach ($profile->getCollectors() as $collector) {
             if ($collector instanceof LateDataCollectorInterface) {
-                $collector->lateCollect();
+                $collector->lateCollect($profile);
             }
         }
 

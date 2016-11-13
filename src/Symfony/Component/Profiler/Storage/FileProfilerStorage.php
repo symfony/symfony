@@ -260,8 +260,6 @@ class FileProfilerStorage implements ProfilerStorageInterface
     protected function createProfileFromData($token, $data, $parent = null)
     {
         $profile = new Profile($token);
-        $profile->setIp($data['ip']);
-        $profile->setMethod($data['method']);
         $profile->setName($data['name']);
         $profile->setTime($data['time']);
         $profile->setStatusCode($data['status_code']);

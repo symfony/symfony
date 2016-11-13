@@ -23,7 +23,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
 use Symfony\Component\Profiler\Context\RequestContext;
-use Symfony\Component\Profiler\ProfileInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -31,7 +30,7 @@ use Symfony\Component\Routing\Route;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RequestDataCollector extends DataCollector implements EventSubscriberInterface
+class RequestDataCollector extends DataCollector implements SummaryCollectorInterface, EventSubscriberInterface
 {
     /** @var \SplObjectStorage */
     protected $controllers;
@@ -44,7 +43,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function collectData(ContextInterface $context, ProfileInterface $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         if (!$context instanceof RequestContext) {
             return false;
@@ -52,12 +51,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
         $response = $context->getResponse();
         $request = $context->getRequest();
-        $profile->setMethod($request->getMethod());
-        try {
-            $profile->setIp($request->getClientIp());
-        } catch (ConflictingHeadersException $e) {
-            $profile->setIp('Unknown');
-        }
         $responseHeaders = $response->headers->all();
         $cookies = array();
         foreach ($response->headers->getCookies() as $cookie) {
@@ -138,6 +131,11 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'locale' => $request->getLocale(),
         );
 
+        try {
+            $this->data['id'] = $request->getClientIp();
+        } catch (ConflictingHeadersException $e) {
+            $this->data['id'] = 'Unknown';
+        }
         if (isset($this->data['request_headers']['php-auth-pw'])) {
             $this->data['request_headers']['php-auth-pw'] = '******';
         }
@@ -444,5 +442,13 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         return $cookie;
+    }
+
+    public function getSummary(Profile $profile)
+    {
+        return array(
+            'ip' => $this->data['ip'],
+            'method' => $this->data['method']
+        );
     }
 }

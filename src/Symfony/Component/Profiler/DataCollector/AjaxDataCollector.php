@@ -13,7 +13,7 @@ namespace Symfony\Component\Profiler\DataCollector;
 
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Context\RequestContext;
-use Symfony\Component\Profiler\ProfileInterface;
+use Symfony\Component\Profiler\Profile;
 
 /**
  * AjaxDataCollector.
@@ -22,7 +22,7 @@ use Symfony\Component\Profiler\ProfileInterface;
  */
 class AjaxDataCollector extends DataCollector
 {
-    public function collectData(ContextInterface $context, ProfileInterface $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         return $context instanceof RequestContext;
     }

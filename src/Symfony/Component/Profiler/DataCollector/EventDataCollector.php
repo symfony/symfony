@@ -14,7 +14,7 @@ namespace Symfony\Component\Profiler\DataCollector;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
 use Symfony\Component\Profiler\Context\ContextInterface;
-use Symfony\Component\Profiler\ProfileInterface;
+use Symfony\Component\Profiler\Profile;
 
 /**
  * EventDataCollector.
@@ -33,7 +33,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function collectData(ContextInterface $context, ProfileInterface $profile)
+    public function collectData(ContextInterface $context, Profile $profile)
     {
         $this->data = array(
             'called_listeners' => array(),
@@ -42,7 +42,7 @@ class EventDataCollector extends DataCollector implements LateDataCollectorInter
         return true;
     }
 
-    public function lateCollect(ProfileInterface $profile)
+    public function lateCollect(Profile $profile)
     {
         if ($this->dispatcher instanceof TraceableEventDispatcherInterface) {
             $this->setCalledListeners($this->dispatcher->getCalledListeners());

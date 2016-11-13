@@ -16,6 +16,6 @@ namespace Symfony\Component\Workflow\Exception;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class InvalidDefinitionException extends \LogicException implements ExceptionInterface
+class InvalidDefinitionException extends LogicException
 {
 }

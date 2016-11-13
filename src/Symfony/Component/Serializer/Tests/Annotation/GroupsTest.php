@@ -31,7 +31,7 @@ class GroupsTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotAnArrayGroupsParameter()
     {
-        new Groups(array('value' => 'coopTilleuls'));
+        new Groups(array('value' => 12));
     }
 
     /**
@@ -48,5 +48,11 @@ class GroupsTest extends \PHPUnit_Framework_TestCase
 
         $groups = new Groups(array('value' => $validData));
         $this->assertEquals($validData, $groups->getGroups());
+    }
+
+    public function testSingleGroup()
+    {
+        $groups = new Groups(array('value' => 'a'));
+        $this->assertEquals(array('a'), $groups->getGroups());
     }
 }

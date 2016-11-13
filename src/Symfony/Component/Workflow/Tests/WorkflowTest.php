@@ -216,12 +216,12 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
         $builder->addPlaces(range('a', 'g'));
 
-        $builder->addTransition(new Transition('t1', 'a', array('b', 'c')));
-        $builder->addTransition(new Transition('t2', array('b', 'c'), 'd'));
-        $builder->addTransition(new Transition('t3', 'd', 'e'));
-        $builder->addTransition(new Transition('t4', 'd', 'f'));
-        $builder->addTransition(new Transition('t5', 'e', 'g'));
-        $builder->addTransition(new Transition('t6', 'f', 'g'));
+        $builder->addTransition('t1', 'a', array('b', 'c'));
+        $builder->addTransition('t2', array('b', 'c'), 'd');
+        $builder->addTransition('t3', 'd', 'e');
+        $builder->addTransition('t4', 'd', 'f');
+        $builder->addTransition('t5', 'e', 'g');
+        $builder->addTransition('t6', 'f', 'g');
 
         return $builder->build();
 

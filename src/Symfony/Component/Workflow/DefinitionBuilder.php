@@ -23,17 +23,20 @@ use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 class DefinitionBuilder
 {
     private $places = array();
-    private $transitions = array();
+    private $transitionsCollection;
     private $initialPlace;
 
     /**
-     * @param string[]     $places
-     * @param Transition[] $transitions
+     * @param string[]             $places
+     * @param (Transition|array)[] $transitions Nested values can be either instances of Transition or
+     *                                          arrays with three values: the transition name, and two
+     *                                          to pass string or arrays of string for froms and todos
      */
     public function __construct(array $places = array(), array $transitions = array())
     {
         $this->addPlaces($places);
-        $this->addTransitions($transitions);
+        $this->transitionsCollection = new TransitionsCollectionBuilder();
+        $this->transitionsCollection->addTransitions($transitions);
     }
 
     /**
@@ -41,7 +44,7 @@ class DefinitionBuilder
      */
     public function build()
     {
-        return new Definition($this->places, $this->transitions, $this->initialPlace);
+        return new Definition($this->places, $this->transitionsCollection->getTransitions(), $this->initialPlace);
     }
 
     /**
@@ -50,7 +53,7 @@ class DefinitionBuilder
     public function reset()
     {
         $this->places = array();
-        $this->transitions = array();
+        $this->transitionsCollection->reset();
         $this->initialPlace = null;
     }
 
@@ -79,15 +82,23 @@ class DefinitionBuilder
         }
     }
 
+    /**
+     * @param (Transition|array)[] $transitions Nested values can be either instances of Transition or
+     *                                          arrays with three values: the transition name, and two
+     *                                          to pass string or arrays of string for froms and todos
+     */
     public function addTransitions(array $transitions)
     {
-        foreach ($transitions as $transition) {
-            $this->addTransition($transition);
-        }
+        $this->transitionsCollection->addTransitions($transitions);
     }
 
-    public function addTransition(Transition $transition)
+    /**
+     * @param Transition|string    $transition
+     * @param string[]|string|null $froms
+     * @param string[]|string|null $tos
+     */
+    public function addTransition($transition, $froms = null, $tos = null)
     {
-        $this->transitions[] = $transition;
+        $this->transitionsCollection->addTransition($transition, $froms, $tos);
     }
 }

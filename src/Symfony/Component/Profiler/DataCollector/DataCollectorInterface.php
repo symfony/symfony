@@ -13,6 +13,7 @@ namespace Symfony\Component\Profiler\DataCollector;
 
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
+use Symfony\Component\Profiler\ProfileInterface;
 
 /**
  * DataCollectorInterface.
@@ -25,10 +26,10 @@ interface DataCollectorInterface
      * Collects data for the given Request and Response.
      *
      * @param ContextInterface $context
-     * @param Profile $profile
+     * @param ProfileInterface|Profile $profile
      * @return
      */
-    public function collectData(ContextInterface $context, Profile $profile);
+    public function collectData(ContextInterface $context, ProfileInterface $profile);
 
     /**
      * Returns the name of the collector.

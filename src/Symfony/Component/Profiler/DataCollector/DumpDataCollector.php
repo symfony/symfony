@@ -13,8 +13,8 @@ namespace Symfony\Component\Profiler\DataCollector;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Profiler\Context\ContextInterface;
-use Symfony\Component\Profiler\Profile;
 use Symfony\Component\Profiler\Context\RequestContext;
+use Symfony\Component\Profiler\ProfileInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -140,7 +140,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         }
     }
 
-    public function collectData(ContextInterface $context, Profile $profile)
+    public function collectData(ContextInterface $context, ProfileInterface $profile)
     {
         // Sub-requests and programmatic calls stay in the collected profile.
         if ($this->dumper) {

@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
 use Symfony\Component\Profiler\Context\RequestContext;
+use Symfony\Component\Profiler\ProfileInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -43,7 +44,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
     /**
      * {@inheritdoc}
      */
-    public function collectData(ContextInterface $context, Profile $profile)
+    public function collectData(ContextInterface $context, ProfileInterface $profile)
     {
         if (!$context instanceof RequestContext) {
             return false;

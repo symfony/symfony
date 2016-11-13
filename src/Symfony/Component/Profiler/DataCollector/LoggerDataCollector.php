@@ -36,7 +36,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function collectData(ContextInterface $context, Profile $profile)
+    public function collectData(ContextInterface $context, ProfileInterface $profile)
     {
         return true;
     }

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Profiler\DataCollector;
 
-use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\LinkStub;
 use Symfony\Component\VarDumper\Caster\StubCaster;

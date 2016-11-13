@@ -35,12 +35,12 @@ class Profile implements ProfileInterface
     private $type;
 
     /**
-     * @var Profile
+     * @var ProfileInterface
      */
     private $parent;
 
     /**
-     * @var Profile[]
+     * @var ProfileInterface[]
      */
     private $children = array();
 
@@ -77,9 +77,9 @@ class Profile implements ProfileInterface
     /**
      * Sets the parent token.
      *
-     * @param Profile $parent The parent Profile
+     * @param ProfileInterface $parent The parent Profile
      */
-    public function setParent(Profile $parent)
+    public function setParent(ProfileInterface $parent)
     {
         $this->parent = $parent;
     }

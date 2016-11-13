@@ -1,10 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: yosefderay
- * Date: 11/12/16
- * Time: 7:41 PM
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 namespace Symfony\Component\Profiler;
 
 use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
@@ -13,7 +16,7 @@ use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
 /**
  * Profile.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Yosef Deray <yderay@gmail.com>
  */
 interface ProfileInterface
 {
@@ -25,25 +28,11 @@ interface ProfileInterface
     public function getToken();
 
     /**
-     * Sets the parent token.
-     *
-     * @param Profile $parent The parent Profile
-     */
-    public function setParent(Profile $parent);
-
-    /**
      * Returns the parent profile.
      *
      * @return Profile The parent profile
      */
     public function getParent();
-
-    /**
-     * Returns the parent token.
-     *
-     * @return null|string The parent token
-     */
-    public function getParentToken();
 
     /**
      * Returns the name.

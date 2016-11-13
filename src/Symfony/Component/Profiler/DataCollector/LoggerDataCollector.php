@@ -15,6 +15,7 @@ use Symfony\Component\Debug\Exception\SilencedErrorContext;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
+use Symfony\Component\Profiler\ProfileInterface;
 
 /**
  * LogDataCollector.
@@ -43,7 +44,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * {@inheritdoc}
      */
-    public function lateCollect()
+    public function lateCollect(ProfileInterface $profile)
     {
         if (null !== $this->logger) {
             $this->data = $this->computeErrorsCount();

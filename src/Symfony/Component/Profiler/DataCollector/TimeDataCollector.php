@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\Profile;
 use Symfony\Component\Profiler\Context\RequestContext;
+use Symfony\Component\Profiler\ProfileInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -62,7 +63,7 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     /**
      * {@inheritdoc}
      */
-    public function lateCollect()
+    public function lateCollect(ProfileInterface $profile)
     {
         if (null !== $this->stopwatch && isset($this->data['token'])) {
             $this->setEvents($this->stopwatch->getSectionEvents($this->data['token']));

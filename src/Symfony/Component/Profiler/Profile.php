@@ -18,7 +18,7 @@ use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Profile
+class Profile implements ProfileInterface
 {
     private $token;
 

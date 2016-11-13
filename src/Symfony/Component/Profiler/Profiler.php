@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Profiler\Context\ContextInterface;
 use Symfony\Component\Profiler\DataCollector\DataCollectorInterface;
 use Symfony\Component\Profiler\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\Profiler\Storage\ProfilerStorageInterface;
 
 /**
  * Profiler.

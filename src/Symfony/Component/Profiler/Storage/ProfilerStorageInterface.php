@@ -9,7 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Profiler;
+namespace Symfony\Component\Profiler\Storage;
+
+use Symfony\Component\Profiler\Profile;
 
 /**
  * ProfilerStorageInterface.

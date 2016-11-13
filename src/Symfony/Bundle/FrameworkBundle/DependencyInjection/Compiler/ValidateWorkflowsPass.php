@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
-use Symfony\Component\Workflow\Validator\SinglePlaceWorkflowValidator;
 use Symfony\Component\Workflow\Validator\StateMachineValidator;
 use Symfony\Component\Workflow\Validator\WorkflowValidator;
 
@@ -59,19 +58,24 @@ class ValidateWorkflowsPass implements CompilerPassInterface
     {
         if ($tag['type'] === 'state_machine') {
             $name = 'state_machine';
-            $class = StateMachineValidator::class;
         } elseif ($tag['marking_store'] === 'scalar') {
-            $name = 'single_place';
-            $class = SinglePlaceWorkflowValidator::class;
+            $name = 'workflow_single_place';
         } else {
             $name = 'workflow';
-            $class = WorkflowValidator::class;
         }
 
-        if (empty($this->validators[$name])) {
-            $this->validators[$name] = new $class();
+        if (isset($this->validators[$name])) {
+            return $this->validators[$name];
         }
 
-        return $this->validators[$name];
+        switch ($name) {
+            case 'state_machine':
+                return $this->validators[$name] = new StateMachineValidator();
+            case 'workflow_single_place':
+                return $this->validators[$name] = new WorkflowValidator(true);
+            case 'workflow':
+            default:
+                return $this->validators[$name] = new WorkflowValidator();
+        }
     }
 }

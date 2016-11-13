@@ -3,13 +3,11 @@
 namespace Symfony\Component\Workflow\Tests\Validator;
 
 use Symfony\Component\Workflow\Definition;
-use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Tests\WorkflowTest;
 use Symfony\Component\Workflow\Transition;
-use Symfony\Component\Workflow\Validator\SinglePlaceWorkflowValidator;
-use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Workflow\Validator\WorkflowValidator;
 
-class SinglePlaceWorkflowValidatorTest extends WorkflowTest
+class WorkflowValidatorTest extends WorkflowTest
 {
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
@@ -19,7 +17,7 @@ class SinglePlaceWorkflowValidatorTest extends WorkflowTest
     {
         $definition = $this->createComplexWorkflow();
 
-        (new SinglePlaceWorkflowValidator())->validate($definition, 'foo');
+        (new WorkflowValidator(true))->validate($definition, 'foo');
     }
 
     public function testSinglePlaceWorkflowValidatorAndSimpleWorkflow()
@@ -28,6 +26,6 @@ class SinglePlaceWorkflowValidatorTest extends WorkflowTest
         $transition = new Transition('t1', 'a', 'b');
         $definition = new Definition($places, array($transition));
 
-        (new SinglePlaceWorkflowValidator())->validate($definition, 'foo');
+        (new WorkflowValidator(true))->validate($definition, 'foo');
     }
 }

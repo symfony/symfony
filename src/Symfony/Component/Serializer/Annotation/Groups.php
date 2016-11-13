@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 class Groups
 {
     /**
-     * @var array
+     * @var string[]
      */
     private $groups;
 
@@ -39,23 +39,20 @@ class Groups
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', get_class($this)));
         }
 
-        if (!is_array($data['value'])) {
-            throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be an array of strings.', get_class($this)));
-        }
-
-        foreach ($data['value'] as $group) {
+        $value = (array) $data['value'];
+        foreach ($value as $group) {
             if (!is_string($group)) {
-                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be an array of strings.', get_class($this)));
+                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a string or an array of strings.', get_class($this)));
             }
         }
 
-        $this->groups = $data['value'];
+        $this->groups = $value;
     }
 
     /**
      * Gets groups.
      *
-     * @return array
+     * @return string[]
      */
     public function getGroups()
     {

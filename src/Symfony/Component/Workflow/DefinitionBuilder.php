@@ -23,7 +23,7 @@ use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 class DefinitionBuilder
 {
     private $places = array();
-    private $transitions = array();
+    private $transitionsCollection;
     private $initialPlace;
 
     /**
@@ -35,7 +35,8 @@ class DefinitionBuilder
     public function __construct(array $places = array(), array $transitions = array())
     {
         $this->addPlaces($places);
-        $this->addTransitions($transitions);
+        $this->transitionsCollection = new TransitionsCollectionBuilder();
+        $this->transitionsCollection->addTransitions($transitions);
     }
 
     /**
@@ -43,7 +44,7 @@ class DefinitionBuilder
      */
     public function build()
     {
-        return new Definition($this->places, $this->transitions, $this->initialPlace);
+        return new Definition($this->places, $this->transitionsCollection->getTransitions(), $this->initialPlace);
     }
 
     /**
@@ -52,7 +53,7 @@ class DefinitionBuilder
     public function reset()
     {
         $this->places = array();
-        $this->transitions = array();
+        $this->transitionsCollection->reset();
         $this->initialPlace = null;
     }
 
@@ -88,14 +89,7 @@ class DefinitionBuilder
      */
     public function addTransitions(array $transitions)
     {
-        foreach ($transitions as $transition) {
-            if ($transition instanceof Transition) {
-                $this->addTransition($transition);
-            } else {
-                list($name, $froms, $tos) = $transition;
-                $this->addTransition($name, $froms, $tos);
-            }
-        }
+        $this->transitionsCollection->addTransitions($transitions);
     }
 
     /**
@@ -105,10 +99,6 @@ class DefinitionBuilder
      */
     public function addTransition($transition, $froms = null, $tos = null)
     {
-        if ($transition instanceof Transition) {
-            $this->transitions[] = $transition;
-        } else {
-            $this->transitions[] = new Transition($transition, $froms, $tos);
-        }
+        $this->transitionsCollection->addTransition($transition, $froms, $tos);
     }
 }

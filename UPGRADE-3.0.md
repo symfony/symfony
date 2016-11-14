@@ -1902,5 +1902,5 @@ UPGRADE FROM 2.x to 3.0
    After:
 
    ```php
-   $request->query->get('foo')[bar];
+   $request->query->get('foo')['bar'];
    ```

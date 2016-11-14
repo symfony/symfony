@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\ReversedTransformer;
@@ -54,6 +56,17 @@ class TimeType extends AbstractType
 
         if ('single_text' === $options['widget']) {
             $builder->addViewTransformer(new DateTimeToStringTransformer($options['model_timezone'], $options['view_timezone'], $format));
+
+            // handle seconds ignored by user's browser when with_seconds enabled
+            // https://codereview.chromium.org/450533009/
+            if ($options['with_seconds']) {
+                $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $e) {
+                    $data = $e->getData();
+                    if ($data && preg_match('/^\d{2}:\d{2}$/', $data)) {
+                        $e->setData($data.':00');
+                    }
+                });
+            }
         } else {
             $hourOptions = $minuteOptions = $secondOptions = array(
                 'error_bubbling' => true,

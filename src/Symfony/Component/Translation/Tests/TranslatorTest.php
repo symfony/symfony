@@ -273,6 +273,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->trans('foo');
     }
 
+    public function testNestedFallbackCatalogueWhenUsingMultipleLocales()
+    {
+        $translator = new Translator('fr');
+        $translator->setFallbackLocales(array('ru', 'en'));
+
+        $translator->getCatalogue('fr');
+
+        $this->assertNotNull($translator->getCatalogue('ru')->getFallbackCatalogue());
+    }
+
     public function testFallbackCatalogueResources()
     {
         $translator = new Translator('en_GB', new MessageSelector());

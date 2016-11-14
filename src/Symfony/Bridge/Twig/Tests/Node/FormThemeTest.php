@@ -66,6 +66,10 @@ class FormThemeTest extends \PHPUnit_Framework_TestCase
 
     protected function getVariableGetter($name)
     {
+        if (PHP_VERSION_ID >= 70000) {
+            return sprintf('($context["%s"] ?? null)', $name, $name);
+        }
+
         return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
     }
 }

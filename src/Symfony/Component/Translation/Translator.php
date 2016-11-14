@@ -380,7 +380,7 @@ EOF
 
         foreach ($this->computeFallbackLocales($locale) as $fallback) {
             if (!isset($this->catalogues[$fallback])) {
-                $this->doLoadCatalogue($fallback);
+                $this->loadCatalogue($fallback);
             }
 
             $fallbackCatalogue = new MessageCatalogue($fallback, $this->catalogues[$fallback]->all());

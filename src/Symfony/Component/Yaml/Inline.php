@@ -30,13 +30,13 @@ class Inline
     private static $objectForMap = false;
 
     /**
-     * Converts a YAML string to a PHP array.
+     * Converts a YAML string to a PHP value.
      *
      * @param string $value      A YAML string
      * @param int    $flags      A bit field of PARSE_* constants to customize the YAML parser behavior
      * @param array  $references Mapping of variable names to values
      *
-     * @return array A PHP array representing the YAML string
+     * @return mixed A PHP value
      *
      * @throws ParseException
      */
@@ -121,7 +121,7 @@ class Inline
      * @param mixed $value The PHP variable to convert
      * @param int   $flags A bit field of Yaml::DUMP_* constants to customize the dumped YAML string
      *
-     * @return string The YAML string representing the PHP array
+     * @return string The YAML string representing the PHP value
      *
      * @throws DumpException When trying to dump PHP resource
      */
@@ -266,7 +266,7 @@ class Inline
     }
 
     /**
-     * Parses a scalar to a YAML string.
+     * Parses a YAML scalar.
      *
      * @param string $scalar
      * @param int    $flags
@@ -276,7 +276,7 @@ class Inline
      * @param bool   $evaluate
      * @param array  $references
      *
-     * @return string A YAML string
+     * @return string
      *
      * @throws ParseException When malformed inline YAML string is parsed
      *
@@ -329,12 +329,12 @@ class Inline
     }
 
     /**
-     * Parses a quoted scalar to YAML.
+     * Parses a YAML quoted scalar.
      *
      * @param string $scalar
      * @param int    &$i
      *
-     * @return string A YAML string
+     * @return string
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
@@ -359,14 +359,14 @@ class Inline
     }
 
     /**
-     * Parses a sequence to a YAML string.
+     * Parses a YAML sequence.
      *
      * @param string $sequence
      * @param int    $flags
      * @param int    &$i
      * @param array  $references
      *
-     * @return string A YAML string
+     * @return array
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
@@ -419,14 +419,14 @@ class Inline
     }
 
     /**
-     * Parses a mapping to a YAML string.
+     * Parses a YAML mapping.
      *
      * @param string $mapping
      * @param int    $flags
      * @param int    &$i
      * @param array  $references
      *
-     * @return string A YAML string
+     * @return array|\stdClass
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */

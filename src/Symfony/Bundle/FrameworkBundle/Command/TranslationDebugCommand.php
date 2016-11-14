@@ -21,6 +21,8 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\LoggingTranslator;
 
 /**
  * Helps finding unused or missing translation messages in a given locale
@@ -301,7 +303,7 @@ EOF
     {
         $fallbackCatalogues = array();
         $translator = $this->getContainer()->get('translator');
-        if ($translator instanceof Translator) {
+        if ($translator instanceof Translator || $translator instanceof DataCollectorTranslator || $translator instanceof LoggingTranslator) {
             foreach ($translator->getFallbackLocales() as $fallbackLocale) {
                 if ($fallbackLocale === $locale) {
                     continue;

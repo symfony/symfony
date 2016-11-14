@@ -80,7 +80,13 @@ if ($this->env->isDebug()) {
 }
 
 EOTXT;
-        $expected = preg_replace('/%(.*?)%/', PHP_VERSION_ID >= 50400 ? '(isset($context["$1"]) ? $context["$1"] : null)' : '$this->getContext($context, "$1")', $expected);
+        if (PHP_VERSION_ID >= 70000) {
+            $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
+        } elseif (PHP_VERSION_ID >= 50400) {
+            $expected = preg_replace('/%(.*?)%/', '(isset($context["$1"]) ? $context["$1"] : null)', $expected);
+        } else {
+            $expected = preg_replace('/%(.*?)%/', '$this->getContext($context, "$1")', $expected);
+        }
 
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }
@@ -106,7 +112,14 @@ if ($this->env->isDebug()) {
 }
 
 EOTXT;
-        $expected = preg_replace('/%(.*?)%/', PHP_VERSION_ID >= 50400 ? '(isset($context["$1"]) ? $context["$1"] : null)' : '$this->getContext($context, "$1")', $expected);
+
+        if (PHP_VERSION_ID >= 70000) {
+            $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
+        } elseif (PHP_VERSION_ID >= 50400) {
+            $expected = preg_replace('/%(.*?)%/', '(isset($context["$1"]) ? $context["$1"] : null)', $expected);
+        } else {
+            $expected = preg_replace('/%(.*?)%/', '$this->getContext($context, "$1")', $expected);
+        }
 
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }

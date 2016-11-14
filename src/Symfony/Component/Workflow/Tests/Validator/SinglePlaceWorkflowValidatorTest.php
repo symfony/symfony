@@ -3,11 +3,9 @@
 namespace Symfony\Component\Workflow\Tests\Validator;
 
 use Symfony\Component\Workflow\Definition;
-use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Tests\WorkflowTest;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Validator\SinglePlaceWorkflowValidator;
-use Symfony\Component\Workflow\Workflow;
 
 class SinglePlaceWorkflowValidatorTest extends WorkflowTest
 {

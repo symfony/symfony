@@ -4,8 +4,8 @@ namespace Symfony\Component\Workflow\Tests\Dumper;
 
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
-use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\MultipleStateMarking;
 
 class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,13 +40,13 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     {
         yield array(
             $this->provideComplexWorkflowDefinition(),
-            new Marking(array('b' => 1)),
+            new MultipleStateMarking(array('b' => 1)),
             $this->createComplexWorkflowDumpWithMarking(),
         );
 
         yield array(
             $this->provideSimpleWorkflowDefinition(),
-            new Marking(array('c' => 1, 'd' => 1)),
+            new MultipleStateMarking(array('c' => 1, 'd' => 1)),
             $this->createSimpleWorkflowDumpWithMarking(),
         );
     }

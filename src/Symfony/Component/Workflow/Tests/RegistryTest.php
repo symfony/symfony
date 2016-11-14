@@ -4,12 +4,15 @@ namespace Symfony\Component\Workflow\Tests;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Definition;
-use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
+use Symfony\Component\Workflow\MarkingStore\MarkingStore;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow;
 
 class RegistryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Registry
+     */
     private $registry;
 
     protected function setUp()
@@ -18,9 +21,9 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->registry = new Registry();
 
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), Subject1::class);
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), Subject2::class);
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), Subject2::class);
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStore::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), Subject1::class);
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStore::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), Subject2::class);
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStore::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), Subject2::class);
     }
 
     protected function tearDown()

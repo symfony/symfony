@@ -18,8 +18,7 @@
             <argument /> <!-- name -->
         </service>
 
-        <service id="workflow.marking_store.multiple_state" class="Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore" abstract="true" />
-        <service id="workflow.marking_store.single_state" class="Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore" abstract="true" />
+        <service id="workflow.marking_store.property_access" class="Symfony\Component\Workflow\MarkingStore\PropertyAccessMarkingStore" abstract="true" />
 
         <service id="workflow.registry" class="Symfony\Component\Workflow\Registry" />
 

@@ -431,13 +431,16 @@ class FrameworkExtension extends Extension
             ));
 
             // Create MarkingStore
-            if (isset($workflow['marking_store']['type'])) {
-                $markingStoreDefinition = new DefinitionDecorator('workflow.marking_store.'.$workflow['marking_store']['type']);
+            if (isset($workflow['marking_store']['service'])) {
+                $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
+            } else {
+                $markingStoreDefinition = new DefinitionDecorator('workflow.marking_store.property_access');
                 foreach ($workflow['marking_store']['arguments'] as $argument) {
                     $markingStoreDefinition->addArgument($argument);
                 }
-            } elseif (isset($workflow['marking_store']['service'])) {
-                $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
+
+                $markingStrategy = 'state_machine' === $type ? 'single_state' : $workflow['marking_store']['type'];
+                $markingStoreDefinition->replaceArgument(2, $markingStrategy);
             }
 
             // Create Workflow
@@ -447,6 +450,9 @@ class FrameworkExtension extends Extension
                 $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
             }
             $workflowDefinition->replaceArgument(3, $name);
+            if ('workflow' === $type) {
+                $workflowDefinition->replaceArgument(4, $workflow['use_tokens']);
+            }
 
             // Store to container
             $workflowId = sprintf('%s.%s', $type, $name);

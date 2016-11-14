@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Workflow;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
+use Symfony\Component\Workflow\EventListener\WorkflowListener;
 use Symfony\Component\Workflow\Exception\LogicException;
-use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
-use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\MarkingStore;
+use Symfony\Component\Workflow\MarkingStore\PropertyAccessMarkingStore;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -29,13 +31,30 @@ class Workflow
     private $markingStore;
     private $dispatcher;
     private $name;
+    private $useTokens;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
+    /**
+     * @param Definition                    $definition
+     * @param MarkingStore|null             $markingStore
+     * @param EventDispatcherInterface|null $dispatcher
+     * @param string                        $name
+     * @param bool                          $useTokens
+     */
+    public function __construct(Definition $definition, MarkingStore $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed', $useTokens = false)
     {
         $this->definition = $definition;
-        $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
+        $this->markingStore = $markingStore ?: new PropertyAccessMarkingStore();
         $this->dispatcher = $dispatcher;
         $this->name = $name;
+        $this->useTokens = (bool) $useTokens;
+
+        if (!$useTokens) {
+            if (null === $dispatcher) {
+                $this->dispatcher = new EventDispatcher();
+            }
+
+            $this->dispatcher->addListener(sprintf('workflow.%s.guard', $name), new WorkflowListener());
+        }
     }
 
     /**
@@ -56,7 +75,7 @@ class Workflow
         }
 
         // check if the subject is already in the workflow
-        if (!$marking->getPlaces()) {
+        if (!$marking->getState()) {
             if (!$this->definition->getInitialPlace()) {
                 throw new LogicException(sprintf('The Marking is empty and there is no initial place for workflow "%s".', $this->name));
             }
@@ -65,7 +84,7 @@ class Workflow
 
         // check that the subject has a known place
         $places = $this->definition->getPlaces();
-        foreach ($marking->getPlaces() as $placeName => $nbToken) {
+        foreach ($marking->getState() as $placeName => $nbToken) {
             if (!isset($places[$placeName])) {
                 $message = sprintf('Place "%s" is not valid for workflow "%s".', $placeName, $this->name);
                 if (!$places) {
@@ -230,10 +249,12 @@ class Workflow
         }
 
         foreach ($transition->getTos() as $place) {
-            $marking->mark($place);
+            if (!$marking->has($place) || $this->useTokens) {
+                $marking->mark($place);
 
-            if (null !== $this->dispatcher) {
-                $this->dispatcher->dispatch(sprintf('workflow.%s.enter.%s', $this->name, $place), $event);
+                if (null !== $this->dispatcher) {
+                    $this->dispatcher->dispatch(sprintf('workflow.%s.enter.%s', $this->name, $place), $event);
+                }
             }
         }
     }
@@ -286,9 +307,12 @@ class Workflow
      */
     private function getTransitionForSubject($subject, Marking $marking, array $transitions)
     {
+        $strategy = $this->markingStore->getStrategy();
         foreach ($transitions as $transition) {
             foreach ($transition->getFroms() as $place) {
-                if (!$marking->has($place)) {
+                if ($marking->has($place) && Marking::STRATEGY_MULTIPLE_STATE === $strategy) {
+                    break;
+                } elseif (!$marking->has($place)) {
                     continue 2;
                 }
             }

@@ -6,9 +6,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Event\GuardEvent;
-use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
-use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\PropertyAccessMarkingStore;
+use Symfony\Component\Workflow\MultipleStateMarking;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
@@ -22,7 +21,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
+        $workflow = new Workflow(new Definition(array(), array()), $this->getMockBuilder(PropertyAccessMarkingStore::class)->getMock());
 
         $workflow->getMarking($subject);
     }
@@ -35,7 +34,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
+        $workflow = new Workflow(new Definition(array(), array()), new PropertyAccessMarkingStore());
 
         $workflow->getMarking($subject);
     }
@@ -49,7 +48,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $subject->marking = array('nope' => true);
-        $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
+        $workflow = new Workflow(new Definition(array(), array()), new PropertyAccessMarkingStore());
 
         $workflow->getMarking($subject);
     }
@@ -59,11 +58,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore());
 
         $marking = $workflow->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertInstanceOf(MultipleStateMarking::class, $marking);
         $this->assertTrue($marking->has('a'));
         $this->assertSame(array('a' => 1), $subject->marking);
     }
@@ -74,11 +73,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $subject->marking = array('b' => 1, 'c' => 1);
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore());
 
         $marking = $workflow->getMarking($subject);
 
-        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertInstanceOf(MultipleStateMarking::class, $marking);
         $this->assertTrue($marking->has('b'));
         $this->assertTrue($marking->has('c'));
     }
@@ -92,7 +91,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore());
 
         $workflow->can($subject, 'foobar');
     }
@@ -102,10 +101,30 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore());
 
         $this->assertTrue($workflow->can($subject, 't1'));
         $this->assertFalse($workflow->can($subject, 't2'));
+    }
+
+    public function testCannotHaveManyTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1, 'c' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore());
+
+        $this->assertFalse($workflow->can($subject, 't1'));
+    }
+
+    public function testCanUsingTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1, 'c' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, null, true);
+
+        $this->assertTrue($workflow->can($subject, 't1'));
     }
 
     public function testCanWithGuard()
@@ -117,7 +136,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
             $event->setBlocked(true);
         });
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $this->assertFalse($workflow->can($subject, 't1'));
     }
@@ -131,7 +150,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore());
 
         $workflow->apply($subject, 't2');
     }
@@ -141,11 +160,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $definition = $this->createComplexWorkflow();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore());
 
         $marking = $workflow->apply($subject, 't1');
 
-        $this->assertInstanceOf(Marking::class, $marking);
+        $this->assertInstanceOf(MultipleStateMarking::class, $marking);
         $this->assertFalse($marking->has('a'));
         $this->assertTrue($marking->has('b'));
         $this->assertTrue($marking->has('c'));
@@ -157,7 +176,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcherMock();
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $eventNameExpected = array(
             'workflow.guard',
@@ -185,6 +204,40 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
+    public function testApplyWithoutTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name');
+
+        foreach ($workflow->getEnabledTransitions($subject) as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('d' => 1), $subject->marking);
+    }
+
+    public function testApplyWithTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('f' => 2);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name', true);
+
+        foreach ($workflow->getEnabledTransitions($subject) as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('f' => 1, 'g' => 1), $subject->marking);
+
+        foreach ($workflow->getEnabledTransitions($subject) as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('g' => 2), $subject->marking);
+    }
+
     public function testGetEnabledTransitions()
     {
         $definition = $this->createComplexWorkflow();
@@ -194,7 +247,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
             $event->setBlocked(true);
         });
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $this->assertEmpty($workflow->getEnabledTransitions($subject));
 
@@ -208,6 +261,52 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(1, $transitions);
         $this->assertSame('t5', $transitions[0]->getName());
+    }
+
+    public function testGetEnabledTransitionDoesNotExceedOneToken()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => true, 'b' => true, 'c' => true);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name');
+
+        $transitions = $workflow->getEnabledTransitions($subject);
+        // "a" cannot go in "b" or "c" as they're already marked
+        $this->assertCount(1, $transitions);
+    }
+
+    public function testGetEnabledTransitionUsingTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1, 'c' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name', true);
+
+        $transitions = $workflow->getEnabledTransitions($subject);
+        $this->assertCount(2, $transitions);
+
+        foreach ($transitions as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('b' => 1, 'c' => 1, 'd' => 1), $subject->marking);
+    }
+
+    public function testGetEnabledTransitionUsingTokensWithMultipleTokens()
+    {
+        $definition = $this->createComplexWorkflow();
+        $subject = new \stdClass();
+        $subject->marking = array('b' => 2, 'c' => 1);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), null, 'workflow_name', true);
+
+        $transitions = $workflow->getEnabledTransitions($subject);
+        $this->assertCount(1, $transitions);
+
+        foreach ($transitions as $transition) {
+            $workflow->apply($subject, $transition->getName());
+        }
+
+        $this->assertSame(array('b' => 1, 'd' => 1), $subject->marking);
     }
 
     protected function createComplexWorkflow()

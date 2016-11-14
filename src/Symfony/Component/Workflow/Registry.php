@@ -30,6 +30,14 @@ class Registry
         $this->workflows[] = array($workflow, $className);
     }
 
+    /**
+     * @param string      $subject
+     * @param string|null $workflowName
+     *
+     * @return Workflow
+     *
+     * @throws InvalidArgumentException When no workflow is matched
+     */
     public function get($subject, $workflowName = null)
     {
         $matched = null;

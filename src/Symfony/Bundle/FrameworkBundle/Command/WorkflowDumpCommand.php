@@ -15,8 +15,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
-use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\Workflow;
+use Symfony\Component\Workflow\MultipleStateMarking;
+use Symfony\Component\Workflow\SingleStateMarking;
+use Symfony\Component\Workflow\StateMachine;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -67,7 +68,7 @@ EOF
         }
 
         $dumper = new GraphvizDumper();
-        $marking = new Marking();
+        $marking = $workflow instanceof StateMachine ? new SingleStateMarking() : new MultipleStateMarking();
 
         foreach ($input->getArgument('marking') as $place) {
             $marking->mark($place);

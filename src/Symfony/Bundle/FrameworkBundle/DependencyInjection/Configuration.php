@@ -244,6 +244,7 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->enumNode('type')
                                         ->values(array('multiple_state', 'single_state'))
+                                        ->defaultValue('multiple_state')
                                     ->end()
                                     ->arrayNode('arguments')
                                         ->beforeNormalization()

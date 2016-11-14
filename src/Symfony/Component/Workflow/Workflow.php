@@ -15,8 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Workflow\Event\Event;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Exception\LogicException;
-use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
-use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\MarkingStore;
+use Symfony\Component\Workflow\MarkingStore\PropertyAccessMarkingStore;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -30,10 +30,10 @@ class Workflow
     private $dispatcher;
     private $name;
 
-    public function __construct(Definition $definition, MarkingStoreInterface $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
+    public function __construct(Definition $definition, MarkingStore $markingStore = null, EventDispatcherInterface $dispatcher = null, $name = 'unnamed')
     {
         $this->definition = $definition;
-        $this->markingStore = $markingStore ?: new MultipleStateMarkingStore();
+        $this->markingStore = $markingStore ?: new PropertyAccessMarkingStore();
         $this->dispatcher = $dispatcher;
         $this->name = $name;
     }
@@ -56,7 +56,7 @@ class Workflow
         }
 
         // check if the subject is already in the workflow
-        if (!$marking->getPlaces()) {
+        if (!$marking->getState()) {
             if (!$this->definition->getInitialPlace()) {
                 throw new LogicException(sprintf('The Marking is empty and there is no initial place for workflow "%s".', $this->name));
             }
@@ -65,7 +65,7 @@ class Workflow
 
         // check that the subject has a known place
         $places = $this->definition->getPlaces();
-        foreach ($marking->getPlaces() as $placeName => $nbToken) {
+        foreach ($marking->getState() as $placeName => $nbToken) {
             if (!isset($places[$placeName])) {
                 $message = sprintf('Place "%s" is not valid for workflow "%s".', $placeName, $this->name);
                 if (!$places) {

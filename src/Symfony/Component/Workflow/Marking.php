@@ -12,41 +12,45 @@
 namespace Symfony\Component\Workflow;
 
 /**
- * Marking contains the place of every tokens.
+ * A base Marking which contains the state of the
+ * state of a Workflow or a StateMachine a representation
+ * by places with tokens.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Jules Pietri <jules@heahprod.com>
  */
-class Marking
+abstract class Marking
 {
-    private $places = array();
+    const STRATEGY_SINGLE_STATE = 'single_state';
+    const STRATEGY_MULTIPLE_STATE = 'multiple_state';
+
+    protected $places = array();
 
     /**
-     * @param string[] $representation Keys are the place name and values should be 1
+     * @param string $place
+     *
+     * @return bool
      */
-    public function __construct(array $representation = array())
-    {
-        foreach ($representation as $place => $nbToken) {
-            $this->mark($place);
-        }
-    }
-
-    public function mark($place)
-    {
-        $this->places[$place] = 1;
-    }
-
-    public function unmark($place)
-    {
-        unset($this->places[$place]);
-    }
-
-    public function has($place)
+    final public function has($place)
     {
         return isset($this->places[$place]);
     }
 
-    public function getPlaces()
+    /**
+     * @return int[] An array of places as keys and token counts as values.
+     */
+    final public function getState()
     {
         return $this->places;
     }
+
+    /**
+     * @param string $place
+     */
+    abstract public function mark($place);
+
+    /**
+     * @param string $place
+     */
+    abstract public function unmark($place);
 }

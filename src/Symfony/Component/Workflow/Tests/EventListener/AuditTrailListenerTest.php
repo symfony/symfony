@@ -6,7 +6,7 @@ use Psr\Log\AbstractLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\EventListener\AuditTrailListener;
-use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\PropertyAccessMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
@@ -29,7 +29,7 @@ class AuditTrailListenerTest extends \PHPUnit_Framework_TestCase
         $ed = new EventDispatcher();
         $ed->addSubscriber(new AuditTrailListener($logger));
 
-        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $ed);
+        $workflow = new Workflow($definition, new PropertyAccessMarkingStore(), $ed);
 
         $workflow->apply($object, 't1');
 

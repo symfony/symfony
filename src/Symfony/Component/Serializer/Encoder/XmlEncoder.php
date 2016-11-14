@@ -392,7 +392,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
                     }
                 } elseif (is_numeric($key) || !$this->isElementNameValid($key)) {
                     $append = $this->appendNode($parentNode, $data, 'item', $key);
-                } else {
+                } elseif (null !== $data || !isset($this->context['remove_empty_tags']) || false === $this->context['remove_empty_tags']) {
                     $append = $this->appendNode($parentNode, $data, $key);
                 }
             }

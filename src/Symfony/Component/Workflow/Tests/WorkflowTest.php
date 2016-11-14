@@ -47,7 +47,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     public function testGetMarkingWithImpossiblePlace()
     {
         $subject = new \stdClass();
-        $subject->marking = null;
         $subject->marking = array('nope' => true);
         $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
 
@@ -210,7 +209,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('t5', $transitions[0]->getName());
     }
 
-    protected function createComplexWorkflow()
+    public static function createComplexWorkflow()
     {
         $builder = new DefinitionBuilder();
 

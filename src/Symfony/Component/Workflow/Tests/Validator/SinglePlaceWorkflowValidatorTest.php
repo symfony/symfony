@@ -9,7 +9,7 @@ use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Validator\SinglePlaceWorkflowValidator;
 use Symfony\Component\Workflow\Workflow;
 
-class SinglePlaceWorkflowValidatorTest extends WorkflowTest
+class SinglePlaceWorkflowValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
@@ -17,7 +17,7 @@ class SinglePlaceWorkflowValidatorTest extends WorkflowTest
      */
     public function testSinglePlaceWorkflowValidatorAndComplexWorkflow()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = WorkflowTest::createComplexWorkflow();
 
         (new SinglePlaceWorkflowValidator())->validate($definition, 'foo');
     }

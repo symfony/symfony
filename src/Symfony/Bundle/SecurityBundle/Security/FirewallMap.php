@@ -63,6 +63,24 @@ class FirewallMap implements FirewallMapInterface
         return $context->getConfig();
     }
 
+    /**
+     * @param string $name
+     *
+     * @throws \OutOfBoundsException
+     *
+     * @return FirewallConfig
+     */
+    public function getFirewallConfigByName($name)
+    {
+        $contextId = 'security.firewall.map.context.'.$name;
+
+        if (!array_key_exists($contextId, $this->map)) {
+            throw new \OutOfBoundsException(sprintf('The firewall "%s" does not exist.', $name));
+        }
+
+        return $this->container->get($contextId)->getConfig();
+    }
+
     private function getFirewallContext(Request $request)
     {
         if ($this->contexts->contains($request)) {

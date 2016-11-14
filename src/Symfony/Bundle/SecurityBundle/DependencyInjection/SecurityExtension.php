@@ -387,6 +387,7 @@ class SecurityExtension extends Extension
                     $firewall['logout']['csrf_token_id'],
                     $firewall['logout']['csrf_parameter'],
                     isset($firewall['logout']['csrf_token_generator']) ? new Reference($firewall['logout']['csrf_token_generator']) : null,
+                    false === $firewall['stateless'] && isset($firewall['context']) ? $firewall['context'] : null,
                 ))
             ;
         }

@@ -183,6 +183,9 @@ Security
  * The `RoleInterface` has been deprecated. Extend the `Symfony\Component\Security\Core\Role\Role`
    class in your custom role implementations instead.
 
+ * The `LogoutUrlGenerator::registerListener()` method will expect a 6th `$context = null` argument in 4.0.
+   Define the argument when overriding this method.
+
 SecurityBundle
 --------------
 

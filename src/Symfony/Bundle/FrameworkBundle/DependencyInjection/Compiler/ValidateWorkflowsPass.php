@@ -58,7 +58,7 @@ class ValidateWorkflowsPass implements CompilerPassInterface
         if ('single_state' === $tag['marking_store']) {
             return new WorkflowValidator(true);
         }
-        
+
         return new WorkflowValidator();
     }
 }

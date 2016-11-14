@@ -23,11 +23,6 @@ use Symfony\Component\Workflow\Validator\WorkflowValidator;
  */
 class ValidateWorkflowsPass implements CompilerPassInterface
 {
-    /**
-     * @var DefinitionValidatorInterface[]
-     */
-    private $validators = array();
-
     public function process(ContainerBuilder $container)
     {
         $taggedServices = $container->findTaggedServiceIds('workflow.definition');
@@ -44,7 +39,7 @@ class ValidateWorkflowsPass implements CompilerPassInterface
                     throw new RuntimeException(sprintf('The "marking_store" for the tag "workflow.definition" of service "%s" must be set.', $id));
                 }
 
-                $this->getValidator($tag)->validate($definition, $tag['name']);
+                $this->createValidator($tag)->validate($definition, $tag['name']);
             }
         }
     }
@@ -54,28 +49,16 @@ class ValidateWorkflowsPass implements CompilerPassInterface
      *
      * @return DefinitionValidatorInterface
      */
-    private function getValidator($tag)
+    private function createValidator($tag)
     {
         if ('state_machine' === $tag['type']) {
-            $name = 'state_machine';
-        } elseif ('single_state' === $tag['marking_store']) {
-            $name = 'workflow_single_state';
-        } else {
-            $name = 'workflow';
+            return new StateMachineValidator();
         }
 
-        if (isset($this->validators[$name])) {
-            return $this->validators[$name];
+        if ('single_state' === $tag['marking_store']) {
+            return new WorkflowValidator(true);
         }
-
-        switch ($name) {
-            case 'state_machine':
-                return $this->validators[$name] = new StateMachineValidator();
-            case 'workflow_single_state':
-                return $this->validators[$name] = new WorkflowValidator(true);
-            case 'workflow':
-            default:
-                return $this->validators[$name] = new WorkflowValidator();
-        }
+        
+        return new WorkflowValidator();
     }
 }

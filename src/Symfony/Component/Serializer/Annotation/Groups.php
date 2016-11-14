@@ -42,7 +42,7 @@ class Groups
         $value = (array) $data['value'];
         foreach ($value as $group) {
             if (!is_string($group)) {
-                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be an array of strings.', get_class($this)));
+                throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" must be a string or an array of strings.', get_class($this)));
             }
         }
 

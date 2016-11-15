@@ -54,7 +54,7 @@ interface FormTypeGuesserInterface
      * Example:
      *  You want a float greater than 5, 4.512313 is not valid but length(4.512314) > length(5)
      *
-     * @link https://github.com/symfony/symfony/pull/3927
+     * @see https://github.com/symfony/symfony/pull/3927
      *
      * @param string $class    The fully qualified class name
      * @param string $property The name of the property to guess for

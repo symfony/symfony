@@ -21,7 +21,7 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @link http://source.icu-project.org/repos/icu/icu4j/trunk/main/classes/core/src/com/ibm/icu/util/Region.java
+ * @see http://source.icu-project.org/repos/icu/icu4j/trunk/main/classes/core/src/com/ibm/icu/util/Region.java
  *
  * @internal
  */

@@ -357,7 +357,7 @@ class ErrorHandler
         $type &= $level | $this->screamedErrors;
 
         if ($type && ($log || $throw)) {
-            if (PHP_VERSION_ID < 50400 && isset($context['GLOBALS']) && ($this->scopedErrors & $type)) {
+            if (isset($context['GLOBALS']) && ($this->scopedErrors & $type)) {
                 $e = $context;                  // Whatever the signature of the method,
                 unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
                 $context = $e;

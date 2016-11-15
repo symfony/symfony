@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2016-11-09T12:47:29Z
+
+I see your point of view @stof, but is not how __halt_compiler works
+(AFAIK). It won't stop the whole php compiler, but only the compiling of
+the current file-unit.
+
+Try this
+
+```php
+<?php
+
+include './halt.php';
+echo "after halt\n";
+```php
+<?php
+echo "before halt\n";
+
+__halt_compiler();
+
+dsfsdfsdfsdfsdf
+
+```
+You'll get:
+
+before halt
+after halt
+
+2016-11-09 13:18 GMT+01:00 Christophe Coevoet <notifications@github.com>:
+
+> your fix looks wrong to me. A file containing __halt_compiler simply
+> cannot be inlined at all (well, you could accept *1* such file if it can
+> be placed at the end, but this becomes much too tricky)
+>
+> —
+> You are receiving this because you authored the thread.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/20455#issuecomment-259401877>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AE-mh4rUmf-3goQsr0sAuKxVxthWmnrqks5q8bn5gaJpZM4KtcYJ>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2016-11-14T13:48:11Z
+
+Ok, added the fix for `__DIR__` and `__FILE__`. I've also indented the regex and is clearer now IMO.
+
+---------------------------------------------------------------------------
+
+by inso at 2016-11-14T16:47:01Z
+
+Maybe it is better to use token_get_all?
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2016-11-14T17:29:47Z
+
+token_get_all is probably much more correct/safe, but I think that the regex could be enough. Worst case, it match more files than required and are included instead of inlined. Dunno, let the maintainer decide :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-14T17:32:36Z
+
+``token_get_all`` can use too much memory on big PHP files, hitting the memory limit
+
+---------------------------------------------------------------------------
+
+by giosh94mhz at 2016-11-15T08:25:33Z
+
+I've fixed some "unrelated" unit tests, and now everything pass correctly on travis & co.
+The box above still show a "changes requested" box from @nicolas-grekas which I cannot fix, since I've rebase the code. I never used this GitHub feature, I feel like a noob :)

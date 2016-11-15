@@ -223,7 +223,7 @@ class TimeTypeTest extends TestCase
 
     public function testSubmitWithSecondsAndBrowserOmissionSeconds()
     {
-        $form = $this->factory->create('time', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'input' => 'string',

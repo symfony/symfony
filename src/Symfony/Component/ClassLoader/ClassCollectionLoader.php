@@ -130,8 +130,15 @@ class ClassCollectionLoader
             throw new \RuntimeException(sprintf('Class Collection Loader was not able to create directory "%s"', $cacheDir));
         }
 
-        $c = '(?:\s*+(?:(?:#|//)[^\n]*+\n|/\*(?:(?<!\*/).)++)?+)*+';
-        $strictTypesRegex = str_replace('.', $c, "'^<\?php\s.declare.\(.strict_types.=.1.\).;'is");
+        $spacesRegex = '(?:\s*+(?:(?:\#|//)[^\n]*+\n|/\*(?:(?<!\*/).)++)?+)*+';
+        $dontInlineRegex = <<<REGEX
+            '(?:
+               ^<\?php\s.declare.\(.strict_types.=.1.\).;
+               | \b__halt_compiler.\(.\)
+               | \b__(?:DIR|FILE)__\b
+            )'isx
+REGEX;
+        $dontInlineRegex = str_replace('.', $spacesRegex, $dontInlineRegex);
 
         $cacheDir = explode(DIRECTORY_SEPARATOR, $cacheDir);
         $files = array();
@@ -145,7 +152,7 @@ class ClassCollectionLoader
             $files[$class->getName()] = $file = $class->getFileName();
             $c = file_get_contents($file);
 
-            if (preg_match($strictTypesRegex, $c)) {
+            if (preg_match($dontInlineRegex, $c)) {
                 $file = explode(DIRECTORY_SEPARATOR, $file);
 
                 for ($i = 0; isset($file[$i], $cacheDir[$i]); ++$i) {

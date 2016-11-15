@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-11T17:58:18Z
+
+@HeahDude sorry missed your changes in #20490, to me this makes more sense, rather then combining `true` and `throw`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-12T09:44:00Z
+
+I agree that it is not really intuitive to throw an exception in case of an invalid definition, but return `true` otherwise.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T09:36:11Z
+
+So.. what about removing the `WorkflowValidator` - https://github.com/symfony/symfony/pull/20490#discussion_r87690017?
+
+Looks like a premature optimization to me.. and im not even sure validators should resemble a semi same inheritance tree.
+
+edit: affects https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/ValidateWorkflowsPass.php#L68
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T10:02:09Z
+
+Back to 1 workflow validator and 1 state machine validator seems most intuitive to me =/
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-13T12:55:56Z
+
+You should not validate every workflows as a single place workflow, this feels wrong to me.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T13:19:46Z
+
+Not sure i understand.. right now it's optin.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-13T13:29:14Z
+
+Ok haven't look at the code yet :p
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-14T16:40:52Z
+
+:+1:
+
+---
+
+(I removed the Bug label, since it's not a bug. Could you edit your PR description?)

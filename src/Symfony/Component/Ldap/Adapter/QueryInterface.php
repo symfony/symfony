@@ -24,8 +24,8 @@ interface QueryInterface
     const DEREF_ALWAYS = 0x03;
 
     const SCOPE_BASE = 'base';
-    const SCOPE_ONELEVEL = 'one_level';
-    const SCOPE_SUBTREE = 'subtree';
+    const SCOPE_ONE = 'one';
+    const SCOPE_SUB = 'sub';
 
     /**
      * Executes a query and returns the list of Ldap entries.

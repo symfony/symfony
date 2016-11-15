@@ -64,10 +64,10 @@ class Query extends AbstractQuery
                 case static::SCOPE_BASE:
                     $func = 'ldap_read';
                     break;
-                case static::SCOPE_ONELEVEL:
+                case static::SCOPE_ONE:
                     $func = 'ldap_list';
                     break;
-                case static::SCOPE_SUBTREE:
+                case static::SCOPE_SUB:
                     $func = 'ldap_search';
                     break;
                 default:

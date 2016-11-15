@@ -90,7 +90,7 @@ class AdapterTest extends LdapTestCase
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
 
         $one_level_result = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)', array(
-            'scope' => Query::SCOPE_ONELEVEL,
+            'scope' => Query::SCOPE_ONE,
         ))->execute();
 
         $subtree_count = $ldap->createQuery('ou=Components,dc=symfony,dc=com', '(objectclass=*)')->execute()->count();

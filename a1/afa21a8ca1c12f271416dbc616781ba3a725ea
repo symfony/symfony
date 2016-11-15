@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by keradus at 2016-11-14T10:15:05Z
+
+Nope. As with all other CS fixes, it should be applied to lowest supported branch and then, after having it marge to successors, could be rerun on following branches.

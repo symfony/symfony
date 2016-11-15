@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-11-14T10:50:40Z
+
+but shouldn't we allow it ? It would be useful in case some config treats null as being "don't enable this feature", which is the case for the database_url in Doctrine (allowing to configure with username/password/host locally when not setting the URL)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-14T10:53:08Z
+
+Could be, but should be allowed for all parameters then (for consistency, and because we use the same code paths for all params, env or not)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-14T11:03:00Z
+
+normal parameters (non-env-based) allow to store ``null`` (they also allow to store arrays, contrary to env parameters)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-14T11:11:22Z
+
+Indeed, I messed up here :) Fixed!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-14T12:31:48Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-15T13:11:32Z
+
+👍
+
+Status: Reviewed

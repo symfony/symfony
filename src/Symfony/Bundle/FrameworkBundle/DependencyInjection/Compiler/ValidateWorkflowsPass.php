@@ -29,6 +29,9 @@ class ValidateWorkflowsPass implements CompilerPassInterface
      */
     private $validators = array();
 
+    /**
+     * @param ContainerBuilder $container
+     */
     public function process(ContainerBuilder $container)
     {
         $taggedServices = $container->findTaggedServiceIds('workflow.definition');

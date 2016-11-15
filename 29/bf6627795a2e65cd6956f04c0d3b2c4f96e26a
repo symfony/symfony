@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-11-14T17:37:10Z
+
+this should be done in 2.8 actually, to avoid getting a deprecation warning there.
+
+But we can change this when merging (by rebasing your commit first)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-14T17:40:49Z
+
+You're right of course. I've rebased and changed the target.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-14T17:49:29Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-14T17:50:05Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-15T11:38:37Z
+
+:+1:
+
+Status: Reviewed

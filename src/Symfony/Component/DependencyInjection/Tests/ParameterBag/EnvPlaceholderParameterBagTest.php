@@ -113,21 +113,30 @@ class EnvPlaceholderParameterBagTest extends \PHPUnit_Framework_TestCase
     public function testResolveEnvCastsIntToString()
     {
         $bag = new EnvPlaceholderParameterBag();
-        $bag->get('env(INT)');
-        $bag->set('env(INT)', 2);
+        $bag->get('env(INT_VAR)');
+        $bag->set('env(Int_Var)', 2);
         $bag->resolve();
-        $this->assertSame('2', $bag->all()['env(int)']);
+        $this->assertSame('2', $bag->all()['env(int_var)']);
+    }
+
+    public function testResolveEnvAllowsNull()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $bag->get('env(NULL_VAR)');
+        $bag->set('env(Null_Var)', null);
+        $bag->resolve();
+        $this->assertNull($bag->all()['env(null_var)']);
     }
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage The default value of env parameter "ARRAY" must be string or null, array given.
+     * @expectedExceptionMessage The default value of env parameter "ARRAY_VAR" must be string or null, array given.
      */
     public function testResolveThrowsOnBadDefaultValue()
     {
         $bag = new EnvPlaceholderParameterBag();
-        $bag->get('env(ARRAY)');
-        $bag->set('env(ARRAY)', array());
+        $bag->get('env(ARRAY_VAR)');
+        $bag->set('env(Array_Var)', array());
         $bag->resolve();
     }
 }

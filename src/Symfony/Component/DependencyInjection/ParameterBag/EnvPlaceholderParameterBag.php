@@ -96,7 +96,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
             }
             if (is_numeric($default = $this->parameters[$name])) {
                 $this->parameters[$name] = (string) $default;
-            } elseif (!is_string($default)) {
+            } elseif (null !== $default && !is_string($default)) {
                 throw new RuntimeException(sprintf('The default value of env parameter "%s" must be string or null, %s given.', $env, gettype($default)));
             }
         }

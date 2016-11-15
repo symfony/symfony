@@ -146,7 +146,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
             '<response><person><firstname>Peter</firstname></person></response>'."\n";
 
         $context = array(
-            'remove_empty_tags' => true
+            'remove_empty_tags' => true,
         );
 
         $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));

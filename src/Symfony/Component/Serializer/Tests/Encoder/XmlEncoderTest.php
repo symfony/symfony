@@ -140,8 +140,7 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testEncodeRemovingEmptyTags()
     {
-        $xml = simplexml_load_string('<firstname>Peter</firstname><lastname/>');
-        $array = array('person' => $xml);
+        $array = array('person' => array('firstname' => 'Peter', 'lastname' => null));
 
         $expected = '<?xml version="1.0"?>'."\n".
             '<response><person><firstname>Peter</firstname></person></response>'."\n";

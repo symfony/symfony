@@ -372,6 +372,10 @@ class ErrorHandler
             return $type && $log;
         }
 
+        if (isset($context['GLOBALS']) && ($this->scopedErrors & $type)) {
+            unset($context['GLOBALS']);
+        }
+
         if (null !== $backtrace && $type & E_ERROR) {
             // E_ERROR fatal errors are triggered on HHVM when
             // hhvm.error_handling.call_user_handler_on_fatals=1

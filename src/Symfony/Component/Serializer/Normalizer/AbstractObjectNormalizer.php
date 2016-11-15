@@ -209,20 +209,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     abstract protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = array());
 
     /**
-     * Should this attribute be normalized?
-     *
-     * @param mixed  $object
-     * @param string $attributeName
-     * @param array  $context
-     *
-     * @return bool
-     */
-    protected function isAttributeToNormalize($object, $attributeName, &$context)
-    {
-        return !in_array($attributeName, $this->ignoredAttributes) && !$this->isMaxDepthReached(get_class($object), $attributeName, $context);
-    }
-
-    /**
      * Validates the submitted data and denormalizes it.
      *
      * @param string      $currentClass

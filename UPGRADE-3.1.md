@@ -111,6 +111,10 @@ Serializer
    deprecated and will not be supported in Symfony 4.0. You should use the
    `CacheClassMetadataFactory` class instead.
 
+ * The `AbstractObjectNormalizer::isAttributeToNormalize()` method has been removed
+   because it was initially added by mistake, has never been used and is not tested
+   nor documented.
+
 Translation
 -----------
 

@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-14T22:19:11Z
+
+This piece of code changed in 3.2, are you sure the issue is on <= 3.1?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2016-11-14T22:22:04Z
+
+I could repro with 3.1.6, not sure about 3.2 though, but in general I find it surprising/disappointing that this whole code reinvents exception serialization instead of passing on the raw exception object to the logger context as defined in PSR-3, which would have allowed monolog to serialize it well in this case. Obviously I am a bit biased but still.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-14T22:33:42Z
+
+So, check 3.2, which does just that :)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2016-11-15T11:03:48Z
+
+OK I can confirm that on symfony master the bug isn't there anymore, that's great! I don't know if we should merge this fix anyway for lower versions or not. It's kind of an edge case that something bad happens on the global scope these days, so up to you.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-15T11:19:07Z
+
+I'm still in favor of fixing such tricky edge case (especially when we have the fix), as infinite loops in the error handling makes debugging very hard
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-15T11:57:34Z
+
+Looking [a few lines above](https://github.com/symfony/symfony/pull/20519/files#diff-e7d086f2c2086fdb8f108e74f11dac5bR402), I'd say let's unset GLOBALS all the time, no matter which PHP version is in use. The fix should be just removing the PHP version check from this line.
+Note also that this applies to 2.7 so should rebased.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2016-11-15T12:09:17Z
+
+Ah I thought 2.7 was EOL sorry :) I'll rebase, and you rather do the unset above there without any condition around it is that right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-15T12:12:11Z
+
+I'd keep the `if`, but remove the first check for the PHP version.
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2016-11-15T12:13:19Z
+
+OK thanks, I'm asking because I have no idea what the rest is about and don't really have time to dig in :)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2016-11-15T12:39:13Z
+
+Alright let me know if there's anything else I can do here

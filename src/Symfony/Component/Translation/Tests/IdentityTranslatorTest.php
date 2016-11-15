@@ -90,6 +90,10 @@ class IdentityTranslatorTest extends \PHPUnit_Framework_TestCase
             array('There are 10 apples', 'There is 1 apple|There are %count% apples', 10, array('%count%' => 10)),
             // custom validation messages may be coded with a fixed value
             array('There are 2 apples', 'There are 2 apples', 2, array('%count%' => 2)),
+            // tests for float numbers
+            array('There is almost half apple', '[0,0.5[ There is almost half apple |{0.5} There is half apple |]0.5,1] There is more than half apple', 0.2, array()),
+            array('There is half apple', '[0,0.5[ There is almost half apple |{0.5} There is half apple |]0.5,1] There is more than half apple', 0.5, array()),
+            array('There is more than half apple', '[0,0.5[ There is almost half apple |{0.5} There is half apple |]0.5,1] There is more than half apple', 0.8, array()),
         );
     }
 }

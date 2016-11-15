@@ -30,6 +30,8 @@ class PluralizationRules
      */
     public static function get($number, $locale)
     {
+        $number = (int) $number;
+
         if ('pt_BR' === $locale) {
             // temporary set a locale for brazilian
             $locale = 'xbr';

@@ -152,6 +152,16 @@ class XmlEncoderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $this->encoder->encode($array, 'xml', $context));
     }
 
+    public function testEncodeNotRemovingEmptyTags()
+    {
+        $array = array('person' => array('firstname' => 'Peter', 'lastname' => null));
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response><person><firstname>Peter</firstname><lastname/></person></response>'."\n";
+
+        $this->assertSame($expected, $this->encoder->encode($array, 'xml'));
+    }
+
     public function testContext()
     {
         $array = array('person' => array('name' => 'George Abitbol'));

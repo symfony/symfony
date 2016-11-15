@@ -57,10 +57,10 @@ class ValidateWorkflowsPass implements CompilerPassInterface
      */
     private function getValidator($tag)
     {
-        if ($tag['type'] === 'state_machine') {
+        if ('state_machine' === $tag['type']) {
             $name = 'state_machine';
             $class = StateMachineValidator::class;
-        } elseif ($tag['marking_store'] === 'scalar') {
+        } elseif ('scalar' === $tag['marking_store']) {
             $name = 'single_place';
             $class = SinglePlaceWorkflowValidator::class;
         } else {

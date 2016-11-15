@@ -62,7 +62,5 @@ class StateMachineValidator implements DefinitionValidatorInterface
             }
             $transitionFromNames[$from][$transition->getName()] = true;
         }
-
-        return true;
     }
 }

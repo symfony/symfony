@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
-use Symfony\Component\Workflow\Validator\SinglePlaceWorkflowValidator;
 use Symfony\Component\Workflow\Validator\StateMachineValidator;
 use Symfony\Component\Workflow\Validator\WorkflowValidator;
 
@@ -24,11 +23,6 @@ use Symfony\Component\Workflow\Validator\WorkflowValidator;
  */
 class ValidateWorkflowsPass implements CompilerPassInterface
 {
-    /**
-     * @var DefinitionValidatorInterface[]
-     */
-    private $validators = array();
-
     public function process(ContainerBuilder $container)
     {
         $taggedServices = $container->findTaggedServiceIds('workflow.definition');
@@ -45,7 +39,7 @@ class ValidateWorkflowsPass implements CompilerPassInterface
                     throw new RuntimeException(sprintf('The "marking_store" for the tag "workflow.definition" of service "%s" must be set.', $id));
                 }
 
-                $this->getValidator($tag)->validate($definition, $tag['name']);
+                $this->createValidator($tag)->validate($definition, $tag['name']);
             }
         }
     }
@@ -55,23 +49,16 @@ class ValidateWorkflowsPass implements CompilerPassInterface
      *
      * @return DefinitionValidatorInterface
      */
-    private function getValidator($tag)
+    private function createValidator($tag)
     {
-        if ($tag['type'] === 'state_machine') {
-            $name = 'state_machine';
-            $class = StateMachineValidator::class;
-        } elseif ($tag['marking_store'] === 'scalar') {
-            $name = 'single_place';
-            $class = SinglePlaceWorkflowValidator::class;
-        } else {
-            $name = 'workflow';
-            $class = WorkflowValidator::class;
+        if ('state_machine' === $tag['type']) {
+            return new StateMachineValidator();
         }
 
-        if (empty($this->validators[$name])) {
-            $this->validators[$name] = new $class();
+        if ('single_state' === $tag['marking_store']) {
+            return new WorkflowValidator(true);
         }
 
-        return $this->validators[$name];
+        return new WorkflowValidator();
     }
 }

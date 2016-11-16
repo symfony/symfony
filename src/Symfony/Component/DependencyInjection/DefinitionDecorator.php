@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * This definition decorates another definition.
@@ -195,5 +196,107 @@ class DefinitionDecorator extends Definition
         $this->arguments['index_'.$index] = $value;
 
         return $this;
+    }
+
+    /**
+     * Creates a new Definition by merging the current decorator with the given parent definition.
+     *
+     * @return Definition
+     */
+    public function resolveChanges(Definition $parentDef)
+    {
+        if ($parentDef instanceof self) {
+            throw new InvalidArgumentException('$parenfDef must be a resolved Definition.');
+        }
+        $def = new Definition();
+
+        // merge in parent definition
+        // purposely ignored attributes: abstract, tags
+        $def->setClass($parentDef->getClass());
+        $def->setArguments($parentDef->getArguments());
+        $def->setMethodCalls($parentDef->getMethodCalls());
+        $def->setProperties($parentDef->getProperties());
+        $def->setAutowiringTypes($parentDef->getAutowiringTypes());
+        if ($parentDef->isDeprecated()) {
+            $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
+        }
+        $def->setFactory($parentDef->getFactory());
+        $def->setConfigurator($parentDef->getConfigurator());
+        $def->setFile($parentDef->getFile());
+        $def->setPublic($parentDef->isPublic());
+        $def->setLazy($parentDef->isLazy());
+        $def->setAutowired($parentDef->isAutowired());
+
+        // overwrite with values specified in the decorator
+        $changes = $this->getChanges();
+        if (isset($changes['class'])) {
+            $def->setClass($this->getClass());
+        }
+        if (isset($changes['factory'])) {
+            $def->setFactory($this->getFactory());
+        }
+        if (isset($changes['configurator'])) {
+            $def->setConfigurator($this->getConfigurator());
+        }
+        if (isset($changes['file'])) {
+            $def->setFile($this->getFile());
+        }
+        if (isset($changes['public'])) {
+            $def->setPublic($this->isPublic());
+        }
+        if (isset($changes['lazy'])) {
+            $def->setLazy($this->isLazy());
+        }
+        if (isset($changes['deprecated'])) {
+            $def->setDeprecated($this->isDeprecated(), $this->getDeprecationMessage('%service_id%'));
+        }
+        if (isset($changes['autowire'])) {
+            $def->setAutowired($this->isAutowired());
+        }
+        if (isset($changes['decorated_service'])) {
+            $decoratedService = $this->getDecoratedService();
+            if (null === $decoratedService) {
+                $def->setDecoratedService($decoratedService);
+            } else {
+                $def->setDecoratedService($decoratedService[0], $decoratedService[1], $decoratedService[2]);
+            }
+        }
+
+        // merge arguments
+        foreach ($this->getArguments() as $k => $v) {
+            if (is_numeric($k)) {
+                $def->addArgument($v);
+                continue;
+            }
+
+            if (0 !== strpos($k, 'index_')) {
+                throw new RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
+            }
+
+            $index = (int) substr($k, strlen('index_'));
+            $def->replaceArgument($index, $v);
+        }
+
+        // merge properties
+        foreach ($this->getProperties() as $k => $v) {
+            $def->setProperty($k, $v);
+        }
+
+        // append method calls
+        if ($calls = $this->getMethodCalls()) {
+            $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
+        }
+
+        // merge autowiring types
+        foreach ($this->getAutowiringTypes() as $autowiringType) {
+            $def->addAutowiringType($autowiringType);
+        }
+
+        // these attributes are always taken from the child
+        $def->setAbstract($this->isAbstract());
+        $def->setShared($this->isShared());
+        $def->setTags($this->getTags());
+
+        return $def;
     }
 }

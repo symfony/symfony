@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\UnresolvedServiceDefinitionException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\Config\Resource\FileResource;
@@ -424,7 +425,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (!isset($this->definitions[$id]) && isset($this->aliasDefinitions[$id])) {
-            return $this->get($this->aliasDefinitions[$id]);
+            return $this->get($this->aliasDefinitions[$id], $invalidBehavior);
         }
 
         try {
@@ -441,6 +442,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
         try {
             $service = $this->createService($definition, $id);
+        } catch (UnresolvedServiceDefinitionException $e) {
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                return;
+            }
+
+            throw $e;
         } finally {
             unset($this->loading[$id]);
         }
@@ -836,7 +843,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function createService(Definition $definition, $id, $tryProxy = true)
     {
         if ('Symfony\Component\DependencyInjection\Definition' !== get_class($definition)) {
-            throw new RuntimeException(sprintf('Constructing service "%s" from a %s is not supported at build time.', $id, get_class($definition)));
+            throw new UnresolvedServiceDefinitionException(sprintf('Constructing service "%s" from a %s is not supported at build time.', $id, get_class($definition)));
         }
 
         if ($definition->isSynthetic()) {

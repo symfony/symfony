@@ -41,7 +41,8 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('kRFqMp5odS', $cachePool->getArgument(0));
+        $this->assertSame(Definition::class, get_class($container->getDefinition('app.cache_pool')));
+        $this->assertSame('kRFqMp5odS', $container->getDefinition('app.cache_pool')->getArgument(0));
     }
 
     public function testArgsAreReplaced()
@@ -75,6 +76,7 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
         $adapter = new Definition();
         $adapter->setAbstract(true);
         $adapter->addTag('cache.pool');
+        $adapter->addArgument(null);
         $container->setDefinition('app.cache_adapter', $adapter);
         $cachePool = new DefinitionDecorator('app.cache_adapter');
         $cachePool->addTag('cache.pool', array('foobar' => 123));

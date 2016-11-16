@@ -112,7 +112,11 @@
                 {% if templates is defined %}
                     <ul id="menu-profiler">
                         {% for name, template in templates %}
-                            {% set menu %}{{ template.renderBlock('menu', { collector: profile.getcollector(name), profiler_markup_version: profiler_markup_version }) }}{% endset %}
+                            {% set menu -%}
+                                {% with { collector: profile.getcollector(name), profiler_markup_version: profiler_markup_version } %}
+                                    {{ block('menu', template) }}
+                                {% endwith %}
+                            {%- endset %}
                             {% if menu is not empty %}
                                 <li class="{{ name }} {{ name == panel ? 'selected' : '' }}">
                                     <a href="{{ path('_profiler', { token: token, panel: name }) }}">{{ menu|raw }}</a>

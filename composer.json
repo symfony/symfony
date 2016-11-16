@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.5.9",
         "doctrine/common": "~2.4",
-        "twig/twig": "~1.27|~2.0",
+        "twig/twig": "~1.28|~2.0",
         "psr/cache": "~1.0",
         "psr/log": "~1.0",
         "symfony/polyfill-intl-icu": "~1.0",

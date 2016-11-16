@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  * @author Michael Schummel
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @link http://www.michael-schummel.de/2007/10/05/iban-prufung-mit-php/
+ * @see http://www.michael-schummel.de/2007/10/05/iban-prufung-mit-php/
  */
 class IbanValidator extends ConstraintValidator
 {
@@ -33,7 +33,7 @@ class IbanValidator extends ConstraintValidator
      * a BBAN (Basic Bank Account Number) which has a fixed length per country and,
      * included within it, a bank identifier with a fixed position and a fixed length per country
      *
-     * @link http://www.swift.com/dsp/resources/documents/IBAN_Registry.pdf
+     * @see http://www.swift.com/dsp/resources/documents/IBAN_Registry.pdf
      *
      * @var array
      */

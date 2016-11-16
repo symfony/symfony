@@ -120,11 +120,51 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('data_collector.config'), '->registerProfilerConfiguration() does not load collectors.xml');
     }
 
-    public function testWorkflow()
+    public function testWorkflows()
     {
-        $container = $this->createContainerFromFile('workflow');
+        $container = $this->createContainerFromFile('workflows');
 
-        $this->assertTrue($container->hasDefinition('workflow.my_workflow'));
+        $this->assertTrue($container->hasDefinition('workflow.article', 'Workflow is registered as a service'));
+        $this->assertTrue($container->hasDefinition('workflow.article.definition', 'Workflow definition is registered as a service'));
+
+        $workflowDefinition = $container->getDefinition('workflow.article.definition');
+
+        $this->assertSame(
+            array(
+                'draft',
+                'wait_for_journalist',
+                'approved_by_journalist',
+                'wait_for_spellchecker',
+                'approved_by_spellchecker',
+                'published',
+            ),
+            $workflowDefinition->getArgument(0),
+            'Places are passed to the workflow definition'
+        );
+        $this->assertSame(array('workflow.definition' => array(array('name' => 'article', 'type' => 'workflow', 'marking_store' => 'multiple_state'))), $workflowDefinition->getTags());
+
+        $this->assertTrue($container->hasDefinition('state_machine.pull_request', 'State machine is registered as a service'));
+        $this->assertTrue($container->hasDefinition('state_machine.pull_request.definition', 'State machine definition is registered as a service'));
+        $this->assertCount(4, $workflowDefinition->getArgument(1));
+        $this->assertSame('draft', $workflowDefinition->getArgument(2));
+
+        $stateMachineDefinition = $container->getDefinition('state_machine.pull_request.definition');
+
+        $this->assertSame(
+            array(
+                'start',
+                'coding',
+                'travis',
+                'review',
+                'merged',
+                'closed',
+            ),
+            $stateMachineDefinition->getArgument(0),
+            'Places are passed to the state machine definition'
+        );
+        $this->assertSame(array('workflow.definition' => array(array('name' => 'pull_request', 'type' => 'state_machine', 'marking_store' => 'single_state'))), $stateMachineDefinition->getTags());
+        $this->assertCount(9, $stateMachineDefinition->getArgument(1));
+        $this->assertSame('start', $stateMachineDefinition->getArgument(2));
     }
 
     public function testRouter()

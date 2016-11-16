@@ -51,6 +51,7 @@ class CodeExtension extends \Twig_Extension
             new \Twig_SimpleFilter('file_excerpt', array($this, 'fileExcerpt'), array('is_safe' => array('html'))),
             new \Twig_SimpleFilter('format_file', array($this, 'formatFile'), array('is_safe' => array('html'))),
             new \Twig_SimpleFilter('format_file_from_text', array($this, 'formatFileFromText'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('format_log_message', array($this, 'formatLogMessage'), array('is_safe' => array('html'))),
             new \Twig_SimpleFilter('file_link', array($this, 'getFileLink')),
         );
     }
@@ -151,7 +152,7 @@ class CodeExtension extends \Twig_Extension
             }
 
             for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, count($content)); $i <= $max; ++$i) {
-                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><div class="anchor" id="line'.$i.'"></div><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
+                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><a class="anchor" name="line'.$i.'"></a><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
             }
 
             return '<ol start="'.max($line - $srcContext, 1).'">'.implode("\n", $lines).'</ol>';
@@ -183,9 +184,7 @@ class CodeExtension extends \Twig_Extension
         $text = "$text at line $line";
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            $flags = ENT_COMPAT | ENT_SUBSTITUTE;
-
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, $flags, $this->charset), $text);
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset), $text);
         }
 
         return $text;
@@ -213,6 +212,27 @@ class CodeExtension extends \Twig_Extension
         return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
             return 'in '.$this->formatFile($match[2], $match[3]);
         }, $text);
+    }
+
+    /**
+     * @internal
+     */
+    public function formatLogMessage($message, array $context)
+    {
+        if ($context && false !== strpos($message, '{')) {
+            $replacements = array();
+            foreach ($context as $key => $val) {
+                if (is_scalar($val)) {
+                    $replacements['{'.$key.'}'] = $val;
+                }
+            }
+
+            if ($replacements) {
+                $message = strtr($message, $replacements);
+            }
+        }
+
+        return htmlspecialchars($message, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
     }
 
     /**

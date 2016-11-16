@@ -110,7 +110,7 @@ class ProfilerController
             'panel' => $panel,
             'page' => $page,
             'request' => $request,
-            'templates' => $this->getTemplateManager()->getTemplates($profile),
+            'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
             'profiler_markup_version' => 2, // 1 = original profiler, 2 = Symfony 2.8+ profiler
         )), 200, array('Content-Type' => 'text/html'));
@@ -189,7 +189,7 @@ class ProfilerController
             'request' => $request,
             'position' => $position,
             'profile' => $profile,
-            'templates' => $this->getTemplateManager()->getTemplates($profile),
+            'templates' => $this->getTemplateManager()->getNames($profile),
             'profiler_url' => $url,
             'token' => $token,
             'profiler_markup_version' => 2, // 1 = original toolbar, 2 = Symfony 2.8+ toolbar

@@ -1683,7 +1683,7 @@ class Request
      * It works if your JavaScript library sets an X-Requested-With HTTP header.
      * It is known to work with common JavaScript frameworks:
      *
-     * @link http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
+     * @see http://en.wikipedia.org/wiki/List_of_Ajax_frameworks#JavaScript
      *
      * @return bool true if the request is an XMLHttpRequest, false otherwise
      */

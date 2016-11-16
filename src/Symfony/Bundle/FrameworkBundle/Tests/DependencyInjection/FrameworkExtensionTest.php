@@ -167,6 +167,24 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame('start', $stateMachineDefinition->getArgument(2));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "type" and "service" cannot be used together.
+     */
+    public function testWorkflowCannotHaveBothTypeAndService()
+    {
+        $this->createContainerFromFile('workflow_with_type_and_service');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "arguments" and "service" cannot be used together.
+     */
+    public function testWorkflowCannotHaveBothArgumentsAndService()
+    {
+        $this->createContainerFromFile('workflow_with_arguments_and_service');
+    }
+
     public function testRouter()
     {
         $container = $this->createContainerFromFile('full');

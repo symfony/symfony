@@ -255,6 +255,7 @@ class Configuration implements ConfigurationInterface
                                             ->ifString()
                                             ->then(function ($v) { return array($v); })
                                         ->end()
+                                        ->requiresAtLeastOneElement()
                                         ->prototype('scalar')
                                         ->end()
                                     ->end()
@@ -263,13 +264,12 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->end()
                                 ->validate()
-                                    ->always(function ($v) {
-                                        if (isset($v['type']) && isset($v['service'])) {
-                                            throw new \InvalidArgumentException('"type" and "service" could not be used together.');
-                                        }
-
-                                        return $v;
-                                    })
+                                    ->ifTrue(function ($v) { return isset($v['type']) && isset($v['service']); })
+                                    ->thenInvalid('"type" and "service" cannot be used together.')
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(function ($v) { return isset($v['arguments']) && isset($v['service']); })
+                                    ->thenInvalid('"arguments" and "service" cannot be used together.')
                                 ->end()
                             ->end()
                             ->arrayNode('supports')

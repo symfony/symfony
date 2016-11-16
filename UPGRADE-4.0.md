@@ -16,9 +16,6 @@ Debug
 DependencyInjection
 -------------------
 
- * Calling `get()` on a `ContainerBuilder` instance before compiling the
-   container is not supported anymore and will throw an exception.
-
  * Using unsupported configuration keys in YAML configuration files raises an
    exception.
 

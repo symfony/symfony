@@ -1,0 +1,103 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-09T13:44:19Z
+
+@wouterj I never used the XML config, but previous tests were OK. So I'm not 100% sure about this PR. Did you test it ? Should we add more tests ?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-11-09T13:49:04Z
+
+@lyrixx I couldn't find any tests for workflow config (did a very quick search though). Prototyped arrays are represented by multiple occurences of the same element in XML. For example:
+```yaml
+workflows:
+    blogpost: ...
+    pull_request: ...
+```
+```xml
+<workflow name="blogpost">...</workflow>
+<workflow name="pull_request">...</workflow>
+```
+
+As you can see, this difference in format means the Config processor has to be aware of singular and plural versions of all prototyped config names (workflows vs workflow). This is done by adding these `->fixXmlConfig()` calls.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-09T14:04:37Z
+
+Tests are there: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/Tests/DependencyInjection/Fixtures/xml/workflow.xml
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-10T15:28:43Z
+
+@wouterj Could you rebase please?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-10T16:54:23Z
+
+👍 after rebasing
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-11T09:36:07Z
+
+I rebased this PR and also updated the XML schema definition. The changes made by @wouterj were technically not needed with the definition before, but having it this way is more inline with how we define XML configs elsewhere.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-11T10:15:31Z
+
+`type` and `service` are now attributes instead of elements as suggested by @stof in https://github.com/symfony/symfony/pull/20482#discussion_r87563553.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-11T12:46:16Z
+
+@lyrixx the DI config does not seem to allow configuring the initial place, according to the XSD schema. Is it expected ?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-11T15:35:02Z
+
+@stof see #20490.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-15T10:02:10Z
+
+I want to merge #20490 first, then could you add the new initial_place, in the fixtures?
+Thanks
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-15T10:13:42Z
+
+@lyrixx 👍 Just leave a comment here so either @wouterj or me will be able to update the PR accordingly.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-15T14:34:09Z
+
+@xabbuh @wouterj  : I just merged the other PR. Thanks.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-15T14:58:21Z
+
+@lyrixx updated here
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-15T15:14:44Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-16T08:33:05Z
+
+👍

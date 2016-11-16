@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-10T18:02:12Z
+
+We should add some tests too.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-10T18:17:09Z
+
+Tests added
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-11T10:04:31Z
+
+If you are not comfortable with the XML config format, I can submit a separate PR instead to fix it.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-15T16:18:25Z
+
+@xabbuh I have merged other PRs relative to the configuration. Could you rebase this one? Thanks ;)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-15T16:39:15Z
+
+@lyrixx Should I wait for #20458 to avoid rebasing twice or do you prefer to merge here first?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-15T17:44:37Z
+
+Indeed. I forget the other one. I prefer to wait another +1 there before the merge.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-16T08:35:00Z
+
+I merged #20458 so please update your XML fixtures
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-16T08:46:22Z
+
+I rebased and updated the XML fixtures.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-16T09:13:48Z
+
+:+1:

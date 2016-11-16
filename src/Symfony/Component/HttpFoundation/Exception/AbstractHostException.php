@@ -20,9 +20,6 @@ namespace Symfony\Component\HttpFoundation\Exception;
  */
 abstract class AbstractHostException extends \UnexpectedValueException implements ExceptionInterface
 {
-    /**
-     * @var string
-     */
     private $host;
 
     /**
@@ -35,9 +32,6 @@ abstract class AbstractHostException extends \UnexpectedValueException implement
         $this->host = $host;
     }
 
-    /**
-     * @return string
-     */
     public function getHost()
     {
         return $this->host;

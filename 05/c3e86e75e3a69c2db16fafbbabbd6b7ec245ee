@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-11-16T12:18:59Z
+
+:+1: for the revert.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-16T12:22:38Z
+
+Thank you for this fix :) 👍
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-16T13:07:59Z
+
+Getting a service instance in a compiler pass is very fragile, as you have no guarantee that the service definition is in a working state at this point (which implies having all dependencies in a working state too).
+And it leads to lots of bug reports
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-16T13:17:52Z
+
+-1 for this, for the reason I gave in https://github.com/symfony/symfony/pull/20537#issuecomment-260943055
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T13:31:03Z
+
+Agree with @stof you shouldnt (and imo. mustnt) get servives before/during compilation. If you want some, compile a different container first which you can use for building the 2nd container.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-16T14:07:28Z
+
+The "should not do this" or "is fragile" arguments are fine for a discussion. Yet, I invite you to open real code and make it work with this constraint you are saying is good. In my experience, you'll get worse code in the end.
+Challenge: please open a PR on VichUploaderBundle to fix the current deprecation on 3.2, without making the bundle ugly of course.
+
+Again: bootstrapping is a complex issue, done step by step, and fragile by nature. Once in the bootstrapped comfort zone, things are easy. Before, "pureness" theory does not apply.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T14:16:52Z
+
+Compile a new container with the `metadata_reader` service (or perhaps just create the service at this point) => inject it into the pass?
+
+> bootstrapping is a complex issue, done step by step
+
+Exactly; _step by step_.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-16T14:20:02Z
+
+@nicolas-grekas the issue is that a service can depend on lots of other services. and as soon as any of them comes from a different bundle, you have **no way** to know that it will be usable at the time your compiler pas runs (and even no way to be sure that this will stay true in the future)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-16T15:23:08Z
+
+👍 for reverting
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T18:23:49Z
+
+Anyway, if we allow cheating; what about an explicit version? `ContainerBuilder::getAtOwnRisk()` that is. Im very -1 about removing this integrity check from `get()`.
+
+Im not even sure we can do both actually :))
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-16T20:43:27Z
+
+I updated this PR so that the revert is only about this very deprecation, and not about enhancements that were made to tests at the same time.

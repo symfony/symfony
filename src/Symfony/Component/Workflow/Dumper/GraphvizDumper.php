@@ -84,7 +84,7 @@ class GraphvizDumper implements DumperInterface
         $transitions = array();
 
         foreach ($definition->getTransitions() as $transition) {
-            $transitions[] = array(
+            $transitions[$transition->getName()] = array(
                 'attributes' => array('shape' => 'box', 'regular' => true),
                 'name' => $transition->getName(),
             );
@@ -126,21 +126,20 @@ class GraphvizDumper implements DumperInterface
     private function findEdges(Definition $definition)
     {
         $dotEdges = array();
+        $getEdge = function ($from, $to, $direction) use (&$dotEdges) {
+            $dotEdges[$from.$to.$direction] = array(
+                'from' => $from,
+                'to' => $to,
+                'direction' => $direction,
+            );
+        };
 
         foreach ($definition->getTransitions() as $transition) {
             foreach ($transition->getFroms() as $from) {
-                $dotEdges[] = array(
-                    'from' => $from,
-                    'to' => $transition->getName(),
-                    'direction' => 'from',
-                );
+                $getEdge($from, $transition->getName(), 'from');
             }
             foreach ($transition->getTos() as $to) {
-                $dotEdges[] = array(
-                    'from' => $transition->getName(),
-                    'to' => $to,
-                    'direction' => 'to',
-                );
+                $getEdge($transition->getName(), $to, 'to');
             }
         }
 
@@ -152,10 +151,11 @@ class GraphvizDumper implements DumperInterface
         $code = '';
 
         foreach ($edges as $edge) {
+            $from = 'from' === $edge['direction'];
             $code .= sprintf("  %s_%s -> %s_%s [style=\"solid\"];\n",
-                'from' === $edge['direction'] ? 'place' : 'transition',
+                $from ? 'place' : 'transition',
                 $this->dotize($edge['from']),
-                'from' === $edge['direction'] ? 'transition' : 'place',
+                $from ? 'transition' : 'place',
                 $this->dotize($edge['to'])
             );
         }

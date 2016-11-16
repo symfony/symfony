@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-11T07:44:03Z
+
+What about using this great feature in Form, the component that needs it most? They even define [a method called renderBlock()](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/FormRenderer.php#L95)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-11T15:24:01Z
+
+@javiereguiluz Unfortunately the logic in the Form integration is complex and cannot use this technique as we are manually passing blocks to `renderBlock()`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-13T01:47:04Z
+
+Updated based on the latest changes for Twig 1.28.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-16T19:22:21Z
+
+:+1:
+
+Status: Reviewed

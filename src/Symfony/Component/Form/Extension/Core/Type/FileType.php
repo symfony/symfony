@@ -32,7 +32,7 @@ class FileType extends AbstractType
                 $form = $event->getForm();
                 $data = $event->getData();
 
-                // submitted data for an input file (no required) without choosing any file
+                // submitted data for an input file (not required) without choosing any file
                 if (array(null) === $data) {
                     $emptyData = $form->getConfig()->getEmptyData();
 

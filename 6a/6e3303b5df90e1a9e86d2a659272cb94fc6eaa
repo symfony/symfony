@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-15T15:14:07Z
+
+Are they opened by default? If so, can you add a limit of maybe 5 or 10 logs? I've had pages where there are 100+ logs and that will make it annoying to find the exception.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-15T16:05:11Z
+
+@iltar this PR is about fixing this page, ie make it work again; not about making it better. We could (and should) work on that for 3.3. But this one is a bug fix (placeholders are not replaced right now, and CSS needs a fix in the code block excerpt).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-15T16:31:24Z
+
+I mis-read the code as well. 👍
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-15T16:46:55Z
+
+Ah my bad, I only saw new code 😆

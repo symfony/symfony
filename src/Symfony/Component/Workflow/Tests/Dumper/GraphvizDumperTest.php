@@ -2,13 +2,14 @@
 
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
-use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
 
 class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 {
+    use WorkflowBuilderTrait;
+
     private $dumper;
 
     public function setUp()
@@ -39,13 +40,13 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     public function provideWorkflowDefinitionWithMarking()
     {
         yield array(
-            $this->provideComplexWorkflowDefinition(),
+            $this->createComplexWorkflow(),
             new Marking(array('b' => 1)),
             $this->createComplexWorkflowDumpWithMarking(),
         );
 
         yield array(
-            $this->provideSimpleWorkflowDefinition(),
+            $this->createSimpleWorkflowDefinition(),
             new Marking(array('c' => 1, 'd' => 1)),
             $this->createSimpleWorkflowDumpWithMarking(),
         );
@@ -53,36 +54,8 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
     public function provideWorkflowDefinitionWithoutMarking()
     {
-        yield array($this->provideComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking());
-        yield array($this->provideSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking());
-    }
-
-    public function provideComplexWorkflowDefinition()
-    {
-        $builder = new DefinitionBuilder();
-
-        $builder->addPlaces(range('a', 'g'));
-
-        $builder->addTransition(new Transition('t1', 'a', array('b', 'c')));
-        $builder->addTransition(new Transition('t2', array('b', 'c'), 'd'));
-        $builder->addTransition(new Transition('t3', 'd', 'e'));
-        $builder->addTransition(new Transition('t4', 'd', 'f'));
-        $builder->addTransition(new Transition('t5', 'e', 'g'));
-        $builder->addTransition(new Transition('t6', 'f', 'g'));
-
-        return $builder->build();
-    }
-
-    public function provideSimpleWorkflowDefinition()
-    {
-        $builder = new DefinitionBuilder();
-
-        $builder->addPlaces(range('a', 'c'));
-
-        $builder->addTransition(new Transition('t1', 'a', 'b'));
-        $builder->addTransition(new Transition('t2', 'b', 'c'));
-
-        return $builder->build();
+        yield array($this->createComplexWorkflow(), $this->provideComplexWorkflowDumpWithoutMarking());
+        yield array($this->createSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking());
     }
 
     public function createComplexWorkflowDumpWithMarking()

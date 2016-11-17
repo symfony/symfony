@@ -4,22 +4,20 @@ namespace Symfony\Component\Workflow\Tests\EventListener;
 
 use Psr\Log\AbstractLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\EventListener\AuditTrailListener;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
+use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
+use Symfony\Component\Workflow\Tests\createSimpleWorkflowDefinition;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
 class AuditTrailListenerTest extends \PHPUnit_Framework_TestCase
 {
+    use WorkflowBuilderTrait;
+
     public function testItWorks()
     {
-        $transitions = array(
-            new Transition('t1', 'a', 'b'),
-            new Transition('t2', 'a', 'b'),
-        );
-
-        $definition = new Definition(array('a', 'b'), $transitions);
+        $definition = $this->createSimpleWorkflowDefinition();
 
         $object = new \stdClass();
         $object->marking = null;

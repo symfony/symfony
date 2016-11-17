@@ -7,6 +7,10 @@ in 3.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.2.0...v3.2.1
 
+* 3.2.0-RC1 (2016-11-17)
+
+ * 
+
 * 3.2.0-BETA1 (2016-10-27)
 
  * feature #19973 Added a default ide file link web view (jeremyFreeAgent)

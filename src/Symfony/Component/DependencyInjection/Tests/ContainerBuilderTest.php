@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\InactiveScopeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
@@ -402,6 +403,20 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($builder->get('foo'), $builder->resolveServices(new Reference('foo')), '->resolveServices() resolves service references to service instances');
         $this->assertEquals(array('foo' => array('foo', $builder->get('foo'))), $builder->resolveServices(array('foo' => array('foo', new Reference('foo')))), '->resolveServices() resolves service references to service instances in nested arrays');
         $this->assertEquals($builder->get('foo'), $builder->resolveServices(new Expression('service("foo")')), '->resolveServices() resolves expressions');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Constructing service "foo" from a Symfony\Component\DependencyInjection\DefinitionDecorator is not supported at build time.
+     */
+    public function testResolveServicesWithDecoratedDefinition()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setDefinition('grandpa', new Definition('stdClass'));
+        $builder->setDefinition('parent', new DefinitionDecorator('grandpa'));
+        $builder->setDefinition('foo', new DefinitionDecorator('parent'));
+
+        $builder->get('foo');
     }
 
     public function testMerge()

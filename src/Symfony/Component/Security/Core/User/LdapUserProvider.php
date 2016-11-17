@@ -31,6 +31,7 @@ class LdapUserProvider implements UserProviderInterface
     private $searchDn;
     private $searchPassword;
     private $defaultRoles;
+    private $uidKey;
     private $defaultSearch;
     private $passwordAttribute;
 
@@ -51,6 +52,7 @@ class LdapUserProvider implements UserProviderInterface
         $this->searchDn = $searchDn;
         $this->searchPassword = $searchPassword;
         $this->defaultRoles = $defaultRoles;
+        $this->uidKey = $uidKey;
         $this->defaultSearch = str_replace('{uid_key}', $uidKey, $filter);
         $this->passwordAttribute = $passwordAttribute;
     }
@@ -80,7 +82,7 @@ class LdapUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException('More than one user found');
         }
 
-        return $this->loadUser($username, $entries[0]);
+        return $this->loadUser($entries[0]->getAttribute($this->uidKey)[0], $entries[0]);
     }
 
     /**

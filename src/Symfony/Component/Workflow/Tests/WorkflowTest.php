@@ -4,7 +4,6 @@ namespace Symfony\Component\Workflow\Tests;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Workflow\Definition;
-use Symfony\Component\Workflow\DefinitionBuilder;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
@@ -14,6 +13,8 @@ use Symfony\Component\Workflow\Workflow;
 
 class WorkflowTest extends \PHPUnit_Framework_TestCase
 {
+    use WorkflowBuilderTrait;
+
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\LogicException
      * @expectedExceptionMessage The value returned by the MarkingStore is not an instance of "Symfony\Component\Workflow\Marking" for workflow "unnamed".
@@ -47,7 +48,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     public function testGetMarkingWithImpossiblePlace()
     {
         $subject = new \stdClass();
-        $subject->marking = null;
         $subject->marking = array('nope' => true);
         $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
 
@@ -208,34 +208,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(1, $transitions);
         $this->assertSame('t5', $transitions[0]->getName());
-    }
-
-    protected function createComplexWorkflow()
-    {
-        $builder = new DefinitionBuilder();
-
-        $builder->addPlaces(range('a', 'g'));
-
-        $builder->addTransition(new Transition('t1', 'a', array('b', 'c')));
-        $builder->addTransition(new Transition('t2', array('b', 'c'), 'd'));
-        $builder->addTransition(new Transition('t3', 'd', 'e'));
-        $builder->addTransition(new Transition('t4', 'd', 'f'));
-        $builder->addTransition(new Transition('t5', 'e', 'g'));
-        $builder->addTransition(new Transition('t6', 'f', 'g'));
-
-        return $builder->build();
-
-        // The graph looks like:
-        //
-        // +---+     +----+     +---+     +----+     +----+     +----+     +----+     +----+     +---+
-        // | a | --> | t1 | --> | c | --> | t2 | --> | d  | --> | t4 | --> | f  | --> | t6 | --> | g |
-        // +---+     +----+     +---+     +----+     +----+     +----+     +----+     +----+     +---+
-        //             |                    ^          |                                           ^
-        //             |                    |          |                                           |
-        //             v                    |          v                                           |
-        //           +----+                 |        +----+     +----+     +----+                  |
-        //           | b  | ----------------+        | t3 | --> | e  | --> | t5 | -----------------+
-        //           +----+                          +----+     +----+     +----+
     }
 }
 

@@ -31,18 +31,13 @@ class WorkflowValidator implements DefinitionValidatorInterface
 
     public function validate(Definition $definition, $name)
     {
-        if ($this->singlePlace) {
-            foreach ($definition->getTransitions() as $transition) {
-                if (1 < count($transition->getTos())) {
-                    throw new InvalidDefinitionException(
-                        sprintf(
-                            'The marking store of workflow "%s" can not store many places. But the transition "%s" has too many output (%d). Only one is accepted.',
-                            $name,
-                            $transition->getName(),
-                            count($transition->getTos())
-                        )
-                    );
-                }
+        if (!$this->singlePlace) {
+            return;
+        }
+
+        foreach ($definition->getTransitions() as $transition) {
+            if (1 < count($transition->getTos())) {
+                throw new InvalidDefinitionException(sprintf('The marking store of workflow "%s" can not store many places. But the transition "%s" has too many output (%d). Only one is accepted.', $name, $transition->getName(), count($transition->getTos())));
             }
         }
     }

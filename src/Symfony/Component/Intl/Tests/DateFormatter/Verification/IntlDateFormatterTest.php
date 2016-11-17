@@ -25,7 +25,7 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 {
     protected function setUp()
     {
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         parent::setUp();
     }
@@ -45,6 +45,8 @@ class IntlDateFormatterTest extends AbstractIntlDateFormatterTest
 
     protected function getDateFormatter($locale, $datetype, $timetype, $timezone = null, $calendar = IntlDateFormatter::GREGORIAN, $pattern = null)
     {
+        IntlTestHelper::requireFullIntl($this, '55.1');
+
         if (!$formatter = new \IntlDateFormatter($locale, $datetype, $timetype, $timezone, $calendar, $pattern)) {
             throw new \InvalidArgumentException(intl_get_error_message());
         }

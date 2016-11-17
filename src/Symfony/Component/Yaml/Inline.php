@@ -606,10 +606,8 @@ class Inline
                         return (float) str_replace(',', '', $scalar);
                     case preg_match(self::getTimestampRegex(), $scalar):
                         if (Yaml::PARSE_DATETIME & $flags) {
-                            $date = new \DateTime($scalar);
-                            $date->setTimeZone(new \DateTimeZone('UTC'));
-
-                            return $date;
+                            // When no timezone is provided in the parsed date, YAML spec says we must assume UTC.
+                            return new \DateTime($scalar, new \DateTimeZone('UTC'));
                         }
 
                         $timeZone = date_default_timezone_get();

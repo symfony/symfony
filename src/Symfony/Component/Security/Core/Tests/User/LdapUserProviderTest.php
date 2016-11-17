@@ -119,7 +119,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(
@@ -165,7 +165,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(
@@ -207,7 +207,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(
@@ -238,7 +238,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testLoadUserByUsernameIsSuccessfulWithPasswordAttribute()
+    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttributeAndWrongCase()
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();
@@ -249,7 +249,46 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
+            ->expects($this->exactly(2))
+            ->method('offsetGet')
+            ->with(0)
+            ->will($this->returnValue(new Entry('foo', array(
+                    'sAMAccountName' => array('foo'),
+                )
+            )))
+        ;
+        $result
             ->expects($this->once())
+            ->method('count')
+            ->will($this->returnValue(1))
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('escape')
+            ->will($this->returnValue('Foo'))
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('query')
+            ->will($this->returnValue($query))
+        ;
+
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
+        $this->assertSame('foo', $provider->loadUserByUsername('Foo')->getUsername());
+    }
+
+    public function testLoadUserByUsernameIsSuccessfulWithPasswordAttribute()
+    {
+        $result = $this->getMock(CollectionInterface::class);
+        $query = $this->getMock(QueryInterface::class);
+        $query
+            ->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($result))
+        ;
+        $ldap = $this->getMock(LdapInterface::class);
+        $result
+            ->expects($this->exactly(2))
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(

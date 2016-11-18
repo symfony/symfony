@@ -1,0 +1,128 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-11-17T15:52:31Z
+
+Tests are needed to cover this
+
+---------------------------------------------------------------------------
+
+by noahheck at 2016-11-17T16:19:24Z
+
+@stof There are tests for this, but they were failing in non-UTC timezone: #20551
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-17T16:41:04Z
+
+#20551 should make such bugs visible in the future. So yes, I agree that we don't have to update the tests.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-17T18:22:31Z
+
+@nicolas-grekas why did you removed BC break label? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-17T18:27:04Z
+
+@ro0NL why should we keep it in the first place?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-17T18:29:31Z
+
+Keep what? The spec is correct now, but the BC break is real right? Before system timezone was the default, now UTC :confused:
+
+---------------------------------------------------------------------------
+
+by noahheck at 2016-11-17T23:22:25Z
+
+@ro0NL All parsed `DateTime`s were converted to UTC. Before, the system timezone was used only used if there wasn't timezone information in the timestamp string. The `DateTime` was then converted to UTC time, but converting had the possibility of changing the representation. The returned `DateTime` will still be in UTC, just without the value being changed.
+
+I don't know if that constitutes a BC break (?)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-18T08:47:17Z
+
+Before datetimes without a timezone assumed the system timezone, _before_ UTC conversion. Now UTC is assumed.. (ie. no conversion happens).
+
+What about this approach?
+
+```php
+// in 4.0
+// return new \DateTime($scalar, new \DateTimeZone('UTC'));
+
+if ('UTC' !== date_default_timezone_get()) {
+   // trigger deprecation: datetimes without a timezone are assumed UTC in 4.0 instead of the system timezone
+}
+
+// current code, ie.
+$date = new \DateTime($scalar);
+$date->setTimeZone(new \DateTimeZone('UTC'));
+
+return $date;
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-18T14:55:15Z
+
+@ro0NL a deprecation is something that a user must be able to resolve by changing its code. Not the case here. This is clearly a bug to me. Every bug fix is a behavior change by definition.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-18T15:06:55Z
+
+You can change the datetime value, so it includes the timezone explicitly. Which is only needed, if the system timezone is not UTC already. This gives correct YAML, as well as the expected value.
+
+Just saying this can lead to tricky side effects, as we get a total different time value.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-18T15:18:38Z
+
+Changing a date definition in yaml to workaround a parser implementation bug is definitely not a "code fix"...
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-18T16:20:11Z
+
+If the Yaml timestamp does not include the timezone info, parsing it as a UTC timestamp is the right thing to do according the behavior of the official PyYaml parser.
+So 👍 for this
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-18T17:30:02Z
+
+Would a changelog help? To clarify, i _know_ configs defining a datetime value (some specific 'since' date that is updated once in a while) which will now _silently_ fetch data from one hour earlier than expected (system tz = +01:00).
+
+People should be aware of this change, to update accordingly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-18T20:40:48Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-18T20:52:15Z
+
+@ro0NL this will be in the usual changelog and github history.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-18T20:59:27Z
+
+Correct.. i meant  a upgrade note actually. But i guess this is fine then, lets see what happens :)
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-18T21:07:15Z
+
+In fact, this bug comes from #20291 which is quite recent.
+I reverted the UTC normalization behavior that I wrongly introduced then, and added test cases for the correct behavior (preserving TZ info).

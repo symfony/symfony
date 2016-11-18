@@ -9,10 +9,6 @@ To get the diff between two versions, go to https://github.com/symfony/symfony/c
 
 * 3.2.0-RC1 (2016-11-17)
 
- * 
-
-* 3.2.0-RC1 (2016-11-17)
-
  * feature #20533 [DI] Revert "deprecate get() for uncompiled container builders" (nicolas-grekas)
  * bug #20525 [TwigBundle] Give some love to exception pages (nicolas-grekas)
  * bug #20484 bumped min version of Twig to 1.28 (fabpot)

@@ -658,3 +658,8 @@ Routing
    // url generated in @router service
    $router->generate('blog_show', array('slug' => 'my-blog-post'), UrlGeneratorInterface::ABSOLUTE_URL);
    ```
+   
+DoctrineBridge
+--------------
+ * Deprecated using the entity provider with a Doctrine repository implementing `UserProviderInterface`.
+   Make it implement `UserLoaderInterface` instead.

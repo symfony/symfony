@@ -1,14 +1,9 @@
 {
-    "Version": "2.1.19.94",
+    "Version": "2.1.28.76",
     "Names": {
-        "BD": "Bangladesh",
-        "CC": "Islas Cocos (Keeling)",
-        "GG": "Guernsey",
-        "HK": "Región Administrativa Especial de Hong Kong de la República Popular China",
-        "IC": "Islas Canarias",
-        "MO": "Región Administrativa Especial de Macao de la República Popular China",
+        "BA": "Bosnia y Herzegovina",
         "TA": "Tristán de Acuña",
-        "UM": "Islas Ultramarinas Menores de Estados Unidos",
-        "VI": "Islas Vírgenes de los Estados Unidos"
+        "TL": "Timor-Leste",
+        "UM": "Islas Ultramarinas Menores de Estados Unidos"
     }
 }

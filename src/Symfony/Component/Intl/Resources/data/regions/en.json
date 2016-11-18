@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.24.18",
+    "Version": "2.1.30.50",
     "Names": {
         "AC": "Ascension Island",
         "AD": "Andorra",
@@ -72,6 +72,7 @@
         "ER": "Eritrea",
         "ES": "Spain",
         "ET": "Ethiopia",
+        "EZ": "Eurozone",
         "FI": "Finland",
         "FJ": "Fiji",
         "FK": "Falkland Islands",
@@ -236,6 +237,7 @@
         "UA": "Ukraine",
         "UG": "Uganda",
         "UM": "U.S. Outlying Islands",
+        "UN": "United Nations",
         "US": "United States",
         "UY": "Uruguay",
         "UZ": "Uzbekistan",

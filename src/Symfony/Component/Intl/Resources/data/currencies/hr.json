@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.23.7",
+    "Version": "2.1.28.79",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "bjeloruska nova rublja (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "bjeloruska rublja"
+        ],
         "BYR": [
             "BYR",
-            "bjeloruska rublja"
+            "bjeloruska rublja (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -1039,7 +1043,7 @@
         ],
         "VUV": [
             "VUV",
-            "vanuatuški vatu"
+            "vanuatski vatu"
         ],
         "WST": [
             "WST",

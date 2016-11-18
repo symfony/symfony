@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.29.88",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "Valko-Venäjän uusi rupla (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Valko-Venäjän rupla"
+        ],
         "BYR": [
             "BYR",
-            "Valko-Venäjän rupla"
+            "Valko-Venäjän rupla (2000–2016)"
         ],
         "BZD": [
             "BZD",
@@ -263,7 +267,7 @@
         ],
         "CNY": [
             "CNY",
-            "Kiinan yuan"
+            "Kiinan juan"
         ],
         "COP": [
             "COP",
@@ -739,11 +743,11 @@
         ],
         "NIC": [
             "NIC",
-            "Nicaraguan cordoba (1988–1991)"
+            "Nicaraguan córdoba (1988–1991)"
         ],
         "NIO": [
             "NIO",
-            "Nicaraguan cordoba"
+            "Nicaraguan córdoba"
         ],
         "NLG": [
             "NLG",
@@ -895,11 +899,11 @@
         ],
         "SRD": [
             "SRD",
-            "Surinamin dollari"
+            "Surinamen dollari"
         ],
         "SRG": [
             "SRG",
-            "Surinamin guldeni"
+            "Surinamen guldeni"
         ],
         "SSP": [
             "SSP",

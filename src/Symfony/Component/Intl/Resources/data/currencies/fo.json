@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.76",
     "Names": {
         "AED": [
             "AED",
@@ -93,9 +93,13 @@
             "BWP",
             "Botsvana pula"
         ],
+        "BYN": [
+            "BYN",
+            "Hvítarussland ruble"
+        ],
         "BYR": [
             "BYR",
-            "Hvítarussland ruble"
+            "Hvítarussland ruble (2000–2016)"
         ],
         "BZD": [
             "BZD",

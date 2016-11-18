@@ -1,5 +1,5 @@
 {
-    "Version": "2.1.22.93",
+    "Version": "2.1.28.76",
     "Names": {
         "ADP": [
             "ADP",
@@ -217,9 +217,13 @@
             "BYB",
             "Rùbal ùr Bealaruiseach (1994–1999)"
         ],
+        "BYN": [
+            "BYN",
+            "Rùbal Bealaruiseach"
+        ],
         "BYR": [
             "BYR",
-            "Rùbal Bealaruiseach"
+            "Rùbal Bealaruiseach (2000–2016)"
         ],
         "BZD": [
             "BZD",

@@ -1,0 +1,31 @@
+{
+    "Version": "2.1.27.99",
+    "Names": {
+        "ace": "acehnés",
+        "arp": "arapaho",
+        "bas": "basa",
+        "bax": "bamun",
+        "bho": "bhojpuri",
+        "bua": "buriat",
+        "dum": "neerlandés medieval",
+        "enm": "inglés medieval",
+        "frm": "francés medieval",
+        "gmh": "alemán de la alta edad media",
+        "grc": "griego antiguo",
+        "hak": "hak",
+        "hsb": "alto sorbio",
+        "kea": "criollo caboverdiano",
+        "lus": "lushai",
+        "mga": "irlandés medieval",
+        "nan": "nan",
+        "nso": "sotho septentrional",
+        "pcm": "pcm",
+        "rn": "kiroundi",
+        "shu": "árabe chadiano",
+        "ss": "siswati",
+        "sw_CD": "swahili del Congo",
+        "tn": "setchwana",
+        "wo": "wolof",
+        "wuu": "wuu"
+    }
+}

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-17T16:43:08Z
+
+Hm, I would have expected more failures (at least the one being fixed in #20550).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-17T16:44:17Z
+
+Wait until it's merged up to master :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-17T17:10:07Z
+
+Oh indeed, this feature was not present in in 2.7. :D
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-18T08:34:32Z
+
+Looks like a good idea!

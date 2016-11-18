@@ -1945,7 +1945,7 @@ class Request
             $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
 
             if (!$request instanceof self) {
-                throw new \UnexpectedValueException(
+                throw new \LogicException(
                     sprintf(
                         'The Request factory must return an instance of %s. Got %s.',
                         self::class, is_object($request) ? get_class($request) : (null === $request ? 'null' : gettype($request))

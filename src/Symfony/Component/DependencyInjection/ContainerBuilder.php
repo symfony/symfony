@@ -794,6 +794,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function createService(Definition $definition, $id, $tryProxy = true)
     {
+        if ('Symfony\Component\DependencyInjection\Definition' !== get_class($definition)) {
+            throw new RuntimeException(sprintf('Constructing service "%s" from a %s is not supported at build time.', $id, get_class($definition)));
+        }
+
         if ($definition->isSynthetic()) {
             throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
         }

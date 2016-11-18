@@ -24,7 +24,7 @@ class CollatorTest extends AbstractCollatorTest
 {
     protected function setUp()
     {
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         parent::setUp();
     }

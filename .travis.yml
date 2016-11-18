@@ -51,6 +51,7 @@ before_install:
     # A sigchild-enabled-PHP is used to test the Process component on the lowest PHP matrix line
     - if [[ ! $deps && $PHP = ${MIN_PHP%.*} && ! -d php-$MIN_PHP/sapi ]]; then wget http://museum.php.net/php5/php-$MIN_PHP.tar.bz2 -O - | tar -xj; (cd php-$MIN_PHP; ./configure --enable-sigchild --enable-pcntl; make -j2); fi
     - if [[ ! $PHP = hhvm* ]]; then INI_FILE=~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini; else INI_FILE=/etc/hhvm/php.ini; fi
+    - if [[ ! $skip ]]; then echo date.timezone = Europe/Paris >> $INI_FILE; fi
     - if [[ ! $skip ]]; then echo memory_limit = -1 >> $INI_FILE; fi
     - if [[ ! $skip ]]; then echo session.gc_probability = 0 >> $INI_FILE; fi
     - if [[ ! $skip && $PHP = 5.* ]]; then echo extension = mongo.so >> $INI_FILE; fi

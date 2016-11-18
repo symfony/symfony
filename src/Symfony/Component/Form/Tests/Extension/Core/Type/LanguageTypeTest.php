@@ -19,7 +19,7 @@ class LanguageTypeTest extends TestCase
 {
     protected function setUp()
     {
-        IntlTestHelper::requireIntl($this);
+        IntlTestHelper::requireIntl($this, false);
 
         parent::setUp();
     }

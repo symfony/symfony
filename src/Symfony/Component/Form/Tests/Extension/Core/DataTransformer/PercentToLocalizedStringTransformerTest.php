@@ -53,7 +53,7 @@ class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
     public function testTransformWithScale()
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_AT');
 
@@ -92,7 +92,7 @@ class PercentToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCas
     public function testReverseTransformWithScale()
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_AT');
 

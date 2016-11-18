@@ -253,6 +253,9 @@ UPGRADE FROM 2.x to 3.0
    closures, but the closure is now resolved in the type instead of in the
    loader.
 
+ * Using the entity provider with a Doctrine repository implementing `UserProviderInterface` is not supported anymore.
+   You should make the repository implement `UserLoaderInterface` instead.
+
 ### EventDispatcher
 
  * The method `getListenerPriority($eventName, $listener)` has been added to the

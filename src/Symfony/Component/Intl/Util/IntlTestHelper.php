@@ -28,19 +28,21 @@ class IntlTestHelper
 {
     /**
      * Should be called before tests that work fine with the stub implementation.
-     *
-     * @param \PhpUnit_Framework_TestCase $testCase
      */
-    public static function requireIntl(\PHPUnit_Framework_TestCase $testCase)
+    public static function requireIntl(\PHPUnit_Framework_TestCase $testCase, $minimumIcuVersion = null)
     {
+        if (null === $minimumIcuVersion) {
+            $minimumIcuVersion = Intl::getIcuStubVersion();
+        }
+
         // We only run tests if the version is *one specific version*.
         // This condition is satisfied if
         //
         //   * the intl extension is loaded with version Intl::getIcuStubVersion()
         //   * the intl extension is not loaded
 
-        if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getIcuStubVersion(), '!=', 1)) {
-            $testCase->markTestSkipped('ICU version '.Intl::getIcuStubVersion().' is required.');
+        if (($minimumIcuVersion || defined('HHVM_VERSION_ID')) && IcuVersion::compare(Intl::getIcuVersion(), $minimumIcuVersion, '!=', 1)) {
+            $testCase->markTestSkipped('ICU version '.$minimumIcuVersion.' is required.');
         }
 
         // Normalize the default locale in case this is not done explicitly
@@ -60,24 +62,15 @@ class IntlTestHelper
     /**
      * Should be called before tests that require a feature-complete intl
      * implementation.
-     *
-     * @param \PhpUnit_Framework_TestCase $testCase
      */
-    public static function requireFullIntl(\PHPUnit_Framework_TestCase $testCase)
+    public static function requireFullIntl(\PHPUnit_Framework_TestCase $testCase, $minimumIcuVersion = null)
     {
         // We only run tests if the intl extension is loaded...
         if (!Intl::isExtensionLoaded()) {
             $testCase->markTestSkipped('Extension intl is required.');
         }
 
-        // ... and only if the version is *one specific version*
-        if (IcuVersion::compare(Intl::getIcuVersion(), Intl::getIcuStubVersion(), '!=', 1)) {
-            $testCase->markTestSkipped('ICU version '.Intl::getIcuStubVersion().' is required.');
-        }
-
-        // Normalize the default locale in case this is not done explicitly
-        // in the test
-        \Locale::setDefault('en');
+        self::requireIntl($testCase, $minimumIcuVersion);
 
         // Consequently, tests will
         //
@@ -89,8 +82,6 @@ class IntlTestHelper
 
     /**
      * Skips the test unless the current system has a 32bit architecture.
-     *
-     * @param \PhpUnit_Framework_TestCase $testCase
      */
     public static function require32Bit(\PHPUnit_Framework_TestCase $testCase)
     {
@@ -101,8 +92,6 @@ class IntlTestHelper
 
     /**
      * Skips the test unless the current system has a 64bit architecture.
-     *
-     * @param \PhpUnit_Framework_TestCase $testCase
      */
     public static function require64Bit(\PHPUnit_Framework_TestCase $testCase)
     {

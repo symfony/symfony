@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-18T07:40:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-11-18T12:19:31Z
+
+I don't think Carson bot likes the short questioner :)
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-18T13:17:36Z
+
+@sstok The issue is that carson doesn't check if both "yes" and "no" are present in the corresponding columns, and since I wanted to submit this PR quickly, I do not took the time to cleanup the template at first :)

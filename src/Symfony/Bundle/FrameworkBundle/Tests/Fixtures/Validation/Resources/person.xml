@@ -15,4 +15,15 @@
             </constraint>
         </property>
     </class>
+
+    <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\NonExistentClass">
+        <property name="gender">
+            <constraint name="Choice">
+                <option name="choices">
+                    <value>other</value>
+                </option>
+                <option name="message">This should be ignored.</option>
+            </constraint>
+        </property>
+    </class>
 </constraint-mapping>

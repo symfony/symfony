@@ -335,8 +335,8 @@ class PhpDumper extends Dumper
                 $code .= $this->addNewInstance($id, $sDefinition, '$'.$name, ' = ');
 
                 if (!$this->hasReference($id, $sDefinition->getMethodCalls(), true) && !$this->hasReference($id, $sDefinition->getProperties(), true)) {
-                    $code .= $this->addServiceMethodCalls(null, $sDefinition, $name);
                     $code .= $this->addServiceProperties(null, $sDefinition, $name);
+                    $code .= $this->addServiceMethodCalls(null, $sDefinition, $name);
                     $code .= $this->addServiceConfigurator(null, $sDefinition, $name);
                 }
 
@@ -507,8 +507,8 @@ class PhpDumper extends Dumper
             }
 
             $name = (string) $this->definitionVariables->offsetGet($iDefinition);
-            $code .= $this->addServiceMethodCalls(null, $iDefinition, $name);
             $code .= $this->addServiceProperties(null, $iDefinition, $name);
+            $code .= $this->addServiceMethodCalls(null, $iDefinition, $name);
             $code .= $this->addServiceConfigurator(null, $iDefinition, $name);
         }
 
@@ -663,8 +663,8 @@ EOF;
                 $this->addServiceInlinedDefinitions($id, $definition).
                 $this->addServiceInstance($id, $definition).
                 $this->addServiceInlinedDefinitionsSetup($id, $definition).
-                $this->addServiceMethodCalls($id, $definition).
                 $this->addServiceProperties($id, $definition).
+                $this->addServiceMethodCalls($id, $definition).
                 $this->addServiceConfigurator($id, $definition).
                 $this->addServiceReturn($id, $definition)
             ;

@@ -40,7 +40,7 @@ class LdapUserProvider implements UserProviderInterface
      * @param string        $baseDn
      * @param string        $searchDn
      * @param string        $searchPassword
-     * @param array         $defaultRoles$entries[0]
+     * @param array         $defaultRoles
      * @param string        $uidKey
      * @param string        $filter
      * @param string        $passwordAttribute

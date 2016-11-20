@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -55,7 +56,7 @@ this is either <comment>yaml</comment> or <comment>xml</comment>.
 When the option is not provided, <comment>yaml</comment> is used.
 
   <info>php %command.full_name% FrameworkBundle --format=xml</info>
-  
+
 For dumping a specific option, add its path as second argument (only available for the yaml format):
 
   <info>php %command.full_name% framework profiler.matcher</info>
@@ -75,8 +76,9 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         if (null === $name = $input->getArgument('name')) {
-            $this->listBundles($io);
-            $io->comment(array(
+            $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
+            $this->listBundles($errorIo);
+            $errorIo->comment(array(
                 'Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)',
                 'For dumping a specific option, add its path as the second argument of this command. (e.g. <comment>config:dump-reference FrameworkBundle profiler.matcher</comment> to dump the <comment>framework.profiler.matcher</comment> configuration)',
             ));

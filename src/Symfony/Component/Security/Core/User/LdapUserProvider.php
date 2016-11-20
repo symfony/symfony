@@ -127,7 +127,7 @@ class LdapUserProvider implements UserProviderInterface
      * Fetches a required unique attribute value from an LDAP entry.
      *
      * @param null|Entry $entry
-     * @param string $attribute
+     * @param string     $attribute
      */
     private function getAttributeValue(Entry $entry, $attribute)
     {

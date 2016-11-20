@@ -40,7 +40,7 @@ class LdapUserProvider implements UserProviderInterface
      * @param string        $baseDn
      * @param string        $searchDn
      * @param string        $searchPassword
-     * @param array         $defaultRoles
+     * @param array         $defaultRoles$entries[0]
      * @param string        $uidKey
      * @param string        $filter
      * @param string        $passwordAttribute
@@ -82,7 +82,10 @@ class LdapUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException('More than one user found');
         }
 
-        return $this->loadUser($entries[0]->getAttribute($this->uidKey)[0], $entries[0]);
+        $entry = $entries[0];
+        $username = $this->getAttributeValue($entry, $this->uidKey);
+
+        return $this->loadUser($username, $entry);
     }
 
     /**
@@ -115,30 +118,31 @@ class LdapUserProvider implements UserProviderInterface
      */
     protected function loadUser($username, Entry $entry)
     {
-        $password = $this->getPassword($entry);
+        $password = $this->getAttributeValue($entry, $this->passwordAttribute);
 
         return new User($username, $password, $this->defaultRoles);
     }
 
     /**
-     * Fetches the password from an LDAP entry.
+     * Fetches a required unique attribute value from an LDAP entry.
      *
      * @param null|Entry $entry
+     * @param string $attribute
      */
-    private function getPassword(Entry $entry)
+    private function getAttributeValue(Entry $entry, $attribute)
     {
-        if (null === $this->passwordAttribute) {
+        if (null === $attribute) {
             return;
         }
 
-        if (!$entry->hasAttribute($this->passwordAttribute)) {
-            throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $this->passwordAttribute, $entry->getDn()));
+        if (!$entry->hasAttribute($attribute)) {
+            throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $attribute, $entry->getDn()));
         }
 
-        $values = $entry->getAttribute($this->passwordAttribute);
+        $values = $entry->getAttribute($attribute);
 
         if (1 !== count($values)) {
-            throw new InvalidArgumentException(sprintf('Attribute "%s" has multiple values.', $this->passwordAttribute));
+            throw new InvalidArgumentException(sprintf('Attribute "%s" has multiple values.', $attribute));
         }
 
         return $values[0];

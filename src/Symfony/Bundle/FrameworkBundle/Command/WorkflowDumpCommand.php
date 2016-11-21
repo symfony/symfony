@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
+use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Workflow;
 
@@ -60,13 +61,14 @@ EOF
         $serviceId = $input->getArgument('name');
         if ($container->has('workflow.'.$serviceId)) {
             $workflow = $container->get('workflow.'.$serviceId);
+            $dumper = new GraphvizDumper();
         } elseif ($container->has('state_machine.'.$serviceId)) {
             $workflow = $container->get('state_machine.'.$serviceId);
+            $dumper = new StateMachineGraphvizDumper();
         } else {
             throw new \InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $serviceId));
         }
 
-        $dumper = new GraphvizDumper();
         $marking = new Marking();
 
         foreach ($input->getArgument('marking') as $place) {

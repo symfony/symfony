@@ -56,7 +56,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMarkingWithEmptyInitialMarking()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $workflow = new Workflow($definition, new MultipleStateMarkingStore());
@@ -70,7 +70,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMarkingWithExistingMarking()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $subject->marking = array('b' => 1, 'c' => 1);
@@ -89,7 +89,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanWithUnexistingTransition()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $workflow = new Workflow($definition, new MultipleStateMarkingStore());
@@ -99,7 +99,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testCan()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $workflow = new Workflow($definition, new MultipleStateMarkingStore());
@@ -110,7 +110,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testCanWithGuard()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcher();
@@ -128,7 +128,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      */
     public function testApplyWithImpossibleTransition()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $workflow = new Workflow($definition, new MultipleStateMarkingStore());
@@ -138,7 +138,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testApply()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $workflow = new Workflow($definition, new MultipleStateMarkingStore());
@@ -153,7 +153,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyWithEventDispatcher()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcherMock();
@@ -187,7 +187,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEnabledTransitions()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcher();

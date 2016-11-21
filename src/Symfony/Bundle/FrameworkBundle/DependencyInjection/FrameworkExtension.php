@@ -1045,6 +1045,7 @@ class FrameworkExtension extends Extension
         foreach (array('doctrine', 'psr6', 'redis') as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
                 $container->setAlias('cache.'.$name, Compiler\CachePoolPass::getServiceProvider($container, $config[$name]));
+                $container->getAlias('cache.'.$name)->setPublic(false);
             }
         }
         foreach (array('app', 'system') as $name) {

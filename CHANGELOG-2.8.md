@@ -7,6 +7,28 @@ in 2.8 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.8.0...v2.8.1
 
+* 2.8.14 (2016-11-21)
+
+ * bug #20543 [DI] Fix error when trying to resolve a DefinitionDecorator (nicolas-grekas)
+ * bug #20544 [PhpUnitBridge] Fix time-sensitive tests that use data providers (julienfalque)
+ * bug #20484 bumped min version of Twig to 1.28 (fabpot)
+ * bug #20519 [Debug] Remove GLOBALS from exception context to avoid endless recursion (Seldaek)
+ * bug #20455 [ClassLoader] Fix ClassCollectionLoader inlining with __halt_compiler (giosh94mhz)
+ * bug #20307 [Form] Fix Date\TimeType marked as invalid on request with single_text and zero seconds (LuisDeimos)
+ * bug #20466 [Translation] fixed nested fallback catalogue  using multiple locales. (aitboudad)
+ * bug #20465 [#18637][TranslationDebug] workaround for getFallbackLocales. (aitboudad)
+ * bug #20440 [TwigBridge][TwigBundle][HttpKernel] prefer getSourceContext() over getSource() (xabbuh)
+ * bug #20422 [Translation][fallback] add missing resources in parent catalogues. (aitboudad)
+ * bug #20378 [Form] Fixed show float values as choice value in ChoiceType (yceruto)
+ * bug #20294 Improved the design of the metrics in the profiler (javiereguiluz)
+ * bug #20375 [HttpFoundation][Session] Fix memcache session handler (klandaika)
+ * bug #20377 [Console] Fix infinite loop on missing input (chalasr)
+ * bug #20372 [Console] simplified code (fabpot)
+ * bug #20342 [Form] Fix UrlType transforms valid protocols (ogizanagi)
+ * bug #20292 Enhance GAE compat by removing some realpath() (nicolas-grekas)
+ * bug #20326 [VarDumper] Fix dumping Twig source in stack traces (nicolas-grekas)
+ * bug #20321 Compatibility with Twig 1.27 (xkobal)
+
 * 2.8.13 (2016-10-27)
 
  * bug #20289 Fix edge case with StreamedResponse where headers are sent twice (Nicofuma)

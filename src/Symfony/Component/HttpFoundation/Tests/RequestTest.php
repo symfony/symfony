@@ -1301,6 +1301,25 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($request->get('foo'));
     }
 
+    public function testHasParameterPrecedence()
+    {
+        $request = new Request();
+        $request->attributes->set('foo', 'attr');
+        $request->query->set('foo', 'query');
+        $request->request->set('foo', 'body');
+
+        $this->assertTrue($request->has('foo'));
+
+        $request->attributes->remove('foo');
+        $this->assertTrue($request->has('foo'));
+
+        $request->query->remove('foo');
+        $this->assertTrue($request->has('foo'));
+
+        $request->request->remove('foo');
+        $this->assertFalse($request->has('foo'));
+    }
+
     public function testGetPreferredLanguage()
     {
         $request = new Request();

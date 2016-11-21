@@ -732,6 +732,24 @@ class Request
     }
 
     /**
+     * Returns true if the parameter is defined from any bag.
+     *
+     * This method is mainly useful for libraries that want to provide some flexibility. If you don't need the
+     * flexibility in controllers, it is better to explicitly check request parameters from the appropriate
+     * public property instead (attributes, query, request).
+     *
+     * Order of precedence: PATH (routing placeholders or custom attributes), GET, BODY
+     *
+     * @param string $key the key
+     *
+     * @return bool true if the parameter exists, false otherwise
+     */
+    public function has($key)
+    {
+        return $this->attributes->has($key) || $this->query->has($key) || $this->request->has($key);
+    }
+
+    /**
      * Gets the Session.
      *
      * @return SessionInterface|null The session

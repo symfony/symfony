@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Definition\Dumper;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\DateTimeNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\EnumNode;
@@ -73,6 +74,12 @@ class YamlReferenceDumper
             }
         } elseif ($node instanceof EnumNode) {
             $comments[] = 'One of '.implode('; ', array_map('json_encode', $node->getValues()));
+            $default = $node->hasDefaultValue() ? Inline::dump($node->getDefaultValue()) : '~';
+        } elseif ($node instanceof DateTimeNode) {
+            $comment = 'A timestamp or datetime string';
+            $comment .= $node->getFormat() ? sprintf(' matching the "%s" format', $node->getFormat()) : '';
+            $comment .= $node->getTimezone() ? sprintf(' (default timezone: "%s")', $node->getTimezone()->getName()) : '';
+            $comments[] = $comment;
             $default = $node->hasDefaultValue() ? Inline::dump($node->getDefaultValue()) : '~';
         } else {
             $default = '~';

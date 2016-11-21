@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Definition\Dumper;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\DateTimeNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\EnumNode;
@@ -155,6 +156,11 @@ class XmlReferenceDumper
 
                     if ($child instanceof EnumNode) {
                         $comments[] = 'One of '.implode('; ', array_map('json_encode', $child->getValues()));
+                    } elseif ($child instanceof DateTimeNode) {
+                        $comment = 'A timestamp or datetime string';
+                        $comment .= $child->getFormat() ? sprintf(' matching the "%s" format', $child->getFormat()) : '';
+                        $comment .= $child->getTimezone() ? sprintf(' (default timezone: "%s")', $child->getTimezone()->getName()) : '';
+                        $comments[] = $comment;
                     }
 
                     if (count($comments)) {

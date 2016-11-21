@@ -44,6 +44,9 @@ acme_root:
     scalar_required:      ~ # Required
     enum_with_default:    this # One of "this"; "that"
     enum:                 ~ # One of "this"; "that"
+    datetime:             ~ # A timestamp or datetime string
+    datetime_with_timezone:  ~ # A timestamp or datetime string (default timezone: "Japan")
+    datetime_with_format_and_timezone:  ~ # A timestamp or datetime string matching the "d/m/Y" format (default timezone: "Japan")
 
     # some info
     array:

@@ -93,7 +93,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 foreach ($session->all() as $key => $value) {
                     $sessionAttributes[$key] = $this->cloneVar($value);
                 }
-                $sessionAttributes = $session->all();
                 $flashes = $session->getFlashBag()->peekAll();
             }
         }

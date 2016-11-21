@@ -90,7 +90,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 $sessionMetadata['Created'] = date(DATE_RFC822, $session->getMetadataBag()->getCreated());
                 $sessionMetadata['Last used'] = date(DATE_RFC822, $session->getMetadataBag()->getLastUsed());
                 $sessionMetadata['Lifetime'] = $session->getMetadataBag()->getLifetime();
-                foreach ($sessionAttributes as $key => $value) {
+                foreach ($session->all() as $key => $value) {
                     $sessionAttributes[$key] = $this->cloneVar($value);
                 }
                 $sessionAttributes = $session->all();

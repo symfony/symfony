@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Security;
 
-use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
@@ -20,8 +19,6 @@ class FirewallContextTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetters()
     {
-        $config = new FirewallConfig('main', 'request_matcher', 'user_checker');
-
         $exceptionListener = $this
             ->getMockBuilder(ExceptionListener::class)
             ->disableOriginalConstructor()
@@ -34,9 +31,8 @@ class FirewallContextTest extends \PHPUnit_Framework_TestCase
                 ->getMock(),
         );
 
-        $context = new FirewallContext($listeners, $exceptionListener, $config);
+        $context = new FirewallContext($listeners, $exceptionListener);
 
         $this->assertEquals(array($listeners, $exceptionListener), $context->getContext());
-        $this->assertEquals($config, $context->getConfig());
     }
 }

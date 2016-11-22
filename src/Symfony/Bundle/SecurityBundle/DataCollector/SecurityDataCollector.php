@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\DataCollector;
 
+use Symfony\Bundle\SecurityBundle\Security\FirewallConfigRegistry;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,8 +22,6 @@ use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\VarDumper\Cloner\Data;
-use Symfony\Component\Security\Http\FirewallMapInterface;
-use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 
 /**
  * SecurityDataCollector.
@@ -35,7 +34,7 @@ class SecurityDataCollector extends DataCollector
     private $roleHierarchy;
     private $logoutUrlGenerator;
     private $accessDecisionManager;
-    private $firewallMap;
+    private $firewallConfigRegistry;
 
     /**
      * Constructor.
@@ -44,15 +43,15 @@ class SecurityDataCollector extends DataCollector
      * @param RoleHierarchyInterface|null         $roleHierarchy
      * @param LogoutUrlGenerator|null             $logoutUrlGenerator
      * @param AccessDecisionManagerInterface|null $accessDecisionManager
-     * @param FirewallMapInterface|null           $firewallMap
+     * @param FirewallConfigRegistry|null         $firewallConfigRegistry
      */
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallConfigRegistry $firewallConfigRegistry = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
         $this->logoutUrlGenerator = $logoutUrlGenerator;
         $this->accessDecisionManager = $accessDecisionManager;
-        $this->firewallMap = $firewallMap;
+        $this->firewallConfigRegistry = $firewallConfigRegistry;
     }
 
     /**
@@ -140,9 +139,8 @@ class SecurityDataCollector extends DataCollector
 
         // collect firewall context information
         $this->data['firewall'] = null;
-        if ($this->firewallMap instanceof FirewallMap) {
-            $firewallConfig = $this->firewallMap->getFirewallConfig($request);
-            if (null !== $firewallConfig) {
+        if (null !== $this->firewallConfigRegistry) {
+            if (null !== $firewallConfig = $this->firewallConfigRegistry->fromRequest($request)) {
                 $this->data['firewall'] = array(
                     'name' => $firewallConfig->getName(),
                     'allows_anonymous' => $firewallConfig->allowsAnonymous(),

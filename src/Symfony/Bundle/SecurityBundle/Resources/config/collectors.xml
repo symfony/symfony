@@ -11,7 +11,7 @@
             <argument type="service" id="security.role_hierarchy" />
             <argument type="service" id="security.logout_url_generator" />
             <argument type="service" id="security.access.decision_manager" />
-            <argument type="service" id="security.firewall.map" />
+            <argument type="service" id="security.firewall.config_registry" />
         </service>
     </services>
 </container>

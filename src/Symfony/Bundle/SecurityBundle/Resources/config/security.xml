@@ -114,7 +114,7 @@
             <argument />  <!-- FirewallConfig -->
         </service>
 
-        <service id="security.firewall.config" class="Symfony\Bundle\SecurityBundle\Security\FirewallConfig" abstract="true" public="false">
+        <service id="security.firewall.config" class="Symfony\Bundle\SecurityBundle\Security\FirewallConfig" abstract="true">
             <argument />                   <!-- name -->
             <argument />                   <!-- request_matcher -->
             <argument />                   <!-- user_checker -->

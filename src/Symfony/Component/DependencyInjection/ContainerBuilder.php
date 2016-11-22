@@ -430,7 +430,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (!array_key_exists($id, $this->definitions) && isset($this->aliasDefinitions[$id])) {
-            return $this->get($this->aliasDefinitions[$id]);
+            return $this->get($this->aliasDefinitions[$id], $invalidBehavior);
         }
 
         try {

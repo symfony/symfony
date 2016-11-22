@@ -78,18 +78,21 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             array(
                 'simple',
-                'security.request_matcher.707b20193d4cb9f2718114abcbebb32af48f948484fc166a03482f49bf14f25e271f72c7',
                 'security.user_checker',
+                'security.request_matcher.707b20193d4cb9f2718114abcbebb32af48f948484fc166a03482f49bf14f25e271f72c7',
                 false,
             ),
             array(
                 'secure',
-                '',
                 'security.user_checker',
+                null,
                 true,
                 true,
                 'security.user.provider.concrete.default',
+                null,
                 'security.authentication.form_entry_point.secure',
+                null,
+                null,
                 array(
                     'logout',
                     'switch_user',
@@ -104,13 +107,15 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'host',
-                'security.request_matcher.dda8b565689ad8509623ee68fb2c639cd81cd4cb339d60edbaf7d67d30e6aa09bd8c63c3',
                 'security.user_checker',
+                'security.request_matcher.dda8b565689ad8509623ee68fb2c639cd81cd4cb339d60edbaf7d67d30e6aa09bd8c63c3',
                 true,
                 false,
                 'security.user.provider.concrete.default',
                 'host',
                 'security.authentication.basic_entry_point.host',
+                null,
+                null,
                 array(
                     'http_basic',
                     'anonymous',
@@ -118,13 +123,15 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'with_user_checker',
-                '',
                 'app.user_checker',
+                null,
                 true,
                 false,
                 'security.user.provider.concrete.default',
                 'with_user_checker',
                 'security.authentication.basic_entry_point.with_user_checker',
+                null,
+                null,
                 array(
                     'http_basic',
                     'anonymous',

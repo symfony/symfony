@@ -20,7 +20,7 @@ class FirewallContextTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetters()
     {
-        $config = new FirewallConfig('main', 'request_matcher', 'user_checker');
+        $config = new FirewallConfig('main', 'user_checker', 'request_matcher');
 
         $exceptionListener = $this
             ->getMockBuilder(ExceptionListener::class)

@@ -68,7 +68,9 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
 
         foreach ($this->extractSupportedLoaders($loaders) as $loader) {
             foreach ($loader->getMappedClasses() as $mappedClass) {
-                $metadataFactory->getMetadataFor($mappedClass);
+                if ($metadataFactory->hasMetadataFor($mappedClass)) {
+                    $metadataFactory->getMetadataFor($mappedClass);
+                }
             }
         }
 

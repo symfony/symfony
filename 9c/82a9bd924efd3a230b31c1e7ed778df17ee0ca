@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-13T12:53:05Z
+
+A bug fix usually goes into the lowest possible maintained branch, can this go into 2.7?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-13T15:45:25Z
+
+@Imangazaliev you should also rebase your commit on the 2.7 branch in git and (force) push your branch from there.
+
+And perhaps add a little test? :angel:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-14T10:09:44Z
+
+As you created your PR from your master branch directly, rebasing it elsewhere will mess your fork though. this is why using feature branches is better.
+
+And btw, when opening the PR, it is good to explain what the bug being fixed is instead of saying ``bug fixed``

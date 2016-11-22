@@ -557,6 +557,7 @@ class Process implements \IteratorAggregate
                 yield self::OUT => '';
             }
 
+            $this->checkTimeout();
             $this->readPipesForOutput(__FUNCTION__, $blocking);
         }
     }

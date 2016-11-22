@@ -41,8 +41,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
             if ($this->has($name)) {
                 $defaultValue = parent::get($name);
 
-                if (!is_scalar($defaultValue)) {
-                    throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar, but "%s" given to "%s".', gettype($defaultValue), $name));
+                if (null !== $defaultValue && !is_scalar($defaultValue)) {
+                    throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar or null, but "%s" given to "%s".', gettype($defaultValue), $name));
                 }
             }
 

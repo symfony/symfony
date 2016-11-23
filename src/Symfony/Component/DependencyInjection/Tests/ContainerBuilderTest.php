@@ -423,9 +423,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testResolveServicesWithCustomDefinitionClass()
     {
         $builder = new ContainerBuilder();
-        $builder->setDefinition('foo', new CustomDefinition(\stdClass::class));
+        $builder->setDefinition('foo', new CustomDefinition('stdClass'));
 
-        $this->assertInstanceOf(\stdClass::class, $builder->get('foo'));
+        $this->assertInstanceOf('stdClass', $builder->get('foo'));
     }
 
     public function testMerge()

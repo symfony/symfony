@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
-
 use Symfony\Component\DependencyInjection\Definition;
 
 class CustomDefinition extends Definition
 {
-
 }

@@ -103,6 +103,12 @@
             <argument type="service" id="event_dispatcher" />
         </service>
 
+        <service id="security.firewall.config_registry" class="Symfony\Bundle\SecurityBundle\Security\FirewallConfigRegistry">
+            <argument type="collection" /> <!-- Collection of FirewallConfig -->
+            <argument type="collection" /> <!-- Collection of RequestMatcher indexed by firewall name -->
+            <argument type="service" id="request_stack" on-invalid="null" />
+        </service>
+
         <service id="security.firewall.map" class="Symfony\Bundle\SecurityBundle\Security\FirewallMap" public="false">
             <argument type="service" id="service_container" />
             <argument type="collection" />
@@ -111,7 +117,6 @@
         <service id="security.firewall.context" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext" abstract="true">
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
-            <argument />  <!-- FirewallConfig -->
         </service>
 
         <service id="security.firewall.config" class="Symfony\Bundle\SecurityBundle\Security\FirewallConfig" abstract="true" public="false">

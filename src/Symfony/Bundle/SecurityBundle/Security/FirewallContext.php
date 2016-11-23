@@ -23,22 +23,11 @@ class FirewallContext
 {
     private $listeners;
     private $exceptionListener;
-    private $config;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
+    public function __construct(array $listeners, ExceptionListener $exceptionListener = null)
     {
-        if (null === $config) {
-            @trigger_error(sprintf('"%s()" expects an instance of "%s" as third argument since version 3.2 and will trigger an error in 4.0 if not provided.', __METHOD__, FirewallConfig::class), E_USER_DEPRECATED);
-        }
-
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
-        $this->config = $config;
-    }
-
-    public function getConfig()
-    {
-        return $this->config;
     }
 
     public function getContext()

@@ -236,8 +236,10 @@ class SecurityExtension extends Extension
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
         $map = $authenticationProviders = array();
+        $firewallConfigs = array();
+        $matchers = array();
         foreach ($firewalls as $name => $firewall) {
-            $configId = 'security.firewall.map.config.'.$name;
+            $configId = 'security.firewall.config.'.$name;
 
             list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
 
@@ -246,10 +248,11 @@ class SecurityExtension extends Extension
             $context
                 ->replaceArgument(0, $listeners)
                 ->replaceArgument(1, $exceptionListener)
-                ->replaceArgument(2, new Reference($configId))
             ;
 
             $map[$contextId] = $matcher;
+            $matchers[$name] = $matcher;
+            $firewallConfigs[] = new Reference($configId);
         }
         $mapDef->replaceArgument(1, $map);
 
@@ -260,6 +263,11 @@ class SecurityExtension extends Extension
         $container
             ->getDefinition('security.authentication.manager')
             ->replaceArgument(0, $authenticationProviders)
+        ;
+
+        $container->getDefinition('security.firewall.config_registry')
+            ->replaceArgument(0, $firewallConfigs)
+            ->replaceArgument(1, $matchers)
         ;
     }
 

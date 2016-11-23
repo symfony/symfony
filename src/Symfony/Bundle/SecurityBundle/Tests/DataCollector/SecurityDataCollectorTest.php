@@ -13,12 +13,11 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DataCollector;
 
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
-use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Bundle\SecurityBundle\Security\FirewallConfigRegistry;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
-use Symfony\Component\Security\Http\FirewallMapInterface;
 
 class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
 {
@@ -81,17 +80,17 @@ class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
         $firewallConfig = new FirewallConfig('dummy', 'security.request_matcher.dummy', 'security.user_checker.dummy');
         $request = $this->getRequest();
 
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMap::class)
+        $registry = $this
+            ->getMockBuilder(FirewallConfigRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $firewallMap
+        $registry
             ->expects($this->once())
-            ->method('getFirewallConfig')
+            ->method('fromRequest')
             ->with($request)
             ->willReturn($firewallConfig);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap);
+        $collector = new SecurityDataCollector(null, null, null, null, $registry);
         $collector->collect($request, $this->getResponse());
         $collected = $collector->getFirewall();
 
@@ -119,23 +118,13 @@ class SecurityDataCollectorTest extends \PHPUnit_Framework_TestCase
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
-        // Inject an instance that is not context aware
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMapInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap);
-        $collector->collect($request, $response);
-        $this->assertNull($collector->getFirewall());
-
         // Null config
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMap::class)
+        $registry = $this
+            ->getMockBuilder(FirewallConfigRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap);
+        $collector = new SecurityDataCollector(null, null, null, null, $registry);
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
     }

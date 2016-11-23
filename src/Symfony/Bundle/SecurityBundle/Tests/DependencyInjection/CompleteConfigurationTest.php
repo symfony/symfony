@@ -65,14 +65,47 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $container = $this->getContainer('container1');
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $listeners = array();
-        $configs = array();
         foreach (array_keys($arguments[1]) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map(function ($ref) { return (string) $ref; }, $arguments['index_0']);
+        }
 
-            $configDef = $container->getDefinition($arguments['index_2']);
-            $configs[] = array_values($configDef->getArguments());
+        $this->assertEquals(array(
+            array(),
+            array(
+                'security.channel_listener',
+                'security.logout_listener.secure',
+                'security.authentication.listener.x509.secure',
+                'security.authentication.listener.remote_user.secure',
+                'security.authentication.listener.form.secure',
+                'security.authentication.listener.basic.secure',
+                'security.authentication.listener.digest.secure',
+                'security.authentication.listener.rememberme.secure',
+                'security.authentication.listener.anonymous.secure',
+                'security.authentication.switchuser_listener.secure',
+                'security.access_listener',
+            ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.0',
+                'security.authentication.listener.basic.host',
+                'security.authentication.listener.anonymous.host',
+                'security.access_listener',
+            ),
+            array(
+                'security.channel_listener',
+                'security.context_listener.1',
+                'security.authentication.listener.basic.with_user_checker',
+                'security.authentication.listener.anonymous.with_user_checker',
+                'security.access_listener',
+            ),
+        ), $listeners);
+
+        $configs = array();
+        $configDefs = $container->getDefinition('security.firewall.config_registry')->getArgument(0);
+        foreach ($configDefs as $configRef) {
+            $configs[] = array_values($container->getDefinition($configRef)->getArguments());
         }
 
         $this->assertEquals(array(
@@ -131,37 +164,6 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
         ), $configs);
-
-        $this->assertEquals(array(
-            array(),
-            array(
-                'security.channel_listener',
-                'security.logout_listener.secure',
-                'security.authentication.listener.x509.secure',
-                'security.authentication.listener.remote_user.secure',
-                'security.authentication.listener.form.secure',
-                'security.authentication.listener.basic.secure',
-                'security.authentication.listener.digest.secure',
-                'security.authentication.listener.rememberme.secure',
-                'security.authentication.listener.anonymous.secure',
-                'security.authentication.switchuser_listener.secure',
-                'security.access_listener',
-            ),
-            array(
-                'security.channel_listener',
-                'security.context_listener.0',
-                'security.authentication.listener.basic.host',
-                'security.authentication.listener.anonymous.host',
-                'security.access_listener',
-            ),
-            array(
-                'security.channel_listener',
-                'security.context_listener.1',
-                'security.authentication.listener.basic.with_user_checker',
-                'security.authentication.listener.anonymous.with_user_checker',
-                'security.access_listener',
-            ),
-        ), $listeners);
     }
 
     public function testFirewallRequestMatchers()

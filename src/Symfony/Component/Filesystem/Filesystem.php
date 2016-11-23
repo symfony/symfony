@@ -624,7 +624,7 @@ class Filesystem
      * @param string $filename The file to be written to
      * @param string $content  The data to write into the file
      *
-     * @throws IOException If the file cannot be written to.
+     * @throws IOException If the file cannot be written to
      */
     public function dumpFile($filename, $content)
     {
@@ -646,6 +646,31 @@ class Filesystem
 
         @chmod($tmpFile, 0666 & ~umask());
         $this->rename($tmpFile, $filename, true);
+    }
+
+    /**
+     * Appends content to an existing file.
+     *
+     * @param string $filename The file to which to append content
+     * @param string $content  The content to append
+     *
+     * @throws IOException If the file is not writable
+     */
+    public function appendToFile($filename, $content)
+    {
+        $dir = dirname($filename);
+
+        if (!is_dir($dir)) {
+            $this->mkdir($dir);
+        }
+
+        if (!is_writable($dir)) {
+            throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
+        }
+
+        if (false === @file_put_contents($filename, $content, FILE_APPEND)) {
+            throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
+        }
     }
 
     /**

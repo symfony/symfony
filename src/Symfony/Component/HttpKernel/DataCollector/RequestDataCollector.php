@@ -53,6 +53,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
         $route = '';
+        $routeParams = array();
         foreach ($request->attributes->all() as $key => $value) {
             if ('_route' === $key && is_object($value)) {
                 $attributes[$key] = $this->cloneVar($value->getPath());
@@ -62,6 +63,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
 
             if ('_route' === $key) {
                 $route = is_object($value) ? $value->getPath() : $value;
+            }
+
+            if ('_route_params' === $key && is_array($value)) {
+                foreach ($value as $k => $v) {
+                    $routeParams[$k] = $this->cloneVar($v);
+                }
             }
         }
 
@@ -83,7 +90,9 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 $sessionMetadata['Created'] = date(DATE_RFC822, $session->getMetadataBag()->getCreated());
                 $sessionMetadata['Last used'] = date(DATE_RFC822, $session->getMetadataBag()->getLastUsed());
                 $sessionMetadata['Lifetime'] = $session->getMetadataBag()->getLifetime();
-                $sessionAttributes = $session->all();
+                foreach ($session->all() as $key => $value) {
+                    $sessionAttributes[$key] = $this->cloneVar($value);
+                }
                 $flashes = $session->getFlashBag()->peekAll();
             }
         }
@@ -104,6 +113,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'request_cookies' => $request->cookies->all(),
             'request_attributes' => $attributes,
             'route' => $route,
+            'route_params' => $routeParams,
             'response_headers' => $responseHeaders,
             'session_metadata' => $sessionMetadata,
             'session_attributes' => $sessionAttributes,
@@ -264,7 +274,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     public function getRouteParams()
     {
-        return isset($this->data['request_attributes']['_route_params']) ? $this->data['request_attributes']['_route_params'] : $this->cloneVar(array());
+        return $this->data['route_params'];
     }
 
     /**

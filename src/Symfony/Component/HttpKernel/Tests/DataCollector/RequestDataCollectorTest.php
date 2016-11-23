@@ -47,7 +47,7 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\ParameterBag', $c->getRequestQuery());
         $this->assertSame('html', $c->getFormat());
         $this->assertEquals('foobar', $c->getRoute());
-        $this->assertEquals($cloner->cloneVar(array('name' => 'foo')), $c->getRouteParams());
+        $this->assertEquals(array('name' => $cloner->cloneVar('foo')), $c->getRouteParams());
         $this->assertSame(array(), $c->getSessionAttributes());
         $this->assertSame('en', $c->getLocale());
         $this->assertEquals($cloner->cloneVar($request->attributes->get('resource')), $attributes->get('resource'));

@@ -63,7 +63,15 @@ class XmlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'xml' === pathinfo($resource, PATHINFO_EXTENSION);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        if (null === $type && 'xml' === pathinfo($resource, PATHINFO_EXTENSION)) {
+            return true;
+        }
+
+        return 'xml' === $type;
     }
 
     /**
@@ -96,7 +104,7 @@ class XmlFileLoader extends FileLoader
         $defaultDirectory = dirname($file);
         foreach ($imports as $import) {
             $this->setCurrentDir($defaultDirectory);
-            $this->import($import->getAttribute('resource'), null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
+            $this->import($import->getAttribute('resource'), XmlUtils::phpize($import->getAttribute('type')) ?: null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
         }
     }
 

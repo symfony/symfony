@@ -44,6 +44,14 @@ class PhpFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        if (null === $type && 'php' === pathinfo($resource, PATHINFO_EXTENSION)) {
+            return true;
+        }
+
+        return 'php' === $type;
     }
 }

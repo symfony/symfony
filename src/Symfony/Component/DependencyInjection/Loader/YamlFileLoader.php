@@ -101,7 +101,15 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        if (null === $type && in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yaml', 'yml'), true)) {
+            return true;
+        }
+
+        return in_array($type, array('yaml', 'yml'), true);
     }
 
     /**
@@ -127,7 +135,7 @@ class YamlFileLoader extends FileLoader
             }
 
             $this->setCurrentDir($defaultDirectory);
-            $this->import($import['resource'], null, isset($import['ignore_errors']) ? (bool) $import['ignore_errors'] : false, $file);
+            $this->import($import['resource'], isset($import['type']) ? $import['type'] : null, isset($import['ignore_errors']) ? (bool) $import['ignore_errors'] : false, $file);
         }
     }
 

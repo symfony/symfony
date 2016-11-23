@@ -161,6 +161,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
             'bar' => '%foo%',
             'imported_from_ini' => true,
             'imported_from_yaml' => true,
+            'with_wrong_ext' => 'from yaml',
         );
 
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
@@ -443,7 +444,8 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader(new ContainerBuilder(), new FileLocator());
 
         $this->assertTrue($loader->supports('foo.xml'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        $this->assertTrue($loader->supports('with_wrong_ext.yml', 'xml'), '->supports() returns true if the resource with forced type is loadable');
     }
 
     public function testNoNamingConflictsForAnonymousServices()

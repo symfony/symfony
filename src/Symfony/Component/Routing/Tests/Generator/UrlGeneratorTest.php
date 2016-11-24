@@ -670,6 +670,14 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/app.php/testing#fragment', $url);
     }
 
+    public function testQueryStringParametersCanBeObjectsWithToString()
+    {
+        $routes = $this->getRoutes('test', new Route('/{name}'));
+        $url = $this->getGenerator($routes, array())->generate('test', array('name' => new MyObject(), 'query' => new MyObject()));
+
+        $this->assertSame('/app.php/string?query=string', $url);
+    }
+
     protected function getGenerator(RouteCollection $routes, array $parameters = array(), $logger = null)
     {
         $context = new RequestContext('/app.php');
@@ -687,5 +695,13 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
         $routes->add($name, $route);
 
         return $routes;
+    }
+}
+
+class MyObject
+{
+    public function __tostring()
+    {
+        return 'string';
     }
 }

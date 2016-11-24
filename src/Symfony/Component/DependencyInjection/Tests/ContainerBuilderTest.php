@@ -500,6 +500,18 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('Foo' => 0, 'Bar' => 1), $container->getEnvCounters());
     }
 
+    public function testResolveEnvValues()
+    {
+        $_ENV['DUMMY_ENV_VAR'] = 'du%%y';
+
+        $container = new ContainerBuilder();
+        $container->setParameter('bar', '%% %env(DUMMY_ENV_VAR)%');
+
+        $this->assertSame('%% du%%%%y', $container->resolveEnvPlaceholders('%bar%', true));
+
+        unset($_ENV['DUMMY_ENV_VAR']);
+    }
+
     /**
      * @expectedException \LogicException
      */

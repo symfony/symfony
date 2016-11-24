@@ -449,7 +449,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (!array_key_exists($id, $this->definitions) && isset($this->aliasDefinitions[$id])) {
-            return $this->get($this->aliasDefinitions[$id]);
+            return $this->get($this->aliasDefinitions[$id], $invalidBehavior);
         }
 
         try {
@@ -859,8 +859,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function createService(Definition $definition, $id, $tryProxy = true)
     {
-        if ('Symfony\Component\DependencyInjection\Definition' !== get_class($definition)) {
-            throw new RuntimeException(sprintf('Constructing service "%s" from a %s is not supported at build time.', $id, get_class($definition)));
+        if ($definition instanceof DefinitionDecorator) {
+            throw new RuntimeException(sprintf('Constructing service "%s" from a parent definition is not supported at build time.', $id));
         }
 
         if ($definition->isSynthetic()) {

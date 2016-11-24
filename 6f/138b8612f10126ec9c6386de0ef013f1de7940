@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-22T09:45:36Z
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-22T10:34:56Z
+
+@chalasr the issue is that ``<argument />`` and ``<argument></argument>`` are exactly the same for our loader. We have no way to know how it was written before the XML parsing (as PHP is doing the XML parsing). And so it must be transformed to the empty string, not to ``null`` otherwise it becomes impossible to specify the empty string in XML config files
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-22T10:38:39Z
+
+@stof : That's another issue, but do you know why we can't infer `null` from `<argument />` whereas `<argument type="string"/>` would allow to specify it should be an empty string? BC reasons?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-22T10:39:12Z
+
+yeah, changing it is impossible for BC anyway
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-23T13:26:59Z
+
+:+1:, must be on 3.2 (BC break otherwise, because argument reordering)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-23T14:36:59Z
+
+@nicolas-grekas : I've removed the deprecation as well as asked in https://github.com/symfony/symfony/pull/20591#issuecomment-262528073

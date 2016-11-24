@@ -7,7 +7,7 @@ use Symfony\Component\Workflow\Transition;
 
 trait WorkflowBuilderTrait
 {
-    private function createComplexWorkflow()
+    private function createComplexWorkflowDefinition()
     {
         $places = range('a', 'g');
 
@@ -33,7 +33,7 @@ trait WorkflowBuilderTrait
         //           +----+                          +----+     +----+     +----+
     }
 
-    public function createSimpleWorkflowDefinition()
+    private function createSimpleWorkflowDefinition()
     {
         $places = range('a', 'c');
 
@@ -42,5 +42,38 @@ trait WorkflowBuilderTrait
         $transitions[] = new Transition('t2', 'b', 'c');
 
         return new Definition($places, $transitions);
+
+        // The graph looks like:
+        // +---+     +----+     +---+     +----+     +---+
+        // | a | --> | t1 | --> | b | --> | t2 | --> | c |
+        // +---+     +----+     +---+     +----+     +---+
+    }
+
+    private function createComplexStateMachineDefinition()
+    {
+        $places = array('a', 'b', 'c', 'd');
+
+        $transitions[] = new Transition('t1', 'a', 'b');
+        $transitions[] = new Transition('t1', 'd', 'b');
+        $transitions[] = new Transition('t2', 'b', 'c');
+        $transitions[] = new Transition('t3', 'b', 'd');
+
+        $definition = new Definition($places, $transitions);
+
+        return $definition;
+
+        // The graph looks like:
+        //                     t1
+        //               +------------------+
+        //               v                  |
+        // +---+  t1   +-----+  t2   +---+  |
+        // | a | ----> |  b  | ----> | c |  |
+        // +---+       +-----+       +---+  |
+        //               |                  |
+        //               | t3               |
+        //               v                  |
+        //             +-----+              |
+        //             |  d  | -------------+
+        //             +-----+
     }
 }

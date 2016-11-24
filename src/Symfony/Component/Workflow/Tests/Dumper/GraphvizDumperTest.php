@@ -20,7 +20,7 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideWorkflowDefinitionWithoutMarking
      */
-    public function testGraphvizDumperWithoutMarking($definition, $expected)
+    public function testDumpWithoutMarking($definition, $expected)
     {
         $dump = $this->dumper->dump($definition);
 
@@ -30,7 +30,7 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideWorkflowDefinitionWithMarking
      */
-    public function testWorkflowWithMarking($definition, $marking, $expected)
+    public function testDumpWithMarking($definition, $marking, $expected)
     {
         $dump = $this->dumper->dump($definition, $marking);
 
@@ -40,9 +40,9 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     public function provideWorkflowDefinitionWithMarking()
     {
         yield array(
-            $this->createComplexWorkflow(),
+            $this->createComplexWorkflowDefinition(),
             new Marking(array('b' => 1)),
-            $this->createComplexWorkflowDumpWithMarking(),
+            $this->createComplexWorkflowDefinitionDumpWithMarking(),
         );
 
         yield array(
@@ -54,11 +54,11 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
     public function provideWorkflowDefinitionWithoutMarking()
     {
-        yield array($this->createComplexWorkflow(), $this->provideComplexWorkflowDumpWithoutMarking());
+        yield array($this->createComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking());
         yield array($this->createSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking());
     }
 
-    public function createComplexWorkflowDumpWithMarking()
+    public function createComplexWorkflowDefinitionDumpWithMarking()
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"

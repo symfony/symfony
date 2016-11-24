@@ -1968,7 +1968,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
         $request->setMethod($method);
-        $this->assertEquals($safe, $request->isMethodSafe());
+        $this->assertEquals($safe, $request->isMethodSafe(false));
     }
 
     public function methodSafeProvider()
@@ -1985,6 +1985,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('TRACE', true),
             array('CONNECT', false),
         );
+    }
+
+    public function testMethodSafeChecksCacheable()
+    {
+        $request = new Request();
+        $request->setMethod('OPTION');
+        $this->assertFalse($request->isMethodSafe());
     }
 
     /**

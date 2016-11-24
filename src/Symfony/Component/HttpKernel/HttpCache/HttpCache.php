@@ -202,7 +202,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
         $this->traces[$request->getMethod().' '.$path] = array();
 
-        if (!$request->isMethodSafe()) {
+        if (!$request->isMethodSafe(false)) {
             $response = $this->invalidate($request, $catch);
         } elseif ($request->headers->has('expect') || !$request->isMethodCacheable()) {
             $response = $this->pass($request, $catch);

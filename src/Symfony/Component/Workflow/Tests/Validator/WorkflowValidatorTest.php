@@ -15,7 +15,7 @@ class WorkflowValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSinglePlaceWorkflowValidatorAndComplexWorkflow()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
 
         (new WorkflowValidator(true))->validate($definition, 'foo');
     }

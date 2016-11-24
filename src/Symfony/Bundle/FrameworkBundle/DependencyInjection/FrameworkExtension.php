@@ -1242,9 +1242,13 @@ class FrameworkExtension extends Extension
         $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
 
+        if (isset($config['prefix_seed'])) {
+            $container->setParameter('cache.prefix.seed', $config['prefix_seed']);
+        }
         foreach (array('doctrine', 'psr6', 'redis') as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
                 $container->setAlias('cache.'.$name, Compiler\CachePoolPass::getServiceProvider($container, $config[$name]));
+                $container->getAlias('cache.'.$name)->setPublic(false);
             }
         }
         foreach (array('app', 'system') as $name) {

@@ -104,8 +104,8 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $resolver = new LoaderResolver(array(
-            new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml')),
-            new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml')),
+            new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/ini')),
+            new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml')),
             new PhpFileLoader($container, new FileLocator(self::$fixturesPath.'/php')),
             $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml')),
         ));

@@ -267,6 +267,7 @@ class SecurityExtension extends Extension
     {
         $config = $container->setDefinition($configId, new DefinitionDecorator('security.firewall.config'));
         $config->replaceArgument(0, $id);
+        $config->replaceArgument(1, $firewall['user_checker']);
 
         // Matcher
         $matcher = null;
@@ -279,8 +280,7 @@ class SecurityExtension extends Extension
             $matcher = $this->createRequestMatcher($container, $pattern, $host, $methods);
         }
 
-        $config->replaceArgument(1, (string) $matcher);
-        $config->replaceArgument(2, $firewall['user_checker']);
+        $config->replaceArgument(2, $matcher ? (string) $matcher : null);
         $config->replaceArgument(3, $firewall['security']);
 
         // Security disabled?
@@ -306,6 +306,7 @@ class SecurityExtension extends Extension
         // Channel listener
         $listeners[] = new Reference('security.channel_listener');
 
+        $contextKey = null;
         // Context serializer listener
         if (false === $firewall['stateless']) {
             $contextKey = $id;
@@ -313,10 +314,10 @@ class SecurityExtension extends Extension
                 $contextKey = $firewall['context'];
             }
 
-            $config->replaceArgument(6, $contextKey);
-
             $listeners[] = new Reference($this->createContextListener($container, $contextKey));
         }
+
+        $config->replaceArgument(6, $contextKey);
 
         // Logout listener
         if (isset($firewall['logout'])) {
@@ -399,12 +400,8 @@ class SecurityExtension extends Extension
         // Exception listener
         $exceptionListener = new Reference($this->createExceptionListener($container, $firewall, $id, $configuredEntryPoint ?: $defaultEntryPoint, $firewall['stateless']));
 
-        if (isset($firewall['access_denied_handler'])) {
-            $config->replaceArgument(8, $firewall['access_denied_handler']);
-        }
-        if (isset($firewall['access_denied_url'])) {
-            $config->replaceArgument(9, $firewall['access_denied_url']);
-        }
+        $config->replaceArgument(8, isset($firewall['access_denied_handler']) ? $firewall['access_denied_handler'] : null);
+        $config->replaceArgument(9, isset($firewall['access_denied_url']) ? $firewall['access_denied_url'] : null);
 
         $container->setAlias(new Alias('security.user_checker.'.$id, false), $firewall['user_checker']);
 

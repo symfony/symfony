@@ -17,8 +17,8 @@ namespace Symfony\Bundle\SecurityBundle\Security;
 final class FirewallConfig
 {
     private $name;
-    private $requestMatcher;
     private $userChecker;
+    private $requestMatcher;
     private $securityEnabled;
     private $stateless;
     private $provider;
@@ -30,8 +30,8 @@ final class FirewallConfig
 
     /**
      * @param string      $name
-     * @param string      $requestMatcher
      * @param string      $userChecker
+     * @param string|null $requestMatcher
      * @param bool        $securityEnabled
      * @param bool        $stateless
      * @param string|null $provider
@@ -41,11 +41,11 @@ final class FirewallConfig
      * @param string|null $accessDeniedUrl
      * @param string[]    $listeners
      */
-    public function __construct($name, $requestMatcher, $userChecker, $securityEnabled = true, $stateless = false, $provider = null, $context = null, $entryPoint = null, $accessDeniedHandler = null, $accessDeniedUrl = null, $listeners = array())
+    public function __construct($name, $userChecker, $requestMatcher = null, $securityEnabled = true, $stateless = false, $provider = null, $context = null, $entryPoint = null, $accessDeniedHandler = null, $accessDeniedUrl = null, $listeners = array())
     {
         $this->name = $name;
-        $this->requestMatcher = $requestMatcher;
         $this->userChecker = $userChecker;
+        $this->requestMatcher = $requestMatcher;
         $this->securityEnabled = $securityEnabled;
         $this->stateless = $stateless;
         $this->provider = $provider;
@@ -62,7 +62,8 @@ final class FirewallConfig
     }
 
     /**
-     * @return string The request matcher service id
+     * @return string|null The request matcher service id or null if neither the request matcher, pattern or host
+     *                     options were provided
      */
     public function getRequestMatcher()
     {

@@ -154,7 +154,7 @@
                 {% endif %}
 
                 <h3>Request Headers</h3>
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders, labels: ['Header', 'Value'] }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestheaders, labels: ['Header', 'Value'], maxDepth: 1 }, with_context = false) }}
 
                 <h3>Request Content</h3>
 
@@ -183,7 +183,7 @@
             <div class="tab-content">
                 <h3>Response Headers</h3>
 
-                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responseheaders, labels: ['Header', 'Value'] }, with_context = false) }}
+                {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.responseheaders, labels: ['Header', 'Value'], maxDepth: 1 }, with_context = false) }}
             </div>
         </div>
 

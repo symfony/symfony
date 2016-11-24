@@ -116,8 +116,8 @@
 
         <service id="security.firewall.config" class="Symfony\Bundle\SecurityBundle\Security\FirewallConfig" abstract="true" public="false">
             <argument />                   <!-- name -->
-            <argument />                   <!-- request_matcher -->
             <argument />                   <!-- user_checker -->
+            <argument />                   <!-- request_matcher -->
             <argument />                   <!-- security enabled -->
             <argument />                   <!-- stateless -->
             <argument />                   <!-- provider -->

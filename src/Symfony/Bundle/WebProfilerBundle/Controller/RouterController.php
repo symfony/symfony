@@ -87,7 +87,7 @@ class RouterController
         $traceRequest = Request::create(
             $request->getPathInfo(),
             $request->getRequestServer(true)->get('REQUEST_METHOD'),
-            $request->getRequestAttributes(true)->all(),
+            array(),
             $request->getRequestCookies(true)->all(),
             array(),
             $request->getRequestServer(true)->all()

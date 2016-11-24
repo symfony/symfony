@@ -1,0 +1,94 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-23T13:39:30Z
+
+This would force all projects that use the method in the intended way to update their code to get rid of the deprecation message. I am not sure if they will be really happy about that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-23T13:41:10Z
+
+Yes, as much as we are otherwise forcing people (e.g. Drupal) to update their code. That's why BC break are bad :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-23T13:41:51Z
+
+And deprecations do never force anyone to update their code, unless they decide to do so to prepare for next major.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-23T14:00:27Z
+
+Sure, but Drupal is misusing the concept of safe methods. Thus IMO it's fair to have them update their code.
+
+How do you see the method in 4.0? Will it have a completely useless parameter? How do we deal with code that triggered deprecations in 3.x? It will then still work (somehow) and the deprecation is gone?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-23T14:09:57Z
+
+> Drupal is misusing the concept of safe methods
+
+We have to acknowledge that we opened a big trap :-) In OSS, "the code is doc", so they just shopped for the right method and they chose right at the time they decided to use this one. Nowhere in the doc nor in the code do we mention that this method was intended to behave like RFC 7231!
+
+> How do you see the method in 4.0? Will it have a completely useless parameter?
+
+With the code path triggering the deprecation removed. And keeping calls that have the useless param asis for cross-major-version compat yes. Then maybe deprecate any args at all in 4.1.
+
+> How do we deal with code that triggered deprecations in 3.x? It will then still work (somehow) and the deprecation is gone?
+
+As noted in the deprecation message, code *may* be updated to either adding false as argument, or use `isMethodCacheable` depending on the use case.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-23T14:23:25Z
+
+If we acknowledge that the previous method was not clear enough in telling that it provided an implementation of the RFC spec, I suggest that we completely deprecate the method. We can then introduce a new one dealing with the "safe" keyword and have the `isCacheableMethod()` method for users who need to deal with caches.
+
+> As noted in the deprecation message, code may be updated to either adding `false` as argument, or use isMethodCacheable depending on the use case.
+
+Which would be weird if you really wanted to use the method in the RFC-compatible way. Because you then for Symfony 3.x compatibility you add the `false` argument while you could simply omit it in 4.x again.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-23T14:26:31Z
+
+> while you could simply omit it in 4.x again
+
+true, we already created such migration path for 3.0, e.g. the `choices_as_values` form option
+
+---------------------------------------------------------------------------
+
+by wimleers at 2016-11-23T14:52:53Z
+
+>  so they just shopped for the right method and they chose right at the time they decided to use this one
+
+Not even that. We looked at `HttpCache` for Symfony best practices. Since `HttpCache` used `Request::isMethodSafe()`, we figured this was the best practice.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-23T15:06:10Z
+
+> true, we already created such migration path for 3.0, e.g. the `choices_as_values` form option
+
+That's true, but you needed to adapt your code to be compatible with Symfony 3.x. However, if you are currently only relying on the safe semantic of an HTTP method, you wouldn't have to update your code in 4.x to make it work the same. That's why I think we could then better deprecate the method itself and think about a more meaningful one (something like `doesMethodHaveSideEffects()`).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-23T15:14:11Z
+
+> you wouldn't have to update your code in 4.x to make it work the same
+
+instead of renaming, the plan could be:
+- force the arg to be set and be `false` (but still use `func_get_arg` instead of real arg to preserve the signature) or throw a `BadMethodCallException`
+- then deprecate setting this `false` arg in 4.1
+
+that way, things must be explicit. WDYT?
+The `isMethodSafe` name is consistent to me, I'd prefer keep it the same...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-23T15:20:44Z
+
+@xabbuh PR updated accordingly

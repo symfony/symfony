@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
 use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
+use Symfony\Component\HttpKernel\Tests\HttpCache\HttpCacheTestCase;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {
@@ -571,6 +572,35 @@ EOF;
             $this->fail('Hidden resources should raise an exception when returning the first matching path');
         } catch (\RuntimeException $e) {
         }
+    }
+
+    public function testLocateResourceOverrideBundleConfigFiles()
+    {
+        $bundle = $this->getBundle(__DIR__.'/Fixtures/BaseBundle', null, 'BaseBundle', 'BaseBundle');
+
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideConfig')
+            ->setConstructorArgs(array('test', false))
+            ->setMethods(array('getBundle'))
+            ->getMock();
+
+        $p = new \ReflectionProperty($kernel, 'rootDir');
+        $p->setAccessible(true);
+        $p->setValue($kernel, __DIR__.'/Fixtures');
+
+        $kernel
+            ->expects($this->any())
+            ->method('getBundle')
+            ->will($this->returnValue(array($bundle)))
+        ;
+
+        HttpCacheTestCase::clearDirectory($kernel->getCacheDir());
+
+        $kernel->boot();
+
+        $container = $kernel->getContainer();
+
+        $this->assertEquals('override-foo', $container->getParameter('foo'));
+        $this->assertEquals('override-bar', $container->getParameter('bar'));
     }
 
     public function testLocateResourceOnDirectories()

@@ -32,8 +32,8 @@ class FirewallConfigTest extends \PHPUnit_Framework_TestCase
 
         $config = new FirewallConfig(
             'foo_firewall',
-            $options['request_matcher'],
             $options['user_checker'],
+            $options['request_matcher'],
             $options['security'],
             $options['stateless'],
             $options['provider'],

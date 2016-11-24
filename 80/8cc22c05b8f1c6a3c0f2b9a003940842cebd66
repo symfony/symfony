@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-11-22T14:59:29Z
+
+currently, the ProfilerController forces to disable the profiler on its pages. Should we add a configuration setting to allow keeping the profiler enabled in the WebProfilerBundle pages for people working on it ? This may be an idea
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-22T15:18:11Z
+
+> configuration setting to allow keeping the profiler enabled in the WebProfilerBundle
+
+Maybe, but I fear people will just miss the configuration option most of the time and fall in the same trap. Another idea would be to fail hard on any log message triggered above some threshold while rendering a profiler panel. Or something else, like extra special care.
+For another PR of course if anyone wants to work on that.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-22T15:25:02Z
+
+@nicolas-grekas being able to re-enable the profiler while working on it would not solve everything magically, but it would make it easier to solve them when taking care, and with an easy change.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-22T17:25:44Z
+
+@nicolas-grekas  with this approach can the multiple headers bug target 2.7? - https://github.com/symfony/symfony/pull/20567#issuecomment-261713472
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-22T17:31:28Z
+
+I don't know. The panel is so different in 2.7 that I'll let you look at it if you'd like... It's up to you, personally I'm fine with 2.7 asis :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-22T17:44:05Z
+
+True. However for symfony being a _HTTP_ framework and such.. i find it quite disturbing though :)) and we're still stuck with it for some while. Then again, it's not really security related or so..
+
+I think ideally the bug is fixed separate from this PR, targeting 2.7+. Since this PR only fixes the `profiler_dump` issue on it right?
+
+Ie. we should at least consider 2.8 and/or 3.1 on it right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-22T17:48:34Z
+
+This PR applies only on 3.2 yes. The rest is up to you :)

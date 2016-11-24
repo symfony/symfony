@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
@@ -266,6 +267,18 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo, $builder->get('alias'), '->set() replaces an existing alias');
     }
 
+    public function testAliasesKeepInvalidBehavior()
+    {
+        $builder = new ContainerBuilder();
+
+        $aliased = new Definition('stdClass');
+        $aliased->addMethodCall('setBar', array(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)));
+        $builder->setDefinition('aliased', $aliased);
+        $builder->setAlias('alias', 'aliased');
+
+        $this->assertEquals(new \stdClass(), $builder->get('alias'));
+    }
+
     public function testAddGetCompilerPass()
     {
         $builder = new ContainerBuilder();
@@ -415,7 +428,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Constructing service "foo" from a Symfony\Component\DependencyInjection\DefinitionDecorator is not supported at build time.
+     * @expectedExceptionMessage Constructing service "foo" from a parent definition is not supported at build time.
      */
     public function testResolveServicesWithDecoratedDefinition()
     {
@@ -425,6 +438,14 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->setDefinition('foo', new DefinitionDecorator('parent'));
 
         $builder->get('foo');
+    }
+
+    public function testResolveServicesWithCustomDefinitionClass()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setDefinition('foo', new CustomDefinition('stdClass'));
+
+        $this->assertInstanceOf('stdClass', $builder->get('foo'));
     }
 
     public function testMerge()

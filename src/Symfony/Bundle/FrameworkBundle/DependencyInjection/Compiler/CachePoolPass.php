@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -38,6 +39,7 @@ class CachePoolPass implements CompilerPassInterface
         }
         $container->getParameterBag()->remove('cache.prefix.seed');
 
+        $resolvedPools = array();
         $aliases = $container->getAliases();
         $attributes = array(
             'provider',
@@ -45,15 +47,12 @@ class CachePoolPass implements CompilerPassInterface
             'default_lifetime',
         );
         foreach ($container->findTaggedServiceIds('cache.pool') as $id => $tags) {
-            $adapter = $pool = $container->getDefinition($id);
+            $pool = $container->getDefinition($id);
             if ($pool->isAbstract()) {
                 continue;
             }
-            while ($adapter instanceof DefinitionDecorator) {
-                $adapter = $container->findDefinition($adapter->getParent());
-                if ($t = $adapter->getTag('cache.pool')) {
-                    $tags[0] += $t[0];
-                }
+            if ($pool instanceof DefinitionDecorator) {
+                $resolvedPools[$id] = $pool = $this->resolveAdapters($container, $pool, $id, $tags);
             }
             if (!isset($tags[0]['namespace'])) {
                 $tags[0]['namespace'] = $this->getNamespace($namespaceSuffix, $id);
@@ -86,11 +85,30 @@ class CachePoolPass implements CompilerPassInterface
                 $pool->addTag('cache.pool', array('clearer' => $clearer));
             }
         }
+        foreach ($resolvedPools as $id => $pool) {
+            $container->setDefinition($id, $pool);
+        }
     }
 
     private function getNamespace($namespaceSuffix, $id)
     {
         return substr(str_replace('/', '-', base64_encode(hash('sha256', $id.$namespaceSuffix, true))), 0, 10);
+    }
+
+    private function resolveAdapters(ContainerBuilder $container, DefinitionDecorator $pool, $id, array &$tags)
+    {
+        if (!$container->has($parent = $pool->getParent())) {
+            throw new RuntimeException(sprintf('Service "%s": Parent definition "%s" does not exist.', $id, $parent));
+        }
+        $adapter = $container->findDefinition($parent);
+        if ($t = $adapter->getTag('cache.pool')) {
+            $tags[0] += $t[0];
+        }
+        if ($adapter instanceof DefinitionDecorator) {
+            $adapter = $this->resolveAdapters($container, $adapter, $parent, $tags);
+        }
+
+        return $pool->resolveChanges($adapter);
     }
 
     /**

@@ -17,9 +17,13 @@ use Symfony\Component\Config\FileLocator;
 
 class YamlCompleteConfigurationTest extends CompleteConfigurationTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function getLoader(ContainerBuilder $container)
     {
-        $loadXml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
-        $loadXml->load($file.'.yml');
+        return new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
+    }
+
+    protected function getFileExtension()
+    {
+        return 'yml';
     }
 }

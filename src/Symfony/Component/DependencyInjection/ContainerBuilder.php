@@ -937,13 +937,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->shareService($definition, $service, $id);
         }
 
-        foreach ($definition->getMethodCalls() as $call) {
-            $this->callMethod($service, $call);
-        }
-
         $properties = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getProperties())));
         foreach ($properties as $name => $value) {
             $service->$name = $value;
+        }
+
+        foreach ($definition->getMethodCalls() as $call) {
+            $this->callMethod($service, $call);
         }
 
         if ($callable = $definition->getConfigurator()) {

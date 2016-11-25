@@ -23,6 +23,8 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputAwareInterface;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -1030,6 +1032,24 @@ class Application
         }
 
         return $this;
+    }
+
+    /**
+     * Helper to run a sub-command from a command.
+     *
+     * @param string               $command Command that should be run.
+     * @param OutputInterface|null $output  The output to use. If not provided, the output will be silenced.
+     *
+     * @return int 0 if everything went fine, or an error code
+     */
+    public function runCommand($command, OutputInterface $output = null)
+    {
+        $input = new StringInput($command);
+        $output = $output ?: new NullOutput();
+
+        $command = $this->find($this->getCommandName($input));
+
+        return $command->run($input, $output);
     }
 
     private function stringWidth($string)

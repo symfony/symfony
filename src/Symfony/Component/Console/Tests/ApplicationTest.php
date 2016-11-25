@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -28,6 +29,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Tests\Output\TestOutput;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ApplicationTest extends \PHPUnit_Framework_TestCase
@@ -1172,6 +1174,40 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $inputStream = $tester->getInput()->getStream();
         $this->assertEquals($tester->getInput()->isInteractive(), @posix_isatty($inputStream));
+    }
+
+    public function testRunCommand()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+
+        $output = new TestOutput();
+        $code = $application->runCommand('foo:bar', $output);
+
+        $this->assertEquals("interact called\ncalled\n", $output->output);
+        $this->assertSame(0, $code);
+    }
+
+    public function testRunCommandWithoutOutput()
+    {
+        $application = new Application();
+        $application->add(new \FooCommand());
+
+        $code = $application->runCommand('foo:bar');
+
+        $this->assertSame(0, $code);
+    }
+
+    public function testRunCommandReturnsIntegerExitCode()
+    {
+        $application = new Application();
+        $command = new Command('foo:bar');
+        $command->setCode(function () {
+            return 1;
+        });
+        $application->add($command);
+
+        $this->assertSame(1, $application->runCommand('foo:bar'));
     }
 }
 

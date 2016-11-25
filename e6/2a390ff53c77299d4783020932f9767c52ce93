@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by Tobion at 2016-11-19T12:49:34Z
+
+The change makes sense to me.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-11-19T17:32:17Z
+
+Isn't this a case where a configurator would make more sense? (though I agree with the fix)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-19T17:45:17Z
+
+It's really simple (property) "configuration" (only initializing) :) i'd prefer this approach working out-of-the-box instead of setting up a configurator class, etc.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-22T00:05:53Z
+
+Tests are broken (the dumped containers should be updated).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-22T20:19:55Z
+
+@fabpot green (ignore fabbot.io)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-24T01:10:00Z
+
+Now, the question is wether we need to merge this in 2.7 or 3.2. I would vote for 3.2.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-24T08:00:58Z
+
+To me, this looks like a bugfix and should be merged into 2.7. Merging this into 3.2 also has the drawback that the behaviour does change between supported versions which might be needless additional work for maintainers who need this feature for 2.x and 3.x.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-24T08:05:48Z
+
+Would it be possible to have a test case that shows why this ordering is important? The fixture update doesn't qualify as such to me (too easy to update them without considering the actual side effect).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-24T13:57:04Z
+
+Ping @symfony/deciders , we need to make a decision on this one before the end of the week for 3.2 to be ready (1/3).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-24T14:25:55Z
+
+👍 for merging this into 2.7 and if possible in any way with a test like suggested by @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-24T14:27:20Z
+
+Ill add the test somewhere tonight :+1: this is about asserting a property is initialized within a method call right?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-24T14:29:37Z
+
+@ro0NL yes
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-24T17:51:29Z
+
+Test added.. however it does not involve the `PhpDumper` i realize now :) It covers only `ContainerBuilder` :thinking: Should we add a similar test there as well?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-24T18:09:39Z
+
+Let's be safe :)
+
+Speaking about.. what kind of case could we break in real life apps on 2.7? As it's only affected during service _initialization_. Imo. it qualifies a bugfix.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-11-25T00:20:24Z
+
+Considering the impact of bug fixes like #20562, it might be safer to change the behavior only in 3.2. But I'm fine either way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-25T09:05:59Z
+
+I have the same kind of thought than @Tobion . Yet, *if* this happens to break something, breaking 3.2 is not better than breaking 2.7. For this reason, and also because I fail to see where this can break anything reasonable, I'm :+1: for 2.7.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-25T09:34:21Z
+
+The only case we could break is when you have a method call changing behavior when the property is initialized or no, and initializing the property as a public property. This case looks quite insane though (and if the initialization relies on this to be working, the class is quite unusable directly).
+
+So I'm also :+1: for 2.7 as it allows methods to rely on the property values.

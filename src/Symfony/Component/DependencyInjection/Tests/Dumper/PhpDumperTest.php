@@ -97,7 +97,9 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
      */
     public function testExportParameters($parameters)
     {
-        $dumper = new PhpDumper(new ContainerBuilder(new ParameterBag($parameters)));
+        $container = new ContainerBuilder(new ParameterBag($parameters));
+        $container->compile();
+        $dumper = new PhpDumper($container);
         $dumper->dump();
     }
 
@@ -156,6 +158,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('bar$', 'FooClass');
         $container->register('bar$!', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => $class)));
 
@@ -169,6 +172,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('foo_bar', 'FooClass');
         $container->register('foobar', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => $class)));
 
@@ -182,6 +186,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('bar', 'FooClass');
         $container->register('foo_bar', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array(
             'class' => $class,
@@ -203,6 +208,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $def = new Definition('stdClass');
         $def->setFactory($factory);
         $container->setDefinition('bar', $def);
+        $container->compile();
         $dumper = new PhpDumper($container);
         $dumper->dump();
     }

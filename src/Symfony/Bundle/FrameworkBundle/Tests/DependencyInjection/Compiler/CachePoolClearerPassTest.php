@@ -24,6 +24,10 @@ class CachePoolClearerPassTest extends \PHPUnit_Framework_TestCase
     public function testPoolRefsAreWeak()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.name', 'app');
+        $container->setParameter('kernel.environment', 'prod');
+        $container->setParameter('kernel.root_dir', 'foo');
 
         $publicPool = new Definition();
         $publicPool->addArgument('namespace');

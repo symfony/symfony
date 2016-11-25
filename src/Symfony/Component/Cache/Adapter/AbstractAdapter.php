@@ -15,13 +15,14 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CounterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
+abstract class AbstractAdapter implements AdapterInterface, CounterInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -372,6 +373,40 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         return $ok;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * This implementation is not atomic unless the "doIncrement()" method provided by the concrete adapter is.
+     */
+    public function increment($key, $step = 1)
+    {
+        if (!is_numeric($step)) {
+            return false;
+        }
+        $id = $this->getId($key);
+
+        try {
+            if (is_numeric($result = $this->doIncrement($id, (int) $step))) {
+                return $result;
+            }
+            CacheItem::log($this->logger, 'Failed to increment key "{key}"', array('key' => $key));
+        } catch (\Exception $e) {
+            CacheItem::log($this->logger, 'Failed to increment key "{key}"', array('key' => $key, 'exception' => $e));
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This implementation is not atomic unless the "doIncrement()" method provided by the concrete adapter is.
+     */
+    public function decrement($key, $step = 1)
+    {
+        return is_numeric($step) ? $this->increment($key, -$step) : false;
+    }
+
     public function __destruct()
     {
         if ($this->deferred) {
@@ -404,6 +439,29 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         } finally {
             ini_set('unserialize_callback_func', $unserializeCallbackHandler);
         }
+    }
+
+    /**
+     * Increments a value in the cache by the given step value and returns the new value.
+     *
+     * If the key does not exist, it is initialized to the value of $step.
+     *
+     * @param string $key  The cache item key
+     * @param int    $step The value to increment by
+     *
+     * @return int|bool The new value on success and false on failure
+     */
+    protected function doIncrement($id, $step)
+    {
+        foreach ($this->doFetch(array($id)) as $value) {
+            if (is_numeric($value)) {
+                $step += $value;
+            }
+        }
+
+        $e = $this->doSave(array($id => $step), 0);
+
+        return true === $e || array() === $e ? $step : false;
     }
 
     private function getId($key)

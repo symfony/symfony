@@ -14,12 +14,13 @@ namespace Symfony\Component\Cache\Adapter;
 use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\SimpleCache\CounterInterface;
 use Symfony\Component\Cache\CacheItem;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
+class ArrayAdapter implements AdapterInterface, CounterInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -195,6 +196,33 @@ class ArrayAdapter implements AdapterInterface, LoggerAwareInterface
     public function commit()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function increment($key, $step = 1)
+    {
+        if (!is_numeric($step)) {
+            return false;
+        }
+
+        if ($this->hasItem($key) && is_numeric($this->values[$key])) {
+            $this->values[$key] += (int) $step;
+        } else {
+            $this->values[$key] = (int) $step;
+            $this->expiries[$key] = PHP_INT_MAX;
+        }
+
+        return $this->values[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function decrement($key, $step = 1)
+    {
+        return is_numeric($step) ? $this->increment($key, -$step) : false;
     }
 
     private function generateItems(array $keys, $now)

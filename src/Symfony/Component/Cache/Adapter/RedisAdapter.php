@@ -266,6 +266,14 @@ class RedisAdapter extends AbstractAdapter
         return $failed;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function doIncrement($id, $step)
+    {
+        return $this->redis->incrBy($id, $step);
+    }
+
     private function execute($command, $id, array $args, $redis = null)
     {
         array_unshift($args, $id);

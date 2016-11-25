@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T07:22:21Z
+
+Just wondering: would it make sense to add this check in DelegatingLoader instead?
+Something like:
+
+``` patch
+--- a/src/Symfony/Bundle/FrameworkBundle/Routing/DelegatingLoader.php
++++ b/src/Symfony/Bundle/FrameworkBundle/Routing/DelegatingLoader.php
+@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
+  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
+  *
+  * This implementation resolves the _controller attribute from the short notation
+- * to the fully-qualified form (from a:b:c to class:method).
++ * to the fully-qualified form (from a:b:c to class::method).
+  *
+  * @author Fabien Potencier <fabien@symfony.com>
+  */
+@@ -85,7 +85,8 @@ class DelegatingLoader extends BaseDelegatingLoader
+         $this->loading = false;
+
+         foreach ($collection->all() as $route) {
+-            if ($controller = $route->getDefault('_controller')) {
++            $controller = $route->getDefault('_controller');
++            if ($controller && false === strpos($controller, '::')) {
+                 try {
+                     $controller = $this->parser->parse($controller);
+                 } catch (\InvalidArgumentException $e) {
+```
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-11-02T08:32:55Z
+
+@nicolas-grekas I can add that as well but the change in ControllerNameParser should be done regardless in my opinion.
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-11-05T08:44:28Z
+
+@nicolas-grekas  @ro0NL All fixed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-05T09:42:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-05T11:09:22Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-11-06T07:11:47Z
+
+@ro0NL Like this?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-10T17:06:04Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by enumag at 2016-11-19T10:28:54Z
+
+I didn't notice the coding style error before. It's fixed now. Anything else?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-25T11:41:26Z
+
+👍 for this
+
+And should we apply it to older branches too ? We did it in the past for some performance improvements.
+
+On a side note, this will not improve the performance in prod, except for the cache warmup, as the routing loader is not called once anymore the matcher and generator are cached.

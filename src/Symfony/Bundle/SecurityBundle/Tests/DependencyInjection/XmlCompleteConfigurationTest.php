@@ -17,9 +17,13 @@ use Symfony\Component\Config\FileLocator;
 
 class XmlCompleteConfigurationTest extends CompleteConfigurationTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function getLoader(ContainerBuilder $container)
     {
-        $loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
-        $loadXml->load($file.'.xml');
+        return new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
+    }
+
+    protected function getFileExtension()
+    {
+        return 'xml';
     }
 }

@@ -14,9 +14,9 @@ namespace Symfony\Component\Form\Util;
 /**
  * Iterator for {@link OrderedHashMap} objects.
  *
- * This class is internal and should not be used.
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @internal
  */
 class OrderedHashMapIterator implements \Iterator
 {

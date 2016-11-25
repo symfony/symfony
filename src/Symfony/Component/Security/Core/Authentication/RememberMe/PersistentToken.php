@@ -12,9 +12,9 @@
 namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
 /**
- * This class is only used by PersistentTokenRememberMeServices internally.
- *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @internal
  */
 final class PersistentToken implements PersistentTokenInterface
 {

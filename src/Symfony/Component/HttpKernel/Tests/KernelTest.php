@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest;
 use Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideName;
 use Symfony\Component\HttpKernel\Tests\Fixtures\FooBarBundle;
-use Symfony\Component\HttpKernel\Tests\HttpCache\HttpCacheTestCase;
 
 class KernelTest extends \PHPUnit_Framework_TestCase
 {

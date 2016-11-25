@@ -11,7 +11,7 @@ CHANGELOG
  * Removed `symfony/asset` from the list of required dependencies in `composer.json`
  * The `Resources/public/images/*` files have been removed.
  * The `Resources/public/css/*.css` files have been removed (they are now inlined in TwigBundle).
- * Added possibility to prioritize form type extensions with `'priority'` attribute on tags `form.type_extension` 
+ * Added possibility to prioritize form type extensions with `'priority'` attribute on tags `form.type_extension`
 
 3.1.0
 -----

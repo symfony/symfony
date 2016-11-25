@@ -29,12 +29,20 @@ class RouteCompiler implements RouteCompilerInterface
     const SEPARATORS = '/,;.:-_~+*=@|';
 
     /**
+     * The maximum supported length of a PCRE subpattern name
+     * http://pcre.org/current/doc/html/pcre2pattern.html#SEC16.
+     *
+     * @internal
+     */
+    const VARIABLE_MAXIMUM_LENGTH = 32;
+
+    /**
      * {@inheritdoc}
      *
      * @throws \InvalidArgumentException If a path variable is named _fragment
      * @throws \LogicException           If a variable is referenced more than once
-     * @throws \DomainException          If a variable name is numeric because PHP raises an error for such
-     *                                   subpatterns in PCRE and thus would break matching, e.g. "(?P<123>.+)".
+     * @throws \DomainException          If a variable name starts with a digit or if it is too long to be successfully used as
+     *                                   a PCRE subpattern.
      */
     public static function compile(Route $route)
     {
@@ -121,11 +129,17 @@ class RouteCompiler implements RouteCompilerInterface
             }
             $isSeparator = '' !== $precedingChar && false !== strpos(static::SEPARATORS, $precedingChar);
 
-            if (is_numeric($varName)) {
-                throw new \DomainException(sprintf('Variable name "%s" cannot be numeric in route pattern "%s". Please use a different name.', $varName, $pattern));
+            // A PCRE subpattern name must start with a non-digit. Also a PHP variable cannot start with a digit so the
+            // variable would not be usable as a Controller action argument.
+            if (preg_match('/^\d/', $varName)) {
+                throw new \DomainException(sprintf('Variable name "%s" cannot start with a digit in route pattern "%s". Please use a different name.', $varName, $pattern));
             }
             if (in_array($varName, $variables)) {
                 throw new \LogicException(sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $varName));
+            }
+
+            if (strlen($varName) > self::VARIABLE_MAXIMUM_LENGTH) {
+                throw new \DomainException(sprintf('Variable name "%s" cannot be longer than %s characters in route pattern "%s". Please use a shorter name.', $varName, self::VARIABLE_MAXIMUM_LENGTH, $pattern));
             }
 
             if ($isSeparator && $precedingText !== $precedingChar) {

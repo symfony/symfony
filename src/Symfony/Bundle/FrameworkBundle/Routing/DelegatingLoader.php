@@ -20,7 +20,7 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
  *
  * This implementation resolves the _controller attribute from the short notation
- * to the fully-qualified form (from a:b:c to class:method).
+ * to the fully-qualified form (from a:b:c to class::method).
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -75,15 +75,17 @@ class DelegatingLoader extends BaseDelegatingLoader
         }
 
         foreach ($collection->all() as $route) {
-            if ($controller = $route->getDefault('_controller')) {
-                try {
-                    $controller = $this->parser->parse($controller);
-                } catch (\InvalidArgumentException $e) {
-                    // unable to optimize unknown notation
-                }
-
-                $route->setDefault('_controller', $controller);
+            if (!$controller = $route->getDefault('_controller')) {
+                continue;
             }
+
+            try {
+                $controller = $this->parser->parse($controller);
+            } catch (\InvalidArgumentException $e) {
+                // unable to optimize unknown notation
+            }
+
+            $route->setDefault('_controller', $controller);
         }
 
         return $collection;

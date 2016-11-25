@@ -47,6 +47,10 @@ Either the extension alias or bundle name can be used:
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
 
+For dumping a specific option, add its path as second argument:
+
+  <info>php %command.full_name% framework serializer.enabled</info>
+
 EOF
             )
         ;

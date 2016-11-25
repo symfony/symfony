@@ -796,6 +796,20 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($classInList);
     }
 
+    public function testInitializePropertiesBeforeMethodCalls()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass');
+        $container->register('bar', 'MethodCallClass')
+            ->setProperty('simple', 'bar')
+            ->setProperty('complex', new Reference('foo'))
+            ->addMethodCall('callMe');
+
+        $container->compile();
+
+        $this->assertTrue($container->get('bar')->callPassed(), '->compile() initializes properties before method calls');
+    }
+
     public function testAutowiring()
     {
         $container = new ContainerBuilder();

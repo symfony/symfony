@@ -1475,6 +1475,8 @@ class Request
     /**
      * Checks whether or not the method is safe.
      *
+     * @see https://tools.ietf.org/html/rfc7231#section-4.2.1
+     *
      * @param bool $andCacheable Adds the additional condition that the method should be cacheable. True by default.
      *
      * @return bool
@@ -1504,6 +1506,8 @@ class Request
 
     /**
      * Checks whether the method is cacheable or not.
+     *
+     * @see https://tools.ietf.org/html/rfc7231#section-4.2.3
      *
      * @return bool
      */

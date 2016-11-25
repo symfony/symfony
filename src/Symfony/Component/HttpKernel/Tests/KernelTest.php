@@ -580,7 +580,7 @@ EOF;
 
         $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForOverrideConfig')
             ->setConstructorArgs(array('test', false))
-            ->setMethods(array('getBundle'))
+            ->setMethods(array('getBundle', 'getContainerClass'))
             ->getMock();
 
         $p = new \ReflectionProperty($kernel, 'rootDir');
@@ -593,7 +593,11 @@ EOF;
             ->will($this->returnValue(array($bundle)))
         ;
 
-        HttpCacheTestCase::clearDirectory($kernel->getCacheDir());
+        $kernel
+            ->expects($this->any())
+            ->method('getContainerClass')
+            ->will($this->returnValue('OverrideTestProjectContainer'))
+        ;
 
         $kernel->boot();
 

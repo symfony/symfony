@@ -33,6 +33,8 @@ class RouteCompiler implements RouteCompilerInterface
      * http://pcre.org/current/doc/html/pcre2pattern.html#SEC16.
      *
      * @var int
+     *
+     * @internal
      */
     const VARIABLE_MAXIMUM_LENGTH = 32;
 

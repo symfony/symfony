@@ -41,9 +41,9 @@ class UsernamePasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('_username', 'Symfony\Component\Form\Extension\Core\Type\TextType')
-            ->add('_password', 'Symfony\Component\Form\Extension\Core\Type\PasswordType')
-            ->add('_target_path', 'Symfony\Component\Form\Extension\Core\Type\HiddenType')
+            ->add($options['username_field_name'], 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add($options['password_field_name'], 'Symfony\Component\Form\Extension\Core\Type\PasswordType')
+            ->add($options['target_path_field_name'],  'Symfony\Component\Form\Extension\Core\Type\HiddenType')
         ;
 
         /* Note: since the Security component's form login listener intercepts
@@ -51,13 +51,13 @@ class UsernamePasswordType extends AbstractType
          * request; however, we can match the expected behavior by checking the
          * session for an authentication error and last username.
          */
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
             if (null !== $error = $this->authenticationUtils->getLastAuthenticationError()) {
                 $event->getForm()->addError(new FormError($error->getMessage()));
             }
 
             $event->setData(array_replace((array) $event->getData(), array(
-                '_username' => $this->authenticationUtils->getLastUsername(),
+                $options['username_field_name'] => $this->authenticationUtils->getLastUsername(),
             )));
         });
     }
@@ -72,6 +72,9 @@ class UsernamePasswordType extends AbstractType
          */
 
         $resolver->setDefaults(array(
+            'username_field_name' => '_username',
+            'password_field_name' => '_password',
+            'target_path_field_name' => '_target_path',
             'csrf_field_name' => '_csrf_token',
             'csrf_token_id' => 'authenticate',
         ));

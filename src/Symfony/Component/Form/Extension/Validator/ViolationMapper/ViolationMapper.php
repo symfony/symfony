@@ -188,7 +188,11 @@ class ViolationMapper implements ViolationMapperInterface
 
             /** @var FormInterface $child */
             foreach ($children as $i => $child) {
-                $childPath = (string) $child->getPropertyPath();
+            	if(method_exists($child,'getPropertyPathForLayer')){
+            		$childPath = (string)$child->getPropertyPathForLayer(FormInterface::LAYER_MODEL);
+            	}else{
+            		$childPath = (string)$child->getPropertyPath();
+            	}
                 if ($childPath === $chunk) {
                     $target = $child;
                     $foundAtIndex = $it->key();
@@ -207,6 +211,44 @@ class ViolationMapper implements ViolationMapperInterface
         }
 
         return $target;
+    }
+
+    /**
+     * Calculates the child property path considering the parents model data type
+     * 
+     * 
+     *
+     * @param FormInterface $child Child form
+     * @return string
+     **/
+    protected static function getChildPropertyPath(FormInterface $child){
+        $config = $child->getConfig();
+        $propertyPath = $config->getPropertyPath();
+        if (null !== $propertyPath) {
+            $path = (string)$propertyPath;
+        }else{
+            $name = $child->getName();
+            if (null === $name || '' === $name ) {
+                $path = '';
+            }else{
+                $path = $name;
+                $parent = $child->getParent();        
+                while ($parent && $parent->getConfig()->getInheritData()) {
+                    $parent = $parent->getParent();
+                }
+                if($parent instanceof FormInterface){
+                    $dataClass = $parent->getConfig()->getDataClass();
+                    if(null === $dataClass){
+                        $parentData = $parent->getData();
+                        //check that the model data can be accesed like an array
+                        if(!is_object($parentData) || $parentData instanceof \ArrayAccess){
+                            $path = "[{$name}]";
+                        }
+                    }
+                }
+            }
+        }
+        return $path;
     }
 
     /**

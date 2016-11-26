@@ -21,6 +21,8 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Form\Tests\Extension\Validator\Model\ValidatedObject;
+use Symfony\Component\Form\Tests\Extension\Validator\DataTransformer\ViewObjectTransformer;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -117,6 +119,53 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $error->setOrigin($form);
 
         return $error;
+    }
+
+    public function testMapToFormIfChildUsesViewTransformer()
+    {
+        $violation1 = $this->getConstraintViolation('data.property1');
+        $violation2 = $this->getConstraintViolation('data.property2');
+        $violation3 = $this->getConstraintViolation('data.childObject.property1');
+        $violation4 = $this->getConstraintViolation('data.childObject.property2');
+        $violation5 = $this->getConstraintViolation('data.childObject.property3');
+
+        $parent = $this->getForm('parent');
+        $parent->getConfig()
+               ->setErrorBubbling(false)
+               ->addViewTransformer(new ViewObjectTransformer('Symfony\Component\Form\Tests\Extension\Validator\Model\ValidatedObject'));
+        $child1 = $this->getForm('property1');
+        $child1->getConfig()->setCompound(false);
+        $child2 = $this->getForm('property2');
+        $child2->getConfig()->setCompound(false);
+        $child3 = $this->getForm('childObject');
+        $child3->getConfig()->setErrorBubbling(false)
+                            ->addViewTransformer(new ViewObjectTransformer('Symfony\Component\Form\Tests\Extension\Validator\Model\ValidatedObject'));
+        $grandChild1 = $this->getForm('property1');
+        $grandChild1->getConfig()->setCompound(false);
+        $grandChild2 = $this->getForm('property2');
+        $grandChild2->getConfig()->setCompound(false);
+
+        $parent->add($child1);
+        $parent->add($child2);
+        $parent->add($child3);
+        $child3->add($grandChild1);
+        $child3->add($grandChild2);
+
+        $parent->setData(new ValidatedObject(new ValidatedObject()));
+        $parent->submit(array());
+        
+        $this->mapper->mapViolation($violation1, $parent);
+        $this->mapper->mapViolation($violation2, $parent);
+        $this->mapper->mapViolation($violation3, $parent);
+        $this->mapper->mapViolation($violation4, $parent);
+        $this->mapper->mapViolation($violation5, $parent);
+
+        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
+        $this->assertCount(1, $child1->getErrors(), $child1->getName().' should have an error, but has none');
+        $this->assertCount(1, $child2->getErrors(), $child2->getName().' should have an error, but has none');
+        $this->assertCount(1, $child3->getErrors(), $child3->getName().' should have an error, but has none');
+        $this->assertCount(1, $grandChild1->getErrors(), $grandChild1->getName().' should have an error, but has none');
+        $this->assertCount(1, $grandChild2->getErrors(), $grandChild2->getName().' should have an error, but has none');
     }
 
     public function testMapToFormInheritingParentDataIfDataDoesNotMatch()

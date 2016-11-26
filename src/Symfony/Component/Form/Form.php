@@ -215,25 +215,50 @@ class Form implements \IteratorAggregate, FormInterface
      */
     public function getPropertyPath()
     {
-        if (null !== $this->config->getPropertyPath()) {
-            return $this->config->getPropertyPath();
-        }
-
-        if (null === $this->getName() || '' === $this->getName()) {
-            return;
-        }
-
-        $parent = $this->parent;
-
-        while ($parent && $parent->getConfig()->getInheritData()) {
-            $parent = $parent->getParent();
-        }
-
-        if ($parent && null === $parent->getConfig()->getDataClass()) {
-            return new PropertyPath('['.$this->getName().']');
-        }
-
-        return new PropertyPath($this->getName());
+    	return $this->getPropertyPathForLayer(self::LAYER_VIEW);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getPropertyPathForLayer($layer)
+    {
+    	if (null !== $this->config->getPropertyPath()) {
+    		return $this->config->getPropertyPath();
+    	}
+    
+    	$name = $this->getName();
+    	if (null === $name || '' === $name) {
+    		return;
+    	}
+    	
+    	$path = $name;
+    	$parent = $this->getParent();
+    	while ($parent && $parent->getConfig()->getInheritData()) {
+    		$parent = $parent->getParent();
+    	}
+    	if($parent instanceof FormInterface){
+    		$dataClass = $parent->getConfig()->getDataClass();
+    		if(null === $dataClass){
+    			switch ($layer){
+    				case self::LAYER_MODEL:
+    					$parentData = $parent->getData();
+    					break;
+    				case self::LAYER_NORM:
+    					$parentData = $parent->getNormData();
+						break;
+    				default:
+    					$parentData = $parent->getViewData();
+    					break;
+    			}
+    			//check that the model data can be accesed like an array
+    			if(!is_object($parentData) || $parentData instanceof \ArrayAccess){
+    				$path = "[{$name}]";
+    			}
+    		}
+    	}
+    	
+    	return new PropertyPath($path);
     }
 
     /**

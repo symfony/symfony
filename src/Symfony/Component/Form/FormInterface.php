@@ -20,6 +20,27 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 interface FormInterface extends \ArrayAccess, \Traversable, \Countable
 {
+	/**
+	 * Constant for view layer
+	 * 
+	 * @var string LAYER_VIEW
+	 */
+	const LAYER_VIEW  = 'view';
+	
+	/**
+	 * Constant for norm layer
+	 *
+	 * @var string LAYER_NORM
+	 */
+	const LAYER_NORM  = 'norm';
+	
+	/**
+	 * Constant for model layer
+	 *
+	 * @var string LAYER_MODEL
+	 */
+	const LAYER_MODEL = 'model';
+	
     /**
      * Sets the parent form.
      *
@@ -176,6 +197,16 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @return \Symfony\Component\PropertyAccess\PropertyPathInterface The property path
      */
     public function getPropertyPath();
+    
+    /*
+     * Returns the property path that the form is mapped in a layer.
+     * 
+     * @return string $layer Layer for property path
+     * @return \Symfony\Component\PropertyAccess\PropertyPathInterface The property path
+     * 
+     * @since 4.0.0
+     */
+    //public function getPropertyPathForLayer($layer);
 
     /**
      * Adds an error to this form.

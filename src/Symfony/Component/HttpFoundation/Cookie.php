@@ -94,12 +94,12 @@ class Cookie
         $str = urlencode($this->getName()).'=';
 
         if ('' === (string) $this->getValue()) {
-            $str .= 'deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001);
+            $str .= 'deleted; expires='.gmdate('D, d-M-Y H:i:s T', time() - 31536001).'; max-age=-31536001';
         } else {
             $str .= urlencode($this->getValue());
 
             if ($this->getExpiresTime() !== 0) {
-                $str .= '; expires='.gmdate('D, d-M-Y H:i:s T', $this->getExpiresTime());
+                $str .= '; expires='.gmdate('D, d-M-Y H:i:s T', $this->getExpiresTime()).'; max-age='.$this->getMaxAge();
             }
         }
 
@@ -164,6 +164,16 @@ class Cookie
     public function getExpiresTime()
     {
         return $this->expire;
+    }
+
+    /**
+     * Gets the max-age attribute.
+     *
+     * @return int
+     */
+    public function getMaxAge()
+    {
+        return 0 !== $this->expire ? $this->expire - time() : 0;
     }
 
     /**

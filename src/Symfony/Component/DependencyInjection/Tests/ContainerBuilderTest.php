@@ -82,6 +82,15 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\DependencyInjection\Definition', $builder->getDefinition('foo'), '->register() returns the newly created Definition instance');
     }
 
+    public function testAutowire()
+    {
+        $builder = new ContainerBuilder();
+        $builder->autowire('foo', 'Bar\FooClass');
+
+        $this->assertTrue($builder->hasDefinition('foo'), '->autowire() registers a new service definition');
+        $this->assertTrue($builder->getDefinition('foo')->isAutowired(), '->autowire() creates autowired definitions');
+    }
+
     public function testHas()
     {
         $builder = new ContainerBuilder();

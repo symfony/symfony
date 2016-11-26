@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-25T22:06:00Z
+
+Shouldn't we rather initialise the property with the empty array then instead of using `null`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-25T22:30:44Z
+
+It may be clearer indeed to initialize both expectedDeprecations and gatheredDeprecations to the empty array, and reset them also L184. Can you take care of that @julienfalque please?
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2016-11-25T22:59:18Z
+
+Done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-25T23:02:28Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-26T07:27:53Z
+
+:+1:

@@ -25,8 +25,8 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
     private $skippedFile = false;
     private $wasSkipped = array();
     private $isSkipped = array();
-    private $expectedDeprecations;
-    private $gatheredDeprecations;
+    private $expectedDeprecations = array();
+    private $gatheredDeprecations = array();
     private $previousErrorHandler;
 
     /**
@@ -181,7 +181,8 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                 $test->getTestResultObject()->addFailure($test, $e, $time);
             }
 
-            $this->expectedDeprecations = $this->gatheredDeprecations = $this->previousErrorHandler = null;
+            $this->expectedDeprecations = $this->gatheredDeprecations = array();
+            $this->previousErrorHandler = null;
         }
         if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
             $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName(false));

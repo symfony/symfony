@@ -39,7 +39,7 @@
                                     {%- else -%}
                                             {{ redirect_route }}
                                     {%- endif %}
-                                    (<a href="{{ path('_profiler', { token: redirect.token }) }}">{{ redirect.token }}</a>)
+                                    (<a href="{{ path('_profiler', { token: redirect.token, panel: app.request.query.get('panel', 'request') }) }}">{{ redirect.token }}</a>)
                                 </dd>
                             </dl>
                         {%- endif %}

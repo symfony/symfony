@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
+use Symfony\Bundle\SecurityBundle\Form\Type\UsernamePasswordType;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -343,6 +344,20 @@ abstract class Controller implements ContainerAwareInterface
     protected function createFormBuilder($data = null, array $options = array())
     {
         return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
+    }
+
+    /**
+     * Creates a Form instance that can be rendered as a login form for the given firewall.
+     *
+     * @param string $firewall The name of the target firewall
+     *
+     * @return Form
+     */
+    protected function createLoginForm($firewall)
+    {
+        return $this->container->get('form.factory')->createNamed('', UsernamePasswordType::class, null, array(
+            'target_firewall' => $firewall,
+        ));
     }
 
     /**

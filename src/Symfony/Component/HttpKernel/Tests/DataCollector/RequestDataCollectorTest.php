@@ -59,6 +59,16 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('application/json', $c->getContentType());
     }
 
+    public function testCollectWithoutRouteParams()
+    {
+        $request = $this->createRequest(array());
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $this->assertEquals(array(), $c->getRouteParams());
+    }
+
     public function testKernelResponseDoesNotStartSession()
     {
         $kernel = $this->getMock(HttpKernelInterface::class);
@@ -197,12 +207,12 @@ class RequestDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('n/a', $c->getController());
     }
 
-    protected function createRequest()
+    protected function createRequest($routeParams = array('name' => 'foo'))
     {
         $request = Request::create('http://test.com/foo?bar=baz');
         $request->attributes->set('foo', 'bar');
         $request->attributes->set('_route', 'foobar');
-        $request->attributes->set('_route_params', array('name' => 'foo'));
+        $request->attributes->set('_route_params', $routeParams);
         $request->attributes->set('resource', fopen(__FILE__, 'r'));
         $request->attributes->set('object', new \stdClass());
 

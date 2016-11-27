@@ -276,8 +276,13 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         $data = $this->data['request_attributes']['_route_params'];
+        $rawData = $data->getRawData();
+        if (!isset($rawData[1])) {
+            return array();
+        }
+
         $params = array();
-        foreach ($data->getRawData()[1] as $k => $v) {
+        foreach ($rawData[1] as $k => $v) {
             $params[$k] = $data->seek($k);
         }
 

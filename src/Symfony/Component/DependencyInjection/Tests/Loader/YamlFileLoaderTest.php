@@ -223,16 +223,6 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage A "tags" entry must be an array for service
-     */
-    public function testNonArrayTagThrowsException()
-    {
-        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('badtag4.yml');
-    }
-
     public function testTagWithoutNameThrowsException()
     {
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
@@ -243,6 +233,15 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\InvalidArgumentException', $e, '->load() throws an InvalidArgumentException if a tag is missing the name key');
             $this->assertStringStartsWith('A "tags" entry is missing a "name" key for service ', $e->getMessage(), '->load() throws an InvalidArgumentException if a tag is missing the name key');
         }
+    }
+
+    public function testNameOnlyTagsAreAllowedAsString()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('tag_name_only.yml');
+
+        $this->assertCount(1, $container->getDefinition('foo_service')->getTag('foo'));
     }
 
     public function testTagWithAttributeArrayThrowsException()

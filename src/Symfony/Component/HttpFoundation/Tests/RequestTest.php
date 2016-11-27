@@ -2020,7 +2020,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function testMethodSafeChecksCacheable()
     {
         $request = new Request();
-        $request->setMethod('OPTION');
+        $request->setMethod('OPTIONS');
         $this->assertFalse($request->isMethodSafe());
     }
 

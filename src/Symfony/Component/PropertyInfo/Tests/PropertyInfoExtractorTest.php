@@ -28,8 +28,7 @@ class PropertyInfoExtractorTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $extractors = array(new NullExtractor(), new DummyExtractor());
-        $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors);
+        $this->propertyInfo = new PropertyInfoExtractor(array(new NullExtractor(), new DummyExtractor()));
     }
 
     public function testInstanceOf()
@@ -38,6 +37,7 @@ class PropertyInfoExtractorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface', $this->propertyInfo);
         $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface', $this->propertyInfo);
         $this->assertInstanceOf('Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface', $this->propertyInfo);
+        $this->assertInstanceOf('Symfony\Component\PropertyInfo\ExtractorInterface', $this->propertyInfo);
     }
 
     public function testGetShortDescription()

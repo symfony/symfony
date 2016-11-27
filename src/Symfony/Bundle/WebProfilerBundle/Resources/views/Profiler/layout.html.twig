@@ -38,7 +38,7 @@
                             {% for name, template in templates %}
                                 {% set menu -%}
                                     {% with { 'collector': profile.getcollector(name) } %}
-                                        {{ block('menu', template) }}
+                                        {{- block('menu', template) -}}
                                     {% endwith %}
                                 {%- endset %}
                                 {% if menu != '' %}

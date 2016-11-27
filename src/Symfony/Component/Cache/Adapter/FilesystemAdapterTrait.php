@@ -15,6 +15,8 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
 trait FilesystemAdapterTrait
 {

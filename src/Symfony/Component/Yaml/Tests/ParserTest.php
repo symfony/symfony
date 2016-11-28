@@ -66,8 +66,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         return $tests;
     }
 
-    public function testLineBreaksBeforeDocumentSeparatorAndComment() {
-      $this->parser->parse(file_get_contents(__DIR__.'/Fixtures/LineBreaksBeforeDocumentSeparatorAndComment.yml'));
+    public function testLineBreaksBeforeDocumentSeparatorAndComment()
+    {
+        $this->parser->parse(file_get_contents(__DIR__.'/Fixtures/LineBreaksBeforeDocumentSeparatorAndComment.yml'));
     }
 
     public function testTabsInYaml()

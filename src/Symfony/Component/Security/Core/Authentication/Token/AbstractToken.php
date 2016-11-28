@@ -33,7 +33,7 @@ abstract class AbstractToken implements TokenInterface
     /**
      * Constructor.
      *
-     * @param RoleInterface[]|string[] $roles An array of roles
+     * @param (Role|string)[] $roles An array of roles
      *
      * @throws \InvalidArgumentException
      */

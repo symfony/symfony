@@ -437,6 +437,13 @@ Ldap
 
  * The `RenameEntryInterface` has been deprecated, and merged with `EntryManagerInterface`
 
+SecurityBundle
+--------------
+
+ * The `UserPasswordEncoderCommand` class does not allow `null` as the first argument anymore.
+ 
+ * `UserPasswordEncoderCommand` does not implement `ContainerAwareInterface` anymore.
+
 Workflow
 --------
 

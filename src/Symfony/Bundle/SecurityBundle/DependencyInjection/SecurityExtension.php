@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -96,6 +97,11 @@ class SecurityExtension extends Extension
 
         if ($config['encoders']) {
             $this->createEncoders($config['encoders'], $container);
+
+            if (class_exists(Application::class)) {
+                $loader->load('console.xml');
+                $container->getDefinition('security.console.user_password_encoder_command')->replaceArgument(1, array_keys($config['encoders']));
+            }
         }
 
         // load ACL

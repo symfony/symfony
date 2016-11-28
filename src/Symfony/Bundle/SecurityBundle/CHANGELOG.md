@@ -4,6 +4,10 @@ CHANGELOG
 3.3.0
 -----
 
+ * Deprecated instantiating `UserPasswordEncoderCommand` without its constructor
+   arguments fully provided.
+ * Deprecated `UserPasswordEncoderCommand::getContainer()` and relying on the
+  `ContainerAwareInterface` interface for this command.
  * Deprecated the `FirewallMap::$map` and `$container` properties.
 
 3.2.0

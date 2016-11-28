@@ -18,7 +18,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\User\User;
 
 /**
  * Encode a user's password.
@@ -27,6 +30,31 @@ use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
  */
 class UserPasswordEncoderCommand extends ContainerAwareCommand
 {
+    private $encoderFactory;
+    private $userClasses;
+
+    public function __construct(EncoderFactoryInterface $encoderFactory = null, array $userClasses = array())
+    {
+        if (null === $encoderFactory) {
+            @trigger_error(sprintf('Passing null as the first argument of "%s" is deprecated since version 3.3 and will be removed in 4.0. If the command was registered by convention, make it a service instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
+        $this->encoderFactory = $encoderFactory;
+        $this->userClasses = $userClasses;
+
+        parent::__construct();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getContainer()
+    {
+        @trigger_error(sprintf('Method "%s" is deprecated since version 3.3 and "%s" won\'t implement "%s" anymore in 4.0.', __METHOD__, __CLASS__, ContainerAwareInterface::class), E_USER_DEPRECATED);
+
+        return parent::getContainer();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -36,7 +64,7 @@ class UserPasswordEncoderCommand extends ContainerAwareCommand
             ->setName('security:encode-password')
             ->setDescription('Encodes a password.')
             ->addArgument('password', InputArgument::OPTIONAL, 'The plain password to encode.')
-            ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the encoder used to encode the password.', 'Symfony\Component\Security\Core\User\User')
+            ->addArgument('user-class', InputArgument::OPTIONAL, 'The User entity class path associated with the encoder used to encode the password.')
             ->addOption('empty-salt', null, InputOption::VALUE_NONE, 'Do not generate a salt or let the encoder generate one.')
             ->setHelp(<<<EOF
 
@@ -55,8 +83,9 @@ security:
         AppBundle\Entity\User: bcrypt
 </comment>
 
-If you execute the command non-interactively, the default Symfony User class
-is used and a random salt is generated to encode the password:
+If you execute the command non-interactively, the first available configured
+user class under the <comment>security.encoders</comment> key is used and a random salt is
+generated to encode the password:
 
   <info>php %command.full_name% --no-interaction [password]</info>
 
@@ -89,10 +118,11 @@ EOF
         $input->isInteractive() ? $io->title('Symfony Password Encoder Utility') : $io->newLine();
 
         $password = $input->getArgument('password');
-        $userClass = $input->getArgument('user-class');
+        $userClass = $this->getUserClass($input, $io);
         $emptySalt = $input->getOption('empty-salt');
 
-        $encoder = $this->getContainer()->get('security.encoder_factory')->getEncoder($userClass);
+        $encoderFactory = $this->encoderFactory ?: parent::getContainer()->get('security.encoder_factory');
+        $encoder = $encoderFactory->getEncoder($userClass);
         $bcryptWithoutEmptySalt = !$emptySalt && $encoder instanceof BCryptPasswordEncoder;
 
         if ($bcryptWithoutEmptySalt) {
@@ -165,5 +195,31 @@ EOF
     private function generateSalt()
     {
         return base64_encode(random_bytes(30));
+    }
+
+    private function getUserClass(InputInterface $input, SymfonyStyle $io)
+    {
+        if (null !== $userClass = $input->getArgument('user-class')) {
+            return $userClass;
+        }
+
+        if (empty($this->userClasses)) {
+            if (null === $this->encoderFactory) {
+                // BC to be removed and simply keep the exception whenever there is no configured user classes in 4.0
+                return User::class;
+            }
+
+            throw new \RuntimeException('There are no configured encoders for the "security" extension.');
+        }
+
+        if (!$input->isInteractive() || 1 === count($this->userClasses)) {
+            return reset($this->userClasses);
+        }
+
+        $userClasses = $this->userClasses;
+        natcasesort($userClasses);
+        $userClasses = array_values($userClasses);
+
+        return $io->choice('For which user class would you like to encode a password?', $userClasses, reset($userClasses));
     }
 }

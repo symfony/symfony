@@ -93,6 +93,15 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($cache->isFresh());
     }
 
+    public function testCacheIsNotFreshWhenUnserializeFails()
+    {
+        file_put_contents($this->metaFile, str_replace('FileResource', 'ClassNotHere', file_get_contents($this->metaFile)));
+
+        $cache = new ConfigCache($this->cacheFile, true);
+
+        $this->assertFalse($cache->isFresh());
+    }
+
     public function testWriteDumpsFile()
     {
         unlink($this->cacheFile);

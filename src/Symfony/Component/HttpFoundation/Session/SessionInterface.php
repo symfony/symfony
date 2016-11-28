@@ -21,6 +21,14 @@ use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 interface SessionInterface
 {
     /**
+     * Mark this session as empty if this session has not started.
+     * This method should be called when we have no previous session
+     * (no session cookie) and then the session will be internally
+     * marked as empty, if it has not started yet.
+     */
+    public function markAsEmpty();
+
+    /**
      * Starts the session storage.
      *
      * @return bool True if session started

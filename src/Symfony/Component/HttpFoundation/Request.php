@@ -775,6 +775,9 @@ class Request
     public function setSession(SessionInterface $session)
     {
         $this->session = $session;
+        if (!$this->hasPreviousSession()) {
+            $this->session->markAsEmpty();
+        }
     }
 
     /**

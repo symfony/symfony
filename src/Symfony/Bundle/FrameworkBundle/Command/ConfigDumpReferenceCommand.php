@@ -74,9 +74,9 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+        $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
 
         if (null === $name = $input->getArgument('name')) {
-            $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
             $this->listBundles($errorIo);
             $errorIo->comment(array(
                 'Provide the name of a bundle as the first argument of this command to dump its default configuration. (e.g. <comment>config:dump-reference FrameworkBundle</comment>)',
@@ -96,7 +96,7 @@ EOF
         $path = $input->getArgument('path');
 
         if ($path !== null && 'yaml' !== $format) {
-            $io->error('The "path" option is only available for the "yaml" format.');
+            $errorIo->error('The "path" option is only available for the "yaml" format.');
 
             return 1;
         }

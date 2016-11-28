@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
+use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -1198,7 +1199,7 @@ class Request
      *
      * @return string
      *
-     * @throws \UnexpectedValueException when the host name is invalid
+     * @throws SuspiciousOperationException when the host name is invalid
      */
     public function getHost()
     {
@@ -1220,7 +1221,7 @@ class Request
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         if ($host && '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)) {
-            throw new \UnexpectedValueException(sprintf('Invalid Host "%s"', $host));
+            throw new SuspiciousOperationException(sprintf('Invalid Host "%s"', $host));
         }
 
         if (count(self::$trustedHostPatterns) > 0) {
@@ -1238,7 +1239,7 @@ class Request
                 }
             }
 
-            throw new \UnexpectedValueException(sprintf('Untrusted Host "%s"', $host));
+            throw new SuspiciousOperationException(sprintf('Untrusted Host "%s"', $host));
         }
 
         return $host;

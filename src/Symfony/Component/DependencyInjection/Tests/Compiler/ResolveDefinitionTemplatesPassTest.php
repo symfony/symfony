@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -21,7 +21,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
         $container->register('parent', 'foo')->setArguments(array('moo', 'b'))->setProperty('foo', 'moo');
-        $container->setDefinition('child', new DefinitionDecorator('parent'))
+        $container->setDefinition('child', new ChildDefinition('parent'))
             ->replaceArgument(0, 'a')
             ->setProperty('foo', 'bar')
             ->setClass('bar')
@@ -30,7 +30,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->process($container);
 
         $def = $container->getDefinition('child');
-        $this->assertNotInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $def);
+        $this->assertNotInstanceOf(ChildDefinition::class, $def);
         $this->assertEquals('bar', $def->getClass());
         $this->assertEquals(array('a', 'b'), $def->getArguments());
         $this->assertEquals(array('foo' => 'bar'), $def->getProperties());
@@ -46,7 +46,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
             ->addMethodCall('bar', array('foo'))
         ;
 
@@ -69,7 +69,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
         ;
 
         $this->process($container);
@@ -88,7 +88,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
         ;
 
         $this->process($container);
@@ -107,7 +107,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
         ;
 
         $this->process($container);
@@ -126,7 +126,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
         ;
 
         $this->process($container);
@@ -144,7 +144,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
             ->setShared(false)
         ;
 
@@ -164,12 +164,12 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container
-            ->setDefinition('child2', new DefinitionDecorator('child1'))
+            ->setDefinition('child2', new ChildDefinition('child1'))
             ->replaceArgument(1, 'b')
         ;
 
         $container
-            ->setDefinition('child1', new DefinitionDecorator('parent'))
+            ->setDefinition('child1', new ChildDefinition('parent'))
             ->replaceArgument(0, 'a')
         ;
 
@@ -186,7 +186,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('parent', 'stdClass');
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'))
+        $container->setDefinition('child1', new ChildDefinition('parent'))
             ->setLazy(true)
         ;
 
@@ -203,7 +203,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
             ->setLazy(true)
         ;
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'));
+        $container->setDefinition('child1', new ChildDefinition('parent'));
 
         $this->process($container);
 
@@ -216,7 +216,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('parent', 'stdClass');
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'))
+        $container->setDefinition('child1', new ChildDefinition('parent'))
             ->setAutowired(true)
         ;
 
@@ -233,7 +233,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
             ->setAutowired(true)
         ;
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'));
+        $container->setDefinition('child1', new ChildDefinition('parent'));
 
         $this->process($container);
 
@@ -246,11 +246,11 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('parent', 'parentClass');
         $container->register('sibling', 'siblingClass')
-            ->setConfigurator(new DefinitionDecorator('parent'), 'foo')
-            ->setFactory(array(new DefinitionDecorator('parent'), 'foo'))
-            ->addArgument(new DefinitionDecorator('parent'))
-            ->setProperty('prop', new DefinitionDecorator('parent'))
-            ->addMethodCall('meth', array(new DefinitionDecorator('parent')))
+            ->setConfigurator(new ChildDefinition('parent'), 'foo')
+            ->setFactory(array(new ChildDefinition('parent'), 'foo'))
+            ->addArgument(new ChildDefinition('parent'))
+            ->setProperty('prop', new ChildDefinition('parent'))
+            ->addMethodCall('meth', array(new ChildDefinition('parent')))
         ;
 
         $this->process($container);
@@ -282,7 +282,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('parent', 'stdClass');
 
-        $container->setDefinition('child1', new DefinitionDecorator('parent'))
+        $container->setDefinition('child1', new ChildDefinition('parent'))
             ->setDecoratedService('foo', 'foo_inner', 5)
         ;
 
@@ -298,7 +298,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
             ->setDeprecated(true)
         ;
 
-        $container->setDefinition('decorated_deprecated_parent', new DefinitionDecorator('deprecated_parent'));
+        $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'));
 
         $this->process($container);
 
@@ -312,7 +312,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
             ->setDeprecated(true)
         ;
 
-        $container->setDefinition('decorated_deprecated_parent', new DefinitionDecorator('deprecated_parent'))
+        $container->setDefinition('decorated_deprecated_parent', new ChildDefinition('deprecated_parent'))
             ->setDeprecated(false)
         ;
 
@@ -331,7 +331,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container
-            ->setDefinition('child', new DefinitionDecorator('parent'))
+            ->setDefinition('child', new ChildDefinition('parent'))
             ->addAutowiringType('Bar')
         ;
 
@@ -350,7 +350,7 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
 
         $container->register('parent', 'ParentClass');
         $container->setAlias('parent_alias', 'parent');
-        $container->setDefinition('child', new DefinitionDecorator('parent_alias'));
+        $container->setDefinition('child', new ChildDefinition('parent_alias'));
 
         $this->process($container);
 

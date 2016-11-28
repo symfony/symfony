@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -45,7 +45,7 @@ class SimplePreAuthenticationFactory implements SecurityFactoryInterface
     {
         $provider = 'security.authentication.provider.simple_preauth.'.$id;
         $container
-            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.simple'))
+            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.simple'))
             ->replaceArgument(0, new Reference($config['authenticator']))
             ->replaceArgument(1, new Reference($userProvider))
             ->replaceArgument(2, $id)
@@ -53,7 +53,7 @@ class SimplePreAuthenticationFactory implements SecurityFactoryInterface
 
         // listener
         $listenerId = 'security.authentication.listener.simple_preauth.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.simple_preauth'));
+        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.simple_preauth'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($config['authenticator']));
 

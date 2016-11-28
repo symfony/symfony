@@ -19,8 +19,8 @@ use Symfony\Component\Cache\Adapter\DoctrineAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -754,14 +754,14 @@ abstract class FrameworkExtensionTest extends TestCase
         return $container;
     }
 
-    private function assertPathPackage(ContainerBuilder $container, DefinitionDecorator $package, $basePath, $version, $format)
+    private function assertPathPackage(ContainerBuilder $container, ChildDefinition $package, $basePath, $version, $format)
     {
         $this->assertEquals('assets.path_package', $package->getParent());
         $this->assertEquals($basePath, $package->getArgument(0));
         $this->assertVersionStrategy($container, $package->getArgument(1), $version, $format);
     }
 
-    private function assertUrlPackage(ContainerBuilder $container, DefinitionDecorator $package, $baseUrls, $version, $format)
+    private function assertUrlPackage(ContainerBuilder $container, ChildDefinition $package, $baseUrls, $version, $format)
     {
         $this->assertEquals('assets.url_package', $package->getParent());
         $this->assertEquals($baseUrls, $package->getArgument(0));
@@ -786,7 +786,7 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $poolDefinition = $container->getDefinition($id);
 
-        $this->assertInstanceOf(DefinitionDecorator::class, $poolDefinition, sprintf('Cache pool "%s" is based on an abstract cache pool.', $id));
+        $this->assertInstanceOf(ChildDefinition::class, $poolDefinition, sprintf('Cache pool "%s" is based on an abstract cache pool.', $id));
 
         $this->assertTrue($poolDefinition->hasTag('cache.pool'), sprintf('Service definition "%s" is tagged with the "cache.pool" tag.', $id));
         $this->assertFalse($poolDefinition->isAbstract(), sprintf('Service definition "%s" is not abstract.', $id));
@@ -799,7 +799,7 @@ abstract class FrameworkExtensionTest extends TestCase
         do {
             $parentId = $parentDefinition->getParent();
             $parentDefinition = $container->findDefinition($parentId);
-        } while ($parentDefinition instanceof DefinitionDecorator);
+        } while ($parentDefinition instanceof ChildDefinition);
 
         switch ($adapter) {
             case 'cache.adapter.apcu':

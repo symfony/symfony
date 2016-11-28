@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -65,7 +65,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         // configure the GuardAuthenticationFactory to have the dynamic constructor arguments
         $providerId = 'security.authentication.provider.guard.'.$id;
         $container
-            ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.guard'))
+            ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.guard'))
             ->replaceArgument(0, $authenticatorReferences)
             ->replaceArgument(1, new Reference($userProvider))
             ->replaceArgument(2, $id)
@@ -74,7 +74,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
 
         // listener
         $listenerId = 'security.authentication.listener.guard.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.guard'));
+        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.guard'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, $authenticatorReferences);
 

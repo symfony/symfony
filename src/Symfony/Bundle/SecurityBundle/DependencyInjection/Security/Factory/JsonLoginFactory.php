@@ -11,8 +11,8 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -51,7 +51,7 @@ class JsonLoginFactory extends AbstractFactory
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
-            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
+            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProviderId))
             ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)
@@ -82,7 +82,7 @@ class JsonLoginFactory extends AbstractFactory
     protected function createListener($container, $id, $config, $userProvider)
     {
         $listenerId = $this->getListenerId();
-        $listener = new DefinitionDecorator($listenerId);
+        $listener = new ChildDefinition($listenerId);
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
         $listener->replaceArgument(4, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));

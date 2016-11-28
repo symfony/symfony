@@ -16,11 +16,11 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -443,8 +443,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $builder = new ContainerBuilder();
         $builder->setDefinition('grandpa', new Definition('stdClass'));
-        $builder->setDefinition('parent', new DefinitionDecorator('grandpa'));
-        $builder->setDefinition('foo', new DefinitionDecorator('parent'));
+        $builder->setDefinition('parent', new ChildDefinition('grandpa'));
+        $builder->setDefinition('foo', new ChildDefinition('parent'));
 
         $builder->get('foo');
     }

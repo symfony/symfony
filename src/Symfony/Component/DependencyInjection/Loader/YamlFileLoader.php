@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -189,7 +189,7 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['parent'])) {
-            $definition = new DefinitionDecorator($service['parent']);
+            $definition = new ChildDefinition($service['parent']);
         } else {
             $definition = new Definition();
         }

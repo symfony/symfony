@@ -13,10 +13,10 @@ namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -145,7 +145,7 @@ class XmlFileLoader extends FileLoader
         }
 
         if ($parent = $service->getAttribute('parent')) {
-            $definition = new DefinitionDecorator($parent);
+            $definition = new ChildDefinition($parent);
         } else {
             $definition = new Definition();
         }
@@ -346,7 +346,7 @@ class XmlFileLoader extends FileLoader
                 $arg->setAttribute('key', $arg->getAttribute('name'));
             }
 
-            // this is used by DefinitionDecorator to overwrite a specific
+            // this is used by ChildDefinition to overwrite a specific
             // argument of the parent definition
             if ($arg->hasAttribute('index')) {
                 $key = 'index_'.$arg->getAttribute('index');

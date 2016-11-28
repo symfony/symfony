@@ -7,6 +7,12 @@ ClassLoader
  * The ApcClassLoader, WinCacheClassLoader and XcacheClassLoader classes have been deprecated
    in favor of the `--apcu-autoloader` option introduced in composer 1.3
 
+DependencyInjection
+-------------------
+
+ * The `DefinitionDecorator` class is deprecated and will be removed in 4.0, use
+   the `ChildDefinition` class instead.
+
 Finder
 ------
 

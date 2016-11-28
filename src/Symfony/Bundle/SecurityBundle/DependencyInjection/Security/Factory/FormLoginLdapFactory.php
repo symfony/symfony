@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -28,7 +28,7 @@ class FormLoginLdapFactory extends FormLoginFactory
     {
         $provider = 'security.authentication.provider.ldap_bind.'.$id;
         $container
-            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.ldap_bind'))
+            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.ldap_bind'))
             ->replaceArgument(0, new Reference($userProviderId))
             ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)

@@ -22,6 +22,9 @@ Debug
 DependencyInjection
 -------------------
 
+ * The `DefinitionDecorator` class has been removed. Use the `ChildDefinition`
+   class instead.
+
  * Using unsupported configuration keys in YAML configuration files raises an
    exception.
 

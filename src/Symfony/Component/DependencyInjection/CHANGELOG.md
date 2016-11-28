@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * deprecated the `DefinitionDecorator` class in favor of `ChildDefinition`
+
 3.2.0
 -----
 

@@ -11,14 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 /**
- * This replaces all DefinitionDecorator instances with their equivalent fully
+ * This replaces all ChildDefinition instances with their equivalent fully
  * merged Definition instance.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -31,7 +31,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
     private $currentId;
 
     /**
-     * Process the ContainerBuilder to replace DefinitionDecorator instances with their real Definition instances.
+     * Process the ContainerBuilder to replace ChildDefinition instances with their real Definition instances.
      *
      * @param ContainerBuilder $container
      */
@@ -64,7 +64,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
             if (is_array($argument)) {
                 $arguments[$k] = $this->resolveArguments($container, $argument);
             } elseif ($argument instanceof Definition) {
-                if ($argument instanceof DefinitionDecorator) {
+                if ($argument instanceof ChildDefinition) {
                     $arguments[$k] = $argument = $this->resolveDefinition($container, $argument);
                     if ($isRoot) {
                         $container->setDefinition($k, $argument);
@@ -88,14 +88,14 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
     /**
      * Resolves the definition.
      *
-     * @param ContainerBuilder    $container  The ContainerBuilder
-     * @param DefinitionDecorator $definition
+     * @param ContainerBuilder $container  The ContainerBuilder
+     * @param ChildDefinition  $definition
      *
      * @return Definition
      *
      * @throws \RuntimeException When the definition is invalid
      */
-    private function resolveDefinition(ContainerBuilder $container, DefinitionDecorator $definition)
+    private function resolveDefinition(ContainerBuilder $container, ChildDefinition $definition)
     {
         try {
             return $this->doResolveDefinition($container, $definition);
@@ -108,14 +108,14 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         }
     }
 
-    private function doResolveDefinition(ContainerBuilder $container, DefinitionDecorator $definition)
+    private function doResolveDefinition(ContainerBuilder $container, ChildDefinition $definition)
     {
         if (!$container->has($parent = $definition->getParent())) {
             throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));
         }
 
         $parentDef = $container->findDefinition($parent);
-        if ($parentDef instanceof DefinitionDecorator) {
+        if ($parentDef instanceof ChildDefinition) {
             $id = $this->currentId;
             $this->currentId = $parent;
             $parentDef = $this->resolveDefinition($container, $parentDef);

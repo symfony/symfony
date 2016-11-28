@@ -851,7 +851,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private function createService(Definition $definition, $id, $tryProxy = true)
     {
-        if ($definition instanceof DefinitionDecorator) {
+        if ($definition instanceof ChildDefinition) {
             throw new RuntimeException(sprintf('Constructing service "%s" from a parent definition is not supported at build time.', $id));
         }
 

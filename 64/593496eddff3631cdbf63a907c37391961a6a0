@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-11-25T10:07:52Z
+
+Are you sure about this ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-25T10:07:53Z
+
+Here is the patch for this method comparing it to its parent implem.
+Do you mean that this difference is useless and the parent implem is good enough?
+```diff
+     public function denormalize($data, $class, $format = null, array $context = array())
+     {
+-        if (!isset($context['cache_key'])) {
+-            $context['cache_key'] = $this->getCacheKey($format, $context);
+-        }
+         $allowedAttributes = $this->getAllowedAttributes($class, $context, true);
+         $normalizedData = $this->prepareForDenormalization($data);
+
+         $reflectionClass = new \ReflectionClass($class);
+         $object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
+
++        $classMethods = get_class_methods($object);
+         foreach ($normalizedData as $attribute => $value) {
+             if ($this->nameConverter) {
+                 $attribute = $this->nameConverter->denormalize($attribute);
+             }
+
+-            if (($allowedAttributes !== false && !in_array($attribute, $allowedAttributes)) || !$this->isAllowedAttribute($class, $attribute, $format, $context)) {
+-                continue;
+-            }
++            $allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
++            $ignored = in_array($attribute, $this->ignoredAttributes);
++
++            if ($allowed && !$ignored) {
++                $setter = 'set'.ucfirst($attribute);
+
+-            $value = $this->validateAndDenormalize($class, $attribute, $value, $format, $context);
+-            try {
+-                $this->setAttributeValue($object, $attribute, $value, $format, $context);
+-            } catch (InvalidArgumentException $e) {
+-                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
++                if (in_array($setter, $classMethods) && !$reflectionClass->getMethod($setter)->isStatic()) {
++                    $object->$setter($value);
++                }
+             }
+         }
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-25T10:24:53Z
+
+@nicolas-grekas @stof In fact the parent method is better because it contains cache and validation. This methods prevent cache and validation to trigger and IMO should be removed.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-11-28T09:25:50Z
+
+@dunglas whilst I agree with the removal of the PR wouldn't that break Sf BC break policy as a user may potentially extend this serializer and use this method? Wouldn't it be better to just deprecate it for now?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-28T09:28:07Z
+
+@theofidry The method is still there (it's defined by the `AbstractObjectNormalizer`).
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-11-28T09:29:21Z
+
+Fair, 👍 then

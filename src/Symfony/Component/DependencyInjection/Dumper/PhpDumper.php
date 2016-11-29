@@ -774,7 +774,7 @@ EOF;
      */
     private function startClass($fileHeader, $class, $baseClass, $namespace)
     {
-        $bagClass = $this->container->isFrozen( ) ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
         $fileHeader = str_replace("\n", "\n * ", $fileHeader);
         if (false !== strpos($fileHeader, '*/')) {
             throw new InvalidArgumentException(

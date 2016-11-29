@@ -48,7 +48,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     {
         $dumper = new PhpDumper($container = new ContainerBuilder());
         $this->expectException(InvalidArgumentException::class);
-        $dumper->dump( array( 'class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump', 'file_header' => "Test file header */ echo '123';") );
+        $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump', 'file_header' => "Test file header */ echo '123';"));
     }
 
     public function testDumpOptimizationString()

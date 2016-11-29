@@ -25,6 +25,61 @@ class YamlReferenceDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->getConfigurationAsString(), $dumper->dump($configuration));
     }
 
+    public function provideDumpAtPath()
+    {
+        return array(
+            'Regular node' => array('scalar_true', <<<EOL
+scalar_true:          true
+EOL
+            ),
+            'Array node' => array('array', <<<EOL
+# some info
+array:
+    child1:               ~
+    child2:               ~
+
+    # this is a long
+    # multi-line info text
+    # which should be indented
+    child3:               ~ # Example: example setting
+EOL
+            ),
+            'Regular nested' => array('array.child2', <<<EOL
+child2:               ~
+EOL
+            ),
+            'Prototype' => array('cms_pages.page', <<<EOL
+# Prototype
+page:
+
+    # Prototype
+    locale:
+        title:                ~ # Required
+        path:                 ~ # Required
+EOL
+            ),
+            'Nested prototype' => array('cms_pages.page.locale', <<<EOL
+# Prototype
+locale:
+    title:                ~ # Required
+    path:                 ~ # Required
+EOL
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider provideDumpAtPath
+     */
+    public function testDumpAtPath($path, $expected)
+    {
+        $configuration = new ExampleConfiguration();
+
+        $dumper = new YamlReferenceDumper();
+
+        $this->assertSame(trim($expected), trim($dumper->dumpAtPath($configuration, $path)));
+    }
+
     private function getConfigurationAsString()
     {
         return <<<'EOL'

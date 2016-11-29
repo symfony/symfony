@@ -1,6 +1,7 @@
 <?php
 /**
  * Test file header
+ * Multi line one
  */
 
 namespace Symfony\Component\DependencyInjection\Dump;

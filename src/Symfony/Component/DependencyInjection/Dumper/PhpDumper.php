@@ -92,9 +92,10 @@ class PhpDumper extends Dumper
      *
      * Available options:
      *
-     *  * class:      The class name
-     *  * base_class: The base class name
-     *  * namespace:  The class namespace
+     *  * file_header: Text to place in a php docblock at the start of the file to serve as a header
+     *  * class:       The class name
+     *  * base_class:  The base class name
+     *  * namespace:   The class namespace
      *
      * @param array $options An array of options
      *
@@ -773,13 +774,19 @@ EOF;
      */
     private function startClass($fileHeader, $class, $baseClass, $namespace)
     {
-        $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
-        $fileHeaderLine = $fileHeader ? "$fileHeader\n\n" : '';
+        $bagClass = $this->container->isFrozen( ) ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $fileHeader = str_replace("\n", "\n * ", $fileHeader);
+        if (false !== strpos($fileHeader, '*/')) {
+            throw new InvalidArgumentException(
+                'file_header should not contain "*/" character sequence for security reasons'
+            );
+        }
+        $fileHeader = $fileHeader ? "/**\n * ".$fileHeader."\n */\n\n" : '';
         $namespaceLine = $namespace ? "namespace $namespace;\n" : '';
 
         return <<<EOF
 <?php
-$fileHeaderLine$namespaceLine
+$fileHeader$namespaceLine
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;

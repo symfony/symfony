@@ -44,10 +44,12 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         new PhpDumper($container);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     */
     public function testDumpFileHeaderSecurityException()
     {
         $dumper = new PhpDumper($container = new ContainerBuilder());
-        $this->expectException(InvalidArgumentException::class);
         $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump', 'file_header' => "Test file header */ echo '123';"));
     }
 

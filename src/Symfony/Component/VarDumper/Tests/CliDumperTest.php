@@ -271,7 +271,7 @@ stream resource {@{$ref}
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     -trace: {
-      bar.twig:%d: {
+      %sTwig.php:2: {
         : foo bar
         :   twig source
         : 

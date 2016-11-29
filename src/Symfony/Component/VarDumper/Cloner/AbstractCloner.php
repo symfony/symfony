@@ -252,14 +252,15 @@ abstract class AbstractCloner implements ClonerInterface
                 new \ReflectionClass($class),
                 array_reverse(array($class => $class) + class_parents($class) + class_implements($class) + array('*' => '*')),
             );
+            $classInfo[1] = array_map('strtolower', $classInfo[1]);
 
             $this->classInfo[$class] = $classInfo;
         }
 
-        $a = $this->callCaster('Symfony\Component\VarDumper\Caster\Caster::castObject', $obj, $classInfo[0], null, $isNested);
+        $a = Caster::castObject($obj, $classInfo[0]);
 
         foreach ($classInfo[1] as $p) {
-            if (!empty($this->casters[$p = strtolower($p)])) {
+            if (!empty($this->casters[$p])) {
                 foreach ($this->casters[$p] as $p) {
                     $a = $this->callCaster($p, $obj, $a, $stub, $isNested);
                 }

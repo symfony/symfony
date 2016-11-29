@@ -41,6 +41,8 @@ class ExceptionCaster
         E_STRICT => 'E_STRICT',
     );
 
+    private static $framesCache = array();
+
     public static function castError(\Error $e, array $a, Stub $stub, $isNested, $filter = 0)
     {
         return self::filterExceptionArray($stub->class, $a, "\0Error\0", $filter);
@@ -142,43 +144,52 @@ class ExceptionCaster
         $prefix = Caster::PREFIX_VIRTUAL;
 
         if (isset($f['file'], $f['line'])) {
-            if (preg_match('/\((\d+)\)(?:\([\da-f]{32}\))? : (?:eval\(\)\'d code|runtime-created function)$/', $f['file'], $match)) {
-                $f['file'] = substr($f['file'], 0, -strlen($match[0]));
-                $f['line'] = (int) $match[1];
-            }
-            $caller = isset($f['function']) ? sprintf('in %s() on line %d', (isset($f['class']) ? $f['class'].$f['type'] : '').$f['function'], $f['line']) : null;
-            $src = $f['line'];
-            $srcKey = $f['file'];
-            $ellipsis = explode(DIRECTORY_SEPARATOR, $srcKey);
-            $ellipsis = 3 < count($ellipsis) ? 2 + strlen(implode(array_slice($ellipsis, -2))) : 0;
+            $cacheKey = $f;
+            unset($cacheKey['object'], $cacheKey['args']);
+            $cacheKey[] = self::$srcContext;
+            $cacheKey = implode('-', $cacheKey);
 
-            if (file_exists($f['file']) && 0 <= self::$srcContext) {
-                if (!empty($f['class']) && is_subclass_of($f['class'], 'Twig_Template') && method_exists($f['class'], 'getDebugInfo')) {
-                    $template = isset($f['object']) ? $f['object'] : unserialize(sprintf('O:%d:"%s":0:{}', strlen($f['class']), $f['class']));
+            if (isset(self::$framesCache[$cacheKey])) {
+                $a[$prefix.'src'] = self::$framesCache[$cacheKey];
+            } else {
+                if (preg_match('/\((\d+)\)(?:\([\da-f]{32}\))? : (?:eval\(\)\'d code|runtime-created function)$/', $f['file'], $match)) {
+                    $f['file'] = substr($f['file'], 0, -strlen($match[0]));
+                    $f['line'] = (int) $match[1];
+                }
+                $caller = isset($f['function']) ? sprintf('in %s() on line %d', (isset($f['class']) ? $f['class'].$f['type'] : '').$f['function'], $f['line']) : null;
+                $src = $f['line'];
+                $srcKey = $f['file'];
+                $ellipsis = explode(DIRECTORY_SEPARATOR, $srcKey);
+                $ellipsis = 3 < count($ellipsis) ? 2 + strlen(implode(array_slice($ellipsis, -2))) : 0;
 
-                    $ellipsis = 0;
-                    $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
-                    $templateInfo = $template->getDebugInfo();
-                    if (isset($templateInfo[$f['line']])) {
-                        $templatePath = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getPath() : null;
+                if (file_exists($f['file']) && 0 <= self::$srcContext) {
+                    if (!empty($f['class']) && is_subclass_of($f['class'], 'Twig_Template') && method_exists($f['class'], 'getDebugInfo')) {
+                        $template = isset($f['object']) ? $f['object'] : unserialize(sprintf('O:%d:"%s":0:{}', strlen($f['class']), $f['class']));
 
-                        if ($templateSrc) {
-                            $templateSrc = explode("\n", $templateSrc);
-                            $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, $caller, 'twig', $templatePath);
-                            $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
+                        $ellipsis = 0;
+                        $templateSrc = method_exists($template, 'getSourceContext') ? $template->getSourceContext()->getCode() : (method_exists($template, 'getSource') ? $template->getSource() : '');
+                        $templateInfo = $template->getDebugInfo();
+                        if (isset($templateInfo[$f['line']])) {
+                            if (!method_exists($template, 'getSourceContext') || !file_exists($templatePath = $template->getSourceContext()->getPath())) {
+                                $templatePath = null;
+                            }
+                            if ($templateSrc) {
+                                $src = self::extractSource($templateSrc, $templateInfo[$f['line']], self::$srcContext, $caller, 'twig', $templatePath);
+                                $srcKey = ($templatePath ?: $template->getTemplateName()).':'.$templateInfo[$f['line']];
+                            }
+                        }
+                    }
+                    if ($srcKey == $f['file']) {
+                        $src = self::extractSource(file_get_contents($f['file']), $f['line'], self::$srcContext, $caller, 'php', $f['file']);
+                        $srcKey .= ':'.$f['line'];
+                        if ($ellipsis) {
+                            $ellipsis += 1 + strlen($f['line']);
                         }
                     }
                 }
-                if ($srcKey == $f['file']) {
-                    $src = self::extractSource(explode("\n", file_get_contents($f['file'])), $f['line'], self::$srcContext, $caller, 'php', $f['file']);
-                    $srcKey .= ':'.$f['line'];
-                    if ($ellipsis) {
-                        $ellipsis += 1 + strlen($f['line']);
-                    }
-                }
+                $srcAttr = $ellipsis ? 'ellipsis='.$ellipsis : '';
+                self::$framesCache[$cacheKey] = $a[$prefix.'src'] = new EnumStub(array("\0~$srcAttr\0$srcKey" => $src));
             }
-            $srcAttr = $ellipsis ? 'ellipsis='.$ellipsis : '';
-            $a[$prefix.'src'] = new EnumStub(array("\0~$srcAttr\0$srcKey" => $src));
         }
 
         unset($a[$prefix.'args'], $a[$prefix.'line'], $a[$prefix.'file']);
@@ -232,14 +243,16 @@ class ExceptionCaster
         ));
     }
 
-    private static function extractSource(array $srcArray, $line, $srcContext, $title, $lang, $file = null)
+    private static function extractSource($srcLines, $line, $srcContext, $title, $lang, $file = null)
     {
+        $srcLines = explode("\n", $srcLines);
         $src = array();
 
         for ($i = $line - 1 - $srcContext; $i <= $line - 1 + $srcContext; ++$i) {
-            $src[] = (isset($srcArray[$i]) ? $srcArray[$i] : '')."\n";
+            $src[] = (isset($srcLines[$i]) ? $srcLines[$i] : '')."\n";
         }
 
+        $srcLines = array();
         $ltrim = 0;
         do {
             $pad = null;
@@ -257,7 +270,6 @@ class ExceptionCaster
         } while (0 > $i && null !== $pad);
 
         --$ltrim;
-        $srcArray = array();
 
         foreach ($src as $i => $c) {
             if ($ltrim) {
@@ -274,9 +286,9 @@ class ExceptionCaster
                 }
             }
             $c->attr['lang'] = $lang;
-            $srcArray[sprintf("\0~%d\0", $i + $line - $srcContext)] = $c;
+            $srcLines[sprintf("\0~%d\0", $i + $line - $srcContext)] = $c;
         }
 
-        return new EnumStub($srcArray);
+        return new EnumStub($srcLines);
     }
 }

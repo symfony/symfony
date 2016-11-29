@@ -287,6 +287,11 @@ class ExecutionContext implements ExecutionContextInterface
         return $this->group;
     }
 
+    public function getConstraint()
+    {
+        return $this->constraint;
+    }
+
     /**
      * {@inheritdoc}
      */

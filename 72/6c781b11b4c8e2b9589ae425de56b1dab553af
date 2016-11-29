@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-29T10:06:44Z
+
+👍  I think it makes the class + method more readable ... but I 'd also prefer to not have the ellipsis 😄
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-29T10:10:58Z
+
+I tend to agree with @javiereguiluz here. I don't think hidding the namespace is really worth it here
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-29T10:24:31Z
+
+Updated by `max-width: 100em;` on the same rule in `profiler.css.twig`.
+
+This will display (simulating namespace that doesn't fit the window width):
+![after](https://cloud.githubusercontent.com/assets/243674/20706067/c9d818fe-b625-11e6-867b-c5af8a1e4af5.png)
+
+Or in fullwidth:
+![fullwidth](https://cloud.githubusercontent.com/assets/243674/20706123/016835f6-b626-11e6-8de6-4ae82966823d.png)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-29T10:27:07Z
+
+👍

@@ -36,6 +36,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump')), '->dump() takes a class and a base_class options');
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-2.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump', 'file_header' => '/* Test file header */')), '->dump() takes a file_header, class and a base_class options');
 
         $container = new ContainerBuilder();
         new PhpDumper($container);

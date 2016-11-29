@@ -106,6 +106,7 @@ class PhpDumper extends Dumper
     {
         $this->targetDirRegex = null;
         $options = array_merge(array(
+            'file_header' => '',
             'class' => 'ProjectServiceContainer',
             'base_class' => 'Container',
             'namespace' => '',
@@ -141,7 +142,7 @@ class PhpDumper extends Dumper
             }
         }
 
-        $code = $this->startClass($options['class'], $options['base_class'], $options['namespace']);
+        $code = $this->startClass($options['file_header'], $options['class'], $options['base_class'], $options['namespace']);
 
         if ($this->container->isFrozen()) {
             $code .= $this->addFrozenConstructor();
@@ -763,20 +764,22 @@ EOF;
     /**
      * Adds the class headers.
      *
-     * @param string $class     Class name
-     * @param string $baseClass The name of the base class
-     * @param string $namespace The class namespace
+     * @param string $fileHeader Text to place just after php tag
+     * @param string $class      Class name
+     * @param string $baseClass  The name of the base class
+     * @param string $namespace  The class namespace
      *
      * @return string
      */
-    private function startClass($class, $baseClass, $namespace)
+    private function startClass($fileHeader, $class, $baseClass, $namespace)
     {
         $bagClass = $this->container->isFrozen() ? 'use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;' : 'use Symfony\Component\DependencyInjection\ParameterBag\\ParameterBag;';
+        $fileHeaderLine = $fileHeader ? "$fileHeader\n\n" : '';
         $namespaceLine = $namespace ? "namespace $namespace;\n" : '';
 
         return <<<EOF
 <?php
-$namespaceLine
+$fileHeaderLine$namespaceLine
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;

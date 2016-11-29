@@ -116,6 +116,11 @@ HttpFoundation
      - `isInvalid`/`isSuccessful`/`isRedirection`/`isClientError`/`isServerError`
      - `isOk`/`isForbidden`/`isNotFound`/`isRedirect`/`isEmpty`
 
+Serializer
+----------
+
+ * Method `AbstractNormalizer::instantiateObject()` will have a 6th `$format = null` argument in Symfony 4.0. Not defining it when overriding the method is deprecated.
+
 TwigBridge
 ----------
 

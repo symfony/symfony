@@ -170,6 +170,8 @@ Serializer
  * The ability to pass a Doctrine `Cache` instance to the `ClassMetadataFactory`
    class has been removed. You should use the `CacheClassMetadataFactory` class
    instead.
+   
+ * Not defining the 6th argument `$format = null` of the `AbstractNormalizer::instantiateObject()` method when overriding it is not supported anymore.
 
 Translation
 -----------

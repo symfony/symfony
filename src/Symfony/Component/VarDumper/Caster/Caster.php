@@ -57,15 +57,20 @@ class Caster
         }
 
         if ($a) {
+            $combine = false;
             $p = array_keys($a);
             foreach ($p as $i => $k) {
                 if (isset($k[0]) && "\0" !== $k[0] && !$reflector->hasProperty($k)) {
+                    $combine = true;
                     $p[$i] = self::PREFIX_DYNAMIC.$k;
                 } elseif (isset($k[16]) && "\0" === $k[16] && 0 === strpos($k, "\0class@anonymous\0")) {
+                    $combine = true;
                     $p[$i] = "\0".$reflector->getParentClass().'@anonymous'.strrchr($k, "\0");
                 }
             }
-            $a = array_combine($p, $a);
+            if ($combine) {
+                $a = array_combine($p, $a);
+            }
         }
 
         return $a;

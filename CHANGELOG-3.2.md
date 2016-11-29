@@ -7,6 +7,33 @@ in 3.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.2.0...v3.2.1
 
+* 3.2.0-RC2 (2016-11-27)
+
+ * bug #20601 [FrameworkBundle] Don't rely on any parent definition for "cache.annotations" (nicolas-grekas)
+ * bug #20638 Fix legacy tests that do not trigger any depreciation (julienfalque)
+ * bug #20374 [FrameworkBundle] Improve performance of ControllerNameParser (enumag)
+ * bug #20474 [Routing] Fail properly when a route parameter name cannot be used as a PCRE subpattern name (fancyweb)
+ * bug #20616 [Bridge/Doctrine] Use cache.prefix.seed parameter for generating cache namespace (nicolas-grekas)
+ * bug #20566 [DI] Initialize properties before method calls (ro0NL)
+ * bug #20583 [Workflow] Fixed graphviz dumper for state machine (lyrixx)
+ * bug #20621 [HttpKernel] Fix exception when serializing request attributes (nicolas-grekas)
+ * bug #20609 [DI] Fixed custom services definition BC break introduced in ec7e70fb… (kiler129)
+ * bug #20598 [DI] Aliases should preserve the aliased invalid behavior (nicolas-grekas)
+ * bug #20600 [Process] Fix process continuing after reached timeout using getIterator() (chalasr)
+ * bug #20603 [HttpKernel] Deprecate checking for cacheable HTTP methods in Request::isMethodSafe() (nicolas-grekas)
+ * bug #20602 [HttpKernel] Revert BC breaking change of Request::isMethodSafe() (nicolas-grekas)
+ * bug #20610 [FrameworkBundle] Add framework.cache.prefix_seed for predictible cache key prefixes (nicolas-grekas)
+ * bug #20595 [WebProfilerBundle] Fix deprecated uses of profiler_dump (nicolas-grekas)
+ * bug #20589 [SecurityBundle] Fix FirewallConfig nullable arguments (ogizanagi)
+ * bug #20590 [DI] Allow null as default env value (sroze)
+ * bug #20499 [Doctrine][Form] support large integers (xabbuh)
+ * bug #20559 [FrameworkBundle] Avoid warming up the validator cache for non-existent class (Seldaek)
+ * bug #20576 [Process] Do feat test before enabling TTY mode (nicolas-grekas)
+ * bug #20577 [FrameworkBundle] Mark cache.default_*_provider services private (nicolas-grekas)
+ * bug #20550 [YAML] Fix processing timestamp strings with timezone (myesain)
+ * bug #20543 [DI] Fix error when trying to resolve a DefinitionDecorator (nicolas-grekas)
+ * bug #20544 [PhpUnitBridge] Fix time-sensitive tests that use data providers (julienfalque)
+
 * 3.2.0-RC1 (2016-11-17)
 
  * feature #20533 [DI] Revert "deprecate get() for uncompiled container builders" (nicolas-grekas)

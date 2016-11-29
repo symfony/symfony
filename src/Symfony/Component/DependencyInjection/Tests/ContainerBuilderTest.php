@@ -495,7 +495,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(Foo)');
         $config = new ContainerBuilder($bag);
-        $config->resolveEnvPlaceholders($bag->get('env(Bar)'));
+        $this->assertSame(array('%env(Bar)%'), $config->resolveEnvPlaceholders(array($bag->get('env(Bar)'))));
         $container->merge($config);
         $this->assertEquals(array('Foo' => 0, 'Bar' => 1), $container->getEnvCounters());
     }

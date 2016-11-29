@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-28T05:42:26Z
+
+:+1:
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by patrick-mcdougle at 2016-11-28T06:02:09Z
+
+2.7?
+
+---------------------------------------------------------------------------
+
+by jzawadzki at 2016-11-28T07:17:21Z
+
+@patrick-mcdougle - I based PR on the branch which have the change that caused this bug, but bug itself is visible only in new profiler so it should be at least 2.8
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-28T08:37:59Z
+
+👍
+
+I have tested this in the application and it solved the problem. Thanks @jzawadzki!

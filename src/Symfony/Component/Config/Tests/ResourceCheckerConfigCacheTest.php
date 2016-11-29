@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests;
 
 use Symfony\Component\Config\Tests\Resource\ResourceStub;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
 
 class ResourceCheckerConfigCacheTest extends \PHPUnit_Framework_TestCase
@@ -104,6 +105,18 @@ class ResourceCheckerConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $cache = new ResourceCheckerConfigCache($this->cacheFile, array($checker));
         $cache->write('', array(new ResourceStub()));
+
+        $this->assertFalse($cache->isFresh());
+    }
+
+    public function testCacheIsNotFreshWhenUnserializeFails()
+    {
+        $checker = $this->getMock('\Symfony\Component\Config\ResourceCheckerInterface');
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, array($checker));
+        $cache->write('foo', array(new FileResource(__FILE__)));
+
+        $metaFile = "{$this->cacheFile}.meta";
+        file_put_contents($metaFile, str_replace('FileResource', 'ClassNotHere', file_get_contents($metaFile)));
 
         $this->assertFalse($cache->isFresh());
     }

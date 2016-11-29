@@ -43,6 +43,7 @@ class HtmlDumper extends CliDumper
         'meta' => 'color:#B729D9',
         'key' => 'color:#56DB3A',
         'index' => 'color:#1299DA',
+        'ellipsis' => 'color:#FF8400',
     );
 
     private $displayOptions = array(
@@ -380,7 +381,7 @@ pre.sf-dump .sf-dump-ellipsis {
     display: inline-block;
     overflow: visible;
     text-overflow: ellipsis;
-    width: 5em;
+    max-width: 5em;
     white-space: nowrap;
     overflow: hidden;
     vertical-align: top;

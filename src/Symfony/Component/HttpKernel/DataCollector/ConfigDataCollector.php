@@ -67,11 +67,11 @@ class ConfigDataCollector extends DataCollector
             'env' => isset($this->kernel) ? $this->kernel->getEnvironment() : 'n/a',
             'debug' => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
             'php_version' => PHP_VERSION,
+            'php_architecture' => PHP_INT_SIZE * 8,
+            'php_locale' => \Locale::getDefault() ?: 'n/a',
+            'php_timezone' => date_default_timezone_get(),
             'xdebug_enabled' => extension_loaded('xdebug'),
-            'eaccel_enabled' => extension_loaded('eaccelerator') && ini_get('eaccelerator.enable'),
             'apc_enabled' => extension_loaded('apc') && ini_get('apc.enabled'),
-            'xcache_enabled' => extension_loaded('xcache') && ini_get('xcache.cacher'),
-            'wincache_enabled' => extension_loaded('wincache') && ini_get('wincache.ocenabled'),
             'zend_opcache_enabled' => extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
             'bundles' => array(),
             'sapi_name' => PHP_SAPI,
@@ -137,6 +137,30 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
+     * @return int The PHP architecture as number of bits (e.g. 32 or 64)
+     */
+    public function getPhpArchitecture()
+    {
+        return $this->data['php_architecture'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhpLocale()
+    {
+        return $this->data['php_locale'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhpTimezone()
+    {
+        return $this->data['php_timezone'];
+    }
+
+    /**
      * Gets the application name.
      *
      * @return string The application name
@@ -177,16 +201,6 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Returns true if EAccelerator is enabled.
-     *
-     * @return bool true if EAccelerator is enabled, false otherwise
-     */
-    public function hasEAccelerator()
-    {
-        return $this->data['eaccel_enabled'];
-    }
-
-    /**
      * Returns true if APC is enabled.
      *
      * @return bool true if APC is enabled, false otherwise
@@ -204,36 +218,6 @@ class ConfigDataCollector extends DataCollector
     public function hasZendOpcache()
     {
         return $this->data['zend_opcache_enabled'];
-    }
-
-    /**
-     * Returns true if XCache is enabled.
-     *
-     * @return bool true if XCache is enabled, false otherwise
-     */
-    public function hasXCache()
-    {
-        return $this->data['xcache_enabled'];
-    }
-
-    /**
-     * Returns true if WinCache is enabled.
-     *
-     * @return bool true if WinCache is enabled, false otherwise
-     */
-    public function hasWinCache()
-    {
-        return $this->data['wincache_enabled'];
-    }
-
-    /**
-     * Returns true if any accelerator is enabled.
-     *
-     * @return bool true if any accelerator is enabled, false otherwise
-     */
-    public function hasAccelerator()
-    {
-        return $this->hasApc() || $this->hasZendOpcache() || $this->hasEAccelerator() || $this->hasXCache() || $this->hasWinCache();
     }
 
     public function getBundles()

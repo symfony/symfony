@@ -192,17 +192,22 @@
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasaccelerator ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">PHP acceleration</span>
+            <span class="value">{{ collector.phparchitecture }} <span class="unit">bits</span></span>
+            <span class="label">Architecture</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">Xdebug</span>
+            <span class="value">{{ collector.phplocale }}</span>
+            <span class="label">Locale</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.phptimezone }}</span>
+            <span class="label">Timezone</span>
         </div>
     </div>
 
-    <div class="metrics metrics-horizontal">
+    <div class="metrics">
         <div class="metric">
             <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
             <span class="label">OPcache</span>
@@ -214,13 +219,8 @@
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxcache ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">XCache</span>
-        </div>
-
-        <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.haseaccelerator ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">EAccelerator</span>
+            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
+            <span class="label">Xdebug</span>
         </div>
     </div>
 

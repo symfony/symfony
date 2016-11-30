@@ -88,7 +88,7 @@
 
         <service id="twig.extension.code" class="Symfony\Bridge\Twig\Extension\CodeExtension" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="debug.file_link_formatter" />
+            <argument type="service" id="debug.file_link_formatter" on-invalid="ignore" />
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
         </service>

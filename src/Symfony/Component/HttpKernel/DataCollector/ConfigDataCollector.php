@@ -68,7 +68,7 @@ class ConfigDataCollector extends DataCollector
             'debug' => isset($this->kernel) ? $this->kernel->isDebug() : 'n/a',
             'php_version' => PHP_VERSION,
             'php_architecture' => PHP_INT_SIZE * 8,
-            'php_locale' => \Locale::getDefault() ?: 'n/a',
+            'php_intl_locale' => \Locale::getDefault() ?: 'n/a',
             'php_timezone' => date_default_timezone_get(),
             'xdebug_enabled' => extension_loaded('xdebug'),
             'apc_enabled' => extension_loaded('apc') && ini_get('apc.enabled'),
@@ -147,9 +147,9 @@ class ConfigDataCollector extends DataCollector
     /**
      * @return string
      */
-    public function getPhpLocale()
+    public function getPhpIntlLocale()
     {
-        return $this->data['php_locale'];
+        return $this->data['php_intl_locale'];
     }
 
     /**

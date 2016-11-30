@@ -131,6 +131,20 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage Using "%env(FOO)%" is not allowed in routing configuration.
+     */
+    public function testEnvPlaceholders()
+    {
+        $routes = new RouteCollection();
+
+        $routes->add('foo', new Route('/%env(FOO)%'));
+
+        $router = new Router($this->getServiceContainer($routes), 'foo');
+        $router->getRouteCollection();
+    }
+
     public function testHostPlaceholders()
     {
         $routes = new RouteCollection();

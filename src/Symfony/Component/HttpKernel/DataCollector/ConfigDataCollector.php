@@ -71,7 +71,7 @@ class ConfigDataCollector extends DataCollector
             'php_intl_locale' => \Locale::getDefault() ?: 'n/a',
             'php_timezone' => date_default_timezone_get(),
             'xdebug_enabled' => extension_loaded('xdebug'),
-            'apc_enabled' => extension_loaded('apc') && ini_get('apc.enabled'),
+            'apcu_enabled' => extension_loaded('apcu') && ini_get('apc.enabled'),
             'zend_opcache_enabled' => extension_loaded('Zend OPcache') && ini_get('opcache.enable'),
             'bundles' => array(),
             'sapi_name' => PHP_SAPI,
@@ -201,13 +201,13 @@ class ConfigDataCollector extends DataCollector
     }
 
     /**
-     * Returns true if APC is enabled.
+     * Returns true if APCu is enabled.
      *
-     * @return bool true if APC is enabled, false otherwise
+     * @return bool true if APCu is enabled, false otherwise
      */
-    public function hasApc()
+    public function hasApcu()
     {
-        return $this->data['apc_enabled'];
+        return $this->data['apcu_enabled'];
     }
 
     /**

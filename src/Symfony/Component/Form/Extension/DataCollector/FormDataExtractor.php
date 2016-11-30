@@ -24,11 +24,6 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 class FormDataExtractor implements FormDataExtractorInterface
 {
     /**
-     * @var VarCloner
-     */
-    private $cloner;
-
-    /**
      * Constructs a new data extractor.
      */
     public function __construct(ValueExporter $valueExporter = null, $triggerDeprecationNotice = true)

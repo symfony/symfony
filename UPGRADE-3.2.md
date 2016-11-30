@@ -119,7 +119,9 @@ HttpFoundation
 Serializer
 ----------
 
- * Method `AbstractNormalizer::instantiateObject()` will have a 6th `$format = null` argument in Symfony 4.0. Not defining it when overriding the method is deprecated.
+ * Method `AbstractNormalizer::instantiateObject()` will have a 6th
+   `$format = null` argument in Symfony 4.0. Not defining it when overriding
+   the method is deprecated.
 
 TwigBridge
 ----------

@@ -27,6 +27,8 @@ FrameworkBundle
  * The `Resources/public/images/*` files have been removed.
  * The `Resources/public/css/*.css` files have been removed (they are now inlined
    in TwigBundle).
+ * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
+   be automatically used when available.   
 
 Console
 -------
@@ -68,12 +70,6 @@ Form
        // ...
    }
    ```
-
-FrameworkBundle
----------------
-
- * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
-   be automatically used when available.
 
 HttpKernel
 ----------

@@ -202,6 +202,7 @@ EOF
 
     /**
      * Find all services where the service $name is used.
+     * Can be either by the constructor, by a setter or by a public property.
      *
      * @param ContainerBuilder $builder
      * @param string           $name
@@ -215,6 +216,19 @@ EOF
         foreach ($builder->getDefinitions() as $service => $definition) {
             foreach ($definition->getArguments() as $argument) {
                 if ($argument instanceof Reference && (string) $argument === $name) {
+                    $usages[] = $service;
+                }
+            }
+            foreach ($definition->getMethodCalls() as $methodCall) {
+                $methodParameters = $methodCall[1];
+                foreach ($methodParameters as $methodParameter) {
+                    if ($methodParameter instanceof Reference && (string) $methodParameter === $name) {
+                        $usages[] = $service;
+                    }
+                }
+            }
+            foreach ($definition->getProperties() as $property) {
+                if ($property instanceof Reference && (string) $property === $name) {
                     $usages[] = $service;
                 }
             }

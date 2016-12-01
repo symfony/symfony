@@ -107,7 +107,7 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $io, $object, $name);
-            $options = array('id' => $name, 'injections' => $this->findServiceIdsInjections($object, $name));
+            $options = array('id' => $name, 'usages' => $this->findServiceIdsUsages($object, $name));
         } else {
             $options = array('show_private' => $input->getOption('show-private'));
         }
@@ -201,26 +201,26 @@ EOF
     }
 
     /**
-     * Find all services where the service $name has been injected.
+     * Find all services where the service $name is used.
      *
      * @param ContainerBuilder $builder
      * @param string           $name
      *
      * @return array
      */
-    private function findServiceIdsInjections(ContainerBuilder $builder, $name)
+    private function findServiceIdsUsages(ContainerBuilder $builder, $name)
     {
-        $injections = array();
+        $usages = array();
 
         foreach ($builder->getDefinitions() as $service => $definition) {
             foreach ($definition->getArguments() as $argument) {
                 if ($argument instanceof Reference && (string) $argument === $name) {
-                    $injections[] = $service;
+                    $usages[] = $service;
                 }
             }
         }
 
-        return $injections;
+        return $usages;
     }
 
     private function findServiceIdsContaining(ContainerBuilder $builder, $name)

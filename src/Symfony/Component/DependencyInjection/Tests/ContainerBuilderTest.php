@@ -814,8 +814,8 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\A');
-        $bDefinition = $container->register('b', __NAMESPACE__.'\B');
+        $container->register('a', A::class);
+        $bDefinition = $container->register('b', B::class);
         $bDefinition->setAutowired(true);
 
         $container->compile();

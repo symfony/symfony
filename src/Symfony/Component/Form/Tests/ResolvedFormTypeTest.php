@@ -347,12 +347,12 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     public function provideTypeClassBlockPrefixTuples()
     {
         return array(
-            array(__NAMESPACE__.'\Fixtures\FooType', 'foo'),
-            array(__NAMESPACE__.'\Fixtures\Foo', 'foo'),
-            array(__NAMESPACE__.'\Fixtures\Type', 'type'),
-            array(__NAMESPACE__.'\Fixtures\FooBarHTMLType', 'foo_bar_html'),
-            array(__NAMESPACE__.'\Fixtures\Foo1Bar2Type', 'foo1_bar2'),
-            array(__NAMESPACE__.'\Fixtures\FBooType', 'f_boo'),
+            array(Fixtures\FooType::class, 'foo'),
+            array(Fixtures\Foo::class, 'foo'),
+            array(Fixtures\Type::class, 'type'),
+            array(Fixtures\FooBarHTMLType::class, 'foo_bar_html'),
+            array(Fixtures\Foo1Bar2Type::class, 'foo1_bar2'),
+            array(Fixtures\FBooType::class, 'f_boo'),
         );
     }
 

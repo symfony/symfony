@@ -139,7 +139,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Can only be run on case insensitive filesystems');
         }
 
-        class_exists(__NAMESPACE__.'\Fixtures\CaseMismatch', true);
+        class_exists(Fixtures\CaseMismatch::class, true);
     }
 
     /**
@@ -147,17 +147,17 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testPsr4CaseMismatch()
     {
-        class_exists(__NAMESPACE__.'\Fixtures\Psr4CaseMismatch', true);
+        class_exists(Fixtures\Psr4CaseMismatch::class, true);
     }
 
     public function testNotPsr0()
     {
-        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0', true));
+        $this->assertTrue(class_exists(Fixtures\NotPSR0::class, true));
     }
 
     public function testNotPsr0Bis()
     {
-        $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0bis', true));
+        $this->assertTrue(class_exists(Fixtures\NotPSR0bis::class, true));
     }
 
     public function testClassAlias()

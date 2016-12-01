@@ -242,7 +242,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testEmptyIfEmptyCountable()
     {
-        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__.'\SimpleFormTest_Countable', $this->dispatcher));
+        $this->form = new Form(new FormConfigBuilder('name', SimpleFormTest_Countable::class, $this->dispatcher));
 
         $this->form->setData(new SimpleFormTest_Countable(0));
 
@@ -251,7 +251,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testNotEmptyIfFilledCountable()
     {
-        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__.'\SimpleFormTest_Countable', $this->dispatcher));
+        $this->form = new Form(new FormConfigBuilder('name', SimpleFormTest_Countable::class, $this->dispatcher));
 
         $this->form->setData(new SimpleFormTest_Countable(1));
 
@@ -260,7 +260,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testEmptyIfEmptyTraversable()
     {
-        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__.'\SimpleFormTest_Traversable', $this->dispatcher));
+        $this->form = new Form(new FormConfigBuilder('name', SimpleFormTest_Traversable::class, $this->dispatcher));
 
         $this->form->setData(new SimpleFormTest_Traversable(0));
 
@@ -269,7 +269,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testNotEmptyIfFilledTraversable()
     {
-        $this->form = new Form(new FormConfigBuilder('name', __NAMESPACE__.'\SimpleFormTest_Traversable', $this->dispatcher));
+        $this->form = new Form(new FormConfigBuilder('name', SimpleFormTest_Traversable::class, $this->dispatcher));
 
         $this->form->setData(new SimpleFormTest_Traversable(1));
 

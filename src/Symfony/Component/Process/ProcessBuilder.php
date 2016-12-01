@@ -265,7 +265,7 @@ class ProcessBuilder
         $options = $this->options;
 
         $arguments = array_merge($this->prefix, $this->arguments);
-        $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
+        $script = implode(' ', array_map(array(ProcessUtils::class, 'escapeArgument'), $arguments));
 
         $process = new Process($script, $this->cwd, $this->env, $this->input, $this->timeout, $options);
 

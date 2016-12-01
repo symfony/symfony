@@ -24,8 +24,8 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('foo', __NAMESPACE__.'\Foo');
-        $barDefinition = $container->register('bar', __NAMESPACE__.'\Bar');
+        $container->register('foo', Foo::class);
+        $barDefinition = $container->register('bar', Bar::class);
         $barDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -39,8 +39,8 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('b', __NAMESPACE__.'\B');
-        $cDefinition = $container->register('c', __NAMESPACE__.'\C');
+        $container->register('b', B::class);
+        $cDefinition = $container->register('c', C::class);
         $cDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -54,8 +54,8 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('f', __NAMESPACE__.'\F');
-        $gDefinition = $container->register('g', __NAMESPACE__.'\G');
+        $container->register('f', F::class);
+        $gDefinition = $container->register('g', G::class);
         $gDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -71,9 +71,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('b', __NAMESPACE__.'\B');
-        $container->register('f', __NAMESPACE__.'\F');
-        $hDefinition = $container->register('h', __NAMESPACE__.'\H')->addArgument(new Reference('b'));
+        $container->register('b', B::class);
+        $container->register('f', F::class);
+        $hDefinition = $container->register('h', H::class)->addArgument(new Reference('b'));
         $hDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -88,9 +88,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('b', __NAMESPACE__.'\B');
-        $container->register('f', __NAMESPACE__.'\F');
-        $hDefinition = $container->register('h', __NAMESPACE__.'\H')->addArgument('')->addArgument('');
+        $container->register('b', B::class);
+        $container->register('f', F::class);
+        $hDefinition = $container->register('h', H::class)->addArgument('')->addArgument('');
         $hDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -109,10 +109,10 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('c1', __NAMESPACE__.'\CollisionA');
-        $container->register('c2', __NAMESPACE__.'\CollisionB');
-        $container->register('c3', __NAMESPACE__.'\CollisionB');
-        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $container->register('c1', CollisionA::class);
+        $container->register('c2', CollisionB::class);
+        $container->register('c3', CollisionB::class);
+        $aDefinition = $container->register('a', CannotBeAutowired::class);
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -127,9 +127,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a1', __NAMESPACE__.'\Foo');
-        $container->register('a2', __NAMESPACE__.'\Foo');
-        $aDefinition = $container->register('a', __NAMESPACE__.'\NotGuessableArgument');
+        $container->register('a1', Foo::class);
+        $container->register('a2', Foo::class);
+        $aDefinition = $container->register('a', NotGuessableArgument::class);
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -144,9 +144,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a1', __NAMESPACE__.'\B');
-        $container->register('a2', __NAMESPACE__.'\B');
-        $aDefinition = $container->register('a', __NAMESPACE__.'\NotGuessableArgumentForSubclass');
+        $container->register('a1', B::class);
+        $container->register('a2', B::class);
+        $aDefinition = $container->register('a', NotGuessableArgumentForSubclass::class);
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -172,9 +172,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a1', __NAMESPACE__.'\Foo');
-        $container->register('a2', __NAMESPACE__.'\Foo')->addAutowiringType(__NAMESPACE__.'\Foo');
-        $aDefinition = $container->register('a', __NAMESPACE__.'\NotGuessableArgument');
+        $container->register('a1', Foo::class);
+        $container->register('a2', Foo::class)->addAutowiringType(Foo::class);
+        $aDefinition = $container->register('a', NotGuessableArgument::class);
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -188,9 +188,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('c1', __NAMESPACE__.'\CollisionA');
-        $container->register('c2', __NAMESPACE__.'\CollisionB')->addAutowiringType(__NAMESPACE__.'\CollisionInterface');
-        $aDefinition = $container->register('a', __NAMESPACE__.'\CannotBeAutowired');
+        $container->register('c1', CollisionA::class);
+        $container->register('c2', CollisionB::class)->addAutowiringType(CollisionInterface::class);
+        $aDefinition = $container->register('a', CannotBeAutowired::class);
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -204,7 +204,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $coopTilleulsDefinition = $container->register('coop_tilleuls', __NAMESPACE__.'\LesTilleuls');
+        $coopTilleulsDefinition = $container->register('coop_tilleuls', LesTilleuls::class);
         $coopTilleulsDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -214,22 +214,22 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('autowired.symfony\component\dependencyinjection\tests\compiler\dunglas', $container->getDefinition('coop_tilleuls')->getArgument(0));
 
         $dunglasDefinition = $container->getDefinition('autowired.symfony\component\dependencyinjection\tests\compiler\dunglas');
-        $this->assertEquals(__NAMESPACE__.'\Dunglas', $dunglasDefinition->getClass());
+        $this->assertEquals(Dunglas::class, $dunglasDefinition->getClass());
         $this->assertFalse($dunglasDefinition->isPublic());
         $this->assertCount(1, $dunglasDefinition->getArguments());
         $this->assertEquals('autowired.symfony\component\dependencyinjection\tests\compiler\lille', $dunglasDefinition->getArgument(0));
 
         $lilleDefinition = $container->getDefinition('autowired.symfony\component\dependencyinjection\tests\compiler\lille');
-        $this->assertEquals(__NAMESPACE__.'\Lille', $lilleDefinition->getClass());
+        $this->assertEquals(Lille::class, $lilleDefinition->getClass());
     }
 
     public function testResolveParameter()
     {
         $container = new ContainerBuilder();
 
-        $container->setParameter('class_name', __NAMESPACE__.'\Foo');
+        $container->setParameter('class_name', Foo::class);
         $container->register('foo', '%class_name%');
-        $barDefinition = $container->register('bar', __NAMESPACE__.'\Bar');
+        $barDefinition = $container->register('bar', Bar::class);
         $barDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -242,9 +242,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\A');
-        $container->register('foo', __NAMESPACE__.'\Foo');
-        $optDefinition = $container->register('opt', __NAMESPACE__.'\OptionalParameter');
+        $container->register('a', A::class);
+        $container->register('foo', Foo::class);
+        $optDefinition = $container->register('opt', OptionalParameter::class);
         $optDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -260,8 +260,8 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('foo', __NAMESPACE__.'\Foo');
-        $container->register('bar', __NAMESPACE__.'\Bar');
+        $container->register('foo', Foo::class);
+        $container->register('bar', Bar::class);
 
         $pass = new AutowirePass();
         $pass->process($container);
@@ -277,7 +277,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $aDefinition = $container->register('a', __NAMESPACE__.'\BadTypeHintedArgument');
+        $aDefinition = $container->register('a', BadTypeHintedArgument::class);
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -303,9 +303,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('abstract_foo', __NAMESPACE__.'\Foo')->setAbstract(true);
-        $container->register('foo', __NAMESPACE__.'\Foo');
-        $container->register('bar', __NAMESPACE__.'\Bar')->setAutowired(true);
+        $container->register('abstract_foo', Foo::class)->setAbstract(true);
+        $container->register('foo', Foo::class);
+        $container->register('bar', Bar::class)->setAutowired(true);
 
         $pass = new AutowirePass();
         $pass->process($container);
@@ -318,10 +318,10 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('foo', __NAMESPACE__.'\Foo');
-        $container->register('a', __NAMESPACE__.'\A');
-        $container->register('dunglas', __NAMESPACE__.'\Dunglas');
-        $container->register('multiple', __NAMESPACE__.'\MultipleArguments')
+        $container->register('foo', Foo::class);
+        $container->register('a', A::class);
+        $container->register('dunglas', Dunglas::class);
+        $container->register('multiple', MultipleArguments::class)
             ->setAutowired(true)
             // set the 2nd (index 1) argument only: autowire the first and third
             // args are: A, Foo, Dunglas
@@ -351,9 +351,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\A');
-        $container->register('dunglas', __NAMESPACE__.'\Dunglas');
-        $container->register('arg_no_type_hint', __NAMESPACE__.'\MultipleArguments')
+        $container->register('a', A::class);
+        $container->register('dunglas', Dunglas::class);
+        $container->register('arg_no_type_hint', MultipleArguments::class)
             ->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -370,9 +370,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\A');
-        $container->register('lille', __NAMESPACE__.'\Lille');
-        $container->register('not_really_optional_scalar', __NAMESPACE__.'\MultipleArgumentsOptionalScalarNotReallyOptional')
+        $container->register('a', A::class);
+        $container->register('lille', Lille::class);
+        $container->register('not_really_optional_scalar', MultipleArgumentsOptionalScalarNotReallyOptional::class)
             ->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -383,9 +383,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\A');
-        $container->register('lille', __NAMESPACE__.'\Lille');
-        $container->register('with_optional_scalar', __NAMESPACE__.'\MultipleArgumentsOptionalScalar')
+        $container->register('a', A::class);
+        $container->register('lille', Lille::class);
+        $container->register('with_optional_scalar', MultipleArgumentsOptionalScalar::class)
             ->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -407,9 +407,9 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('a', __NAMESPACE__.'\A');
-        $container->register('lille', __NAMESPACE__.'\Lille');
-        $container->register('with_optional_scalar_last', __NAMESPACE__.'\MultipleArgumentsOptionalScalarLast')
+        $container->register('a', A::class);
+        $container->register('lille', Lille::class);
+        $container->register('with_optional_scalar_last', MultipleArgumentsOptionalScalarLast::class)
             ->setAutowired(true);
 
         $pass = new AutowirePass();

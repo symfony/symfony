@@ -288,7 +288,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertTrue(
-            $serializer->supportsDenormalization(array(), __NAMESPACE__.'\Model[]', 'json')
+            $serializer->supportsDenormalization(array(), Model::class.'[]', 'json')
         );
     }
 

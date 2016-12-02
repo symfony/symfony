@@ -188,8 +188,8 @@
             <thead class="small">
                 <tr>
                     <th>Symfony Status</th>
-                    <th>Bugs are fixed until</th>
-                    <th>Security issues are fixed until</th>
+                    <th>Bugs {{ collector.symfonystate in ['eom', 'eol'] ? 'were' : 'are' }} fixed until</th>
+                    <th>Security issues {{ collector.symfonystate == 'eol' ? 'were' : 'are' }} fixed until</th>
                     <th></th>
                 </tr>
             </thead>

@@ -136,7 +136,7 @@ class TextDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService(ContainerBuilder $builder, $service, array $options = array())
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -145,7 +145,10 @@ class TextDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $this->describeContainerAlias($service, $options);
         } elseif ($service instanceof Definition) {
-            $this->describeContainerDefinition($service, $options);
+            $tableHeaders = array('Option', 'Value');
+            $tableRows = $this->getContainerDefinitionDataWithUsages($builder, $service, $options['id']);
+
+            $options['output']->table($tableHeaders, $tableRows);
         } else {
             $options['output']->title(sprintf('Information for Service "<info>%s</info>"', $options['id']));
             $options['output']->table(
@@ -243,13 +246,27 @@ class TextDescriptor extends Descriptor
      */
     protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
-        if (isset($options['id'])) {
-            $options['output']->title(sprintf('Information for Service "<info>%s</info>"', $options['id']));
+        $serviceId = isset($options['id']) ? $options['id'] : null;
+
+        if (null !== $serviceId) {
+            $options['output']->title(sprintf('Information for Service "<info>%s</info>"', $serviceId));
         }
 
         $tableHeaders = array('Option', 'Value');
+        $tableRows = $this->getContainerDefinitionData($definition, $serviceId);
 
-        $tableRows[] = array('Service ID', isset($options['id']) ? $options['id'] : '-');
+        $options['output']->table($tableHeaders, $tableRows);
+    }
+
+    /**
+     * @param Definition  $definition
+     * @param string|null $serviceId
+     *
+     * @return array
+     */
+    private function getContainerDefinitionData(Definition $definition, $serviceId = null)
+    {
+        $tableRows[] = array('Service ID', null !== $serviceId ? $serviceId : '-');
         $tableRows[] = array('Class', $definition->getClass() ?: '-');
 
         $tags = $definition->getTags();
@@ -324,14 +341,7 @@ class TextDescriptor extends Descriptor
             }
         }
 
-        $injections = '-';
-        if (isset($options['injections']) && !empty($options['injections'])) {
-            $injections = implode(', ', $options['injections']);
-        }
-
-        $tableRows[] = array('Injected Into', $injections);
-
-        $options['output']->table($tableHeaders, $tableRows);
+        return $tableRows;
     }
 
     /**
@@ -467,5 +477,22 @@ class TextDescriptor extends Descriptor
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
             isset($options['raw_output']) ? !$options['raw_output'] : true
         );
+    }
+
+    /**
+     * @param ContainerBuilder $builder
+     * @param Definition       $definition
+     * @param string           $serviceId
+     *
+     * @return array
+     */
+    private function getContainerDefinitionDataWithUsages(ContainerBuilder $builder, Definition $definition, $serviceId)
+    {
+        $usages = $this->findServiceIdsUsages($builder, $serviceId);
+
+        $tableRows = $this->getContainerDefinitionData($definition, $serviceId);
+        $tableRows[] = array('Usages', !empty($usages) ? implode(', ', $usages) : '-');
+
+        return $tableRows;
     }
 }

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-10-05T15:23:54Z
+
+would be great to use the same class, to avoid having to add 2 classes in the SVG file (or to maintain 2 SVG files)
+
+---------------------------------------------------------------------------
+
+by havvg at 2016-10-05T15:27:20Z
+
+Fine by me, what should I name the unified class?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-07T09:17:17Z
+
+What about using `.sf-svg-path` as the single class name?
+
+---------------------------------------------------------------------------
+
+by havvg at 2016-11-07T09:42:51Z
+
+@javiereguiluz I renamed them.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-07T09:52:19Z
+
+👍

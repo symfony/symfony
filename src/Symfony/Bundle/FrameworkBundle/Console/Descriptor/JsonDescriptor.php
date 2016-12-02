@@ -77,7 +77,7 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService(ContainerBuilder $builder, $service, array $options = array())
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -86,7 +86,7 @@ class JsonDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $this->writeData($this->getContainerAliasData($service), $options);
         } elseif ($service instanceof Definition) {
-            $this->writeData($this->getContainerDefinitionData($service), $options);
+            $this->writeData($this->getContainerDefinitionDataWithUsages($builder, $service, $options['id'], false), $options);
         } else {
             $this->writeData(get_class($service), $options);
         }
@@ -108,7 +108,7 @@ class JsonDescriptor extends Descriptor
                 $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
             } elseif ($service instanceof Definition) {
                 if (($showPrivate || $service->isPublic())) {
-                    $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service);
+                    $data['definitions'][$serviceId] = $this->getContainerDefinitionDataWithUsages($builder, $service, $serviceId, false);
                 }
             } else {
                 $data['services'][$serviceId] = get_class($service);
@@ -260,6 +260,22 @@ class JsonDescriptor extends Descriptor
                 }
             }
         }
+
+        return $data;
+    }
+
+    /**
+     * @param ContainerBuilder $builder
+     * @param Definition       $definition
+     * @param string           $serviceId
+     * @param bool             $omitTags
+     *
+     * @return array
+     */
+    private function getContainerDefinitionDataWithUsages(ContainerBuilder $builder, Definition $definition, $serviceId, $omitTags = false)
+    {
+        $data = $this->getContainerDefinitionData($definition, $omitTags);
+        $data['usages'] = $this->findServiceIdsUsages($builder, $serviceId);
 
         return $data;
     }

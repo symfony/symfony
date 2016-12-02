@@ -1,0 +1,14 @@
+{
+    "class": "Full\\Qualified\\Class3",
+    "public": true,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "file": null,
+    "tags": [
+
+    ],
+    "autowire": false,
+    "autowiring_types": []
+}

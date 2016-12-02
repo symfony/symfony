@@ -20,7 +20,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * A console command for retrieving information about services.
@@ -107,7 +106,7 @@ EOF
             $options = array('tag' => $tag, 'show_private' => $input->getOption('show-private'));
         } elseif ($name = $input->getArgument('name')) {
             $name = $this->findProperServiceName($input, $io, $object, $name);
-            $options = array('id' => $name, 'usages' => $this->findServiceIdsUsages($object, $name));
+            $options = array('id' => $name);
         } else {
             $options = array('show_private' => $input->getOption('show-private'));
         }
@@ -198,43 +197,6 @@ EOF
         $default = 1 === count($matchingServices) ? $matchingServices[0] : null;
 
         return $io->choice('Select one of the following services to display its information', $matchingServices, $default);
-    }
-
-    /**
-     * Find all services where the service $name is used.
-     * Can be either by the constructor, by a setter or by a public property.
-     *
-     * @param ContainerBuilder $builder
-     * @param string           $name
-     *
-     * @return array
-     */
-    private function findServiceIdsUsages(ContainerBuilder $builder, $name)
-    {
-        $usages = array();
-
-        foreach ($builder->getDefinitions() as $service => $definition) {
-            foreach ($definition->getArguments() as $argument) {
-                if ($argument instanceof Reference && (string) $argument === $name) {
-                    $usages[] = $service;
-                }
-            }
-            foreach ($definition->getMethodCalls() as $methodCall) {
-                $methodParameters = $methodCall[1];
-                foreach ($methodParameters as $methodParameter) {
-                    if ($methodParameter instanceof Reference && (string) $methodParameter === $name) {
-                        $usages[] = $service;
-                    }
-                }
-            }
-            foreach ($definition->getProperties() as $property) {
-                if ($property instanceof Reference && (string) $property === $name) {
-                    $usages[] = $service;
-                }
-            }
-        }
-
-        return $usages;
     }
 
     private function findServiceIdsContaining(ContainerBuilder $builder, $name)

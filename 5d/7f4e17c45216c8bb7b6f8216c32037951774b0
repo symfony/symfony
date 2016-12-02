@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-01T11:30:32Z
+
+a better solution would be to use an alias rather than a child service
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-01T12:33:26Z
+
+@stof : That's what I meant by (and the first solution I implemented):
+
+> Another solution is to simply create a private alias. But I don't know if we should care or not about the case people may rely on the fact both services exist as definition, and not as an alias, in a compiler pass.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-01T12:44:43Z
+
+(By this I mean someone may use `$container->getDefinition('twig.loader.filesystem')` in a compiler pass, which won't work if `twig.loader.filesystem` becomes an alias)
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2016-12-02T09:18:47Z
+
+I'm using `$container->getDefinition('twig.loader.filesystem')` in a compiler pass.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-02T10:25:27Z
+
+I am not sure if this is something that is part of our BC promise. Using `hasDefinitiin()` and `getDefinition()` in fact isn't the best idea (at least when working with definitions from other bundles that you do not control). You should rather use `has()` and `findDefinition()`.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-02T10:47:01Z
+
+@xabbuh is true. Definitions can be replaced by aliases in many cases (for instance when using ``decorates``)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-02T11:01:48Z
+
+Fair enough. Reverted to the private alias solution 😄

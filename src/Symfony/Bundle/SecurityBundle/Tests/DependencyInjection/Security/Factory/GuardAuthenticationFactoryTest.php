@@ -60,11 +60,13 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
                 'authenticators' => array('authenticator1', 'authenticator2'),
                 'provider' => 'some_provider',
                 'entry_point' => 'the_entry_point',
+                'break_on_failure' => true,
             ),
             array(
                 'authenticators' => array('authenticator1', 'authenticator2'),
                 'provider' => 'some_provider',
                 'entry_point' => 'the_entry_point',
+                'break_on_failure' => true,
             ),
         );
 
@@ -76,6 +78,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
             array(
                 'authenticators' => array('authenticator1', 'authenticator2'),
                 'entry_point' => null,
+                'break_on_failure' => true,
             ),
         );
 
@@ -100,6 +103,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'authenticators' => array('authenticator123'),
             'entry_point' => null,
+            'break_on_failure' => true,
         );
         list($container, $entryPointId) = $this->executeCreate($config, null);
         $this->assertEquals('authenticator123', $entryPointId);
@@ -123,6 +127,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'authenticators' => array('authenticator123'),
             'entry_point' => null,
+            'break_on_failure' => true,
         );
         list(, $entryPointId) = $this->executeCreate($config, 'some_default_entry_point');
         $this->assertEquals('some_default_entry_point', $entryPointId);
@@ -137,6 +142,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'authenticators' => array('authenticator123'),
             'entry_point' => 'authenticator123',
+            'break_on_failure' => true,
         );
         $this->executeCreate($config, 'some_default_entry_point');
     }
@@ -150,6 +156,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'authenticators' => array('authenticator123', 'authenticatorABC'),
             'entry_point' => null,
+            'break_on_failure' => true,
         );
         $this->executeCreate($config, null);
     }
@@ -160,6 +167,7 @@ class GuardAuthenticationFactoryTest extends \PHPUnit_Framework_TestCase
         $config = array(
             'authenticators' => array('authenticator123', 'authenticatorABC'),
             'entry_point' => 'authenticatorABC',
+            'break_on_failure' => true,
         );
         list($container, $entryPointId) = $this->executeCreate($config, null);
         $this->assertEquals('authenticatorABC', $entryPointId);

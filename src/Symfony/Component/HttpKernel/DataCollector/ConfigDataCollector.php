@@ -131,10 +131,9 @@ class ConfigDataCollector extends DataCollector
         return $this->data['symfony_state'];
     }
 
-
     /**
      * Returns the minor Symfony version used (without patch numbers of extra
-     * suffix like "RC", "beta", etc.)
+     * suffix like "RC", "beta", etc.).
      *
      * @return string
      */

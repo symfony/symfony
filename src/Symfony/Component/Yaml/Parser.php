@@ -738,7 +738,7 @@ class Parser
         }
 
         // remove start of the document marker (---)
-        $trimmedValue = preg_replace('#^\n*\s*\-\-\-.*?\n#s', '', $value, -1, $count);
+        $trimmedValue = preg_replace('#^\h*\v*---.*?\n#s', '', $value, -1, $count);
         if ($count == 1) {
             // items have been removed, update the offset
             $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");

@@ -81,6 +81,22 @@ EOF;
         $this->parser->parse($yaml);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Unable to parse at line 3 (near "  ---").
+     */
+    public function testSpacesBeforeDocumentSeparator()
+    {
+        $yaml = <<<'EOF'
+   
+
+  ---
+key2: value2
+
+EOF;
+        $this->parser->parse($yaml);
+    }
+
     public function testTabsInYaml()
     {
         // test tabs in YAML

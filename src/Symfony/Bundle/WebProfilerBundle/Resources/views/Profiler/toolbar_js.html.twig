@@ -66,7 +66,7 @@
                         }
                     };
                 }
-                Sfjs.addEventListener(document.getElementById('sfToolbarHideButton-{{ token }}'), 'click', function () {
+                Sfjs.addEventListener(document.getElementById('sfToolbarHideButton-{{ token }}'), 'click', function (event) {
                     event.preventDefault();
 
                     var p = this.parentNode;

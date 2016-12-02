@@ -243,6 +243,17 @@
                 var oldFetch = window.fetch;
                 window.fetch = function () {
                     var promise = oldFetch.apply(this, arguments);
+                    var paramType = Object.prototype.toString.call(arguments[0]);
+                    if (paramType === '[object Request]') {
+                        arguments[0] = arguments[0].url;
+                        arguments[1] = {
+                            method: arguments[0].method,
+                            credentials: arguments[0].credentials,
+                            headers: arguments[0].headers,
+                            mode: arguments[0].mode,
+                            redirect: arguments[0].redirect
+                        };
+                    }
                     if (!arguments[0].match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
                         var method = 'GET';
                         if (arguments[1] && arguments[1].method !== undefined) {

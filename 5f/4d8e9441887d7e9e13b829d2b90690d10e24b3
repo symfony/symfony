@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-01T15:00:16Z
+
+👍
+
+Status: reviewed
+(I asked myself about if it wouldn't be better to keep a small indentation, but really not sure)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-01T15:02:52Z
+
+> (I asked myself about if it wouldn't be better to keep a small indentation, but really not sure)
+
+I guess it's the developper responsibility to add it himself when required, but it makes no sense to enforce a global rule for this.

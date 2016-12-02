@@ -83,6 +83,11 @@ class ConfigDataCollector extends DataCollector
             }
 
             $this->data['symfony_state'] = $this->determineSymfonyState();
+            $this->data['symfony_minor_version'] = sprintf('%s.%s', Kernel::MAJOR_VERSION, Kernel::MINOR_VERSION);
+            $eom = \DateTime::createFromFormat('m/Y', Kernel::END_OF_MAINTENANCE);
+            $eol = \DateTime::createFromFormat('m/Y', Kernel::END_OF_LIFE);
+            $this->data['symfony_eom'] = $eom->format('F Y');
+            $this->data['symfony_eol'] = $eol->format('F Y');
         }
     }
 
@@ -124,6 +129,40 @@ class ConfigDataCollector extends DataCollector
     public function getSymfonyState()
     {
         return $this->data['symfony_state'];
+    }
+
+
+    /**
+     * Returns the minor Symfony version used (without patch numbers of extra
+     * suffix like "RC", "beta", etc.)
+     *
+     * @return string
+     */
+    public function getSymfonyMinorVersion()
+    {
+        return $this->data['symfony_minor_version'];
+    }
+
+    /**
+     * Returns the human redable date when this Symfony version ends its
+     * maintenance period.
+     *
+     * @return string
+     */
+    public function getSymfonyEom()
+    {
+        return $this->data['symfony_eom'];
+    }
+
+    /**
+     * Returns the human redable date when this Symfony version reaches its
+     * "end of life" and won't receive bugs or security fixes.
+     *
+     * @return string
+     */
+    public function getSymfonyEol()
+    {
+        return $this->data['symfony_eol'];
     }
 
     /**

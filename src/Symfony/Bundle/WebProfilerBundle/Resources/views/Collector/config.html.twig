@@ -181,6 +181,31 @@
                 </div>
             {% endif %}
         </div>
+
+        {% set symfony_status = { dev: 'Unstable Version', stable: 'Stable Version', eom: 'Maintenance Ended', eol: 'Version Expired' } %}
+        {% set symfony_status_class = { dev: 'warning', stable: 'success', eom: 'warning', eol: 'error' } %}
+        <table>
+            <thead class="small">
+                <tr>
+                    <th>Symfony Status</th>
+                    <th>Bugs are fixed until</th>
+                    <th>Security issues are fixed until</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="font-normal">
+                        <span class="label status-{{ symfony_status_class[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</span>
+                    </td>
+                    <td class="font-normal">{{ collector.symfonyeom }}</td>
+                    <td class="font-normal">{{ collector.symfonyeol }}</td>
+                    <td class="font-normal">
+                        <a href="//symfony.com/roadmap?version={{ collector.symfonyminorversion }}#checker">View roadmap</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     {% endif %}
 
     <h2>PHP Configuration</h2>

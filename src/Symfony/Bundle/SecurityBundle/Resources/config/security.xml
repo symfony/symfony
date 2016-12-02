@@ -156,6 +156,11 @@
             <argument type="service" id="router" on-invalid="null" />
         </service>
 
+        <!-- Form -->
+        <service id="form.type.role" class="Symfony\Bundle\SecurityBundle\Form\Type\RoleType">
+            <tag name="form.type" />
+            <argument>%security.role_hierarchy.roles%</argument>
+        </service>
 
         <!-- Validator -->
         <service id="security.validator.user_password" class="Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator">

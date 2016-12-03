@@ -1,0 +1,144 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-05T20:18:23Z
+
+Travis CI: [PHP: hhvm-stable (Failure unrelated)](https://travis-ci.org/symfony/symfony/jobs/173552703#L5568)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-06T09:44:59Z
+
+Should we also return an empty array, if multiple? ie. like the choice type does: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Core/Type/ChoiceType.php#L244
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-06T15:31:53Z
+
+@ro0NL yeah, I had already planned it in a separated PR :+1:
+
+Edit: because `empty_data` doesn't work when no file is uploaded (with `multiple = true` it submit `array(null)` instead of `null` or `array()`) so we need a transformer to fix that and validate also the array of `File` and `UploadedFile` .
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-06T18:58:04Z
+
+Could be one PR if you ask me :)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-08T22:11:24Z
+
+I've updated this PR with the 2nd FileType improvement, as it depends on the 1st one.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-08T22:32:36Z
+
+@yceruto : This transformer looks strange to me for the use-case (there is no bijective transformation).
+
+> Edit: because empty_data doesn't work when no file is uploaded (with multiple = true it submit array(null) instead of null or array()) so we need a transformer to fix that and validate also the array of File and UploadedFile .
+
+Would it be feasible to listen on `FormEvents::PRE_SUBMIT` and set an empty array (or even `$form->getConfig()->getEmptyData()` result) if the event data is `array(null)` ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-09T13:54:33Z
+
+@ogizanagi:
+
+> Would it be feasible to listen on FormEvents::PRE_SUBMIT and set an empty array (or even $form->getConfig()->getEmptyData() result) if the event data is array(null) ?
+
+Yes! could be (my first thought was that) but, what about the data flow validation? Do you think that transformer should be removed completely (even when there is no bijective transformation)?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-09T14:02:45Z
+
+@yceruto : I think it should be removed completely. It's not the data transformer's responsibility to validate the data, except when it prevents transformation. There is no transformation here. ^^'
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-09T14:07:11Z
+
+We need be consistent with FileType data flow, otherwise when `multiple = true` any data type can be passed to this one (even when it do nothing with these values).
+
+Edit: How we could guarantee this without the data transformer ?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-09T14:44:10Z
+
+I've updated the implementation:
+- Removed DataTransformer
+- Added default `'empty_data' => array()` when `'multiple' => true`
+- Added `PRE_SUBMIT` listener to change `array(null)` to default empty data.
+
+ping @ogizanagi
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-10T16:47:53Z
+
+Status: Reviewed
+
+(bis 😆 )
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-15T18:21:56Z
+
+👍
+
+Nice job with this PR @yceruto! What about having this merged in 2.7 as a bug fix instead?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-15T19:15:18Z
+
+For me will be great to add this one since 2.7 (Rebasing...)
+
+Status: Needs Work
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-16T12:58:08Z
+
+Rebased to 2.7 finished :sweat_smile:
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-18T17:48:38Z
+
+Could anyone remove `Feature` and add `Bug` label, please ? Thanks.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-11-22T20:21:57Z
+
+It's ready for review again now in 2.7 branch.
+
+Thank you @ogizanagi for you previous review.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-02T16:24:43Z
+
+@HeahDude now in 2.7 base branch as "bugfix" any thought about this one?
+
+It's ready for @symfony/deciders?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-03T09:21:46Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-03T11:27:43Z
+
+:+1:
+
+Status: Reviewed

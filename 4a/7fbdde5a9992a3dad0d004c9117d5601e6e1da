@@ -1,0 +1,205 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-09-11T08:39:18Z
+
+Will this also solve https://github.com/doctrine/DoctrineBundle/issues/562?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-03T15:38:27Z
+
+@antanas-arvasevicius looking [at your comment here](https://github.com/doctrine/DoctrineBundle/issues/562), I think we can close this PR, isn't it?
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-10-03T15:46:08Z
+
+Hi, no this PR fixes the issue, I'll add some test cases to this PR and
+hope this will be merged into release. But why do you think that this PR
+should be closed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-03T15:48:29Z
+
+> why do you think that this PR should be closed?
+
+Because reading your comment, you say "it's not due lazy->lazy" :)
+And also because "lazy" is an optional feature that requires proxy-manager.
+Or should this be done conditionally when proxy-manager is used?
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-10-03T16:00:20Z
+
+Yes, that doctrine bug is not due lazy->lazy. It's due this bug which was
+fixed with this PR. It's due a fact that hasReference() also scans lazy
+service dependencies to find out circular dependencies, why is that so
+because lazy is indirectly referenced and instantiated lazily. And that
+Doctrine lazy listeners has worked only by miracle because it used
+Configuration as inlined service definition and thats why hasReference
+hadn't detected any circular dep.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-03T16:27:53Z
+
+So, what about:
+
+>  Or should this be done conditionally when proxy-manager is used?
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-10-03T21:09:17Z
+
+It would be reasonable to do it conditionally because if proxy-manager
+doesn't exists then everything is instantiated eagerly and we need
+detection of circular references in this case. If proxy-manager is
+available then we need to "skip reference search in lazy service's
+arguments". What do you think?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-05T12:55:36Z
+
+I agree :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-10T00:26:39Z
+
+Anything to be done before merging this one?
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-11-10T05:32:38Z
+
+On Nov 10, 2016 2:26 AM, "Fabien Potencier" notifications@github.com
+wrote:
+
+> Anything to be done before merging this one?
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> https://github.com/symfony/symfony/pull/19902#issuecomment-259566579, or
+> mute the thread
+> https://github.com/notifications/unsubscribe-auth/AEAcnFDb7RZgYeYoDImXkxBprTf1OUu2ks5q8mTOgaJpZM4J5yIT
+> .
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-11-10T05:39:48Z
+
+Hi, needed to add unit test with DI setup which shows correct behavior (no
+circular reference error while injecting argument in lazy service which is
+dependent of that service itself) e.g. graph: new A(new B(A)). If B is
+marked as lazy we should allow this configuration.
+
+On Nov 10, 2016 7:32 AM, "Antanas Arvasevicius" <
+antanas.arvasevicius@gmail.com> wrote:
+
+> On Nov 10, 2016 2:26 AM, "Fabien Potencier" notifications@github.com
+> wrote:
+>
+> > Anything to be done before merging this one?
+> >
+> > —
+> > You are receiving this because you were mentioned.
+> > Reply to this email directly, view it on GitHub
+> > https://github.com/symfony/symfony/pull/19902#issuecomment-259566579, or
+> > mute the thread
+> > https://github.com/notifications/unsubscribe-auth/AEAcnFDb7RZgYeYoDImXkxBprTf1OUu2ks5q8mTOgaJpZM4J5yIT
+> > .
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-10T10:11:39Z
+
+if B is lazy _and_ we can actually make it lazy (if we cannot generate the lazy proxy, it is the same than not being lazy)
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-11-10T10:31:14Z
+
+Right, but what's the point to allow lazy:true without proxy mngr? Are
+there any use cases for that?
+Now, if you need a lazy for avoiding circular refs and proxy manager is not
+there you'll get circular reference error and not an error which tells you
+that you must enable proxy manager for this.
+
+On Nov 10, 2016 12:11 PM, "Christophe Coevoet" notifications@github.com
+wrote:
+
+> if B is lazy _and_ we can actually make it lazy (if we cannot generate
+> the lazy proxy, it is the same than not being lazy)
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> https://github.com/symfony/symfony/pull/19902#issuecomment-259651424,
+> or mute the thread
+> https://github.com/notifications/unsubscribe-auth/AEAcnF7eP7HvJbyqeC04_6KkyTVKGC3hks5q8u3rgaJpZM4J5yIT
+> .
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-10T14:55:57Z
+
+At least for Open-Source bundles, people might tag a service as lazy as an optimization if the end user has the proxy manager and as a noop if it's not installed.
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-11-11T10:42:51Z
+
+Added unit tests, And also had found out that CheckCircularReferencesPass detects circular references. I've applied patch for that too. Please review.
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-11-22T11:06:26Z
+
+@fabpot could this be merged now? Or there are any problems?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-25T12:14:35Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-11-28T09:33:08Z
+
+Rebase onto what? Haven't thought that bug fix could take so long to be applied... I really do not understand how your bug fix apply policy works, but it sucks. Bye.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-28T13:51:17Z
+
+A rebase on the target branch of this PR which is 2.7, since some other commits have changed some files modified in this PR, you need to resolve some conflicts so maintainers are able to merge it automatically. Thank you for contributing.
+
+---------------------------------------------------------------------------
+
+by antanas-arvasevicius at 2016-11-28T14:31:56Z
+
+Thanks for explanation. Now rebased my branch. Is this fix will be available in 2.8 .. 3.1 also?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-28T14:32:50Z
+
+Yes it will ;)
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-03T09:16:26Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-03T10:31:17Z
+
+:+1: (the $isLazy temp var could be removed)

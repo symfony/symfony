@@ -140,6 +140,7 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
                   if (self::PARENT_CLASS == $name) {
                       return $metadata;
                   }
+
                   return new ClassMetadata(self::INTERFACE_A_CLASS);
               });
 
@@ -162,12 +163,10 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
           ->will($this->returnValue(false));
 
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
-        $metadata->addConstraint(new Callback(function() {} ));
+        $metadata->addConstraint(new Callback(function () {}));
 
         $metadata = $factory->getMetadataFor(self::CLASS_NAME);
-
     }
-
 }
 
 class TestLoader implements LoaderInterface

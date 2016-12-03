@@ -20,7 +20,12 @@ class DumpNode extends \Twig_Node
 
     public function __construct($varPrefix, \Twig_Node $values = null, $lineno, $tag = null)
     {
-        parent::__construct(array('values' => $values), array(), $lineno, $tag);
+        $nodes = array();
+        if (null !== $values) {
+            $nodes['values'] = $values;
+        }
+
+        parent::__construct($nodes, array(), $lineno, $tag);
         $this->varPrefix = $varPrefix;
     }
 
@@ -33,9 +38,7 @@ class DumpNode extends \Twig_Node
             ->write("if (\$this->env->isDebug()) {\n")
             ->indent();
 
-        $values = $this->getNode('values');
-
-        if (null === $values) {
+        if (!$this->hasNode('values')) {
             // remove embedded templates (macros) from the context
             $compiler
                 ->write(sprintf('$%svars = array();'."\n", $this->varPrefix))
@@ -50,7 +53,7 @@ class DumpNode extends \Twig_Node
                 ->write("}\n")
                 ->addDebugInfo($this)
                 ->write(sprintf('\Symfony\Component\VarDumper\VarDumper::dump($%svars);'."\n", $this->varPrefix));
-        } elseif (1 === $values->count()) {
+        } elseif (($values = $this->getNode('values')) && 1 === $values->count()) {
             $compiler
                 ->addDebugInfo($this)
                 ->write('\Symfony\Component\VarDumper\VarDumper::dump(')
@@ -62,7 +65,7 @@ class DumpNode extends \Twig_Node
                 ->write('\Symfony\Component\VarDumper\VarDumper::dump(array('."\n")
                 ->indent();
             foreach ($values as $node) {
-                $compiler->addIndentation();
+                $compiler->write('');
                 if ($node->hasAttribute('name')) {
                     $compiler
                         ->string($node->getAttribute('name'))

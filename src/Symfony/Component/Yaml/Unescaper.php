@@ -73,7 +73,7 @@ class Unescaper
      */
     public function unescapeCharacter($value)
     {
-        switch ($value{1}) {
+        switch ($value[1]) {
             case '0':
                 return "\x0";
             case 'a':

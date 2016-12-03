@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 /**
  * The QuestionHelper class provides helpers to interact with the user.
@@ -134,7 +135,7 @@ class QuestionHelper extends Helper
             if (false === $ret) {
                 $ret = fgets($inputStream, 4096);
                 if (false === $ret) {
-                    throw new \RuntimeException('Aborted');
+                    throw new RuntimeException('Aborted');
                 }
                 $ret = trim($ret);
             }
@@ -200,6 +201,7 @@ class QuestionHelper extends Helper
      *
      * @param OutputInterface $output
      * @param Question        $question
+     * @param resource        $inputStream
      *
      * @return string
      */
@@ -316,7 +318,8 @@ class QuestionHelper extends Helper
     /**
      * Gets a hidden response from user.
      *
-     * @param OutputInterface $output An Output instance
+     * @param OutputInterface $output      An Output instance
+     * @param resource        $inputStream The handler resource
      *
      * @return string The answer
      *
@@ -352,7 +355,7 @@ class QuestionHelper extends Helper
             shell_exec(sprintf('stty %s', $sttyMode));
 
             if (false === $value) {
-                throw new \RuntimeException('Aborted');
+                throw new RuntimeException('Aborted');
             }
 
             $value = trim($value);
@@ -370,7 +373,7 @@ class QuestionHelper extends Helper
             return $value;
         }
 
-        throw new \RuntimeException('Unable to hide the response.');
+        throw new RuntimeException('Unable to hide the response.');
     }
 
     /**
@@ -395,6 +398,8 @@ class QuestionHelper extends Helper
 
             try {
                 return call_user_func($question->getValidator(), $interviewer());
+            } catch (RuntimeException $e) {
+                throw $e;
             } catch (\Exception $error) {
             }
         }

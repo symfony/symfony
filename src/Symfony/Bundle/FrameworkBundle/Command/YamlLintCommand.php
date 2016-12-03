@@ -34,7 +34,7 @@ class YamlLintCommand extends Command
             ->setDescription('Lints a file and outputs encountered errors')
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command lints a YAML file and outputs to STDOUT
 the first encountered syntax error.
 
@@ -85,7 +85,6 @@ EOF
             throw new \RuntimeException(sprintf('File or directory "%s" is not readable', $filename));
         }
 
-        $files = array();
         if (is_file($filename)) {
             $files = array($filename);
         } elseif (is_dir($filename)) {
@@ -157,7 +156,7 @@ EOF
             }
         });
 
-        $output->writeln(json_encode($filesInfo, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0));
+        $output->writeln(json_encode($filesInfo, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : 0));
 
         return min($errors, 1);
     }

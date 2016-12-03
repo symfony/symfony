@@ -9,8 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Validator\Tests\Fixtures;
+namespace Symfony\Component\Console\Exception;
 
-interface EntityInterface
+/**
+ * @author Jérôme Tamarelle <jerome@tamarelle.net>
+ */
+class RuntimeException extends \RuntimeException
 {
 }

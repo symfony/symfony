@@ -89,6 +89,20 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
     }
 
     /**
+     * Gets the fallback locales.
+     *
+     * @return array $locales The fallback locales
+     */
+    public function getFallbackLocales()
+    {
+        if ($this->translator instanceof Translator) {
+            return $this->translator->getFallbackLocales();
+        }
+
+        return array();
+    }
+
+    /**
      * Passes through all unknown calls onto the translator object.
      */
     public function __call($method, $args)
@@ -108,7 +122,7 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
      * @param string|null $locale
      * @param string|null $domain
      * @param string      $id
-     * @param string      $trans
+     * @param string      $translation
      */
     private function collectMessage($locale, $domain, $id, $translation)
     {

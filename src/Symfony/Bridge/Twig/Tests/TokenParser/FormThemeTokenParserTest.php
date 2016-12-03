@@ -23,7 +23,7 @@ class FormThemeTokenParserTest extends \PHPUnit_Framework_TestCase
     {
         $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $env->addTokenParser(new FormThemeTokenParser());
-        $stream = $env->tokenize($source);
+        $stream = $env->tokenize(new \Twig_Source($source, ''));
         $parser = new \Twig_Parser($env);
 
         $this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode(0));

@@ -212,7 +212,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testMappingIfNotSubmitted()
+    public function testAbortMappingIfNotSubmitted()
     {
         $violation = $this->getConstraintViolation('children[address].data.street');
         $parent = $this->getForm('parent');
@@ -230,12 +230,12 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error');
-        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error');
-        $this->assertCount(1, $grandChild->getErrors(), $grandChild->getName().' should have one error');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
+        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error, but has one');
+        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testDotRuleMappingIfNotSubmitted()
+    public function testAbortDotRuleMappingIfNotSubmitted()
     {
         $violation = $this->getConstraintViolation('data.address');
         $parent = $this->getForm('parent');
@@ -255,9 +255,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error');
-        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error');
-        $this->assertCount(1, $grandChild->getErrors(), $grandChild->getName().' should have an error');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
+        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error, but has one');
+        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
     public function provideDefaultTests()

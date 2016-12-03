@@ -40,7 +40,7 @@ Form
 ----
 
  * In form types and extension overriding the "setDefaultOptions" of the
-   AbstractType or AbstractExtensionType has been deprecated in favor of
+   AbstractType or AbstractTypeExtension has been deprecated in favor of
    overriding the new "configureOptions" method.
 
    The method "setDefaultOptions(OptionsResolverInterface $resolver)" will

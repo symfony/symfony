@@ -106,7 +106,7 @@ class ProfilerController
             'panel' => $panel,
             'page' => $page,
             'request' => $request,
-            'templates' => $this->getTemplateManager()->getTemplates($profile),
+            'templates' => $this->getTemplateManager()->getNames($profile),
             'is_ajax' => $request->isXmlHttpRequest(),
         )), 200, array('Content-Type' => 'text/html'));
     }
@@ -200,7 +200,7 @@ class ProfilerController
         return new Response($this->twig->render('@WebProfiler/Profiler/toolbar.html.twig', array(
             'position' => $position,
             'profile' => $profile,
-            'templates' => $this->getTemplateManager()->getTemplates($profile),
+            'templates' => $this->getTemplateManager()->getNames($profile),
             'profiler_url' => $url,
             'token' => $token,
         )), 200, array('Content-Type' => 'text/html'));

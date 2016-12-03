@@ -1264,6 +1264,21 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertNull($this->response->getETag());
         $this->assertNull($this->response->getLastModified());
     }
+
+    public function testDoesNotCacheOptionsRequest()
+    {
+        $this->setNextResponse(200, array('Cache-Control' => 'public, s-maxage=60'), 'get');
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsCalled();
+
+        $this->setNextResponse(200, array('Cache-Control' => 'public, s-maxage=60'), 'options');
+        $this->request('OPTIONS', '/');
+        $this->assertHttpKernelIsCalled();
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsNotCalled();
+        $this->assertSame('get', $this->response->getContent());
+    }
 }
 
 class TestKernel implements HttpKernelInterface

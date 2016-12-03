@@ -21,7 +21,9 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     private static $containerCache = array();
 
-    abstract protected function loadFromFile(ContainerBuilder $container, $file);
+    abstract protected function getLoader(ContainerBuilder $container);
+
+    abstract protected function getFileExtension();
 
     public function testRolesHierarchy()
     {
@@ -237,6 +239,8 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
     protected function getContainer($file)
     {
+        $file = $file.'.'.$this->getFileExtension();
+
         if (isset(self::$containerCache[$file])) {
             return self::$containerCache[$file];
         }
@@ -246,7 +250,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $bundle = new SecurityBundle();
         $bundle->build($container); // Attach all default factories
-        $this->loadFromFile($container, $file);
+        $this->getLoader($container)->load($file);
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());

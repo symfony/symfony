@@ -56,12 +56,6 @@ class MemcacheSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testCloseSession()
     {
-        $this->memcache
-            ->expects($this->once())
-            ->method('close')
-            ->will($this->returnValue(true))
-        ;
-
         $this->assertTrue($this->storage->close());
     }
 

@@ -36,7 +36,7 @@ class LocaleTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDisplayCountriesForSwitzerland()
     {
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         $countries = Locale::getDisplayCountries('de_CH');
         $this->assertEquals('Schweiz', $countries['CH']);

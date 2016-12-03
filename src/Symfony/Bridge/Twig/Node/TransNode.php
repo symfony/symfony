@@ -18,7 +18,21 @@ class TransNode extends \Twig_Node
 {
     public function __construct(\Twig_Node $body, \Twig_Node $domain = null, \Twig_Node_Expression $count = null, \Twig_Node_Expression $vars = null, \Twig_Node_Expression $locale = null, $lineno = 0, $tag = null)
     {
-        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars, 'locale' => $locale), array(), $lineno, $tag);
+        $nodes = array('body' => $body);
+        if (null !== $domain) {
+            $nodes['domain'] = $domain;
+        }
+        if (null !== $count) {
+            $nodes['count'] = $count;
+        }
+        if (null !== $vars) {
+            $nodes['vars'] = $vars;
+        }
+        if (null !== $locale) {
+            $nodes['locale'] = $locale;
+        }
+
+        parent::__construct($nodes, array(), $lineno, $tag);
     }
 
     /**
@@ -30,24 +44,23 @@ class TransNode extends \Twig_Node
     {
         $compiler->addDebugInfo($this);
 
-        $vars = $this->getNode('vars');
         $defaults = new \Twig_Node_Expression_Array(array(), -1);
-        if ($vars instanceof \Twig_Node_Expression_Array) {
+        if ($this->hasNode('vars') && ($vars = $this->getNode('vars')) instanceof \Twig_Node_Expression_Array) {
             $defaults = $this->getNode('vars');
             $vars = null;
         }
         list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults, (bool) $vars);
 
-        $method = null === $this->getNode('count') ? 'trans' : 'transChoice';
+        $method = !$this->hasNode('count') ? 'trans' : 'transChoice';
 
         $compiler
-            ->write('echo $this->env->getExtension(\'translator\')->getTranslator()->'.$method.'(')
+            ->write('echo $this->env->getExtension(\'Symfony\Bridge\Twig\Extension\TranslationExtension\')->getTranslator()->'.$method.'(')
             ->subcompile($msg)
         ;
 
         $compiler->raw(', ');
 
-        if (null !== $this->getNode('count')) {
+        if ($this->hasNode('count')) {
             $compiler
                 ->subcompile($this->getNode('count'))
                 ->raw(', ')
@@ -68,13 +81,13 @@ class TransNode extends \Twig_Node
 
         $compiler->raw(', ');
 
-        if (null === $this->getNode('domain')) {
+        if (!$this->hasNode('domain')) {
             $compiler->repr('messages');
         } else {
             $compiler->subcompile($this->getNode('domain'));
         }
 
-        if (null !== $this->getNode('locale')) {
+        if ($this->hasNode('locale')) {
             $compiler
                 ->raw(', ')
                 ->subcompile($this->getNode('locale'))
@@ -96,18 +109,18 @@ class TransNode extends \Twig_Node
         preg_match_all('/(?<!%)%([^%]+)%/', $msg, $matches);
 
         foreach ($matches[1] as $var) {
-            $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getLine());
+            $key = new \Twig_Node_Expression_Constant('%'.$var.'%', $body->getTemplateLine());
             if (!$vars->hasElement($key)) {
-                if ('count' === $var && null !== $this->getNode('count')) {
+                if ('count' === $var && $this->hasNode('count')) {
                     $vars->addElement($this->getNode('count'), $key);
                 } else {
-                    $varExpr = new \Twig_Node_Expression_Name($var, $body->getLine());
+                    $varExpr = new \Twig_Node_Expression_Name($var, $body->getTemplateLine());
                     $varExpr->setAttribute('ignore_strict_check', $ignoreStrictCheck);
                     $vars->addElement($varExpr, $key);
                 }
             }
         }
 
-        return array(new \Twig_Node_Expression_Constant(str_replace('%%', '%', trim($msg)), $body->getLine()), $vars);
+        return array(new \Twig_Node_Expression_Constant(str_replace('%%', '%', trim($msg)), $body->getTemplateLine()), $vars);
     }
 }

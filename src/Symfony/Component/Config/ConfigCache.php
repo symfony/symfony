@@ -85,8 +85,33 @@ class ConfigCache implements ConfigCacheInterface
             return false;
         }
 
+        $e = null;
+        $meta = false;
         $time = filemtime($this->file);
-        $meta = unserialize(file_get_contents($metadata));
+        $signalingException = new \UnexpectedValueException();
+        $prevUnserializeHandler = ini_set('unserialize_callback_func', '');
+        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context) use (&$prevErrorHandler, $signalingException) {
+            if (E_WARNING === $type && 'Class __PHP_Incomplete_Class has no unserializer' === $msg) {
+                throw $signalingException;
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($type, $msg, $file, $line, $context) : false;
+        });
+
+        try {
+            $meta = unserialize(file_get_contents($metadata));
+        } catch (\Error $e) {
+        } catch (\Exception $e) {
+        }
+        restore_error_handler();
+        ini_set('unserialize_callback_func', $prevUnserializeHandler);
+        if (null !== $e && $e !== $signalingException) {
+            throw $e;
+        }
+        if (false === $meta) {
+            return false;
+        }
+
         foreach ($meta as $resource) {
             if (!$resource->isFresh($time)) {
                 return false;

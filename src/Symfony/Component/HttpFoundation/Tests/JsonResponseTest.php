@@ -213,6 +213,14 @@ class JsonResponseTest extends \PHPUnit_Framework_TestCase
 
         JsonResponse::create($serializable);
     }
+
+    public function testSetComplexCallback()
+    {
+        $response = JsonResponse::create(array('foo' => 'bar'));
+        $response->setCallback('ಠ_ಠ["foo"].bar[0]');
+
+        $this->assertEquals('/**/ಠ_ಠ["foo"].bar[0]({"foo":"bar"});', $response->getContent());
+    }
 }
 
 if (interface_exists('JsonSerializable')) {

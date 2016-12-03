@@ -362,21 +362,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function set($id, $service, $scope = self::SCOPE_CONTAINER)
     {
         $id = strtolower($id);
+        $set = isset($this->definitions[$id]);
 
-        if ($this->isFrozen()) {
+        if ($this->isFrozen() && ($set || isset($this->obsoleteDefinitions[$id])) && !$this->{$set ? 'definitions' : 'obsoleteDefinitions'}[$id]->isSynthetic()) {
             // setting a synthetic service on a frozen container is alright
-            if (
-                (!isset($this->definitions[$id]) && !isset($this->obsoleteDefinitions[$id]))
-                    ||
-                (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())
-                    ||
-                (isset($this->obsoleteDefinitions[$id]) && !$this->obsoleteDefinitions[$id]->isSynthetic())
-            ) {
-                throw new BadMethodCallException(sprintf('Setting service "%s" on a frozen container is not allowed.', $id));
-            }
+            throw new BadMethodCallException(sprintf('Setting service "%s" on a frozen container is not allowed.', $id));
         }
 
-        if (isset($this->definitions[$id])) {
+        if ($set) {
             $this->obsoleteDefinitions[$id] = $this->definitions[$id];
         }
 
@@ -436,8 +429,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $service;
         }
 
-        if (!isset($this->definitions[$id]) && isset($this->aliasDefinitions[$id])) {
-            return $this->get($this->aliasDefinitions[$id]);
+        if (!array_key_exists($id, $this->definitions) && isset($this->aliasDefinitions[$id])) {
+            return $this->get($this->aliasDefinitions[$id], $invalidBehavior);
         }
 
         try {
@@ -784,7 +777,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasDefinition($id)
     {
-        return isset($this->definitions[strtolower($id)]);
+        return array_key_exists(strtolower($id), $this->definitions);
     }
 
     /**
@@ -800,7 +793,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $id = strtolower($id);
 
-        if (!isset($this->definitions[$id])) {
+        if (!array_key_exists($id, $this->definitions)) {
             throw new ServiceNotFoundException($id);
         }
 
@@ -847,6 +840,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function createService(Definition $definition, $id, $tryProxy = true)
     {
+        if ($definition instanceof DefinitionDecorator) {
+            throw new RuntimeException(sprintf('Constructing service "%s" from a parent definition is not supported at build time.', $id));
+        }
+
         if ($definition->isSynthetic()) {
             throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The DIC does not know how to construct this service.', $id));
         }
@@ -905,13 +902,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $this->shareService($definition, $service, $id);
         }
 
-        foreach ($definition->getMethodCalls() as $call) {
-            $this->callMethod($service, $call);
-        }
-
         $properties = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getProperties())));
         foreach ($properties as $name => $value) {
             $service->$name = $value;
+        }
+
+        foreach ($definition->getMethodCalls() as $call) {
+            $this->callMethod($service, $call);
         }
 
         if ($callable = $definition->getConfigurator()) {

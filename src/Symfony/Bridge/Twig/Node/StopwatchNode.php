@@ -18,7 +18,7 @@ namespace Symfony\Bridge\Twig\Node;
  */
 class StopwatchNode extends \Twig_Node
 {
-    public function __construct(\Twig_Node $name, $body, \Twig_Node_Expression_AssignName $var, $lineno = 0, $tag = null)
+    public function __construct(\Twig_Node $name, \Twig_Node $body, \Twig_Node_Expression_AssignName $var, $lineno = 0, $tag = null)
     {
         parent::__construct(array('body' => $body, 'name' => $name, 'var' => $var), array(), $lineno, $tag);
     }
@@ -32,11 +32,11 @@ class StopwatchNode extends \Twig_Node
             ->raw(' = ')
             ->subcompile($this->getNode('name'))
             ->write(";\n")
-            ->write("\$this->env->getExtension('stopwatch')->getStopwatch()->start(")
+            ->write("\$this->env->getExtension('Symfony\Bridge\Twig\Extension\StopwatchExtension')->getStopwatch()->start(")
             ->subcompile($this->getNode('var'))
             ->raw(", 'template');\n")
             ->subcompile($this->getNode('body'))
-            ->write("\$this->env->getExtension('stopwatch')->getStopwatch()->stop(")
+            ->write("\$this->env->getExtension('Symfony\Bridge\Twig\Extension\StopwatchExtension')->getStopwatch()->stop(")
             ->subcompile($this->getNode('var'))
             ->raw(");\n")
         ;

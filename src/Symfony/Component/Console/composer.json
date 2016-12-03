@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.3.9"
+        "php": ">=5.3.9",
+        "symfony/debug": "~2.7,>=2.7.2"
     },
     "require-dev": {
         "symfony/event-dispatcher": "~2.1",

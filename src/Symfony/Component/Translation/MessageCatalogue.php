@@ -178,6 +178,10 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
             if ($c->getLocale() === $catalogue->getLocale()) {
                 throw new \LogicException(sprintf('Circular reference detected when adding a fallback catalogue for locale "%s".', $catalogue->getLocale()));
             }
+
+            foreach ($catalogue->getResources() as $resource) {
+                $c->addResource($resource);
+            }
         } while ($c = $c->parent);
 
         $catalogue->parent = $this;

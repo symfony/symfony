@@ -444,7 +444,7 @@ EOF;
 
     public function testObjectForMapEnabledWithMapping()
     {
-        $yaml = <<<EOF
+        $yaml = <<<'EOF'
 foo:
     fiz: [cat]
 EOF;
@@ -581,7 +581,7 @@ EOF
 
     public function testSequenceInMappingStartedBySingleDashLine()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 a:
 -
   b:
@@ -609,7 +609,7 @@ EOT;
 
     public function testSequenceFollowedByCommentEmbeddedInMapping()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 a:
     b:
         - c
@@ -645,7 +645,7 @@ EOF
      */
     public function testScalarInSequence()
     {
-        Yaml::parse(<<<EOF
+        Yaml::parse(<<<'EOF'
 foo:
     - bar
 "missing colon"
@@ -666,7 +666,7 @@ EOF
      */
     public function testMappingDuplicateKeyBlock()
     {
-        $input = <<<EOD
+        $input = <<<'EOD'
 parent:
     child: first
     child: duplicate
@@ -684,7 +684,7 @@ EOD;
 
     public function testMappingDuplicateKeyFlow()
     {
-        $input = <<<EOD
+        $input = <<<'EOD'
 parent: { child: first, child: duplicate }
 parent: { child: duplicate, child: duplicate }
 EOD;
@@ -968,7 +968,7 @@ EOT
         );
         $tests[] = array($yaml, $expected);
 
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 foo:
   bar:
     scalar-block: >
@@ -1011,7 +1011,7 @@ EOT;
 
     public function testBlankLinesAreParsedAsNewLinesInFoldedBlocks()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 test: >-
     <h2>A heading</h2>
 
@@ -1023,7 +1023,7 @@ EOT;
 
         $this->assertSame(
             array(
-                'test' => <<<EOT
+                'test' => <<<'EOT'
 <h2>A heading</h2>
 <ul> <li>a list</li> <li>may be a good example</li> </ul>
 EOT
@@ -1035,7 +1035,7 @@ EOT
 
     public function testAdditionallyIndentedLinesAreParsedAsNewLinesInFoldedBlocks()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 test: >-
     <h2>A heading</h2>
 
@@ -1047,7 +1047,7 @@ EOT;
 
         $this->assertSame(
             array(
-                'test' => <<<EOT
+                'test' => <<<'EOT'
 <h2>A heading</h2>
 <ul>
   <li>a list</li>
@@ -1080,7 +1080,7 @@ EOT
         return array(
             array(
                 4,
-                <<<YAML
+                <<<'YAML'
 foo:
     -
         # bar
@@ -1089,7 +1089,7 @@ YAML
             ),
             array(
                 5,
-                <<<YAML
+                <<<'YAML'
 foo:
     -
         # bar
@@ -1099,7 +1099,7 @@ YAML
             ),
             array(
                 8,
-                <<<YAML
+                <<<'YAML'
 foo:
     -
         # foobar
@@ -1112,7 +1112,7 @@ YAML
             ),
             array(
                 10,
-                <<<YAML
+                <<<'YAML'
 foo:
     -
         # foobar

@@ -34,7 +34,7 @@ class RenderNode extends \Twig_Node
     {
         $compiler
             ->addDebugInfo($this)
-            ->write("echo \$this->env->getExtension('actions')->renderUri(")
+            ->write("echo \$this->env->getExtension('Symfony\Bundle\TwigBundle\Extension\ActionsExtension')->renderUri(")
             ->subcompile($this->getNode('expr'))
             ->raw(', ')
             ->subcompile($this->getNode('options'))

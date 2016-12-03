@@ -28,6 +28,15 @@ class ControllerResolver implements ControllerResolverInterface
     private $logger;
 
     /**
+     * If the ...$arg functionality is available.
+     *
+     * Requires at least PHP 5.6.0 or HHVM 3.9.1
+     *
+     * @var bool
+     */
+    private $supportsVariadic;
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
@@ -35,6 +44,8 @@ class ControllerResolver implements ControllerResolverInterface
     public function __construct(LoggerInterface $logger = null)
     {
         $this->logger = $logger;
+
+        $this->supportsVariadic = method_exists('ReflectionParameter', 'isVariadic');
     }
 
     /**
@@ -99,13 +110,20 @@ class ControllerResolver implements ControllerResolverInterface
         return $this->doGetArguments($request, $controller, $r->getParameters());
     }
 
+    /**
+     * @param Request                $request
+     * @param callable               $controller
+     * @param \ReflectionParameter[] $parameters
+     *
+     * @return array The arguments to use when calling the action
+     */
     protected function doGetArguments(Request $request, $controller, array $parameters)
     {
         $attributes = $request->attributes->all();
         $arguments = array();
         foreach ($parameters as $param) {
             if (array_key_exists($param->name, $attributes)) {
-                if (PHP_VERSION_ID >= 50600 && $param->isVariadic() && is_array($attributes[$param->name])) {
+                if ($this->supportsVariadic && $param->isVariadic() && is_array($attributes[$param->name])) {
                     $arguments = array_merge($arguments, array_values($attributes[$param->name]));
                 } else {
                     $arguments[] = $attributes[$param->name];
@@ -114,6 +132,8 @@ class ControllerResolver implements ControllerResolverInterface
                 $arguments[] = $request;
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
+            } elseif ($param->allowsNull()) {
+                $arguments[] = null;
             } else {
                 if (is_array($controller)) {
                     $repr = sprintf('%s::%s()', get_class($controller[0]), $controller[1]);

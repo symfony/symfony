@@ -115,7 +115,9 @@ class ReflectionCaster
         ));
 
         if (isset($a[$prefix.'returnType'])) {
-            $a[$prefix.'returnType'] = (string) $a[$prefix.'returnType'];
+            $v = $a[$prefix.'returnType'];
+            $v = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
+            $a[$prefix.'returnType'] = $a[$prefix.'returnType']->allowsNull() ? '?'.$v : $v;
         }
         if (isset($a[$prefix.'this'])) {
             $a[$prefix.'this'] = new CutStub($a[$prefix.'this']);
@@ -164,23 +166,18 @@ class ReflectionCaster
             'position' => 'getPosition',
             'isVariadic' => 'isVariadic',
             'byReference' => 'isPassedByReference',
+            'allowsNull' => 'allowsNull',
         ));
 
-        try {
-            if (method_exists($c, 'hasType')) {
-                if ($c->hasType()) {
-                    $a[$prefix.'typeHint'] = $c->getType()->__toString();
-                }
-            } else {
-                $v = explode(' ', $c->__toString(), 6);
-                if (isset($v[5]) && 0 === strspn($v[4], '.&$')) {
-                    $a[$prefix.'typeHint'] = $v[4];
-                }
+        if (method_exists($c, 'getType')) {
+            if ($v = $c->getType()) {
+                $a[$prefix.'typeHint'] = $v instanceof \ReflectionNamedType ? $v->getName() : $v->__toString();
             }
-        } catch (\ReflectionException $e) {
-            if (preg_match('/^Class ([^ ]++) does not exist$/', $e->getMessage(), $m)) {
-                $a[$prefix.'typeHint'] = $m[1];
-            }
+        } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $c, $v)) {
+            $a[$prefix.'typeHint'] = $v[1];
+        }
+        if (!isset($a[$prefix.'typeHint'])) {
+            unset($a[$prefix.'allowsNull']);
         }
 
         try {
@@ -188,9 +185,13 @@ class ReflectionCaster
             if (method_exists($c, 'isDefaultValueConstant') && $c->isDefaultValueConstant()) {
                 $a[$prefix.'default'] = new ConstStub($c->getDefaultValueConstantName(), $v);
             }
+            if (null === $v) {
+                unset($a[$prefix.'allowsNull']);
+            }
         } catch (\ReflectionException $e) {
-            if (isset($a[$prefix.'typeHint']) && $c->allowsNull()) {
+            if (isset($a[$prefix.'typeHint']) && $c->allowsNull() && !class_exists('ReflectionNamedType', false)) {
                 $a[$prefix.'default'] = null;
+                unset($a[$prefix.'allowsNull']);
             }
         }
 

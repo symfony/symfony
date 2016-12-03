@@ -25,7 +25,7 @@ class TwigNodeProvider
             new \Twig_Node_Expression_Array(array(), 0),
             new \Twig_Node_Expression_Array(array(), 0),
             null,
-            null
+            new \Twig_Source('', '')
         );
     }
 

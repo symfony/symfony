@@ -159,6 +159,8 @@ class Application
      * @param OutputInterface $output An Output instance
      *
      * @return int 0 if everything went fine, or an error code
+     *
+     * @throws \Exception propagate the exception from `doRunCommand`
      */
     public function doRun(InputInterface $input, OutputInterface $output)
     {
@@ -843,7 +845,13 @@ class Application
         }
 
         if (null === $this->dispatcher) {
-            return $command->run($input, $output);
+            try {
+                return $command->run($input, $output);
+            } catch (\Exception $e) {
+                throw $e;
+            } catch (\Throwable $e) {
+                throw new FatalThrowableError($e);
+            }
         }
 
         $event = new ConsoleCommandEvent($command, $input, $output);

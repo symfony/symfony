@@ -33,10 +33,17 @@ class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
 
             if (isset($arguments[1])) {
                 if ('label' === $blockNameSuffix) {
-                    // The "label" function expects the label in the second and
+                    // The "label" function can have the label in the second and
                     // the variables in the third argument
                     $label = $arguments[1];
                     $variables = isset($arguments[2]) ? $arguments[2] : null;
+
+                    if ($label instanceof \Twig_Node_Expression_Array) {
+                        // The "variables" were passed as the second argument
+                        $variables = $arguments[1];
+                        $label = new \Twig_Node_Expression_Constant(null, 0);
+                    }
+
                     $lineno = $label->getTemplateLine();
 
                     if ($label instanceof \Twig_Node_Expression_Constant) {

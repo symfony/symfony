@@ -261,6 +261,29 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCompileLabelWithVariablesAsSecondArgument()
+    {
+        $arguments = new \Twig_Node(array(
+            new \Twig_Node_Expression_Name('form', 0),
+            new \Twig_Node_Expression_Array(array(
+                new \Twig_Node_Expression_Constant('label', 0),
+                new \Twig_Node_Expression_Constant('my own label', 0),
+            ), 0),
+        ));
+
+        $node = new SearchAndRenderBlockNode('form_label', $arguments, 0);
+
+        $compiler = new \Twig_Compiler(new \Twig_Environment($this->getMock('Twig_LoaderInterface')));
+
+        $this->assertEquals(
+            sprintf(
+                '$this->env->getRuntime(\'Symfony\Bridge\Twig\Form\TwigRenderer\')->searchAndRenderBlock(%s, \'label\', array("label" => "my own label"))',
+                $this->getVariableGetter('form')
+            ),
+            trim($compiler->compile($node)->getSource())
+        );
+    }
+
     protected function getVariableGetter($name)
     {
         if (PHP_VERSION_ID >= 70000) {

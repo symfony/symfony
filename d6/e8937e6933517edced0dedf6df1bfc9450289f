@@ -1,0 +1,169 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-02T12:36:09Z
+
+👍  A great help for JSON APis!
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2016-06-02T13:58:29Z
+
+Unless you have to pass the JWT and the login/password in the same request, the standard way for password authentication is HTTP Basic. This is supported out of the box in Symfony and easy to do with [jQuery.ajax](http://api.jquery.com/jquery.ajax/).
+Then a simple controller that return a new JWT can be created as an entry point.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-06-02T18:26:15Z
+
+@GromNaN I agree about that HTTP Basic and form-data stay the standard way for getting a JWT (& simpler for most cases).
+But that's not an absolute rule and, depending on the client's platform/language/framework or simply out of preference, JSON can be the way to go.
+Also I think that this could be helpful for a large number of use cases therefore good to have in Symfony
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-06-03T10:40:30Z
+
+Does this make https://github.com/gfreeau/GfreeauGetJWTBundle obsolete?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-03T10:46:28Z
+
+@teohhanhui AFAIK, GfreeauGetJWTBundle is for x-www-formencoded data, not for JSON documents.
+@GromNaN it's more common to send JSON documents (or form data) than using HTTP Basic auth to get a JWT token. Most client-side and server-side libs work that way.
+
+---------------------------------------------------------------------------
+
+by teohhanhui at 2016-06-03T10:50:50Z
+
+@dunglas:
+
+> GfreeauGetJWTBundle is for x-www-formencoded data, not for JSON documents
+
+But the usual intention is to avoid `form_login`, which uses cookies. The fact that it uses `x-www-form-urlencoded` seems to me simply due to ease of implementation (the code seems to be adapted from Symfony's `UsernamePasswordFormAuthenticationListener`).
+
+---------------------------------------------------------------------------
+
+by jorge07 at 2016-06-03T10:53:00Z
+
+Why not a Request body listener like FOSRestBundle has? But that way you can use also XML for example... I'm already using exactly this way to login with Json on 3.0.6 with FOSRestBundle 2
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-06-08T15:54:37Z
+
+I've done some changes to this PR:
+- The provider is now stateless (it doesn't use the session)
+- It uses the PropertyAccess component to access the username and the password as brilliantly suggested by @xabbuh
+- Functional tests added
+
+It is ready for review.
+
+---------------------------------------------------------------------------
+
+by Simperfit at 2016-07-02T18:58:45Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-07-04T07:59:11Z
+
+The min version in the `composer.json` file of the SecurityBundle needs to be updated.
+
+@dunglas Can you rebase here to hopefully let Travis run the job on PHP 7 again.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-10T08:44:22Z
+
+Rebased against master and comments fixed.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-07-17T10:25:50Z
+
+ping @symfony/deciders (HHVM error not related)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-07-18T07:07:43Z
+
+Imo you should also add a functional test case covering a config where the `username_path` and `password_path` are actually used.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-16T11:49:03Z
+
+@xabbuh test updated.
+
+---------------------------------------------------------------------------
+
+by DavidBadura at 2016-08-16T12:08:46Z
+
+the configuration of the security is currently really awkward. we have with LDAP for each combination of "how to extract credentials" and "how to authenticate a user" a own factory:
+
+```
+$extension->addSecurityListenerFactory(new FormLoginFactory());
+$extension->addSecurityListenerFactory(new FormLoginLdapFactory());
+$extension->addSecurityListenerFactory(new HttpBasicFactory());
+$extension->addSecurityListenerFactory(new HttpBasicLdapFactory());
+```
+
+**how to extract credentials:**
+- form (post)
+- http basic (header)
+- json _new_
+
+**how to authenticate a user:**
+- normal
+- ldap
+
+now we add a new factory named `JsonLoginFactory`. But it is currently not possible to use JSON and LDAP. For this we need another Factory named `JsonLdapLoginFactory`.
+
+```
+$extension->addSecurityListenerFactory(new FormLoginFactory());
+$extension->addSecurityListenerFactory(new FormLoginLdapFactory());
+$extension->addSecurityListenerFactory(new JsonLoginFactory());
+$extension->addSecurityListenerFactory(new JsonLoginLdapFactory());
+$extension->addSecurityListenerFactory(new HttpBasicFactory());
+$extension->addSecurityListenerFactory(new HttpBasicLdapFactory());
+```
+
+**Question:** should we not separate it somehow?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-08-16T12:15:03Z
+
+@DavidBadura should be in a separate issue/PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-13T11:58:40Z
+
+Rebased. ping @symfony/deciders. It would be nice if it's available in 3.2.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-19T19:11:10Z
+
+👍 LGTM
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-25T10:51:01Z
+
+@fabpot can we merge this one? It is ready for a while now, it would be nice to have it in 3.2. As it's a  new feature, it cannot broke existing apps.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-25T11:25:00Z
+
+Docs added symfony/symfony-docs#7081
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-06T19:31:51Z
+
+👍 for 3.3

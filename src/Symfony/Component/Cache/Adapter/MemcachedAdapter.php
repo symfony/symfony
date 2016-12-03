@@ -112,7 +112,7 @@ class MemcachedAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = [])
     {
         $this->validateKeys($keys);
 
@@ -138,8 +138,7 @@ class MemcachedAdapter implements AdapterInterface
 
         try {
             $this->client->get($namespacedKey);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
 

@@ -64,7 +64,7 @@ class CheckboxType extends AbstractType
 
         $resolver->setNormalizer('force_submit', function (Options $options) {
             // If pre set data is true, we need to ensure that $emptyData will be submitted
-            return (bool) $options['data'];
+            return isset($options['data']) && (bool) $options['data'];
         });
     }
 

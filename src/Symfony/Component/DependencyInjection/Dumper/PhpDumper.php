@@ -1294,9 +1294,9 @@ EOF;
 
                     $service = $this->container->getDefinition($argumentId);
 
-                    // if exists proxy dumper (proxy-manager) don't search references in lazy services.
-                    // As these services will be instantiated lazily and don't have direct related references.
-                    if ($service->isLazy() && !($this->getProxyDumper() instanceof NullDumper)) {
+                    // if the proxy manager is enabled, disable searching for references in lazy services,
+                    // as these services will be instantiated lazily and don't have direct related references.
+                    if ($service->isLazy() && !$this->getProxyDumper() instanceof NullDumper) {
                         continue;
                     }
 

@@ -82,25 +82,16 @@ class MethodCallClass
 
 class DummyProxyDumper implements ProxyDumper
 {
-    /**
-     * {@inheritdoc}
-     */
     public function isProxyCandidate(Definition $definition)
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProxyFactoryCode(Definition $definition, $id)
     {
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getProxyCode(Definition $definition)
     {
         return '';

@@ -26,7 +26,7 @@ abstract class AbstractVoter implements VoterInterface
      */
     public function supportsAttribute($attribute)
     {
-        return in_array($attribute, $this->getSupportedAttributes());
+        return in_array($attribute, $this->getSupportedAttributes(), true);
     }
 
     /**

@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CheckboxType extends AbstractType
@@ -51,13 +52,18 @@ class CheckboxType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $forceSubmit = function (FormInterface $form, $viewData) {
+        $emptyData = function (FormInterface $form, $viewData) {
             return $viewData;
+        };
+
+        $forceSubmit = function (Options $options) {
+            return $options['data'];
         };
 
         $resolver->setDefaults(array(
             'value' => '1',
             'compound' => false,
+            'empty_data' => $emptyData,
             'force_submit' => $forceSubmit, // internal
         ));
     }

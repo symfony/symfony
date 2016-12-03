@@ -342,7 +342,7 @@ EOF;
             ),
         );
 
-        $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block.yml'), $this->dumper->dump($data, 3, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        $this->assertSame(file_get_contents(__DIR__.'/Fixtures/multiple_lines_as_literal_block.yml'), $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
     /**

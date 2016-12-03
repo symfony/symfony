@@ -24,6 +24,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AutowirePass implements CompilerPassInterface
 {
+    /**
+     * @var ContainerBuilder
+     */
     private $container;
     private $reflectionClasses = array();
     private $definedTypes = array();
@@ -40,6 +43,7 @@ class AutowirePass implements CompilerPassInterface
 
         try {
             $this->container = $container;
+
             foreach ($container->getDefinitions() as $id => $definition) {
                 if ($definition->isAutowired()) {
                     $this->completeDefinition($id, $definition);
@@ -104,6 +108,11 @@ class AutowirePass implements CompilerPassInterface
         $arguments = $definition->getArguments();
         foreach ($constructor->getParameters() as $index => $parameter) {
             if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
+                continue;
+            }
+
+            if ($this->container->hasParameter($parameter->name)) {
+                $arguments[$index] = $this->container->getParameter($parameter->name);
                 continue;
             }
 

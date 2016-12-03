@@ -843,7 +843,13 @@ class Application
         }
 
         if (null === $this->dispatcher) {
-            return $command->run($input, $output);
+            try {
+                return $command->run($input, $output);
+            } catch (\Exception $e) {
+                throw $e;
+            } catch (\Throwable $e) {
+                throw new FatalThrowableError($e);
+            }
         }
 
         $event = new ConsoleCommandEvent($command, $input, $output);

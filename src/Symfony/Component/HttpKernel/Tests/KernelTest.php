@@ -85,6 +85,9 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
+    /**
+     * @group legacy
+     */
     public function testClassCacheIsLoaded()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));
@@ -105,6 +108,9 @@ class KernelTest extends \PHPUnit_Framework_TestCase
         $kernel->boot();
     }
 
+    /**
+     * @group legacy
+     */
     public function testClassCacheIsNotLoadedWhenKernelIsNotBooted()
     {
         $kernel = $this->getKernel(array('initializeBundles', 'initializeContainer', 'doLoadClassCache'));

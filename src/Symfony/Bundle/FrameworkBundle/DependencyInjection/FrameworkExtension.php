@@ -71,6 +71,14 @@ class FrameworkExtension extends Extension
 
         $loader->load('web.xml');
         $loader->load('services.xml');
+
+        if (PHP_VERSION_ID < 70000) {
+            $definition = $container->getDefinition('kernel.class_cache.cache_warmer');
+            $definition->addTag('kernel.cache_warmer');
+            // Ignore deprecation for PHP versions below 7.0
+            $definition->setDeprecated(false);
+        }
+
         $loader->load('fragment_renderer.xml');
 
         // Property access is used by both the Form and the Validator component
@@ -194,47 +202,49 @@ class FrameworkExtension extends Extension
             'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
         ));
 
-        $this->addClassesToCompile(array(
-            'Symfony\\Component\\Config\\ConfigCache',
-            'Symfony\\Component\\Config\\FileLocator',
+        if (PHP_VERSION_ID < 70000) {
+            $this->addClassesToCompile(array(
+                'Symfony\\Component\\Config\\ConfigCache',
+                'Symfony\\Component\\Config\\FileLocator',
 
-            'Symfony\\Component\\Debug\\ErrorHandler',
+                'Symfony\\Component\\Debug\\ErrorHandler',
 
-            'Symfony\\Component\\DependencyInjection\\ContainerAwareInterface',
-            'Symfony\\Component\\DependencyInjection\\Container',
+                'Symfony\\Component\\DependencyInjection\\ContainerAwareInterface',
+                'Symfony\\Component\\DependencyInjection\\Container',
 
-            'Symfony\\Component\\EventDispatcher\\Event',
-            'Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher',
+                'Symfony\\Component\\EventDispatcher\\Event',
+                'Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher',
 
-            'Symfony\\Component\\HttpFoundation\\Response',
-            'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
+                'Symfony\\Component\\HttpFoundation\\Response',
+                'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
 
-            'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
-            'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
-            'Symfony\\Component\\HttpKernel\\Bundle\\Bundle',
-            'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
-            'Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolver',
-            'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadata',
-            'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadataFactory',
-            'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
-            'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEvent',
-            'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEvent',
-            'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
-            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
-            'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
-            'Symfony\\Component\\HttpKernel\\HttpKernel',
-            'Symfony\\Component\\HttpKernel\\KernelEvents',
-            'Symfony\\Component\\HttpKernel\\Config\\FileLocator',
+                'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
+                'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
+                'Symfony\\Component\\HttpKernel\\Bundle\\Bundle',
+                'Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver',
+                'Symfony\\Component\\HttpKernel\\Controller\\ArgumentResolver',
+                'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadata',
+                'Symfony\\Component\\HttpKernel\\ControllerMetadata\\ArgumentMetadataFactory',
+                'Symfony\\Component\\HttpKernel\\Event\\KernelEvent',
+                'Symfony\\Component\\HttpKernel\\Event\\FilterControllerEvent',
+                'Symfony\\Component\\HttpKernel\\Event\\FilterResponseEvent',
+                'Symfony\\Component\\HttpKernel\\Event\\GetResponseEvent',
+                'Symfony\\Component\\HttpKernel\\Event\\GetResponseForControllerResultEvent',
+                'Symfony\\Component\\HttpKernel\\Event\\GetResponseForExceptionEvent',
+                'Symfony\\Component\\HttpKernel\\HttpKernel',
+                'Symfony\\Component\\HttpKernel\\KernelEvents',
+                'Symfony\\Component\\HttpKernel\\Config\\FileLocator',
 
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
-            'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
+                'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerNameParser',
+                'Symfony\\Bundle\\FrameworkBundle\\Controller\\ControllerResolver',
 
-            // Cannot be included because annotations will parse the big compiled class file
-            // 'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
+                // Cannot be included because annotations will parse the big compiled class file
+                // 'Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller',
 
-            // cannot be included as commands are discovered based on the path to this class via Reflection
-            // 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
-        ));
+                // cannot be included as commands are discovered based on the path to this class via Reflection
+                // 'Symfony\\Bundle\\FrameworkBundle\\FrameworkBundle',
+            ));
+        }
     }
 
     /**
@@ -525,13 +535,15 @@ class FrameworkExtension extends Extension
         $container->setParameter('request_listener.http_port', $config['http_port']);
         $container->setParameter('request_listener.https_port', $config['https_port']);
 
-        $this->addClassesToCompile(array(
-            'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
-            'Symfony\\Component\\Routing\\RequestContext',
-            'Symfony\\Component\\Routing\\Router',
-            'Symfony\\Bundle\\FrameworkBundle\\Routing\\RedirectableUrlMatcher',
-            $container->findDefinition('router.default')->getClass(),
-        ));
+        if (PHP_VERSION_ID < 70000) {
+            $this->addClassesToCompile(array(
+                'Symfony\\Component\\Routing\\Generator\\UrlGenerator',
+                'Symfony\\Component\\Routing\\RequestContext',
+                'Symfony\\Component\\Routing\\Router',
+                'Symfony\\Bundle\\FrameworkBundle\\Routing\\RedirectableUrlMatcher',
+                $container->findDefinition('router.default')->getClass(),
+            ));
+        }
     }
 
     /**
@@ -574,20 +586,22 @@ class FrameworkExtension extends Extension
 
         $container->setParameter('session.save_path', $config['save_path']);
 
-        $this->addClassesToCompile(array(
-            'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
-            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
-            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\PhpBridgeSessionStorage',
-            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler',
-            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\AbstractProxy',
-            'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\SessionHandlerProxy',
-            $container->getDefinition('session')->getClass(),
-        ));
-
-        if ($container->hasDefinition($config['storage_id'])) {
+        if (PHP_VERSION_ID < 70000) {
             $this->addClassesToCompile(array(
-                $container->findDefinition('session.storage')->getClass(),
+                'Symfony\\Bundle\\FrameworkBundle\\EventListener\\SessionListener',
+                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\NativeSessionStorage',
+                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\PhpBridgeSessionStorage',
+                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler',
+                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\AbstractProxy',
+                'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Proxy\\SessionHandlerProxy',
+                $container->getDefinition('session')->getClass(),
             ));
+
+            if ($container->hasDefinition($config['storage_id'])) {
+                $this->addClassesToCompile(array(
+                    $container->findDefinition('session.storage')->getClass(),
+                ));
+            }
         }
 
         $container->setParameter('session.metadata.update_threshold', $config['metadata_update_threshold']);
@@ -657,12 +671,14 @@ class FrameworkExtension extends Extension
             $container->setDefinition('templating.loader', $loaderCache);
         }
 
-        $this->addClassesToCompile(array(
-            'Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables',
-            'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateReference',
-            'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateNameParser',
-            $container->findDefinition('templating.locator')->getClass(),
-        ));
+        if (PHP_VERSION_ID < 70000) {
+            $this->addClassesToCompile(array(
+                'Symfony\\Bundle\\FrameworkBundle\\Templating\\GlobalVariables',
+                'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateReference',
+                'Symfony\\Bundle\\FrameworkBundle\\Templating\\TemplateNameParser',
+                $container->findDefinition('templating.locator')->getClass(),
+            ));
+        }
 
         $container->setParameter('templating.engines', $config['engines']);
         $engines = array_map(function ($engine) { return new Reference('templating.engine.'.$engine); }, $config['engines']);
@@ -695,11 +711,13 @@ class FrameworkExtension extends Extension
                 $container->setAlias('debug.templating.engine.php', 'templating.engine.php');
             }
 
-            $this->addClassesToCompile(array(
-                'Symfony\\Component\\Templating\\Storage\\FileStorage',
-                'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
-                'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
-            ));
+            if (PHP_VERSION_ID < 70000) {
+                $this->addClassesToCompile(array(
+                    'Symfony\\Component\\Templating\\Storage\\FileStorage',
+                    'Symfony\\Bundle\\FrameworkBundle\\Templating\\PhpEngine',
+                    'Symfony\\Bundle\\FrameworkBundle\\Templating\\Loader\\FilesystemLoader',
+                ));
+            }
 
             if ($container->has('assets.packages')) {
                 $container->getDefinition('templating.helper.assets')->replaceArgument(0, new Reference('assets.packages'));
@@ -1015,10 +1033,12 @@ class FrameworkExtension extends Extension
                 $definition = $container->findDefinition('annotations.cache_warmer');
                 $definition->addTag('kernel.cache_warmer');
 
-                $this->addClassesToCompile(array(
-                    'Symfony\Component\Cache\Adapter\PhpArrayAdapter',
-                    'Symfony\Component\Cache\DoctrineProvider',
-                ));
+                if (PHP_VERSION_ID < 70000) {
+                    $this->addClassesToCompile(array(
+                        'Symfony\Component\Cache\Adapter\PhpArrayAdapter',
+                        'Symfony\Component\Cache\DoctrineProvider',
+                    ));
+                }
             } elseif ('file' === $config['cache']) {
                 $cacheDir = $container->getParameterBag()->resolveValue($config['file_cache_dir']);
 
@@ -1270,11 +1290,13 @@ class FrameworkExtension extends Extension
             $propertyAccessDefinition->addTag('monolog.logger', array('channel' => 'cache'));
         }
 
-        $this->addClassesToCompile(array(
-            'Symfony\Component\Cache\Adapter\ApcuAdapter',
-            'Symfony\Component\Cache\Adapter\FilesystemAdapter',
-            'Symfony\Component\Cache\CacheItem',
-        ));
+        if (PHP_VERSION_ID < 70000) {
+            $this->addClassesToCompile(array(
+                'Symfony\Component\Cache\Adapter\ApcuAdapter',
+                'Symfony\Component\Cache\Adapter\FilesystemAdapter',
+                'Symfony\Component\Cache\CacheItem',
+            ));
+        }
     }
 
     /**

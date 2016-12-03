@@ -98,7 +98,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      *
      * @return string The string representation of the variable
      *
-     * @deprecated Deprecated since version 3.2, to be removed in 4.0. Use cloneVar() instead.
+     * @deprecated since version 3.2, to be removed in 4.0. Use cloneVar() instead.
      */
     protected function varToString($var)
     {

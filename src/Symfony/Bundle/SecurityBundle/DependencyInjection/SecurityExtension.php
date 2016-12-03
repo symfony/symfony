@@ -101,20 +101,22 @@ class SecurityExtension extends Extension
             $this->aclLoad($config['acl'], $container);
         }
 
-        // add some required classes for compilation
-        $this->addClassesToCompile(array(
-            'Symfony\Component\Security\Http\Firewall',
-            'Symfony\Component\Security\Core\User\UserProviderInterface',
-            'Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager',
-            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage',
-            'Symfony\Component\Security\Core\Authorization\AccessDecisionManager',
-            'Symfony\Component\Security\Core\Authorization\AuthorizationChecker',
-            'Symfony\Component\Security\Core\Authorization\Voter\VoterInterface',
-            'Symfony\Bundle\SecurityBundle\Security\FirewallConfig',
-            'Symfony\Bundle\SecurityBundle\Security\FirewallMap',
-            'Symfony\Bundle\SecurityBundle\Security\FirewallContext',
-            'Symfony\Component\HttpFoundation\RequestMatcher',
-        ));
+        if (PHP_VERSION_ID < 70000) {
+            // add some required classes for compilation
+            $this->addClassesToCompile(array(
+                'Symfony\Component\Security\Http\Firewall',
+                'Symfony\Component\Security\Core\User\UserProviderInterface',
+                'Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager',
+                'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage',
+                'Symfony\Component\Security\Core\Authorization\AccessDecisionManager',
+                'Symfony\Component\Security\Core\Authorization\AuthorizationChecker',
+                'Symfony\Component\Security\Core\Authorization\Voter\VoterInterface',
+                'Symfony\Bundle\SecurityBundle\Security\FirewallConfig',
+                'Symfony\Bundle\SecurityBundle\Security\FirewallMap',
+                'Symfony\Bundle\SecurityBundle\Security\FirewallContext',
+                'Symfony\Component\HttpFoundation\RequestMatcher',
+            ));
+        }
     }
 
     private function aclLoad($config, ContainerBuilder $container)
@@ -191,9 +193,11 @@ class SecurityExtension extends Extension
             return;
         }
 
-        $this->addClassesToCompile(array(
-            'Symfony\\Component\\Security\\Http\\AccessMap',
-        ));
+        if (PHP_VERSION_ID < 70000) {
+            $this->addClassesToCompile(array(
+                'Symfony\\Component\\Security\\Http\\AccessMap',
+            ));
+        }
 
         foreach ($config['access_control'] as $access) {
             $matcher = $this->createRequestMatcher(

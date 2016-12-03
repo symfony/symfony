@@ -23,9 +23,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -365,6 +367,24 @@ class ControllerTest extends TestCase
         $controller->denyAccessUnlessGranted('foo');
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+     */
+    public function testdenyAccessUnlessGrantedThrowsAccessDeniedHttpException()
+    {
+        $authorizationChecker = $this->getMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
+
+        $container = $this->getMock(ContainerInterface::class);
+        $container->expects($this->at(0))->method('has')->will($this->returnValue(true));
+        $container->expects($this->at(1))->method('get')->will($this->returnValue($authorizationChecker));
+
+        $controller = new Test2Controller();
+        $controller->setContainer($container);
+
+        $controller->denyAccessUnlessGranted('foo');
+    }
+
     public function testRenderViewTwig()
     {
         $twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
@@ -685,5 +705,13 @@ class TestController extends Controller
     public function getDoctrine()
     {
         return parent::getDoctrine();
+    }
+}
+
+class Test2Controller extends TestController
+{
+    public function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
+    {
+        return new AccessDeniedHttpException();
     }
 }

@@ -224,7 +224,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $this->validateGenericNode(
                 $propertyValue,
                 $object,
-                $cacheKey.':'.$propertyName,
+                $cacheKey.':'.get_class($object).':'.$propertyName,
                 $propertyMetadata,
                 $propertyPath,
                 $groups,
@@ -280,7 +280,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $this->validateGenericNode(
                 $value,
                 $object,
-                $cacheKey.':'.$propertyName,
+                $cacheKey.':'.get_class($object).':'.$propertyName,
                 $propertyMetadata,
                 $propertyPath,
                 $groups,
@@ -589,7 +589,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                 $this->validateGenericNode(
                     $propertyValue,
                     $object,
-                    $cacheKey.':'.$propertyName,
+                    $cacheKey.':'.get_class($object).':'.$propertyName,
                     $propertyMetadata,
                     PropertyPath::append($propertyPath, $propertyName),
                     $groups,

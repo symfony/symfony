@@ -37,9 +37,9 @@ class MemcachedAdapterTest extends AdapterTestCase
 
         $client = new \Memcached();
 
-        $client->addServers([
-            [$memcachedHost, 11211],
-        ]);
+        $client->addServers(array(
+            array($memcachedHost, 11211),
+        ));
 
         static::$memcachedClient = $client;
     }

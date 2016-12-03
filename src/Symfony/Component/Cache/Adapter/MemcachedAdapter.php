@@ -23,7 +23,7 @@ class MemcachedAdapter implements AdapterInterface
 {
     private $namespaceKey;
     private $getCacheItemAsArray;
-    private $deferredItems = [];
+    private $deferredItems = array();
     private $changeIsHit;
     private $namespace;
     private $createCacheItem;
@@ -31,13 +31,13 @@ class MemcachedAdapter implements AdapterInterface
 
     /**
      * @param \Memcached $client
-     * @param string $namespace
-     * @param int $defaultLifetime
+     * @param string     $namespace
+     * @param int        $defaultLifetime
      */
     public function __construct(\Memcached $client, $namespace = '', $defaultLifetime = 0)
     {
         $this->client = $client;
-        $this->namespaceKey = 'symfony_cache_namespace_key_' . $namespace;
+        $this->namespaceKey = 'symfony_cache_namespace_key_'.$namespace;
         $this->namespace = $this->client->get($this->namespaceKey);
 
         if (false === $this->namespace) {
@@ -62,11 +62,11 @@ class MemcachedAdapter implements AdapterInterface
 
         $this->getCacheItemAsArray = \Closure::bind(
             function (CacheItem $item) use ($defaultLifetime) {
-                return [
+                return array(
                     'key' => $item->key,
                     'value' => $item->value,
-                    'expiry' => $item->expiry !== null ? $item->expiry : $defaultLifetime
-                ];
+                    'expiry' => $item->expiry !== null ? $item->expiry : $defaultLifetime,
+                );
             },
             null,
             CacheItem::class
@@ -112,7 +112,7 @@ class MemcachedAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function getItems(array $keys = [])
+    public function getItems(array $keys = array())
     {
         $this->validateKeys($keys);
 
@@ -150,7 +150,7 @@ class MemcachedAdapter implements AdapterInterface
      */
     public function clear()
     {
-        $this->deferredItems = [];
+        $this->deferredItems = array();
 
         $namespace = $this->client->increment($this->namespaceKey);
 
@@ -234,7 +234,7 @@ class MemcachedAdapter implements AdapterInterface
      */
     public function commit()
     {
-        $deferredItemsByExpiry = [];
+        $deferredItemsByExpiry = array();
 
         foreach ($this->deferredItems as $deferredItem) {
             $f = $this->getCacheItemAsArray;
@@ -247,13 +247,13 @@ class MemcachedAdapter implements AdapterInterface
             $success = $this->client->setMulti($deferredItems, $expiry);
 
             if (false === $success) {
-                $this->deferredItems = [];
+                $this->deferredItems = array();
 
                 return false;
             }
         }
 
-        $this->deferredItems = [];
+        $this->deferredItems = array();
 
         return true;
     }
@@ -273,7 +273,7 @@ class MemcachedAdapter implements AdapterInterface
      */
     private function addNamespaceToKey($key)
     {
-        return $this->namespace . $key;
+        return $this->namespace.$key;
     }
 
     /**
@@ -307,6 +307,7 @@ class MemcachedAdapter implements AdapterInterface
     /**
      * @param array $keys
      * @param array $notFoundKeys
+     *
      * @return \Generator
      */
     private function generateItems(array $keys, array $notFoundKeys)

@@ -37,7 +37,7 @@ class NumberComparator extends Comparator
     /**
      * Constructor.
      *
-     * @param string $test A comparison string
+     * @param string|int $test A comparison string or an integer
      *
      * @throws \InvalidArgumentException If the test is not understood
      */

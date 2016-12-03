@@ -56,16 +56,16 @@ class CheckboxType extends AbstractType
             return $viewData;
         };
 
-        $forceSubmit = function (Options $options) {
-            return $options['data'];
-        };
-
         $resolver->setDefaults(array(
             'value' => '1',
             'compound' => false,
             'empty_data' => $emptyData,
-            'force_submit' => $forceSubmit, // internal
         ));
+
+        $resolver->setNormalizer('force_submit', function (Options $options) {
+            // If pre set data is true, we need to ensure that $emptyData will be submitted
+            return (bool) $options['data'];
+        });
     }
 
     /**

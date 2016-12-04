@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Kernel;
@@ -759,6 +760,24 @@ EOF;
 
         $kernel->boot();
         $kernel->terminate(Request::create('/'), new Response());
+    }
+
+    public function testKernelRootDirNameStartingWithANumber()
+    {
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\Tests\Fixtures\KernelForTest')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getRootDir'))
+            ->getMock();
+
+        $kernel
+            ->expects($this->any())
+            ->method('getRootDir')
+            ->will($this->returnValue(__DIR__.'/Fixtures/123'));
+
+        $kernel->__construct('dev', false);
+
+        $kernel->boot();
+        $this->assertInstanceOf(ContainerInterface::class, $kernel->getContainer());
     }
 
     /**

@@ -1,0 +1,154 @@
+---------------------------------------------------------------------------
+
+by xunto at 2016-10-27T10:51:00Z
+
+I need to further tell that without this change ldap is almost unusable in some cases.
+
+For example, to build a tree of departments, you need to search in SCOPE_ONELEVEL but you can't (without this PR).
+
+My dirty workaround is to look at length of entry's dn to understand if this is sub-department (cn is uuid, so it has fixed size). This is very dirty and unreliable solution.
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-01T17:52:43Z
+
+Why does nobody look at this PR (it's week already)? @csarrazi marked as author in https://github.com/symfony/ldap. Should I contact him?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-11-01T21:10:53Z
+
+@xunto I do not receive notifications unless I am explicitly tagged in a comment.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-11-01T21:29:25Z
+
+One thing though, please also add functional tests for the scope handling.
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-02T13:11:20Z
+
+I apologise for big amount of commits. My distro have different paths for openldap so I can't run tests on my computer.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-11-02T13:34:22Z
+
+@xunto No problem, as long as you squash everything later! ;)
+
+You could also use the [csarrazi/symfony-ldap](https://hub.docker.com/r/csarrazi/symfony-ldap/) docker repository, if you want to easily spawn an openldap instance, btw!
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-02T13:37:53Z
+
+@csarrazi Everything should be ok now. Thanks for review. I going to squash it right now.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-11-02T13:38:12Z
+
+You're welcome!
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-02T13:40:34Z
+
+@csarrazi done
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-02T13:42:44Z
+
+Oh, didn't noticed yout anwser about default in switch/case. Give me a minute...
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-02T14:27:50Z
+
+@csarrazi Everything is done. Tests pass.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-11-02T21:33:24Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-03T08:34:23Z
+
+@csarrazi Should I slap deciders or mergers now?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-11-03T08:51:36Z
+
+Yup! :)
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-03T09:04:57Z
+
+@csarrazi Thanks for help! @symfony/deciders, it's your turn!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-03T15:19:17Z
+
+Just for your information, this new feature won't be merged for 3.2, but considered for 3.3.
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-03T16:14:36Z
+
+@fabpot Sad but ok, I think.
+
+So it won't get into the master until 3.2 is released? So, in december.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-03T16:20:14Z
+
+Right, that's correct.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-05T11:23:00Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-11-13T14:31:04Z
+
+Hey @xunto! Sorry for getting back one more time. Could you just amend your PR and change the scope names so they respect RFC 2255? ("base" / "one" / "sub").
+
+See https://tools.ietf.org/html/rfc2255
+
+> The scope construct is used to specify the scope of the search to
+>    perform in the given LDAP server.  The allowable scopes are "base"
+>    for a base object search, "one" for a one-level search, or "sub" for
+>    a subtree search.  If scope is omitted, a scope of "base" is assumed.
+
+That would be great! :)
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-14T02:09:28Z
+
+@csarrazi Ok, will do.
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-11-15T13:33:57Z
+
+@csarrazi done.
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-12-02T06:34:28Z
+
+@symfony/deciders, 3.2 is released. Looks like now we can merge this.

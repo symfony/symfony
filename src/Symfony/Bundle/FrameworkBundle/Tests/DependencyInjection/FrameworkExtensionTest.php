@@ -165,6 +165,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('workflow.definition' => array(array('name' => 'pull_request', 'type' => 'state_machine', 'marking_store' => 'single_state'))), $stateMachineDefinition->getTags());
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
         $this->assertSame('start', $stateMachineDefinition->getArgument(2));
+
+        $this->assertTrue($container->hasDefinition('workflow.registry', 'Workflow registry is registered as a service'));
+        $registryDefinition = $container->getDefinition('workflow.registry');
+        $this->assertGreaterThan(0, count($registryDefinition->getMethodCalls()));
     }
 
     /**

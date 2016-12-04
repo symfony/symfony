@@ -12,6 +12,7 @@
 namespace Symfony\Component\Workflow;
 
 use Symfony\Component\Workflow\Exception\InvalidArgumentException;
+use Symfony\Component\Workflow\SupportStrategy\SupportStrategyInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -23,19 +24,26 @@ class Registry
 
     /**
      * @param Workflow $workflow
-     * @param string   $className
+     * @param SupportStrategyInterface $supportStrategy
      */
-    public function add(Workflow $workflow, $className)
+    public function add(Workflow $workflow, SupportStrategyInterface $supportStrategy)
     {
-        $this->workflows[] = array($workflow, $className);
+        $this->workflows[] = array($workflow, $supportStrategy);
     }
 
+    /**
+     * @param object $subject
+     * @param null|string $workflowName
+     *
+     * @return Workflow
+     * @throws InvalidArgumentException
+     */
     public function get($subject, $workflowName = null)
     {
         $matched = null;
 
-        foreach ($this->workflows as list($workflow, $className)) {
-            if ($this->supports($workflow, $className, $subject, $workflowName)) {
+        foreach ($this->workflows as list($workflow, $supportStrategy)) {
+            if ($this->supports($workflow, $supportStrategy, $subject, $workflowName)) {
                 if ($matched) {
                     throw new InvalidArgumentException('At least two workflows match this subject. Set a different name on each and use the second (name) argument of this method.');
                 }
@@ -50,16 +58,24 @@ class Registry
         return $matched;
     }
 
-    private function supports(Workflow $workflow, $className, $subject, $name)
+    /**
+     * @param Workflow $workflow
+     * @param SupportStrategyInterface $supportStrategy
+     * @param object $subject
+     * @param null|string $workflowName
+     *
+     * @return bool
+     */
+    private function supports(Workflow $workflow, SupportStrategyInterface $supportStrategy, $subject, $workflowName)
     {
-        if (!$subject instanceof $className) {
+        if (!$supportStrategy->supports($workflow, $subject)) {
             return false;
         }
 
-        if (null === $name) {
+        if (null === $workflowName) {
             return true;
         }
 
-        return $name === $workflow->getName();
+        return $workflowName === $workflow->getName();
     }
 }

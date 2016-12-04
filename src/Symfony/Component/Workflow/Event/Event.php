@@ -37,16 +37,25 @@ class Event extends BaseEvent
         $this->transition = $transition;
     }
 
+    /**
+     * @return Marking
+     */
     public function getMarking()
     {
         return $this->marking;
     }
 
+    /**
+     * @return object
+     */
     public function getSubject()
     {
         return $this->subject;
     }
 
+    /**
+     * @return Transition
+     */
     public function getTransition()
     {
         return $this->transition;

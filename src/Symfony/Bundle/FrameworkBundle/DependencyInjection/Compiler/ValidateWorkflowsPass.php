@@ -38,6 +38,9 @@ class ValidateWorkflowsPass implements CompilerPassInterface
                 if (!array_key_exists('marking_store', $tag)) {
                     throw new RuntimeException(sprintf('The "marking_store" for the tag "workflow.definition" of service "%s" must be set.', $id));
                 }
+                if (!array_key_exists('supports', $tag) && !array_key_exists('support_strategy', $tag)) {
+                    throw new RuntimeException(sprintf('Either "supports" or "support_strategy" for the tag "workflow.definition" of service "%s" must be set.', $id));
+                }
 
                 $this->createValidator($tag)->validate($definition, $tag['name']);
             }

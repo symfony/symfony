@@ -125,7 +125,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
                 continue;
             }
             if ('request_headers' === $key || 'response_headers' === $key) {
-                $value = array_map(function ($v) { return isset($v[1]) ? $v : $v[0]; }, $value);
+                $value = array_map(function ($v) { return isset($v[1]) ? $v : (isset($v[0]) ? $v[0] : null); }, $value);
             }
             if ('request_server' !== $key && 'request_cookies' !== $key) {
                 $this->data[$key] = array_map(array($this, 'cloneVar'), $value);

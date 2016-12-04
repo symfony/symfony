@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpKernel\Tests;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Kernel;
@@ -777,7 +776,7 @@ EOF;
         $kernel->__construct('dev', false);
 
         $kernel->boot();
-        $this->assertInstanceOf(ContainerInterface::class, $kernel->getContainer());
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerInterface', $kernel->getContainer());
     }
 
     /**

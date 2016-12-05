@@ -242,38 +242,50 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function serialize()
     {
-        $cloneVar = array($this, 'cloneVar');
-
         foreach ($this->data['forms_by_hash'] as &$form) {
-            foreach ($form as $k => $v) {
-                switch ($k) {
-                    case 'type_class':
-                        $form[$k] = $cloneVar($v, true);
-                        break;
-                    case 'synchronized':
-                        $form[$k] = $cloneVar($v);
-                        break;
-                    case 'view_vars':
-                    case 'passed_options':
-                    case 'resolved_options':
-                    case 'default_data':
-                    case 'submitted_data':
-                        if ($v) {
-                            $form[$k] = array_map($cloneVar, $v);
-                        }
-                        break;
-                    case 'errors':
-                        foreach ($v as $i => $e) {
-                            if (!empty($e['trace'])) {
-                                $form['errors'][$i]['trace'] = array_map($cloneVar, $e['trace']);
-                            }
-                        }
-                        break;
-                }
-            }
+            $form = $this->prepareSerialize((array) $form);
         }
 
         return serialize($this->data);
+    }
+
+    private function prepareSerialize($form)
+    {
+        $cloneVar = array($this, 'cloneVar');
+
+        foreach ($form as $k => $v) {
+            switch ($k) {
+                case 'type_class':
+                    $form[$k] = $cloneVar($v, true);
+                    break;
+                case 'synchronized':
+                    $form[$k] = $cloneVar($v);
+                    break;
+                case 'view_vars':
+                case 'passed_options':
+                case 'resolved_options':
+                case 'default_data':
+                case 'submitted_data':
+                    if ($v) {
+                        $form[$k] = array_map($cloneVar, $v);
+                    }
+                    break;
+                case 'errors':
+                    foreach ($v as $i => $e) {
+                        if (!empty($e['trace'])) {
+                            $form['errors'][$i]['trace'] = array_map($cloneVar, $e['trace']);
+                        }
+                    }
+                    break;
+                case 'children':
+                    foreach ($v as $vv => $child) {
+                        $form[$k][$vv] = $this->prepareSerialize($child);
+                    }
+                    break;
+            }
+        }
+
+        return $form;
     }
 
     /**

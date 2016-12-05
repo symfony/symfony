@@ -27,7 +27,7 @@ final class DefaultValueResolver implements ArgumentValueResolverInterface
      */
     public function supports(Request $request, ArgumentMetadata $argument)
     {
-        return $argument->hasDefaultValue() || ($argument->isNullable() && !$argument->isVariadic());
+        return $argument->hasDefaultValue() || (null !== $argument->getType() && $argument->isNullable() && !$argument->isVariadic());
     }
 
     /**

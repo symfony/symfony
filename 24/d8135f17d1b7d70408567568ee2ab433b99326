@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-09-18T06:13:33Z
+
+👍, travis error not related.
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by juliendidier at 2016-09-18T10:48:06Z
+
+Doc PR added.
+See [#6975](https://github.com/symfony/symfony-docs/pull/6975)
+
+---------------------------------------------------------------------------
+
+by juliendidier at 2016-09-22T09:17:48Z
+
+Rebased from master to fix builds.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-11T14:58:05Z
+
+I'll merge this PR in 3.3. Thanks @juliendidier

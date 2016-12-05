@@ -24,10 +24,18 @@ class Registry
 
     /**
      * @param Workflow $workflow
-     * @param SupportStrategyInterface $supportStrategy
+     * @param string|SupportStrategyInterface $supportStrategy
      */
-    public function add(Workflow $workflow, SupportStrategyInterface $supportStrategy)
+    public function add(Workflow $workflow, $supportStrategy)
     {
+        if (!$supportStrategy instanceof SupportStrategyInterface) {
+            if (!is_string($supportStrategy)) {
+                throw new InvalidArgumentException('Expecting instance of SupportStrategyInterface or class name as a string.');
+            }
+
+            @trigger_error('Support of class name string was deprecated after version 3.2 and won\'t work anymore in 4.0.', E_USER_DEPRECATED);
+        }
+
         $this->workflows[] = array($workflow, $supportStrategy);
     }
 
@@ -60,15 +68,18 @@ class Registry
 
     /**
      * @param Workflow $workflow
-     * @param SupportStrategyInterface $supportStrategy
+     * @param string|SupportStrategyInterface $supportStrategy
      * @param object $subject
      * @param null|string $workflowName
      *
      * @return bool
      */
-    private function supports(Workflow $workflow, SupportStrategyInterface $supportStrategy, $subject, $workflowName)
+    private function supports(Workflow $workflow, $supportStrategy, $subject, $workflowName)
     {
-        if (!$supportStrategy->supports($workflow, $subject)) {
+        if (is_string($supportStrategy) && !$subject instanceof $supportStrategy) {
+            return false;
+        }
+        if ($supportStrategy instanceof SupportStrategyInterface && !$supportStrategy->supports($workflow, $subject)) {
             return false;
         }
 

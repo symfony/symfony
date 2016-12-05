@@ -15,18 +15,25 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $workflows = array();
-
         $this->registry = new Registry();
 
         $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->getSupportStrategy(Subject1::class));
         $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), $this->getSupportStrategy(Subject2::class));
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->getSupportStrategy(Subject2::class));
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), Subject2::class);
     }
 
     protected function tearDown()
     {
         $this->registry = null;
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Expecting instance of SupportStrategyInterface or class name as a string.
+     */
+    public function testAddUnsupportedSupportStrategy()
+    {
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow4'), array(Subject1::class, Subject2::class));
     }
 
     public function testGetWithSuccess()

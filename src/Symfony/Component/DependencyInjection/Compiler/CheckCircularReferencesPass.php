@@ -60,14 +60,18 @@ class CheckCircularReferencesPass implements CompilerPassInterface
             $id = $node->getId();
 
             if (empty($this->checkedNodes[$id])) {
-                $searchKey = array_search($id, $this->currentPath);
-                $this->currentPath[] = $id;
 
-                if (false !== $searchKey) {
-                    throw new ServiceCircularReferenceException($id, array_slice($this->currentPath, $searchKey));
+                // don't check circular dependencies for lazy services
+                if (!$node->getValue() || !$node->getValue()->isLazy()) {
+                    $searchKey = array_search($id, $this->currentPath);
+                    $this->currentPath[] = $id;
+
+                    if (false !== $searchKey) {
+                        throw new ServiceCircularReferenceException($id, array_slice($this->currentPath, $searchKey));
+                    }
+
+                    $this->checkOutEdges($node->getOutEdges());
                 }
-
-                $this->checkOutEdges($node->getOutEdges());
 
                 $this->checkedNodes[$id] = true;
                 array_pop($this->currentPath);

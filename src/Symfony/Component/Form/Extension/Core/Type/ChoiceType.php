@@ -40,6 +40,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ChoiceType extends AbstractType
 {
     /**
+     * @internal To be removed in 3.0
+     */
+    const DEPRECATED_EMPTY_VALUE = '__deprecated_empty_value__';
+
+    /**
      * Caches created choice lists.
      *
      * @var ChoiceListFactoryInterface
@@ -344,7 +349,7 @@ class ChoiceType extends AbstractType
         };
 
         $placeholderNormalizer = function (Options $options, $placeholder) use ($that) {
-            if (!is_object($options['empty_value']) || !$options['empty_value'] instanceof \Exception) {
+            if ($that::DEPRECATED_EMPTY_VALUE !== $options['empty_value']) {
                 @trigger_error(sprintf('The form option "empty_value" of the "%s" form type (%s) is deprecated since version 2.6 and will be removed in 3.0. Use "placeholder" instead.', $that->getName(), __CLASS__), E_USER_DEPRECATED);
 
                 if (null === $placeholder || '' === $placeholder) {
@@ -396,7 +401,7 @@ class ChoiceType extends AbstractType
             'preferred_choices' => array(),
             'group_by' => null,
             'empty_data' => $emptyData,
-            'empty_value' => new \Exception(), // deprecated
+            'empty_value' => self::DEPRECATED_EMPTY_VALUE,
             'placeholder' => $placeholder,
             'error_bubbling' => false,
             'compound' => $compound,

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
+use DummyProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -18,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
+
+require_once __DIR__.'/../Fixtures/includes/classes.php';
 
 class PhpDumperTest extends \PHPUnit_Framework_TestCase
 {
@@ -293,5 +296,53 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $container = new \Symfony_DI_PhpDumper_Test_Properties_Before_Method_Calls();
         $this->assertTrue($container->get('bar')->callPassed(), '->dump() initializes properties before method calls');
+    }
+
+    public function testCircularReferenceAllowanceForLazyServices()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->addArgument(new Reference('bar'));
+        $container->register('bar', 'stdClass')->setLazy(true)->addArgument(new Reference('foo'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+    }
+
+    public function testCircularReferenceAllowanceForInlinedDefinitionsForLazyServices()
+    {
+        /*
+         *   test graph:
+         *              [connection] -> [event_manager] --> [entity_manager](lazy)
+         *                                                           |
+         *                                                           --(call)- addEventListener ("@lazy_service")
+         *
+         *              [lazy_service](lazy) -> [entity_manager](lazy)
+         *
+         */
+
+        $container = new ContainerBuilder();
+
+        $eventManagerDefinition = new Definition('stdClass');
+
+        $connectionDefinition = $container->register('connection', 'stdClass');
+        $connectionDefinition->addArgument($eventManagerDefinition);
+
+        $container->register('entity_manager', 'stdClass')
+            ->setLazy(true)
+            ->addArgument(new Reference('connection'));
+
+        $lazyServiceDefinition = $container->register('lazy_service', 'stdClass');
+        $lazyServiceDefinition->setLazy(true);
+        $lazyServiceDefinition->addArgument(new Reference('entity_manager'));
+
+        $eventManagerDefinition->addMethodCall('addEventListener', array(new Reference('lazy_service')));
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $dumper->setProxyDumper(new DummyProxyDumper());
+        $dumper->dump();
     }
 }

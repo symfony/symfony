@@ -165,6 +165,12 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('workflow.definition' => array(array('name' => 'pull_request', 'type' => 'state_machine', 'marking_store' => 'single_state'))), $stateMachineDefinition->getTags());
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
         $this->assertSame('start', $stateMachineDefinition->getArgument(2));
+
+        $serviceMarkingStoreWorkflowDefinition = $container->getDefinition('workflow.service_marking_store_workflow');
+        /** @var Reference $markingStoreRef */
+        $markingStoreRef = $serviceMarkingStoreWorkflowDefinition->getArgument(1);
+        $this->assertInstanceOf(Reference::class, $markingStoreRef);
+        $this->assertEquals('workflow_service', (string) $markingStoreRef);
     }
 
     /**

@@ -3,16 +3,16 @@
 namespace Symfony\Component\Workflow\Tests\MarkingStore;
 
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore;
 
-class ScalarMarkingStoreTest extends \PHPUnit_Framework_TestCase
+class SingleStateMarkingStoreTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetSetMarking()
     {
         $subject = new \stdClass();
         $subject->myMarks = null;
 
-        $markingStore = new ScalarMarkingStore('myMarks');
+        $markingStore = new SingleStateMarkingStore('myMarks');
 
         $marking = $markingStore->getMarking($subject);
 

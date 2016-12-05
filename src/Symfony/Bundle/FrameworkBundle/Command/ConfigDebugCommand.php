@@ -38,7 +38,7 @@ class ConfigDebugCommand extends AbstractConfigCommand
                 new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
             ))
             ->setDescription('Dumps the current configuration for an extension')
-            ->setHelp(<<<EOF
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> command dumps the current configuration for an
 extension/bundle.
 
@@ -46,6 +46,10 @@ Either the extension alias or bundle name can be used:
 
   <info>php %command.full_name% framework</info>
   <info>php %command.full_name% FrameworkBundle</info>
+
+For dumping a specific option, add its path as second argument:
+
+  <info>php %command.full_name% framework serializer.enabled</info>
 
 EOF
             )

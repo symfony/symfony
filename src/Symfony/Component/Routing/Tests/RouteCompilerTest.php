@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Tests;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCompiler;
 
@@ -184,25 +183,20 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @group legacy
      * @dataProvider provideCompileImplicitUtf8Data
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Using UTF-8 route %s without setting the "utf8" option is deprecated %s.
      */
     public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens, $deprecationType)
     {
-        $deprecations = array(
-            sprintf('Using UTF-8 route %s without setting the "utf8" option is deprecated', $deprecationType),
-        );
+        $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
+        $route = $r->newInstanceArgs($arguments);
 
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () use ($name, $arguments, $prefix, $regex, $variables, $tokens) {
-            $r = new \ReflectionClass('Symfony\\Component\\Routing\\Route');
-            $route = $r->newInstanceArgs($arguments);
-
-            $compiled = $route->compile();
-            $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
-            $this->assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
-            $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
-            $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
-        });
+        $compiled = $route->compile();
+        $this->assertEquals($prefix, $compiled->getStaticPrefix(), $name.' (static prefix)');
+        $this->assertEquals($regex, $compiled->getRegex(), $name.' (regex)');
+        $this->assertEquals($variables, $compiled->getVariables(), $name.' (variables)');
+        $this->assertEquals($tokens, $compiled->getTokens(), $name.' (tokens)');
     }
 
     public function provideCompileImplicitUtf8Data()
@@ -289,16 +283,16 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getNumericVariableNames
+     * @dataProvider getVariableNamesStartingWithADigit
      * @expectedException \DomainException
      */
-    public function testRouteWithNumericVariableName($name)
+    public function testRouteWithVariableNameStartingWithADigit($name)
     {
         $route = new Route('/{'.$name.'}');
         $route->compile();
     }
 
-    public function getNumericVariableNames()
+    public function getVariableNamesStartingWithADigit()
     {
         return array(
            array('09'),
@@ -376,6 +370,15 @@ class RouteCompilerTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
         );
+    }
+
+    /**
+     * @expectedException \DomainException
+     */
+    public function testRouteWithTooLongVariableName()
+    {
+        $route = new Route(sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
+        $route->compile();
     }
 }
 

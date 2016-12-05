@@ -67,7 +67,9 @@ class TemplateManager
      *
      * @param Profile $profile
      *
-     * @return array
+     * @return Twig_Template[]
+     *
+     * @deprecated not used anymore internally
      */
     public function getTemplates(Profile $profile)
     {
@@ -89,7 +91,7 @@ class TemplateManager
      *
      * @throws \UnexpectedValueException
      */
-    protected function getNames(Profile $profile)
+    public function getNames(Profile $profile)
     {
         $templates = array();
 
@@ -127,7 +129,11 @@ class TemplateManager
         }
 
         try {
-            $loader->getSource($template);
+            if ($loader instanceof \Twig_SourceContextLoaderInterface) {
+                $loader->getSourceContext($template);
+            } else {
+                $loader->getSource($template);
+            }
 
             return true;
         } catch (\Twig_Error_Loader $e) {

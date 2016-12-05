@@ -26,7 +26,7 @@ use Symfony\Component\Workflow\Marking;
  */
 class GraphvizDumper implements DumperInterface
 {
-    private static $defaultOptions = array(
+    protected static $defaultOptions = array(
         'graph' => array('ratio' => 'compress', 'rankdir' => 'LR'),
         'node' => array('fontsize' => 9, 'fontname' => 'Arial', 'color' => '#333333', 'fillcolor' => 'lightblue', 'fixedsize' => true, 'width' => 1),
         'edge' => array('fontsize' => 9, 'fontname' => 'Arial', 'color' => '#333333', 'arrowhead' => 'normal', 'arrowsize' => 0.5),
@@ -58,7 +58,10 @@ class GraphvizDumper implements DumperInterface
             .$this->endDot();
     }
 
-    private function findPlaces(Definition $definition, Marking $marking = null)
+    /**
+     * @internal
+     */
+    protected function findPlaces(Definition $definition, Marking $marking = null)
     {
         $places = array();
 
@@ -79,50 +82,55 @@ class GraphvizDumper implements DumperInterface
         return $places;
     }
 
-    private function findTransitions(Definition $definition)
+    /**
+     * @internal
+     */
+    protected function findTransitions(Definition $definition)
     {
         $transitions = array();
 
-        foreach ($definition->getTransitions() as $name => $transition) {
-            $transitions[$name] = array(
+        foreach ($definition->getTransitions() as $transition) {
+            $transitions[] = array(
                 'attributes' => array('shape' => 'box', 'regular' => true),
+                'name' => $transition->getName(),
             );
         }
 
         return $transitions;
     }
 
-    private function addPlaces(array $places)
+    /**
+     * @internal
+     */
+    protected function addPlaces(array $places)
     {
         $code = '';
 
         foreach ($places as $id => $place) {
-            $code .= sprintf("  place_%s [label=\"%s\", shape=circle%s];\n",
-                $this->dotize($id),
-                $id,
-                $this->addAttributes($place['attributes'])
-            );
+            $code .= sprintf("  place_%s [label=\"%s\", shape=circle%s];\n", $this->dotize($id), $id, $this->addAttributes($place['attributes']));
         }
 
         return $code;
     }
 
-    private function addTransitions(array $transitions)
+    /**
+     * @internal
+     */
+    protected function addTransitions(array $transitions)
     {
         $code = '';
 
-        foreach ($transitions as $id => $place) {
-            $code .= sprintf("  transition_%s [label=\"%s\", shape=box%s];\n",
-                $this->dotize($id),
-                $id,
-                $this->addAttributes($place['attributes'])
-            );
+        foreach ($transitions as $place) {
+            $code .= sprintf("  transition_%s [label=\"%s\", shape=box%s];\n", $this->dotize($place['name']), $place['name'], $this->addAttributes($place['attributes']));
         }
 
         return $code;
     }
 
-    private function findEdges(Definition $definition)
+    /**
+     * @internal
+     */
+    protected function findEdges(Definition $definition)
     {
         $dotEdges = array();
 
@@ -146,7 +154,10 @@ class GraphvizDumper implements DumperInterface
         return $dotEdges;
     }
 
-    private function addEdges($edges)
+    /**
+     * @internal
+     */
+    protected function addEdges(array $edges)
     {
         $code = '';
 
@@ -162,7 +173,10 @@ class GraphvizDumper implements DumperInterface
         return $code;
     }
 
-    private function startDot(array $options)
+    /**
+     * @internal
+     */
+    protected function startDot(array $options)
     {
         return sprintf("digraph workflow {\n  %s\n  node [%s];\n  edge [%s];\n\n",
             $this->addOptions($options['graph']),
@@ -171,12 +185,23 @@ class GraphvizDumper implements DumperInterface
         );
     }
 
-    private function endDot()
+    /**
+     * @internal
+     */
+    protected function endDot()
     {
         return "}\n";
     }
 
-    private function addAttributes($attributes)
+    /**
+     * @internal
+     */
+    protected function dotize($id)
+    {
+        return strtolower(preg_replace('/[^\w]/i', '_', $id));
+    }
+
+    private function addAttributes(array $attributes)
     {
         $code = array();
 
@@ -187,7 +212,7 @@ class GraphvizDumper implements DumperInterface
         return $code ? ', '.implode(', ', $code) : '';
     }
 
-    private function addOptions($options)
+    private function addOptions(array $options)
     {
         $code = array();
 
@@ -196,10 +221,5 @@ class GraphvizDumper implements DumperInterface
         }
 
         return implode(' ', $code);
-    }
-
-    private function dotize($id)
-    {
-        return strtolower(preg_replace('/[^\w]/i', '_', $id));
     }
 }

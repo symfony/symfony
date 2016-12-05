@@ -42,6 +42,8 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     private $cloner;
 
+    private static $stubsCache = array();
+
     public function serialize()
     {
         return serialize($this->data);
@@ -124,14 +126,17 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
             return $var;
         }
         if (is_string($var)) {
+            if (isset(self::$stubsCache[$var])) {
+                return self::$stubsCache[$var];
+            }
             if (false !== strpos($var, '\\')) {
                 $c = (false !== $i = strpos($var, '::')) ? substr($var, 0, $i) : $var;
                 if (class_exists($c, false) || interface_exists($c, false) || trait_exists($c, false)) {
-                    return new ClassStub($var);
+                    return self::$stubsCache[$var] = new ClassStub($var);
                 }
             }
-            if (false !== strpos($var, DIRECTORY_SEPARATOR) && file_exists($var)) {
-                return new LinkStub($var);
+            if (false !== strpos($var, DIRECTORY_SEPARATOR) && false === strpos($var, '://') && false === strpos($var, "\0") && is_file($var)) {
+                return self::$stubsCache[$var] = new LinkStub($var);
             }
         }
 

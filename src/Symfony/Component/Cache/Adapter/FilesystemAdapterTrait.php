@@ -15,6 +15,8 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
 trait FilesystemAdapterTrait
 {
@@ -35,7 +37,7 @@ trait FilesystemAdapterTrait
         if (!file_exists($dir = $directory.'/.')) {
             @mkdir($directory, 0777, true);
         }
-        if (false === $dir = realpath($dir)) {
+        if (false === $dir = realpath($dir) ?: (file_exists($dir) ? $dir : false)) {
             throw new InvalidArgumentException(sprintf('Cache directory does not exist (%s)', $directory));
         }
         if (!is_writable($dir .= DIRECTORY_SEPARATOR)) {
@@ -98,13 +100,13 @@ trait FilesystemAdapterTrait
 
     private function getFile($id, $mkdir = false)
     {
-        $hash = str_replace('/', '-', base64_encode(md5(static::class.$id, true)));
-        $dir = $this->directory.$hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR;
+        $hash = str_replace('/', '-', base64_encode(hash('sha256', static::class.$id, true)));
+        $dir = $this->directory.strtoupper($hash[0].DIRECTORY_SEPARATOR.$hash[1].DIRECTORY_SEPARATOR);
 
         if ($mkdir && !file_exists($dir)) {
             @mkdir($dir, 0777, true);
         }
 
-        return $dir.substr($hash, 2, -2);
+        return $dir.substr($hash, 2, 20);
     }
 }

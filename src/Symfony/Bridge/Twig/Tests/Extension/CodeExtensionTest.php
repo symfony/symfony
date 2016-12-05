@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\CodeExtension;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
 class CodeExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,6 +65,6 @@ class CodeExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getExtension()
     {
-        return new CodeExtension('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar', '/root', 'UTF-8');
+        return new CodeExtension(new FileLinkFormatter('proto://%f#&line=%l&'.substr(__FILE__, 0, 5).'>foobar'), '/root', 'UTF-8');
     }
 }

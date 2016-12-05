@@ -18,6 +18,12 @@ CHANGELOG
  * removed passing a query builder closure to `ORMQueryBuilderLoader`
  * removed `loader` and `property` options of the `DoctrineType`
 
+2.8.0
+-----
+
+ * deprecated using the entity provider with a Doctrine repository implementing UserProviderInterface
+ * added UserLoaderInterface for loading users through Doctrine.
+
 2.7.0
 -----
 

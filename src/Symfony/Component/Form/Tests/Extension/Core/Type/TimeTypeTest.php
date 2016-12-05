@@ -221,6 +221,22 @@ class TimeTypeTest extends TestCase
         $this->assertEquals('03', $form->getViewData());
     }
 
+    public function testSubmitWithSecondsAndBrowserOmissionSeconds()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'input' => 'string',
+            'widget' => 'single_text',
+            'with_seconds' => true,
+        ));
+
+        $form->submit('03:04');
+
+        $this->assertEquals('03:04:00', $form->getData());
+        $this->assertEquals('03:04:00', $form->getViewData());
+    }
+
     public function testSetDataWithoutMinutes()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\TimeType', null, array(

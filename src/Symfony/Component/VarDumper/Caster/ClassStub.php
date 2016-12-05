@@ -64,7 +64,7 @@ class ClassStub extends ConstStub
 
         if ($f = $r->getFileName()) {
             $this->attr['file'] = $f;
-            $this->attr['line'] = $r->getStartLine() - substr_count($r->getDocComment(), "\n");
+            $this->attr['line'] = $r->getStartLine();
         }
     }
 

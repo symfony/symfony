@@ -88,7 +88,6 @@ class RouterMatchCommandTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValueMap(array(
                 array('router', 1, $router),
                 array('controller_name_converter', 1, $loader),
-
             )));
 
         return $container;

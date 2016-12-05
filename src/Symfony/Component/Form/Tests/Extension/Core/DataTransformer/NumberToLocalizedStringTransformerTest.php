@@ -42,7 +42,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testTransform($from, $to, $locale)
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault($locale);
 
@@ -68,7 +68,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testTransformWithGrouping($from, $to, $locale)
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault($locale);
 
@@ -80,7 +80,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testTransformWithScale()
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_AT');
 
@@ -185,7 +185,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testTransformWithRounding($scale, $input, $output, $roundingMode)
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_AT');
 
@@ -197,7 +197,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testTransformDoesNotRoundIfNoScale()
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_AT');
 
@@ -212,7 +212,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransform($to, $from, $locale)
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault($locale);
 
@@ -227,7 +227,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformWithGrouping($to, $from, $locale)
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault($locale);
 
@@ -242,7 +242,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformWithGroupingAndFixedSpaces()
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('ru');
 
@@ -254,7 +254,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformWithGroupingButWithoutGroupSeparator()
     {
         // Since we test against "de_AT", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_AT');
 
@@ -374,7 +374,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('fr');
         $transformer = new NumberToLocalizedStringTransformer(null, true);
@@ -394,7 +394,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
     {
         // Since we test against "de_DE", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_DE');
 
@@ -409,7 +409,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep()
     {
         // Since we test against "de_DE", we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('de_DE');
 
@@ -421,7 +421,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsDotButNoGroupingUsed()
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('fr');
         $transformer = new NumberToLocalizedStringTransformer();
@@ -433,7 +433,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('bg');
         $transformer = new NumberToLocalizedStringTransformer(null, true);
@@ -508,7 +508,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      *
-     * @link https://github.com/symfony/symfony/issues/3161
+     * @see https://github.com/symfony/symfony/issues/3161
      */
     public function testReverseTransformDisallowsNaN()
     {
@@ -585,7 +585,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte()
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('ru');
 
@@ -601,7 +601,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformIgnoresTrailingSpacesInExceptionMessage()
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('ru');
 
@@ -628,7 +628,7 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
     public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte()
     {
         // Since we test against other locales, we need the full implementation
-        IntlTestHelper::requireFullIntl($this);
+        IntlTestHelper::requireFullIntl($this, false);
 
         \Locale::setDefault('ru');
 

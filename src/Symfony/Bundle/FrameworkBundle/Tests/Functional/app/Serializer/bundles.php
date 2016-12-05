@@ -9,13 +9,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Workflow\MarkingStore;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 
-/**
- * UniqueTransitionOutputInterface.
- *
- * @author Grégoire Pineau <lyrixx@lyrixx.info>
- */
-interface UniqueTransitionOutputInterface
-{
-}
+return array(
+    new FrameworkBundle(),
+);

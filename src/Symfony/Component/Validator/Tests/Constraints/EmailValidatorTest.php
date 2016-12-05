@@ -174,6 +174,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             array('test@email>'),
             array('test@email<'),
             array('test@email{'),
+            array(str_repeat('x', 254).'@example.com'), //email with warnings
         );
     }
 

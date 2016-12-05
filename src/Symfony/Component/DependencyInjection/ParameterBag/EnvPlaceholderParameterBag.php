@@ -41,8 +41,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
             if ($this->has($name)) {
                 $defaultValue = parent::get($name);
 
-                if (!is_scalar($defaultValue)) {
-                    throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar, but "%s" given to "%s".', gettype($defaultValue), $name));
+                if (null !== $defaultValue && !is_scalar($defaultValue)) {
+                    throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar or null, but "%s" given to "%s".', gettype($defaultValue), $name));
                 }
             }
 
@@ -76,6 +76,28 @@ class EnvPlaceholderParameterBag extends ParameterBag
 
             foreach ($newPlaceholders as $env => $placeholders) {
                 $this->envPlaceholders[$env] += $placeholders;
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolve()
+    {
+        if ($this->resolved) {
+            return;
+        }
+        parent::resolve();
+
+        foreach ($this->envPlaceholders as $env => $placeholders) {
+            if (!isset($this->parameters[$name = strtolower("env($env)")])) {
+                continue;
+            }
+            if (is_numeric($default = $this->parameters[$name])) {
+                $this->parameters[$name] = (string) $default;
+            } elseif (null !== $default && !is_scalar($default)) {
+                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be scalar or null, %s given.', $env, gettype($default)));
             }
         }
     }

@@ -1107,7 +1107,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('put'),
             array('delete'),
             array('patch'),
-
         );
     }
 
@@ -1995,7 +1994,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $request = new Request();
         $request->setMethod($method);
-        $this->assertEquals($safe, $request->isMethodSafe());
+        $this->assertEquals($safe, $request->isMethodSafe(false));
     }
 
     public function methodSafeProvider()
@@ -2012,6 +2011,17 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('TRACE', true),
             array('CONNECT', false),
         );
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Checking only for cacheable HTTP methods with Symfony\Component\HttpFoundation\Request::isMethodSafe() is deprecated since version 3.2 and will throw an exception in 4.0. Disable checking only for cacheable methods by calling the method with `false` as first argument or use the Request::isMethodCacheable() instead.
+     */
+    public function testMethodSafeChecksCacheable()
+    {
+        $request = new Request();
+        $request->setMethod('OPTIONS');
+        $this->assertFalse($request->isMethodSafe());
     }
 
     /**

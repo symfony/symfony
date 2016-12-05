@@ -13,16 +13,17 @@
 
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
     {% for name, template in templates %}
-        {{ template.renderblock('toolbar', {
-            'collector': profile.getcollector(name),
-            'profiler_url': profiler_url,
-            'token': profile.token,
-            'name': name,
-            'profiler_markup_version': profiler_markup_version,
-            'csp_script_nonce': csp_script_nonce,
-            'csp_style_nonce': csp_style_nonce
-          })
-        }}
+        {% with {
+            collector: profile.getcollector(name),
+            profiler_url: profiler_url,
+            token: profile.token,
+            name: name,
+            profiler_markup_version: profiler_markup_version,
+            csp_script_nonce: csp_script_nonce,
+            csp_style_nonce: csp_style_nonce
+          } %}
+            {{ block('toolbar', template) }}
+        {% endwith %}
     {% endfor %}
 
     {% if 'normal' != position %}

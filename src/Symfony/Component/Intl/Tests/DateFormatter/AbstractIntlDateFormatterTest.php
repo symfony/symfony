@@ -832,9 +832,7 @@ abstract class AbstractIntlDateFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $dateTime = new \DateTime();
         $dateTime->setTimestamp(null === $timestamp ? time() : $timestamp);
-        if (null !== $timeZone) {
-            $dateTime->setTimezone(new \DateTimeZone($timeZone));
-        }
+        $dateTime->setTimezone(new \DateTimeZone($timeZone ?: getenv('TZ') ?: 'UTC'));
 
         return $dateTime;
     }

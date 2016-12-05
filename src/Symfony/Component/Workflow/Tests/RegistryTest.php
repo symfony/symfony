@@ -18,9 +18,9 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->registry = new Registry();
 
-        $this->registry->add(new Workflow(new Definition(), $this->getMock(MarkingStoreInterface::class), $this->getMock(EventDispatcherInterface::class), 'workflow1'), Subject1::class);
-        $this->registry->add(new Workflow(new Definition(), $this->getMock(MarkingStoreInterface::class), $this->getMock(EventDispatcherInterface::class), 'workflow2'), Subject2::class);
-        $this->registry->add(new Workflow(new Definition(), $this->getMock(MarkingStoreInterface::class), $this->getMock(EventDispatcherInterface::class), 'workflow3'), Subject2::class);
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), Subject1::class);
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), Subject2::class);
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), Subject2::class);
     }
 
     protected function tearDown()
@@ -55,7 +55,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Workflow\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
      * @expectedExceptionMessage Unable to find a workflow for class "stdClass".
      */
     public function testGetWithNoMatch()

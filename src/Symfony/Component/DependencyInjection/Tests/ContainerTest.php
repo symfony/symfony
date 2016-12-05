@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -131,20 +130,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
      */
     public function testGetLegacyServiceIds()
     {
         $sc = new LegacyProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
 
-        $deprecations = array(
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-        );
-
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () use ($sc) {
-            $this->assertEquals(array('internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
-        });
+        $this->assertEquals(array('internal', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -193,39 +186,33 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
      */
     public function testLegacyGet()
     {
         $sc = new LegacyProjectServiceContainer();
         $sc->set('foo', $foo = new \stdClass());
 
-        $deprecations = array(
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-        );
+        $this->assertEquals($foo, $sc->get('foo'), '->get() returns the service for the given id');
+        $this->assertEquals($foo, $sc->get('Foo'), '->get() returns the service for the given id, and converts id to lowercase');
+        $this->assertEquals($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
+        $this->assertEquals($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
+        $this->assertEquals($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
+        $this->assertEquals($sc->__foo_baz, $sc->get('foo\\baz'), '->get() returns the service if a get*Method() is defined');
 
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () use ($sc, $foo) {
-            $this->assertEquals($foo, $sc->get('foo'), '->get() returns the service for the given id');
-            $this->assertEquals($foo, $sc->get('Foo'), '->get() returns the service for the given id, and converts id to lowercase');
-            $this->assertEquals($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
-            $this->assertEquals($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
-            $this->assertEquals($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
-            $this->assertEquals($sc->__foo_baz, $sc->get('foo\\baz'), '->get() returns the service if a get*Method() is defined');
+        $sc->set('bar', $bar = new \stdClass());
+        $this->assertEquals($bar, $sc->get('bar'), '->get() prefers to return a service defined with set() than one defined with a getXXXMethod()');
 
-            $sc->set('bar', $bar = new \stdClass());
-            $this->assertEquals($bar, $sc->get('bar'), '->get() prefers to return a service defined with set() than one defined with a getXXXMethod()');
-
-            try {
-                $sc->get('');
-                $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
-            } catch (\Exception $e) {
-                $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
-            }
-            $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
-        });
+        try {
+            $sc->get('');
+            $this->fail('->get() throws a \InvalidArgumentException exception if the service is empty');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
+        }
+        $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
     }
 
     public function testGetThrowServiceNotFoundException()
@@ -288,28 +275,22 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
+     * @expectedDeprecation Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.
      */
     public function testLegacyHas()
     {
         $sc = new LegacyProjectServiceContainer();
         $sc->set('foo', new \stdClass());
 
-        $deprecations = array(
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-            'Generating a dumped container without populating the method map is deprecated since 3.2 and will be unsupported in 4.0. Update your dumper to generate the method map.',
-        );
-
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () use ($sc) {
-            $this->assertFalse($sc->has('foo1'), '->has() returns false if the service does not exist');
-            $this->assertTrue($sc->has('foo'), '->has() returns true if the service exists');
-            $this->assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
-            $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
-            $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
-            $this->assertTrue($sc->has('foo\\baz'), '->has() returns true if a get*Method() is defined');
-        });
+        $this->assertFalse($sc->has('foo1'), '->has() returns false if the service does not exist');
+        $this->assertTrue($sc->has('foo'), '->has() returns true if the service exists');
+        $this->assertTrue($sc->has('bar'), '->has() returns true if a get*Method() is defined');
+        $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
+        $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
+        $this->assertTrue($sc->has('foo\\baz'), '->has() returns true if a get*Method() is defined');
     }
 
     public function testInitialized()
@@ -400,66 +381,42 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Unsetting the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
      */
     public function testUnsetInternalPrivateServiceIsDeprecated()
     {
-        $deprecations = array(
-            'Unsetting the "internal" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.',
-        );
-
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
-            $c = new ProjectServiceContainer();
-            $c->set('internal', null);
-        });
+        $c = new ProjectServiceContainer();
+        $c->set('internal', null);
     }
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Setting the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0. A new public service will be created instead.
      */
     public function testChangeInternalPrivateServiceIsDeprecated()
     {
-        $deprecations = array(
-            'Setting the "internal" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0. A new public service will be created instead.',
-        );
-
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
-            $c = new ProjectServiceContainer();
-            $c->set('internal', new \stdClass());
-        });
+        $c = new ProjectServiceContainer();
+        $c->set('internal', new \stdClass());
     }
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Checking for the existence of the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
      */
     public function testCheckExistenceOfAnInternalPrivateServiceIsDeprecated()
     {
-        $deprecations = array(
-            'Checking for the existence of the "internal" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.',
-        );
-
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
-            $c = new ProjectServiceContainer();
-            $c->has('internal');
-        });
+        $c = new ProjectServiceContainer();
+        $c->has('internal');
     }
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Requesting the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
      */
     public function testRequestAnInternalSharedPrivateServiceIsDeprecated()
     {
-        $deprecations = array(
-            'Requesting the "internal" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.',
-        );
-
-        ErrorAssert::assertDeprecationsAreTriggered($deprecations, function () {
-            $c = new ProjectServiceContainer();
-            $c->get('internal');
-        });
+        $c = new ProjectServiceContainer();
+        $c->get('internal');
     }
 }
 

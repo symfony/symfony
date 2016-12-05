@@ -20,7 +20,9 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     private static $containerCache = array();
 
-    abstract protected function loadFromFile(ContainerBuilder $container, $file);
+    abstract protected function getLoader(ContainerBuilder $container);
+
+    abstract protected function getFileExtension();
 
     public function testRolesHierarchy()
     {
@@ -63,14 +65,81 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testFirewalls()
     {
         $container = $this->getContainer('container1');
-
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $listeners = array();
+        $configs = array();
         foreach (array_keys($arguments[1]) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map(function ($ref) { return (string) $ref; }, $arguments['index_0']);
+
+            $configDef = $container->getDefinition($arguments['index_2']);
+            $configs[] = array_values($configDef->getArguments());
         }
+
+        $this->assertEquals(array(
+            array(
+                'simple',
+                'security.user_checker',
+                'security.request_matcher.707b20193d4cb9f2718114abcbebb32af48f948484fc166a03482f49bf14f25e271f72c7',
+                false,
+            ),
+            array(
+                'secure',
+                'security.user_checker',
+                null,
+                true,
+                true,
+                'security.user.provider.concrete.default',
+                null,
+                'security.authentication.form_entry_point.secure',
+                null,
+                null,
+                array(
+                    'logout',
+                    'switch_user',
+                    'x509',
+                    'remote_user',
+                    'form_login',
+                    'http_basic',
+                    'http_digest',
+                    'remember_me',
+                    'anonymous',
+                ),
+            ),
+            array(
+                'host',
+                'security.user_checker',
+                'security.request_matcher.dda8b565689ad8509623ee68fb2c639cd81cd4cb339d60edbaf7d67d30e6aa09bd8c63c3',
+                true,
+                false,
+                'security.user.provider.concrete.default',
+                'host',
+                'security.authentication.basic_entry_point.host',
+                null,
+                null,
+                array(
+                    'http_basic',
+                    'anonymous',
+                ),
+            ),
+            array(
+                'with_user_checker',
+                'app.user_checker',
+                null,
+                true,
+                false,
+                'security.user.provider.concrete.default',
+                'with_user_checker',
+                'security.authentication.basic_entry_point.with_user_checker',
+                null,
+                null,
+                array(
+                    'http_basic',
+                    'anonymous',
+                ),
+            ),
+        ), $configs);
 
         $this->assertEquals(array(
             array(),
@@ -267,6 +336,8 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
     protected function getContainer($file)
     {
+        $file = $file.'.'.$this->getFileExtension();
+
         if (isset(self::$containerCache[$file])) {
             return self::$containerCache[$file];
         }
@@ -276,7 +347,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $bundle = new SecurityBundle();
         $bundle->build($container); // Attach all default factories
-        $this->loadFromFile($container, $file);
+        $this->getLoader($container)->load($file);
 
         $container->getCompilerPassConfig()->setOptimizationPasses(array());
         $container->getCompilerPassConfig()->setRemovingPasses(array());

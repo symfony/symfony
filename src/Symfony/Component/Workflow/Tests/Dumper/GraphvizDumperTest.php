@@ -2,13 +2,14 @@
 
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
-use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\Transition;
+use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
 
 class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 {
+    use WorkflowBuilderTrait;
+
     private $dumper;
 
     public function setUp()
@@ -19,7 +20,7 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideWorkflowDefinitionWithoutMarking
      */
-    public function testGraphvizDumperWithoutMarking($definition, $expected)
+    public function testDumpWithoutMarking($definition, $expected)
     {
         $dump = $this->dumper->dump($definition);
 
@@ -29,7 +30,7 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideWorkflowDefinitionWithMarking
      */
-    public function testWorkflowWithMarking($definition, $marking, $expected)
+    public function testDumpWithMarking($definition, $marking, $expected)
     {
         $dump = $this->dumper->dump($definition, $marking);
 
@@ -39,13 +40,13 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
     public function provideWorkflowDefinitionWithMarking()
     {
         yield array(
-            $this->createprovideComplexWorkflowDefinition(),
+            $this->createComplexWorkflowDefinition(),
             new Marking(array('b' => 1)),
-            $this->createComplexWorkflowDumpWithMarking(),
+            $this->createComplexWorkflowDefinitionDumpWithMarking(),
         );
 
         yield array(
-            $this->provideSimpleWorkflowDefinition(),
+            $this->createSimpleWorkflowDefinition(),
             new Marking(array('c' => 1, 'd' => 1)),
             $this->createSimpleWorkflowDumpWithMarking(),
         );
@@ -53,39 +54,11 @@ class GraphvizDumperTest extends \PHPUnit_Framework_TestCase
 
     public function provideWorkflowDefinitionWithoutMarking()
     {
-        yield array($this->createprovideComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking());
-        yield array($this->provideSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking());
+        yield array($this->createComplexWorkflowDefinition(), $this->provideComplexWorkflowDumpWithoutMarking());
+        yield array($this->createSimpleWorkflowDefinition(), $this->provideSimpleWorkflowDumpWithoutMarking());
     }
 
-    public function createprovideComplexWorkflowDefinition()
-    {
-        $definition = new Definition();
-
-        $definition->addPlaces(range('a', 'g'));
-
-        $definition->addTransition(new Transition('t1', 'a', array('b', 'c')));
-        $definition->addTransition(new Transition('t2', array('b', 'c'), 'd'));
-        $definition->addTransition(new Transition('t3', 'd', 'e'));
-        $definition->addTransition(new Transition('t4', 'd', 'f'));
-        $definition->addTransition(new Transition('t5', 'e', 'g'));
-        $definition->addTransition(new Transition('t6', 'f', 'g'));
-
-        return $definition;
-    }
-
-    public function provideSimpleWorkflowDefinition()
-    {
-        $definition = new Definition();
-
-        $definition->addPlaces(range('a', 'c'));
-
-        $definition->addTransition(new Transition('t1', 'a', 'b'));
-        $definition->addTransition(new Transition('t2', 'b', 'c'));
-
-        return $definition;
-    }
-
-    public function createComplexWorkflowDumpWithMarking()
+    public function createComplexWorkflowDefinitionDumpWithMarking()
     {
         return 'digraph workflow {
   ratio="compress" rankdir="LR"

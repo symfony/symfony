@@ -310,6 +310,10 @@
                 <source>This value does not match the expected {{ charset }} charset.</source>
                 <target>Detta värde har inte den förväntade teckenkodningen {{ charset }}.</target>
             </trans-unit>
+            <trans-unit id="81">
+                <source>This is not a valid Business Identifier Code (BIC).</source>
+                <target>Detta är inte en giltig BIC-kod.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

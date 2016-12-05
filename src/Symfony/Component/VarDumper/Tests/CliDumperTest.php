@@ -115,7 +115,7 @@ EOTXT
         $var = xml_parser_create();
 
         $this->assertDumpMatchesFormat(
-            <<<EOTXT
+            <<<'EOTXT'
 xml resource {
   current_byte_index: %i
   current_column_number: %i
@@ -137,7 +137,7 @@ EOTXT
         $var[''] = 2;
 
         $this->assertDumpMatchesFormat(
-            <<<EOTXT
+            <<<'EOTXT'
 array:4 [
   "0" => {}
   "1" => &1 null
@@ -156,7 +156,7 @@ EOTXT
         $var->{1} = 2;
 
         $this->assertDumpMatchesFormat(
-            <<<EOTXT
+            <<<'EOTXT'
 {
   +1: 1
   +"1": 2
@@ -268,17 +268,10 @@ EOTXT
         $this->assertStringMatchesFormat(
             <<<EOTXT
 stream resource {@{$ref}
-%Awrapper_type: "PHP"
-  stream_type: "MEMORY"
-  mode: "%s+b"
-  unread_bytes: 0
-  seekable: true
-  uri: "php://memory"
-%Aoptions: []
   ⚠: Symfony\Component\VarDumper\Exception\ThrowingCasterException {{$r}
     #message: "Unexpected Exception thrown from a caster: Foobar"
     -trace: {
-      bar.twig:%d: {
+      %sTwig.php:2: {
         : foo bar
         :   twig source
         : 
@@ -305,6 +298,13 @@ stream resource {@{$ref}
       }
     }
   }
+%Awrapper_type: "PHP"
+  stream_type: "MEMORY"
+  mode: "%s+b"
+  unread_bytes: 0
+  seekable: true
+  uri: "php://memory"
+%Aoptions: []
 }
 
 EOTXT
@@ -349,7 +349,7 @@ EOTXT
         $var = $this->getSpecialVars();
 
         $this->assertDumpEquals(
-            <<<EOTXT
+            <<<'EOTXT'
 array:3 [
   0 => array:1 [
     0 => &1 array:1 [
@@ -395,7 +395,7 @@ EOTXT
         $dumper->dump($data);
 
         $this->assertSame(
-            <<<EOTXT
+            <<<'EOTXT'
 array:2 [
   1 => array:1 [
     "GLOBALS" => &1 array:1 [
@@ -437,7 +437,7 @@ EOTXT
         });
 
         $this->assertSame(
-            <<<EOTXT
+            <<<'EOTXT'
 array:1 [
   0 => array:1 [
     0 => array:1 [

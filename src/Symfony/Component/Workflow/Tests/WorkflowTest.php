@@ -7,32 +7,13 @@ use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
-use Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore;
-use Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
 class WorkflowTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage The marking store (Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore) of workflow "unnamed" can not store many places. But the transition "t1" has too many output (2). Only one is accepted.
-     */
-    public function testConstructorWithUniqueTransitionOutputInterfaceAndComplexWorkflow()
-    {
-        $definition = $this->createComplexWorkflow();
-
-        new Workflow($definition, new ScalarMarkingStore());
-    }
-
-    public function testConstructorWithUniqueTransitionOutputInterfaceAndSimpleWorkflow()
-    {
-        $places = array('a', 'b');
-        $transition = new Transition('t1', 'a', 'b');
-        $definition = new Definition($places, array($transition));
-
-        new Workflow($definition, new ScalarMarkingStore());
-    }
+    use WorkflowBuilderTrait;
 
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\LogicException
@@ -42,7 +23,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow(new Definition(), $this->getMock(MarkingStoreInterface::class));
+        $workflow = new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock());
 
         $workflow->getMarking($subject);
     }
@@ -55,7 +36,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow(new Definition(), new PropertyAccessorMarkingStore());
+        $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
 
         $workflow->getMarking($subject);
     }
@@ -67,19 +48,18 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     public function testGetMarkingWithImpossiblePlace()
     {
         $subject = new \stdClass();
-        $subject->marking = null;
         $subject->marking = array('nope' => true);
-        $workflow = new Workflow(new Definition(), new PropertyAccessorMarkingStore());
+        $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
 
         $workflow->getMarking($subject);
     }
 
     public function testGetMarkingWithEmptyInitialMarking()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $marking = $workflow->getMarking($subject);
 
@@ -90,11 +70,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMarkingWithExistingMarking()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $subject->marking = array('b' => 1, 'c' => 1);
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $marking = $workflow->getMarking($subject);
 
@@ -109,20 +89,20 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanWithUnexistingTransition()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $workflow->can($subject, 'foobar');
     }
 
     public function testCan()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $this->assertTrue($workflow->can($subject, 't1'));
         $this->assertFalse($workflow->can($subject, 't2'));
@@ -130,12 +110,14 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testCanWithGuard()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) { $event->setBlocked(true); });
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
+            $event->setBlocked(true);
+        });
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $this->assertFalse($workflow->can($subject, 't1'));
     }
@@ -146,20 +128,20 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      */
     public function testApplyWithImpossibleTransition()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $workflow->apply($subject, 't2');
     }
 
     public function testApply()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore());
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
         $marking = $workflow->apply($subject, 't1');
 
@@ -171,11 +153,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testApplyWithEventDispatcher()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcherMock();
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $eventNameExpected = array(
             'workflow.guard',
@@ -205,53 +187,27 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEnabledTransitions()
     {
-        $definition = $this->createComplexWorkflow();
+        $definition = $this->createComplexWorkflowDefinition();
         $subject = new \stdClass();
         $subject->marking = null;
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) { $event->setBlocked(true); });
-        $workflow = new Workflow($definition, new PropertyAccessorMarkingStore(), $eventDispatcher, 'workflow_name');
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
+            $event->setBlocked(true);
+        });
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
 
         $this->assertEmpty($workflow->getEnabledTransitions($subject));
 
         $subject->marking = array('d' => true);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(2, $transitions);
-        $this->assertSame('t3', $transitions['t3']->getName());
-        $this->assertSame('t4', $transitions['t4']->getName());
+        $this->assertSame('t3', $transitions[0]->getName());
+        $this->assertSame('t4', $transitions[1]->getName());
 
         $subject->marking = array('c' => true, 'e' => true);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(1, $transitions);
-        $this->assertSame('t5', $transitions['t5']->getName());
-    }
-
-    private function createComplexWorkflow()
-    {
-        $definition = new Definition();
-
-        $definition->addPlaces(range('a', 'g'));
-
-        $definition->addTransition(new Transition('t1', 'a', array('b', 'c')));
-        $definition->addTransition(new Transition('t2', array('b', 'c'), 'd'));
-        $definition->addTransition(new Transition('t3', 'd', 'e'));
-        $definition->addTransition(new Transition('t4', 'd', 'f'));
-        $definition->addTransition(new Transition('t5', 'e', 'g'));
-        $definition->addTransition(new Transition('t6', 'f', 'g'));
-
-        return $definition;
-
-        // The graph looks like:
-        //
-        // +---+     +----+     +---+     +----+     +----+     +----+     +----+     +----+     +---+
-        // | a | --> | t1 | --> | c | --> | t2 | --> | d  | --> | t4 | --> | f  | --> | t6 | --> | g |
-        // +---+     +----+     +---+     +----+     +----+     +----+     +----+     +----+     +---+
-        //             |                    ^          |                                           ^
-        //             |                    |          |                                           |
-        //             v                    |          v                                           |
-        //           +----+                 |        +----+     +----+     +----+                  |
-        //           | b  | ----------------+        | t3 | --> | e  | --> | t5 | -----------------+
-        //           +----+                          +----+     +----+     +----+
+        $this->assertSame('t5', $transitions[0]->getName());
     }
 }
 

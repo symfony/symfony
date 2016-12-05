@@ -21,9 +21,9 @@ class ExceptionCasterTest extends \PHPUnit_Framework_TestCase
 {
     use VarDumperTestTrait;
 
-    private function getTestException()
+    private function getTestException($msg, &$ref = null)
     {
-        return new \Exception('foo');
+        return new \Exception(''.$msg);
     }
 
     protected function tearDown()
@@ -34,7 +34,8 @@ class ExceptionCasterTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultSettings()
     {
-        $e = $this->getTestException($this);
+        $ref = array('foo');
+        $e = $this->getTestException('foo', $ref);
 
         $expectedDump = <<<'EODUMP'
 Exception {
@@ -45,21 +46,23 @@ Exception {
   -trace: {
     %sExceptionCasterTest.php:26: {
       : {
-      :     return new \Exception('foo');
+      :     return new \Exception(''.$msg);
       : }
     }
     %sExceptionCasterTest.php:%d: {
-      : {
-      :     $e = $this->getTestException($this);
+      : $ref = array('foo');
+      : $e = $this->getTestException('foo', $ref);
       : 
       arguments: {
-        Symfony\Component\VarDumper\Tests\Caster\ExceptionCasterTest {#1 …}
+        $msg: "foo"
+        &$ref: array:1 [ …1]
       }
     }
 %A
 EODUMP;
 
         $this->assertDumpMatchesFormat($expectedDump, $e);
+        $this->assertSame(array('foo'), $ref);
     }
 
     public function testSeek()
@@ -70,7 +73,7 @@ EODUMP;
 {
   %sExceptionCasterTest.php:26: {
     : {
-    :     return new \Exception('foo');
+    :     return new \Exception(''.$msg);
     : }
   }
   %sExceptionCasterTest.php:%d: {
@@ -78,7 +81,7 @@ EODUMP;
     :     $e = $this->getTestException(2);
     : 
     arguments: {
-      2
+      $msg: 2
     }
   }
 %A
@@ -94,14 +97,14 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 Exception {
-  #message: "foo"
+  #message: "1"
   #code: 0
   #file: "%sExceptionCasterTest.php"
   #line: 26
   -trace: {
     %sExceptionCasterTest.php:26: {
       : {
-      :     return new \Exception('foo');
+      :     return new \Exception(''.$msg);
       : }
     }
     %sExceptionCasterTest.php:%d: {
@@ -122,7 +125,7 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 Exception {
-  #message: "foo"
+  #message: "1"
   #code: 0
   #file: "%sExceptionCasterTest.php"
   #line: 26
@@ -149,7 +152,7 @@ EODUMP;
 
         $expectedDump = <<<'EODUMP'
 <foo></foo><bar><span class=sf-dump-note>Exception</span> {<samp>
-  #<span class=sf-dump-protected title="Protected property">message</span>: "<span class=sf-dump-str title="3 characters">foo</span>"
+  #<span class=sf-dump-protected title="Protected property">message</span>: "<span class=sf-dump-str>1</span>"
   #<span class=sf-dump-protected title="Protected property">code</span>: <span class=sf-dump-num>0</span>
   #<span class=sf-dump-protected title="Protected property">file</span>: "<span class=sf-dump-str title="%sExceptionCasterTest.php
 %d characters"><span class=sf-dump-ellipsis>%sTests</span>%eCaster%eExceptionCasterTest.php</span>"
@@ -176,15 +179,14 @@ EODUMP;
         $f = array(
             new FrameStub(array(
                 'file' => dirname(__DIR__).'/Fixtures/Twig.php',
-                'line' => 19,
+                'line' => 20,
                 'class' => '__TwigTemplate_VarDumperFixture_u75a09',
-                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem())),
             )),
             new FrameStub(array(
                 'file' => dirname(__DIR__).'/Fixtures/Twig.php',
-                'line' => 19,
+                'line' => 21,
                 'class' => '__TwigTemplate_VarDumperFixture_u75a09',
-                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(new \Twig_Environment(new \Twig_Loader_Filesystem()), null),
+                'object' => new \__TwigTemplate_VarDumperFixture_u75a09(null, __FILE__),
             )),
         );
 
@@ -192,14 +194,11 @@ EODUMP;
 array:2 [
   0 => {
     class: "__TwigTemplate_VarDumperFixture_u75a09"
-    object: __TwigTemplate_VarDumperFixture_u75a09 {
-    %A
-    }
     src: {
-      bar.twig:2: {
+      %sTwig.php:1: {
+        : 
         : foo bar
         :   twig source
-        : 
       }
     }
   }
@@ -209,7 +208,7 @@ array:2 [
     %A
     }
     src: {
-      foo.twig:2: {
+      %sExceptionCasterTest.php:2: {
         : foo bar
         :   twig source
         : 

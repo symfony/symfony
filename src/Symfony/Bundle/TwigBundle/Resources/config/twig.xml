@@ -45,7 +45,8 @@
         </service>
 
         <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">
-            <argument type="collection" />
+            <argument type="collection" /> <!-- paths -->
+            <argument></argument> <!-- project's root dir -->
         </service>
 
         <service id="twig.loader.filesystem" class="Symfony\Bundle\TwigBundle\Loader\FilesystemLoader" public="false">
@@ -86,7 +87,7 @@
 
         <service id="twig.extension.code" class="Symfony\Bridge\Twig\Extension\CodeExtension" public="false">
             <tag name="twig.extension" />
-            <argument>%debug.file_link_format%</argument>
+            <argument type="service" id="debug.file_link_formatter"></argument>
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
         </service>

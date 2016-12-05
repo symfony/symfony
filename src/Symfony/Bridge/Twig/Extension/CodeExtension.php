@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
+
 /**
  * Twig extension relate to PHP code and used by the profiler and the default exception templates.
  *
@@ -25,18 +27,13 @@ class CodeExtension extends \Twig_Extension
     /**
      * Constructor.
      *
-     * @param string|array $fileLinkFormat The format for links to source files
-     * @param string       $rootDir        The project root directory
-     * @param string       $charset        The charset
+     * @param string|FileLinkFormatter $fileLinkFormat The format for links to source files
+     * @param string                   $rootDir        The project root directory
+     * @param string                   $charset        The charset
      */
     public function __construct($fileLinkFormat, $rootDir, $charset)
     {
-        $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
-        if ($fileLinkFormat && !is_array($fileLinkFormat)) {
-            $i = strpos($f = $fileLinkFormat, '&', max(strrpos($f, '%f'), strrpos($f, '%l'))) ?: strlen($f);
-            $fileLinkFormat = array(substr($f, 0, $i)) + preg_split('/&([^>]++)>/', substr($f, $i), -1, PREG_SPLIT_DELIM_CAPTURE);
-        }
-        $this->fileLinkFormat = $fileLinkFormat;
+        $this->fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         $this->rootDir = str_replace('/', DIRECTORY_SEPARATOR, dirname($rootDir)).DIRECTORY_SEPARATOR;
         $this->charset = $charset;
     }
@@ -54,6 +51,7 @@ class CodeExtension extends \Twig_Extension
             new \Twig_SimpleFilter('file_excerpt', array($this, 'fileExcerpt'), array('is_safe' => array('html'))),
             new \Twig_SimpleFilter('format_file', array($this, 'formatFile'), array('is_safe' => array('html'))),
             new \Twig_SimpleFilter('format_file_from_text', array($this, 'formatFileFromText'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFilter('format_log_message', array($this, 'formatLogMessage'), array('is_safe' => array('html'))),
             new \Twig_SimpleFilter('file_link', array($this, 'getFileLink')),
         );
     }
@@ -128,12 +126,13 @@ class CodeExtension extends \Twig_Extension
     /**
      * Returns an excerpt of a code file around the given line number.
      *
-     * @param string $file A file path
-     * @param int    $line The selected line number
+     * @param string $file       A file path
+     * @param int    $line       The selected line number
+     * @param int    $srcContext The number of displayed lines around or -1 for the whole file
      *
      * @return string An HTML string
      */
-    public function fileExcerpt($file, $line)
+    public function fileExcerpt($file, $line, $srcContext = 3)
     {
         if (is_readable($file)) {
             // highlight_file could throw warnings
@@ -141,14 +140,22 @@ class CodeExtension extends \Twig_Extension
             $code = @highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
-            $content = preg_split('#<br />#', $code);
+            // split multiline spans
+            $code = preg_replace_callback('#<span ([^>]++)>((?:[^<]*+<br \/>)++[^<]*+)</span>#', function ($m) {
+                return "<span $m[1]>".str_replace('<br />', "</span><br /><span $m[1]>", $m[2]).'</span>';
+            }, $code);
+            $content = explode('<br />', $code);
 
             $lines = array();
-            for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; ++$i) {
-                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
+            if (0 > $srcContext) {
+                $srcContext = count($content);
             }
 
-            return '<ol start="'.max($line - 3, 1).'">'.implode("\n", $lines).'</ol>';
+            for ($i = max($line - $srcContext, 1), $max = min($line + $srcContext, count($content)); $i <= $max; ++$i) {
+                $lines[] = '<li'.($i == $line ? ' class="selected"' : '').'><a class="anchor" name="line'.$i.'"></a><code>'.self::fixCodeMarkup($content[$i - 1]).'</code></li>';
+            }
+
+            return '<ol start="'.max($line - $srcContext, 1).'">'.implode("\n", $lines).'</ol>';
         }
     }
 
@@ -177,9 +184,7 @@ class CodeExtension extends \Twig_Extension
         $text = "$text at line $line";
 
         if (false !== $link = $this->getFileLink($file, $line)) {
-            $flags = ENT_COMPAT | ENT_SUBSTITUTE;
-
-            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, $flags, $this->charset), $text);
+            return sprintf('<a href="%s" title="Click to open this file" class="file_link">%s</a>', htmlspecialchars($link, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset), $text);
         }
 
         return $text;
@@ -195,15 +200,8 @@ class CodeExtension extends \Twig_Extension
      */
     public function getFileLink($file, $line)
     {
-        if ($this->fileLinkFormat && file_exists($file)) {
-            for ($i = 1; isset($this->fileLinkFormat[$i]); ++$i) {
-                if (0 === strpos($file, $k = $this->fileLinkFormat[$i++])) {
-                    $file = substr_replace($file, $this->fileLinkFormat[$i], 0, strlen($k));
-                    break;
-                }
-            }
-
-            return strtr($this->fileLinkFormat[0], array('%f' => $file, '%l' => $line));
+        if ($fmt = $this->fileLinkFormat) {
+            return is_string($fmt) ? strtr($fmt, array('%f' => $file, '%l' => $line)) : $fmt->format($file, $line);
         }
 
         return false;
@@ -214,6 +212,27 @@ class CodeExtension extends \Twig_Extension
         return preg_replace_callback('/in ("|&quot;)?(.+?)\1(?: +(?:on|at))? +line (\d+)/s', function ($match) {
             return 'in '.$this->formatFile($match[2], $match[3]);
         }, $text);
+    }
+
+    /**
+     * @internal
+     */
+    public function formatLogMessage($message, array $context)
+    {
+        if ($context && false !== strpos($message, '{')) {
+            $replacements = array();
+            foreach ($context as $key => $val) {
+                if (is_scalar($val)) {
+                    $replacements['{'.$key.'}'] = $val;
+                }
+            }
+
+            if ($replacements) {
+                $message = strtr($message, $replacements);
+            }
+        }
+
+        return htmlspecialchars($message, ENT_COMPAT | ENT_SUBSTITUTE, $this->charset);
     }
 
     /**

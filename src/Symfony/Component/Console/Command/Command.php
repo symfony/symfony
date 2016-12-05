@@ -34,7 +34,7 @@ class Command
     private $processTitle;
     private $aliases = array();
     private $definition;
-    private $public = true;
+    private $hidden = false;
     private $help;
     private $description;
     private $ignoreValidationErrors = false;
@@ -202,8 +202,6 @@ class Command
      * @param OutputInterface $output An OutputInterface instance
      *
      * @return int The command exit code
-     *
-     * @throws \Exception
      *
      * @see setCode()
      * @see execute()
@@ -448,13 +446,13 @@ class Command
     }
 
     /**
-     * @param bool $public Whether the command should be publicly shown or not.
-     * 
+     * @param bool $hidden Whether or not the command should be hidden from the list of commands
+     *
      * @return Command The current instance
      */
-    public function setPublic($public)
+    public function setHidden($hidden)
     {
-        $this->public = (bool) $public;
+        $this->hidden = (bool) $hidden;
 
         return $this;
     }
@@ -462,9 +460,9 @@ class Command
     /**
      * @return bool Whether the command should be publicly shown or not.
      */
-    public function isPublic()
+    public function isHidden()
     {
-        return $this->public;
+        return $this->hidden;
     }
 
     /**

@@ -15,6 +15,8 @@ use Symfony\Component\DomCrawler\Field\FormField;
 
 /**
  * This is an internal class that must not be used directly.
+ *
+ * @internal
  */
 class FormFieldRegistry
 {

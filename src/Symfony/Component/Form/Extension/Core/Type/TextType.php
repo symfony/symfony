@@ -59,7 +59,6 @@ class TextType extends AbstractType implements DataTransformerInterface
 
     /**
      * {@inheritdoc}
-     *.
      */
     public function reverseTransform($data)
     {

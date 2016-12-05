@@ -86,11 +86,11 @@ class RouterController
     {
         $traceRequest = Request::create(
             $request->getPathInfo(),
-            $request->getRequestServer()->get('REQUEST_METHOD'),
-            $request->getRequestAttributes()->all(),
-            $request->getRequestCookies()->all(),
+            $request->getRequestServer(true)->get('REQUEST_METHOD'),
             array(),
-            $request->getRequestServer()->all()
+            $request->getRequestCookies(true)->all(),
+            array(),
+            $request->getRequestServer(true)->all()
         );
 
         $context = $this->matcher->getContext();

@@ -160,7 +160,6 @@ class Router extends BaseRouter implements WarmableInterface
                 gettype($resolved)
                 )
             );
-
         }, $value);
 
         return str_replace('%%', '%', $escapedValue);

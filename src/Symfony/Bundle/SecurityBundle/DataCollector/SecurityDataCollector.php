@@ -21,6 +21,8 @@ use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\Security\Http\FirewallMapInterface;
+use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 
 /**
  * SecurityDataCollector.
@@ -33,6 +35,7 @@ class SecurityDataCollector extends DataCollector
     private $roleHierarchy;
     private $logoutUrlGenerator;
     private $accessDecisionManager;
+    private $firewallMap;
 
     /**
      * Constructor.
@@ -41,13 +44,15 @@ class SecurityDataCollector extends DataCollector
      * @param RoleHierarchyInterface|null         $roleHierarchy
      * @param LogoutUrlGenerator|null             $logoutUrlGenerator
      * @param AccessDecisionManagerInterface|null $accessDecisionManager
+     * @param FirewallMapInterface|null           $firewallMap
      */
-    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null)
+    public function __construct(TokenStorageInterface $tokenStorage = null, RoleHierarchyInterface $roleHierarchy = null, LogoutUrlGenerator $logoutUrlGenerator = null, AccessDecisionManagerInterface $accessDecisionManager = null, FirewallMapInterface $firewallMap = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->roleHierarchy = $roleHierarchy;
         $this->logoutUrlGenerator = $logoutUrlGenerator;
         $this->accessDecisionManager = $accessDecisionManager;
+        $this->firewallMap = $firewallMap;
     }
 
     /**
@@ -108,7 +113,7 @@ class SecurityDataCollector extends DataCollector
                 'token_class' => get_class($token),
                 'logout_url' => $logoutUrl,
                 'user' => $token->getUsername(),
-                'roles' => $this->cloneVar(array_map(function (RoleInterface $role) { return $role->getRole();}, $assignedRoles)),
+                'roles' => $this->cloneVar(array_map(function (RoleInterface $role) { return $role->getRole(); }, $assignedRoles)),
                 'inherited_roles' => $this->cloneVar(array_map(function (RoleInterface $role) { return $role->getRole(); }, $inheritedRoles)),
                 'supports_role_hierarchy' => null !== $this->roleHierarchy,
             );
@@ -131,6 +136,28 @@ class SecurityDataCollector extends DataCollector
             $this->data['access_decision_log'] = array();
             $this->data['voter_strategy'] = 'unknown';
             $this->data['voters'] = array();
+        }
+
+        // collect firewall context information
+        $this->data['firewall'] = null;
+        if ($this->firewallMap instanceof FirewallMap) {
+            $firewallConfig = $this->firewallMap->getFirewallConfig($request);
+            if (null !== $firewallConfig) {
+                $this->data['firewall'] = array(
+                    'name' => $firewallConfig->getName(),
+                    'allows_anonymous' => $firewallConfig->allowsAnonymous(),
+                    'request_matcher' => $firewallConfig->getRequestMatcher(),
+                    'security_enabled' => $firewallConfig->isSecurityEnabled(),
+                    'stateless' => $firewallConfig->isStateless(),
+                    'provider' => $firewallConfig->getProvider(),
+                    'context' => $firewallConfig->getContext(),
+                    'entry_point' => $firewallConfig->getEntryPoint(),
+                    'access_denied_handler' => $firewallConfig->getAccessDeniedHandler(),
+                    'access_denied_url' => $firewallConfig->getAccessDeniedUrl(),
+                    'user_checker' => $firewallConfig->getUserChecker(),
+                    'listeners' => $this->cloneVar($firewallConfig->getListeners()),
+                );
+            }
         }
     }
 
@@ -253,6 +280,16 @@ class SecurityDataCollector extends DataCollector
     public function getAccessDecisionLog()
     {
         return $this->data['access_decision_log'];
+    }
+
+    /**
+     * Returns the configuration of the current firewall context.
+     *
+     * @return array
+     */
+    public function getFirewall()
+    {
+        return $this->data['firewall'];
     }
 
     /**

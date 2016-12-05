@@ -224,11 +224,11 @@ class ProjectServiceContainer extends Container
 
         $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
-        $instance->setBar($this->get('bar'));
-        $instance->initialize();
         $instance->foo = 'bar';
         $instance->moo = $a;
         $instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
+        $instance->setBar($this->get('bar'));
+        $instance->initialize();
         sc_configure($instance);
 
         return $instance;
@@ -275,8 +275,8 @@ class ProjectServiceContainer extends Container
 
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
-        $a->setBaz($this->get('baz'));
         $a->pub = 'pub';
+        $a->setBaz($this->get('baz'));
 
         $instance->setBar($a);
 

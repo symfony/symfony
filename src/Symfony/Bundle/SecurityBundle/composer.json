@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/security": "~3.2",
+        "symfony/security": "~3.3",
         "symfony/http-kernel": "~3.2",
         "symfony/polyfill-php70": "~1.0"
     },
@@ -40,7 +40,7 @@
         "symfony/yaml": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
         "doctrine/doctrine-bundle": "~1.4",
-        "twig/twig": "~1.27|~2.0"
+        "twig/twig": "~1.28|~2.0"
     },
     "suggest": {
         "symfony/security-acl": "For using the ACL functionality of this bundle"
@@ -54,7 +54,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.2-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

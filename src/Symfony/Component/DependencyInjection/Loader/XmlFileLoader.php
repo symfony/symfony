@@ -152,7 +152,7 @@ class XmlFileLoader extends FileLoader
 
         foreach (array('class', 'shared', 'public', 'synthetic', 'lazy', 'abstract') as $key) {
             if ($value = $service->getAttribute($key)) {
-                $method = 'set'.str_replace('-', '', $key);
+                $method = 'set'.$key;
                 $definition->$method(XmlUtils::phpize($value));
             }
         }
@@ -391,7 +391,7 @@ class XmlFileLoader extends FileLoader
                     $arguments[$key] = $arg->nodeValue;
                     break;
                 case 'constant':
-                    $arguments[$key] = constant($arg->nodeValue);
+                    $arguments[$key] = constant(trim($arg->nodeValue));
                     break;
                 default:
                     $arguments[$key] = XmlUtils::phpize($arg->nodeValue);

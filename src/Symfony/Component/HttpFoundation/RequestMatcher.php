@@ -19,22 +19,22 @@ namespace Symfony\Component\HttpFoundation;
 class RequestMatcher implements RequestMatcherInterface
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $path;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $host;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $methods = array();
 
     /**
-     * @var string
+     * @var string[]
      */
     private $ips = array();
 
@@ -76,13 +76,13 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matchScheme($scheme)
     {
-        $this->schemes = array_map('strtolower', (array) $scheme);
+        $this->schemes = null !== $scheme ? array_map('strtolower', (array) $scheme) : array();
     }
 
     /**
      * Adds a check for the URL host name.
      *
-     * @param string $regexp A Regexp
+     * @param string|null $regexp A Regexp
      */
     public function matchHost($regexp)
     {
@@ -92,7 +92,7 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the URL path info.
      *
-     * @param string $regexp A Regexp
+     * @param string|null $regexp A Regexp
      */
     public function matchPath($regexp)
     {
@@ -112,21 +112,21 @@ class RequestMatcher implements RequestMatcherInterface
     /**
      * Adds a check for the client IP.
      *
-     * @param string|string[] $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
+     * @param string|string[]|null $ips A specific IP address or a range specified using IP/netmask like 192.168.1.0/24
      */
     public function matchIps($ips)
     {
-        $this->ips = (array) $ips;
+        $this->ips = null !== $ips ? (array) $ips : array();
     }
 
     /**
      * Adds a check for the HTTP method.
      *
-     * @param string|string[] $method An HTTP method or an array of HTTP methods
+     * @param string|string[]|null $method An HTTP method or an array of HTTP methods
      */
     public function matchMethod($method)
     {
-        $this->methods = array_map('strtoupper', (array) $method);
+        $this->methods = null !== $method ? array_map('strtoupper', (array) $method) : array();
     }
 
     /**
@@ -145,11 +145,11 @@ class RequestMatcher implements RequestMatcherInterface
      */
     public function matches(Request $request)
     {
-        if ($this->schemes && !in_array($request->getScheme(), $this->schemes)) {
+        if ($this->schemes && !in_array($request->getScheme(), $this->schemes, true)) {
             return false;
         }
 
-        if ($this->methods && !in_array($request->getMethod(), $this->methods)) {
+        if ($this->methods && !in_array($request->getMethod(), $this->methods, true)) {
             return false;
         }
 

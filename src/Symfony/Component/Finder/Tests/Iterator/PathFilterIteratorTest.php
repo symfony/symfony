@@ -77,7 +77,6 @@ class PathFilterIteratorTest extends IteratorTestCase
             array($inner, array('copy/A'),      array(), array('abc.dat.copy', 'ab.dat.copy', 'a.dat.copy')),
             array($inner, array('copy/A/B'),    array(), array('abc.dat.copy', 'ab.dat.copy')),
             array($inner, array('copy/A/B/C'),  array(), array('abc.dat.copy')),
-
         );
     }
 }

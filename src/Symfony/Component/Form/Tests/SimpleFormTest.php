@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use Symfony\Bridge\PhpUnit\ErrorAssert;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -316,13 +315,11 @@ class SimpleFormTest extends AbstractFormTest
 
     /**
      * @group legacy
-     * @requires function Symfony\Bridge\PhpUnit\ErrorAssert::assertDeprecationsAreTriggered
+     * @expectedDeprecation Call Form::isValid() with an unsubmitted form %s.
      */
     public function testNotValidIfNotSubmitted()
     {
-        ErrorAssert::assertDeprecationsAreTriggered(array('Call Form::isValid() with an unsubmitted form'), function () {
-            $this->assertFalse($this->form->isValid());
-        });
+        $this->assertFalse($this->form->isValid());
     }
 
     public function testNotValidIfErrors()
@@ -648,10 +645,10 @@ class SimpleFormTest extends AbstractFormTest
         $form = $this->getBuilder()
             ->setEmptyData('foo')
             ->addViewTransformer(new FixedDataTransformer(array(
-            '' => '',
-            // direction is reversed!
-            'bar' => 'foo',
-        )))
+                '' => '',
+                // direction is reversed!
+                'bar' => 'foo',
+            )))
             ->getForm();
 
         $form->submit('');
@@ -663,17 +660,17 @@ class SimpleFormTest extends AbstractFormTest
     {
         $form = $this->getBuilder()
             ->setEmptyData(function ($form) {
-            // the form instance is passed to the closure to allow use
-            // of form data when creating the empty value
-            $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
+                // the form instance is passed to the closure to allow use
+                // of form data when creating the empty value
+                $this->assertInstanceOf('Symfony\Component\Form\FormInterface', $form);
 
-            return 'foo';
-        })
+                return 'foo';
+            })
             ->addViewTransformer(new FixedDataTransformer(array(
-            '' => '',
-            // direction is reversed!
-            'bar' => 'foo',
-        )))
+                '' => '',
+                // direction is reversed!
+                'bar' => 'foo',
+            )))
             ->getForm();
 
         $form->submit('');

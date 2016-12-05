@@ -10,7 +10,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     public function testAddPlaces()
     {
         $places = range('a', 'e');
-        $definition = new Definition($places);
+        $definition = new Definition($places, array());
 
         $this->assertCount(5, $definition->getPlaces());
 
@@ -23,15 +23,13 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
     public function testAddPlacesInvalidArgument()
     {
         $places = array('a"', 'e"');
-        $definition = new Definition($places);
+        $definition = new Definition($places, array());
     }
 
     public function testSetInitialPlace()
     {
         $places = range('a', 'e');
-        $definition = new Definition($places);
-
-        $definition->setInitialPlace($places[3]);
+        $definition = new Definition($places, array(), $places[3]);
 
         $this->assertEquals($places[3], $definition->getInitialPlace());
     }
@@ -42,9 +40,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetInitialPlaceAndPlaceIsNotDefined()
     {
-        $definition = new Definition();
-
-        $definition->setInitialPlace('d');
+        $definition = new Definition(array(), array(), 'd');
     }
 
     public function testAddTransition()
@@ -55,7 +51,7 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $definition = new Definition($places, array($transition));
 
         $this->assertCount(1, $definition->getTransitions());
-        $this->assertSame($transition, $definition->getTransitions()['name']);
+        $this->assertSame($transition, $definition->getTransitions()[0]);
     }
 
     /**

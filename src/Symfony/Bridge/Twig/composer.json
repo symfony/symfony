@@ -17,13 +17,13 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "twig/twig": "~1.27|~2.0"
+        "twig/twig": "~1.28|~2.0"
     },
     "require-dev": {
         "symfony/asset": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
         "symfony/form": "~3.0.4",
-        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/http-kernel": "~3.2",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/routing": "~2.8|~3.0",
         "symfony/templating": "~2.8|~3.0",
@@ -59,7 +59,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.2-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

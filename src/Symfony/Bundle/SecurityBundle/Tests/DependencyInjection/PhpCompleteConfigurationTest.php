@@ -17,9 +17,13 @@ use Symfony\Component\Config\FileLocator;
 
 class PhpCompleteConfigurationTest extends CompleteConfigurationTest
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function getLoader(ContainerBuilder $container)
     {
-        $loadXml = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
-        $loadXml->load($file.'.php');
+        return new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
+    }
+
+    protected function getFileExtension()
+    {
+        return 'php';
     }
 }

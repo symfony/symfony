@@ -7,13 +7,19 @@
     <services>
         <service id="workflow.abstract" class="Symfony\Component\Workflow\Workflow" abstract="true">
             <argument /> <!-- workflow definition -->
-            <argument /> <!-- marking store -->
+            <argument type="constant">null</argument> <!-- marking store -->
+            <argument type="service" id="event_dispatcher" on-invalid="ignore" />
+            <argument /> <!-- name -->
+        </service>
+        <service id="state_machine.abstract" class="Symfony\Component\Workflow\StateMachine" abstract="true">
+            <argument /> <!-- workflow definition -->
+            <argument type="constant">null</argument> <!-- marking store -->
             <argument type="service" id="event_dispatcher" on-invalid="ignore" />
             <argument /> <!-- name -->
         </service>
 
-        <service id="workflow.marking_store.property_accessor" class="Symfony\Component\Workflow\MarkingStore\PropertyAccessorMarkingStore" abstract="true" />
-        <service id="workflow.marking_store.scalar" class="Symfony\Component\Workflow\MarkingStore\ScalarMarkingStore" abstract="true" />
+        <service id="workflow.marking_store.multiple_state" class="Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore" abstract="true" />
+        <service id="workflow.marking_store.single_state" class="Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore" abstract="true" />
 
         <service id="workflow.registry" class="Symfony\Component\Workflow\Registry" />
 

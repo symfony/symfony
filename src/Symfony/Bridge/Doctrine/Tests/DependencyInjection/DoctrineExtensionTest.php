@@ -44,7 +44,7 @@ class DoctrineExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->expects($this->any())
             ->method('getObjectManagerElementName')
             ->will($this->returnCallback(function ($name) {
-                 return 'doctrine.orm.'.$name;
+                return 'doctrine.orm.'.$name;
             }));
     }
 

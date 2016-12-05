@@ -16,18 +16,20 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Workflow\Marking;
 
 /**
- * PropertyAccessorMarkingStore.
+ * MultipleStateMarkingStore stores the marking into a property of the
+ * subject.
+ *
+ * This store deals with a "multiple state" Marking. It means a subject can be
+ * in many states at the same time.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class PropertyAccessorMarkingStore implements MarkingStoreInterface
+class MultipleStateMarkingStore implements MarkingStoreInterface
 {
     private $property;
     private $propertyAccessor;
 
     /**
-     * PropertyAccessorMarkingStore constructor.
-     *
      * @param string                         $property
      * @param PropertyAccessorInterface|null $propertyAccessor
      */

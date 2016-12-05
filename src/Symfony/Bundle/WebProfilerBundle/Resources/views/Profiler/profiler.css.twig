@@ -166,6 +166,10 @@ table thead th {
 table thead th.key {
     width: 19%;
 }
+table thead.small th {
+    font-size: 12px;
+    padding: 4px 10px;
+}
 
 table tbody th,
 table tbody td {
@@ -257,12 +261,12 @@ table tbody ul {
 {# Metrics
    ------------------------------------------------------------------------- #}
 .metrics {
-    margin: 1em 0;
+    margin: 1em 0 0;
     overflow: auto;
 }
 .metrics .metric {
     float: left;
-    margin-right: 1em;
+    margin: 0 1em 1em 0;
 }
 
 .metric {
@@ -315,6 +319,12 @@ table tbody ul {
     margin: 0;
     padding-left: 4px;
     vertical-align: middle;
+}
+
+.metric-divider {
+    float: left;
+    margin: 0 1em;
+    min-height: 1px; {# required to apply 'margin' to an empty 'div' #}
 }
 
 {# Cards
@@ -472,7 +482,8 @@ tr.status-warning td {
     margin-top: -4px;
     vertical-align: middle;
 }
-#header h1 svg path {
+#header h1 svg path,
+#header h1 svg .sf-svg-path {
     fill: #FFF;
 }
 #header .search {
@@ -659,7 +670,8 @@ tr.status-warning td {
     height: 24px;
     max-width: 24px;
 }
-#menu-profiler li a .label .icon svg path {
+#menu-profiler li a .label .icon svg path,
+#menu-profiler li a .label .icon svg .sf-svg-path {
     fill: #DDD;
 }
 #menu-profiler li a .label strong {
@@ -686,7 +698,9 @@ tr.status-warning td {
     color: #FFF;
 }
 #menu-profiler li.selected a .icon svg path,
-#menu-profiler li a:hover .icon svg path {
+#menu-profiler li.selected a .icon svg .sf-svg-path,
+#menu-profiler li a:hover .icon svg path,
+#menu-profiler li a:hover .icon svg .sf-svg-path {
     fill: #FFF;
 }
 
@@ -894,6 +908,7 @@ table.logs .metadata {
 #collector-content .sf-dump-note { color: #6897BB; }
 #collector-content .sf-dump-key { color: #789339; }
 #collector-content .sf-dump-ref { color: #6E6E6E; }
+#collector-content .sf-dump-ellipsis { color: #CC7832; max-width: 100em; }
 
 #collector-content .sf-dump {
     margin: 0;

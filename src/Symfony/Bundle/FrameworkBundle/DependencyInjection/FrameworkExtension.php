@@ -12,7 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
+use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -65,7 +67,7 @@ class FrameworkExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
 
         $loader->load('web.xml');
         $loader->load('services.xml');
@@ -403,30 +405,59 @@ class FrameworkExtension extends Extension
         $registryDefinition = $container->getDefinition('workflow.registry');
 
         foreach ($workflows as $name => $workflow) {
-            $definitionDefinition = new Definition(Workflow\Definition::class);
-            $definitionDefinition->addMethodCall('addPlaces', array($workflow['places']));
+            $type = $workflow['type'];
+
+            $transitions = array();
             foreach ($workflow['transitions'] as $transitionName => $transition) {
-                $definitionDefinition->addMethodCall('addTransition', array(new Definition(Workflow\Transition::class, array($transitionName, $transition['from'], $transition['to']))));
+                if ($type === 'workflow') {
+                    $transitions[] = new Definition(Workflow\Transition::class, array($transitionName, $transition['from'], $transition['to']));
+                } elseif ($type === 'state_machine') {
+                    foreach ($transition['from'] as $from) {
+                        foreach ($transition['to'] as $to) {
+                            $transitions[] = new Definition(Workflow\Transition::class, array($transitionName, $from, $to));
+                        }
+                    }
+                }
             }
 
+            // Create a Definition
+            $definitionDefinition = new Definition(Workflow\Definition::class);
+            $definitionDefinition->setPublic(false);
+            $definitionDefinition->addArgument($workflow['places']);
+            $definitionDefinition->addArgument($transitions);
+            $definitionDefinition->addTag('workflow.definition', array(
+                'name' => $name,
+                'type' => $type,
+                'marking_store' => isset($workflow['marking_store']['type']) ? $workflow['marking_store']['type'] : null,
+            ));
+            if (isset($workflow['initial_place'])) {
+                $definitionDefinition->addArgument($workflow['initial_place']);
+            }
+
+            // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {
                 $markingStoreDefinition = new DefinitionDecorator('workflow.marking_store.'.$workflow['marking_store']['type']);
                 foreach ($workflow['marking_store']['arguments'] as $argument) {
                     $markingStoreDefinition->addArgument($argument);
                 }
-            } else {
+            } elseif (isset($workflow['marking_store']['service'])) {
                 $markingStoreDefinition = new Reference($workflow['marking_store']['service']);
             }
 
-            $workflowDefinition = new DefinitionDecorator('workflow.abstract');
+            // Create Workflow
+            $workflowDefinition = new DefinitionDecorator(sprintf('%s.abstract', $type));
             $workflowDefinition->replaceArgument(0, $definitionDefinition);
-            $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
+            if (isset($markingStoreDefinition)) {
+                $workflowDefinition->replaceArgument(1, $markingStoreDefinition);
+            }
             $workflowDefinition->replaceArgument(3, $name);
 
-            $workflowId = 'workflow.'.$name;
-
+            // Store to container
+            $workflowId = sprintf('%s.%s', $type, $name);
             $container->setDefinition($workflowId, $workflowDefinition);
+            $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
 
+            // Add workflow to Registry
             foreach ($workflow['supports'] as $supportedClass) {
                 $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $supportedClass));
             }
@@ -468,6 +499,12 @@ class FrameworkExtension extends Extension
 
         $definition->replaceArgument(4, $debug);
         $definition->replaceArgument(6, $debug);
+
+        if ($debug && class_exists(DebugProcessor::class)) {
+            $definition = new Definition(DebugProcessor::class);
+            $definition->setPublic(false);
+            $container->setDefinition('debug.log_processor', $definition);
+        }
     }
 
     /**
@@ -805,7 +842,7 @@ class FrameworkExtension extends Extension
         if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
             $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
 
-            $dirs[] = dirname($r->getFileName()).'/../Resources/translations';
+            $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
         }
         $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
@@ -938,21 +975,21 @@ class FrameworkExtension extends Extension
             $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
-                $files[0][] = realpath($file);
+                $files[0][] = $file;
                 $container->addResource(new FileResource($file));
             }
 
             if (is_file($file = $dirname.'/Resources/config/validation.yml')) {
-                $files[1][] = realpath($file);
+                $files[1][] = $file;
                 $container->addResource(new FileResource($file));
             }
 
             if (is_dir($dir = $dirname.'/Resources/config/validation')) {
                 foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
-                    $files[0][] = $file->getRealPath();
+                    $files[0][] = $file->getPathname();
                 }
                 foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
-                    $files[1][] = $file->getRealPath();
+                    $files[1][] = $file->getPathname();
                 }
 
                 $container->addResource(new DirectoryResource($dir));
@@ -1115,7 +1152,7 @@ class FrameworkExtension extends Extension
             $dirname = dirname($reflection->getFileName());
 
             if (is_file($file = $dirname.'/Resources/config/serialization.xml')) {
-                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array(realpath($file)));
+                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file));
                 $definition->setPublic(false);
 
                 $serializerLoaders[] = $definition;
@@ -1123,7 +1160,7 @@ class FrameworkExtension extends Extension
             }
 
             if (is_file($file = $dirname.'/Resources/config/serialization.yml')) {
-                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array(realpath($file)));
+                $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file));
                 $definition->setPublic(false);
 
                 $serializerLoaders[] = $definition;
@@ -1132,13 +1169,13 @@ class FrameworkExtension extends Extension
 
             if (is_dir($dir = $dirname.'/Resources/config/serialization')) {
                 foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
-                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file->getRealPath()));
+                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file->getPathname()));
                     $definition->setPublic(false);
 
                     $serializerLoaders[] = $definition;
                 }
                 foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
-                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file->getRealPath()));
+                    $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file->getPathname()));
                     $definition->setPublic(false);
 
                     $serializerLoaders[] = $definition;
@@ -1201,14 +1238,18 @@ class FrameworkExtension extends Extension
 
     private function registerCacheConfiguration(array $config, ContainerBuilder $container)
     {
-        $version = substr(str_replace('/', '-', base64_encode(md5(uniqid(mt_rand(), true), true))), 0, -2);
+        $version = substr(str_replace('/', '-', base64_encode(hash('sha256', uniqid(mt_rand(), true), true))), 0, 22);
+        $container->getDefinition('cache.annotations')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.apcu')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.system')->replaceArgument(2, $version);
         $container->getDefinition('cache.adapter.filesystem')->replaceArgument(2, $config['directory']);
 
+        if (isset($config['prefix_seed'])) {
+            $container->setParameter('cache.prefix.seed', $config['prefix_seed']);
+        }
         foreach (array('doctrine', 'psr6', 'redis') as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
-                $container->setAlias('cache.'.$name, Compiler\CachePoolPass::getServiceProvider($container, $config[$name]));
+                $container->setAlias('cache.'.$name, new Alias(Compiler\CachePoolPass::getServiceProvider($container, $config[$name]), false));
             }
         }
         foreach (array('app', 'system') as $name) {
@@ -1265,7 +1306,7 @@ class FrameworkExtension extends Extension
      */
     public function getXsdValidationBasePath()
     {
-        return __DIR__.'/../Resources/config/schema';
+        return dirname(__DIR__).'/Resources/config/schema';
     }
 
     public function getNamespace()

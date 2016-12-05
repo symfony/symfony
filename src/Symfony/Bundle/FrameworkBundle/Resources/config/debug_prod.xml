@@ -17,10 +17,14 @@
             <argument>-1</argument><!-- Log levels map for enabled error levels -->
             <argument>%debug.error_handler.throw_at%</argument>
             <argument>true</argument>
-            <argument>%debug.file_link_format%</argument>
+            <argument type="service" id="debug.file_link_formatter"></argument>
             <argument>true</argument>
         </service>
 
         <service id="debug.stopwatch" class="Symfony\Component\Stopwatch\Stopwatch" />
+
+        <service id="debug.file_link_formatter" class="Symfony\Component\HttpKernel\Debug\FileLinkFormatter" public="false">
+            <argument>%debug.file_link_format%</argument>
+        </service>
     </services>
 </container>

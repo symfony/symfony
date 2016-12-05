@@ -38,7 +38,7 @@ class FixUrlProtocolListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if ($this->defaultProtocol && $data && !preg_match('~^\w+://~', $data)) {
+        if ($this->defaultProtocol && $data && !preg_match('~^[\w+.-]+://~', $data)) {
             $event->setData($this->defaultProtocol.'://'.$data);
         }
     }

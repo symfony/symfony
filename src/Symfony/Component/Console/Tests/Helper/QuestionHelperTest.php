@@ -744,6 +744,34 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
         $dialog->ask($this->createInputInterfaceMock(), $output, $question);
     }
 
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted
+     */
+    public function testAskThrowsExceptionOnMissingInput()
+    {
+        $dialog = new QuestionHelper();
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\RuntimeException
+     * @expectedExceptionMessage Aborted
+     */
+    public function testAskThrowsExceptionOnMissingInputWithValidator()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('What\'s your name?');
+        $question->setValidator(function () {
+            if (!$value) {
+                throw new \Exception('A value is required.');
+            }
+        });
+
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);

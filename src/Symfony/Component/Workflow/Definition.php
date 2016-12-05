@@ -17,42 +17,62 @@ use Symfony\Component\Workflow\Exception\LogicException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class Definition
+final class Definition
 {
     private $places = array();
     private $transitions = array();
     private $initialPlace;
 
     /**
-     * Definition constructor.
-     *
      * @param string[]     $places
      * @param Transition[] $transitions
+     * @param string|null  $initialPlace
      */
-    public function __construct(array $places = array(), array $transitions = array())
+    public function __construct(array $places, array $transitions, $initialPlace = null)
     {
-        $this->addPlaces($places);
-        $this->addTransitions($transitions);
+        foreach ($places as $place) {
+            $this->addPlace($place);
+        }
+
+        foreach ($transitions as $transition) {
+            $this->addTransition($transition);
+        }
+
+        $this->setInitialPlace($initialPlace);
     }
 
+    /**
+     * @return string|null
+     */
     public function getInitialPlace()
     {
         return $this->initialPlace;
     }
 
+    /**
+     * @return string[]
+     */
     public function getPlaces()
     {
         return $this->places;
     }
 
+    /**
+     * @return Transition[]
+     */
     public function getTransitions()
     {
         return $this->transitions;
     }
 
-    public function setInitialPlace($place)
+    private function setInitialPlace($place)
     {
+        if (null === $place) {
+            return;
+        }
+
         if (!isset($this->places[$place])) {
             throw new LogicException(sprintf('Place "%s" cannot be the initial place as it does not exist.', $place));
         }
@@ -60,7 +80,7 @@ class Definition
         $this->initialPlace = $place;
     }
 
-    public function addPlace($place)
+    private function addPlace($place)
     {
         if (!preg_match('{^[\w\d_-]+$}', $place)) {
             throw new InvalidArgumentException(sprintf('The place "%s" contains invalid characters.', $place));
@@ -73,21 +93,7 @@ class Definition
         $this->places[$place] = $place;
     }
 
-    public function addPlaces(array $places)
-    {
-        foreach ($places as $place) {
-            $this->addPlace($place);
-        }
-    }
-
-    public function addTransitions(array $transitions)
-    {
-        foreach ($transitions as $transition) {
-            $this->addTransition($transition);
-        }
-    }
-
-    public function addTransition(Transition $transition)
+    private function addTransition(Transition $transition)
     {
         $name = $transition->getName();
 
@@ -103,6 +109,6 @@ class Definition
             }
         }
 
-        $this->transitions[$name] = $transition;
+        $this->transitions[] = $transition;
     }
 }

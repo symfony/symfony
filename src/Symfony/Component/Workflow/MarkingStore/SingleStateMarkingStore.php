@@ -16,18 +16,19 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Workflow\Marking;
 
 /**
- * ScalarMarkingStore.
+ * SingleStateMarkingStore stores the marking into a property of the subject.
+ *
+ * This store deals with a "single state" Marking. It means a subject can be in
+ * one and only one state at the same time.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class ScalarMarkingStore implements MarkingStoreInterface, UniqueTransitionOutputInterface
+class SingleStateMarkingStore implements MarkingStoreInterface
 {
     private $property;
     private $propertyAccessor;
 
     /**
-     * ScalarMarkingStore constructor.
-     *
      * @param string                         $property
      * @param PropertyAccessorInterface|null $propertyAccessor
      */

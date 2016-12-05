@@ -254,7 +254,7 @@ class TextDescriptor extends Descriptor
 
         $tags = $definition->getTags();
         if (count($tags)) {
-            $tagInformation = '';
+            $tagInformation = array();
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $tagParameters) {
                     $parameters = array_map(function ($key, $value) {
@@ -263,12 +263,13 @@ class TextDescriptor extends Descriptor
                     $parameters = implode(', ', $parameters);
 
                     if ('' === $parameters) {
-                        $tagInformation .= sprintf('%s', $tagName);
+                        $tagInformation[] = sprintf('%s', $tagName);
                     } else {
-                        $tagInformation .= sprintf('%s (%s)', $tagName, $parameters);
+                        $tagInformation[] = sprintf('%s (%s)', $tagName, $parameters);
                     }
                 }
             }
+            $tagInformation = implode("\n", $tagInformation);
         } else {
             $tagInformation = '-';
         }

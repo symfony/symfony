@@ -34,12 +34,12 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
 
     protected function getChoices()
     {
-        return array(0, 1, '1', 'a', false, true, $this->object, null);
+        return array(0, 1, 1.5, '1', 'a', false, true, $this->object, null);
     }
 
     protected function getValues()
     {
-        return array('0', '1', '2', '3', '4', '5', '6', '7');
+        return array('0', '1', '2', '3', '4', '5', '6', '7', '8');
     }
 
     public function testCreateChoiceListWithValueCallback()
@@ -153,5 +153,14 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
         $this->assertSame(array(0 => ''), $choiceList->getChoicesForValues(array('')));
         $this->assertSame(array(0 => true), $choiceList->getChoicesForValues(array('1')));
         $this->assertSame(array(0 => false), $choiceList->getChoicesForValues(array('0')));
+    }
+
+    public function testGetChoicesForValuesWithContainingEmptyStringAndFloats()
+    {
+        $choiceList = new ArrayChoiceList(array('Empty String' => '', '1/3' => 0.3, '1/2' => 0.5));
+
+        $this->assertSame(array(0 => ''), $choiceList->getChoicesForValues(array('')));
+        $this->assertSame(array(0 => 0.3), $choiceList->getChoicesForValues(array('0.3')));
+        $this->assertSame(array(0 => 0.5), $choiceList->getChoicesForValues(array('0.5')));
     }
 }

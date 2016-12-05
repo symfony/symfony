@@ -34,8 +34,11 @@ abstract class AbstractQuery implements QueryInterface
             'timeout' => 0,
             'deref' => static::DEREF_NEVER,
             'attrsOnly' => 0,
+            'scope' => static::SCOPE_SUB,
         ));
         $resolver->setAllowedValues('deref', array(static::DEREF_ALWAYS, static::DEREF_NEVER, static::DEREF_FINDING, static::DEREF_SEARCHING));
+        $resolver->setAllowedValues('scope', array(static::SCOPE_BASE, static::SCOPE_ONE, static::SCOPE_SUB));
+
         $resolver->setNormalizer('filter', function (Options $options, $value) {
             return is_array($value) ? $value : array($value);
         });

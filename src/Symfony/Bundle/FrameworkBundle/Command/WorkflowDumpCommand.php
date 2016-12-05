@@ -15,7 +15,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
+use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
 use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Workflow;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -55,24 +57,24 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $workflow = $this->getContainer()->get('workflow.'.$input->getArgument('name'));
-        $definition = $this->getProperty($workflow, 'definition');
-
-        $dumper = new GraphvizDumper();
+        $container = $this->getContainer();
+        $serviceId = $input->getArgument('name');
+        if ($container->has('workflow.'.$serviceId)) {
+            $workflow = $container->get('workflow.'.$serviceId);
+            $dumper = new GraphvizDumper();
+        } elseif ($container->has('state_machine.'.$serviceId)) {
+            $workflow = $container->get('state_machine.'.$serviceId);
+            $dumper = new StateMachineGraphvizDumper();
+        } else {
+            throw new \InvalidArgumentException(sprintf('No service found for "workflow.%1$s" nor "state_machine.%1$s".', $serviceId));
+        }
 
         $marking = new Marking();
+
         foreach ($input->getArgument('marking') as $place) {
             $marking->mark($place);
         }
 
-        $output->writeln($dumper->dump($definition, $marking));
-    }
-
-    private function getProperty($object, $property)
-    {
-        $reflectionProperty = new \ReflectionProperty(get_class($object), $property);
-        $reflectionProperty->setAccessible(true);
-
-        return $reflectionProperty->getValue($object);
+        $output->writeln($dumper->dump($workflow->getDefinition(), $marking));
     }
 }

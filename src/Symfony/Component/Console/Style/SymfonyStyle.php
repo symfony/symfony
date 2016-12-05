@@ -338,16 +338,6 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function getOption($name)
-    {
-        return $this->input->getOption($name);
-    }
-
-    /**
      * @return ProgressBar
      */
     private function getProgressBar()

@@ -254,7 +254,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
                     case 'resolved_options':
                     case 'default_data':
                     case 'submitted_data':
-                        if ($v) {
+                        if ($v && is_array($v)) {
                             $form[$k] = array_map($cloneVar, $v);
                         }
                         break;

@@ -37,6 +37,13 @@ class ControllerResolver implements ControllerResolverInterface
     private $supportsVariadic;
 
     /**
+     * If scalar types exists.
+     *
+     * @var bool
+     */
+    private $supportsScalarTypes;
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface $logger A LoggerInterface instance
@@ -46,6 +53,7 @@ class ControllerResolver implements ControllerResolverInterface
         $this->logger = $logger;
 
         $this->supportsVariadic = method_exists('ReflectionParameter', 'isVariadic');
+        $this->supportsScalarTypes = method_exists('ReflectionParameter', 'getType');
     }
 
     /**
@@ -132,7 +140,7 @@ class ControllerResolver implements ControllerResolverInterface
                 $arguments[] = $request;
             } elseif ($param->isDefaultValueAvailable()) {
                 $arguments[] = $param->getDefaultValue();
-            } elseif ($param->allowsNull()) {
+            } elseif ($this->supportsScalarTypes && $param->hasType() && $param->allowsNull()) {
                 $arguments[] = null;
             } else {
                 if (is_array($controller)) {

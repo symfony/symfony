@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-04T10:50:54Z
+
+`$response->headers->set('X-Foo-Bar', null);` is invalid :confused: The API of `$values` is `string|string[]` (well.. `string|array` actually).
+
+But it doesnt expect `null` at all. Hence `remove()`.
+
+---------------------------------------------------------------------------
+
+by gmoreira at 2016-12-04T11:21:48Z
+
+@ro0NL You are correct, I should have noticed this. However, this brings up an interesting point, should the HeaderBag set() method protect against this being possible?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-04T11:24:34Z
+
+No, this is design by contract. We could however clarify the PHPdoc, ie. `string|string[]`, and perhaps default an empty array to `array('')` for the sake of it.
+
+Then there are also a few `array_key_exists` checks which shouldnt be needed imo.
+
+---------------------------------------------------------------------------
+
+by alcalyn at 2016-12-04T14:02:59Z
+
+Personnaly I don't use `$headersBag->set('X-Foo-Bar', null);`, but `$headersBag->set('X-Foo-Bar', $myValue);`, and unfortunately `$myValue` was sometimes `null`. It doesn't affect the behaviour until this bug.
+
+I think that if we set `null`, it should just not appears in headers, and let an empty array in headers bag, like before `3.2`. So I agree this PR.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-04T14:41:14Z
+
+Imo setting `null` equals setting an empty string; ie. a header value is a string.
+
+> and unfortunately $myValue was sometimes null
+
+That doesnt mean you can just violate `string|string[]`.
+
+---------------------------------------------------------------------------
+
+by gmoreira at 2016-12-05T07:13:29Z
+
+@nicolas-grekas would be interested in your opinion here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-05T09:43:14Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-05T13:04:07Z
+
+Is it really something for master only?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-05T13:15:21Z
+
+3.2!

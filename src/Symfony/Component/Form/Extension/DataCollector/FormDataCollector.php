@@ -209,9 +209,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      */
     public function buildPreliminaryFormTree(FormInterface $form)
     {
-        $this->data['forms'][$form->getName()] = array();
-
-        $this->recursiveBuildPreliminaryFormTree($form, $this->data['forms'][$form->getName()], $this->data['forms_by_hash']);
+        $this->data['forms'][$form->getName()] = &$this->recursiveBuildPreliminaryFormTree($form, $this->data['forms_by_hash']);
     }
 
     /**
@@ -219,9 +217,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
      */
     public function buildFinalFormTree(FormInterface $form, FormView $view)
     {
-        $this->data['forms'][$form->getName()] = array();
-
-        $this->recursiveBuildFinalFormTree($form, $view, $this->data['forms'][$form->getName()], $this->data['forms_by_hash']);
+        $this->data['forms'][$form->getName()] = &$this->recursiveBuildFinalFormTree($form, $view, $this->data['forms_by_hash']);
     }
 
     /**
@@ -354,26 +350,25 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
         return $cache = $this->cloner->cloneVar($var);
     }
 
-    private function recursiveBuildPreliminaryFormTree(FormInterface $form, &$output, array &$outputByHash)
+    private function &recursiveBuildPreliminaryFormTree(FormInterface $form, array &$outputByHash)
     {
         $hash = spl_object_hash($form);
 
+        $output = &$outputByHash[$hash];
         $output = isset($this->dataByForm[$hash])
             ? $this->dataByForm[$hash]
             : array();
 
-        $outputByHash[$hash] = &$output;
-
         $output['children'] = array();
 
         foreach ($form as $name => $child) {
-            $output['children'][$name] = array();
-
-            $this->recursiveBuildPreliminaryFormTree($child, $output['children'][$name], $outputByHash);
+            $output['children'][$name] = &$this->recursiveBuildPreliminaryFormTree($child, $outputByHash);
         }
+
+        return $output;
     }
 
-    private function recursiveBuildFinalFormTree(FormInterface $form = null, FormView $view, &$output, array &$outputByHash)
+    private function &recursiveBuildFinalFormTree(FormInterface $form = null, FormView $view, array &$outputByHash)
     {
         $viewHash = spl_object_hash($view);
         $formHash = null;
@@ -385,6 +380,9 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
             // the FormInterface tree of the form, so we need to get the
             // corresponding FormInterface instance for its view in a different way
             $formHash = $this->formsByView[$viewHash];
+        }
+        if (null !== $formHash) {
+            $output = &$outputByHash[$formHash];
         }
 
         $output = isset($this->dataByView[$viewHash])
@@ -398,8 +396,6 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
                     ? $this->dataByForm[$formHash]
                     : array()
             );
-
-            $outputByHash[$formHash] = &$output;
         }
 
         $output['children'] = array();
@@ -411,9 +407,9 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
                 ? $form->get($name)
                 : null;
 
-            $output['children'][$name] = array();
-
-            $this->recursiveBuildFinalFormTree($childForm, $childView, $output['children'][$name], $outputByHash);
+            $output['children'][$name] = &$this->recursiveBuildFinalFormTree($childForm, $childView, $outputByHash);
         }
+
+        return $output;
     }
 }

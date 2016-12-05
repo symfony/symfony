@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Templating;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * GlobalVariables is the entry point for Symfony global variables in PHP templates.
@@ -33,21 +34,27 @@ class GlobalVariables
     }
 
     /**
-     * Returns the current user.
+     * Returns the current token.
      *
-     * @return mixed
-     *
-     * @see TokenInterface::getUser()
+     * @return TokenInterface|null
      */
-    public function getUser()
+    public function getToken()
     {
         if (!$this->container->has('security.token_storage')) {
             return;
         }
 
-        $tokenStorage = $this->container->get('security.token_storage');
+        return $this->container->get('security.token_storage')->getToken();
+    }
 
-        if (!$token = $tokenStorage->getToken()) {
+    /**
+     * Returns the current user.
+     *
+     * @see TokenInterface::getUser()
+     */
+    public function getUser()
+    {
+        if (!$token = $this->getToken()) {
             return;
         }
 

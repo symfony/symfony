@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * Added `GlobalVariables::getToken()`
+
 3.2.0
 -----
 

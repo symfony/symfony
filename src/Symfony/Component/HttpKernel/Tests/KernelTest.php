@@ -114,6 +114,21 @@ class KernelTest extends \PHPUnit_Framework_TestCase
             ->method('doLoadClassCache');
     }
 
+    public function testInvalidContainerClassName()
+    {
+        $kernel = new KernelForTest('test', true);
+
+        $p = new \ReflectionProperty($kernel, 'name');
+        $p->setAccessible(true);
+        $p->setValue($kernel, '123foobar');
+
+        $reflection = new \ReflectionClass(get_class($kernel));
+        $method = $reflection->getMethod('getContainerClass');
+        $method->setAccessible(true);
+
+        $this->assertSame('_123foobarTestDebugProjectContainer', $method->invoke($kernel));
+    }
+
     public function testEnvParametersResourceIsAdded()
     {
         $container = new ContainerBuilder();

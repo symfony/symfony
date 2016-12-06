@@ -32,7 +32,6 @@
                 <argument>Symfony\Component\HttpFoundation\Request</argument>
                 <argument>Symfony\Component\HttpKernel\Kernel</argument>
                 <argument>Symfony\Component\ClassLoader\ClassCollectionLoader</argument>
-                <argument>Symfony\Component\ClassLoader\ApcClassLoader</argument>
             </argument>
         </service>
 

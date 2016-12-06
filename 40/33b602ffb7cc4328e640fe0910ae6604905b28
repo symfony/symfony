@@ -1,0 +1,121 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-21T07:28:52Z
+
+The `TraceableEventDispatcher` (`debug.event_dispatcher` service)  must be the injected one in dev environment as it decorates it. However the current implementation gives always the decorated service (`event_dispatcher`), not the decorator.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-10-21T08:33:01Z
+
+The `TraceableEventDispatcher` is not registered in the container by using the `decorates` feature of the DIC, but instead by doing this weird thing in the [`FrameworkExtension`](https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L452-L456).
+
+If we want to make this PR work properly with the event dispatcher in debug mode, we should transfer the `autowiring_type` to the `debug.event_dispatcher` service definition...
+Or maybe we should remove the code from the `FrameworkExtension` and use the `decorates` feature instead ? It'll allow to handle correctly the autowiring type with decorated event dispatcher instances more straightforwardly. But I don't know if it can cause any BC break...?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-21T12:17:25Z
+
+@ogizanagi As you suggested, I made `@debug.event_dispatcher` decorates `@event_dispatcher` and removed the definition replacement logic from the `FrameworkExtension`.
+
+The `debug.event_dispatcher.parent` service doesn't exist anymore, it is now `debug.event_dispatcher.inner`. AFAIK it should not be a BC break as the service was just created internally to mimic what `decorates` does
+
+However we still need to manually cleanup the`event_dispatcher` autowiring types [from the extension](https://github.com/symfony/symfony/pull/20260/files#diff-0e793081ceb720201745c982a568903fR453), otherwise it is always a `ContainerAwareEventDispatcher` (the decorated) which is injected. Maybe the `AutowirePass` has aliases in its map (the decorated `@event_dispatcher`)?
+
+Anyway, that's really not a big deal (one method call on the definition).
+Also I added some tests and changed this to a feature on master.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-21T15:49:54Z
+
+Failing build on travis unrelated (yaml)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-10-21T16:18:01Z
+
+> However we still need to manually cleanup the event_dispatcher autowiring types from the extension, otherwise it is always a ContainerAwareEventDispatcher (the decorated) which is injected. Maybe the AutowirePass has aliases in its map (the decorated @event_dispatcher)?
+>
+> Anyway, that's really not a big deal (one method call on the definition).
+
+It's kind of a big deal. 😄 I thought 71d502a was supposed to handle this case 😕
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-21T19:49:19Z
+
+Needs #20267 for removing [this method call](https://github.com/symfony/symfony/pull/20260/files#diff-0e793081ceb720201745c982a568903fR453).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-24T08:59:26Z
+
+Needs branch 2.8 to be merged in master
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-25T09:23:22Z
+
+I made the changes after #20267, this is ready.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-05T11:46:00Z
+
+Tests have been fixed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-05T11:49:03Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-07T09:31:42Z
+
+@dunglas could you please review/approve this proposal? Do you think it's ready for 3.2? Thanks!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-07T09:39:13Z
+
+:+1:
+
+For me it's ok to merge this PR in 3.2.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-17T10:07:04Z
+
+apparently it will finally be for 3.3 as many others, it would be nice to have an explanation.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-17T10:11:48Z
+
+@chalasr sorry about that, the core team is very busy, reviewing usually takes time. When reviewing is done, @fabpot is the only one to do the tedious work of merging most PRs and preparing stable releases. It can, again, take some time.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-17T12:52:02Z
+
+End of development happened more than a month and a half ago. Since then, we should not have merged new features or significant changes. We did some for features that were discussion since a very long time, but we had priorities. RC1 is just around the corner, so merging anything substantial at this point is not possible anymore. Sorry about that, but we need to make choices. That's our release process. Date is fixed, features are not.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-17T12:53:50Z
+
+And I can perfectly understand, thank you for the hint.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-06T14:11:55Z
+
+I believe this can be merged now that 3.2 is released.

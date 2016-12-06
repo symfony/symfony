@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-06T10:40:52Z
+
+should we also deprecate WinCacheClassLoader and XcacheClassLoader providing similar wrappers with other storages ?
+
+Btw, if we deprecate these caching loaders, and we deprecate the ClassCollectionLoader, the component will only contain the basic PSR-0, PSR-4 and classmap loaders, which are all useless when using composer. So we may want to deprecate the whole component instead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T11:00:07Z
+
+@stof I added WinCache and Xcache to this PR. I agree with you about deprecating the component. Should be done in another PR (esp. HttpKernel\Client is using the component right now, it needs some work to be freed from it).

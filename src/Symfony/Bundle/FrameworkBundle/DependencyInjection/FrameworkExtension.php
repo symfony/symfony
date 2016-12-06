@@ -479,12 +479,6 @@ class FrameworkExtension extends Extension
 
         if ($debug) {
             $loader->load('debug.xml');
-
-            // replace the regular event_dispatcher service with the debug one
-            $definition = $container->findDefinition('event_dispatcher');
-            $definition->setPublic(false);
-            $container->setDefinition('debug.event_dispatcher.parent', $definition);
-            $container->setAlias('event_dispatcher', 'debug.event_dispatcher');
         }
 
         $definition = $container->findDefinition('debug.debug_handlers_listener');

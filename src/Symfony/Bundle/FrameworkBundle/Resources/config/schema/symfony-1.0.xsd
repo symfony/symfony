@@ -261,12 +261,20 @@
             <xsd:element name="to" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="match" type="workflow_match" />
     </xsd:complexType>
 
     <xsd:simpleType name="workflow_type">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="state_machine" />
             <xsd:enumeration value="workflow" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="workflow_match">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="all" />
+            <xsd:enumeration value="one" />
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>

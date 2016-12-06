@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Workflow\Transition;
 
 abstract class FrameworkExtensionTest extends TestCase
 {
@@ -183,6 +184,23 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testWorkflowCannotHaveBothArgumentsAndService()
     {
         $this->createContainerFromFile('workflow_with_arguments_and_service');
+    }
+
+    public function testWorkflowWithMatch()
+    {
+        $container = $this->createContainerFromFile('workflow_with_match_type');
+
+        $this->assertTrue($container->hasDefinition('workflow.my_workflow', 'Workflow is registered as a service'));
+        $this->assertTrue($container->hasDefinition('workflow.my_workflow.definition', 'Workflow definition is registered as a service'));
+
+        $workflowDefinition = $container->getDefinition('workflow.my_workflow.definition');
+        $transactions = $workflowDefinition->getArgument(1);
+
+        $this->assertCount(1, $transactions);
+
+        $transaction = $transactions[0];
+
+        $this->assertSame(Transition::MATCH_ONE, $transaction->getArgument(3));
     }
 
     public function testRouter()

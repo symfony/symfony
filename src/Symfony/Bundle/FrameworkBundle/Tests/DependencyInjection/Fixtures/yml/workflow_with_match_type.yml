@@ -1,0 +1,19 @@
+framework:
+    workflows:
+        my_workflow:
+            marking_store:
+                type: multiple_state
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest
+            places:
+                - first
+                - second
+                - last
+            transitions:
+                go:
+                    match: one
+                    from:
+                        - first
+                        - secound
+                    to:
+                        - last

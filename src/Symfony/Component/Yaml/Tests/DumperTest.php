@@ -257,6 +257,7 @@ EOF;
     public function getEscapeSequences()
     {
         return array(
+            'empty string' => array('', "''"),
             'null' => array("\x0", '"\\0"'),
             'bell' => array("\x7", '"\\a"'),
             'backspace' => array("\x8", '"\\b"'),
@@ -271,7 +272,7 @@ EOF;
             'slash' => array('/', '/'),
             'backslash' => array('\\', '\\'),
             'next-line' => array("\xC2\x85", '"\\N"'),
-            'non-breaking-space' => array('�', '�'),
+            'non-breaking-space' => array("\xc2\xa0", '"\\_"'),
             'line-separator' => array("\xE2\x80\xA8", '"\\L"'),
             'paragraph-separator' => array("\xE2\x80\xA9", '"\\P"'),
             'colon' => array(':', "':'"),

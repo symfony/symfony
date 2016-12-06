@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-06T15:18:01Z
+
+note to mergers: this should go in older branches
+
+---------------------------------------------------------------------------
+
+by ShinDarth at 2016-12-06T15:35:24Z
+
+@stof done, changed the IF condition
+
+---------------------------------------------------------------------------
+
+by ShinDarth at 2016-12-06T15:45:37Z
+
+@nicolas-grekas done, thanks
+
+@stof can you please answer [my question](https://github.com/symfony/symfony/pull/20782#issuecomment-265156220) in that other PR?

@@ -23,7 +23,10 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
  */
 class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRuntimeInterface
 {
-    private $renderer;
+    /**
+     * Make this property private in 4.0.
+     */
+    public $renderer;
 
     public function __construct(TwigRendererInterface $renderer = null)
     {

@@ -30,6 +30,12 @@ class Registry
         $this->workflows[] = array($workflow, $className);
     }
 
+    /**
+     * @param object      $subject
+     * @param string|null $workflowName
+     *
+     * @return Workflow
+     */
     public function get($subject, $workflowName = null)
     {
         $matched = null;

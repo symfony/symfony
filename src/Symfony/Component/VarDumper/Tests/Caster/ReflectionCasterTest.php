@@ -147,7 +147,7 @@ EOTXT
      */
     public function testGenerator()
     {
-        if (ini_get('xdebug.overload_var_dump') == 2) {
+        if (extension_loaded('xdebug')) {
             $this->markTestSkipped('xdebug is active');
         }
 

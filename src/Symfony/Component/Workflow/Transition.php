@@ -19,16 +19,20 @@ use Symfony\Component\Workflow\Exception\InvalidArgumentException;
  */
 class Transition
 {
+    const MATCH_ALL = 'all';
+    const MATCH_ONE = 'one';
+
     private $name;
     private $froms;
     private $tos;
+    private $matchType;
 
     /**
      * @param string          $name
      * @param string|string[] $froms
      * @param string|string[] $tos
      */
-    public function __construct($name, $froms, $tos)
+    public function __construct($name, $froms, $tos, $matchType = self::MATCH_ALL)
     {
         if (!preg_match('{^[\w\d_-]+$}', $name)) {
             throw new InvalidArgumentException(sprintf('The transition "%s" contains invalid characters.', $name));
@@ -37,6 +41,7 @@ class Transition
         $this->name = $name;
         $this->froms = (array) $froms;
         $this->tos = (array) $tos;
+        $this->matchType = $matchType;
     }
 
     public function getName()
@@ -52,5 +57,10 @@ class Transition
     public function getTos()
     {
         return $this->tos;
+    }
+
+    public function getMatchType()
+    {
+        return $this->matchType;
     }
 }

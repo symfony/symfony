@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by theofidry at 2016-11-29T20:09:10Z
+
+👍 I had this patch in mind since day one but never found the time to do it thanks very much 🎉
+
+I personally hesitated between:
+
+- This solution
+- Having a null encoder (the patch I used on my side meanwhile)
+- Adding a `DenormalizerAware` which IMO is more appropriate than `SerializerAware`
+
+---------------------------------------------------------------------------
+
+by tyx at 2016-11-30T09:56:17Z
+
+Thanks for this fix, looks great for me.
+
+For me this feature was the most expected of the 3.2, I hope we can have this one merged within the first release !
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-30T10:35:23Z
+
+> hope we can have this one merged within the first release !
+
+@tyx : That's already too late for this 😅  http://symfony.com/blog/symfony-3-2-0-released
+
+---------------------------------------------------------------------------
+
+by tyx at 2016-11-30T10:52:01Z
+
+😢
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-30T11:00:59Z
+
+IMO it should be merged as a bug fix in the 3.1 branch (and so we'll be in the next minor version of 3.2).
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-30T11:02:37Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-30T11:04:30Z
+
+> IMO it should be merged as a bug fix in the 3.1 branch (and so we'll be in the next minor version of 3.2).
+
+@dunglas : 3.1? But it was introduced in https://github.com/symfony/symfony/pull/19277 which has been merged in 3.2 only 😕
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-30T11:05:28Z
+
+Sorry, you're right, it should be merged in 3.2.

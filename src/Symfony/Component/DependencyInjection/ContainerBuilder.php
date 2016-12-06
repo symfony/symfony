@@ -1026,7 +1026,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Resolves env parameter placeholders in a string.
+     * Resolves env parameter placeholders in a string or an array..
      *
      * @param string      $string    The string to resolve
      * @param string|null $format    A sprintf() format to use as replacement for env placeholders or null to use the default parameter format

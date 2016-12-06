@@ -413,12 +413,7 @@ class Container implements ResettableContainerInterface
         if (isset($this->envCache[$name]) || array_key_exists($name, $this->envCache)) {
             return $this->envCache[$name];
         }
-        if (isset($_ENV[$name])) {
-            return $this->envCache[$name] = $_ENV[$name];
-        }
-        if (false !== $env = getenv($name)) {
-            return $this->envCache[$name] = $env;
-        }
+
         if (!$this->hasParameter("env($name)")) {
             throw new EnvNotFoundException($name);
         }

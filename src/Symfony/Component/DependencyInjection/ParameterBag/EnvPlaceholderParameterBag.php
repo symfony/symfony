@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\ParameterBag;
 
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
@@ -29,13 +30,12 @@ class EnvPlaceholderParameterBag extends ParameterBag
         if (0 === strpos($name, 'env(') && ')' === substr($name, -1) && 'env()' !== $name) {
             $env = substr($name, 4, -1);
 
-            if (isset($this->envPlaceholders[$env])) {
-                foreach ($this->envPlaceholders[$env] as $placeholder) {
-                    return $placeholder; // return first result
-                }
+            if (isset($_ENV[$env])) {
+                return $_ENV[$env];
             }
-            if (preg_match('/\W/', $env)) {
-                throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
+
+            if (false !== $value = getenv($env)) {
+                return $value;
             }
 
             if ($this->has($name)) {
@@ -44,13 +44,11 @@ class EnvPlaceholderParameterBag extends ParameterBag
                 if (null !== $defaultValue && !is_scalar($defaultValue)) {
                     throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar or null, but "%s" given to "%s".', gettype($defaultValue), $name));
                 }
+
+                return $defaultValue;
             }
 
-            $uniqueName = md5($name.uniqid(mt_rand(), true));
-            $placeholder = sprintf('env_%s_%s', $env, $uniqueName);
-            $this->envPlaceholders[$env][$placeholder] = $placeholder;
-
-            return $placeholder;
+            throw new EnvNotFoundException($name);
         }
 
         return parent::get($name);
@@ -64,6 +62,43 @@ class EnvPlaceholderParameterBag extends ParameterBag
     public function getEnvPlaceholders()
     {
         return $this->envPlaceholders;
+    }
+
+    /**
+     * Returns the map of env vars used in the resolved parameter values to their placeholders.
+     *
+     * @return string[][] A map of env var names to their placeholders
+     */
+    public function getEnvPlaceholder($name)
+    {
+        if (0 !== strpos($name, 'env(') || ')' !== substr($name, -1) || 'env()' !== $name) {
+            return $name;
+        }
+
+        $env = substr($name, 4, -1);
+
+        if (isset($this->envPlaceholders[$env])) {
+            foreach ($this->envPlaceholders[$env] as $placeholder) {
+                return $placeholder; // return first result
+            }
+        }
+        if (preg_match('/\W/', $env)) {
+            throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
+        }
+
+        if ($this->has($name)) {
+            $defaultValue = parent::get($name);
+
+            if (null !== $defaultValue && !is_scalar($defaultValue)) {
+                throw new RuntimeException(sprintf('The default value of an env() parameter must be scalar or null, but "%s" given to "%s".', gettype($defaultValue), $name));
+            }
+        }
+
+        $uniqueName = md5($name.uniqid(mt_rand(), true));
+        $placeholder = sprintf('env_%s_%s', $env, $uniqueName);
+        $this->envPlaceholders[$env][$placeholder] = $placeholder;
+
+        return $placeholder;
     }
 
     /**

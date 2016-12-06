@@ -72,6 +72,18 @@ class GlobalVariables
     }
 
     /**
+     * Returns the master request.
+     *
+     * @return Request|null The HTTP request object
+     */
+    public function getMasterRequest()
+    {
+        if ($this->container->has('request_stack')) {
+            return $this->container->get('request_stack')->getMasterRequest();
+        }
+    }
+
+    /**
      * Returns the current session.
      *
      * @return Session|null The session

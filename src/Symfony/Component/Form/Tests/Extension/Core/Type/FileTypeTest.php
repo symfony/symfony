@@ -56,7 +56,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSubmitEmptyMultiple()
     {
-        $form = $this->factory->createBuilder('file', null, array(
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType', null, array(
             'multiple' => true,
         ))->getForm();
 
@@ -68,7 +68,7 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
     public function testSetDataMultiple()
     {
-        $form = $this->factory->createBuilder('file', null, array(
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType', null, array(
             'multiple' => true,
         ))->getForm();
 

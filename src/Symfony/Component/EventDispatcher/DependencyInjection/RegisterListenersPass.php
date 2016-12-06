@@ -108,7 +108,17 @@ class RegisterListenersPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
             }
 
-            $definition->addMethodCall('addSubscriberService', array($id, $class));
+            foreach ($class::getSubscribedEvents() as $eventName => $params) {
+                if (is_string($params)) {
+                    $definition->addMethodCall('addListenerService', array($eventName, array($id, $params), 0));
+                } elseif (is_string($params[0])) {
+                    $definition->addMethodCall('addListenerService', array($eventName, array($id, $params[0]), isset($params[1]) ? $params[1] : 0));
+                } elseif (is_array($params[0])) {
+                    foreach ($params as $listener) {
+                        $definition->addMethodCall('addListenerService', array($eventName, array($id, $listener[0]), isset($listener[1]) ? $listener[1] : 0));
+                    }
+                }
+            }
         }
     }
 }

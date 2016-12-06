@@ -153,7 +153,7 @@ class ContainerAwareEventDispatcher extends EventDispatcher
                 $this->listenerIds[$eventName][] = array($serviceId, $params, 0);
             } elseif (is_string($params[0])) {
                 $this->listenerIds[$eventName][] = array($serviceId, $params[0], isset($params[1]) ? $params[1] : 0);
-            } else {
+            } elseif (is_array($params[0])) {
                 foreach ($params as $listener) {
                     $this->listenerIds[$eventName][] = array($serviceId, $listener[0], isset($listener[1]) ? $listener[1] : 0);
                 }

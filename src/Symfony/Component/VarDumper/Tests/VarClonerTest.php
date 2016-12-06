@@ -157,6 +157,10 @@ EOTXT;
 
     public function testJsonCast()
     {
+        if (extension_loaded('xdebug')) {
+            $this->markTestSkipped('xdebug is active');
+        }
+
         $data = (array) json_decode('{"1":{}}');
 
         $cloner = new VarCloner();

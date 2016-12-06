@@ -147,6 +147,10 @@ EOTXT
      */
     public function testGenerator()
     {
+        if (extension_loaded('xdebug')) {
+            $this->markTestSkipped('xdebug is active');
+        }
+
         $g = new GeneratorDemo();
         $g = $g->baz();
         $r = new \ReflectionGenerator($g);

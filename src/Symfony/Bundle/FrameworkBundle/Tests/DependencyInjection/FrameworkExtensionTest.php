@@ -185,6 +185,29 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->createContainerFromFile('workflow_with_arguments_and_service');
     }
 
+    public function testWorkflowMultipleTransitionsWithSameName()
+    {
+        $container = $this->createContainerFromFile('workflow_with_multiple_transitions_with_same_name');
+
+        $this->assertTrue($container->hasDefinition('workflow.article', 'Workflow is registered as a service'));
+        $this->assertTrue($container->hasDefinition('workflow.article.definition', 'Workflow definition is registered as a service'));
+
+        $workflowDefinition = $container->getDefinition('workflow.article.definition');
+
+        $transitions = $workflowDefinition->getArgument(1);
+
+        $this->assertCount(5, $transitions);
+
+        $this->assertSame('request_review', $transitions[0]->getArgument(0));
+        $this->assertSame('journalist_approval', $transitions[1]->getArgument(0));
+        $this->assertSame('spellchecker_approval', $transitions[2]->getArgument(0));
+        $this->assertSame('publish', $transitions[3]->getArgument(0));
+        $this->assertSame('publish', $transitions[4]->getArgument(0));
+
+        $this->assertSame(array('approved_by_journalist', 'approved_by_spellchecker'), $transitions[3]->getArgument(1));
+        $this->assertSame(array('draft'), $transitions[4]->getArgument(1));
+    }
+
     public function testRouter()
     {
         $container = $this->createContainerFromFile('full');

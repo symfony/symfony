@@ -17,7 +17,14 @@ class ChildA
 {
     /**
      * @Assert\Valid
+     * @Assert\NotNull
      * @Assert\NotBlank
      */
     public $name;
+    /**
+     * @var ChildB
+     * @Assert\Valid
+     * @Assert\NotNull
+     */
+    public $childB;
 }

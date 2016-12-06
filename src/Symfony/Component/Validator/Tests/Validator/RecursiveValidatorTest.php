@@ -61,4 +61,38 @@ class RecursiveValidatorTest extends AbstractTest
 
         $validator->validate($entity, null, array());
     }
+
+    public function testRelationBetweenChildAAndChildB()
+    {
+        $entity = new Entity();
+        $childA = new ChildA();
+        $childB = new ChildB();
+
+        $childA->childB = $childB;
+        $childB->childA = $childA;
+
+        $childA->name = false;
+        $childB->name = 'fake';
+        $entity->childA = array($childA);
+        $entity->childB = array($childB);
+
+        $validatorContext = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+        $validatorContext
+            ->expects($this->once())
+            ->method('validate')
+            ->with($entity, null, array())
+            ->willReturnSelf();
+
+        $validator = $this
+            ->getMockBuilder('Symfony\Component\Validator\Validator\RecursiveValidator')
+            ->disableOriginalConstructor()
+            ->setMethods(array('startContext'))
+            ->getMock();
+        $validator
+            ->expects($this->once())
+            ->method('startContext')
+            ->willReturn($validatorContext);
+
+        $validator->validate($entity, null, array());
+    }
 }

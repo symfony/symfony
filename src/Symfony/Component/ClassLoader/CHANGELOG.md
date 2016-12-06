@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * The ApcClassLoader, WinCacheClassLoader and XcacheClassLoader classes have been deprecated
+   in favor of the `--apcu-autoloader` option introduced in composer 1.3
+
 3.0.0
 -----
 

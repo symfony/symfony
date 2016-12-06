@@ -14,6 +14,9 @@ namespace Symfony\Component\ClassLoader\Tests;
 use Symfony\Component\ClassLoader\ApcClassLoader;
 use Symfony\Component\ClassLoader\ClassLoader;
 
+/**
+ * @group legacy
+ */
 class ApcClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

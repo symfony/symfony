@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-05T15:37:16Z
+
+Can you add test covering the bug to prevent regressions ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-05T15:38:08Z
+
+No, I can't... This code is a maze...
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-05T15:42:49Z
+
+Well, you said you had a reproducer. Couldn't it be used as a test ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-05T15:43:42Z
+
+It's a functional test with master + sub requests + profiler enabled. ie. a heavy stack...
+
+---------------------------------------------------------------------------
+
+by Padam87 at 2016-12-05T16:37:20Z
+
+I can confirm that the patch works.
+
+---------------------------------------------------------------------------
+
+by Padam87 at 2016-12-05T17:25:41Z
+
+I've added a failing test, which is fixed by this patch
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-06T09:06:35Z
+
+👍

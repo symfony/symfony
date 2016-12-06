@@ -5,6 +5,12 @@ services:
     test.autowiring_types.autowired_services:
         class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\AutowiringTypes\AutowiredServices
         autowire: true
+
+    another_router:
+        class: Symfony\Bundle\FrameworkBundle\Routing\Router
+        arguments:
+          - "@service_container"
+
 framework:
     templating:
         engines: ['php']

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
 
@@ -44,6 +45,15 @@ class AutowiringTypesTest extends WebTestCase
         $autowiredServices = $container->get('test.autowiring_types.autowired_services');
         $this->assertInstanceOf(FrameworkBundleEngineInterface::class, $autowiredServices->getFrameworkBundleEngine());
         $this->assertInstanceOf(ComponentEngineInterface::class, $autowiredServices->getEngine());
+    }
+
+    public function testRouterAutowiring()
+    {
+        static::bootKernel();
+        $container = static::$kernel->getContainer();
+
+        $autowiredServices = $container->get('test.autowiring_types.autowired_services');
+        $this->assertInstanceOf(RouterInterface::class, $autowiredServices->getRouter());
     }
 
     protected static function createKernel(array $options = array())

@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolClearer
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ControllerArgumentValueResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PropertyInfoPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RoutingResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
@@ -73,6 +74,7 @@ class FrameworkBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new RoutingResolverPass());
+        $container->addCompilerPass(new RoutingPass());
         $container->addCompilerPass(new ProfilerPass());
         // must be registered before removing private services as some might be listeners/subscribers
         // but as late as possible to get resolved parameters

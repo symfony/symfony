@@ -436,6 +436,16 @@ class Command
     }
 
     /**
+     * Returns the process title of the command.
+     *
+     * @return string The command name
+     */
+    public function getProcessTitle()
+    {
+        return $this->processTitle;
+    }
+
+    /**
      * Returns the command name.
      *
      * @return string The command name

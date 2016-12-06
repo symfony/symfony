@@ -182,7 +182,21 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
         $marking = $workflow->apply($subject, 't1');
 
-        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
+        $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEventNames);
+    }
+
+    public function testApplyWithEventDispatcherAndEventArguments()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $eventDispatcher = new EventDispatcherMock();
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore(), $eventDispatcher, 'workflow_name');
+
+        $arguments = array('code' => '123');
+        $marking = $workflow->apply($subject, 't1', $arguments);
+
+        $this->assertSame($arguments, $eventDispatcher->dispatchedEvents[0]->getArguments());
     }
 
     public function testGetEnabledTransitions()
@@ -214,10 +228,12 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 class EventDispatcherMock implements \Symfony\Component\EventDispatcher\EventDispatcherInterface
 {
     public $dispatchedEvents = array();
+    public $dispatchedEventNames = array();
 
     public function dispatch($eventName, \Symfony\Component\EventDispatcher\Event $event = null)
     {
-        $this->dispatchedEvents[] = $eventName;
+        $this->dispatchedEvents[] = $event;
+        $this->dispatchedEventNames[] = $eventName;
     }
 
     public function addListener($eventName, $listener, $priority = 0)

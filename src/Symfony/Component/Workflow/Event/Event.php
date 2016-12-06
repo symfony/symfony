@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Workflow\Event;
 
-use Symfony\Component\EventDispatcher\Event as BaseEvent;
+use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
 
@@ -19,9 +19,8 @@ use Symfony\Component\Workflow\Transition;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class Event extends BaseEvent
+class Event extends GenericEvent
 {
-    private $subject;
     private $marking;
     private $transition;
 
@@ -29,10 +28,12 @@ class Event extends BaseEvent
      * @param object     $subject
      * @param Marking    $marking
      * @param Transition $transition
+     * @param array      $arguments
      */
-    public function __construct($subject, Marking $marking, Transition $transition)
+    public function __construct($subject, Marking $marking, Transition $transition, array $arguments = array())
     {
-        $this->subject = $subject;
+        parent::__construct($subject, $arguments);
+
         $this->marking = $marking;
         $this->transition = $transition;
     }
@@ -40,11 +41,6 @@ class Event extends BaseEvent
     public function getMarking()
     {
         return $this->marking;
-    }
-
-    public function getSubject()
-    {
-        return $this->subject;
     }
 
     public function getTransition()

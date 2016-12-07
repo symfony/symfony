@@ -72,6 +72,8 @@ class Application
     private $defaultCommand;
 
     /**
+     * Constructor.
+     *
      * @param string $name    The name of the application
      * @param string $version The version of the application
      */
@@ -100,9 +102,6 @@ class Application
      * @param OutputInterface $output An Output instance
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @throws \Exception When doRun threw an exception and catchExceptions is false
-     * @throws \Throwable When doRun threw a throwable
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
@@ -195,7 +194,7 @@ class Application
     /**
      * Set a helper set to be used with the command.
      *
-     * @param HelperSet $helperSet
+     * @param HelperSet $helperSet The helper set
      */
     public function setHelperSet(HelperSet $helperSet)
     {
@@ -203,6 +202,8 @@ class Application
     }
 
     /**
+     * Get the helper set associated with the command.
+     *
      * @return HelperSet The HelperSet instance associated with this command
      */
     public function getHelperSet()
@@ -213,7 +214,7 @@ class Application
     /**
      * Set an input definition to be used with this application.
      *
-     * @param InputDefinition $definition
+     * @param InputDefinition $definition The input definition
      */
     public function setDefinition(InputDefinition $definition)
     {
@@ -221,7 +222,9 @@ class Application
     }
 
     /**
-     * @return InputDefinition The InputDefinition related to this Application
+     * Gets the InputDefinition related to this Application.
+     *
+     * @return InputDefinition The InputDefinition instance
      */
     public function getDefinition()
     {
@@ -229,7 +232,9 @@ class Application
     }
 
     /**
-     * @return string The help message
+     * Gets the help message.
+     *
+     * @return string A help message
      */
     public function getHelp()
     {
@@ -237,6 +242,8 @@ class Application
     }
 
     /**
+     * Sets whether to catch exceptions or not during commands execution.
+     *
      * @param bool $boolean Whether to catch exceptions or not during commands execution
      */
     public function setCatchExceptions($boolean)
@@ -245,6 +252,8 @@ class Application
     }
 
     /**
+     * Sets whether to automatically exit after a command execution or not.
+     *
      * @param bool $boolean Whether to automatically exit after a command execution or not
      */
     public function setAutoExit($boolean)
@@ -253,6 +262,8 @@ class Application
     }
 
     /**
+     * Gets the name of the application.
+     *
      * @return string The application name
      */
     public function getName()
@@ -263,7 +274,7 @@ class Application
     /**
      * Sets the application name.
      *
-     * @param string $name
+     * @param string $name The application name
      */
     public function setName($name)
     {
@@ -271,6 +282,8 @@ class Application
     }
 
     /**
+     * Gets the application version.
+     *
      * @return string The application version
      */
     public function getVersion()
@@ -279,6 +292,8 @@ class Application
     }
 
     /**
+     * Sets the application version.
+     *
      * @param string $version The application version
      */
     public function setVersion($version)
@@ -287,6 +302,8 @@ class Application
     }
 
     /**
+     * Returns the long version of the application.
+     *
      * @return string The long application version
      */
     public function getLongVersion()
@@ -319,7 +336,7 @@ class Application
      *
      * If a Command is not enabled it will not be added.
      *
-     * @param Command[] $commands
+     * @param Command[] $commands An array of commands
      */
     public function addCommands(array $commands)
     {
@@ -334,7 +351,7 @@ class Application
      * If a command with the same name already exists, it will be overridden.
      * If the command is not enabled it will not be added.
      *
-     * @param Command $command
+     * @param Command $command A Command object
      *
      * @return Command|null The registered command if enabled or null
      */
@@ -366,7 +383,7 @@ class Application
      *
      * @param string $name The command name or alias
      *
-     * @return Command
+     * @return Command A Command object
      *
      * @throws \InvalidArgumentException When given command name does not exist
      */
@@ -391,6 +408,8 @@ class Application
     }
 
     /**
+     * Returns true if the command exists, false otherwise.
+     *
      * @param string $name The command name or alias
      *
      * @return bool true if the command exists, false otherwise
@@ -468,7 +487,7 @@ class Application
      *
      * @param string $name A command name or a command alias
      *
-     * @return Command
+     * @return Command A Command instance
      *
      * @throws \InvalidArgumentException When command name is incorrect or ambiguous
      */
@@ -525,7 +544,7 @@ class Application
      *
      * @param string $namespace A namespace name
      *
-     * @return Command[]
+     * @return Command[] An array of Command instances
      */
     public function all($namespace = null)
     {
@@ -544,9 +563,11 @@ class Application
     }
 
     /**
-     * @param string[] $names An array of names
+     * Returns an array of possible abbreviations given a set of names.
      *
-     * @return array An array of possible abbreviations given a set of names.
+     * @param array $names An array of names
+     *
+     * @return array An array of abbreviations
      */
     public static function getAbbreviations($names)
     {
@@ -808,8 +829,6 @@ class Application
      * @param OutputInterface $output  An Output instance
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @throws \Throwable|\Exception when the command being run threw an throwable
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
@@ -859,9 +878,11 @@ class Application
     }
 
     /**
-     * @param InputInterface $input
+     * Gets the name of the command based on input.
      *
-     * @return string The command name based on input
+     * @param InputInterface $input The input interface
+     *
+     * @return string The command name
      */
     protected function getCommandName(InputInterface $input)
     {
@@ -869,7 +890,9 @@ class Application
     }
 
     /**
-     * @return InputDefinition The default input definition
+     * Gets the default input definition.
+     *
+     * @return InputDefinition An InputDefinition instance
      */
     protected function getDefaultInputDefinition()
     {
@@ -887,7 +910,9 @@ class Application
     }
 
     /**
-     * @return Command[] The default commands that should always be available
+     * Gets the default commands that should always be available.
+     *
+     * @return Command[] An array of default Command instances
      */
     protected function getDefaultCommands()
     {
@@ -895,7 +920,9 @@ class Application
     }
 
     /**
-     * @return HelperSet The default helper set with the helpers that should always be available
+     * Gets the default helper set with the helpers that should always be available.
+     *
+     * @return HelperSet A HelperSet instance
      */
     protected function getDefaultHelperSet()
     {
@@ -1042,7 +1069,7 @@ class Application
     /**
      * Sets the default Command name.
      *
-     * @param string $commandName
+     * @param string $commandName The Command name
      */
     public function setDefaultCommand($commandName)
     {
@@ -1099,9 +1126,11 @@ class Application
     }
 
     /**
+     * Returns all namespaces of the command name.
+     *
      * @param string $name The full name of the command
      *
-     * @return string[] The namespaces of the command name
+     * @return string[] The namespaces of the command
      */
     private function extractAllNamespaces($name)
     {

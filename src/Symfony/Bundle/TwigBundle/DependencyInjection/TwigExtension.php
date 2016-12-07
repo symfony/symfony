@@ -72,11 +72,16 @@ class TwigExtension extends Extension
             if (!$namespace) {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path));
             } else {
+                // register the "override" path
+                if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$namespace.'/views')) {
+                    $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $namespace));
+                }
+
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
         }
 
-        // register bundles as Twig namespaces
+        // register bundles as Twig namespaces (deprecated)
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
             if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
@@ -128,6 +133,9 @@ class TwigExtension extends Extension
         ));
     }
 
+    /**
+     * @deprecated The automatic @AcmeDemo (for AcmeDemoBundle) Twig path was deprecated in 2.8 and will be removed in 3.0
+     */
     private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
     {
         $name = $bundle;

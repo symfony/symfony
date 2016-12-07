@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-12-05T18:10:28Z
+
+Wow thanks for putting that much effort into BC!
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-12-05T20:30:38Z
+
+I am afraid that this property is not initialized anymore but haven't tested yet.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-12-05T20:47:55Z
+
+@Koc : [yes it is I think](https://github.com/symfony/symfony/blob/master/src/Symfony/Bridge/Twig/Extension/FormExtension.php#L33)
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2016-12-05T21:16:26Z
+
+Is it safer to throw an Exception when using magic methods with something else than '$renderer'?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-12-05T21:16:49Z
+
+[Proof Travis job](https://travis-ci.org/sonata-project/SonataAdminBundle/jobs/181472730). Not sure it completely works though… maybe something more needs to be done (the initialization @Koc was talking about?)
+
+[Here is the output without your changes](https://travis-ci.org/sonata-project/SonataAdminBundle/jobs/181316189#L586)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T07:58:05Z
+
+> Is it safer to throw an Exception when using magic methods with something else than '$renderer'?
+
+this is unrelated and wouldn't match the behavior in 4.0
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-06T08:00:38Z
+
+@nicolas-grekas But it allows us to add private or protected properties in the future without exposing them. Otherwise we would have to remember to update the magic getter and setter methods.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T08:16:28Z
+
+> But it allows us to add private or protected properties in the future without exposing them. Otherwise we would have to remember to update the magic getter and setter methods.
+
+So be it. Throwing would prevent removing the magic methods to preserve the
+behavior in 4.0, which is a no go to me.
+
+---------------------------------------------------------------------------
+
+by fbourigault at 2016-12-06T08:24:43Z
+
+@nicolas-grekas, you must also re-inject the renderer in the service definition as it was [removed when this break was introduced](https://github.com/symfony/symfony/commit/b515702fc90d759fba502b7e474f7462b4a9b578#diff-af1c832537900d7a594b1a9249348b13L119).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T15:26:25Z
+
+The renderer is now reinjected, but in a lazy way. PR ready.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-06T22:39:07Z
+
+> So be it. Throwing would prevent removing the magic methods to preserve the
+behavior in 4.0, which is a no go to me.
+
+@nicolas-grekas But the current implementation would suffer the same. You would receive `null` now, but you will get a PHP error with Symfony 4.0. Throwing an exception now would at least warn users to be aware that they do something wrong.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T22:47:20Z
+
+They will get exactly the same behavior as if the property did not exist: a PHP notice.
+See https://3v4l.org/YBvLe
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-07T08:15:37Z
+
+Oh indeed, I didn't say anything then. :)

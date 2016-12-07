@@ -13,6 +13,8 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\WeightedVoterInterface;
+use Symfony\Component\Security\Core\Exception\RuntimeException;
 
 /**
  * AccessDecisionManager is the base class for all access decision managers
@@ -155,16 +157,17 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $grant = 0;
         $deny = 0;
         foreach ($this->voters as $voter) {
+            $weight = $this->getWeightForVoter($voter);
             $result = $voter->vote($token, $object, $attributes);
 
             switch ($result) {
                 case VoterInterface::ACCESS_GRANTED:
-                    ++$grant;
+                    $grant += $weight;
 
                     break;
 
                 case VoterInterface::ACCESS_DENIED:
-                    ++$deny;
+                    $deny += $weight;
 
                     break;
             }
@@ -219,5 +222,26 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->allowIfAllAbstainDecisions;
+    }
+
+    /**
+     * @param VoterInterface $voter
+     *
+     * @return int
+     *
+     * @throws RuntimeException
+     */
+    private function getWeightForVoter(VoterInterface $voter)
+    {
+        $weight = 1;
+        if ($voter instanceof WeightedVoterInterface) {
+            $weight = (int) $voter->getWeight();
+        }
+
+        if ($weight < 1) {
+            throw new RuntimeException(sprintf('Weighted voter of class "%s" needs to have an integer weight >= 1', get_class($voter)));
+        }
+
+        return $weight;
     }
 }

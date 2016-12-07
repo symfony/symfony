@@ -123,6 +123,8 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $metadata = new ClassMetadata(self::PARENT_CLASS);
         $metadata->addConstraint(new ConstraintA());
 
+        $parentClass = self::PARENT_CLASS;
+
         $loader->expects($this->never())
                ->method('loadClassMetadata');
 
@@ -134,8 +136,8 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
                   array(self::PARENT_CLASS),
                   array(self::INTERFACE_A_CLASS)
               )
-              ->willReturnCallback(function ($name) use ($metadata) {
-                  if (self::PARENT_CLASS == $name) {
+              ->willReturnCallback(function ($name) use ($metadata, $parentClass) {
+                  if ($parentClass == $name) {
                       return $metadata;
                   }
 

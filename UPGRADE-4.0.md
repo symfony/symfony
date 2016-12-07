@@ -6,6 +6,10 @@ Console
 
  * Setting unknown style options is not supported anymore and throws an
    exception.
+  
+ * The signature of `Application::renderException(\Exception $e, OutputInterface $output)` 
+   has changed for `Application::renderException(\Throwable $e, OutputInterface $output)`.
+   You must update your implementations.
 
 Debug
 -----

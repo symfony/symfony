@@ -1000,6 +1000,39 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, $tester->getStatusCode(), 'Status code should be 1');
     }
 
+    public function testErrorsAreNotCaughtByDefault()
+    {
+        $application = new Application();
+
+        $this->assertFalse($application->areErrorsCaught());
+    }
+
+    /**
+     * @requires PHP 7
+     */
+    public function testCatchesErrors()
+    {
+        $application = new Application();
+
+        $application->setCatchErrors(true);
+        $application->setAutoExit(false);
+
+        $this->assertTrue($application->areErrorsCaught());
+
+        $application->register('foo')->setCode(function () {
+            throw new \Error('This error should be catch by Application::run');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'foo'));
+        $this->assertSame(1, $tester->getStatusCode(), 'Status code should be 1');
+        $this->assertContains(<<<'EOTXT'
+  [Error]                                         
+  This error should be catch by Application::run
+EOTXT
+            , $tester->getDisplay(true), 'The PHP error should be caught when catchErrors is true.');
+    }
+
     public function testRunWithDispatcherSkippingCommand()
     {
         $application = new Application();

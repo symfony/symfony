@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Exception\ErrorException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\ProcessHelper;
@@ -62,6 +63,7 @@ class Application
     private $name;
     private $version;
     private $catchExceptions = true;
+    private $catchErrors = false;
     private $autoExit = true;
     private $definition;
     private $helperSet;
@@ -100,8 +102,6 @@ class Application
      * @param OutputInterface $output An Output instance
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @throws \Exception When doRun returns Exception
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
@@ -124,7 +124,14 @@ class Application
             if (!$this->catchExceptions) {
                 throw $e;
             }
+        } catch (\Error $e) {
+            if (!$this->catchErrors) {
+                throw $e;
+            }
+            $e = new ErrorException($e);
+        }
 
+        if (isset($e)) {
             if ($output instanceof ConsoleOutputInterface) {
                 $this->renderException($e, $output->getErrorOutput());
             } else {
@@ -269,6 +276,22 @@ class Application
     public function setCatchExceptions($boolean)
     {
         $this->catchExceptions = (bool) $boolean;
+    }
+
+    /**
+     * @return bool Whether errors are caught or not during commands execution
+     */
+    public function areErrorsCaught()
+    {
+        return $this->catchErrors;
+    }
+
+    /**
+     * @param bool $boolean Whether to catch errors or not during commands execution
+     */
+    public function setCatchErrors($boolean)
+    {
+        $this->catchErrors = (bool) $boolean;
     }
 
     /**
@@ -620,6 +643,10 @@ class Application
      */
     public function renderException(\Exception $e, OutputInterface $output)
     {
+        if ($e instanceof ErrorException) {
+            $e = $e->getError();
+        }
+
         $output->writeln('', OutputInterface::VERBOSITY_QUIET);
 
         do {
@@ -814,8 +841,6 @@ class Application
      * @param OutputInterface $output  An Output instance
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @throws \Exception when the command being run threw an exception
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {

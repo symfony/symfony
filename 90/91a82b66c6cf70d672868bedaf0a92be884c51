@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-06T21:57:31Z
+
+What about triggering a deprecation at least from the `SecurityDataCollector` in case a role does implement `RoleInterface` without extending `Role`?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-06T21:58:53Z
+
+@ogizanagi But such a role would have triggered the deprecation already because of the `@deprecated` annotation in the `RoleInterface` (at least in the `dev` environment).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-06T22:08:37Z
+
+Right. I forgot about this behavior.

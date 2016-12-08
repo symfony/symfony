@@ -135,7 +135,7 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
                     return self::$stubsCache[$var] = new ClassStub($var);
                 }
             }
-            if (false !== strpos($var, DIRECTORY_SEPARATOR) && false === strpos($var, '://') && false === strpos($var, "\0") && is_file($var)) {
+            if (false !== strpos($var, DIRECTORY_SEPARATOR) && false === strpos($var, '://') && false === strpos($var, "\0") && @is_file($var)) {
                 return self::$stubsCache[$var] = new LinkStub($var);
             }
         }

@@ -268,7 +268,7 @@ class Configuration implements ConfigurationInterface
                                     ->thenInvalid('"type" and "service" cannot be used together.')
                                 ->end()
                                 ->validate()
-                                    ->ifTrue(function ($v) { return (isset($v['arguments']) && !empty($v['arguments'])) && isset($v['service']); })
+                                    ->ifTrue(function ($v) { return !empty($v['arguments']) && isset($v['service']); })
                                     ->thenInvalid('"arguments" and "service" cannot be used together.')
                                 ->end()
                             ->end()

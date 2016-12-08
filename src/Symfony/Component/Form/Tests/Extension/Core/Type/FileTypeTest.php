@@ -44,6 +44,33 @@ class FileTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form->getData());
     }
 
+    public function testSubmitEmptyMultiple()
+    {
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType', null, array(
+            'multiple' => true,
+        ))->getForm();
+
+        // submitted data when an input file is uploaded without choosing any file
+        $form->submit(array(null));
+
+        $this->assertSame(array(), $form->getData());
+    }
+
+    public function testSetDataMultiple()
+    {
+        $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType', null, array(
+            'multiple' => true,
+        ))->getForm();
+
+        $data = array(
+            $this->createUploadedFileMock('abcdef', 'first.jpg', true),
+            $this->createUploadedFileMock('zyxwvu', 'second.jpg', true),
+        );
+
+        $form->setData($data);
+        $this->assertSame($data, $form->getData());
+    }
+
     public function testSubmitMultiple()
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FileType', null, array(

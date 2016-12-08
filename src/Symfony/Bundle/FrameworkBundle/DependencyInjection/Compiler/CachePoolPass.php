@@ -34,7 +34,7 @@ class CachePoolPass implements CompilerPassInterface
         } else {
             $seed = '_'.$container->getParameter('kernel.root_dir');
         }
-        $seed .= '.'.$container->getParameter('kernel.name').'.'.$container->getParameter('kernel.environment').'.'.$container->getParameter('kernel.debug');
+        $seed .= '.'.$container->getParameter('kernel.name').'.'.$container->getParameter('kernel.environment');
 
         $aliases = $container->getAliases();
         $attributes = array(

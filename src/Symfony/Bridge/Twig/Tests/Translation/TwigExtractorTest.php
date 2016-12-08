@@ -72,8 +72,7 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException              \Twig_Error
-     * @expectedExceptionMessageRegExp /Unclosed "block" in ".*extractor(\/|\\)syntax_error\.twig" at line 1/
+     * @expectedException \Twig_Error
      * @dataProvider resourcesWithSyntaxErrorsProvider
      */
     public function testExtractSyntaxError($resources)
@@ -82,7 +81,19 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
         $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
 
         $extractor = new TwigExtractor($twig);
-        $extractor->extract($resources, new MessageCatalogue('en'));
+
+        try {
+            $extractor->extract($resources, new MessageCatalogue('en'));
+        } catch (\Twig_Error $e) {
+            if (method_exists($e, 'getSourceContext')) {
+                $this->assertSame(dirname(__DIR__).strtr('/Fixtures/extractor/syntax_error.twig', '/', DIRECTORY_SEPARATOR), $e->getFile());
+                $this->assertSame(1, $e->getLine());
+                $this->assertSame('Unclosed "block".', $e->getMessage());
+            } else {
+                $this->expectExceptionMessageRegExp('/Unclosed "block" in ".*extractor(\\/|\\\\)syntax_error\\.twig" at line 1/');
+            }
+            throw $e;
+        }
     }
 
     /**

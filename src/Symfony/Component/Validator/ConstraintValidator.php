@@ -36,7 +36,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
     const OBJECT_TO_STRING = 2;
 
     /**
-     * @var ExecutionContextInterface2Dot5
+     * @var ExecutionContextInterface
      */
     protected $context;
 

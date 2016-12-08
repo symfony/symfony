@@ -39,7 +39,7 @@
                                     {%- else -%}
                                             {{ redirect_route }}
                                     {%- endif %}
-                                    (<a href="{{ path('_profiler', { token: redirect.token }) }}">{{ redirect.token }}</a>)
+                                    (<a href="{{ path('_profiler', { token: redirect.token, panel: request.query.get('panel', 'request') }) }}">{{ redirect.token }}</a>)
                                 </dd>
                             </dl>
                         {%- endif %}
@@ -113,9 +113,11 @@
                     <ul id="menu-profiler">
                         {% for name, template in templates %}
                             {% set menu -%}
-                                {% with { collector: profile.getcollector(name), profiler_markup_version: profiler_markup_version } %}
-                                    {{- block('menu', template) -}}
-                                {% endwith %}
+                                {% if block('menu', template) is defined %}
+                                    {% with { collector: profile.getcollector(name), profiler_markup_version: profiler_markup_version } %}
+                                        {{- block('menu', template) -}}
+                                    {% endwith %}
+                                {% endif %}
                             {%- endset %}
                             {% if menu is not empty %}
                                 <li class="{{ name }} {{ name == panel ? 'selected' : '' }}">

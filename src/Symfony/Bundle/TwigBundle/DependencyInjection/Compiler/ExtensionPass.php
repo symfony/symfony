@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -69,7 +70,7 @@ class ExtensionPass implements CompilerPassInterface
             $loader->addTag('twig.loader');
             $loader->setMethodCalls($container->getDefinition('twig.loader.filesystem')->getMethodCalls());
 
-            $container->setDefinition('twig.loader.filesystem', $loader);
+            $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
         }
 
         if ($container->has('assets.packages')) {

@@ -1201,6 +1201,13 @@ EOF;
                     $visited[$argumentId] = true;
 
                     $service = $this->container->getDefinition($argumentId);
+
+                    // if the proxy manager is enabled, disable searching for references in lazy services,
+                    // as these services will be instantiated lazily and don't have direct related references.
+                    if ($service->isLazy() && !$this->getProxyDumper() instanceof NullDumper) {
+                        continue;
+                    }
+
                     $arguments = array_merge($service->getMethodCalls(), $service->getArguments(), $service->getProperties());
 
                     if ($this->hasReference($id, $arguments, $deep, $visited)) {

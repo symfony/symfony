@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-08T13:08:25Z
+
+Would it be possible to write a test covering the actual bug (i.e. checking that ``getMappedClasses`` works) instead of asserting the internal property ? it would be more reliable (the class is free to do what it wants with its private property as long as the public API works fine)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T13:15:45Z
+
+The property is protected, so it's a "public" side effect, which means the test is good :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T15:36:09Z
+
+@stof is this PR ok for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T15:48:57Z
+
+Note that this PR is against 2.7. `getMappedClasses` exists only on 3.2
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-08T15:55:35Z
+
+:+1:
+Status: reviewed

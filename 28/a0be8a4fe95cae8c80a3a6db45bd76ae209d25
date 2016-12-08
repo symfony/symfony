@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-16T19:25:39Z
+
+How can this actually happen?
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2016-11-16T19:30:30Z
+
+I've had it happen when loading this service definition: https://github.com/Sylius/Sylius/blob/82815edc768459159b4ea5910100d6e3f50bb8b3/src/Sylius/Bundle/CoreBundle/Resources/config/services/taxation.xml#L33..L40
+
+Note: I'll add that as a test case, just wanted to get opinions before spending the time doing that. According to the schema, it is a valid service definition, albeit an unusual one.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-16T20:07:42Z
+
+Hm, indeed. Guess we should deprecate that for 4.0.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2016-11-17T06:19:33Z
+
+Ok, I've added a test for the specific use case. Should I add the deprecation here or do you want to discuss that first?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-17T08:55:32Z
+
+As deprecations always must be done in the next minor version, but this is a bug fix that should be merged into all maintained branches, we should do the deprecation in a different PR.
+
+By the way, isn't Symfony 2.7 affected by this too?
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2016-11-17T09:35:51Z
+
+You are correct - I merely forgot that it was a LTS release as well. I changed the base to 2.7, but travis-ci seems to have missed it.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-17T09:56:25Z
+
+Rebasing and force pushing again may help Travis.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-17T10:21:00Z
+
+yeah, this happens becomes Sylius mixes integer (implicit) keys and associative keys.
+This would still not work properly anyway, as a non-numeric key should just be ignored when searching the max. So the bug fix is incomplete.
+And we should indeed trigger a deprecation in Symfony 3.3 when mixing this IMO (but with the proper detection logic).
+
+Btw, it is useless in the case of Sylius anyway, as top-level arguments don't care about the keys (as PHP does not have named arguments). Using `<argument key="...">` only makes sense inside an array argument (`<argument type="collection">`). So I suggest you to also clean the Sylius service definition
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2016-11-17T10:24:54Z
+
+> So I suggest you to also clean the Sylius service definition
+
+Sylius/Sylius#6752 was merged, so it's clean in dev-master.
+
+According to the schema, it is valid to have `key` in an argument even when it's outside of a collection. I agree that it makes no sense and that it should be deprecated.
+
+As for ignoring numeric keys, I could do that, which would change the resulting array (instead of having `['type' => 'bar', 1 => foo]` it would be `['type' => 'bar', 0 => foo]`). If that's acceptable, I'll gladly filter out non-numeric values before passing it to `max`.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-17T10:34:10Z
+
+@alcaeus this is because the XSD schema does not make a distinction between `<argument>` used inside `<service>` or inside another `<argument>` (this was done this way to avoid making the XSD more complex, but it might have been a mistake).
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2016-11-17T10:36:09Z
+
+I guessed as much. Once keys outside of collection arguments have been forbidden (so with 4.0) the schema should be updated to reflect this.
+
+---------------------------------------------------------------------------
+
+by alcaeus at 2016-11-25T14:43:44Z
+
+@nicolas-grekas good idea! I changed the code a little bit, opting for a more explicit approach to fetch the last array key by using `array_keys` and `array_pop`. Relying on a loop just leaving variables around just feels dirty.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T14:33:43Z
+
+:+1:
+status: reviewed

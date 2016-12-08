@@ -577,4 +577,13 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->getDefinition('bar')->isAutowired());
     }
+
+    public function testArgumentWithKeyOutsideCollection()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('with_key_outside_collection.xml');
+
+        $this->assertSame(array('type' => 'foo', 'bar'), $container->getDefinition('foo')->getArguments());
+    }
 }

@@ -165,6 +165,38 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    public function testMarkingStoreWithService()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $processedConfiguration = $processor->processConfiguration($configuration, array(
+            array(
+                'workflows' => array(
+                    'example' => array(
+                        'type' => 'workflow',
+                        'supports' => self::class,
+                        'marking_store' => array(
+                            'service' => 'my_example_service',
+                        ),
+                        'places' => array(
+                            'first_place',
+                            'second_place',
+                        ),
+                        'transitions' => array(
+                            'transform' => array(
+                                'from' => 'first_place',
+                                'to' => 'second_place',
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ));
+
+        $this->assertArrayHasKey('workflows', $processedConfiguration);
+    }
+
     protected static function getBundleDefaultConfig()
     {
         return array(

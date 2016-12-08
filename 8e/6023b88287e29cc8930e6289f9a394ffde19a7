@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-29T20:20:48Z
+
+👍  from my side this fixes the main bug reported in #20684.
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-30T07:58:27Z
+
+👍
+
+This solution worked for me too. Thanks Nicolas.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-30T09:13:50Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-30T17:46:14Z
+
+@nicolas-grekas About #20696, I just checked this out after your last commit and the result is that running `debug:container --parameter "env(database_url)"` gives the parameter placeholder (`"%env(database_url)%"`) and running `debug:container --parameters` gives the default parameter value.
+
+It's quite better than the current output but as you can guess I expected to get the actual value of the parameter, which looks not possible actually. Does #20618 helps in that way?
+Meantime,  shouldn't the output be consistent for `debug:config` and `debug:container` with both options (maybe always dump the placeholder)?
+
+Anyway, thank you for this.

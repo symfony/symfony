@@ -43,6 +43,7 @@ acme_root:
         - elem1
         - elem2
     scalar_required:      ~ # Required
+    node_with_a_looong_name: ~
     enum_with_default:    this # One of "this"; "that"
     enum:                 ~ # One of "this"; "that"
 

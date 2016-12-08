@@ -37,11 +37,11 @@
                         <ul id="menu-profiler">
                             {% for name, template in templates %}
                                 {% set menu -%}
-                                    {% if block('menu', template) is defined %}
+                                    {%- if block('menu', template) is defined -%}
                                         {% with { 'collector': profile.getcollector(name) } %}
                                             {{- block('menu', template) -}}
                                         {% endwith %}
-                                    {% endif %}
+                                    {%- endif -%}
                                 {%- endset %}
                                 {% if menu != '' %}
                                     <li class="{{ name }}{% if name == panel %} selected{% endif %}">

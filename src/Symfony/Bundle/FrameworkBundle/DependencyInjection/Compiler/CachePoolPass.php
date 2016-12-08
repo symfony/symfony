@@ -30,7 +30,7 @@ class CachePoolPass implements CompilerPassInterface
     {
         $namespaceSuffix = '';
 
-        foreach (array('name', 'root_dir', 'environment', 'debug') as $key) {
+        foreach (array('name', 'root_dir', 'environment') as $key) {
             if ($container->hasParameter('kernel.'.$key)) {
                 $namespaceSuffix .= '.'.$container->getParameter('kernel.'.$key);
             }

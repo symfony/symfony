@@ -66,9 +66,19 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
 
         $arrayPool = new ArrayAdapter(0, false);
         $reader = new CachedReader($this->annotationReader, new DoctrineProvider($arrayPool));
+        $throwingAutoloader = function ($class) { throw new \ReflectionException(sprintf('Class %s does not exist', $class)); };
+        spl_autoload_register($throwingAutoloader);
 
-        foreach ($annotatedClasses as $class) {
-            $this->readAllComponents($reader, $class);
+        try {
+            foreach ($annotatedClasses as $class) {
+                try {
+                    $this->readAllComponents($reader, $class);
+                } catch (\ReflectionException $e) {
+                    // ignore failing reflection
+                }
+            }
+        } finally {
+            spl_autoload_unregister($throwingAutoloader);
         }
 
         $values = $arrayPool->getValues();

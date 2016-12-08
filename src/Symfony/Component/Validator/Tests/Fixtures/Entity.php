@@ -47,6 +47,7 @@ class Entity extends EntityParent implements EntityInterfaceB
     private $internal;
     public $data = 'Overridden data';
     public $initialized = false;
+
     public function __construct($internal = null)
     {
         $this->internal = $internal;

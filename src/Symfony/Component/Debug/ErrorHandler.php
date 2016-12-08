@@ -478,12 +478,13 @@ class ErrorHandler
                 ($type & $level) ? $this->loggers[$type][1] : LogLevel::DEBUG,
                 $logMessage,
                 array('exception' => $errorAsException),
+                $errorAsException,
             );
         } else {
             try {
                 $this->isRecursive = true;
                 $level = ($type & $level) ? $this->loggers[$type][1] : LogLevel::DEBUG;
-                $this->loggers[$type][0]->log($level, $logMessage, array('exception' => $errorAsException));
+                static::logError($this->loggers[$type][0], $level, $logMessage, array('exception' => $errorAsException), $errorAsException);
             } finally {
                 $this->isRecursive = false;
             }
@@ -529,7 +530,8 @@ class ErrorHandler
             }
         }
         if ($this->loggedErrors & $type) {
-            $this->loggers[$type][0]->log($this->loggers[$type][1], $message, array('exception' => $exception));
+            list($logger, $level) = $this->loggers[$type];
+            static::logError($logger, $level, $message, array('exception' => $exception), $exception);
         }
         if ($exception instanceof FatalErrorException && !$exception instanceof OutOfMemoryException && $error) {
             foreach ($this->getFatalErrorHandlers() as $handler) {
@@ -646,8 +648,8 @@ class ErrorHandler
             $errors = self::$stackedErrors;
             self::$stackedErrors = array();
 
-            foreach ($errors as $error) {
-                $error[0]->log($error[1], $error[2], $error[3]);
+            foreach ($errors as list($logger, $level, $message, $context, $exception)) {
+                static::logError($logger, $level, $message, $context, $exception);
             }
         }
     }
@@ -666,5 +668,21 @@ class ErrorHandler
             new UndefinedMethodFatalErrorHandler(),
             new ClassNotFoundFatalErrorHandler(),
         );
+    }
+
+    /**
+     * @param LoggerInterface|null       $logger
+     * @param string                     $level
+     * @param string                     $message
+     * @param array                      $context
+     * @param \Exception|\Throwable|null $exception
+     */
+    protected static function logError($logger, $level, $message, $context, $exception)
+    {
+        if (!$logger instanceof LoggerInterface) {
+            return;
+        }
+
+        $logger->log($level, $message, $context);
     }
 }

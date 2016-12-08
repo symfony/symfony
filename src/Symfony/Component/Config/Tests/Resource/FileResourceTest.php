@@ -79,6 +79,6 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
     {
         $unserialized = unserialize(serialize($this->resource));
 
-        $this->assertSame(realpath($this->file), $this->resource->getResource());
+        $this->assertSame(realpath($this->file), $unserialized->getResource());
     }
 }

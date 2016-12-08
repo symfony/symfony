@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by mbabker at 2016-11-30T15:45:45Z
+
+Wait, the service is also defined as part of the Framework bundle with 3.2.  So either way it seems there's a missing required dependency, but now I'm not sure what it should be.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-01T09:44:58Z
+
+In the TwigBundle, we could just pass `null` if the service does not exist to fall back to the default behaviour:
+
+```xml
+<service id="twig.extension.code" class="Symfony\Bridge\Twig\Extension\CodeExtension" public="false">
+    <tag name="twig.extension" />
+    <argument type="service" id="debug.file_link_formatter" on-invalid="ignore"></argument>
+    <argument>%kernel.root_dir%</argument>
+    <argument>%kernel.charset%</argument>
+</service>
+```
+
+---------------------------------------------------------------------------
+
+by mbabker at 2016-12-01T13:28:33Z
+
+Thanks for that idea @xabbuh.  I've changed the PR's details to match the suggestion.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-01T13:45:42Z
+
+I think we can solve this for the FrameworkBundle in a similar way.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-01T15:11:48Z
+
+Shouldn't we patch these files also?
+src/Symfony/Bundle/DebugBundle/Resources/config/services.xml
+src/Symfony/Bundle/WebProfilerBundle/Resources/config/profiler.xml
+
+@xabbuh, it looks like `debug.file_link_formatter` is always defined in FrameworkBundle 3.2, isn't it?
+
+---------------------------------------------------------------------------
+
+by mbabker at 2016-12-01T15:41:15Z
+
+> Shouldn't we patch these files also?
+> src/Symfony/Bundle/DebugBundle/Resources/config/services.xml
+
+Done
+
+> src/Symfony/Bundle/WebProfilerBundle/Resources/config/profiler.xml
+
+Not needed, the service has a second definition in that file and the bundle depends on HttpKernel ~3.2 so the service class will always exist.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-02T10:20:48Z
+
+I think you also need to update the `DumpDataCollector` to properly deal with the passed formatter being `null`.
+
+---------------------------------------------------------------------------
+
+by mbabker at 2016-12-02T13:34:53Z
+
+It does already unless I've misread https://github.com/symfony/symfony/blob/87ef7235be13131a6ec97d98f8f9f7237ffd3541/src/Symfony/Component/HttpKernel/DataCollector/DumpDataCollector.php#L44 ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-02T14:27:47Z
+
+Sorry, I confused that on my mobile. :(
+
+:+1: looks good to me
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-02T14:59:57Z
+
+:+1:

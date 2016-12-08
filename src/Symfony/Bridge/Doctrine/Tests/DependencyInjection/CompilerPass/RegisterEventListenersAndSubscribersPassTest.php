@@ -150,6 +150,26 @@ class RegisterEventListenersAndSubscribersPassTest extends \PHPUnit_Framework_Te
         $this->assertEquals(array(), $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
     }
 
+    public function testResolvesParametersForConnectionTagAttribute()
+    {
+        $container = $this->createBuilder();
+        $container->setParameter('connection_name', 'default');
+
+        $container
+            ->register('a', 'stdClass')
+            ->addTag('doctrine.event_listener', array(
+                'event' => 'onFlush',
+                'connection' => '%connection_name%',
+            ))
+        ;
+        $this->process($container);
+
+        $callsDefault = $container->getDefinition('doctrine.dbal.default_connection.event_manager')->getMethodCalls();
+
+        $this->assertSame('addEventListener', $callsDefault[0][0]);
+        $this->assertSame('a', (string) $callsDefault[0][1][1]);
+    }
+
     private function process(ContainerBuilder $container)
     {
         $pass = new RegisterEventListenersAndSubscribersPass('doctrine.connections', 'doctrine.dbal.%s_connection.event_manager', 'doctrine');

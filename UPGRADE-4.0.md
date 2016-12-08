@@ -170,6 +170,12 @@ HttpKernel
 
  * The `DataCollector::varToString()` method has been removed in favor of `cloneVar()`.
 
+Security
+--------
+
+ * The `RoleInterface` has been removed. Extend the `Symfony\Component\Security\Core\Role\Role`
+   class instead.
+
 Serializer
 ----------
 

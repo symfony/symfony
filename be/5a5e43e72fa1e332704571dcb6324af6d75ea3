@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-08T13:28:59Z
+
+@nicolas-grekas can you also check deprecations in the profiler ? #20829 makes me think we have some there too
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T14:03:05Z
+
+@stof updated

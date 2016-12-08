@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by bramtweedegolf at 2016-06-22T12:22:11Z
+
+Sorry, status should not be bug but enhancement.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-06-22T14:29:01Z
+
+this should be covered by a test
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-06-23T11:54:10Z
+
+I think that this qualifies as a bug fix. Can you add a test for that case?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-09T11:24:21Z
+
+ping @bramtweedegolf
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-08-24T11:36:53Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T22:23:44Z
+
+@bramtweedegolf Can you take the latest comments into account and add some unit tests to finish this PR? Thanks.

@@ -1026,34 +1026,47 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
-     * Resolves env parameter placeholders in a string.
+     * Resolves env parameter placeholders in a string or an array.
      *
-     * @param string      $string    The string to resolve
+     * @param mixed       $value     The value to resolve
      * @param string|null $format    A sprintf() format to use as replacement for env placeholders or null to use the default parameter format
      * @param array       &$usedEnvs Env vars found while resolving are added to this array
      *
      * @return string The string with env parameters resolved
      */
-    public function resolveEnvPlaceholders($string, $format = null, array &$usedEnvs = null)
+    public function resolveEnvPlaceholders($value, $format = null, array &$usedEnvs = null)
     {
-        $bag = $this->getParameterBag();
-        $envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : $this->envPlaceholders;
-
         if (null === $format) {
             $format = '%%env(%s)%%';
         }
 
+        if (is_array($value)) {
+            $result = array();
+            foreach ($value as $k => $v) {
+                $result[$this->resolveEnvPlaceholders($k, $format, $usedEnvs)] = $this->resolveEnvPlaceholders($v, $format, $usedEnvs);
+            }
+
+            return $result;
+        }
+
+        if (!is_string($value)) {
+            return $value;
+        }
+
+        $bag = $this->getParameterBag();
+        $envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : $this->envPlaceholders;
+
         foreach ($envPlaceholders as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
-                if (false !== stripos($string, $placeholder)) {
-                    $string = str_ireplace($placeholder, sprintf($format, $env), $string);
+                if (false !== stripos($value, $placeholder)) {
+                    $value = str_ireplace($placeholder, sprintf($format, $env), $value);
                     $usedEnvs[$env] = $env;
                     $this->envCounters[$env] = isset($this->envCounters[$env]) ? 1 + $this->envCounters[$env] : 1;
                 }
             }
         }
 
-        return $string;
+        return $value;
     }
 
     /**

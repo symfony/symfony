@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * If you're using Guard authentication, you *must* use a class that implements
  * GuardTokenInterface as your authenticated token (like this class).
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>n@gmail.com>
+ * @author Ryan Weaver <ryan@knpuniversity.com>
  */
 class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenInterface
 {

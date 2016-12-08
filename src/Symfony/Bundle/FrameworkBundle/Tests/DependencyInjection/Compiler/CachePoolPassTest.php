@@ -45,7 +45,7 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
 
         $this->cachePoolPass->process($container);
 
-        $this->assertSame('C42Pcl9VBJ', $cachePool->getArgument(0));
+        $this->assertSame('D07rhFx97S', $cachePool->getArgument(0));
     }
 
     public function testArgsAreReplaced()
@@ -69,7 +69,7 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Reference::class, $cachePool->getArgument(0));
         $this->assertSame('foobar', (string) $cachePool->getArgument(0));
-        $this->assertSame('KO3xHaFEZU', $cachePool->getArgument(1));
+        $this->assertSame('itantF+pIq', $cachePool->getArgument(1));
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 

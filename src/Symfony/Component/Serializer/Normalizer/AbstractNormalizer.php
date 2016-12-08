@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
@@ -336,8 +337,11 @@ abstract class AbstractNormalizer extends SerializerAwareNormalizer implements N
                     $parameterData = $data[$key];
                     try {
                         if (null !== $constructorParameter->getClass()) {
+                            if (!$this->serializer instanceof DenormalizerInterface) {
+                                throw new LogicException(sprintf('Cannot create an instance of %s from serialized data because the serializer inject in "%s" is not a denormalizer', $constructorParameter->getClass(), static::class));
+                            }
                             $parameterClass = $constructorParameter->getClass()->getName();
-                            $parameterData = $this->serializer->deserialize($parameterData, $parameterClass, $format, $context);
+                            $parameterData = $this->serializer->denormalize($parameterData, $parameterClass, $format, $context);
                         }
                     } catch (\ReflectionException $e) {
                         throw new RuntimeException(sprintf('Could not determine the class of the parameter "%s".', $key), 0, $e);

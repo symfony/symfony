@@ -6,28 +6,6 @@ BrowserKit
 
  * Client HTTP user agent has been changed to 'Symfony BrowserKit' (was 'Symfony2 BrowserKit' before).
 
-FrameworkBundle
----------------
-
- * The `doctrine/annotations` dependency has been removed; require it via `composer
-   require doctrine/annotations` if you are using annotations in your project
- * The `symfony/security-core` and `symfony/security-csrf` dependencies have
-   been removed; require them via `composer require symfony/security-core
-   symfony/security-csrf` if you depend on them and don't already depend on
-   `symfony/symfony`
- * The `symfony/templating` dependency has been removed; require it via `composer
-   require symfony/templating` if you depend on it and don't already depend on
-   `symfony/symfony`
- * The `symfony/translation` dependency has been removed; require it via `composer
-   require symfony/translation` if you depend on it and don't already depend on
-   `symfony/symfony`
- * The `symfony/asset` dependency has been removed; require it via `composer
-   require symfony/asset` if you depend on it and don't already depend on
-   `symfony/symfony`
- * The `Resources/public/images/*` files have been removed.
- * The `Resources/public/css/*.css` files have been removed (they are now inlined
-   in TwigBundle).
-
 Console
 -------
 
@@ -72,25 +50,26 @@ Form
 FrameworkBundle
 ---------------
 
+ * The `doctrine/annotations` dependency has been removed; require it via `composer
+   require doctrine/annotations` if you are using annotations in your project
+ * The `symfony/security-core` and `symfony/security-csrf` dependencies have
+   been removed; require them via `composer require symfony/security-core
+   symfony/security-csrf` if you depend on them and don't already depend on
+   `symfony/symfony`
+ * The `symfony/templating` dependency has been removed; require it via `composer
+   require symfony/templating` if you depend on it and don't already depend on
+   `symfony/symfony`
+ * The `symfony/translation` dependency has been removed; require it via `composer
+   require symfony/translation` if you depend on it and don't already depend on
+   `symfony/symfony`
+ * The `symfony/asset` dependency has been removed; require it via `composer
+   require symfony/asset` if you depend on it and don't already depend on
+   `symfony/symfony`
+ * The `Resources/public/images/*` files have been removed.
+ * The `Resources/public/css/*.css` files have been removed (they are now inlined
+   in TwigBundle).
  * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
    be automatically used when available.
-
-HttpKernel
-----------
-
- * `DataCollector::varToString()` is deprecated and will be removed in Symfony
-   4.0. Use the `cloneVar()` method instead.
-
- * Surrogate name in a `Surrogate-Capability` HTTP request header has been changed to 'symfony'.
-
-   Before:
-   ```
-   Surrogate-Capability: symfony2="ESI/1.0"
-   ```
-
-   After:
-   ```
-   Surrogate-Capability: symfony="ESI/1.0"
    ```
 
 HttpFoundation
@@ -115,6 +94,30 @@ HttpFoundation
      - `hasVary`/`getVary`/`setVary`
      - `isInvalid`/`isSuccessful`/`isRedirection`/`isClientError`/`isServerError`
      - `isOk`/`isForbidden`/`isNotFound`/`isRedirect`/`isEmpty`
+
+HttpKernel
+----------
+
+ * `DataCollector::varToString()` is deprecated and will be removed in Symfony
+   4.0. Use the `cloneVar()` method instead.
+
+ * Surrogate name in a `Surrogate-Capability` HTTP request header has been changed to 'symfony'.
+
+   Before:
+   ```
+   Surrogate-Capability: symfony2="ESI/1.0"
+   ```
+
+   After:
+   ```
+   Surrogate-Capability: symfony="ESI/1.0"
+
+Serializer
+----------
+
+ * Method `AbstractNormalizer::instantiateObject()` will have a 6th
+   `$format = null` argument in Symfony 4.0. Not defining it when overriding
+   the method is deprecated.
 
 TwigBridge
 ----------

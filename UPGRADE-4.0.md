@@ -182,6 +182,10 @@ Serializer
  * The ability to pass a Doctrine `Cache` instance to the `ClassMetadataFactory`
    class has been removed. You should use the `CacheClassMetadataFactory` class
    instead.
+   
+ * Not defining the 6th argument `$format = null` of the
+   `AbstractNormalizer::instantiateObject()` method when overriding it is not
+   supported anymore.
 
 Translation
 -----------
@@ -193,6 +197,42 @@ TwigBridge
 
  * The possibility to inject the Form Twig Renderer into the form extension
    has been removed. Inject it into the `TwigRendererEngine` instead.
+
+Validator
+---------
+
+ * The `DateTimeValidator::PATTERN` constant was removed.
+
+ * `Tests\Constraints\AbstractConstraintValidatorTest` has been removed in
+   favor of `Test\ConstraintValidatorTestCase`.
+
+   Before:
+
+   ```php
+   // ...
+   use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
+
+   class MyCustomValidatorTest extends AbstractConstraintValidatorTest
+   {
+       // ...
+   }
+   ```
+
+   After:
+
+   ```php
+   // ...
+   use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+
+   class MyCustomValidatorTest extends ConstraintValidatorTestCase
+   {
+       // ...
+   }
+   ```
+   
+ * The default value of the strict option of the `Choice` Constraint has been
+   changed to `true` as of 4.0. If you need the the previous behaviour ensure to 
+   set the option to `false`.
 
 Yaml
 ----
@@ -285,39 +325,3 @@ Yaml
    the `!php/object` tag.
 
  * Duplicate mapping keys lead to a `ParseException`.
-
-Validator
----------
-
- * The `DateTimeValidator::PATTERN` constant was removed.
-
- * `Tests\Constraints\AbstractConstraintValidatorTest` has been removed in
-   favor of `Test\ConstraintValidatorTestCase`.
-
-   Before:
-
-   ```php
-   // ...
-   use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
-
-   class MyCustomValidatorTest extends AbstractConstraintValidatorTest
-   {
-       // ...
-   }
-   ```
-
-   After:
-
-   ```php
-   // ...
-   use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
-
-   class MyCustomValidatorTest extends ConstraintValidatorTestCase
-   {
-       // ...
-   }
-   ```
-   
- * The default value of the strict option of the `Choice` Constraint has been
-   changed to `true` as of 4.0. If you need the the previous behaviour ensure to 
-   set the option to `false`.

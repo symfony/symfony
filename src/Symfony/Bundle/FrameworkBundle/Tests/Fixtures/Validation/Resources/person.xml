@@ -16,8 +16,8 @@
         </property>
     </class>
 
-    <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\NonExistentClass">
-        <property name="gender">
+    <class name="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Validation\Article">
+        <property name="category">
             <constraint name="Choice">
                 <option name="choices">
                     <value>other</value>

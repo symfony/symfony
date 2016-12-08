@@ -101,7 +101,7 @@ class AddClassesToCachePass implements CompilerPassInterface
             }
 
             if (is_array($function) && $function[0] instanceof ClassLoader) {
-                $classes += $function[0]->getClassMap();
+                $classes += array_filter($function[0]->getClassMap());
             }
         }
 

@@ -66,12 +66,23 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), new Psr6Cache($arrayPool));
 
-        foreach ($this->extractSupportedLoaders($loaders) as $loader) {
-            foreach ($loader->getMappedClasses() as $mappedClass) {
-                if ($metadataFactory->hasMetadataFor($mappedClass)) {
-                    $metadataFactory->getMetadataFor($mappedClass);
+        $throwingAutoloader = function ($class) { throw new \ReflectionException(sprintf('Class %s does not exist', $class)); };
+        spl_autoload_register($throwingAutoloader);
+
+        try {
+            foreach ($this->extractSupportedLoaders($loaders) as $loader) {
+                foreach ($loader->getMappedClasses() as $mappedClass) {
+                    try {
+                        if ($metadataFactory->hasMetadataFor($mappedClass)) {
+                            $metadataFactory->getMetadataFor($mappedClass);
+                        }
+                    } catch (\ReflectionException $e) {
+                        // ignore failing reflection
+                    }
                 }
             }
+        } finally {
+            spl_autoload_unregister($throwingAutoloader);
         }
 
         $values = $arrayPool->getValues();

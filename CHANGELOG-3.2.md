@@ -7,6 +7,17 @@ in 3.2 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.2.0...v3.2.1
 
+* 3.2.0 (2016-11-30)
+
+ * bug #20687 [FrameworkBundle] Forbid env parameters in routing configuration (nicolas-grekas)
+ * bug #20607 [Validator] Bring egulias/email-validator ~2.0 to parity with ~1.2 (Lctrs)
+ * bug #20671 [Config] ConfigCache::isFresh() should return false when unserialize() fails (nicolas-grekas)
+ * bug #20679 [VarDumper] Use default color for ellipsed namespaces/paths (nicolas-grekas)
+ * bug #20676 [ClassLoader] Use only forward slashes in generated class map (nicolas-grekas)
+ * bug #20664 [Validator] ensure the proper context for nested validations (xabbuh)
+ * bug #20661 bug #20653 [WebProfilerBundle] Profiler includes ghost panels (jzawadzki)
+ * bug #20652 Fixed getRouteParams() when no parameters are available (wouterj)
+
 * 3.2.0-RC2 (2016-11-27)
 
  * bug #20601 [FrameworkBundle] Don't rely on any parent definition for "cache.annotations" (nicolas-grekas)

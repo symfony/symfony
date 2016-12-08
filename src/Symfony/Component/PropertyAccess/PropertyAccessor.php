@@ -645,6 +645,8 @@ class PropertyAccessor implements PropertyAccessorInterface
             $object->$property = $value;
         } elseif (self::ACCESS_TYPE_MAGIC === $access[self::ACCESS_TYPE]) {
             $object->{$access[self::ACCESS_NAME]}($value);
+        } elseif (self::ACCESS_TYPE_NOT_FOUND === $access[self::ACCESS_TYPE]) {
+            throw new NoSuchPropertyException(sprintf('Could not determine access type for property "%s".', $property));
         } else {
             throw new NoSuchPropertyException($access[self::ACCESS_NAME]);
         }

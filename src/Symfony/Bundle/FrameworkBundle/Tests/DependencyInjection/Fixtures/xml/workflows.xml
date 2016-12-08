@@ -79,5 +79,16 @@
                 <framework:to>review</framework:to>
             </framework:transition>
         </framework:workflow>
+
+        <framework:workflow name="service_marking_store_workflow">
+            <framework:marking-store service="workflow_service"/>
+            <framework:support>Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTest</framework:support>
+            <framework:place>first</framework:place>
+            <framework:place>last</framework:place>
+            <framework:transition name="go">
+                <framework:from>first</framework:from>
+                <framework:to>last</framework:to>
+            </framework:transition>
+        </framework:workflow>
     </framework:config>
 </container>

@@ -204,6 +204,17 @@ class ArgumentResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \RuntimeException
+     */
+    public function testIfExceptionIsThrownWhenMissingAnArgument()
+    {
+        $request = Request::create('/');
+        $controller = array($this, 'controllerWithFoo');
+
+        self::$resolver->getArguments($request, $controller);
+    }
+
+    /**
      * @requires PHP 7.1
      */
     public function testGetNullableArguments()

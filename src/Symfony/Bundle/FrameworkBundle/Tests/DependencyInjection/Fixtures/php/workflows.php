@@ -88,5 +88,23 @@ $container->loadFromExtension('framework', array(
                 ),
             ),
         ),
+        'service_marking_store_workflow' => array(
+            'marking_store' => array(
+                'service' => 'workflow_service',
+            ),
+            'supports' => array(
+                FrameworkExtensionTest::class,
+            ),
+            'places' => array(
+                'first',
+                'last',
+            ),
+            'transitions' => array(
+                'go' => array(
+                    'from' => 'first',
+                    'to' => 'last',
+                ),
+            ),
+        ),
     ),
 ));

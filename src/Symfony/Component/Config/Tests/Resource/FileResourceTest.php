@@ -52,15 +52,6 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(realpath($this->file), (string) $this->resource);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /The file ".*" does not exist./
-     */
-    public function testResourceDoesNotExist()
-    {
-        $resource = new FileResource('/____foo/foobar'.mt_rand(1, 999999));
-    }
-
     public function testIsFresh()
     {
         $this->assertTrue($this->resource->isFresh($this->time), '->isFresh() returns true if the resource has not changed in same second');
@@ -68,11 +59,21 @@ class FileResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->resource->isFresh($this->time - 86400), '->isFresh() returns false if the resource has been updated');
     }
 
+    public function testIsFreshForCreatedResources()
+    {
+        unlink($this->file);
+
+        $this->resource = new FileResource($this->file);
+        touch($this->file, $this->time);
+
+        $this->assertFalse($this->resource->isFresh($this->time), '->isFresh() returns false if the resource is created');
+    }
+
     public function testIsFreshForDeletedResources()
     {
         unlink($this->file);
 
-        $this->assertFalse($this->resource->isFresh($this->time), '->isFresh() returns false if the resource does not exist');
+        $this->assertFalse($this->resource->isFresh($this->time), '->isFresh() returns false if the resource is deleted');
     }
 
     public function testSerializeUnserialize()

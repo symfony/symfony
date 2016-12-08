@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-15T21:48:51Z
+
+:+1: to remove it as done by this PR.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-16T09:32:06Z
+
+I would vote for deprecating the method to prevent unexpected BC breaks for users of this class.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-16T12:25:36Z
+
+@xabbuh Is it really worth it?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-16T13:01:10Z
+
+Judging by the name of the method and given the fact that people will use the `AbstractObjectNormalizer` as the base class for their own normalizers, I fear that there will be users out there who call this method before doing actual normalisation work which would then break.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-16T15:19:54Z
+
+Ok, fair enough. Let's add a deprecation notice then.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-16T15:43:56Z
+
+After a quick search, I wasn't able to find any public project using this method. Regarding the fact that it was introduced in 3.1 (only 6 months ago) and is useless, I really doubt than anybody has used it.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-16T17:50:07Z
+
+Maybe add a ~~changelog~~ upgrade note about the silent removal of this method. As it was forgotten before...
+
+Imo. we can totally be pragmatic on left-over code from one minor to another. But it should be documented.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-23T13:38:21Z
+
+:+1: on my side for an UPGRADE entry and no deprecation.

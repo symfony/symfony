@@ -20,6 +20,9 @@ use Symfony\Component\VarDumper\Test\VarDumperTestCase;
  */
 class CliDumperTest extends VarDumperTestCase
 {
+    /**
+     * @requires extension iconv
+     */
     public function testGet()
     {
         require __DIR__.'/Fixtures/dumb-var.php';

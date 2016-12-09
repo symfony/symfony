@@ -100,6 +100,9 @@ class MongoDbProfilerStorageTest extends AbstractProfilerStorageTest
         $this->assertEquals($expected, $m->invoke($this->storage, $dsn));
     }
 
+    /**
+     * @requires extension iconv
+     */
     public function testUtf8()
     {
         $profile = new Profile('utf8_test_profile');

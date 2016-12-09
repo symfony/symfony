@@ -283,7 +283,8 @@ class Command
         if (PHP_VERSION_ID >= 50400 && $code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
-                $code = \Closure::bind($code, $this);
+                // Cannot bind static closures for PHP<7.0 so it may fail
+                $code = @\Closure::bind($code, $this);
             }
         }
 

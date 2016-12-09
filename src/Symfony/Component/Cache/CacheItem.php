@@ -22,10 +22,11 @@ final class CacheItem implements CacheItemInterface
 {
     protected $key;
     protected $value;
-    protected $isHit;
+    protected $isHit = false;
     protected $expiry;
     protected $defaultLifetime;
     protected $tags = array();
+    protected $prevTags = array();
     protected $innerItem;
     protected $poolHash;
 
@@ -128,6 +129,18 @@ final class CacheItem implements CacheItemInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Returns the list of tags bound to the value coming from the pool storage if any.
+     *
+     * @return array
+     *
+     * @experimental in version 3.3
+     */
+    public function getPreviousTags()
+    {
+        return $this->prevTags;
     }
 
     /**

@@ -114,4 +114,15 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         $this->assertFalse($pool->getItem('foo')->isHit());
     }
+
+    public function testGetPreviousTags()
+    {
+        $pool = $this->createCachePool();
+
+        $i = $pool->getItem('k');
+        $pool->save($i->tag('foo'));
+
+        $i = $pool->getItem('k');
+        $this->assertSame(array('foo' => 'foo'), $i->getPreviousTags());
+    }
 }

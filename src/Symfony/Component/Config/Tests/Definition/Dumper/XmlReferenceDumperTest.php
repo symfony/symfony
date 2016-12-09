@@ -49,6 +49,7 @@ class XmlReferenceDumperTest extends \PHPUnit_Framework_TestCase
     scalar-array-empty=""
     scalar-array-defaults="elem1,elem2"
     scalar-required=""
+    node-with-a-looong-name=""
     enum-with-default="this"
     enum=""
 >

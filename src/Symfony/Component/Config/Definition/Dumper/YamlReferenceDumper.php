@@ -106,7 +106,7 @@ class YamlReferenceDumper
         $comments = count($comments) ? '# '.implode(', ', $comments) : '';
 
         $key = $prototypedArray ? '-' : $node->getName().':';
-        $text = rtrim(sprintf('%-20s %s %s', $key, $default, $comments), ' ');
+        $text = rtrim(sprintf('%-21s%s %s', $key, $default, $comments), ' ');
 
         if ($info = $node->getInfo()) {
             $this->writeLine('');

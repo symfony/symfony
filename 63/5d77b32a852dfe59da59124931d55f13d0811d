@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by FabienPapet at 2016-11-05T14:52:20Z
+
+Shouldn't the UPGRADE-4.0.md file be updated as well ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-05T15:34:17Z
+
+@FabienPapet You're right, thought I'm not sure upgrade files are not automatically generated from merged commits, changelog ones seem to be so let's get the confirmation of a core team member
+
+---------------------------------------------------------------------------
+
+by Taluu at 2016-11-05T19:31:27Z
+
+AFAIK, you need to update it
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-05T21:32:41Z
+
+UPGRADE updated. Thanks
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-07T19:04:59Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-20T10:18:48Z
+
+Updated to target 3.3
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-08T23:24:40Z
+
+This is ready to go

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\Security;
 
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 /**
  * This is a wrapper around the actual firewall configuration which allows us
@@ -24,12 +25,14 @@ class FirewallContext
     private $listeners;
     private $exceptionListener;
     private $config;
+    private $rememberMeServices;
 
-    public function __construct(array $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null)
+    public function __construct(array $listeners, ExceptionListener $exceptionListener = null, FirewallConfig $config = null, RememberMeServicesInterface $rememberMeServices = null)
     {
         $this->listeners = $listeners;
         $this->exceptionListener = $exceptionListener;
         $this->config = $config;
+        $this->rememberMeServices = $rememberMeServices;
     }
 
     public function getConfig()
@@ -40,5 +43,10 @@ class FirewallContext
     public function getContext()
     {
         return array($this->listeners, $this->exceptionListener);
+    }
+
+    public function getRememberMeServices()
+    {
+        return $this->rememberMeServices;
     }
 }

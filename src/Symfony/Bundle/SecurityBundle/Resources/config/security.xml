@@ -112,6 +112,7 @@
             <argument type="collection" />
             <argument type="service" id="security.exception_listener" />
             <argument />  <!-- FirewallConfig -->
+            <argument type="service" on-invalid="null" />
         </service>
 
         <service id="security.firewall.config" class="Symfony\Bundle\SecurityBundle\Security\FirewallConfig" abstract="true" public="false">

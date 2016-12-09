@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\Security\Http\Firewall\ListenerInterface;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
 
 class FirewallContextTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,6 +23,10 @@ class FirewallContextTest extends \PHPUnit_Framework_TestCase
     {
         $config = new FirewallConfig('main', 'user_checker', 'request_matcher');
 
+        $rememberMeServices = $this
+            ->getMockBuilder(RememberMeServicesInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $exceptionListener = $this
             ->getMockBuilder(ExceptionListener::class)
             ->disableOriginalConstructor()
@@ -34,9 +39,10 @@ class FirewallContextTest extends \PHPUnit_Framework_TestCase
                 ->getMock(),
         );
 
-        $context = new FirewallContext($listeners, $exceptionListener, $config);
+        $context = new FirewallContext($listeners, $exceptionListener, $config, $rememberMeServices);
 
-        $this->assertEquals(array($listeners, $exceptionListener), $context->getContext());
-        $this->assertEquals($config, $context->getConfig());
+        $this->assertSame(array($listeners, $exceptionListener), $context->getContext());
+        $this->assertSame($config, $context->getConfig());
+        $this->assertSame($rememberMeServices, $context->getRememberMeServices());
     }
 }

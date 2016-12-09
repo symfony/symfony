@@ -70,7 +70,6 @@ FrameworkBundle
    in TwigBundle).
  * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
    be automatically used when available.
-   ```
 
 HttpFoundation
 ---------------
@@ -111,6 +110,7 @@ HttpKernel
    After:
    ```
    Surrogate-Capability: symfony="ESI/1.0"
+   ```
 
 Serializer
 ----------

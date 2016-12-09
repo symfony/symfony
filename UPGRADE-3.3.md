@@ -12,3 +12,9 @@ Security
 
  * The `RoleInterface` has been deprecated. Extend the `Symfony\Component\Security\Core\Role\Role`
    class in your custom role implementations instead.
+
+SecurityBundle
+--------------
+
+ * The `FirewallContext::getContext()` method has been deprecated and will be removed in 4.0.
+   Use the `getListeners()` method instead.

@@ -134,6 +134,11 @@ FrameworkBundle
    `serializer.mapping.cache.apc` and `serializer.mapping.cache.doctrine.apc`
    have been removed. APCu should now be automatically used when available.
 
+SecurityBundle
+--------------
+
+ * The `FirewallContext::getContext()` method has been removed, use the `getListeners()` method instead.
+
 HttpFoundation
 ---------------
 

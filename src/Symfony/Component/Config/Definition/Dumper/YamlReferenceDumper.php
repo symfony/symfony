@@ -125,7 +125,7 @@ class YamlReferenceDumper
         $default = (string) $default != '' ? ' '.$default : '';
         $comments = count($comments) ? '# '.implode(', ', $comments) : '';
 
-        $text = rtrim(sprintf('%-20s %s %s', $node->getName().':', $default, $comments), ' ');
+        $text = rtrim(sprintf('%-21s%s %s', $node->getName().':', $default, $comments), ' ');
 
         if ($info = $node->getInfo()) {
             $this->writeLine('');

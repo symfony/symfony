@@ -19,7 +19,8 @@
         "php": ">=5.5.9",
         "symfony/http-kernel": "~3.1",
         "symfony/routing": "~2.8|~3.0",
-        "symfony/twig-bridge": "~2.8|~3.0"
+        "symfony/twig-bridge": "~2.8|~3.0",
+        "twig/twig": "~1.28|~2.0"
     },
     "require-dev": {
         "symfony/config": "~2.8|~3.0",

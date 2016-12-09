@@ -231,7 +231,23 @@ class Inline
 
             if (null !== $delimiters) {
                 $tmp = ltrim(substr($scalar, $i), ' ');
-                if (!in_array($tmp[0], $delimiters)) {
+                $delimiterFound = false;
+
+                foreach ($delimiters as $delimiter) {
+                    // usually, delimiters should be one-character strings
+                    // in this case, we can save some function calls
+                    if ($tmp[0] === $delimiter) {
+                        $delimiterFound = true;
+                        break;
+                    }
+
+                    if (substr($tmp, 0, strlen($delimiter)) === $delimiter) {
+                        $delimiterFound = true;
+                        break;
+                    }
+                }
+
+                if (!$delimiterFound) {
                     throw new ParseException(sprintf('Unexpected characters (%s).', substr($scalar, $i)));
                 }
             }
@@ -382,7 +398,15 @@ class Inline
             }
 
             // key
-            $key = self::parseScalar($mapping, array(':', ' '), array('"', "'"), $i, false);
+            try {
+                // colons after YAML keys must be followed by a space
+                $positionBeforeKeyParsing = $i;
+                $key = self::parseScalar($mapping, array(': ', ' '), array('"', "'"), $i, false);
+            } catch (ParseException $e) {
+                // fall back to search for colons without a following space to support the legacy behavior
+                $key = self::parseScalar($mapping, array(':', ' '), array('"', "'"), $positionBeforeKeyParsing, false);
+                $i = $positionBeforeKeyParsing;
+            }
 
             // value
             $done = false;

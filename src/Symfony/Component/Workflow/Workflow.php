@@ -287,10 +287,17 @@ class Workflow
     private function getTransitionForSubject($subject, Marking $marking, array $transitions)
     {
         foreach ($transitions as $transition) {
+            $isValidTransition = false;
+
             foreach ($transition->getFroms() as $place) {
-                if (!$marking->has($place)) {
-                    continue 2;
+                if ($marking->has($place)) {
+                    $isValidTransition = true;
+                    break;
                 }
+            }
+
+            if (!$isValidTransition) {
+                continue;
             }
 
             if (true !== $this->guardTransition($subject, $marking, $transition)) {

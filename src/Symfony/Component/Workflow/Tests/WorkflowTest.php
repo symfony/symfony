@@ -8,6 +8,7 @@ use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\MarkingStore\MarkingStoreInterface;
 use Symfony\Component\Workflow\MarkingStore\MultipleStateMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
@@ -149,6 +150,25 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($marking->has('a'));
         $this->assertTrue($marking->has('b'));
         $this->assertTrue($marking->has('c'));
+    }
+
+    public function testApplyUsingTransitionWithMultipleFroms()
+    {
+        $places = ['init', 'draft', 'active'];
+
+        $transitions = array();
+        $transitions[] = new Transition('save', 'init', 'draft');
+        $transitions[] = new Transition('publish', ['init', 'draft'], 'active');
+
+        $definition = new Definition($places, $transitions);
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new SingleStateMarkingStore());
+
+        $workflow->apply($subject, 'save');
+        $workflow->apply($subject, 'publish');
+
+        $this->assertEquals('active', $subject->marking);
     }
 
     public function testApplyWithEventDispatcher()

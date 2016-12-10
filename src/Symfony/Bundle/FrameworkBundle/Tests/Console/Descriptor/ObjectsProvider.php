@@ -105,6 +105,9 @@ class ObjectsProvider
                 ->setSynthetic(false)
                 ->setLazy(true)
                 ->setAbstract(true)
+                ->addArgument(new Reference('definition2'))
+                ->addArgument('%parameter%')
+                ->addArgument(new Definition('inline_service', array('arg1', 'arg2')))
                 ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
             'definition_2' => $definition2
                 ->setPublic(false)

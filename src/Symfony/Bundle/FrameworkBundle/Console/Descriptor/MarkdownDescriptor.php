@@ -129,6 +129,7 @@ class MarkdownDescriptor extends Descriptor
 
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $services = array('definitions' => array(), 'aliases' => array(), 'services' => array());
 
         foreach ($this->sortServiceIds($serviceIds) as $serviceId) {
@@ -149,7 +150,7 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\nDefinitions\n-----------\n");
             foreach ($services['definitions'] as $id => $service) {
                 $this->write("\n");
-                $this->describeContainerDefinition($service, array('id' => $id));
+                $this->describeContainerDefinition($service, array('id' => $id, 'show_arguments' => $showArguments));
             }
         }
 
@@ -193,6 +194,10 @@ class MarkdownDescriptor extends Descriptor
             foreach ($definition->getAutowiringTypes() as $autowiringType) {
                 $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
             }
+        }
+
+        if (isset($options['show_arguments']) && $options['show_arguments']) {
+            $output .= "\n".'- Arguments: '.($definition->getArguments() ? 'yes' : 'no');
         }
 
         if ($definition->getFile()) {

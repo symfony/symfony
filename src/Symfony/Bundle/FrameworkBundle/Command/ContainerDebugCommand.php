@@ -44,6 +44,7 @@ class ContainerDebugCommand extends ContainerAwareCommand
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
                 new InputOption('show-private', null, InputOption::VALUE_NONE, 'Used to show public *and* private services'),
+                new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Used to show arguments in services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Shows all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
                 new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
@@ -118,6 +119,7 @@ EOF
 
         $helper = new DescriptorHelper();
         $options['format'] = $input->getOption('format');
+        $options['show_arguments'] = $input->getOption('show-arguments');
         $options['raw_text'] = $input->getOption('raw');
         $options['output'] = $io;
         $helper->describe($output, $object, $options);

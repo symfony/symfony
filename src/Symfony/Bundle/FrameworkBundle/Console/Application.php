@@ -83,6 +83,16 @@ class Application extends BaseApplication
     /**
      * {@inheritdoc}
      */
+    public function find($name)
+    {
+        $this->registerCommands();
+
+        return parent::find($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($name)
     {
         $this->registerCommands();

@@ -19,17 +19,11 @@ class GuardEvent extends Event
 {
     private $blocked = false;
 
-    /**
-     * @return bool
-     */
     public function isBlocked()
     {
         return $this->blocked;
     }
 
-    /**
-     * @param bool $blocked
-     */
     public function setBlocked($blocked)
     {
         $this->blocked = (bool) $blocked;

@@ -66,14 +66,6 @@ class Registry
         return $matched;
     }
 
-    /**
-     * @param Workflow                        $workflow
-     * @param string|SupportStrategyInterface $supportStrategy
-     * @param object                          $subject
-     * @param null|string                     $workflowName
-     *
-     * @return bool
-     */
     private function supports(Workflow $workflow, $supportStrategy, $subject, $workflowName)
     {
         if (is_string($supportStrategy) && !$subject instanceof $supportStrategy) {

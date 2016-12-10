@@ -61,10 +61,14 @@ class TwigExtractor extends AbstractFileExtractor implements ExtractorInterface
             try {
                 $this->extractTemplate(file_get_contents($file->getPathname()), $catalogue);
             } catch (\Twig_Error $e) {
-                if ($file instanceof SplFileInfo) {
-                    $e->setTemplateName($file->getRelativePathname());
-                } elseif ($file instanceof \SplFileInfo) {
-                    $e->setTemplateName($file->getRealPath() ?: $file->getPathname());
+                if ($file instanceof \SplFileInfo) {
+                    $path = $file->getRealPath() ?: $file->getPathname();
+                    $name = $file instanceof SplFileInfo ? $file->getRelativePathname() : $path;
+                    if (method_exists($e, 'setSourceContext')) {
+                        $e->setSourceContext(new \Twig_Source('', $name, $path));
+                    } else {
+                        $e->setTemplateName($name);
+                    }
                 }
 
                 throw $e;

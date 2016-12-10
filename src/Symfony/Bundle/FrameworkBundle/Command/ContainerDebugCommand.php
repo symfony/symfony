@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\FileLocator;
 
 /**
@@ -96,7 +97,11 @@ EOF
         $object = $this->getContainerBuilder();
 
         if ($input->getOption('parameters')) {
-            $object = $object->getParameterBag();
+            $parameters = array();
+            foreach ($object->getParameterBag()->all() as $k => $v) {
+                $parameters[$k] = $object->resolveEnvPlaceholders($v);
+            }
+            $object = new ParameterBag($parameters);
             $options = array();
         } elseif ($parameter = $input->getOption('parameter')) {
             $options = array('parameter' => $parameter);

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -64,13 +65,17 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
         }
 
+        $composerRootDir = $this->getComposerRootDir($container->getParameter('kernel.root_dir'));
+        $loader = $container->getDefinition('twig.loader.filesystem');
+        $loader->replaceArgument(2, $composerRootDir);
+
         if (!$container->has('templating')) {
             $loader = $container->getDefinition('twig.loader.native_filesystem');
-            $loader->replaceArgument(1, $this->getComposerRootDir($container->getParameter('kernel.root_dir')));
+            $loader->replaceArgument(1, $composerRootDir);
             $loader->addTag('twig.loader');
             $loader->setMethodCalls($container->getDefinition('twig.loader.filesystem')->getMethodCalls());
 
-            $container->setDefinition('twig.loader.filesystem', $loader);
+            $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
         }
 
         if ($container->has('assets.packages')) {

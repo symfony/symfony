@@ -107,7 +107,7 @@ class YamlFileLoader extends FileLoader
      *
      * @param string $path The path of the YAML file
      *
-     * @return array|null The class descriptions or null, if the file was empty
+     * @return array The class descriptions
      *
      * @throws \InvalidArgumentException If the file could not be loaded or did
      *                                   not contain a YAML array
@@ -122,7 +122,7 @@ class YamlFileLoader extends FileLoader
 
         // empty file
         if (null === $classes) {
-            return;
+            return array();
         }
 
         // not an array
@@ -139,13 +139,7 @@ class YamlFileLoader extends FileLoader
             $this->yamlParser = new YamlParser();
         }
 
-        // This method may throw an exception. Do not modify the class'
-        // state before it completes
-        if (false === ($classes = $this->parseFile($this->file))) {
-            return;
-        }
-
-        $this->classes = $classes;
+        $this->classes = $this->parseFile($this->file);
 
         if (isset($this->classes['namespaces'])) {
             foreach ($this->classes['namespaces'] as $alias => $namespace) {

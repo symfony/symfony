@@ -336,6 +336,15 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
         new Serializer(array($denormalizerAware));
     }
+
+    public function testDeserializeObjectConstructorWithObjectTypeHint()
+    {
+        $jsonData = '{"bar":{"value":"baz"}}';
+
+        $serializer = new Serializer(array(new ObjectNormalizer()), array('json' => new JsonEncoder()));
+
+        $this->assertEquals(new Foo(new Bar('baz')), $serializer->deserialize($jsonData, Foo::class, 'json'));
+    }
 }
 
 class Model
@@ -379,5 +388,25 @@ class Model
     public function toArray()
     {
         return array('title' => $this->title, 'numbers' => $this->numbers);
+    }
+}
+
+class Foo
+{
+    private $bar;
+
+    public function __construct(Bar $bar)
+    {
+        $this->bar = $bar;
+    }
+}
+
+class Bar
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
     }
 }

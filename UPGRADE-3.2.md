@@ -70,7 +70,6 @@ FrameworkBundle
    in TwigBundle).
  * The service `serializer.mapping.cache.doctrine.apc` is deprecated. APCu should now
    be automatically used when available.
-   ```
 
 HttpFoundation
 ---------------
@@ -111,6 +110,13 @@ HttpKernel
    After:
    ```
    Surrogate-Capability: symfony="ESI/1.0"
+   ```
+
+Router
+------
+
+ * `UrlGenerator` now generates URLs in compliance with [`RFC 3986`](https://www.ietf.org/rfc/rfc3986.txt),
+    which means spaces will be percent encoded (%20) inside query strings.
 
 Serializer
 ----------

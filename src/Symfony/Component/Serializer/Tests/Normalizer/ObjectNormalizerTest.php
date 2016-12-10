@@ -23,7 +23,6 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
-use Symfony\Component\Serializer\Tests\Fixtures\DenormalizerDecoratorSerializer;
 use Symfony\Component\Serializer\Tests\Fixtures\MaxDepthDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\SiblingHolder;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
@@ -171,7 +170,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
 
         $normalizer = new ObjectNormalizer();
-        $serializer = new DenormalizerDecoratorSerializer($normalizer);
+        $serializer = new Serializer(array($normalizer));
         $normalizer->setSerializer($serializer);
 
         $obj = $normalizer->denormalize($data, DummyWithConstructorObject::class);
@@ -197,7 +196,7 @@ class ObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         );
 
         $normalizer = new ObjectNormalizer();
-        $serializer = new DenormalizerDecoratorSerializer($normalizer);
+        $serializer = new Serializer(array($normalizer));
         $normalizer->setSerializer($serializer);
 
         $normalizer->denormalize($data, DummyWithConstructorInexistingObject::class);

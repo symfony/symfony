@@ -46,12 +46,13 @@
 
         <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">
             <argument type="collection" /> <!-- paths -->
-            <argument></argument> <!-- project's root dir -->
+            <argument /> <!-- project's root dir -->
         </service>
 
         <service id="twig.loader.filesystem" class="Symfony\Bundle\TwigBundle\Loader\FilesystemLoader" public="false">
             <argument type="service" id="templating.locator" />
             <argument type="service" id="templating.name_parser" />
+            <argument /> <!-- project's root dir -->
             <tag name="twig.loader"/>
         </service>
 
@@ -87,7 +88,7 @@
 
         <service id="twig.extension.code" class="Symfony\Bridge\Twig\Extension\CodeExtension" public="false">
             <tag name="twig.extension" />
-            <argument type="service" id="debug.file_link_formatter"></argument>
+            <argument type="service" id="debug.file_link_formatter" on-invalid="ignore" />
             <argument>%kernel.root_dir%</argument>
             <argument>%kernel.charset%</argument>
         </service>
@@ -117,7 +118,12 @@
             <argument type="service" id="router.request_context" on-invalid="ignore" />
         </service>
 
-        <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false" />
+        <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">
+            <argument type="collection">
+                <argument type="service" id="service_container" />
+                <argument>twig.form.renderer</argument>
+            </argument>
+        </service>
 
         <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false" />
 

@@ -31,6 +31,10 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $metadata = new ClassMetadata('Symfony\Component\Validator\Tests\Fixtures\Entity');
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
+
+        $r = new \ReflectionProperty($loader, 'classes');
+        $r->setAccessible(true);
+        $this->assertSame(array(), $r->getValue($loader));
     }
 
     /**

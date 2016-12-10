@@ -10,5 +10,4 @@ data:
         empty line:
         
         baz
-    nested_inlined_multi_line_string:
-        inlined_multi_line: "foo\nbar\r\nempty line:\n\nbaz"
+    nested_inlined_multi_line_string: { inlined_multi_line: "foo\nbar\r\nempty line:\n\nbaz" }

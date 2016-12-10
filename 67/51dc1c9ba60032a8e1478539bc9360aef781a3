@@ -1,0 +1,161 @@
+---------------------------------------------------------------------------
+
+by Koc at 2016-12-07T10:55:25Z
+
+❤️  command as service
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-07T11:02:29Z
+
+Changing the default behavior is a BC break so not possible. Solution 1. is simplest, yet it would make sense to allow clearing any pool with the command I agree. I'd prefer a 3rd option: use the cache pool clearer service to clear by name (method to be added on it to allow so.)
+Not a bug though, but a new feature.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-07T12:02:28Z
+
+@nicolas-grekas I would like to go for your 3rd option but I believe adding this new method will be difficult since the `Psr6CacheClearer` doesn't reference pools by id (see `Psr6CacheClearer::addPool()`). Any clue? Otherwise, solution 2 looks the only working solution for this feature.
+
+Btw, could you please re-label this as a feature? Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-07T12:25:12Z
+
+Relabeling done.
+Not sure about command as a service.
+Since each pool can have a different cache clearer, I think we should not reuse the existing cache.default_clearer for that purpose but create a new service (another Psr6CacheClearer enhanced to fit the need?) dedicated to this use case.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-07T12:35:58Z
+
+Thanks for the hints, let's see what it gives.
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-07T21:15:48Z
+
+I added ~~`a CachePoolClearer` which is quite similar to the `Psr6CacheClearer` but~~ a `CachePoolRegistry` referencing pools by id, marked as final and internal. Not sure it is the best way to do it, but it make us able to clear any private cache pool from its id whithout changing the current behavior for cache clearers.
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T11:17:54Z
+
+What about this other strategy:
+- add a constructor to Psr6CacheClearer that takes an array of cache pools as argument (indexed by pool name)
+- deprecated the `add()` method
+- add a `clearPool($key)` method (instead of get/has) that returns true/false
+
+Note also that the registration of the pool in the new service must be done in CachePoolClearerPass (not in CachePoolPass), the reason being that otherwise, unused private pools can't be optimized by the compiler pass that removes unsued private services.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-08T12:04:59Z
+
+> What about this other strategy
+
+Sounds good :)
+
+> CachePoolClearerPass (not in CachePoolPass), the reason being that otherwise, unused private pools can't be removed by the compiler pass that removes unsued private services.
+
+If I move this logic in the `CachePoolClearerPass`, then my private cache pool (which is indeed unused but still exist) is not injected in the new service thus not found by the `cache:pool:clear` command. Is is the behavior we expect? I thought that any cache pool should be clearable, even unused ones, but maybe it makes no sense
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T12:15:58Z
+
+> is not injected in the new service thus not found
+
+at least it matches the behavior of calling `cache:pool:clear cache.default_clearer` which does not clear unused private cache pools. And it looks sensible to me.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-08T20:35:26Z
+
+@nicolas-grekas In fact it's already working for private pools which are not "unused", since any private service being referenced at least twice can be retrieved using `Container::get()`.
+
+But to me, it's common to inject a pool only once so I think it would be legit to be able to use the command for clearing it in this case, isn't it?
+
+> unused private pools can't be optimized by the compiler pass that removes unsued private services.
+
+Note that even after registering pools in the new service from the `CachePoolPass`, if the pool is not referenced at least once (thus really not used), the container still properly remove its definition as it is still considered unused.
+
+So isn't it doable to keep it at is? I added a test for the whole command.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T20:46:36Z
+
+> any private service being referenced at least twice can be retrieved using Container::get()
+
+That's deprecated so we can't build on that.
+
+I don't get your second point nor why do you want to keep it this way. What would be the goal?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-08T21:02:35Z
+
+Oh indeed, I forgot about this deprecation.
+
+> What would be the goal?
+
+Using the command for clearing a pool being injected in only one service is not possible actually, even with the approach you're proposing since the definition doesn't exist anymore in the `CachePoolClearerPass`. The pool needs to be referenced at least twice for being able to use the command for clearing it, and I thought it could be even better if any pool that is injected (even only once) would be clearable through this command.
+But if we're comfortable with that, fair enough. I implemented your proposal, though I'm not sure to use it the right way, could you give it a look?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-09T14:20:07Z
+
+@nicolas-grekas changes done, I think we are almost good here
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-09T17:28:17Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-10T11:21:44Z
+
+Either `cache.default_clearer` or `cache.global_clearer` needs to be a `kernel.cache_clearer`, but not both, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-10T11:25:39Z
+
+@ogizanagi which is the case: https://github.com/symfony/symfony/pull/20810/files#diff-1754c5372532c2b324d500472dd5df66R96
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-10T11:28:40Z
+
+Indeed. Forgot about the fact tags are not inherited anyway when using a parent definition. 👍
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-10T11:32:12Z
+
+However, I found it confusing to reuse the same class for the global cache clearing, even if it's not wired as a kernel cache clearer. What were the arguments against a dedicated `CachePoolRegistry`?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-10T11:54:16Z
+
+There's no need for accessing pools but only clearing them and like this we can keep pools really private (not accessible from a public service).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-10T11:56:01Z
+
+Ok. Let's move forward.
+
+👍

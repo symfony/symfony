@@ -32,8 +32,7 @@ class ApplicationTest extends TestCase
 
     public function testBundleCommandsAreRegistered()
     {
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
-        $bundle->expects($this->once())->method('registerCommands');
+        $bundle = $this->createBundleMock(array());
 
         $kernel = $this->getKernel(array($bundle), true);
 
@@ -46,8 +45,7 @@ class ApplicationTest extends TestCase
 
     public function testBundleCommandsAreRetrievable()
     {
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
-        $bundle->expects($this->once())->method('registerCommands');
+        $bundle = $this->createBundleMock(array());
 
         $kernel = $this->getKernel(array($bundle));
 
@@ -60,46 +58,40 @@ class ApplicationTest extends TestCase
 
     public function testBundleSingleCommandIsRetrievable()
     {
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
-        $bundle->expects($this->once())->method('registerCommands');
+        $command = new Command('example');
+
+        $bundle = $this->createBundleMock(array($command));
 
         $kernel = $this->getKernel(array($bundle));
 
         $application = new Application($kernel);
-
-        $command = new Command('example');
-        $application->add($command);
 
         $this->assertSame($command, $application->get('example'));
     }
 
     public function testBundleCommandCanBeFound()
     {
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
-        $bundle->expects($this->once())->method('registerCommands');
+        $command = new Command('example');
+
+        $bundle = $this->createBundleMock(array($command));
 
         $kernel = $this->getKernel(array($bundle));
 
         $application = new Application($kernel);
-
-        $command = new Command('example');
-        $application->add($command);
 
         $this->assertSame($command, $application->find('example'));
     }
 
     public function testBundleCommandCanBeFoundByAlias()
     {
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
-        $bundle->expects($this->once())->method('registerCommands');
+        $command = new Command('example');
+        $command->setAliases(array('alias'));
+
+        $bundle = $this->createBundleMock(array($command));
 
         $kernel = $this->getKernel(array($bundle));
 
         $application = new Application($kernel);
-
-        $command = new Command('example');
-        $command->setAliases(array('alias'));
-        $application->add($command);
 
         $this->assertSame($command, $application->find('alias'));
     }
@@ -166,5 +158,19 @@ class ApplicationTest extends TestCase
         ;
 
         return $kernel;
+    }
+
+    private function createBundleMock(array $commands)
+    {
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\Bundle');
+        $bundle
+            ->expects($this->once())
+            ->method('registerCommands')
+            ->will($this->returnCallback(function (Application $application) use ($commands) {
+                $application->addCommands($commands);
+            }))
+        ;
+
+        return $bundle;
     }
 }

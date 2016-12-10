@@ -47,8 +47,10 @@ class CachePoolPass implements CompilerPassInterface
             if ($pool->isAbstract()) {
                 continue;
             }
+            $isLazy = $pool->isLazy();
             while ($adapter instanceof DefinitionDecorator) {
                 $adapter = $container->findDefinition($adapter->getParent());
+                $isLazy = $isLazy || $adapter->isLazy();
                 if ($t = $adapter->getTag('cache.pool')) {
                     $tags[0] += $t[0];
                 }
@@ -80,8 +82,16 @@ class CachePoolPass implements CompilerPassInterface
                 throw new InvalidArgumentException(sprintf('Invalid "cache.pool" tag for service "%s": accepted attributes are "clearer", "provider", "namespace" and "default_lifetime", found "%s".', $id, implode('", "', array_keys($tags[0]))));
             }
 
+            $attr = array();
             if (null !== $clearer) {
-                $pool->addTag('cache.pool', array('clearer' => $clearer));
+                $attr['clearer'] = $clearer;
+            }
+            if (!$isLazy) {
+                $pool->setLazy(true);
+                $attr['unlazy'] = true;
+            }
+            if ($attr) {
+                $pool->addTag('cache.pool', $attr);
             }
         }
     }

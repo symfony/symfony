@@ -175,6 +175,9 @@ HttpKernel
 
  * The `DataCollector::varToString()` method has been removed in favor of `cloneVar()`.
 
+ * The `Psr6CacheClearer::addPool()` method has been removed. Pass an array of pools indexed
+   by name to the constructor instead.
+
 Security
 --------
 

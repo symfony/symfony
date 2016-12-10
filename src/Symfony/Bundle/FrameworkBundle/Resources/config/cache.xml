@@ -97,6 +97,7 @@
             <tag name="kernel.cache_clearer" />
         </service>
 
+        <service id="cache.global_clearer" parent="cache.default_clearer" />
         <service id="cache.app_clearer" alias="cache.default_clearer" />
 
     </services>

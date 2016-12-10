@@ -20,7 +20,7 @@
         "symfony/filesystem": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/yaml": "~2.7|~3.0.0"
+        "symfony/yaml": "~2.7|~3.0"
     },
     "suggest": {
         "symfony/yaml": "To use the yaml reference dumper"

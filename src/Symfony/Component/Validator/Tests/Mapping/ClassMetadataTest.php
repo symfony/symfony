@@ -153,26 +153,11 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
             $constraintA2,
         );
 
-        $constraintsByGroup = array(
-            'Default' => array(
-                $constraintA1,
-                $constraintA2,
-            ),
-            'EntityParent' => array(
-                $constraintA1,
-            ),
-            'Entity' => array(
-                $constraintA1,
-                $constraintA2,
-            ),
-        );
-
         $members = $this->metadata->getPropertyMetadata('firstName');
 
         $this->assertCount(1, $members);
         $this->assertEquals(self::PARENTCLASS, $members[0]->getClassName());
         $this->assertEquals($constraints, $members[0]->getConstraints());
-        $this->assertEquals($constraintsByGroup, $members[0]->constraintsByGroup);
     }
 
     public function testMemberMetadatas()

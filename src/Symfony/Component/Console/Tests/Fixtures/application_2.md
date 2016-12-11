@@ -1,23 +1,24 @@
-My Symfony application
-======================
+My Symfony application <info>v1.0</info>
+========================================
 
-* alias1
-* alias2
-* help
-* list
+* `alias1`
+* `alias2`
+* `help`
+* `list`
 
 **descriptor:**
 
-* descriptor:command1
-* descriptor:command2
+* `descriptor:command1`
+* `descriptor:command2`
 
-help
-----
+`help`
+------
 
-* Description: Displays help for a command
-* Usage:
+Displays help for a command
 
-  * `help [--format FORMAT] [--raw] [--] [<command_name>]`
+### Usage
+
+* `help [--format FORMAT] [--raw] [--] [<command_name>]`
 
 The <info>help</info> command displays help for a given command:
 
@@ -29,115 +30,107 @@ You can also output the help in other formats by using the <comment>--format</co
 
 To display the list of available commands, please use the <info>list</info> command.
 
-### Arguments:
+### Arguments
 
-**command_name:**
+#### `command_name`
 
-* Name: command_name
+The command name
+
 * Is required: no
 * Is array: no
-* Description: The command name
 * Default: `'help'`
 
-### Options:
+### Options
 
-**format:**
+#### `--format`
 
-* Name: `--format`
-* Shortcut: <none>
+The output format (txt, xml, json, or md)
+
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
-* Description: The output format (txt, xml, json, or md)
 * Default: `'txt'`
 
-**raw:**
+#### `--raw`
 
-* Name: `--raw`
-* Shortcut: <none>
+To output raw command help
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: To output raw command help
 * Default: `false`
 
-**help:**
+#### `--help|-h`
 
-* Name: `--help`
-* Shortcut: `-h`
+Display this help message
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Display this help message
 * Default: `false`
 
-**quiet:**
+#### `--quiet|-q`
 
-* Name: `--quiet`
-* Shortcut: `-q`
+Do not output any message
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Do not output any message
 * Default: `false`
 
-**verbose:**
+#### `--verbose|-v|-vv|-vvv`
 
-* Name: `--verbose`
-* Shortcut: `-v|-vv|-vvv`
+Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 * Default: `false`
 
-**version:**
+#### `--version|-V`
 
-* Name: `--version`
-* Shortcut: `-V`
+Display this application version
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Display this application version
 * Default: `false`
 
-**ansi:**
+#### `--ansi`
 
-* Name: `--ansi`
-* Shortcut: <none>
+Force ANSI output
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Force ANSI output
 * Default: `false`
 
-**no-ansi:**
+#### `--no-ansi`
 
-* Name: `--no-ansi`
-* Shortcut: <none>
+Disable ANSI output
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Disable ANSI output
 * Default: `false`
 
-**no-interaction:**
+#### `--no-interaction|-n`
 
-* Name: `--no-interaction`
-* Shortcut: `-n`
+Do not ask any interactive question
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Do not ask any interactive question
 * Default: `false`
 
-list
-----
+`list`
+------
 
-* Description: Lists commands
-* Usage:
+Lists commands
 
-  * `list [--raw] [--format FORMAT] [--] [<namespace>]`
+### Usage
+
+* `list [--raw] [--format FORMAT] [--] [<namespace>]`
 
 The <info>list</info> command lists all commands:
 
@@ -155,222 +148,203 @@ It's also possible to get raw list of commands (useful for embedding command run
 
   <info>php app/console list --raw</info>
 
-### Arguments:
+### Arguments
 
-**namespace:**
+#### `namespace`
 
-* Name: namespace
+The namespace name
+
 * Is required: no
 * Is array: no
-* Description: The namespace name
 * Default: `NULL`
 
-### Options:
+### Options
 
-**raw:**
+#### `--raw`
 
-* Name: `--raw`
-* Shortcut: <none>
+To output raw command list
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: To output raw command list
 * Default: `false`
 
-**format:**
+#### `--format`
 
-* Name: `--format`
-* Shortcut: <none>
+The output format (txt, xml, json, or md)
+
 * Accept value: yes
 * Is value required: yes
 * Is multiple: no
-* Description: The output format (txt, xml, json, or md)
 * Default: `'txt'`
 
-descriptor:command1
--------------------
+`descriptor:command1`
+---------------------
 
-* Description: command 1 description
-* Usage:
+command 1 description
 
-  * `descriptor:command1`
-  * `alias1`
-  * `alias2`
+### Usage
+
+* `descriptor:command1`
+* `alias1`
+* `alias2`
 
 command 1 help
 
-### Options:
+### Options
 
-**help:**
+#### `--help|-h`
 
-* Name: `--help`
-* Shortcut: `-h`
+Display this help message
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Display this help message
 * Default: `false`
 
-**quiet:**
+#### `--quiet|-q`
 
-* Name: `--quiet`
-* Shortcut: `-q`
+Do not output any message
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Do not output any message
 * Default: `false`
 
-**verbose:**
+#### `--verbose|-v|-vv|-vvv`
 
-* Name: `--verbose`
-* Shortcut: `-v|-vv|-vvv`
+Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 * Default: `false`
 
-**version:**
+#### `--version|-V`
 
-* Name: `--version`
-* Shortcut: `-V`
+Display this application version
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Display this application version
 * Default: `false`
 
-**ansi:**
+#### `--ansi`
 
-* Name: `--ansi`
-* Shortcut: <none>
+Force ANSI output
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Force ANSI output
 * Default: `false`
 
-**no-ansi:**
+#### `--no-ansi`
 
-* Name: `--no-ansi`
-* Shortcut: <none>
+Disable ANSI output
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Disable ANSI output
 * Default: `false`
 
-**no-interaction:**
+#### `--no-interaction|-n`
 
-* Name: `--no-interaction`
-* Shortcut: `-n`
+Do not ask any interactive question
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Do not ask any interactive question
 * Default: `false`
 
-descriptor:command2
--------------------
+`descriptor:command2`
+---------------------
 
-* Description: command 2 description
-* Usage:
+command 2 description
 
-  * `descriptor:command2 [-o|--option_name] [--] <argument_name>`
-  * `descriptor:command2 -o|--option_name <argument_name>`
-  * `descriptor:command2 <argument_name>`
+### Usage
+
+* `descriptor:command2 [-o|--option_name] [--] <argument_name>`
+* `descriptor:command2 -o|--option_name <argument_name>`
+* `descriptor:command2 <argument_name>`
 
 command 2 help
 
-### Arguments:
+### Arguments
 
-**argument_name:**
+#### `argument_name`
 
-* Name: argument_name
 * Is required: yes
 * Is array: no
-* Description: <none>
 * Default: `NULL`
 
-### Options:
+### Options
 
-**option_name:**
+#### `--option_name|-o`
 
-* Name: `--option_name`
-* Shortcut: `-o`
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: <none>
 * Default: `false`
 
-**help:**
+#### `--help|-h`
 
-* Name: `--help`
-* Shortcut: `-h`
+Display this help message
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Display this help message
 * Default: `false`
 
-**quiet:**
+#### `--quiet|-q`
 
-* Name: `--quiet`
-* Shortcut: `-q`
+Do not output any message
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Do not output any message
 * Default: `false`
 
-**verbose:**
+#### `--verbose|-v|-vv|-vvv`
 
-* Name: `--verbose`
-* Shortcut: `-v|-vv|-vvv`
+Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 * Default: `false`
 
-**version:**
+#### `--version|-V`
 
-* Name: `--version`
-* Shortcut: `-V`
+Display this application version
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Display this application version
 * Default: `false`
 
-**ansi:**
+#### `--ansi`
 
-* Name: `--ansi`
-* Shortcut: <none>
+Force ANSI output
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Force ANSI output
 * Default: `false`
 
-**no-ansi:**
+#### `--no-ansi`
 
-* Name: `--no-ansi`
-* Shortcut: <none>
+Disable ANSI output
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Disable ANSI output
 * Default: `false`
 
-**no-interaction:**
+#### `--no-interaction|-n`
 
-* Name: `--no-interaction`
-* Shortcut: `-n`
+Do not ask any interactive question
+
 * Accept value: no
 * Is value required: no
 * Is multiple: no
-* Description: Do not ask any interactive question
 * Default: `false`

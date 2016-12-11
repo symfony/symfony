@@ -139,6 +139,16 @@ abstract class Client
     }
 
     /**
+     * Unset single server parameter.
+     *
+     * @param string $key A key of the parameter
+     */
+    public function unSetServerParameter($key)
+    {
+        unset($this->server[$key]);
+    }
+
+    /**
      * Gets single server parameter for specified key.
      *
      * @param string $key     A key of the parameter to get

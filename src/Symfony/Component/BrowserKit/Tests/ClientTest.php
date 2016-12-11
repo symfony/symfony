@@ -624,28 +624,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $client = new TestClient();
 
-        $this->assertSame('', $client->getServerParameter('HTTP_HOST'));
-        $this->assertSame('Symfony BrowserKit', $client->getServerParameter('HTTP_USER_AGENT'));
-
-        $client->setServerParameter('HTTP_HOST', 'testhost');
-        $client->unSetServerParameter('HTTP_HOST');
-
-        $this->assertSame('', $client->getServerParameter('HTTP_HOST'));
-
-        $client->setServerParameter('HTTP_USER_AGENT', 'testua');
-        $client->unSetServerParameter('HTTP_USER_AGENT');
-
-        $this->assertSame('', $client->getServerParameter('HTTP_USER_AGENT'));
-
         $client->setServerParameter('HTTP_X-Requested-With', 'XMLHttpRequest');
+
+        $this->assertSame('XMLHttpRequest', $client->getServerParameter('HTTP_X-Requested-With'));
+
         $client->unSetServerParameter('HTTP_X-Requested-With');
-
-        $client->unSetServerParameter('HTTP_X-fefef-With');
-
-        $client->request('GET', 'https://www.example.com/https/www.example.com', array(), array());
+        $client->request('GET', 'https://www.example.com/https/www.example.com');
 
         $this->assertSame('', $client->getServerParameter('HTTP_X-Requested-With'));
-
         $this->assertArrayNotHasKey('HTTP_X-Requested-With', $client->getInternalRequest()->getServer());
     }
 

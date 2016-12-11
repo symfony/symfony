@@ -30,7 +30,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     /**
-     * @expectedException Psr\Cache\InvalidArgumentException
+     * @expectedException \Psr\Cache\InvalidArgumentException
      */
     public function testInvalidTag()
     {

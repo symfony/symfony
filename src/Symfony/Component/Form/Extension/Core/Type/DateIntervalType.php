@@ -115,7 +115,6 @@ class DateIntervalType extends AbstractType
                     }
                 }
             }
-
             foreach ($this->timeParts as $part) {
                 if ($options['with_'.$part]) {
                     $childForm = $builder->create($part, self::$widgets[$options['widget']], $childOptions[$part]);

@@ -43,6 +43,11 @@ ExpressionLanguage
    class has been removed. You should use the `CacheItemPoolInterface` interface
    instead.
 
+Finder
+------
+
+ * The `ExceptionInterface` has been removed.
+
 Form
 ----
 

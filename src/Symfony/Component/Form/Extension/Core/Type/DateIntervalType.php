@@ -134,6 +134,8 @@ class DateIntervalType extends AbstractType
                     $builder->add($childForm);
                 }
             }
+            // Invert should not inherit the required option
+            $invertOptions['required'] = false;
             if ($options['with_invert']) {
                 $builder->add('invert', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', $invertOptions);
             }

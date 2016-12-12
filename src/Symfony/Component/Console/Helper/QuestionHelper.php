@@ -117,7 +117,7 @@ class QuestionHelper extends Helper
     }
 
     /**
-     * Disables use of stty
+     * Disables use of stty.
      */
     public function disableStty()
     {

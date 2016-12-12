@@ -13,7 +13,6 @@ namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Encodes YAML data.

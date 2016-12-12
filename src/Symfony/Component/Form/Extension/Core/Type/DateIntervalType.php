@@ -102,6 +102,7 @@ class DateIntervalType extends AbstractType
                     $childOptions[$part] = array();
                     $childOptions[$part]['error_bubbling'] = true;
                     if ('choice' === $options['widget']) {
+                        $childOptions[$part]['choice_translation_domain'] = false;
                         $childOptions[$part]['choices'] = $options[$part];
                         $childOptions[$part]['placeholder'] = $options['placeholder'][$part];
                     }

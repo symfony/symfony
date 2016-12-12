@@ -249,6 +249,18 @@
         </div>
     </div>
 
+    <div class="metrics metrics-horizontal">
+        <div class="metric">
+            <span class="value"><small>{{ collector.locale }}</small></span>
+            <span class="label">Locale</span>
+        </div>
+
+        <div class="metric">
+            <span class="value"><small>{{ collector.timezone }} <em>({{ 'now'|date(constant('DateTime::W3C')) }})</em></small></span>
+            <span class="label">Timezone</span>
+        </div>
+    </div>
+
     <p>
         <a href="{{ path('_profiler_phpinfo') }}">View full PHP configuration</a>
     </p>

@@ -115,7 +115,10 @@ class PhpFilesAdapter extends AbstractAdapter
             $data[1] = $value;
             $file = $this->getFile($key, true);
             $ok = $this->write($file, '<?php return '.var_export($data, true).';') && $ok;
-            @opcache_compile_file($file);
+
+            if ('cli' !== PHP_SAPI || ini_get('opcache.enable_cli')) {
+                @opcache_compile_file($file);
+            }
         }
 
         return $ok;

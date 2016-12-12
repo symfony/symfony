@@ -117,6 +117,14 @@ class QuestionHelper extends Helper
     }
 
     /**
+     * Disables use of stty
+     */
+    public function disableStty()
+    {
+        self::$stty = false;
+    }
+
+    /**
      * Asks the question to the user.
      *
      * @param OutputInterface $output

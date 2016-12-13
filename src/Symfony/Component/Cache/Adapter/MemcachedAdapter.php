@@ -18,15 +18,15 @@ class MemcachedAdapter extends AbstractAdapter
 {
     private $client;
 
-    public static function isSupported()
-    {
-        return extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
-    }
-
     public function __construct(\Memcached $client, $namespace = '', $defaultLifetime = 0)
     {
         parent::__construct($namespace, $defaultLifetime);
         $this->client = $client;
+    }
+
+    public static function isSupported()
+    {
+        return extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
     }
 
     /**
@@ -34,8 +34,7 @@ class MemcachedAdapter extends AbstractAdapter
      */
     protected function doSave(array $values, $lifetime)
     {
-        return $this->client->setMulti($values, $lifetime)
-            && $this->client->getResultCode() === \Memcached::RES_SUCCESS;
+        return $this->client->setMulti($values, $lifetime) && $this->client->getResultCode() === \Memcached::RES_SUCCESS;
     }
 
     /**
@@ -51,8 +50,7 @@ class MemcachedAdapter extends AbstractAdapter
      */
     protected function doHave($id)
     {
-        return $this->client->get($id) !== false
-            || $this->client->getResultCode() === \Memcached::RES_SUCCESS;
+        return $this->client->get($id) !== false || $this->client->getResultCode() === \Memcached::RES_SUCCESS;
     }
 
     /**

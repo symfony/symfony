@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-09T16:01:39Z
+
+(@bocharsky-bw thanks for proposing this improvement ... I've taken it into account for the upcoming redesign of the exception pages)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-09T16:14:12Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-09T16:16:29Z
+
+@bocharsky-bw you can achieve it today too thanks to the ``--after-context`` option of ``grep`` to display additional context lines after each matched line:
+
+```bash
+curl localhost/any-path-which-throws-uncaught-exception | grep '<h1>' -A 1
+```
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-09T16:17:45Z
+
+And it's better to use `grep '<h1'` instead of `grep '<h1>'`  in case the `<h1>` someday adds CSS classes or HTML attributes.
+
+---------------------------------------------------------------------------
+
+by bocharsky-bw at 2016-12-09T16:20:22Z
+
+Ah, didn't know about `--after-context` - it helps a lot in my case. Thanks @stof !
+
+Completely agree with Javier.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-09T16:21:38Z
+
+@bocharsky-bw I just discovered it as well. But I was quite sure that someone already thought about adding such feature in grep. And so ``man grep`` told me about it.

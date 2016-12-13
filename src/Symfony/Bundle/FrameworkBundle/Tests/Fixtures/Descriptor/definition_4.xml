@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition class="Full\Qualified\Class4" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" file="">
+  <calls>
+    <call method="setFoo"/>
+  </calls>
+</definition>

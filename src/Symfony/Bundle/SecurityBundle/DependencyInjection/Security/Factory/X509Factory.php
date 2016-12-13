@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -27,7 +27,7 @@ class X509Factory implements SecurityFactoryInterface
     {
         $providerId = 'security.authentication.provider.pre_authenticated.'.$id;
         $container
-            ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.pre_authenticated'))
+            ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.pre_authenticated'))
             ->replaceArgument(0, new Reference($userProvider))
             ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->addArgument($id)
@@ -35,7 +35,7 @@ class X509Factory implements SecurityFactoryInterface
 
         // listener
         $listenerId = 'security.authentication.listener.x509.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.x509'));
+        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.x509'));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, $config['user']);
         $listener->replaceArgument(4, $config['credentials']);

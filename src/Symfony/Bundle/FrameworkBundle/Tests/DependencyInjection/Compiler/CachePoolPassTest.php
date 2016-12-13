@@ -12,9 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\CachePoolPass;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 class CachePoolPassTest extends \PHPUnit_Framework_TestCase
@@ -38,7 +38,7 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
         $adapter->addTag('cache.pool');
         $container->setDefinition('app.cache_adapter', $adapter);
         $container->setAlias('app.cache_adapter_alias', 'app.cache_adapter');
-        $cachePool = new DefinitionDecorator('app.cache_adapter_alias');
+        $cachePool = new ChildDefinition('app.cache_adapter_alias');
         $cachePool->addArgument(null);
         $cachePool->addTag('cache.pool');
         $container->setDefinition('app.cache_pool', $cachePool);
@@ -88,7 +88,7 @@ class CachePoolPassTest extends \PHPUnit_Framework_TestCase
         $adapter->setAbstract(true);
         $adapter->addTag('cache.pool');
         $container->setDefinition('app.cache_adapter', $adapter);
-        $cachePool = new DefinitionDecorator('app.cache_adapter');
+        $cachePool = new ChildDefinition('app.cache_adapter');
         $cachePool->addTag('cache.pool', array('foobar' => 123));
         $container->setDefinition('app.cache_pool', $cachePool);
 

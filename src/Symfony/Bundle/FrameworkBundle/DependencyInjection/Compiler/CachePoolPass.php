@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
@@ -48,7 +48,7 @@ class CachePoolPass implements CompilerPassInterface
                 continue;
             }
             $isLazy = $pool->isLazy();
-            while ($adapter instanceof DefinitionDecorator) {
+            while ($adapter instanceof ChildDefinition) {
                 $adapter = $container->findDefinition($adapter->getParent());
                 $isLazy = $isLazy || $adapter->isLazy();
                 if ($t = $adapter->getTag('cache.pool')) {

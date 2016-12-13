@@ -11,19 +11,16 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 
-/**
- * @group legacy
- */
-class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
+class ChildDefinitionTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
-        $this->assertEquals('foo', $def->getParent());
-        $this->assertEquals(array(), $def->getChanges());
+        $this->assertSame('foo', $def->getParent());
+        $this->assertSame(array(), $def->getChanges());
     }
 
     /**
@@ -31,15 +28,15 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetProperty($property, $changeKey)
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
         $getter = 'get'.ucfirst($property);
         $setter = 'set'.ucfirst($property);
 
         $this->assertNull($def->$getter());
         $this->assertSame($def, $def->$setter('foo'));
-        $this->assertEquals('foo', $def->$getter());
-        $this->assertEquals(array($changeKey => true), $def->getChanges());
+        $this->assertSame('foo', $def->$getter());
+        $this->assertSame(array($changeKey => true), $def->getChanges());
     }
 
     public function getPropertyTests()
@@ -54,41 +51,41 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
 
     public function testSetPublic()
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
         $this->assertTrue($def->isPublic());
         $this->assertSame($def, $def->setPublic(false));
         $this->assertFalse($def->isPublic());
-        $this->assertEquals(array('public' => true), $def->getChanges());
+        $this->assertSame(array('public' => true), $def->getChanges());
     }
 
     public function testSetLazy()
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
         $this->assertFalse($def->isLazy());
         $this->assertSame($def, $def->setLazy(false));
         $this->assertFalse($def->isLazy());
-        $this->assertEquals(array('lazy' => true), $def->getChanges());
+        $this->assertSame(array('lazy' => true), $def->getChanges());
     }
 
     public function testSetAutowired()
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
         $this->assertFalse($def->isAutowired());
         $this->assertSame($def, $def->setAutowired(false));
         $this->assertFalse($def->isAutowired());
-        $this->assertEquals(array('autowire' => true), $def->getChanges());
+        $this->assertSame(array('autowire' => true), $def->getChanges());
     }
 
     public function testSetArgument()
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
-        $this->assertEquals(array(), $def->getArguments());
+        $this->assertSame(array(), $def->getArguments());
         $this->assertSame($def, $def->replaceArgument(0, 'foo'));
-        $this->assertEquals(array('index_0' => 'foo'), $def->getArguments());
+        $this->assertSame(array('index_0' => 'foo'), $def->getArguments());
     }
 
     /**
@@ -96,24 +93,24 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testReplaceArgumentShouldRequireIntegerIndex()
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
         $def->replaceArgument('0', 'foo');
     }
 
     public function testReplaceArgument()
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
         $def->setArguments(array(0 => 'foo', 1 => 'bar'));
-        $this->assertEquals('foo', $def->getArgument(0));
-        $this->assertEquals('bar', $def->getArgument(1));
+        $this->assertSame('foo', $def->getArgument(0));
+        $this->assertSame('bar', $def->getArgument(1));
 
         $this->assertSame($def, $def->replaceArgument(1, 'baz'));
-        $this->assertEquals('foo', $def->getArgument(0));
-        $this->assertEquals('baz', $def->getArgument(1));
+        $this->assertSame('foo', $def->getArgument(0));
+        $this->assertSame('baz', $def->getArgument(1));
 
-        $this->assertEquals(array(0 => 'foo', 1 => 'bar', 'index_1' => 'baz'), $def->getArguments());
+        $this->assertSame(array(0 => 'foo', 1 => 'bar', 'index_1' => 'baz'), $def->getArguments());
     }
 
     /**
@@ -121,7 +118,7 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetArgumentShouldCheckBounds()
     {
-        $def = new DefinitionDecorator('foo');
+        $def = new ChildDefinition('foo');
 
         $def->setArguments(array(0 => 'foo'));
         $def->replaceArgument(0, 'foo');

@@ -54,6 +54,9 @@ class SetAclCommandTest extends WebTestCase
         $this->deleteTmpDir('Acl');
     }
 
+    /**
+     * @group legacy
+     */
     public function testSetAclUser()
     {
         $objectId = 1;

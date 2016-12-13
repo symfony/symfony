@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -27,7 +27,7 @@ class HttpDigestFactory implements SecurityFactoryInterface
     {
         $provider = 'security.authentication.provider.dao.'.$id;
         $container
-            ->setDefinition($provider, new DefinitionDecorator('security.authentication.provider.dao'))
+            ->setDefinition($provider, new ChildDefinition('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProvider))
             ->replaceArgument(1, new Reference('security.user_checker.'.$id))
             ->replaceArgument(2, $id)
@@ -38,7 +38,7 @@ class HttpDigestFactory implements SecurityFactoryInterface
 
         // listener
         $listenerId = 'security.authentication.listener.digest.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.digest'));
+        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.digest'));
         $listener->replaceArgument(1, new Reference($userProvider));
         $listener->replaceArgument(2, $id);
         $listener->replaceArgument(3, new Reference($entryPointId));
@@ -75,7 +75,7 @@ class HttpDigestFactory implements SecurityFactoryInterface
 
         $entryPointId = 'security.authentication.digest_entry_point.'.$id;
         $container
-            ->setDefinition($entryPointId, new DefinitionDecorator('security.authentication.digest_entry_point'))
+            ->setDefinition($entryPointId, new ChildDefinition('security.authentication.digest_entry_point'))
             ->addArgument($config['realm'])
             ->addArgument($config['secret'])
         ;

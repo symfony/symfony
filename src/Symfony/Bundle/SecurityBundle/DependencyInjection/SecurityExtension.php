@@ -14,8 +14,8 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -242,7 +242,7 @@ class SecurityExtension extends Extension
             list($matcher, $listeners, $exceptionListener) = $this->createFirewall($container, $name, $firewall, $authenticationProviders, $providerIds, $configId);
 
             $contextId = 'security.firewall.map.context.'.$name;
-            $context = $container->setDefinition($contextId, new DefinitionDecorator('security.firewall.context'));
+            $context = $container->setDefinition($contextId, new ChildDefinition('security.firewall.context'));
             $context
                 ->replaceArgument(0, $listeners)
                 ->replaceArgument(1, $exceptionListener)
@@ -265,7 +265,7 @@ class SecurityExtension extends Extension
 
     private function createFirewall(ContainerBuilder $container, $id, $firewall, &$authenticationProviders, $providerIds, $configId)
     {
-        $config = $container->setDefinition($configId, new DefinitionDecorator('security.firewall.config'));
+        $config = $container->setDefinition($configId, new ChildDefinition('security.firewall.config'));
         $config->replaceArgument(0, $id);
         $config->replaceArgument(1, $firewall['user_checker']);
 
@@ -323,7 +323,7 @@ class SecurityExtension extends Extension
         if (isset($firewall['logout'])) {
             $listenerKeys[] = 'logout';
             $listenerId = 'security.logout_listener.'.$id;
-            $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.logout_listener'));
+            $listener = $container->setDefinition($listenerId, new ChildDefinition('security.logout_listener'));
             $listener->replaceArgument(3, array(
                 'csrf_parameter' => $firewall['logout']['csrf_parameter'],
                 'csrf_token_id' => $firewall['logout']['csrf_token_id'],
@@ -336,7 +336,7 @@ class SecurityExtension extends Extension
                 $logoutSuccessHandlerId = $firewall['logout']['success_handler'];
             } else {
                 $logoutSuccessHandlerId = 'security.logout.success_handler.'.$id;
-                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new DefinitionDecorator('security.logout.success_handler'));
+                $logoutSuccessHandler = $container->setDefinition($logoutSuccessHandlerId, new ChildDefinition('security.logout.success_handler'));
                 $logoutSuccessHandler->replaceArgument(1, $firewall['logout']['target']);
             }
             $listener->replaceArgument(2, new Reference($logoutSuccessHandlerId));
@@ -354,7 +354,7 @@ class SecurityExtension extends Extension
             // add cookie logout handler
             if (count($firewall['logout']['delete_cookies']) > 0) {
                 $cookieHandlerId = 'security.logout.handler.cookie_clearing.'.$id;
-                $cookieHandler = $container->setDefinition($cookieHandlerId, new DefinitionDecorator('security.logout.handler.cookie_clearing'));
+                $cookieHandler = $container->setDefinition($cookieHandlerId, new ChildDefinition('security.logout.handler.cookie_clearing'));
                 $cookieHandler->addArgument($firewall['logout']['delete_cookies']);
 
                 $listener->addMethodCall('addHandler', array(new Reference($cookieHandlerId)));
@@ -430,7 +430,7 @@ class SecurityExtension extends Extension
         }
 
         $listenerId = 'security.context_listener.'.count($this->contextListeners);
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.context_listener'));
+        $listener = $container->setDefinition($listenerId, new ChildDefinition('security.context_listener'));
         $listener->replaceArgument(2, $contextKey);
 
         return $this->contextListeners[$contextKey] = $listenerId;
@@ -461,7 +461,7 @@ class SecurityExtension extends Extension
         if (isset($firewall['anonymous'])) {
             $listenerId = 'security.authentication.listener.anonymous.'.$id;
             $container
-                ->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.anonymous'))
+                ->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.anonymous'))
                 ->replaceArgument(1, $firewall['anonymous']['secret'])
             ;
 
@@ -469,7 +469,7 @@ class SecurityExtension extends Extension
 
             $providerId = 'security.authentication.provider.anonymous.'.$id;
             $container
-                ->setDefinition($providerId, new DefinitionDecorator('security.authentication.provider.anonymous'))
+                ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.anonymous'))
                 ->replaceArgument(0, $firewall['anonymous']['secret'])
             ;
 
@@ -582,7 +582,7 @@ class SecurityExtension extends Extension
             }
 
             $container
-                ->setDefinition($name, new DefinitionDecorator('security.user.provider.chain'))
+                ->setDefinition($name, new ChildDefinition('security.user.provider.chain'))
                 ->addArgument($providers);
 
             return $name;
@@ -599,7 +599,7 @@ class SecurityExtension extends Extension
     private function createExceptionListener($container, $config, $id, $defaultEntryPoint, $stateless)
     {
         $exceptionListenerId = 'security.exception_listener.'.$id;
-        $listener = $container->setDefinition($exceptionListenerId, new DefinitionDecorator('security.exception_listener'));
+        $listener = $container->setDefinition($exceptionListenerId, new ChildDefinition('security.exception_listener'));
         $listener->replaceArgument(3, $id);
         $listener->replaceArgument(4, null === $defaultEntryPoint ? null : new Reference($defaultEntryPoint));
         $listener->replaceArgument(8, $stateless);
@@ -619,7 +619,7 @@ class SecurityExtension extends Extension
         $userProvider = isset($config['provider']) ? $this->getUserProviderId($config['provider']) : $defaultProvider;
 
         $switchUserListenerId = 'security.authentication.switchuser_listener.'.$id;
-        $listener = $container->setDefinition($switchUserListenerId, new DefinitionDecorator('security.authentication.switchuser_listener'));
+        $listener = $container->setDefinition($switchUserListenerId, new ChildDefinition('security.authentication.switchuser_listener'));
         $listener->replaceArgument(1, new Reference($userProvider));
         $listener->replaceArgument(2, new Reference('security.user_checker.'.$id));
         $listener->replaceArgument(3, $id);

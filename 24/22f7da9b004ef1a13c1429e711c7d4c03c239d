@@ -1,0 +1,100 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-13T11:32:48Z
+
+Can you add a test covering this ?
+
+---------------------------------------------------------------------------
+
+by robinvdvleuten at 2016-12-13T11:33:51Z
+
+@stof sure! Just a sec then
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-13T11:43:36Z
+
+That won't work: injecting a string (the REDIS_URL) in RedisAdapter is not allowed.
+What you need to do is add a new config option, let's say default_redis_url, and use that to wire the REDIS_URL as a DSN in the same way that I suggested in https://github.com/symfony/symfony/issues/20850#issuecomment-266058449 (but programmatically in the DI extension.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-13T11:46:36Z
+
+I should review twice before posting :) So this forces any `%env(...)%` to be understood as a DSN. OK then :)
+Does this really work? I mean, env vars are usually seen as unique placeholders from DI ext., not a plain `%env()%` thing.
+Adding a test case will show for sure.
+
+---------------------------------------------------------------------------
+
+by robinvdvleuten at 2016-12-13T11:48:58Z
+
+@nicolas-grekas what I am trying to understand is why the service definition you gave in the ticket;
+
+```yml
+cache.default_redis_provider:
+    class: Redis
+    public: false
+    factory: ["Symfony\\Component\\Cache\\Adapter\\RedisAdapter", "createConnection"]
+    arguments:
+      - "%env(REDIS_URL)%"
+```
+
+is different from this in PHP;
+
+```php
+$definition = new Definition(\Redis::class);
+$definition->setPublic(false);
+$definition->setFactory(array(RedisAdapter::class, 'createConnection'));
+$definition->setArguments(array('%env(REDIS_URL)%'));
+$container->setDefinition($name, $definition);
+```
+
+This should do the same in the compilation process right?
+
+---------------------------------------------------------------------------
+
+by robinvdvleuten at 2016-12-13T11:50:25Z
+
+@nicolas-grekas ha you typed a response faster than I did. This approach worked in my application so I created this PR to get your opinion before putting any effort in the test cases. The `default_redis_provider` isn't testing at all btw.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-13T12:04:09Z
+
+When I apply your patch, I get the same:
+```
+[Symfony\Component\DependencyInjection\Exception\EnvParameterException]
+Incompatible use of dynamic environment variables "REDIS_URL" found in parameters.
+```
+
+The correct patch might be more like:
+```diff
+--- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/CachePoolPass.php
++++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Compiler/CachePoolPass.php
+@@ -106,7 +106,9 @@ class CachePoolPass implements CompilerPassInterface
+      */
+     public static function getServiceProvider(ContainerBuilder $container, $name)
+     {
+-        if (0 === strpos($name, 'redis://')) {
++        $container->resolveEnvPlaceholders($name, null, $usedEnvs);
++
++        if (0 === strpos($name, 'redis://') || $usedEnvs) {
+             $dsn = $name;
+
+             if (!$container->hasDefinition($name = md5($dsn))) {
+```
+
+Btw, I'd be OK on my side to have this as bugfix on 3.2.
+
+---------------------------------------------------------------------------
+
+by robinvdvleuten at 2016-12-13T12:33:21Z
+
+@nicolas-grekas you are right, I was looking at the wrong thing. I've added the resolve call and updated the testcases to test both the default string and the env var.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-13T12:42:35Z
+
+:+1: (on 3.2 also)

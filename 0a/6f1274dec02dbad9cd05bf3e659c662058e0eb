@@ -1,0 +1,250 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-01T18:08:54Z
+
+@yceruto I believe this is a duplicate of #20713 (somehow implementing one of your proposed solutions to fix the same bug) :/
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-01T18:32:25Z
+
+Unbelievable! I researched this (12hr ago) before creating the PR :cry:
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-01T18:44:18Z
+
+@chalasr  Thanks for the warning. I have no problem with close this PR as duplicated, however I will keep it open, since this one must be done in 2.8 and I propose another solution, later the @symfony/deciders will take the right desision.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-01T18:46:31Z
+
+I don't have any issue using 3.2. I think it has been fixed silently in https://github.com/symfony/symfony/pull/19576, which match your solution (but slightly different value).
+
+So 👍 for this one by using the same value if coherent.
+
+<details><summary>BTW, the diff between 2.8 and 3.2</summary>
+
+```diff
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
+index d87e813..1b7b2f5 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
++++ b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig
+@@ -26,6 +26,15 @@
+     display: inline;
+ }
+
++.sf-toolbar-clearer {
++    clear: both;
++    height: 36px;
++}
++
++.sf-display-none {
++    display: none;
++}
++
+ .sf-toolbarreset * {
+     -webkit-box-sizing: content-box;
+     -moz-box-sizing: content-box;
+@@ -36,7 +45,7 @@
+ .sf-toolbarreset {
+     background-color: #222;
+     bottom: 0;
+-    box-shadow: 0 -1px 0px rgba(0, 0, 0, 0.2);
++    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+     color: #EEE;
+     font: 11px Arial, sans-serif;
+     left: 0;
+@@ -139,7 +148,7 @@
+
+ .sf-toolbar-block .sf-toolbar-info-piece .sf-toolbar-status {
+     padding: 2px 5px;
+-    margin-bottom: 0px;
++    margin-bottom: 0;
+ }
+ .sf-toolbar-block .sf-toolbar-info-piece .sf-toolbar-status + .sf-toolbar-status {
+     margin-left: 4px;
+@@ -233,6 +242,16 @@
+ .sf-toolbar-block-request .sf-toolbar-info-piece a:hover {
+     text-decoration: underline;
+ }
++.sf-toolbar-block-request .sf-toolbar-redirection-status {
++    font-weight: normal;
++    padding: 2px 4px;
++    line-height: 18px;
++}
++.sf-toolbar-block-request .sf-toolbar-info-piece span.sf-toolbar-redirection-method {
++    font-size: 12px;
++    height: 17px;
++    line-height: 17px;
++}
+
+ .sf-toolbar-status-green .sf-toolbar-label,
+ .sf-toolbar-status-yellow .sf-toolbar-label,
+@@ -315,7 +334,7 @@
+     padding: 4px;
+ }
+ .sf-ajax-request-url {
+-    max-width: 300px;
++    max-width: 250px;
+     line-height: 9px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+@@ -381,7 +400,7 @@
+
+     .sf-toolbarreset {
+         bottom: auto;
+-        box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2);
++        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+         top: 0;
+     }
+
+@@ -451,9 +470,15 @@
+         padding-left: 0;
+         padding-right: 0;
+     }
+-    .sf-toolbar-block-request .sf-toolbar-status + .sf-toolbar-label {
+-        margin-left: 4px;
++    .sf-toolbar-block-request .sf-toolbar-label {
++        margin-left: 5px;
++    }
++    .sf-toolbar-block-request .sf-toolbar-status + svg {
++        margin-left: 5px;
+     }
++    .sf-toolbar-block-request .sf-toolbar-icon svg + .sf-toolbar-label {
++        margin-left: 0;
++     }
+     .sf-toolbar-block-request .sf-toolbar-label + .sf-toolbar-value {
+         margin-right: 10px;
+     }
+```
+</details>
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-01T20:03:06Z
+
+> (but slightly different value) 250px vs 268px vs 300px
+
+Analyzing it again, it depends of current ``<td>`` content (only "Method", "URL" and "Time" vary in size (in `2.8`) and ``.sf-ajax-request-duration`` class don't has ``max-width``) and still with URL ``max-width: 250px`` and "Time" equal to ``<td>1234567890ms</td>`` (absurd :smiling_imp:) we have the same issue, so I think the right solution should be another one instead :/  ?
+
+What do you think about possible solution (1) or (2) preferably ?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-01T20:29:11Z
+
+(1) Ok, but that's not much different from the current solution 😕
+(2) I don't think it's a good idea to not restrict at all the panels size.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-01T21:03:55Z
+
+Well, anyway a smaller value should cover the issue currently, so I fixed the value to ``250px`` as https://github.com/symfony/symfony/pull/19576/files#diff-485e88132bac45e62c6d82940119bcbaR337
+
+---------------------------------------------------------------------------
+
+by NicolasPion at 2016-12-01T21:16:02Z
+
+Hi @yceruto, maybe you have the same issue than me on #20713
+
+Do you have change the default font for the toolbar ? Because I have try with a fresh 2.8 install, and I think I dont have your issue
+
+![test](https://cloud.githubusercontent.com/assets/11868633/20812889/a2c1c91e-b813-11e6-9879-2274e11ed0ce.jpg)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-01T21:24:13Z
+
+Actually I think the issue only exists after https://github.com/symfony/symfony/pull/17540 (which has been merged in 3.1) and adds the HTTP status code, which explains the width issue as the css wasn't updated.
+
+So this should probably target 3.1.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-01T21:35:21Z
+
+> Do you have change the default font for the toolbar ? Because I have try with a fresh 2.8 install, and I think I dont have your issue
+
+Nope! I don't have any CSS, to reproduce it in 2.8, just adds `sleep(10)` to ajax action and returns a valid response to create a valid profile token value.
+
+---------------------------------------------------------------------------
+
+by NicolasPion at 2016-12-01T21:39:21Z
+
+@ogizanagi , yes, in 3.1 I have this issue with the same code
+
+![test](https://cloud.githubusercontent.com/assets/11868633/20813705/ec2327c6-b816-11e6-97a9-0eab4550bb15.jpg)
+
+@yceruto 2.8, with sleep(10) with valid response :
+
+![test2](https://cloud.githubusercontent.com/assets/11868633/20814254/36dd9056-b819-11e6-84a2-0f05bdabcb7b.jpg)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-01T21:41:00Z
+
+@yceruto : Even having a request with a time faked to `10324000ms` will not be sufficient to reproduce on 2.8 which does not have the `Status` column. I can see this column on your screens, so I assume you're using 3.1, right?
+
+<img width="726" alt="screenshot 2016-12-01 a 22 48 14" src="https://cloud.githubusercontent.com/assets/2211145/20814007/401f2eaa-b818-11e6-8abe-bfa82657e061.PNG">
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-01T22:00:32Z
+
+> Actually I think the issue only exists after #17540 (which has been merged in 3.1) and adds the HTTP status code, which explains the width issue as the css wasn't updated.
+
+Right, it's an extra point, but the issue is possible since 2.8 even when my screenshots were taken in 3.1
+
+2.8 screenshot:
+
+![2 8](https://cloud.githubusercontent.com/assets/2028198/20814235/d56ee81a-b7e6-11e6-85e1-47858784868c.png)
+
+We can see "apparently" no padding-right.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-01T22:09:46Z
+
+@ogizanagi, @NicolasPion You can reproduce it with `OPTIONS` method additionally? If no, let's change to 3.1 base branch.
+
+---------------------------------------------------------------------------
+
+by NicolasPion at 2016-12-01T22:19:36Z
+
+@yceruto yes, I think you can reproduce this bug only if you have many 000000 in the time, and using a sleep(100) in PHP + using "OPTIONS" method in Ajax
+
+In my exemple I have some margin to the right because 556 is smaller than 000
+
+![test3](https://cloud.githubusercontent.com/assets/11868633/20815008/5e6745a6-b81c-11e6-98f4-c0294c9378a0.jpg)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-06T04:55:45Z
+
+@NicolasPion, @ogizanagi However, do you think it's worth fixing it at 2.8? Or do you really think that the problem is more serious from 3.1?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-06T08:05:40Z
+
+@yceruto : Sorry, I forgot to answer you last time. No I think it's ok in 2.8 even with `OPTIONS` because the "Status" column does not exist yet and the time needed to overflow is not realistic.
+
+---------------------------------------------------------------------------
+
+by NicolasPion at 2016-12-06T08:35:22Z
+
+@yceruto : imo, in 2.8 this is not really a "bug" and it is very difficult to reproduce :
+- You need to have long URL
+- You need to use an "OPTIONS" ajax method.
+- The response need to be more slower than 100000ms
+
+ But in 3.1 why not, the only requirement to reproduce this is to have a long URL
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-06T14:47:19Z
+
+Agreed, changed to 3.1 base branch.

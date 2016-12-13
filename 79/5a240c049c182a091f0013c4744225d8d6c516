@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T07:11:44Z
+
+👍 as is. It does not "cost" us anything to deprecate it in 3.3 and remove it in 4.0.

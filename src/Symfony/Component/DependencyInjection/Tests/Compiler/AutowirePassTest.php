@@ -476,6 +476,20 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->hasDefinition('bar'));
     }
+
+    public function testParameterInjection()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('myParameter', 'SymfonyCon Berlin Hackday!');
+
+        $parameterInjectionDefinition = $container->register(ParameterInjection::class, ParameterInjection::class);
+        $parameterInjectionDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertEquals('SymfonyCon Berlin Hackday!', $parameterInjectionDefinition->getArgument(1));
+    }
 }
 
 class Foo
@@ -651,6 +665,13 @@ class IdenticalClassResource extends ClassForResource
 class ClassChangedConstructorArgs extends ClassForResource
 {
     public function __construct($foo, Bar $bar, $baz)
+    {
+    }
+}
+
+class ParameterInjection
+{
+    public function __construct(Foo $foo, $myParameter)
     {
     }
 }

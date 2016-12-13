@@ -108,18 +108,12 @@ class DateIntervalType extends AbstractType
                     }
                 }
             }
-            $invertOptions = array(
-                'error_bubbling' => true,
-            );
             // Append generic carry-along options
             foreach (array('required', 'translation_domain') as $passOpt) {
                 foreach ($this->timeParts as $part) {
                     if ($options['with_'.$part]) {
                         $childOptions[$part][$passOpt] = $options[$passOpt];
                     }
-                }
-                if ($options['with_invert']) {
-                    $invertOptions[$passOpt] = $options[$passOpt];
                 }
             }
             foreach ($this->timeParts as $part) {
@@ -136,7 +130,11 @@ class DateIntervalType extends AbstractType
                 }
             }
             if ($options['with_invert']) {
-                $builder->add('invert', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', $invertOptions);
+                $builder->add('invert', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', array(
+                    'error_bubbling' => true,
+                    'required' => false,
+                    'translation_domain' => $options['translation_domain'],
+                ));
             }
             $builder->addViewTransformer(new DateIntervalToArrayTransformer($parts, 'text' === $options['widget']));
         }

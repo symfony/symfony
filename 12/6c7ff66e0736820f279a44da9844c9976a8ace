@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2016-12-11T10:49:30Z
+
+`https_proxy` can indeed exist, not sure how I can take this into consideration. Should I add an `https` key to the context array?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T09:14:02Z
+
+composer has a bunch of code to properly deal with proxies, see:
+https://github.com/composer/composer/blob/master/src/Composer/Util/StreamContextFactory.php
+
+Since we don't want to put that much logic here, I propose to simply use `wget` when `isset($_SERVER['http_proxy']) || isset($_SERVER['https_proxy'])`.
+
+This could then go as bug fix on 3.2 IMHO.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-12T09:23:35Z
+
+In the Symfony Installer we also used a simplified proxy detection based on the Composer one. It seems to be working OK: https://github.com/symfony/symfony-installer/blob/master/src/Symfony/Installer/DownloadCommand.php#L243
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T09:42:27Z
+
+@javiereguiluz it looks like this builds on a Guzzle feature? Which would mean not applicable here?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-12T09:45:02Z
+
+@nicolas-grekas yes, I was only referring to these lines:
+
+```php
+if (!empty($_SERVER['HTTP_PROXY']) || !empty($_SERVER['http_proxy'])) {
+    $defaults['proxy'] = !empty($_SERVER['http_proxy']) ? $_SERVER['http_proxy'] : $_SERVER['HTTP_PROXY'];
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T13:35:10Z
+
+:+1:

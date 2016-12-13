@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-11T22:04:46Z
+
+@nicolas-grekas New pushed code with changes per your comments (and in some cases, my responses).
+
+Also, un-commented test skips at this point as prior tests have shown `testExpiration`, `testHasItemReturnsFalseWhenDeferredItemIsExpired`, and `testDefaultLifeTime` pass and I assume we want to skip those once this code is merged.
+
+Otherwise, a bit of cleanup in the test class as well. Should be good to go @nicolas-grekas! Let me know if I can do anything else to get this merge ready.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-12T01:57:15Z
+
+@nicolas-grekas I am unable to find any combination of libmemcached and ext-memcached that result in a non-false return for `\Memcached::getAllKeys()`.
+
+How do you feel about replacing this class's `getIdsByPrefix()` with the following:
+
+```php
+private function getIdsByPrefix($namespace)
+{
+    if (false === ($ids = $this->client->getAllKeys())
+     && false === ($ids = $this->getAllKeysMemcache())) {
+        return false;
+    }
+
+    return array_filter((array) $ids, function ($id) use ($namespace) {
+        return 0 === strpos($id, $namespace);
+    });
+}
+
+private function getAllKeysMemcache()
+{
+    static $client = null;
+
+    if (false === $client
+        || (null === $client
+            && false === $client = $this->createMemcacheClient())) {
+        return false;
+    }
+
+    $ids = array();
+    foreach ($client->getExtendedStats('slabs') as $group) {
+        foreach ($group as $slabId => $metadata) {
+            if (!is_array($metadata)) {
+                continue;
+            }
+            foreach ($client->getExtendedStats('cachedump', (int)$slabId, 1000) as $slabIds) {
+                if (is_array($slabIds)) {
+                    $ids = array_merge($ids, array_keys($slabIds));
+                }
+            }
+        }
+    }
+
+    return $ids;
+}
+
+private function createMemcacheClient()
+{
+    if (!extension_loaded('memcache')) {
+        return false;
+    }
+
+    $client = new \Memcache();
+    foreach ($this->client->getServerList() as $srv) {
+        $client->addServer(array_shift($srv), array_shift($srv));
+    }
+
+    return $client;
+}
+```
+
+This ensures the check for the `memcache` extension fallback for obtaining all keys only occurs once, and then allows for proper, namespace-enabled flushing if that extension *is* available.... Thoughts?
+
+*Note: Mixing these extensions in terms of *their values* is dangerous, due to serialization differences, but in terms of simply returning keys is harmless.*
+
+Due to the fact that `\Memcached::getAllKeys()` seems perpetually broken on all major distributions/ext-versions I've tested, this seems like a possible functional (arguably hackie) solution...
+
+Basic logic required for this implementation:
+
+### When `ext-memcache` *Is Not Available*
+
+#### On First Call
+- Method call: `getAllKeysMemcache()` **(final return `bool:false`)**
+- Conditional check: `false === $client`
+- Conditional check: `null === $client`
+- Conditional check: `false === $client = $this->createMemcacheClient())`
+- Conditional check `extension_loaded()`
+
+#### On Subsequent Calls
+- Method call: `getAllKeysMemcache()` **(final return `bool:false`)**
+- Conditional check: `false === $client`
+
+### When `ext-memcache` *Is Available*
+
+#### On First Call
+- Method call: `getAllKeysMemcache()` **(final return `string[]`)**
+- Conditional check: `false === $client`
+- Conditional check: `null === $client`
+- Conditional check: `false === $client = $this->createMemcacheClient())`
+- Conditional check `extension_loaded()`
+- *Instantiate and add servers to `\Memcache` instance*
+- *Perform loop to get ids*
+
+#### On Subsequent Calls
+- Method call: `getAllKeysMemcache()` **(final return `string[]`)**
+- Conditional check: `false === $client`
+- *Perform loop to get ids*
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T07:04:39Z
+
+I think this is going too far, that we should give up and just call flush... :)
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-12T15:43:12Z
+
+Ha; fair enough. This should be good to go in that case. Updated per most recent comments.
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-12T17:53:01Z
+
+@nicolas-grekas Should I make the same `setUp` and `tearDown` changes @stof recommended for my other PR at https://github.com/symfony/symfony/pull/20863#discussion_r91987282
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T18:44:38Z
+
+Let's go :)
+:+1:

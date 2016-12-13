@@ -353,35 +353,52 @@ class ProgressBarTest extends \PHPUnit_Framework_TestCase
 
     public function testRedrawFrequency()
     {
-        $bar = $this->getMock('Symfony\Component\Console\Helper\ProgressBar', array('display'), array($this->getOutputStream(), 6));
-        $bar->expects($this->exactly(4))->method('display');
-
+        $bar = new ProgressBar($output = $this->getOutputStream(), 6);
         $bar->setRedrawFrequency(2);
         $bar->start();
         $bar->setProgress(1);
         $bar->advance(2);
         $bar->advance(2);
         $bar->advance(1);
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            ' 0/6 [>---------------------------]   0%'.
+            $this->generateOutput(' 3/6 [==============>-------------]  50%').
+            $this->generateOutput(' 5/6 [=======================>----]  83%').
+            $this->generateOutput(' 6/6 [============================] 100%'),
+            stream_get_contents($output->getStream())
+        );
     }
 
     public function testRedrawFrequencyIsAtLeastOneIfZeroGiven()
     {
-        $bar = $this->getMock('Symfony\Component\Console\Helper\ProgressBar', array('display'), array($this->getOutputStream()));
-
-        $bar->expects($this->exactly(2))->method('display');
+        $bar = new ProgressBar($output = $this->getOutputStream());
         $bar->setRedrawFrequency(0);
         $bar->start();
         $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    1 [->--------------------------]'),
+            stream_get_contents($output->getStream())
+        );
     }
 
     public function testRedrawFrequencyIsAtLeastOneIfSmallerOneGiven()
     {
-        $bar = $this->getMock('Symfony\Component\Console\Helper\ProgressBar', array('display'), array($this->getOutputStream()));
-
-        $bar->expects($this->exactly(2))->method('display');
+        $bar = new ProgressBar($output = $this->getOutputStream());
         $bar->setRedrawFrequency(0.9);
         $bar->start();
         $bar->advance();
+
+        rewind($output->getStream());
+        $this->assertEquals(
+            '    0 [>---------------------------]'.
+            $this->generateOutput('    1 [->--------------------------]'),
+            stream_get_contents($output->getStream())
+        );
     }
 
     public function testMultiByteSupport()

@@ -711,6 +711,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * Registers an autowired service definition.
+     *
+     * This method implements a shortcut for using setDefinition() with
+     * an autowired definition.
+     *
+     * @param string      $id    The service identifier
+     * @param null|string $class The service class
+     *
+     * @return Definition The created definition
+     */
+    public function autowire($id, $class = null)
+    {
+        return $this->setDefinition($id, (new Definition($class))->setAutowired(true));
+    }
+
+    /**
      * Adds the service definitions.
      *
      * @param Definition[] $definitions An array of service definitions

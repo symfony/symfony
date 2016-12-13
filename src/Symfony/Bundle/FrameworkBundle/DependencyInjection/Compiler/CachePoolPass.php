@@ -106,9 +106,7 @@ class CachePoolPass implements CompilerPassInterface
      */
     public static function getServiceProvider(ContainerBuilder $container, $name)
     {
-        $container->resolveEnvPlaceholders($name, null, $usedEnvs);
-
-        if (0 === strpos($name, 'redis://') || $usedEnvs) {
+        if (0 === strpos($name, 'redis://')) {
             $dsn = $name;
 
             if (!$container->hasDefinition($name = md5($dsn))) {

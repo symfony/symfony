@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2016-10-25T11:15:07Z
+
+👎 For me, any boilerplate stuff I have to remove before I can actually start reporting my issue will make me report less issues. Issue _templates_ are templates and not informative texts, imo.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-10-25T11:27:44Z
+
+For what is worth, it's almost impossible to find a popular GitHub repository without an issue template:
+
+![bootstrap](https://cloud.githubusercontent.com/assets/73419/19684257/92cb6ae4-9ab6-11e6-8205-4eb2353f23ad.png)  ![angular](https://cloud.githubusercontent.com/assets/73419/19684260/95b4af2c-9ab6-11e6-88fc-b0af2e3c65a1.png)
+![react](https://cloud.githubusercontent.com/assets/73419/19684261/976df792-9ab6-11e6-8cf8-58bbeb2b33cc.png)  ![laravel](https://cloud.githubusercontent.com/assets/73419/19684262/98a223a4-9ab6-11e6-8daa-939cfcd42439.png)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-10-25T11:47:30Z
+
+I'm 👍  for having an issue template, but (as pointed by @wouterj) for the same kind of templates we have for pull requests, helping to determinate if it is a bug report, a feature request, which version is concerned... So maintainers (especially @javiereguiluz) don't have to manually add labels on all issues. It should help to avoid support issues as well, as we are forced to define a concrete type (i.e. feature request or bug report, if it can't be in these two choices, then it's a support issue).
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-10-25T13:35:14Z
+
+FYI, you can use html comments `<!--  -->` to hide instructions, Sonata does this for example.
+They only show-up when editing but not when you post them.
+
+https://raw.githubusercontent.com/sonata-project/dev-kit/master/project/.github/ISSUE_TEMPLATE.md
+
+It would also be a good idea to use a questioner for issues:
+Types (bug, feature), Symfony version, php version, etc.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-26T18:48:41Z
+
+So why not both?
+
+```
+<!--
+* Some
+* Guidelines..
+-->
+
+| Q             | A
+| ------------- | ---
+```
+
+>  Issue templates are templates and not informative texts
+
+This is a value used by default for each new issue. How is that not a _template_?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-10-26T19:08:19Z
+
+> This is a value used by default for each new issue. How is that not a template?
+
+Well, the proposed "template" is not a template at all. It just informs you that you shouldn't submit support questions. This is "informative text", which I'm against.
+
+Please note that I'm not against introducing a Q/A table for issues. That's a great example of a template. (it indicates what type of issues Symfony wants in a template way and it doesn't formalize the way people type their feature requests too hard)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-26T19:18:53Z
+
+Ok, we interpret it differently :) From github's pov this is a issue template, whatever the file contents are. Anyway im :+1: on whatever helps creating better issues.
+
+Lets focus on the QA first then? What about;
+- Bug report yes/no
+- Feature request yes/no
+- Symfony version x.y.z
+- PHP version x.y
+
+More or less like @chalasr proposed.
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-10-26T20:47:59Z
+
+I like it. I think we shouldn't add to much stuff in there. When looking at other issue templates, it seems like the proposed items covered the commonly used items.
+
+So:
+
+``` markdown
+| Q                | A
+| ---------------- | -----
+| Bug report?      | yes/no
+| Feature request? | yes/no
+| Symfony version  | x.y.z
+| PHP version      | x.y.z
+```
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-10-27T00:10:50Z
+
+No need for a template when we have Carson :) What about:
+
+```
+<!--
+
+Thanks for supporting Symfony!
+
+* Issues are used for reporting bugs and requesting new features.
+
+  To define which it is, just add "[Bug]" or "[Feature]" before the title of this issue.
+
+  You can also target some specific component(s) with braces, i.e "[Form]" or "[Security]".
+
+  When a bug is suspected, please mention the version of Symfony and PHP you're using.
+
+  If some simple unit test are not enough, you can try to fork symfony/symfony-standard
+  and add the minimum of code to reproduce your scenario.
+
+* If you have a question about using Symfony, please check https://symfony.com/support
+
+-->
+```
+
+?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-10-27T07:00:43Z
+
+I've just closed two support issues that may have not existed if we had explain to users that issues are not the way to ask questions: #20293 and #20318.
+
+By the way, I don't like it at all to create a template where the bug reporter must fill in a lot of information. In that case I'd agree with [this Wouter comment](https://github.com/symfony/symfony/pull/20295#issuecomment-256006796).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-01T18:10:22Z
+
+I like @HeahDude's idea to use carson `[Bug/FR/Feature(Request)]` for automatic labels. Which indeed requires no further template, just some general info. I think it's the most friendly/accessible, yet useful way to handle it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T13:21:58Z
+
+I don't like adding labels in issue titles, they are too often redundant with the title and clutter reading IMHO.
+
+IMHO again, the short comment is a nice idea, looks like a perfect _contextual_ help to me.
+
+My 2cts:
+
+```
+| Q                | A
+| ---------------- | -----
+| Bug report?      | yes/no
+| Feature request? | yes/no
+| BC Break report? | yes/no
+| RFC?             | yes/no
+| Symfony version  | x.y.z
+
+<!--
+- Please fill in this template according to your issue.
+- For support request or how-tos, please visit https://symfony.com/support
+- Otherwise, replace this comment by the description of your issue.
+-->
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-10T17:35:45Z
+
+I like @nicolas-grekas suggestion.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-13T10:09:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-13T10:11:05Z
+
+👍

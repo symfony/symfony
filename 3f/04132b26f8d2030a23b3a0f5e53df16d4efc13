@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2016-11-02T12:24:27Z
+
+I don't like the comments. PR templates should be templates. Contributing guidelines should be described in `CONTRIBUTING.md` or the Symfony Contribution Guide in the docs.
+
+If it turns out people don't read that doc, simply adding a small link to it seems better than duplicating contributing guidelines in so many places imo.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T12:33:58Z
+
+> If it turns out people don't read that doc
+
+that is already proven, and I suggest trying with a comment here instead, see if it makes things better.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-03T09:35:03Z
+
+Comment moved to the bottom
+
+---------------------------------------------------------------------------
+
+by jakzal at 2016-11-10T15:18:45Z
+
+:+1: let's see if this improves PR descriptions
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-10T16:09:19Z
+
+:+1: let's try it
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-10T17:34:23Z
+
+I like @wouterj suggestion to add a link to the CONTRIBUTOR guide.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-21T09:02:07Z
+
+The link to contributing is already there in the UI:
+
+![capture du 2016-11-21 10-09-29](https://cloud.githubusercontent.com/assets/243674/20476713/9eaf74dc-afd2-11e6-82d7-2d554359a704.png)

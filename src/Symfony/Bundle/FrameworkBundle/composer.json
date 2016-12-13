@@ -20,7 +20,7 @@
         "symfony/cache": "~3.2",
         "symfony/class-loader": "~3.2",
         "symfony/dependency-injection": "~3.2",
-        "symfony/config": "~2.8|~3.0",
+        "symfony/config": "~3.2",
         "symfony/event-dispatcher": "~2.8|~3.0",
         "symfony/http-foundation": "~3.1",
         "symfony/http-kernel": "~3.3",

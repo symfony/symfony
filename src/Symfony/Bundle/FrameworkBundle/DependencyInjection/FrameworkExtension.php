@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
@@ -34,6 +35,7 @@ use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Workflow;
 use Symfony\Component\Yaml\Yaml;
 
@@ -87,7 +89,8 @@ class FrameworkExtension extends Extension
         // A translator must always be registered (as support is included by
         // default in the Form component). If disabled, an identity translator
         // will be used and everything will still work as expected.
-        if (class_exists('Symfony\Component\Translation\Translator') || $this->isConfigEnabled($container, $config['form'])) {
+        $container->addResource(new ClassExistenceResource(Translator::class));
+        if (class_exists(Translator::class) || $this->isConfigEnabled($container, $config['form'])) {
             if (!class_exists('Symfony\Component\Translation\Translator')) {
                 throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
             }

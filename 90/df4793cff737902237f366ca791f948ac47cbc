@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-11T11:30:37Z
+
+Can you explain your use-case when you need to inherit the `ProgressBar`? It could help to improve the `ProgressBar` itself.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-11T11:38:26Z
+
+the right fix would be to re-bind the closure explicitly to the right class instead. Switching to protected makes the method accessible (and overwritable) in child class, and so impacts the API covered by BC, which is a no-go.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-11T12:52:18Z
+
+If it doesn't work right now, it won't be a BC break to finalize the class. It just depends on use-cases.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-11-11T19:45:06Z
+
+@unkind indeed it is not a bc break, but it will add stuff to maintain because of sf's bc policy which is avoided when possible.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-11T20:06:29Z
+
+> @unkind indeed it is not a bc break, but it will add stuff to maintain because of sf's bc policy which is avoided when possible.
+
+`final` makes keeping BC easier, what do you mean?
+
+---------------------------------------------------------------------------
+
+by a-ast at 2016-11-11T20:18:46Z
+
+> Can you explain your use-case when you need to inherit the ProgressBar?
+
+@unkind I performed some experiments, but my ideas didn't work because of this issue with inheritance. So, at the end I have no real use case, because I went with another approach.
+
+However, my point is: either `ProgressBar` class must be `final` or inheritance must be supported, isn't it?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-11-11T20:21:15Z
+
+@unkind of course sorry, I didn't understand well what you meant.
+
+I agree with you and I think we should consider make more classes `final` unless people prove that extending them brings real benefits. Here as this helper is unlikely to be worth being extended, I would be for `final`.
+However, I think it's safer to deprecate extending it for 4.0 (it's really simple) as the error doesn't happen as long as you don't call a method of the helper.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-03T10:13:40Z
+
+So do I understand correctly that extended the class does only work as long as you do not call the `start()` method?
+
+---------------------------------------------------------------------------
+
+by a-ast at 2016-12-03T10:16:20Z
+
+@xabbuh yes
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-03T10:17:49Z
+
+In this case declaring the class as `final` should be valid.
+
+---------------------------------------------------------------------------
+
+by a-ast at 2016-12-03T10:52:16Z
+
+BC Promise disallows to make classes final.
+What should I do to make such change in 4.0?
+
+ping @nicolas-grekas, @fabpot
+The issue is very simple: `ProgressBar` is not final, but extending it (even if it is the weird idea) causes Fatal error after calling `start()`.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-12-03T11:01:00Z
+
+@a-ast https://github.com/symfony/symfony/pull/20493 allows to do this by using the `@final` annotation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-03T11:02:18Z
+
+Does it always throw? This would mean nobody could have extended the class, so making it final would be safe.
+
+---------------------------------------------------------------------------
+
+by a-ast at 2016-12-03T11:23:20Z
+
+@nicolas-grekas yes, it throws always.
+It seems that I need to wait until #20493 is merged to continue with my PR, isn't it?
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-12-03T15:12:09Z
+
+@a-ast I fail to see how #20493 blocks you. As already mentioned, `final` doesn't break BC anyway in this specific case.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-12-03T19:15:02Z
+
+https://github.com/symfony/symfony/pull/20493 was only needed in case we considered this change as a bc break. As we don't, you can just directly make the class `final`.
+
+---------------------------------------------------------------------------
+
+by a-ast at 2016-12-04T13:21:50Z
+
+> doesn't break BC anyway in this specific case.
+
+@unkind, @GuilhemN thank you for explanation.
+I made the class `final` and it appeared that some tests failed because they mocked the class to spy  on `display` method.
+I've changed the implementation of this tests. Maybe it is not as elegant as before, but, on the other hand, now it is simpler and without mocking.

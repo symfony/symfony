@@ -7,6 +7,34 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.22 (2016-12-13)
+
+ * bug #20714 [FrameworkBundle] Fix unresolved parameters from default configs in debug:config (chalasr)
+ * bug #20442 [FrameworkBundle] Bundle commands are not available via find() (julienfalque)
+ * bug #20840 [WebProfilerBundle] add dependency on Twig (xabbuh)
+ * bug #20828 [Validator] Fix init of YamlFileLoader::$classes for empty files (nicolas-grekas)
+ * bug #20539 Cast result to int before adding to it (alcaeus)
+ * bug #20831 [Twig] Fix deprecations with Twig 1.29 (nicolas-grekas)
+ * bug #20767 [Cache] Fix dumping SplDoublyLinkedList iter mode (nicolas-grekas)
+ * bug #20736 [Console] fixed PHP7 Errors when not using Dispatcher (keradus)
+ * bug #20755 [HttpKernel] Regression test for missing controller arguments (iltar)
+ * bug #20418 [Form][DX] FileType "multiple" fixes (yceruto)
+ * bug #19902 [DependencyInjection] PhpDumper.php: hasReference() shouldn't search references in lazy service. (antanas-arvasevicius)
+ * bug #20704 [Console] Fix wrong handling of multiline arg/opt descriptions (ogizanagi)
+ * bug #20712 [TwigBundle] Fix twig loader registered twice (ogizanagi)
+ * bug #20671 [Config] ConfigCache::isFresh() should return false when unserialize() fails (nicolas-grekas)
+ * bug #20676 [ClassLoader] Use only forward slashes in generated class map (nicolas-grekas)
+ * bug #20664 [Validator] ensure the proper context for nested validations (xabbuh)
+ * bug #20661 bug #20653 [WebProfilerBundle] Profiler includes ghost panels (jzawadzki)
+ * bug #20374 [FrameworkBundle] Improve performance of ControllerNameParser (enumag)
+ * bug #20474 [Routing] Fail properly when a route parameter name cannot be used as a PCRE subpattern name (fancyweb)
+ * bug #20566 [DI] Initialize properties before method calls (ro0NL)
+ * bug #20609 [DI] Fixed custom services definition BC break introduced in ec7e70fb… (kiler129)
+ * bug #20598 [DI] Aliases should preserve the aliased invalid behavior (nicolas-grekas)
+ * bug #20602 [HttpKernel] Revert BC breaking change of Request::isMethodSafe() (nicolas-grekas)
+ * bug #20499 [Doctrine][Form] support large integers (xabbuh)
+ * bug #20576 [Process] Do feat test before enabling TTY mode (nicolas-grekas)
+
 * 2.7.21 (2016-11-21)
 
  * bug #20543 [DI] Fix error when trying to resolve a DefinitionDecorator (nicolas-grekas)

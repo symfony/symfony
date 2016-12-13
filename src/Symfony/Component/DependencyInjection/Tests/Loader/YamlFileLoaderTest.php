@@ -323,6 +323,10 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services23.yml');
 
         $this->assertTrue($container->getDefinition('bar_service')->isAutowired());
+        $this->assertEquals(array('__construct'), $container->getDefinition('bar_service')->getAutowiredMethods());
+
+        $loader->load('services27.yml');
+        $this->assertEquals(array('set*', 'bar'), $container->getDefinition('autowire_array')->getAutowiredMethods());
     }
 
     /**

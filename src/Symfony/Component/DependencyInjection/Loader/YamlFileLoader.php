@@ -302,7 +302,11 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($service['autowire'])) {
-            $definition->setAutowired($service['autowire']);
+            if (is_array($service['autowire'])) {
+                $definition->setAutowiredMethods($service['autowire']);
+            } else {
+                $definition->setAutowired($service['autowire']);
+            }
         }
 
         if (isset($service['autowiring_types'])) {

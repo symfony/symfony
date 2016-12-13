@@ -38,6 +38,11 @@ class LoggingFormatter
         return $this->format($pass, sprintf('Resolving inheritance for "%s" (parent: %s).', $childId, $parentId));
     }
 
+    public function formatUnusedAutowiringPatterns(CompilerPassInterface $pass, $id, array $patterns)
+    {
+        return $this->format($pass, sprintf('Autowiring\'s patterns "%s" for service "%s" don\'t match any method.', implode('", "', $patterns), $id));
+    }
+
     public function format(CompilerPassInterface $pass, $message)
     {
         return sprintf('%s: %s', get_class($pass), $message);

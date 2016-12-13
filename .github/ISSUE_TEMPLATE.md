@@ -1,3 +1,13 @@
-Thanks for supporting Symfony!
-* Issues are used for reporting bugs and requesting new features.
-* If you have a question about using Symfony, ask it in https://symfony.com/support
+| Q                | A
+| ---------------- | -----
+| Bug report?      | yes/no
+| Feature request? | yes/no
+| BC Break report? | yes/no
+| RFC?             | yes/no
+| Symfony version  | x.y.z
+
+<!--
+- Please fill in this template according to your issue.
+- For support request or how-tos, visit https://symfony.com/support
+- Otherwise, replace this comment by the description of your issue.
+-->

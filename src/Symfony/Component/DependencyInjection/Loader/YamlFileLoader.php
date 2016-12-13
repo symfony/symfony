@@ -267,7 +267,7 @@ class YamlFileLoader extends FileLoader
 
             foreach ($service['tags'] as $tag) {
                 if (!is_array($tag)) {
-                    throw new InvalidArgumentException(sprintf('A "tags" entry must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+                    $tag = array('name' => $tag);
                 }
 
                 if (!isset($tag['name'])) {

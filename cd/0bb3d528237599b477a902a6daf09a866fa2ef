@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-01T14:48:18Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-01T15:02:22Z
+
+Maybe not what *you*'d expect, yet the current behavior on 2.7 is consistent, not buggy.
+If we need to reconsider this, we should do it on 3.3 IMHO.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-01T15:05:52Z
+
+@nicolas-grekas Not sure to understand. Why should parameters be resolved only for explicitly defined configuration?
+
+On the current 2.7, I can get both `%kernel.root_dir%` for a key and its value for another, imho it's not a consistent behavior. Whether we dump placeholders or values, but not both.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-01T17:46:28Z
+
+Maybe it's not clear what I mean.
+
+config:
+```yaml
+twig:
+    debug:            "%kernel.debug%"
+    strict_variables: "%kernel.debug%"
+    form_themes:
+        - "bootstrap_3_layout.html.twig"
+        - "form/fields.html.twig"
+```
+
+output before:
+![before](http://image.prntscr.com/image/f88be46f66894b3b824c06bc3476c356.png)
+
+output after:
+![after](http://image.prntscr.com/image/290011c9a79e4d10811fbf72cbab245b.png)
+
+I find the `debug:config` command especially useful to be aware of what is configured implicitly (i.e. default bundle configurations), which is no more true if the output doesn't contain real values, and quite confusing if one key contains the real value and the second doesn't.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-09T12:28:39Z
+
+So isn't this the expected behavior? Is there any blocker for merging this as a bugfix?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T10:44:43Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-12T11:40:04Z
+
+👍

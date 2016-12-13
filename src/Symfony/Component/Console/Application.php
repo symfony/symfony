@@ -105,8 +105,6 @@ class Application
      * @param OutputInterface $output An Output instance
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @throws \Exception When doRun returns Exception
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
@@ -390,7 +388,7 @@ class Application
      *
      * @return Command A Command object
      *
-     * @throws CommandNotFoundException When command name given does not exist
+     * @throws CommandNotFoundException When given command name does not exist
      */
     public function get($name)
     {
@@ -834,8 +832,6 @@ class Application
      * @param OutputInterface $output  An Output instance
      *
      * @return int 0 if everything went fine, or an error code
-     *
-     * @throws \Exception when the command being run threw an exception
      */
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {

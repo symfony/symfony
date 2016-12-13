@@ -1,12 +1,12 @@
 MbString åpplicätion
 ====================
 
-* `help`
-* `list`
+* [`help`](#help)
+* [`list`](#list)
 
 **descriptor:**
 
-* `descriptor:åèä`
+* [`descriptor:åèä`](#descriptoråèä)
 
 `help`
 ------

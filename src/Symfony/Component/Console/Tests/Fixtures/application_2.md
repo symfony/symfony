@@ -1,15 +1,15 @@
 My Symfony application <info>v1.0</info>
 ========================================
 
-* `alias1`
-* `alias2`
-* `help`
-* `list`
+* [`alias1`](#descriptorcommand1)
+* [`alias2`](#descriptorcommand1)
+* [`help`](#help)
+* [`list`](#list)
 
 **descriptor:**
 
-* `descriptor:command1`
-* `descriptor:command2`
+* [`descriptor:command1`](#descriptorcommand1)
+* [`descriptor:command2`](#descriptorcommand2)
 
 `help`
 ------

@@ -1,8 +1,8 @@
 Console Tool
 ============
 
-* `help`
-* `list`
+* [`help`](#help)
+* [`list`](#list)
 
 `help`
 ------

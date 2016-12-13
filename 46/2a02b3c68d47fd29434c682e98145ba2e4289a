@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by iltar at 2016-12-11T13:29:54Z
+
+Seems a lot better! Is it possible to make a 2 column table (borderless) out of them so they align properly?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2016-12-11T13:37:53Z
+
+Yup, did it by hand because it's like 3 lines of code and the Table requires an output and all.. seemed overly complex for this.
+
+![image](https://cloud.githubusercontent.com/assets/183678/21080435/6549e988-bfaf-11e6-9c64-f9265182a0ee.png)
+
+---------------------------------------------------------------------------
+
+by hason at 2016-12-12T13:46:00Z
+
+What about combine with PR #19282?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2016-12-12T13:58:45Z
+
+Fixed feedback (I had to add a Helper::substr too, I hope that's ok).
+
+@hason hmm yeah I guess if yours is merged it kinda makes this one obsolete anyway? I don't really have a preference, I guess this one is simpler but less powerful.

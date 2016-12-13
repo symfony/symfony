@@ -702,7 +702,7 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('cache');
 
-        $redisUrl= 'redis://localhost';
+        $redisUrl = 'redis://localhost';
         $providerId = md5($redisUrl);
 
         $this->assertTrue($container->hasDefinition($providerId));

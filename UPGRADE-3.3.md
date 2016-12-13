@@ -7,6 +7,11 @@ ClassLoader
  * The ApcClassLoader, WinCacheClassLoader and XcacheClassLoader classes have been deprecated
    in favor of the `--apcu-autoloader` option introduced in composer 1.3
 
+Finder
+------
+
+ * The `ExceptionInterface` has been deprecated and will be removed in 4.0.
+
 Security
 --------
 

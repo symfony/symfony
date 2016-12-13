@@ -18,6 +18,12 @@ Finder
 
  * The `ExceptionInterface` has been deprecated and will be removed in 4.0.
 
+HttpKernel
+-----------
+
+ * The `Psr6CacheClearer::addPool()` method has been deprecated. Pass an array of pools indexed
+   by name to the constructor instead.
+
 Security
 --------
 
@@ -29,9 +35,3 @@ SecurityBundle
 
  * The `FirewallContext::getContext()` method has been deprecated and will be removed in 4.0.
    Use the `getListeners()` method instead.
-   
-HttpKernel
------------
-
- * The `Psr6CacheClearer::addPool()` method has been deprecated. Pass an array of pools indexed
-   by name to the constructor instead.

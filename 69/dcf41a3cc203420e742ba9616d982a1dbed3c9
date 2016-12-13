@@ -1,0 +1,257 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-05T23:55:31Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-06T08:44:54Z
+
+The syntax for the XML loader is:
+
+``` xml
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="autowire_star" class="Foo" autowire="*" />
+        <service id="autowire_array" class="Foo">
+            <autowire>setFoo</autowire>
+            <autowire>bar</autowire>
+        </service>
+    </services>
+</container>
+```
+
+Does it looks good to everybody?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-13T11:52:46Z
+
+ping @symfony/deciders. We need to choose between merging this one or reverting setter autowiring before the 3.2 release.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-10-13T14:16:37Z
+
+The XML loader should probably forbid to use both the autowire attribute and elements at the same time. Stuff like that doesn't make sense:
+
+``` xml
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="autowire_star" class="Foo" autowire="*">
+           <autowire>setFoo</autowire>
+            <autowire>bar</autowire>
+        </service>
+        <service id="autowire_array" class="Foo"  autowire="false">
+            <autowire>setFoo</autowire>
+            <autowire>bar</autowire>
+        </service>
+    </services>
+</container>
+```
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-10-13T14:21:36Z
+
+So if you explicitly autowire a method that has no arguments it is basically the same as a normal call configuration to this method? I suspect people will then misuse autowiring just to call certain methods since there are now 2 ways to do that.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-13T14:44:27Z
+
+@Tobion thanks for the review, comments fixed now.
+
+> So if you explicitly autowire a method that has no arguments it is basically the same as a normal call configuration to this method? I suspect people will then misuse autowiring just to call certain methods since there are now 2 ways to do that.
+
+I think that it's not the same intent:
+- When you use `<autowire>`, it means "always fill parameters of this method, if I add or remove some, it must not fail"
+- When you use `<call>`, it's the old good call without any magic
+
+But again, and as pointed in the doc, I would discourage end users to use setter autowiring. It's a feature designed for creators of RAD frameworks and bundles.
+
+---------------------------------------------------------------------------
+
+by Tobion at 2016-10-13T18:10:52Z
+
+> When you use <autowire>, it means "always fill parameters of this method, if I add or remove some, it must not fail"
+
+Fine for me.
+
+One more thing. I think we should make the programmatic `Definition` methods more explicit and not use a multivalued `@param bool|string|string[] $autowired` parameter. IMO we need to distinguish between configuration and programmatic API.
+
+``` yaml
+autowire: true # constructor autowiring
+autowire: [__construct, setFoo, setBar] # autowire whitelisted methods only
+autowire: '*' # autowire constructor + every setters (following existing rules for setters autowiring)
+```
+
+makes sense as @dunglas and @nicolas-grekas pointed out. But using a magic `*` in a programmers API like
+
+```
+$fooDefinition = new Definition('Foo');
+$fooDefinition->setAutowired('*');
+```
+
+does not makse sense.
+
+So I'd prefer to change the methods on the `Definition` class similar to what @ro0NL suggested in https://github.com/symfony/symfony/pull/19631#issuecomment-240681547.
+
+```
+$definition->setAutowired(Definition::CONSTRUCTOR|Definition::SETTERS);
+$definition->setAutowiredMethods(array('setFoo', 'notASetter'));
+$definition->disableAutowiring();
+```
+
+The current yaml/xml loaders would just map to this explicit API.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-14T11:54:41Z
+
+It will be difficult to make this new API backward compatible with the old one. Currently `autowired` is a boolean.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-16T11:56:16Z
+
+@dunglas what about this approach?
+
+``` php
+$def->setAutowired(false); // no autowiring
+$def->setAutorwired(true/**Def::CONSTRUCTOR*/); // constructor autowiring
+$def->setAutowired(Def::SETTERS); // setter autowiring
+$def->setAutorwired(array('foo')); // whitelist autowiring
+$def->setAutorwired(Def::CONSTRUCTOR|Def::SETTERS); // combined autowiring
+
+// optional: combined + whitelist autowiring
+$def->setAutorwired(Def::CONSTRUCTOR|Def::SETTERS|Def::WHITELIST, array('foo'));
+```
+
+``` yml
+autowire: false # no autowiring
+autowire: true | 'constructor' | constant('Def::CONSTRUCTOR') # constructor autowiring
+autowire: 'setters' | constant('Def::SETTERS') # setter autowiring
+autowire: # whitelist autowiring
+  - foo
+autowire: # combined autowiring
+  constructor: true
+  setters: true
+
+# optional: combined + whitelist autowiring
+autowire:
+  constructor: true
+  setters: true
+  whitelist:
+    - foo
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-16T13:44:42Z
+
+@ro0NL I don't want to change the format for XML and YAML because we already have reached a consensus.
+
+Your proposal for the PHP API doesn't fix the issue raised by @Tobion: the `setAutowire` method still accept several types of parameters (`string`, `bool` and `string[]`); exactly like the current implementation.
+
+Using a bit field isn't the right choice here: you cannot accumulate options. You can only choose one option between constructor autowiring, constructor + setter autowiring or a list of methods to autowire.
+
+IMO the current implementation is good enough even if I would prefer accepting only one type for `setAutowire`. It's expressive, easy to learn and flexible. All loaders (PHP, XML and YAML) also have a similar API (better learning curve).
+
+Maybe can we just introduce a `Definition::SETTER_AUTOWIRING = '*'` to avoid using a special raw string in the PHP API.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-16T13:59:25Z
+
+Fair enough. Just saying im not sure `*` meaning `constructor + setters` is intuitive.. especially as we shouldnt promote setter injection.. right? This is making it more or less special.
+
+`autowire: '*' vs. autowire: { constructor: true, setters: true }`
+
+I'd prefer the latter in terms of less magic, extensibility and verbose configuration. But you're right, we've already reached consensus before. Just thought of this today :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-10-25T10:12:51Z
+
+:+1: on my side. Ping @Tobion, your turn :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-10-25T10:15:18Z
+
+Thanks to @nicolas-grekas's feedback, this PR has been updated to remove edge cases and simplify the implementation:
+
+``` yaml
+services:
+    foo:
+        class: Foo
+        autowire: ['__construct', 'set*'] # Autowire constructor and all setters
+        autowire: true # Converted by loaders in `autowire: ['__construct']` for BC
+        autowire: ['foo', 'bar'] # Autowire only `foo` and `bar` methods
+```
+
+It should resolve @Tobion's concerns, and it allows using patterns as suggested by @Ener-Getick.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-10-30T16:12:18Z
+
+This one needs to be merged before 3.2 or #17608 must be reverted. I think we're almost there, I made some naming suggestions, can @symfony/deciders have a look so that we can decide either way?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-01T18:12:17Z
+
+> Final thoughts; my vote goes to setAutowire($boolOrArray)
+
+Wouldn't be mine: union types require higher cyclomatic complexity. Having
+simple types looks better to me.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-01T18:21:21Z
+
+Perhaps should be avoided, but in this case (to me) it makes most sense from a _configuring_ perspective.
+
+Eventually a YAML/XML/PHP definition represents the same thing, and therefore should have similar (if not the same) schema/API imo.
+
+edit: on 2nd thought :):) maybe choose the desired PHP API now (eg. `setAutowiredMethods(array $methods)`) and extract PHP configuration (eg. `return [];`) later on? Does that make sense?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-02T07:50:19Z
+
+My vote would be for reverting #17608 and merge this one for 3.3.
+This one has a high impact on DX, yet DX needs some time to mature IMHO, and this maybe be too fresh for 3.2.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-02T09:33:00Z
+
+I agree, it's too late for 3.2.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-02T14:45:10Z
+
+I've rebased the PR and updated method's names.
+
+I've added two new methods `setAutowiredMethods(array $autowiredMethods)` and `getAutowiredMethods() : array` because the naming is better and it allows to remove the union type.
+
+However I've kept  `isAutowired() : bool` and `setAutowired(bool $autowired)` (without deprecating them) because it doesn't hurt and it looks better in term of DX when not using method autowiring. And method autowiring should almost never be used when not developing a library or a framework.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-05T09:57:55Z
+
+@fabpot can I merge this one? It will help for #18193 and #20738.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T10:42:10Z
+
+:+1: for merging asap, so that we can play with the feat asap and tweak it if needed in the coming months.

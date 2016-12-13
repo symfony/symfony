@@ -9,9 +9,7 @@
         <div class="text-exception">
             <div class="open-quote">“</div>
 
-            <h1>
-                {{ exception.message|nl2br|format_file_from_text }}
-            </h1>
+            <h1>{{ exception.message|nl2br|format_file_from_text }}</h1>
 
             <div>
                 <strong>{{ status_code }}</strong> {{ status_text }} - {{ exception.class|abbr_class }}

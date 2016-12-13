@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-28T09:51:35Z
+
+> The DefinitionDecorator class does not deal with decorated services
+
+It reflects service that decorates another one, doesn't it?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-28T09:58:41Z
+
+@unkind no. The decorates feature uses normal definition to configure the composition (as the service definition for the decorator does not need to reuse anything from the original service as it gets it as a dependency instead).
+DefinitionDecorator is used for the ``parent`` feature, i.e. a definition extending another one
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-29T09:02:39Z
+
+DerivedDefinition? ChildDefinition?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-29T09:15:25Z
+
+I like `ChildDefinition` 👍
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2016-11-29T09:37:41Z
+
+👍 for `ChildDefinition`.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-03T13:21:34Z
+
+I renamed `DefinitionExtension` to `ChildDefinition`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T10:31:08Z
+
+I'm tempted to vote +1, but then I also considered the burden that we'll put on bundles & co. Not sure it's worth it...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-12T10:44:17Z
+
+Given the confusion this class name caused in the past and still causes, I think we should dare to make this deprecation now and get rid of it in 4.0.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T08:03:48Z
+
+👍  There are some conflicts to be resolved.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-13T13:01:11Z
+
+conflicts are resolved

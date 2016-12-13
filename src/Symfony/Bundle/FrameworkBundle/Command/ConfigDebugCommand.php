@@ -83,7 +83,7 @@ EOF
             $io->title(sprintf('Current configuration for "%s"', $name));
         }
 
-        $io->writeln(Yaml::dump(array($extension->getAlias() => $config), 10));
+        $io->writeln(Yaml::dump(array($extension->getAlias() => $container->getParameterBag()->resolveValue($config)), 10));
     }
 
     private function compileContainer()

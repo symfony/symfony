@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-07T12:49:07Z
+
+I'm :-1: on these changes. In theory, I agree with them, but as it makes merging more complex, and makes diffs between version non-readable, I think leaving them as is is the best thing to do. For new phpdocs, we should stick with the new "rules".
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-07T14:15:49Z
+
+Of course, I understand and expected your comment 😅 .
+If those changes are actually rejected, maybe we can at least keep the ones about adding the `@throws Throwable` and associated descriptions for PHP 7?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-07T14:19:52Z
+
+Fixes on current docblocks are indeed acceptable :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T14:31:55Z
+
+This looks wrong to me. We don't document "rethrowing"
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-08T14:57:13Z
+
+> this should be removed entirely actually. It does not make any sense to document that it throws an exception when the inner code threw an exception. PHP does not require each class to document exceptions thrown in called codes (unlike Java)
+
+> This looks wrong to me. We don't document "rethrowing"
+
+My opinion on this is that it matters only when it has value for the end user.
+`Application` is an entrypoint. It may be useful to know if it handles gracefully or not exceptions for you, especially if it is conditional (the `catchExceptions` flag).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-13T00:23:30Z
+
+So, I'm not trying to be stubborn here, but simply explaining my thoughts on this in order to get yours 😃
+
+What should be done here now?
+
+1. Merge as is: Adds the `Throwable` type and document under what conditions it's thrown, because it has a value for the end user, as Application is an entrypoint.
+1. Remove  `@throw` tags from `Application::run()`, because we don't document rethrowing at all
+1. Something else?
+1. Close this PR
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T08:33:56Z
+
+I would vote for 2
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-13T15:16:17Z
+
+Done. Thanks for the answers. :)

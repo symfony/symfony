@@ -34,8 +34,6 @@ class GlobalVariables
     }
 
     /**
-     * Returns the current token.
-     *
      * @return TokenInterface|null
      */
     public function getToken()
@@ -47,11 +45,6 @@ class GlobalVariables
         return $this->container->get('security.token_storage')->getToken();
     }
 
-    /**
-     * Returns the current user.
-     *
-     * @see TokenInterface::getUser()
-     */
     public function getUser()
     {
         if (!$token = $this->getToken()) {
@@ -67,8 +60,6 @@ class GlobalVariables
     }
 
     /**
-     * Returns the current request.
-     *
      * @return Request|null The HTTP request object
      */
     public function getRequest()
@@ -79,8 +70,6 @@ class GlobalVariables
     }
 
     /**
-     * Returns the current session.
-     *
      * @return Session|null The session
      */
     public function getSession()
@@ -91,8 +80,6 @@ class GlobalVariables
     }
 
     /**
-     * Returns the current app environment.
-     *
      * @return string The current environment string (e.g 'dev')
      */
     public function getEnvironment()
@@ -101,8 +88,6 @@ class GlobalVariables
     }
 
     /**
-     * Returns the current app debug mode.
-     *
      * @return bool The current debug mode
      */
     public function getDebug()

@@ -335,6 +335,29 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('interact called'.PHP_EOL.$expected.PHP_EOL, $tester->getDisplay());
     }
 
+    public function testSetCodeWithStaticClosure()
+    {
+        $command = new \TestCommand();
+        $command->setCode(self::createClosure());
+        $tester = new CommandTester($command);
+        $tester->execute(array());
+
+        if (PHP_VERSION_ID < 70000) {
+            // Cannot bind static closures in PHP 5
+            $this->assertEquals('interact called'.PHP_EOL.'not bound'.PHP_EOL, $tester->getDisplay());
+        } else {
+            // Can bind static closures in PHP 7
+            $this->assertEquals('interact called'.PHP_EOL.'bound'.PHP_EOL, $tester->getDisplay());
+        }
+    }
+
+    private static function createClosure()
+    {
+        return function (InputInterface $input, OutputInterface $output) {
+            $output->writeln(isset($this) ? 'bound' : 'not bound');
+        };
+    }
+
     public function testSetCodeWithNonClosureCallable()
     {
         $command = new \TestCommand();

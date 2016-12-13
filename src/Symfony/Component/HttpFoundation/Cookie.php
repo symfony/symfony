@@ -92,7 +92,9 @@ class Cookie
             }
         }
 
-        $str .= '; path='.$this->getPath() ?: '/';
+        if ($this->getPath()) {
+            $str .= '; path='.$this->getPath();
+        }
 
         if ($this->getDomain()) {
             $str .= '; domain='.$this->getDomain();

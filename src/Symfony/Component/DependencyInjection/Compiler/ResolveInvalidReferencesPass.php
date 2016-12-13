@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -84,6 +85,8 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
         foreach ($arguments as $k => $argument) {
             if (is_array($argument)) {
                 $arguments[$k] = $this->processArguments($argument, $inMethodCall, true);
+            } elseif ($argument instanceof ArgumentInterface) {
+                $argument->setValues($this->processArguments($argument->getValues(), $inMethodCall, true));
             } elseif ($argument instanceof Reference) {
                 $id = (string) $argument;
 

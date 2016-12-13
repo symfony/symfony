@@ -15,6 +15,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -394,6 +395,9 @@ class XmlFileLoader extends FileLoader
                     break;
                 case 'collection':
                     $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, false);
+                    break;
+                case 'iterator':
+                    $arguments[$key] = new IteratorArgument($this->getArgumentsAsPhp($arg, $name, false));
                     break;
                 case 'string':
                     $arguments[$key] = $arg->nodeValue;

@@ -16,6 +16,8 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -405,6 +407,29 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('The configure callable for class "Bar\FooClass" is not a callable.', $e->getMessage(), '->createService() throws an InvalidArgumentException if the configure callable is not a valid callable');
         }
+    }
+
+    public function testCreateServiceWithIteratorArgument()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass');
+        $builder
+            ->register('lazy_context', 'LazyContext')
+            ->setArguments(array(new IteratorArgument(array('k1' => new Reference('bar'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))))
+        ;
+
+        $lazyContext = $builder->get('lazy_context');
+        $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyValues);
+
+        $i = 0;
+        foreach ($lazyContext->lazyValues as $k => $v) {
+            ++$i;
+            $this->assertEquals('k1', $k);
+            $this->assertInstanceOf('\stdClass', $v);
+        }
+
+        // The second argument should have been ignored.
+        $this->assertEquals(1, $i);
     }
 
     /**

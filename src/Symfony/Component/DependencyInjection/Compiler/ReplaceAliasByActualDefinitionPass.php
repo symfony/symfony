@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -96,6 +97,10 @@ class ReplaceAliasByActualDefinitionPass implements CompilerPassInterface
             // Handle recursion step
             if (is_array($argument)) {
                 $arguments[$k] = $this->updateArgumentReferences($replacements, $definitionId, $argument);
+                continue;
+            }
+            if ($argument instanceof ArgumentInterface) {
+                $argument->setValues($this->updateArgumentReferences($replacements, $definitionId, $argument->getValues()));
                 continue;
             }
             // Skip arguments that don't need replacement

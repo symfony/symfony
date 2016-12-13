@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -49,6 +50,8 @@ class CheckExceptionOnInvalidReferenceBehaviorPass implements CompilerPassInterf
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $this->processReferences($argument);
+            } elseif ($argument instanceof ArgumentInterface) {
+                $this->processReferences($argument->getValues());
             } elseif ($argument instanceof Definition) {
                 $this->processDefinition($argument);
             } elseif ($argument instanceof Reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $argument->getInvalidBehavior()) {

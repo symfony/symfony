@@ -2,6 +2,7 @@
 
 require_once __DIR__.'/../includes/classes.php';
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -128,6 +129,14 @@ $container
 $container
     ->register('factory_service_simple', 'Bar')
     ->setFactory(array(new Reference('factory_simple'), 'getInstance'))
+;
+$container
+    ->register('lazy_context', 'LazyContext')
+    ->setArguments(array(new IteratorArgument(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))))
+;
+$container
+    ->register('lazy_context_ignore_invalid_ref', 'LazyContext')
+    ->setArguments(array(new IteratorArgument(array(new Reference('foo.baz'), new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))))
 ;
 
 return $container;

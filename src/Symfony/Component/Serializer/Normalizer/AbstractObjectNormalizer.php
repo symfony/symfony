@@ -18,6 +18,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -68,9 +69,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $stack = array();
         $attributes = $this->getAttributes($object, $format, $context);
         $class = get_class($object);
+        $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
 
         foreach ($attributes as $attribute) {
-            if ($this->isMaxDepthReached($class, $attribute, $context)) {
+            if (null !== $attributesMetadata && $this->isMaxDepthReached($attributesMetadata, $class, $attribute, $context)) {
                 continue;
             }
 
@@ -300,42 +302,35 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Is the max depth reached for the given attribute?
      *
-     * @param string $class
-     * @param string $attribute
-     * @param array  $context
+     * @param AttributeMetadataInterface[] $attributesMetadata
+     * @param string                       $class
+     * @param string                       $attribute
+     * @param array                        $context
      *
      * @return bool
      */
-    private function isMaxDepthReached($class, $attribute, array &$context)
+    private function isMaxDepthReached(array $attributesMetadata, $class, $attribute, array &$context)
     {
-        if (!$this->classMetadataFactory || !isset($context[static::ENABLE_MAX_DEPTH])) {
-            return false;
-        }
-
-        $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
-        $attributesMetadata = $classMetadata->getAttributesMetadata();
-
-        if (!isset($attributesMetadata[$attribute])) {
-            return false;
-        }
-
-        $maxDepth = $attributesMetadata[$attribute]->getMaxDepth();
-        if (null === $maxDepth) {
+        if (
+            !isset($context[static::ENABLE_MAX_DEPTH]) ||
+            !isset($attributesMetadata[$attribute]) ||
+            null === $maxDepth = $attributesMetadata[$attribute]->getMaxDepth()
+        ) {
             return false;
         }
 
         $key = sprintf(static::DEPTH_KEY_PATTERN, $class, $attribute);
-        $keyExist = isset($context[$key]);
+        if (!isset($context[$key])) {
+            $context[$key] = 1;
 
-        if ($keyExist && $context[$key] === $maxDepth) {
+            return false;
+        }
+
+        if ($context[$key] === $maxDepth) {
             return true;
         }
 
-        if ($keyExist) {
-            ++$context[$key];
-        } else {
-            $context[$key] = 1;
-        }
+        ++$context[$key];
 
         return false;
     }

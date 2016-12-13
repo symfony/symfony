@@ -65,7 +65,7 @@ class CacheItemTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideInvalidKey
-     * @expectedException Symfony\Component\Cache\Exception\InvalidArgumentException
+     * @expectedException \Symfony\Component\Cache\Exception\InvalidArgumentException
      * @expectedExceptionMessage Cache tag
      */
     public function testInvalidTag($tag)

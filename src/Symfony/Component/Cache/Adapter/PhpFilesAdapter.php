@@ -93,7 +93,7 @@ class PhpFilesAdapter extends AbstractAdapter
         $ok = true;
         $data = array($lifetime ? time() + $lifetime : PHP_INT_MAX, '');
 
-        foreach ($values as $id => $value) {
+        foreach ($values as $key => $value) {
             if (null === $value || is_object($value)) {
                 $value = serialize($value);
             } elseif (is_array($value)) {
@@ -109,13 +109,16 @@ class PhpFilesAdapter extends AbstractAdapter
                     $value = serialize($value);
                 }
             } elseif (!is_scalar($value)) {
-                throw new InvalidArgumentException(sprintf('Value of type "%s" is not serializable', $key, gettype($value)));
+                throw new InvalidArgumentException(sprintf('Cache key "%s" has non-serializable %s value.', $key, gettype($value)));
             }
 
             $data[1] = $value;
-            $file = $this->getFile($id, true);
+            $file = $this->getFile($key, true);
             $ok = $this->write($file, '<?php return '.var_export($data, true).';') && $ok;
-            @opcache_compile_file($file);
+
+            if ('cli' !== PHP_SAPI || ini_get('opcache.enable_cli')) {
+                @opcache_compile_file($file);
+            }
         }
 
         return $ok;

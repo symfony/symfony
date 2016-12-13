@@ -457,7 +457,7 @@
     {% import _self as tree %}
     <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
         <h2 class="dump-inline">
-            {{ name|default('(no name)') }} ({{ profiler_dump(data.type_class) }})
+            {{ name|default('(no name)') }} {% if data.type_class is defined %}({{ profiler_dump(data.type_class) }}){% endif %}
         </h2>
 
         {% if data.errors is defined and data.errors|length > 0 %}

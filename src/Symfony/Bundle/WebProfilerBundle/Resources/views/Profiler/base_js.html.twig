@@ -234,15 +234,28 @@
                 var oldFetch = window.fetch;
                 window.fetch = function () {
                     var promise = oldFetch.apply(this, arguments);
-                    if (!arguments[0].match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                    var url = arguments[0];
+                    var params = arguments[1];
+                    var paramType = Object.prototype.toString.call(arguments[0]);
+                    if (paramType === '[object Request]') {
+                        url = arguments[0].url;
+                        params = {
+                            method: arguments[0].method,
+                            credentials: arguments[0].credentials,
+                            headers: arguments[0].headers,
+                            mode: arguments[0].mode,
+                            redirect: arguments[0].redirect
+                        };
+                    }
+                    if (!url.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
                         var method = 'GET';
-                        if (arguments[1] && arguments[1].method !== undefined) {
-                            method = arguments[1].method;
+                        if (params && params.method !== undefined) {
+                            method = params.method;
                         }
 
                         var stackElement = {
                             error: false,
-                            url: arguments[0],
+                            url: url,
                             method: method,
                             type: 'fetch',
                             start: new Date()

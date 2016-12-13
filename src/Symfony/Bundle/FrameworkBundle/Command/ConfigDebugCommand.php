@@ -105,7 +105,7 @@ EOF
 
         $io->title(sprintf('Current configuration for "%s.%s"', $extensionAlias, $path));
 
-        $io->writeln(Yaml::dump($config, 10));
+        $io->writeln(Yaml::dump($container->getParameterBag()->resolveValue($config), 10));
     }
 
     private function compileContainer()

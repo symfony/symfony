@@ -17,7 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
 use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\Workflow;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>

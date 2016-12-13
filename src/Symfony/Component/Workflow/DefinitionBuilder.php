@@ -79,6 +79,9 @@ class DefinitionBuilder
         }
     }
 
+    /**
+     * @param Transition[] $transitions
+     */
     public function addTransitions(array $transitions)
     {
         foreach ($transitions as $transition) {

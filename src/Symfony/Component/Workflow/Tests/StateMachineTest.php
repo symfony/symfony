@@ -2,7 +2,6 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
-use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\StateMachine;
 
 class StateMachineTest extends \PHPUnit_Framework_TestCase

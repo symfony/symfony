@@ -137,7 +137,7 @@ abstract class Controller implements ContainerAwareInterface
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
         $response = new BinaryFileResponse($file);
-        $response->setContentDisposition($disposition, $fileName === null ? $response->getFile()->getFileName() : $fileName);
+        $response->setContentDisposition($disposition, $fileName === null ? $response->getFile()->getFilename() : $fileName);
 
         return $response;
     }

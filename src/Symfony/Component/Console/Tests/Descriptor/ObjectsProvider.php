@@ -16,10 +16,8 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorApplication1;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorApplication2;
-use Symfony\Component\Console\Tests\Fixtures\DescriptorApplicationMbString;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2;
-use Symfony\Component\Console\Tests\Fixtures\DescriptorCommandMbString;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -66,7 +64,6 @@ class ObjectsProvider
         return array(
             'command_1' => new DescriptorCommand1(),
             'command_2' => new DescriptorCommand2(),
-            'command_mbstring' => new DescriptorCommandMbString(),
         );
     }
 
@@ -75,7 +72,6 @@ class ObjectsProvider
         return array(
             'application_1' => new DescriptorApplication1(),
             'application_2' => new DescriptorApplication2(),
-            'application_mbstring' => new DescriptorApplicationMbString(),
         );
     }
 }

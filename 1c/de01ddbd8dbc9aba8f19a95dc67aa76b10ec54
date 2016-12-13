@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-06T08:13:49Z
+
+While I agree that this is nice for consistency, I do not agree with it being a bug fix. So I would vote for merging this into the `master` branch instead.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-08T08:53:23Z
+
+Should be merged in master.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-08T22:23:33Z
+
+Fixed and rebased on master.

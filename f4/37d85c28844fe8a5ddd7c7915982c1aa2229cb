@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-30T14:20:57Z
+
+Just throwing the idea even if that's not for this PR: would be great to have a panel/section to display APCu & opcache stats, based on apcu_cache/sma_info() & opcache_get_status().
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-30T14:25:19Z
+
+@nicolas-grekas that a good idea! What if we add those to the upcoming "Cache" panel?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-30T18:08:57Z
+
+@javiereguiluz do you plan to extract x.y.z  from the full PHP version?
+
+ie. mine is `5.6.23-1+deb.sury.org~trusty+2` for instance, not sure if that works out with this design.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-30T19:13:41Z
+
+@ro0NL in #20126 you posted an screenshot and indeed the PHP version looked awful.  What about demoting the long version suffix?
+
+![php-version](https://cloud.githubusercontent.com/assets/73419/20767167/68cd5758-b739-11e6-9159-c1ef1df2db7b.png)
+
+We could do the same for unstable PHP versions:
+
+![php-version-unstable](https://cloud.githubusercontent.com/assets/73419/20767173/6ea1099a-b739-11e6-80ab-4c3eb2e84e2d.png)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-30T19:48:48Z
+
+:+1:

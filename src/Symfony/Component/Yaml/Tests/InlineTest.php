@@ -166,7 +166,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Omitting the space after the colon that follows a mapping key definition is deprecated since version 3.2 and will throw a ParseException in 4.0.
+     * @expectedDeprecation Using a colon that is not followed by an indication character (i.e. " ", ",", "[", "]", "{", "}" is deprecated since version 3.2 and will throw a ParseException in 4.0.
      * throws \Symfony\Component\Yaml\Exception\ParseException in 4.0
      */
     public function testParseMappingKeyWithColonNotFollowedBySpace()
@@ -395,6 +395,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('[foo, {bar: foo}]', array('foo', array('bar' => 'foo'))),
             array('{ foo: {bar: foo} }', array('foo' => array('bar' => 'foo'))),
             array('{ foo: [bar, foo] }', array('foo' => array('bar', 'foo'))),
+            array('{ foo:{bar: foo} }', array('foo' => array('bar' => 'foo'))),
+            array('{ foo:[bar, foo] }', array('foo' => array('bar', 'foo'))),
 
             array('[  foo, [  bar, foo  ]  ]', array('foo', array('bar', 'foo'))),
 

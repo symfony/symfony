@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-26T16:46:11Z
+
+We should plan for #20167 also
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-11-26T16:50:39Z
+
+@nicolas-grekas I agree. What about introducing a third (optional) type parameter?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-27T10:44:06Z
+
+I like the shortcut but the name made me think the method allows to autowire an existing service more than registering a new autowired one (i.e replace `Definition::setAutowire*`).
+Maybe `registerAutowired()` would be easier to understand, even if less cool.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-27T10:49:55Z
+
+`autowire` LGTM :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-01T13:53:39Z
+
+I love it 👍

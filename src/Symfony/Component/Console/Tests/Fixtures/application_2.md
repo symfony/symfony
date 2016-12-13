@@ -1,5 +1,5 @@
-My Symfony application <info>v1.0</info>
-========================================
+My Symfony application v1.0
+===========================
 
 * [`alias1`](#descriptorcommand1)
 * [`alias2`](#descriptorcommand1)

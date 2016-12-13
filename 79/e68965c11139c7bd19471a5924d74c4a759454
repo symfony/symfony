@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by SpacePossum at 2016-12-04T23:40:29Z
+
+:+1:  , but is fabbot.io already updated to 2.0 line?
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-12-05T00:58:08Z
+
+Thats why
+> I would guess that fabbot needs to be updated ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-05T07:48:04Z
+
+Upgrading fabbot is a bit challenging as we need to upgrade all repos before migrating (so, we need some coordination). We will try to do that ASAP.
+
+---------------------------------------------------------------------------
+
+by keradus at 2016-12-05T10:09:31Z
+
+what about detecting version of PHP CS Fixer used in configuration (eg via namespace), so fabbot could support both for a while ?

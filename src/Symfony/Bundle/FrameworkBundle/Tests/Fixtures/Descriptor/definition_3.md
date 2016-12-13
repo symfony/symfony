@@ -1,0 +1,7 @@
+- Class: `Full\Qualified\Class3`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no

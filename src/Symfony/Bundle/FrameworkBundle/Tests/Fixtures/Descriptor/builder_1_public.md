@@ -16,6 +16,35 @@ definition_1
 - Autowired: no
 - Factory Class: `Full\Qualified\FactoryClass`
 - Factory Method: `get`
+- Usages:
+    - `definition_3`
+    - `definition_4`
+
+definition_3
+~~~~~~~~~~~~
+
+- Class: `Full\Qualified\Class3`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Usages:
+    - `definition_4`
+
+definition_4
+~~~~~~~~~~~~
+
+- Class: `Full\Qualified\Class4`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Call: `setFoo`
+- Usages: -
 
 
 Aliases

@@ -97,7 +97,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService(ContainerBuilder $builder, $service, array $options = array())
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -108,7 +108,12 @@ class MarkdownDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $this->describeContainerAlias($service, $childOptions);
         } elseif ($service instanceof Definition) {
-            $this->describeContainerDefinition($service, $childOptions);
+            $serviceId = isset($options['id']) ? $options['id'] : null;
+            $omitTags = isset($options['omit_tags']) ? $options['omit_tags'] : false;
+
+            $output = $this->getContainerDefinitionDataWithUsages($builder, $service, $serviceId, $omitTags);
+
+            $this->write($output);
         } else {
             $this->write(sprintf('**`%s`:** `%s`', $options['id'], get_class($service)));
         }
@@ -149,7 +154,9 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\nDefinitions\n-----------\n");
             foreach ($services['definitions'] as $id => $service) {
                 $this->write("\n");
-                $this->describeContainerDefinition($service, array('id' => $id));
+                $omitTags = isset($options['omit_tags']) ? $options['omit_tags'] : false;
+                $data = $this->getContainerDefinitionDataWithUsages($builder, $service, $id, $omitTags);
+                $this->write($data);
             }
         }
 
@@ -174,6 +181,23 @@ class MarkdownDescriptor extends Descriptor
      * {@inheritdoc}
      */
     protected function describeContainerDefinition(Definition $definition, array $options = array())
+    {
+        $serviceId = isset($options['id']) ? $options['id'] : null;
+        $omitTags = isset($options['omit_tags']) ? $options['omit_tags'] : false;
+
+        $output = $this->getContainerDefinitionData($definition, $serviceId, $omitTags);
+
+        $this->write($output);
+    }
+
+    /**
+     * @param Definition  $definition
+     * @param string|null $serviceId
+     * @param bool        $omitTags
+     *
+     * @return string
+     */
+    private function getContainerDefinitionData(Definition $definition, $serviceId = null, $omitTags = false)
     {
         $output = '- Class: `'.$definition->getClass().'`'
             ."\n".'- Public: '.($definition->isPublic() ? 'yes' : 'no')
@@ -219,7 +243,7 @@ class MarkdownDescriptor extends Descriptor
             $output .= "\n".'- Call: `'.$callData[0].'`';
         }
 
-        if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
+        if (!$omitTags) {
             foreach ($definition->getTags() as $tagName => $tagData) {
                 foreach ($tagData as $parameters) {
                     $output .= "\n".'- Tag: `'.$tagName.'`';
@@ -230,7 +254,11 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
+        if (null !== $serviceId) {
+            $output = sprintf("%s\n%s\n\n%s\n", $serviceId, str_repeat('~', strlen($serviceId)), $output);
+        }
+
+        return $output;
     }
 
     /**
@@ -367,5 +395,32 @@ class MarkdownDescriptor extends Descriptor
         }
 
         return $string;
+    }
+
+    /**
+     * @param ContainerBuilder $builder
+     * @param Definition       $definition
+     * @param string|null      $serviceId
+     * @param bool             $omitTags
+     *
+     * @return string
+     */
+    private function getContainerDefinitionDataWithUsages(ContainerBuilder $builder, Definition $definition, $serviceId = null, $omitTags = false)
+    {
+        $data = $this->getContainerDefinitionData($definition, $serviceId, $omitTags);
+        $usages = $this->findServiceIdsUsages($builder, $serviceId);
+
+        $data .= '- Usages:';
+        foreach ($usages as $usage) {
+            $data .= "\n".sprintf('    - `%s`', $usage);
+        }
+
+        if (empty($usages)) {
+            $data .= ' -';
+        }
+
+        $data .= "\n";
+
+        return $data;
     }
 }

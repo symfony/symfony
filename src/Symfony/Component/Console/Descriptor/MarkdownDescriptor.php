@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -122,8 +123,9 @@ class MarkdownDescriptor extends Descriptor
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);
+        $longVersion = strip_tags($application->getLongVersion());
 
-        $this->write($application->getLongVersion()."\n".str_repeat('=', strlen($application->getLongVersion())));
+        $this->write($longVersion."\n".str_repeat('=', Helper::strlen($longVersion)));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {

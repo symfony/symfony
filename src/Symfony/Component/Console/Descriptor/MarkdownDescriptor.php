@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -122,8 +123,9 @@ class MarkdownDescriptor extends Descriptor
     {
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);
+        $title = $this->getApplicationTitle($application);
 
-        $this->write($application->getLongVersion()."\n".str_repeat('=', strlen($application->getLongVersion())));
+        $this->write($title."\n".str_repeat('=', Helper::strlen($title)));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {
@@ -141,5 +143,18 @@ class MarkdownDescriptor extends Descriptor
             $this->write("\n\n");
             $this->write($this->describeCommand($command));
         }
+    }
+
+    private function getApplicationTitle(Application $application)
+    {
+        if ('UNKNOWN' !== $application->getName()) {
+            if ('UNKNOWN' !== $application->getVersion()) {
+                return sprintf('%s %s', $application->getName(), $application->getVersion());
+            }
+
+            return $application->getName();
+        }
+
+        return 'Console Tool';
     }
 }

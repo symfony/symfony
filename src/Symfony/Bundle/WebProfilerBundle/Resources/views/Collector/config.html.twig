@@ -217,35 +217,35 @@
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasaccelerator ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">PHP acceleration</span>
+            <span class="value">{{ collector.phparchitecture }} <span class="unit">bits</span></span>
+            <span class="label">Architecture</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">Xdebug</span>
+            <span class="value">{{ collector.phpintllocale }}</span>
+            <span class="label">Intl locale</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">{{ collector.phptimezone }}</span>
+            <span class="label">Timezone</span>
         </div>
     </div>
 
-    <div class="metrics metrics-horizontal">
+    <div class="metrics">
         <div class="metric">
             <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
             <span class="label">OPcache</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasapc ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">APC</span>
+            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
+            <span class="label">APCu</span>
         </div>
 
         <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxcache ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">XCache</span>
-        </div>
-
-        <div class="metric">
-            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.haseaccelerator ? 'yes' : 'no') ~ '.svg') }}</span>
-            <span class="label">EAccelerator</span>
+            <span class="value">{{ include('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
+            <span class="label">Xdebug</span>
         </div>
     </div>
 

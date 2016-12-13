@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-06T17:23:44Z
+
+Could you ensure all missing PHPDoc are not missing Anymore.
+
+But please, add PHPDoc only when it is useful for the reader or the IDE.
+
+So for example, the one you added is useful. but the following is useless:
+```php
+
+    /**
+     * Set the title.
+     *
+     * @param string $title A title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+```

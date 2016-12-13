@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-11T18:09:31Z
+
+👍
+
+To me it isn't a BC break, because the markdown format is not something meant to be analyzed programmatically and only intends to provide a quick documentation of the console application (I'm not even sure it'll be considered as a BC break for json actually, nor any format produced by a command is part of the BC promise).
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-11T18:48:55Z
+
+@ogizanagi I agree that this should't be considered a BC. By the way, a while ago I thought about opening a RFC issue to discuss about removing this feature. Do people really use this Markdown descriptor?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-11T18:55:37Z
+
+It's nice API doc for a command. Ie. i would use this to generate a README.md for a command repo.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-11T18:56:33Z
+
+I think it's an easy way to provide a minimalistic documentation for a tool and it is worth keeping it.
+
+I don't see as much utility for the json/xml descriptors though. I don't know what usages it deserves. Someone may try to implement a UI by parsing programmatically those formats, or maybe it can be consumed by generic worker in order to know which command to use and how to call it, but I never seen someone doing nor asking for this.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-11T19:46:51Z
+
+Guys, before discussing removing something, you should assume that it was added for a reason :) The XML format is used by tools like IDEs to get information about available commands to provide a nice UI for instance.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-11T19:49:49Z
+
+Yes, the XML export is useful for those cases. But what about the Markdown export?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-11T19:51:58Z
+
+IIRC, the Markdown format has been added quite recently. So, let's dig a bit into the past PRs to see why it was added.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-11T19:54:27Z
+
+All formats were added in the same PR by @jfsimon: https://github.com/symfony/symfony/pull/7454 ^^
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-11T20:37:47Z
+
+This PR only tends to improve what we already have :) (application_2.md goes from 376 to 350 lines btw).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-11T20:57:45Z
+
+What about removing `Is value required` if an option accepts no value?

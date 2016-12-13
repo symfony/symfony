@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -53,7 +52,7 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-        return $this->container->get('router')->generate($route, $parameters, $referenceType);
+        return $this->container->get('controller_utils')->generateUrl($route, $parameters, $referenceType);
     }
 
     /**
@@ -67,12 +66,7 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function forward($controller, array $path = array(), array $query = array())
     {
-        $request = $this->container->get('request_stack')->getCurrentRequest();
-        $path['_forwarded'] = $request->attributes;
-        $path['_controller'] = $controller;
-        $subRequest = $request->duplicate($query, null, $path);
-
-        return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        return $this->container->get('controller_utils')->forward($controller, $path, $query);
     }
 
     /**
@@ -85,7 +79,7 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function redirect($url, $status = 302)
     {
-        return new RedirectResponse($url, $status);
+        return $this->container->get('controller_utils')->redirect($url, $status);
     }
 
     /**
@@ -99,7 +93,7 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function redirectToRoute($route, array $parameters = array(), $status = 302)
     {
-        return $this->redirect($this->generateUrl($route, $parameters), $status);
+        return $this->container->get('controller_utils')->redirectToRoute($route, $parameters, $status);
     }
 
     /**
@@ -114,15 +108,7 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function json($data, $status = 200, $headers = array(), $context = array())
     {
-        if ($this->container->has('serializer')) {
-            $json = $this->container->get('serializer')->serialize($data, 'json', array_merge(array(
-                'json_encode_options' => JsonResponse::DEFAULT_ENCODING_OPTIONS,
-            ), $context));
-
-            return new JsonResponse($json, $status, $headers, true);
-        }
-
-        return new JsonResponse($data, $status, $headers);
+        return $this->container->get('controller_utils')->json($data, $status, $headers, $context);
     }
 
     /**
@@ -136,10 +122,7 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
     {
-        $response = new BinaryFileResponse($file);
-        $response->setContentDisposition($disposition, $fileName === null ? $response->getFile()->getFileName() : $fileName);
-
-        return $response;
+        return $this->container->get('controller_utils')->file($file, $fileName, $disposition);
     }
 
     /**
@@ -152,11 +135,7 @@ abstract class Controller implements ContainerAwareInterface
      */
     protected function addFlash($type, $message)
     {
-        if (!$this->container->has('session')) {
-            throw new \LogicException('You can not use the addFlash method if sessions are disabled.');
-        }
-
-        $this->container->get('session')->getFlashBag()->add($type, $message);
+        return $this->container->get('controller_utils')->addFlash($type, $message);
     }
 
     /**

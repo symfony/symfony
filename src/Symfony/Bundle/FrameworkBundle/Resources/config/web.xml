@@ -17,6 +17,13 @@
             <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
+        <service id="controller_utils" class="Symfony\Bundle\FrameworkBundle\Controller\ControllerUtils">
+            <argument type="service" id="http_kernel" />
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="router" on-invalid="ignore" />
+            <argument type="service" id="serializer" on-invalid="ignore" />
+        </service>
+
         <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" public="false" />
 
         <service id="argument_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver" public="false">

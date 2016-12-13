@@ -1,4 +1,8 @@
 {
+    "application": {
+        "name": "My Symfony application",
+        "version": "v1.0"
+    },
     "commands": [
         {
             "name": "help",

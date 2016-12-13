@@ -11,7 +11,12 @@
 
 namespace Symfony\Component\Console;
 
+use Symfony\Component\Console\Exception\AmbiguousCommandException;
+use Symfony\Component\Console\Exception\AmbiguousNamespaceException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\UnknownCommandException;
+use Symfony\Component\Console\Exception\UnknownNamespaceException;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -36,6 +41,7 @@ use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -185,7 +191,30 @@ class Application
         }
 
         // the command name MUST be the first element of the input
-        $command = $this->find($name);
+        do {
+            try {
+                $command = $this->find($name);
+            } catch (CommandNotFoundException $e) {
+                $alternatives = $e->getAlternatives();
+                if (0 === count($alternatives) || !$input->isInteractive() || !$this->getHelperSet()->has('question')) {
+                    throw $e;
+                }
+
+                $helper = $this->getHelperSet()->get('question');
+                $question = new ChoiceQuestion(strtok($e->getMessage(), "\n").' Please select one of these suggested commands:', $alternatives);
+                $question->setMaxAttempts(1);
+
+                try {
+                    $name = $helper->ask($input, $output, $question);
+                } catch (InvalidArgumentException $ex) {
+                    throw $e;
+                }
+
+                if (null === $name) {
+                    throw $e;
+                }
+            }
+        } while (!isset($command));
 
         $this->runningCommand = $command;
         $exitCode = $this->doRunCommand($command, $input, $output);
@@ -477,7 +506,8 @@ class Application
      *
      * @return string A registered namespace
      *
-     * @throws CommandNotFoundException When namespace is incorrect or ambiguous
+     * @throws UnknownNamespaceException   When namespace is incorrect
+     * @throws AmbiguousNamespaceException When namespace is ambiguous
      */
     public function findNamespace($namespace)
     {
@@ -486,24 +516,12 @@ class Application
         $namespaces = preg_grep('{^'.$expr.'}', $allNamespaces);
 
         if (empty($namespaces)) {
-            $message = sprintf('There are no commands defined in the "%s" namespace.', $namespace);
-
-            if ($alternatives = $this->findAlternatives($namespace, $allNamespaces)) {
-                if (1 == count($alternatives)) {
-                    $message .= "\n\nDid you mean this?\n    ";
-                } else {
-                    $message .= "\n\nDid you mean one of these?\n    ";
-                }
-
-                $message .= implode("\n    ", $alternatives);
-            }
-
-            throw new CommandNotFoundException($message, $alternatives);
+            throw new UnknownNamespaceException($namespace, $this->findAlternatives($namespace, $allNamespaces, array()));
         }
 
         $exact = in_array($namespace, $namespaces, true);
         if (count($namespaces) > 1 && !$exact) {
-            throw new CommandNotFoundException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))), array_values($namespaces));
+            throw new AmbiguousNamespaceException($namespace, $namespaces);
         }
 
         return $exact ? $namespace : reset($namespaces);
@@ -519,7 +537,8 @@ class Application
      *
      * @return Command A Command instance
      *
-     * @throws CommandNotFoundException When command name is incorrect or ambiguous
+     * @throws UnknownCommandException   When command name is incorrect
+     * @throws AmbiguousCommandException When command name is ambiguous
      */
     public function find($name)
     {
@@ -533,18 +552,7 @@ class Application
                 $this->findNamespace(substr($name, 0, $pos));
             }
 
-            $message = sprintf('Command "%s" is not defined.', $name);
-
-            if ($alternatives = $this->findAlternatives($name, $allCommands)) {
-                if (1 == count($alternatives)) {
-                    $message .= "\n\nDid you mean this?\n    ";
-                } else {
-                    $message .= "\n\nDid you mean one of these?\n    ";
-                }
-                $message .= implode("\n    ", $alternatives);
-            }
-
-            throw new CommandNotFoundException($message, $alternatives);
+            throw new UnknownCommandException($name, $this->findAlternatives($name, $allCommands, array()));
         }
 
         // filter out aliases for commands which are already on the list
@@ -559,9 +567,7 @@ class Application
 
         $exact = in_array($name, $commands, true);
         if (count($commands) > 1 && !$exact) {
-            $suggestions = $this->getAbbreviationSuggestions(array_values($commands));
-
-            throw new CommandNotFoundException(sprintf('Command "%s" is ambiguous (%s).', $name, $suggestions), array_values($commands));
+            throw new AmbiguousCommandException($name, array_values($commands));
         }
 
         return $this->get($exact ? $name : reset($commands));

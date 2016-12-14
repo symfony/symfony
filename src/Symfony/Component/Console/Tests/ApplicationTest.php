@@ -1020,15 +1020,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($application->areErrorsCaught());
 
         $application->register('foo')->setCode(function () {
-            throw new \Error('This error should be catch by Application::run');
+            throw new \Error('This error should be caught by Application::run');
         });
 
         $tester = new ApplicationTester($application);
         $tester->run(array('command' => 'foo'));
         $this->assertSame(1, $tester->getStatusCode(), 'Status code should be 1');
         $this->assertContains(<<<'EOTXT'
-  [Error]                                         
-  This error should be catch by Application::run
+  [Symfony\Component\Debug\Exception\FatalThrowableError]  
+  This error should be caught by Application::run
 EOTXT
             , $tester->getDisplay(true), 'The PHP error should be caught when catchErrors is true.');
     }

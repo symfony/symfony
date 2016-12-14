@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console;
 
-use Symfony\Component\Console\Exception\ErrorException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Helper\DebugFormatterHelper;
 use Symfony\Component\Console\Helper\ProcessHelper;
@@ -128,7 +127,7 @@ class Application
             if (!$this->catchErrors) {
                 throw $e;
             }
-            $e = new ErrorException($e);
+            $e = new FatalThrowableError($e);
         }
 
         if (isset($e)) {
@@ -643,10 +642,6 @@ class Application
      */
     public function renderException(\Exception $e, OutputInterface $output)
     {
-        if ($e instanceof ErrorException) {
-            $e = $e->getError();
-        }
-
         $output->writeln('', OutputInterface::VERBOSITY_QUIET);
 
         do {

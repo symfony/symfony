@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-05T07:26:27Z
+
+👍 (travis error not related)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-07T08:49:31Z
+
+👍 Upgrading was hard for me too on LexikJWTAuthenticationBundle which requires the framework in 2.8+ and don't make use of annotations at all, tests was broken on 3.2.
+
+> Symfony\Component\DependencyInjection\Exception\LogicException: Annotations cannot be enabled as the Doctrine Annotation library is not installed
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-13T13:52:45Z
+
+@fabpot What do you think about this one?
+
+It'll be great to have it for 3.2.2 IMHO.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-13T14:00:59Z
+
+this indeed makes sense

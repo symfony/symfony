@@ -257,7 +257,7 @@ class PrototypedArrayNode extends ArrayNode
                     if (array_keys($v) === array('value')) {
                         $v = $v['value'];
                         if ($this->prototype instanceof ArrayNode && ($children = $this->prototype->getChildren()) && array_key_exists('value', $children)) {
-                            $valuePrototype = current($this->valuePrototypes) ?: clone($children['value']);
+                            $valuePrototype = current($this->valuePrototypes) ?: clone $children['value'];
                             $valuePrototype->parent = $this;
                             $originalClosures = $this->prototype->normalizationClosures;
                             if (is_array($originalClosures)) {

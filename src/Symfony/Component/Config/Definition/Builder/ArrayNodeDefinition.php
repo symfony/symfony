@@ -81,6 +81,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Shorthand for prototype('variable')
+     *
      * @return VariableNodeDefinition
      */
     public function prototypeVariable()
@@ -90,6 +91,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Shorthand for prototype('scalar')
+     *
      * @return ScalarNodeDefinition
      */
     public function prototypeScalar()
@@ -99,6 +101,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Shorthand for prototype('boolean')
+     *
      * @return BooleanNodeDefinition
      */
     public function prototypeBoolean()
@@ -108,6 +111,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Shorthand for prototype('integer')
+     *
      * @return IntegerNodeDefinition
      */
     public function prototypeInteger()
@@ -117,6 +121,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Shorthand for prototype('float')
+     *
      * @return FloatNodeDefinition
      */
     public function prototypeFloat()
@@ -126,6 +131,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Shorthand for prototype('array')
+     *
      * @return ArrayNodeDefinition
      */
     public function prototypeArray()
@@ -135,6 +141,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
     /**
      * Shorthand for prototype('enum')
+     *
      * @return EnumNodeDefinition
      */
     public function prototypeEnum()

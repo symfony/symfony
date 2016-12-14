@@ -22,6 +22,7 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
 class TemplateLocator implements FileLocatorInterface
 {
     protected $locator;
+    protected $rootDir;
     protected $cache;
 
     /**
@@ -36,6 +37,7 @@ class TemplateLocator implements FileLocatorInterface
             $this->cache = require $cache;
         }
 
+        $this->rootDir = realpath(__dir__.'/../../../../../../../../../');
         $this->locator = $locator;
     }
 
@@ -72,13 +74,23 @@ class TemplateLocator implements FileLocatorInterface
         $key = $this->getCacheKey($template);
 
         if (isset($this->cache[$key])) {
-            return $this->cache[$key];
+            return $this->rootDir.$this->cache[$key];
         }
 
         try {
-            return $this->cache[$key] = $this->locator->locate($template->getPath(), $currentPath);
+            return $this->rootDir.($this->cache[$key] = substr($this->locator->locate($template->getPath(), $currentPath), strlen($this->rootDir)));
         } catch (\InvalidArgumentException $e) {
             throw new \InvalidArgumentException(sprintf('Unable to find template "%s" : "%s".', $template, $e->getMessage()), 0, $e);
         }
+    }
+
+    /**
+     * Returns the current cache.
+     *
+     * @return array
+     */
+    public function getCache()
+    {
+        return $this->cache;
     }
 }

@@ -43,13 +43,10 @@ class TemplatePathsCacheWarmer extends CacheWarmer
      */
     public function warmUp($cacheDir)
     {
-        $templates = array();
-
         foreach ($this->finder->findAllTemplates() as $template) {
-            $templates[$template->getLogicalName()] = $this->locator->locate($template);
+            $this->locator->locate($template);
         }
-
-        $this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($templates, true)));
+        $this->writeCacheFile($cacheDir.'/templates.php', sprintf('<?php return %s;', var_export($this->locator->getCache(), true)));
     }
 
     /**

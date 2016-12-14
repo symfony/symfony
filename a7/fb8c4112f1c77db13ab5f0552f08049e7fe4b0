@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T13:47:51Z
+
+The examples you give in the description seems good to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-02T13:48:40Z
+
+Apart from the minor formatting comments, :+1:
+
+@zerustech Can you rebase on current 2.3 so that tests can be re-run? Thanks.
+
+---------------------------------------------------------------------------
+
+by zerustech at 2016-03-03T08:52:01Z
+
+@fabpot Done, please check. Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-03-03T12:37:06Z
+
+@zerustech Thanks, it looks like it breaks some tests. Can you check?
+
+---------------------------------------------------------------------------
+
+by zerustech at 2016-03-04T10:36:39Z
+
+@fabpot Looks like it was caused by `TwigBundle` :
+
+``` console
+Testing src/Symfony/Bundle/TwigBundle
+.....EEF.......EE.......
+
+Time: 17.06 seconds, Memory: 13.25Mb
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-03-07T11:16:54Z
+
+@zerustech Yeah, but this happens when the bunde's config is evaluated and the failures are related to the prototype handling from this PR.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by zerustech at 2016-03-10T12:40:52Z
+
+@xabbuh @fabpot Fixed the following issues:
+1. When the 'value' element in an array is `null`, it does not replace its wrapper array, because `isset()` returns false on `null` element.
+2. `TwigBundle` manipulates its configuration values with the `normalization closures` of its `prototype` nodes. For example, under the `globals` node, `"foo"` is changed to `array("value" => "foo")` and etc, so `TwigBundle` always expects the 'value' key to present. When a `PrototypedArrayNode` node replaces the wrapper array with its 'value' element, the 'value' key disappears and the actual prototype node will be replaced as well: `array("value" => "foo")` becomes `"foo"` and `PrototypedArrayNode` becomes `VariableNode`, so when normalizing the element, the original normalization closures are gone, `"foo"` won't be changed back to `array("value" => "foo")`, which will result in errors. To fix this issue, we can `copy` the original normalization closures into the new prototype node. I know it's not the perfect solution, but at this moment, it's the least-worst solution.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T21:01:20Z
+
+👍 for merge in 2.7 after the small asked change.

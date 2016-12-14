@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -85,14 +86,22 @@ class FrameworkExtension extends Extension
         $this->annotationsConfigEnabled = $this->isConfigEnabled($container, $config['annotations']);
 
         // A translator must always be registered (as support is included by
-        // default in the Form component). If disabled, an identity translator
-        // will be used and everything will still work as expected.
-        if (class_exists('Symfony\Component\Translation\Translator') || $this->isConfigEnabled($container, $config['form'])) {
-            if (!class_exists('Symfony\Component\Translation\Translator')) {
+        // default in the Form and Validator component). If disabled, an identity
+        // translator will be used and everything will still work as expected.
+        if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
+            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['translator'])) {
+                throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
+            }
+
+            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['form'])) {
                 throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
             }
 
-            $loader->load('translation.xml');
+            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['validation'])) {
+                throw new LogicException('Validation support cannot be enabled as the Translation component is not installed.');
+            }
+
+            $loader->load('identity_translator.xml');
         }
 
         if (isset($config['secret'])) {
@@ -165,7 +174,7 @@ class FrameworkExtension extends Extension
         $this->registerEsiConfiguration($config['esi'], $container, $loader);
         $this->registerSsiConfiguration($config['ssi'], $container, $loader);
         $this->registerFragmentsConfiguration($config['fragments'], $container, $loader);
-        $this->registerTranslatorConfiguration($config['translator'], $container);
+        $this->registerTranslatorConfiguration($config['translator'], $container, $loader);
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
         $this->registerCacheConfiguration($config['cache'], $container);
         $this->registerWorkflowConfiguration($config['workflows'], $container, $loader);
@@ -802,15 +811,13 @@ class FrameworkExtension extends Extension
      * @param array            $config    A translator configuration array
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container)
+    private function registerTranslatorConfiguration(array $config, ContainerBuilder $container, LoaderInterface $loader)
     {
         if (!$this->isConfigEnabled($container, $config)) {
             return;
         }
 
-        if (!class_exists('Symfony\Component\Translation\Translator')) {
-            throw new LogicException('Translation support cannot be enabled as the Translator component is not installed.');
-        }
+        $loader->load('translation.xml');
 
         $this->translationConfigEnabled = true;
 

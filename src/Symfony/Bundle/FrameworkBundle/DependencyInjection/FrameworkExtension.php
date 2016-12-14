@@ -13,10 +13,10 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ChildDefinitionTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -40,6 +40,8 @@ use Symfony\Component\Validator\Validation;
  */
 class FrameworkExtension extends Extension
 {
+    use ChildDefinitionTrait;
+
     private $formConfigEnabled = false;
     private $translationConfigEnabled = false;
     private $sessionConfigEnabled = false;
@@ -618,7 +620,7 @@ class FrameworkExtension extends Extension
         }
 
         if (!$baseUrls) {
-            $package = new DefinitionDecorator('assets.path_package');
+            $package = $this->createChildDefinition('assets.path_package');
 
             return $package
                 ->setPublic(false)
@@ -627,7 +629,7 @@ class FrameworkExtension extends Extension
             ;
         }
 
-        $package = new DefinitionDecorator('assets.url_package');
+        $package = $this->createChildDefinition('assets.url_package');
 
         return $package
             ->setPublic(false)
@@ -642,7 +644,7 @@ class FrameworkExtension extends Extension
             return new Reference('assets.empty_version_strategy');
         }
 
-        $def = new DefinitionDecorator('assets.static_version_strategy');
+        $def = $this->createChildDefinition('assets.static_version_strategy');
         $def
             ->replaceArgument(0, $version)
             ->replaceArgument(1, $format)
@@ -1055,7 +1057,7 @@ class FrameworkExtension extends Extension
             );
         }
         foreach ($config['pools'] as $name => $pool) {
-            $definition = new DefinitionDecorator($pool['adapter']);
+            $definition = $this->createChildDefinition($pool['adapter']);
             $definition->setPublic($pool['public']);
             unset($pool['adapter'], $pool['public']);
 

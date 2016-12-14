@@ -22,7 +22,7 @@
     },
     "require-dev": {
         "symfony/stopwatch": "~2.8|~3.0",
-        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/dependency-injection": "~3.1",
         "symfony/form": "~3.0,>=3.0.5",
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/property-access": "~2.8|~3.0",

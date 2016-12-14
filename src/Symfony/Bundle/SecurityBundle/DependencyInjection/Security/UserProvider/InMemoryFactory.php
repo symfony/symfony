@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinitionTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -24,15 +24,17 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class InMemoryFactory implements UserProviderFactoryInterface
 {
+    use ChildDefinitionTrait;
+
     public function create(ContainerBuilder $container, $id, $config)
     {
-        $definition = $container->setDefinition($id, new DefinitionDecorator('security.user.provider.in_memory'));
+        $definition = $container->setDefinition($id, $this->createChildDefinition('security.user.provider.in_memory'));
 
         foreach ($config['users'] as $username => $user) {
             $userId = $id.'_'.$username;
 
             $container
-                ->setDefinition($userId, new DefinitionDecorator('security.user.provider.in_memory.user'))
+                ->setDefinition($userId, $this->createChildDefinition('security.user.provider.in_memory.user'))
                 ->setArguments(array($username, (string) $user['password'], $user['roles']))
             ;
 

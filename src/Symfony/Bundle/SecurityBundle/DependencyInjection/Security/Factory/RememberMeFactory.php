@@ -12,12 +12,14 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinitionTrait;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class RememberMeFactory implements SecurityFactoryInterface
 {
+    use ChildDefinitionTrait;
+
     protected $options = array(
         'name' => 'REMEMBERME',
         'lifetime' => 31536000,
@@ -34,7 +36,7 @@ class RememberMeFactory implements SecurityFactoryInterface
         // authentication provider
         $authProviderId = 'security.authentication.provider.rememberme.'.$id;
         $container
-            ->setDefinition($authProviderId, new DefinitionDecorator('security.authentication.provider.rememberme'))
+            ->setDefinition($authProviderId, $this->createChildDefinition('security.authentication.provider.rememberme'))
             ->replaceArgument(0, new Reference('security.user_checker.'.$id))
             ->addArgument($config['secret'])
             ->addArgument($id)
@@ -56,7 +58,7 @@ class RememberMeFactory implements SecurityFactoryInterface
             ;
         }
 
-        $rememberMeServices = $container->setDefinition($rememberMeServicesId, new DefinitionDecorator($templateId));
+        $rememberMeServices = $container->setDefinition($rememberMeServicesId, $this->createChildDefinition($templateId));
         $rememberMeServices->replaceArgument(1, $config['secret']);
         $rememberMeServices->replaceArgument(2, $id);
 
@@ -101,7 +103,7 @@ class RememberMeFactory implements SecurityFactoryInterface
 
         // remember-me listener
         $listenerId = 'security.authentication.listener.rememberme.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
+        $listener = $container->setDefinition($listenerId, $this->createChildDefinition('security.authentication.listener.rememberme'));
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
         $listener->replaceArgument(5, $config['catch_exceptions']);
 

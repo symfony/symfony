@@ -207,6 +207,9 @@ class Request
 
     protected static $requestFactory;
 
+    private $isHostValid = true;
+    private $isClientIpsValid = true;
+
     /**
      * Constructor.
      *
@@ -820,7 +823,12 @@ class Request
         }
 
         if ($hasTrustedForwardedHeader && $hasTrustedClientIpHeader && $forwardedClientIps !== $xForwardedForClientIps) {
-            throw new ConflictingHeadersException('The request has both a trusted Forwarded header and a trusted Client IP header, conflicting with each other with regards to the originating IP addresses of the request. This is the result of a misconfiguration. You should either configure your proxy only to send one of these headers, or configure Symfony to distrust one of them.');
+            if (!$this->isClientIpsValid) {
+                return array('0.0.0.0');
+            }
+            $this->isClientIpsValid = false;
+
+            throw new ConflictingHeadersException('The request has both a trusted Forwarded header and a trusted Client IP header, conflicting with each other with regards to the originating IP addresses of the request. This is the result of a misconfiguration. You should either configure your proxy only to send one of these headers, or configure your project to distrust one of them.');
         }
 
         if (!$hasTrustedForwardedHeader && !$hasTrustedClientIpHeader) {
@@ -1199,7 +1207,7 @@ class Request
      *
      * @return string
      *
-     * @throws SuspiciousOperationException when the host name is invalid
+     * @throws SuspiciousOperationException when the host name is invalid or not trusted
      */
     public function getHost()
     {
@@ -1221,7 +1229,12 @@ class Request
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         if ($host && '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)) {
-            throw new SuspiciousOperationException(sprintf('Invalid Host "%s"', $host));
+            if (!$this->isHostValid) {
+                return '';
+            }
+            $this->isHostValid = false;
+
+            throw new SuspiciousOperationException(sprintf('Invalid Host "%s".', $host));
         }
 
         if (count(self::$trustedHostPatterns) > 0) {
@@ -1239,7 +1252,12 @@ class Request
                 }
             }
 
-            throw new SuspiciousOperationException(sprintf('Untrusted Host "%s"', $host));
+            if (!$this->isHostValid) {
+                return '';
+            }
+            $this->isHostValid = false;
+
+            throw new SuspiciousOperationException(sprintf('Untrusted Host "%s".', $host));
         }
 
         return $host;

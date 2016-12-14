@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Debug\Exception;
 
-use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
+use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
@@ -42,7 +42,7 @@ class FlattenException
         if ($exception instanceof HttpExceptionInterface) {
             $statusCode = $exception->getStatusCode();
             $headers = array_merge($headers, $exception->getHeaders());
-        } elseif ($exception instanceof SuspiciousOperationException) {
+        } elseif ($exception instanceof RequestExceptionInterface) {
             $statusCode = 400;
         }
 

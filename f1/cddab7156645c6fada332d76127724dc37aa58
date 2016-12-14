@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-13T18:56:37Z
+
+The patch proposed by fabbot is not related to this PR thus cannot be applied.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-13T19:02:36Z
+
+Why that? I think we can apply it, wouldn't be the first time.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-13T19:11:26Z
+
+From our contributing guidelines:
+
+> Never fix coding standards in some existing code as it makes the code review more difficult;
+
+Applied! :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-13T19:23:15Z
+
+:+1:

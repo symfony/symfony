@@ -311,6 +311,10 @@ abstract class Descriptor implements DescriptorInterface
         $usages = array();
 
         foreach ($builder->getDefinitions() as $service => $definition) {
+            if ($name === $service) {
+                continue;
+            }
+
             foreach ($definition->getArguments() as $argument) {
                 if ($argument instanceof Reference && (string) $argument === $name) {
                     $usages[] = $service;
@@ -333,6 +337,7 @@ abstract class Descriptor implements DescriptorInterface
 
         return $usages;
     }
+
     protected function sortParameters(ParameterBag $parameters)
     {
         $parameters = $parameters->all();

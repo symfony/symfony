@@ -80,7 +80,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Shorthand for prototype('variable')
+     * Shorthand for prototype('variable').
      *
      * @return VariableNodeDefinition
      */
@@ -90,7 +90,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Shorthand for prototype('scalar')
+     * Shorthand for prototype('scalar').
      *
      * @return ScalarNodeDefinition
      */
@@ -100,7 +100,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Shorthand for prototype('boolean')
+     * Shorthand for prototype('boolean').
      *
      * @return BooleanNodeDefinition
      */
@@ -110,7 +110,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Shorthand for prototype('integer')
+     * Shorthand for prototype('integer').
      *
      * @return IntegerNodeDefinition
      */
@@ -120,7 +120,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Shorthand for prototype('float')
+     * Shorthand for prototype('float').
      *
      * @return FloatNodeDefinition
      */
@@ -130,7 +130,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Shorthand for prototype('array')
+     * Shorthand for prototype('array').
      *
      * @return ArrayNodeDefinition
      */
@@ -140,7 +140,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Shorthand for prototype('enum')
+     * Shorthand for prototype('enum').
      *
      * @return EnumNodeDefinition
      */

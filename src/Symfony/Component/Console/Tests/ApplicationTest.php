@@ -969,6 +969,24 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
         $tester->run(array('command' => 'dym'));
     }
 
+    public function testRunWithErrorCatchExceptionsFailingStatusCode()
+    {
+        $application = new Application();
+        $application->setDispatcher(new EventDispatcher());
+        $application->setCatchExceptions(true);
+        $application->setAutoExit(false);
+
+        $application->register('dym')->setCode(function (InputInterface $input, OutputInterface $output) {
+            $output->write('dym.');
+
+            throw new \Error('dymerr');
+        });
+
+        $tester = new ApplicationTester($application);
+        $tester->run(array('command' => 'dym'));
+        $this->assertSame(1, $tester->getStatusCode(), 'Status code should be 1');
+    }
+
     /**
      * @expectedException        \LogicException
      * @expectedExceptionMessage caught

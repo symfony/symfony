@@ -116,8 +116,15 @@ class Application
         $this->configureIO($input, $output);
 
         try {
+            $e = null;
             $exitCode = $this->doRun($input, $output);
-        } catch (\Exception $e) {
+        } catch (\Exception $x) {
+            $e = $x;
+        } catch (\Throwable $x) {
+            $e = new FatalThrowableError($x);
+        }
+
+        if (null !== $e) {
             if (!$this->catchExceptions) {
                 throw $e;
             }

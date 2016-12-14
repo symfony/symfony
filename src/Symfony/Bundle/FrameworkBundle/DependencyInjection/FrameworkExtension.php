@@ -464,7 +464,7 @@ class FrameworkExtension extends Extension
                         Workflow\SupportStrategy\ClassInstanceSupportStrategy::class, array($supportedClassName)
                     );
                     $strategyDefinition->setPublic(false);
-                    $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $supportedClassName));
+                    $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $strategyDefinition));
                 }
             }
             if (isset($workflow['support_strategy'])) {

@@ -20,7 +20,6 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -700,6 +699,34 @@ abstract class FrameworkExtensionTest extends TestCase
     {
         $container = $this->createContainerFromFile('property_info');
         $this->assertTrue($container->has('property_info'));
+    }
+
+    public function testCacheDefaultRedisProvider()
+    {
+        $container = $this->createContainerFromFile('cache');
+
+        $redisUrl = 'redis://localhost';
+        $providerId = md5($redisUrl);
+
+        $this->assertTrue($container->hasDefinition($providerId));
+
+        $url = $container->getDefinition($providerId)->getArgument(0);
+
+        $this->assertSame($redisUrl, $url);
+    }
+
+    public function testCacheDefaultRedisProviderWithEnvVar()
+    {
+        $container = $this->createContainerFromFile('cache_env_var');
+
+        $redisUrl = 'redis://paas.com';
+        $providerId = md5($redisUrl);
+
+        $this->assertTrue($container->hasDefinition($providerId));
+
+        $url = $container->getDefinition($providerId)->getArgument(0);
+
+        $this->assertSame($redisUrl, $url);
     }
 
     public function testCachePoolServices()

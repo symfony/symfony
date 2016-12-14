@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 
@@ -363,5 +364,39 @@ class DateIntervalTypeTest extends TestCase
         $form['years']->addError($error);
         $this->assertSame(array(), iterator_to_array($form['years']->getErrors()));
         $this->assertSame(array($error), iterator_to_array($form->getErrors()));
+    }
+
+    public function testTranslationsAreDisabledForChoiceWidget()
+    {
+        $form = $this->factory->create(
+            DateIntervalType::class,
+            null,
+            array(
+                'widget' => 'choice',
+                'with_hours' => true,
+                'with_minutes' => true,
+                'with_seconds' => true,
+            )
+        );
+        $this->assertFalse($form->get('years')->getConfig()->getOption('choice_translation_domain'));
+        $this->assertFalse($form->get('months')->getConfig()->getOption('choice_translation_domain'));
+        $this->assertFalse($form->get('days')->getConfig()->getOption('choice_translation_domain'));
+        $this->assertFalse($form->get('hours')->getConfig()->getOption('choice_translation_domain'));
+        $this->assertFalse($form->get('minutes')->getConfig()->getOption('choice_translation_domain'));
+        $this->assertFalse($form->get('seconds')->getConfig()->getOption('choice_translation_domain'));
+    }
+
+    public function testInvertDoesNotInheritRequiredOption()
+    {
+        $form = $this->factory->create(
+            'Symfony\Component\Form\Extension\Core\Type\DateIntervalType',
+            null,
+            array(
+                'input' => 'dateinterval',
+                'with_invert' => true,
+                'required' => true,
+            )
+        );
+        $this->assertFalse($form->get('invert')->getConfig()->getOption('required'));
     }
 }

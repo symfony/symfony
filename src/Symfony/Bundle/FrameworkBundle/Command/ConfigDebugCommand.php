@@ -83,7 +83,7 @@ EOF
         $configs = $container->resolveEnvPlaceholders($container->getParameterBag()->resolveValue($configs));
 
         $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, $configs);
+        $config = $container->resolveEnvPlaceholders($container->getParameterBag()->resolveValue($processor->processConfiguration($configuration, $configs)));
 
         if (null === $path = $input->getArgument('path')) {
             $io->title(
@@ -130,7 +130,7 @@ EOF
      *
      * @return mixed
      */
-    private function getConfigForPath(array $config = array(), $path, $alias)
+    private function getConfigForPath(array $config, $path, $alias)
     {
         $steps = explode('.', $path);
 

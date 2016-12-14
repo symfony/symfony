@@ -31,7 +31,7 @@ class FormExtension extends \Twig_Extension implements \Twig_Extension_InitRunti
 
     public function __construct($renderer = null)
     {
-        if ($this->renderer instanceof TwigRendererInterface) {
+        if ($renderer instanceof TwigRendererInterface) {
             @trigger_error(sprintf('Passing a Twig Form Renderer to the "%s" constructor is deprecated since version 3.2 and won\'t be possible in 4.0. Pass the Twig_Environment to the TwigRendererEngine constructor instead.', static::class), E_USER_DEPRECATED);
         } elseif (null !== $renderer && !(is_array($renderer) && isset($renderer[0], $renderer[1]) && $renderer[0] instanceof ContainerInterface)) {
             throw new \InvalidArgumentException(sprintf('Passing any arguments the constructor of %s is reserved for internal use.', __CLASS__));

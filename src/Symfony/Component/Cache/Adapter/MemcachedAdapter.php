@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Symfony\Component\Cache\Adapter\Client\MemcachedClient;
+
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
@@ -24,9 +26,15 @@ class MemcachedAdapter extends AbstractAdapter
         $this->client = $client;
     }
 
-    public static function isSupported()
+    /**
+     * @param string[] $servers
+     * @param mixed[]  $options
+     *
+     * @return \Memcached
+     */
+    public static function createConnection($servers = array(), array $options = array())
     {
-        return extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
+        return MemcachedClient::create($servers, $options);
     }
 
     /**
@@ -74,5 +82,14 @@ class MemcachedAdapter extends AbstractAdapter
     protected function doClear($namespace)
     {
         return $this->client->flush();
+    }
+
+    public function __destruct()
+    {
+        parent::__destruct();
+
+        if (!$this->client->isPersistent() && method_exists($this->client, 'flushBuffers')) {
+            $this->client->flushBuffers();
+        }
     }
 }

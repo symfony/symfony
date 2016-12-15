@@ -153,6 +153,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array(new Reference('baz'), 'getClass'), $services['new_factory2']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array('BazClass', 'getInstance'), $services['new_factory3']->getFactory(), '->load() parses the factory tag');
+        $this->assertSame(array(null, 'getInstance'), $services['new_factory4']->getFactory(), '->load() accepts factory tag without class');
         $this->assertEquals(array('foo', new Reference('baz')), $services['with_shortcut_args']->getArguments(), '->load() parses short service definition');
 
         $aliases = $container->getAliases();

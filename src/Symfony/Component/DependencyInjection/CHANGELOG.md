@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * added support for omitting the factory class name in a service definition if the definition class is set
  * deprecated case insensitivity of service identifiers
  * added "iterator" argument type for lazy iteration over a set of values and services
  * added "closure-proxy" argument type for turning services' methods into lazy callables

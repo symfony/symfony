@@ -466,6 +466,10 @@ class YamlFileLoader extends FileLoader
                 return array($this->resolveServices($callable[0]), $callable[1]);
             }
 
+            if ('factory' === $parameter && isset($callable[1]) && null === $callable[0]) {
+                return $callable;
+            }
+
             throw new InvalidArgumentException(sprintf('Parameter "%s" must contain an array with two elements for service "%s" in %s. Check your YAML syntax.', $parameter, $id, $file));
         }
 

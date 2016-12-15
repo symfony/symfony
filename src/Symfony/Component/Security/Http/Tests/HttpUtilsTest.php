@@ -239,6 +239,16 @@ class HttpUtilsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage The first argument of Symfony\Component\Security\Http\HttpUtils::generateUri() must be an instance of Symfony\Component\HttpFoundation\Request.
+     */
+    public function testGenerateUriThrowsExceptionIfNotAnInstanceOfRequest()
+    {
+        $utils = new HttpUtils();
+        $utils->generateUri(null, '/foo/bar');
+    }
+
+    /**
      * @expectedException \LogicException
      * @expectedExceptionMessage You must provide a UrlGeneratorInterface instance to be able to use routes.
      */

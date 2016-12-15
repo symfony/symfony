@@ -135,6 +135,10 @@ class HttpUtils
             return $path;
         }
 
+        if (!$request instanceof Request) {
+            throw new \InvalidArgumentException(sprintf('The first argument of %s() must be an instance of %s.', __METHOD__, Request::class));
+        }
+
         if ('/' === $path[0]) {
             return $request->getUriForPath($path);
         }

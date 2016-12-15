@@ -28,6 +28,18 @@ class TextType extends AbstractType implements DataTransformerInterface
         if ('' === $options['empty_data']) {
             $builder->addViewTransformer($this);
         }
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                if (is_array($event->getData())) {
+                    $event->setData('');
+                    $event->getForm()->addError(
+                        new FormError('Invalid value.')
+                    );
+                }
+            }
+        );
     }
 
     /**

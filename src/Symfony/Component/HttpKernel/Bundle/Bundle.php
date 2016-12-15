@@ -223,6 +223,8 @@ abstract class Bundle implements BundleInterface
     {
         $pos = strrpos(static::class, '\\');
         $this->namespace = false === $pos ? '' : substr(static::class, 0, $pos);
-        $this->name = false === $pos ? static::class : substr(static::class, $pos + 1);
+        if (null === $this->name) {
+            $this->name = false === $pos ? static::class : substr(static::class, $pos + 1);
+        }
     }
 }

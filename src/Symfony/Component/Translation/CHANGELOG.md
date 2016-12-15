@@ -5,6 +5,7 @@ CHANGELOG
 -----
 
  * Added support for escaping `|` in plural translations with double pipe.
+ * Added intl message formatter.
 
 3.1.0
 -----

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
@@ -62,6 +63,8 @@ class PhpDumper extends Dumper
     private $docStar;
     private $serviceIdToMethodNameMap;
     private $usedMethodNames;
+    private $classResources = array();
+    private $baseClass;
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -117,7 +120,9 @@ class PhpDumper extends Dumper
             'debug' => true,
         ), $options);
 
+        $this->classResources = array();
         $this->initializeMethodNamesMap($options['base_class']);
+        $this->baseClass = $options['base_class'];
 
         $this->docStar = $options['debug'] ? '*' : '';
 
@@ -163,6 +168,11 @@ class PhpDumper extends Dumper
             $this->addProxyClasses()
         ;
         $this->targetDirRegex = null;
+
+        foreach ($this->classResources as $r) {
+            $this->container->addClassResource($r);
+        }
+        $this->classResources = array();
 
         $unusedEnvs = array();
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -1418,6 +1428,32 @@ EOF;
             }
 
             return sprintf('new %s(%s)', $this->dumpLiteralClass($this->dumpValue($class)), implode(', ', $arguments));
+        } elseif ($value instanceof ClosureProxyArgument) {
+            list($reference, $method) = $value->getValues();
+            $method = substr($this->dumpLiteralClass($this->dumpValue($method)), 1);
+
+            if ('service_container' === (string) $reference) {
+                $class = $this->baseClass;
+            } elseif (!$this->container->hasDefinition((string) $reference) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+                return 'null';
+            } else {
+                $class = substr($this->dumpLiteralClass($this->dumpValue($this->container->findDefinition((string) $reference)->getClass())), 1);
+            }
+            if (false !== strpos($class, '$') || false !== strpos($method, '$')) {
+                throw new RuntimeException(sprintf('Cannot dump definition for service "%s": dynamic class names or methods, and closure-proxies are incompatible with each other.', $reference));
+            }
+            if (!method_exists($class, $method)) {
+                throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" does not exist.', $reference, $class, $method));
+            }
+            if (!isset($this->classResources[$class])) {
+                $this->classResources[$class] = new \ReflectionClass($class);
+            }
+            $r = $this->classResources[$class]->getMethod($method);
+            if (!$r->isPublic()) {
+                throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" must be public.', $reference, $class, $method));
+            }
+
+            return sprintf("/** @closure-proxy %s::%s */ function %s {\n            return %s->%s;\n        }", $class, $method, $this->generateSignature($r), $this->dumpValue($reference), $this->generateCall($r));
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
@@ -1673,5 +1709,94 @@ EOF;
         }
 
         return $export;
+    }
+
+    private function generateSignature(\ReflectionFunctionAbstract $r)
+    {
+        $signature = array();
+
+        foreach ($r->getParameters() as $p) {
+            $k = '$'.$p->name;
+            if (method_exists($p, 'isVariadic') && $p->isVariadic()) {
+                $k = '...'.$k;
+            }
+            if ($p->isPassedByReference()) {
+                $k = '&'.$k;
+            }
+            if (method_exists($p, 'getType')) {
+                $type = $p->getType();
+            } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $p, $type)) {
+                $type = $type[1];
+            }
+            if ($type && $type = $this->generateTypeHint($type, $r)) {
+                $k = $type.' '.$k;
+            }
+            if ($type && $p->allowsNull()) {
+                $k = '?'.$k;
+            }
+
+            try {
+                $k .= ' = '.$this->dumpValue($p->getDefaultValue(), false);
+                if ($type && $p->allowsNull() && null === $p->getDefaultValue()) {
+                    $k = substr($k, 1);
+                }
+            } catch (\ReflectionException $e) {
+                if ($type && $p->allowsNull() && !class_exists('ReflectionNamedType', false)) {
+                    $k .= ' = null';
+                    $k = substr($k, 1);
+                }
+            }
+
+            $signature[] = $k;
+        }
+
+        return ($r->returnsReference() ? '&(' : '(').implode(', ', $signature).')';
+    }
+
+    private function generateCall(\ReflectionFunctionAbstract $r)
+    {
+        $call = array();
+
+        foreach ($r->getParameters() as $p) {
+            $k = '$'.$p->name;
+            if (method_exists($p, 'isVariadic') && $p->isVariadic()) {
+                $k = '...'.$k;
+            }
+
+            $call[] = $k;
+        }
+
+        return ($r->isClosure() ? '' : $r->name).'('.implode(', ', $call).')';
+    }
+
+    private function generateTypeHint($type, \ReflectionFunctionAbstract $r)
+    {
+        if (is_string($type)) {
+            $name = $type;
+
+            if ('callable' === $name || 'array' === $name) {
+                return $name;
+            }
+        } else {
+            $name = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
+
+            if ($type->isBuiltin()) {
+                return $name;
+            }
+        }
+        $lcName = strtolower($name);
+
+        if ('self' !== $lcName && 'parent' !== $lcName) {
+            return '\\'.$name;
+        }
+        if (!$r instanceof \ReflectionMethod) {
+            return;
+        }
+        if ('self' === $lcName) {
+            return '\\'.$r->getDeclaringClass()->name;
+        }
+        if ($parent = $r->getDeclaringClass()->getParentClass()) {
+            return '\\'.$parent->name;
+        }
     }
 }

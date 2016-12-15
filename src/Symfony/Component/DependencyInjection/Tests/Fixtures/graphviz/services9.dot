@@ -28,6 +28,7 @@ digraph sc {
   node_factory_service_simple [label="factory_service_simple\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_lazy_context [label="lazy_context\nLazyContext\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_lazy_context_ignore_invalid_ref [label="lazy_context_ignore_invalid_ref\nLazyContext\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_closure_proxy [label="closure_proxy\nBarClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_service_container [label="service_container\nSymfony\\Component\\DependencyInjection\\ContainerBuilder\n", shape=record, fillcolor="#9999ff", style="filled"];
   node_foo2 [label="foo2\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo3 [label="foo3\n\n", shape=record, fillcolor="#ff9999", style="filled"];
@@ -50,4 +51,5 @@ digraph sc {
   node_lazy_context -> node_service_container [label="" style="filled" color="#9999ff"];
   node_lazy_context_ignore_invalid_ref -> node_foo_baz [label="" style="filled" color="#9999ff"];
   node_lazy_context_ignore_invalid_ref -> node_invalid [label="" style="filled" color="#9999ff"];
+  node_closure_proxy -> node_closure_proxy [label="" style="filled" color="#9999ff"];
 }

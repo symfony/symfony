@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Compiler\Compiler;
@@ -976,6 +977,31 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     yield $k => $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($v)));
                 }
             });
+        } elseif ($value instanceof ClosureProxyArgument) {
+            $parameterBag = $this->getParameterBag();
+            list($reference, $method) = $value->getValues();
+            if ('service_container' === $id = (string) $reference) {
+                $class = parent::class;
+            } elseif (!$this->hasDefinition($id) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+                return null;
+            } else {
+                $class = $parameterBag->resolveValue($this->findDefinition($id)->getClass());
+            }
+            if (!method_exists($class, $method = $parameterBag->resolveValue($method))) {
+                throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" does not exist.', $id, $class, $method));
+            }
+            $r = new \ReflectionMethod($class, $method);
+            if (!$r->isPublic()) {
+                throw new RuntimeException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" must be public.', $id, $class, $method));
+            }
+            foreach ($r->getParameters() as $p) {
+                if ($p->isPassedByReference()) {
+                    throw new RuntimeException(sprintf('Cannot create closure-proxy for service "%s": parameter "$%s" of method "%s::%s" must not be passed by reference.', $id, $p->name, $class, $method));
+                }
+            }
+            $value = function () use ($id, $method) {
+                return call_user_func_array(array($this->get($id), $method), func_get_args());
+            };
         } elseif ($value instanceof Reference) {
             $value = $this->get((string) $value, $value->getInvalidBehavior());
         } elseif ($value instanceof Definition) {

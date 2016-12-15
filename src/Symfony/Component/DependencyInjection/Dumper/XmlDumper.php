@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Dumper;
 
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Parameter;
@@ -287,6 +288,11 @@ class XmlDumper extends Dumper
             } elseif ($value instanceof IteratorArgument) {
                 $element->setAttribute('type', 'iterator');
                 $this->convertParameters($value->getValues(), $type, $element, 'key');
+            } elseif ($value instanceof ClosureProxyArgument) {
+                list($reference, $method) = $value->getValues();
+                $element->setAttribute('type', 'closure-proxy');
+                $element->setAttribute('id', (string) $reference);
+                $element->setAttribute('method', $method);
             } elseif ($value instanceof Reference) {
                 $element->setAttribute('type', 'service');
                 $element->setAttribute('id', (string) $value);

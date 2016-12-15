@@ -15,6 +15,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -378,20 +379,23 @@ class XmlFileLoader extends FileLoader
                 }
             }
 
+            $onInvalid = $arg->getAttribute('on-invalid');
+            $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            if ('ignore' == $onInvalid) {
+                $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            } elseif ('null' == $onInvalid) {
+                $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+            }
+
             switch ($arg->getAttribute('type')) {
                 case 'service':
-                    $onInvalid = $arg->getAttribute('on-invalid');
-                    $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-                    if ('ignore' == $onInvalid) {
-                        $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-                    } elseif ('null' == $onInvalid) {
-                        $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
-                    }
-
                     $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior);
                     break;
                 case 'expression':
                     $arguments[$key] = new Expression($arg->nodeValue);
+                    break;
+                case 'closure-proxy':
+                    $arguments[$key] = new ClosureProxyArgument($arg->getAttribute('id'), $arg->getAttribute('method'), $invalidBehavior);
                     break;
                 case 'collection':
                     $arguments[$key] = $this->getArgumentsAsPhp($arg, $name, false);

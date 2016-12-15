@@ -80,71 +80,57 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
-     * Shorthand for prototype('variable').
-     *
      * @return VariableNodeDefinition
      */
-    public function prototypeVariable()
+    public function variablePrototype()
     {
         return $this->prototype('variable');
     }
 
     /**
-     * Shorthand for prototype('scalar').
-     *
      * @return ScalarNodeDefinition
      */
-    public function prototypeScalar()
+    public function scalarPrototype()
     {
         return $this->prototype('scalar');
     }
 
     /**
-     * Shorthand for prototype('boolean').
-     *
      * @return BooleanNodeDefinition
      */
-    public function prototypeBoolean()
+    public function booleanPrototype()
     {
         return $this->prototype('boolean');
     }
 
     /**
-     * Shorthand for prototype('integer').
-     *
      * @return IntegerNodeDefinition
      */
-    public function prototypeInteger()
+    public function integerPrototype()
     {
         return $this->prototype('integer');
     }
 
     /**
-     * Shorthand for prototype('float').
-     *
      * @return FloatNodeDefinition
      */
-    public function prototypeFloat()
+    public function floatPrototype()
     {
         return $this->prototype('float');
     }
 
     /**
-     * Shorthand for prototype('array').
-     *
      * @return ArrayNodeDefinition
      */
-    public function prototypeArray()
+    public function arrayPrototype()
     {
         return $this->prototype('array');
     }
 
     /**
-     * Shorthand for prototype('enum').
-     *
      * @return EnumNodeDefinition
      */
-    public function prototypeEnum()
+    public function enumPrototype()
     {
         return $this->prototype('enum');
     }

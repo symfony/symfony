@@ -230,43 +230,43 @@ class ArrayNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     public function testPrototypeVariable()
     {
         $node = new ArrayNodeDefinition('root');
-        $this->assertEquals($node->prototype('variable'), $node->prototypeVariable());
+        $this->assertEquals($node->prototype('variable'), $node->variablePrototype());
     }
 
     public function testPrototypeScalar()
     {
         $node = new ArrayNodeDefinition('root');
-        $this->assertEquals($node->prototype('scalar'), $node->prototypeScalar());
+        $this->assertEquals($node->prototype('scalar'), $node->scalarPrototype());
     }
 
     public function testPrototypeBoolean()
     {
         $node = new ArrayNodeDefinition('root');
-        $this->assertEquals($node->prototype('boolean'), $node->prototypeBoolean());
+        $this->assertEquals($node->prototype('boolean'), $node->booleanPrototype());
     }
 
     public function testPrototypeInteger()
     {
         $node = new ArrayNodeDefinition('root');
-        $this->assertEquals($node->prototype('integer'), $node->prototypeInteger());
+        $this->assertEquals($node->prototype('integer'), $node->integerPrototype());
     }
 
     public function testPrototypeFloat()
     {
         $node = new ArrayNodeDefinition('root');
-        $this->assertEquals($node->prototype('float'), $node->prototypeFloat());
+        $this->assertEquals($node->prototype('float'), $node->floatPrototype());
     }
 
     public function testPrototypeArray()
     {
         $node = new ArrayNodeDefinition('root');
-        $this->assertEquals($node->prototype('array'), $node->prototypeArray());
+        $this->assertEquals($node->prototype('array'), $node->arrayPrototype());
     }
 
     public function testPrototypeEnum()
     {
         $node = new ArrayNodeDefinition('root');
-        $this->assertEquals($node->prototype('enum'), $node->prototypeEnum());
+        $this->assertEquals($node->prototype('enum'), $node->enumPrototype());
     }
 
     public function getEnableableNodeFixtures()

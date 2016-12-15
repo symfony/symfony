@@ -38,6 +38,7 @@ cache:
         - php-$MIN_PHP
 
 services:
+    - memcached
     - mongodb
     - redis-server
 
@@ -60,7 +61,7 @@ before_install:
     - if [[ ! $skip && $PHP = 5.* ]]; then (echo yes | pecl install -f apcu-4.0.11 && echo apc.enable_cli = 1 >> $INI_FILE); fi
     - if [[ ! $skip && $PHP = 7.* ]]; then (echo yes | pecl install -f apcu-5.1.6 && echo apc.enable_cli = 1 >> $INI_FILE); fi
     - if [[ ! $deps && $PHP = 5.* ]]; then (cd src/Symfony/Component/Debug/Resources/ext && phpize && ./configure && make && echo extension = $(pwd)/modules/symfony_debug.so >> $INI_FILE); fi
-    - if [[ ! $skip && $PHP = 5.* ]]; then pecl install -f memcached-2.1.0; fi
+    - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = memcached.so >> $INI_FILE; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = ldap.so >> $INI_FILE; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then echo extension = redis.so >> $INI_FILE; fi;
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then phpenv config-rm xdebug.ini || echo "xdebug not available"; fi

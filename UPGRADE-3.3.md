@@ -16,6 +16,12 @@ DependencyInjection
  * The `DefinitionDecorator` class is deprecated and will be removed in 4.0, use
    the `ChildDefinition` class instead.
 
+EventDispatcher
+---------------
+
+ * The `ContainerAwareEventDispatcher` class has been deprecated.
+   Use `EventDispatcher` with closure-proxy injection instead.
+
 Finder
 ------
 

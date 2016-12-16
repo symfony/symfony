@@ -360,15 +360,15 @@ class Crawler implements \Countable, \IteratorAggregate
      *         return $node->text();
      *     });
      *
-     * @param \Closure $closure An anonymous function
+     * @param callable $callable An anonymous function
      *
      * @return array An array of values returned by the anonymous function
      */
-    public function each(\Closure $closure)
+    public function each(callable $callable)
     {
         $data = array();
         foreach ($this->nodes as $i => $node) {
-            $data[] = $closure($this->createSubCrawler($node), $i);
+            $data[] = $callable($this->createSubCrawler($node), $i);
         }
 
         return $data;
@@ -392,15 +392,15 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * To remove a node from the list, the anonymous function must return false.
      *
-     * @param \Closure $closure An anonymous function
+     * @param callable $callable An anonymous function
      *
      * @return Crawler A Crawler instance with the selected nodes
      */
-    public function reduce(\Closure $closure)
+    public function reduce(callable $callable)
     {
         $nodes = array();
         foreach ($this->nodes as $i => $node) {
-            if (false !== $closure($this->createSubCrawler($node), $i)) {
+            if (false !== $callable($this->createSubCrawler($node), $i)) {
                 $nodes[] = $node;
             }
         }

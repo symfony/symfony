@@ -455,8 +455,10 @@
                     addClass(element, 'sf-toggle-content');
 
                     if (toggles[i].hasAttribute('data-toggle-initial') && toggles[i].getAttribute('data-toggle-initial') == 'display') {
+                        addClass(toggles[i], 'sf-toggle-on');
                         addClass(element, 'sf-toggle-visible');
                     } else {
+                        addClass(toggles[i], 'sf-toggle-off');
                         addClass(element, 'sf-toggle-hidden');
                     }
 
@@ -473,6 +475,8 @@
 
                         var element = document.querySelector(toggle.getAttribute('data-toggle-selector'));
 
+                        toggleClass(toggle, 'sf-toggle-on');
+                        toggleClass(toggle, 'sf-toggle-off');
                         toggleClass(element, 'sf-toggle-hidden');
                         toggleClass(element, 'sf-toggle-visible');
 

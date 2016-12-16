@@ -13,6 +13,11 @@ namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Encoder\PlaintextPasswordEncoder;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
+use Symfony\Component\Security\Core\Exception\AccountExpiredException;
+use Symfony\Component\Security\Core\Exception\AuthenticationExpiredException;
+use Symfony\Component\Security\Core\Exception\CredentialsExpiredException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\Exception\LockedException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
@@ -38,6 +43,96 @@ class DaoAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
         $userProvider->expects($this->once())
                      ->method('loadUserByUsername')
                      ->will($this->throwException(new UsernameNotFoundException()))
+        ;
+
+        $provider = new DaoAuthenticationProvider($userProvider, $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface'), 'key', $this->getMock('Symfony\\Component\\Security\\Core\\Encoder\\EncoderFactoryInterface'));
+        $method = new \ReflectionMethod($provider, 'retrieveUser');
+        $method->setAccessible(true);
+
+        $method->invoke($provider, 'fabien', $this->getSupportedToken());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
+     */
+    public function testRetrieveUserWhenDisabledExceptionOccurs()
+    {
+        $userProvider = $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface');
+        $userProvider->expects($this->once())
+                     ->method('loadUserByUsername')
+                     ->will($this->throwException(new DisabledException()))
+        ;
+
+        $provider = new DaoAuthenticationProvider($userProvider, $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface'), 'key', $this->getMock('Symfony\\Component\\Security\\Core\\Encoder\\EncoderFactoryInterface'));
+        $method = new \ReflectionMethod($provider, 'retrieveUser');
+        $method->setAccessible(true);
+
+        $method->invoke($provider, 'fabien', $this->getSupportedToken());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationExpiredException
+     */
+    public function testRetrieveUserWhenAuthenticationExpiredExceptionOccurs()
+    {
+        $userProvider = $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface');
+        $userProvider->expects($this->once())
+                     ->method('loadUserByUsername')
+                     ->will($this->throwException(new AuthenticationExpiredException()))
+        ;
+
+        $provider = new DaoAuthenticationProvider($userProvider, $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface'), 'key', $this->getMock('Symfony\\Component\\Security\\Core\\Encoder\\EncoderFactoryInterface'));
+        $method = new \ReflectionMethod($provider, 'retrieveUser');
+        $method->setAccessible(true);
+
+        $method->invoke($provider, 'fabien', $this->getSupportedToken());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\CredentialsExpiredException
+     */
+    public function testRetrieveUserWhenCredentialsExpiredExceptionOccurs()
+    {
+        $userProvider = $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface');
+        $userProvider->expects($this->once())
+                     ->method('loadUserByUsername')
+                     ->will($this->throwException(new CredentialsExpiredException()))
+        ;
+
+        $provider = new DaoAuthenticationProvider($userProvider, $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface'), 'key', $this->getMock('Symfony\\Component\\Security\\Core\\Encoder\\EncoderFactoryInterface'));
+        $method = new \ReflectionMethod($provider, 'retrieveUser');
+        $method->setAccessible(true);
+
+        $method->invoke($provider, 'fabien', $this->getSupportedToken());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\LockedException
+     */
+    public function testRetrieveUserWhenLockedExceptionOccurs()
+    {
+        $userProvider = $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface');
+        $userProvider->expects($this->once())
+                     ->method('loadUserByUsername')
+                     ->will($this->throwException(new LockedException()))
+        ;
+
+        $provider = new DaoAuthenticationProvider($userProvider, $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface'), 'key', $this->getMock('Symfony\\Component\\Security\\Core\\Encoder\\EncoderFactoryInterface'));
+        $method = new \ReflectionMethod($provider, 'retrieveUser');
+        $method->setAccessible(true);
+
+        $method->invoke($provider, 'fabien', $this->getSupportedToken());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
+     */
+    public function testRetrieveUserWhenAccountExpiredExceptionOccurs()
+    {
+        $userProvider = $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserProviderInterface');
+        $userProvider->expects($this->once())
+                     ->method('loadUserByUsername')
+                     ->will($this->throwException(new AccountExpiredException()))
         ;
 
         $provider = new DaoAuthenticationProvider($userProvider, $this->getMock('Symfony\\Component\\Security\\Core\\User\\UserCheckerInterface'), 'key', $this->getMock('Symfony\\Component\\Security\\Core\\Encoder\\EncoderFactoryInterface'));

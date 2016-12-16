@@ -4,6 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
+ * Translation related services are not loaded anymore when the `framework.translator` option
+   is disabled.
  * Added `GlobalVariables::getToken()`
 
 3.2.0

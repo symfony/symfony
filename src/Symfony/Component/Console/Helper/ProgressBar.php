@@ -580,7 +580,7 @@ class ProgressBar
                     throw new \LogicException('Unable to display the remaining time if the maximum number of steps is not set.');
                 }
 
-                if (!$bar->getProgress()) {
+                if (!$bar->getProgress() || $bar->getMaxSteps() == 0) {
                     $remaining = 0;
                 } else {
                     $remaining = round((time() - $bar->getStartTime()) / $bar->getProgress() * ($bar->getMaxSteps() - $bar->getProgress()));
@@ -593,7 +593,7 @@ class ProgressBar
                     throw new \LogicException('Unable to display the estimated time if the maximum number of steps is not set.');
                 }
 
-                if (!$bar->getProgress()) {
+                if (!$bar->getProgress() || $bar->getMaxSteps() == 0) {
                     $estimated = 0;
                 } else {
                     $estimated = round((time() - $bar->getStartTime()) / $bar->getProgress() * $bar->getMaxSteps());

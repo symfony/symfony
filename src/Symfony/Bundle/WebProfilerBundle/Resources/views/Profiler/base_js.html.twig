@@ -20,210 +20,201 @@
             var toggleClass = function(el, cssClass) { hasClass(el, cssClass) ? removeClass(el, cssClass) : addClass(el, cssClass); };
         }
 
-        var noop = function() {},
+        var noop = function() {};
 
-            collectionToArray = function (collection) {
-                var length = collection.length || 0,
-                    results = new Array(length);
+        var profilerStorageKey = 'sf2/profiler/';
 
-                while (length--) {
-                    results[length] = collection[length];
-                }
-
-                return results;
-            },
-
-            profilerStorageKey = 'sf2/profiler/',
-
-            request = function(url, onSuccess, onError, payload, options) {
-                var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-                options = options || {};
-                options.maxTries = options.maxTries || 0;
-                xhr.open(options.method || 'GET', url, true);
-                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-                xhr.onreadystatechange = function(state) {
-                    if (4 !== xhr.readyState) {
-                        return null;
-                    }
-
-                    if (xhr.status == 404 && options.maxTries > 1) {
-                        setTimeout(function(){
-                            options.maxTries--;
-                            request(url, onSuccess, onError, payload, options);
-                        }, 500);
-
-                        return null;
-                    }
-
-                    if (200 === xhr.status) {
-                        (onSuccess || noop)(xhr);
-                    } else {
-                        (onError || noop)(xhr);
-                    }
-                };
-                xhr.send(payload || '');
-            },
-
-            getPreference = function(name) {
-                if (!window.localStorage) {
+        var request = function(url, onSuccess, onError, payload, options) {
+            var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+            options = options || {};
+            options.maxTries = options.maxTries || 0;
+            xhr.open(options.method || 'GET', url, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onreadystatechange = function(state) {
+                if (4 !== xhr.readyState) {
                     return null;
                 }
 
-                return localStorage.getItem(profilerStorageKey + name);
-            },
+                if (xhr.status == 404 && options.maxTries > 1) {
+                    setTimeout(function(){
+                        options.maxTries--;
+                        request(url, onSuccess, onError, payload, options);
+                    }, 500);
 
-            setPreference = function(name, value) {
-                if (!window.localStorage) {
                     return null;
                 }
 
-                localStorage.setItem(profilerStorageKey + name, value);
-            },
-
-            requestStack = [],
-
-            extractHeaders = function(xhr, stackElement) {
-                /* Here we avoid to call xhr.getResponseHeader in order to */
-                /* prevent polluting the console with CORS security errors */
-                var allHeaders = xhr.getAllResponseHeaders();
-                var ret;
-
-                if (ret = allHeaders.match(/^x-debug-token:\s+(.*)$/im)) {
-                    stackElement.profile = ret[1];
-                }
-                if (ret = allHeaders.match(/^x-debug-token-link:\s+(.*)$/im)) {
-                    stackElement.profilerUrl = ret[1];
-                }
-            },
-
-            renderAjaxRequests = function() {
-                var requestCounter = document.querySelectorAll('.sf-toolbar-ajax-requests');
-                if (!requestCounter.length) {
-                    return;
-                }
-
-                var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
-                var tbodies = document.querySelectorAll('.sf-toolbar-ajax-request-list');
-                var state = 'ok';
-                if (tbodies.length) {
-                    var tbody = tbodies[0];
-
-                    var rows = document.createDocumentFragment();
-
-                    if (requestStack.length) {
-                        for (var i = 0; i < requestStack.length; i++) {
-                            var request = requestStack[i];
-
-                            var row = document.createElement('tr');
-                            rows.insertBefore(row, rows.firstChild);
-
-                            var methodCell = document.createElement('td');
-                            if (request.error) {
-                                methodCell.className = 'sf-ajax-request-error';
-                            }
-                            methodCell.textContent = request.method;
-                            row.appendChild(methodCell);
-
-                            var typeCell = document.createElement('td');
-                            typeCell.textContent = request.type;
-                            row.appendChild(typeCell);
-
-                            var statusCodeCell = document.createElement('td');
-                            var statusCode = document.createElement('span');
-                            if (request.statusCode < 300) {
-                                statusCode.setAttribute('class', 'sf-toolbar-status');
-                            } else if (request.statusCode < 400) {
-                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
-                            } else {
-                                statusCode.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
-                            }
-                            statusCode.textContent = request.statusCode || '-';
-                            statusCodeCell.appendChild(statusCode);
-                            row.appendChild(statusCodeCell);
-
-                            var pathCell = document.createElement('td');
-                            pathCell.className = 'sf-ajax-request-url';
-                            if ('GET' === request.method) {
-                                var pathLink = document.createElement('a');
-                                pathLink.setAttribute('href', request.url);
-                                pathLink.textContent = request.url;
-                                pathCell.appendChild(pathLink);
-                            } else {
-                                pathCell.textContent = request.url;
-                            }
-                            pathCell.setAttribute('title', request.url);
-                            row.appendChild(pathCell);
-
-                            var durationCell = document.createElement('td');
-                            durationCell.className = 'sf-ajax-request-duration';
-
-                            if (request.duration) {
-                                durationCell.textContent = request.duration + "ms";
-                            } else {
-                                durationCell.textContent = '-';
-                            }
-                            row.appendChild(durationCell);
-
-                            row.appendChild(document.createTextNode(' '));
-                            var profilerCell = document.createElement('td');
-
-                            if (request.profilerUrl) {
-                                var profilerLink = document.createElement('a');
-                                profilerLink.setAttribute('href', request.profilerUrl);
-                                profilerLink.textContent = request.profile;
-                                profilerCell.appendChild(profilerLink);
-                            } else {
-                                profilerCell.textContent = 'n/a';
-                            }
-
-                            row.appendChild(profilerCell);
-
-                            var requestState = 'ok';
-                            if (request.error) {
-                                requestState = 'error';
-                                if (state != "loading" && i > requestStack.length - 4) {
-                                    state = 'error';
-                                }
-                            } else if (request.loading) {
-                                requestState = 'loading';
-                                state = 'loading';
-                            }
-                            row.className = 'sf-ajax-request sf-ajax-request-' + requestState;
-                        }
-
-                        var infoSpan = document.querySelectorAll(".sf-toolbar-ajax-info")[0];
-                        var children = collectionToArray(tbody.children);
-                        for (var i = 0; i < children.length; i++) {
-                            tbody.removeChild(children[i]);
-                        }
-                        tbody.appendChild(rows);
-
-                        if (infoSpan) {
-                            var text = requestStack.length + ' AJAX request' + (requestStack.length > 1 ? 's' : '');
-                            infoSpan.textContent = text;
-                        }
-
-                        ajaxToolbarPanel.style.display = 'block';
-                    } else {
-                        ajaxToolbarPanel.style.display = 'none';
-                    }
-                }
-
-                requestCounter[0].textContent = requestStack.length;
-
-                var className = 'sf-toolbar-ajax-requests sf-toolbar-value';
-                requestCounter[0].className = className;
-
-                if (state == 'ok') {
-                    Sfjs.removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
-                    Sfjs.removeClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
-                } else if (state == 'error') {
-                    Sfjs.addClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
-                    Sfjs.removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
+                if (200 === xhr.status) {
+                    (onSuccess || noop)(xhr);
                 } else {
-                    Sfjs.addClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
+                    (onError || noop)(xhr);
                 }
             };
+            xhr.send(payload || '');
+        };
+
+        var getPreference = function(name) {
+            if (!window.localStorage) {
+                return null;
+            }
+
+            return localStorage.getItem(profilerStorageKey + name);
+        };
+
+        var setPreference = function(name, value) {
+            if (!window.localStorage) {
+                return null;
+            }
+
+            localStorage.setItem(profilerStorageKey + name, value);
+        };
+
+        var requestStack = [];
+
+        var extractHeaders = function(xhr, stackElement) {
+            /* Here we avoid to call xhr.getResponseHeader in order to */
+            /* prevent polluting the console with CORS security errors */
+            var allHeaders = xhr.getAllResponseHeaders();
+            var ret;
+
+            if (ret = allHeaders.match(/^x-debug-token:\s+(.*)$/im)) {
+                stackElement.profile = ret[1];
+            }
+            if (ret = allHeaders.match(/^x-debug-token-link:\s+(.*)$/im)) {
+                stackElement.profilerUrl = ret[1];
+            }
+        };
+
+        var successStreak = 4;
+        var pendingRequests = 0;
+        var renderAjaxRequests = function() {
+            var requestCounter = document.querySelector('.sf-toolbar-ajax-requests');
+            if (!requestCounter) {
+                return;
+            }
+            requestCounter.textContent = requestStack.length;
+            requestCounter.className = 'sf-toolbar-ajax-requests sf-toolbar-value';
+
+            var infoSpan = document.querySelector(".sf-toolbar-ajax-info");
+            if (infoSpan) {
+                infoSpan.textContent = requestStack.length + ' AJAX request' + (requestStack.length > 1 ? 's' : '');
+            }
+
+            var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
+            if (requestStack.length) {
+                ajaxToolbarPanel.style.display = 'block';
+            } else {
+                ajaxToolbarPanel.style.display = 'none';
+            }
+            if (pendingRequests > 0) {
+                addClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
+            } else if (successStreak < 4) {
+                addClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
+                removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
+            } else {
+                removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
+                removeClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
+            }
+        };
+
+        var startAjaxRequest = function(index) {
+            var request = requestStack[index];
+            pendingRequests++;
+            var row = document.createElement('tr');
+            request.DOMNode = row;
+
+            var tbody = document.querySelector('.sf-toolbar-ajax-request-list');
+            if (!tbody) {
+                return;
+            }
+
+            var methodCell = document.createElement('td');
+            methodCell.textContent = request.method;
+            row.appendChild(methodCell);
+
+            var typeCell = document.createElement('td');
+            typeCell.textContent = request.type;
+            row.appendChild(typeCell);
+
+            var statusCodeCell = document.createElement('td');
+            var statusCode = document.createElement('span');
+            statusCode.textContent = '-';
+            statusCodeCell.appendChild(statusCode);
+            row.appendChild(statusCodeCell);
+
+            var pathCell = document.createElement('td');
+            pathCell.className = 'sf-ajax-request-url';
+            if ('GET' === request.method) {
+                var pathLink = document.createElement('a');
+                pathLink.setAttribute('href', request.url);
+                pathLink.textContent = request.url;
+                pathCell.appendChild(pathLink);
+            } else {
+                pathCell.textContent = request.url;
+            }
+            pathCell.setAttribute('title', request.url);
+            row.appendChild(pathCell);
+
+            var durationCell = document.createElement('td');
+            durationCell.className = 'sf-ajax-request-duration';
+            durationCell.textContent = '-';
+            row.appendChild(durationCell);
+
+            var profilerCell = document.createElement('td');
+            profilerCell.textContent = 'n/a';
+            row.appendChild(profilerCell);
+
+            row.className = 'sf-ajax-request sf-ajax-request-loading';
+            tbody.insertBefore(row, tbody.firstChild);
+
+            renderAjaxRequests();
+        };
+
+        var finishAjaxRequest = function(index) {
+            var request = requestStack[index];
+            pendingRequests--;
+            var row = request.DOMNode;
+            /* Unpack the children from the row */
+            var methodCell = row.children[0];
+            var statusCodeCell = row.children[2];
+            var statusCodeElem = statusCodeCell.children[0];
+            var durationCell = row.children[4];
+            var profilerCell = row.children[5];
+
+            if (request.error) {
+                row.className = 'sf-ajax-request sf-ajax-request-error';
+                methodCell.className = 'sf-ajax-request-error';
+                successStreak = 0;
+            } else {
+                row.className = 'sf-ajax-request sf-ajax-request-ok';
+                successStreak++;
+            }
+
+            if (request.statusCode) {
+                if (request.statusCode < 300) {
+                    statusCodeElem.setAttribute('class', 'sf-toolbar-status');
+                } else if (request.statusCode < 400) {
+                    statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
+                } else {
+                    statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+                }
+                statusCodeElem.textContent = request.statusCode;
+            }
+
+            if (request.duration) {
+                durationCell.textContent = request.duration + 'ms';
+            }
+
+            if (request.profilerUrl) {
+                profilerCell.textContent = '';
+                var profilerLink = document.createElement('a');
+                profilerLink.setAttribute('href', request.profilerUrl);
+                profilerLink.textContent = request.profile;
+                profilerCell.appendChild(profilerLink);
+            }
+
+            renderAjaxRequests();
+        };
 
         var addEventListener;
 
@@ -243,35 +234,45 @@
                 var oldFetch = window.fetch;
                 window.fetch = function () {
                     var promise = oldFetch.apply(this, arguments);
-                    if (!arguments[0].match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
+                    var url = arguments[0];
+                    var params = arguments[1];
+                    var paramType = Object.prototype.toString.call(arguments[0]);
+                    if (paramType === '[object Request]') {
+                        url = arguments[0].url;
+                        params = {
+                            method: arguments[0].method,
+                            credentials: arguments[0].credentials,
+                            headers: arguments[0].headers,
+                            mode: arguments[0].mode,
+                            redirect: arguments[0].redirect
+                        };
+                    }
+                    if (!url.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
                         var method = 'GET';
-                        if (arguments[1] && arguments[1].method !== undefined) {
-                            method = arguments[1].method;
+                        if (params && params.method !== undefined) {
+                            method = params.method;
                         }
 
                         var stackElement = {
-                            loading: true,
                             error: false,
-                            url: arguments[0],
+                            url: url,
                             method: method,
                             type: 'fetch',
                             start: new Date()
                         };
 
-                        requestStack.push(stackElement);
+                        var idx = requestStack.push(stackElement) - 1;
                         promise.then(function (r) {
                             stackElement.duration = new Date() - stackElement.start;
-                            stackElement.loading = false;
                             stackElement.error = r.status < 200 || r.status >= 400;
                             stackElement.statusCode = r.status;
                             stackElement.profile = r.headers.get('x-debug-token');
                             stackElement.profilerUrl = r.headers.get('x-debug-token-link');
-                            Sfjs.renderAjaxRequests();
+                            finishAjaxRequest(idx);
                         }, function (e){
-                            stackElement.loading = false;
                             stackElement.error = true;
                         });
-                        Sfjs.renderAjaxRequests();
+                        startAjaxRequest(idx);
                     }
 
                     return promise;
@@ -296,7 +297,6 @@
 
                     if (!path.match(new RegExp({{ excluded_ajax_paths|json_encode|raw }}))) {
                         var stackElement = {
-                            loading: true,
                             error: false,
                             url: url,
                             method: method,
@@ -304,21 +304,20 @@
                             start: new Date()
                         };
 
-                        requestStack.push(stackElement);
+                        var idx = requestStack.push(stackElement) - 1;
 
                         this.addEventListener('readystatechange', function() {
                             if (self.readyState == 4) {
                                 stackElement.duration = new Date() - stackElement.start;
-                                stackElement.loading = false;
                                 stackElement.error = self.status < 200 || self.status >= 400;
                                 stackElement.statusCode = self.status;
                                 extractHeaders(self, stackElement);
 
-                                Sfjs.renderAjaxRequests();
+                                finishAjaxRequest(idx);
                             }
                         }, false);
 
-                        Sfjs.renderAjaxRequests();
+                        startAjaxRequest(idx);
                     }
 
                     proxied.apply(this, Array.prototype.slice.call(arguments));
@@ -395,8 +394,8 @@
 
                         var tabNavigationItem = document.createElement('li');
                         tabNavigationItem.setAttribute('data-tab-id', tabId);
-                        if (j == 0) { Sfjs.addClass(tabNavigationItem, 'active'); }
-                        if (Sfjs.hasClass(tabs[j], 'disabled')) { Sfjs.addClass(tabNavigationItem, 'disabled'); }
+                        if (j == 0) { addClass(tabNavigationItem, 'active'); }
+                        if (hasClass(tabs[j], 'disabled')) { addClass(tabNavigationItem, 'disabled'); }
                         tabNavigationItem.innerHTML = tabTitle;
                         tabNavigation.appendChild(tabNavigationItem);
 
@@ -415,7 +414,7 @@
                         tabId = tabNavigation[j].getAttribute('data-tab-id');
                         document.getElementById(tabId).querySelector('.tab-title').className = 'hidden';
 
-                        if (Sfjs.hasClass(tabNavigation[j], 'active')) {
+                        if (hasClass(tabNavigation[j], 'active')) {
                             document.getElementById(tabId).className = 'block';
                         } else {
                             document.getElementById(tabId).className = 'hidden';
@@ -435,10 +434,10 @@
                             for (var k = 0; k < tabNavigation.length; k++) {
                                 var tabId = tabNavigation[k].getAttribute('data-tab-id');
                                 document.getElementById(tabId).className = 'hidden';
-                                Sfjs.removeClass(tabNavigation[k], 'active');
+                                removeClass(tabNavigation[k], 'active');
                             }
 
-                            Sfjs.addClass(activeTab, 'active');
+                            addClass(activeTab, 'active');
                             var activeTabId = activeTab.getAttribute('data-tab-id');
                             document.getElementById(activeTabId).className = 'block';
                         });
@@ -453,34 +452,33 @@
                     var elementSelector = toggles[i].getAttribute('data-toggle-selector');
                     var element = document.querySelector(elementSelector);
 
-                    Sfjs.addClass(element, 'sf-toggle-content');
+                    addClass(element, 'sf-toggle-content');
 
                     if (toggles[i].hasAttribute('data-toggle-initial') && toggles[i].getAttribute('data-toggle-initial') == 'display') {
-                        Sfjs.addClass(toggles[i], 'sf-toggle-on');
-                        Sfjs.addClass(element, 'sf-toggle-visible');
+                        addClass(toggles[i], 'sf-toggle-on');
+                        addClass(element, 'sf-toggle-visible');
                     } else {
-                        Sfjs.addClass(toggles[i], 'sf-toggle-off');
-                        Sfjs.addClass(element, 'sf-toggle-hidden');
+                        addClass(toggles[i], 'sf-toggle-off');
+                        addClass(element, 'sf-toggle-hidden');
                     }
 
-                    Sfjs.addEventListener(toggles[i], 'click', function(e) {
+                    addEventListener(toggles[i], 'click', function(e) {
                         e.preventDefault();
 
                         var toggle = e.target || e.srcElement;
 
                         /* needed because when the toggle contains HTML contents, user can click */
                         /* on any of those elements instead of their parent '.sf-toggle' element */
-                        while (!Sfjs.hasClass(toggle, 'sf-toggle')) {
+                        while (!hasClass(toggle, 'sf-toggle')) {
                             toggle = toggle.parentNode;
                         }
 
                         var element = document.querySelector(toggle.getAttribute('data-toggle-selector'));
 
-                        Sfjs.toggleClass(toggle, 'sf-toggle-on');
-                        Sfjs.toggleClass(toggle, 'sf-toggle-off');
-
-                        Sfjs.toggleClass(element, 'sf-toggle-hidden');
-                        Sfjs.toggleClass(element, 'sf-toggle-visible');
+                        toggleClass(toggle, 'sf-toggle-on');
+                        toggleClass(toggle, 'sf-toggle-off');
+                        toggleClass(element, 'sf-toggle-hidden');
+                        toggleClass(element, 'sf-toggle-visible');
 
                         /* the toggle doesn't change its contents when clicking on it */
                         if (!toggle.hasAttribute('data-toggle-alt-content')) {
@@ -504,6 +502,7 @@
     Sfjs.addEventListener(window, 'load', function() {
         Sfjs.createTabs();
         Sfjs.createToggles();
+        Sfjs.renderAjaxRequests();
     });
 
 /*]]>*/</script>

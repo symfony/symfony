@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
+use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
@@ -75,6 +76,8 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
                     $this->readAllComponents($reader, $class);
                 } catch (\ReflectionException $e) {
                     // ignore failing reflection
+                } catch (AnnotationException $e) {
+
                 }
             }
         } finally {

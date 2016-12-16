@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-15T07:39:41Z
+
+I would indeed go one step further and only register the identity if `translator` is not enabled explicitly. We should then document this change in the CHANGELOG, but I think we should avoid as much as possible auto-registration like we have now. This will be even more important with Symfony Flex as we don't require `symfony/symfony` and ask users to explicitly register anything they want to use.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-15T13:12:09Z
+
+Fair enough, I included that change too.
+
+---------------------------------------------------------------------------
+
+by BPScott at 2016-12-16T01:08:50Z
+
+Woo, thank you @xabbuh! The identity translation stuff seemed a little fiddly and I'm totally unfamiliar with it so I didn't dare open a PR myself :)
+
+A small review: I spy the class already has `formConfigEnabled` and `translationConfigEnabled` properties that are set elsewhere, could the translation activation checks be done a little later in this file after those values are set to avoid repeated calls to isConfigEnabled()? It might also be adding an extra level of nesting to the if structuring to avoid multiple calls to  `class_exists('Symfony\Component\Translation\Translator')` too. Something like:
+
+```php
+if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
+    if (!class_exists('Symfony\Component\Translation\Translator') {
+        if ($this->isConfigEnabled($container, $config['translator'])) {
+            throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
+        }
+        if ($this->isConfigEnabled($container, $config['form'])) {
+            throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
+        }
+        if ($this->isConfigEnabled($container, $config['validation'])) {
+            throw new LogicException('Validator support cannot be enabled as the Translation component is not installed.');
+        }
+    }
+
+    $loader->load('identity_translator.xml');
+}
+```
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-16T06:25:43Z
+
+@BPScott I don't think that's necessary as this code is only executed during compilation.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-12-16T09:28:15Z
+
+@xabbuh could this cause issues related to: #20949 ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-16T10:29:57Z
+
+@iltar This would solve #20949. Well, at least it will provide a more meaningful error message.

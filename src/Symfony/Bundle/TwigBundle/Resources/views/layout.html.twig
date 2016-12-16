@@ -3,249 +3,159 @@
     <head>
         <meta charset="{{ _charset }}" />
         <meta name="robots" content="noindex,nofollow" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>{% block title %}{% endblock %}</title>
+        <link rel="icon" type="image/png" href="data:image/png;base64,{{ block('favicon_symfony_ghost', '@Twig/Exception/_images.twig') }}">
         <style>
-            html {
-                background: #eee;
-            }
-            body {
-                font: 11px Verdana, Arial, sans-serif;
-                color: #333;
-            }
-            .sf-reset, .sf-reset .block, .sf-reset #message {
-                margin: auto;
-            }
-            img {
-                border: 0;
-            }
-            .clear {
-                clear: both;
-                height: 0;
-                font-size: 0;
-                line-height: 0;
-            }
-            .clear-fix:after {
-                content: "\0020";
-                display: block;
-                height: 0;
-                clear: both;
-                visibility: hidden;
-            }
-            .clear-fix {
-                display: inline-block;
-            }
-            * html .clear-fix {
-                height: 1%;
-            }
-            .clear-fix {
-                display: block;
-            }
-            .header {
-                padding: 30px 30px 20px 30px;
-            }
-            .header-logo {
-                float: left;
-            }
-            .search {
-                float: right;
-                padding-top: 20px;
-            }
-            .search label {
-                line-height: 28px;
-                vertical-align: middle;
-            }
-            .search input {
-                width: 195px;
-                font-size: 12px;
-                border: 1px solid #dadada;
-                background: #fff url(data:image/gif;base64,R0lGODlhAQAFAKIAAPX19e/v7/39/fr6+urq6gAAAAAAAAAAACH5BAAAAAAALAAAAAABAAUAAAMESAEjCQA7) repeat-x left top;
-                padding: 5px 6px;
-                color: #565656;
-            }
-            .search input[type="search"] {
-                -webkit-appearance: textfield;
-            }
-            #content {
-                width: 970px;
-                margin: 0 auto;
-            }
-            #content pre {
-                white-space: normal;
-                font-family: Arial, Helvetica, sans-serif;
-            }
+            html{font-family:sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{margin:.67em 0;font-size:2em}mark{color:#000;background:#ff0}small{font-size:80%}sub,sup{position:relative;font-size:75%;line-height:0;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{height:0;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{margin:0;font:inherit;color:inherit}button{overflow:visible}button,select{text-transform:none}button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{padding:0;border:0}input{line-height:normal}input[type="checkbox"],input[type="radio"]{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:0}input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{height:auto}input[type="search"]{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box;-webkit-appearance:textfield}input[type="search"]::-webkit-search-cancel-button,input[type="search"]::-webkit-search-decoration{-webkit-appearance:none}fieldset{padding:.35em .625em .75em;margin:0 2px;border:1px solid silver}legend{padding:0;border:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-spacing:0;border-collapse:collapse}td,th{padding:0}
 
-            /*
-            Copyright (c) 2010, Yahoo! Inc. All rights reserved.
-            Code licensed under the BSD License:
-            http://developer.yahoo.com/yui/license.html
-            version: 3.1.2
-            build: 56
-            */
-            .sf-reset div,.sf-reset dl,.sf-reset dt,.sf-reset dd,.sf-reset ul,.sf-reset ol,.sf-reset li,.sf-reset h1,.sf-reset h2,.sf-reset h3,.sf-reset h4,.sf-reset h5,.sf-reset h6,.sf-reset pre,.sf-reset code,.sf-reset form,.sf-reset fieldset,.sf-reset legend,.sf-reset input,.sf-reset textarea,.sf-reset p,.sf-reset blockquote,.sf-reset th,.sf-reset td{margin:0;padding:0;}.sf-reset table{border-collapse:collapse;border-spacing:0;}.sf-reset fieldset,.sf-reset img{border:0;}.sf-reset address,.sf-reset caption,.sf-reset cite,.sf-reset code,.sf-reset dfn,.sf-reset em,.sf-reset strong,.sf-reset th,.sf-reset var{font-style:normal;font-weight:normal;}.sf-reset li{list-style:none;}.sf-reset caption,.sf-reset th{text-align:left;}.sf-reset h1,.sf-reset h2,.sf-reset h3,.sf-reset h4,.sf-reset h5,.sf-reset h6{font-size:100%;font-weight:normal;}.sf-reset q:before,.sf-reset q:after{content:'';}.sf-reset abbr,.sf-reset acronym{border:0;font-variant:normal;}.sf-reset sup{vertical-align:text-top;}.sf-reset sub{vertical-align:text-bottom;}.sf-reset input,.sf-reset textarea,.sf-reset select{font-family:inherit;font-size:inherit;font-weight:inherit;}.sf-reset input,.sf-reset textarea,.sf-reset select{font-size:100%;}.sf-reset legend{color:#000;}
-            .sf-reset abbr {
-                border-bottom: 1px dotted #000;
-                cursor: help;
+            html {
+                {# always display the vertical scrollbar to avoid jumps when toggling contents #}
+                overflow-y: scroll;
             }
-            .sf-reset p {
-                font-size: 14px;
-                line-height: 20px;
-                padding-bottom: 20px;
-            }
-            .sf-reset strong {
-                color: #313131;
-                font-weight: bold;
-            }
-            .sf-reset a {
-                color: #6c6159;
-            }
-            .sf-reset a img {
-                border: none;
-            }
-            .sf-reset a:hover {
-                text-decoration: underline;
-            }
-            .sf-reset em {
-                font-style: italic;
-            }
-            .sf-reset h2,
-            .sf-reset h3 {
-                font-weight: bold;
-            }
-            .sf-reset h1 {
-                font-family: Georgia, "Times New Roman", Times, serif;
-                font-size: 20px;
-                color: #313131;
-                word-wrap: break-word;
-            }
-            .sf-reset li {
-                padding-bottom: 10px;
-            }
-            .sf-reset .block {
-                -moz-border-radius: 16px;
-                -webkit-border-radius: 16px;
-                border-radius: 16px;
-                margin-bottom: 20px;
-                background-color: #FFFFFF;
-                border: 1px solid #dfdfdf;
-                padding: 40px 50px;
-                word-break: break-all;
-            }
-            .sf-reset h2 {
-                font-size: 16px;
-                font-family: Arial, Helvetica, sans-serif;
-            }
-            .sf-reset li a {
-                background: none;
-                color: #868686;
-                text-decoration: none;
-            }
-            .sf-reset li a:hover {
-                background: none;
-                color: #313131;
-                text-decoration: underline;
-            }
-            .sf-reset ol {
-                padding: 10px 0;
-            }
-            .sf-reset ol li {
-                list-style: decimal;
-                margin-left: 20px;
-                padding: 2px;
-                padding-bottom: 20px;
-            }
-            .sf-reset ol ol li {
-                list-style-position: inside;
-                margin-left: 0;
-                white-space: nowrap;
-                font-size: 12px;
-                padding-bottom: 0;
-            }
-            .sf-reset li .selected {
-                background-color: #ffd;
-            }
-            .sf-button {
-                display: -moz-inline-box;
-                display: inline-block;
-                text-align: center;
-                vertical-align: middle;
-                border: 0;
-                background: transparent none;
-                text-transform: uppercase;
-                cursor: pointer;
-                font: bold 11px Arial, Helvetica, sans-serif;
-            }
-            .sf-button span {
-                text-decoration: none;
-                display: block;
-                height: 28px;
-                float: left;
-            }
-            .sf-button .border-l {
-                text-decoration: none;
-                display: block;
-                height: 28px;
-                float: left;
-                padding: 0 0 0 7px;
-                background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAcCAYAAACtQ6WLAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQtJREFUeNpiPHnyJAMakARiByDWYEGT8ADiYGVlZStubm5xlv///4MEQYoKZGRkQkRERLRYWVl5wYJQyXBZWdkwCQkJUxAHKgaWlAHSLqKiosb//v1DsYMFKGCvoqJiDmQzwXTAJYECulxcXNLoumCSoszMzDzoumDGghQwYZUECWIzkrAkSIIGOmlkLI10AiX//P379x8jIyMTNmPf/v79+ysLCwsvuiQoNi5//fr1Kch4dAyS3P/gwYMTQBP+wxwHw0xA4gkQ73v9+vUZdJ2w1Lf82bNn4iCHCQoKasHsZw4ODgbRIL8c+/Lly5M3b978Y2dn5wC6npkFLXnsAOKLjx49AmUHLYAAAwBoQubG016R5wAAAABJRU5ErkJggg==) no-repeat top left;
-            }
-            .sf-button .border-r {
-                padding: 0 7px 0 0;
-                background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAcCAYAAACtQ6WLAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAR1JREFUeNpiPHnyZCMDA8MNID5gZmb2nAEJMH7//v3N169fX969e/cYkL8WqGAHXPLv37//QYzfv39/fvPmzbUnT56sAXInmJub/2H5/x8sx8DCwsIrISFhDmQyPX78+CmQXs70798/BmQsKipqBNTgdvz4cWkmkE5kDATMioqKZkCFdiwg1eiAi4tLGqhQF24nMmBmZuYEigth1QkEbEBxTlySYPvJkwSJ00AnjYylgU6gxB8g/oFVEphkvgLF32KNMmCCewYUv4qhEyj47+HDhyeBzIMYOoEp8CxQw56wsLAncJ1//vz5/P79+2svX74EJc2V4BT58+fPd8CE/QKYHMGJOiIiAp6oWW7evDkNSF8DZYfIyEiU7AAQYACJ2vxVdJW4eQAAAABJRU5ErkJggg==) right top no-repeat;
-            }
-            .sf-button .btn-bg {
-                padding: 0 14px;
-                color: #636363;
-                line-height: 28px;
-                background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAcCAYAAACgXdXMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAClJREFUeNpiPnny5EKGf//+/Wf6//8/A4QAcrGzKCZwGc9sa2urBBBgAIbDUoYVp9lmAAAAAElFTkSuQmCC) repeat-x top left;
-            }
-            .sf-button:hover .border-l,
-            .sf-button-selected .border-l {
-                background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAcCAYAAACtQ6WLAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAR9JREFUeNpi/P//PwMyOHfunDqQSgNiexZkibNnzxYBqZa3HOs5v7PcYQBLnjlzhg1IbfzIdsTjA/t+ht9Mr8GKwZL//v3r+sB+0OMN+zqIEf8gFMvJkyd1gXTOa9YNDP//otrPAtSV/Jp9HfPff78Z0AEL0LUeXxivMfxD0wXTqfjj/2ugkf+wSrL9/YtpJEyS4S8WI5Ek/+GR/POPFjr//cenE6/kP9q4Fo/kr39/mdj+M/zFkGQCSj5i+ccPjLJ/GBgkuYOHQR1sNDpmAkb2LBmWwL///zKCIxwZM0VHR18G6p4uxeLLAA4tJMwEshiou1iMxXaHLGswA+t/YbhORuQUv2DBAnCifvxzI+enP3dQJUFg/vz5sOzgBBBgAPxX9j0YnH4JAAAAAElFTkSuQmCC) no-repeat top left;
-            }
-            .sf-button:hover .border-r,
-            .sf-button-selected .border-r {
-                background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAcCAYAAACtQ6WLAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAT5JREFUeNpiPHv27BkGBoaDQDzLyMjoJgMSYHrM3WX8hn1d0f///88DFRYhSzIuv2X5H8Rg/SfKIPDTkYH/l80OINffxMTkF9O/f/8ZQPgnwyuGl+wrGd6x7vf49+9fO9jYf3+Bkkj4NesmBqAV+SdPntQC6vzHgIz//gOawbqOGchOxtAJwp8Zr4F0e7D8/fuPAR38/P8eZIo0yz8skv8YvoIk+YE6/zNgAyD7sRqLkPzzjxY6/+HS+R+fTkZ8djLh08lCUCcuSWawJGbwMTGwg7zyBatX2Bj5QZKPsBrLzaICktzN8g/NWEYGZgYZjoC/wMiei5FMpFh8QPSU6Ojoy3Cd7EwiDBJsDgxiLNY7gLrKQGIsHAxSDHxAO2TZ/b8D+TVxcXF9MCtYtLiKLgDpfUDVsxITE1GyA0CAAQA2E/N8VuHyAAAAAABJRU5ErkJggg==) right top no-repeat;
-            }
-            .sf-button:hover .btn-bg,
-            .sf-button-selected .btn-bg {
-                color: #FFFFFF;
-                text-shadow:0 1px 1px #6b9311;
-                background: transparent url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAcCAIAAAAvP0KbAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAEFJREFUeNpiPnv2LNMdvlymf///M/37B8R/QfQ/MP33L4j+B6Qh7L9//sHpf2h8MA1V+w/KRjYLaDaLCU8vQIABAFO3TxZriO4yAAAAAElFTkSuQmCC) repeat-x top left;
+            body { background-color: #F9F9F9; color: #222; font: 14px/1.4 Helvetica, Arial, sans-serif; }
+
+            a { cursor: pointer; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+            abbr[title] { border-bottom: none; cursor: help; text-decoration: none; }
+
+            code, pre { font: 13px/1.5 Consolas, Monaco, Menlo, "Ubuntu Mono", "Liberation Mono", monospace; }
+
+            table, tr, th, td { background: #FFF; border-collapse: collapse; vertical-align: top; }
+            table { background: #FFF; border: 1px solid #E0E0E0; box-shadow: 0px 0px 1px rgba(128, 128, 128, .2); margin: 1em 0; width: 100%; }
+            table th, table td { border: solid #E0E0E0; border-width: 1px 0; padding: 8px 10px; }
+            table th { background-color: #E0E0E0; font-weight: bold; text-align: left; }
+
+            .hidden-xs-down { display: none; }
+            .block { display: block; }
+            .hidden { display: none; }
+            .nowrap { white-space: nowrap; }
+            .newline { display: block; }
+            .break-long-words { -ms-word-break: break-all; word-break: break-all; word-break: break-word; -webkit-hyphens: auto; -moz-hyphens: auto; hyphens: auto; }
+            .text-small { font-size: 12px !important; }
+            .text-muted { color: #999; }
+            .text-bold { font-weight: bold; }
+            .empty { border: 4px dashed #E0E0E0; color: #999; margin: 1em 0; padding: .5em 2em; }
+
+            .status-success { background: rgba(94, 151, 110, 0.3); }
+            .status-warning { background: rgba(240, 181, 24, 0.3); }
+            .status-error { background: rgba(176, 65, 62, 0.2); }
+            .status-success td, .status-warning td, .status-error td { background: transparent; }
+            tr.status-error td, tr.status-warning td { border-bottom: 1px solid #FAFAFA; border-top: 1px solid #FAFAFA; }
+            .status-warning .colored { color: #A46A1F; }
+            .status-error .colored  { color: #B0413E; }
+
+            .sf-toggle { cursor: pointer; }
+            .sf-toggle-content { -moz-transition: display .25s ease; -webkit-transition: display .25s ease; transition: display .25s ease; }
+            .sf-toggle-content.sf-toggle-hidden { display: none; }
+            .sf-toggle-content.sf-toggle-visible { display: block; }
+            thead.sf-toggle-content.sf-toggle-visible, tbody.sf-toggle-content.sf-toggle-visible { display: table-row-group; }
+            .sf-toggle-off .icon-close, .sf-toggle-on .icon-open { display: none; }
+            .sf-toggle-off .icon-open, .sf-toggle-on .icon-close { display: block; }
+
+            .tab-navigation { margin: 0 0 1em 0; padding: 0; }
+            .tab-navigation li { background: #FFF; border: 1px solid #DDD; color: #444; cursor: pointer; display: inline-block; font-size: 16px; margin: 0 0 0 -1px; padding: .5em .75em; z-index: 1; }
+            .tab-navigation li:hover { background: #EEE; }
+            .tab-navigation li.disabled { background: #F5F5F5; color: #999; }
+            .tab-navigation li.active { background: #666; border-color: #666; color: #FAFAFA; z-index: 1100; }
+            .tab-navigation li .badge { background-color: #F5F5F5; color: #777; display: inline-block; font-size: 14px; font-weight: bold; margin-left: 8px; min-width: 10px; padding: 1px 6px; text-align: center; }
+            .tab-navigation li:hover .badge { background: #FAFAFA; color: #777; }
+            .tab-navigation li.active .badge { background-color: #444; color: #FFF; }
+            .tab-navigation li .badge.status-warning { background: #A46A1F; color: #FFF; }
+            .tab-navigation li .badge.status-error { background: #B0413E; color: #FFF; }
+            .tab-content > *:first-child { margin-top: 0; }
+
+            .container { max-width: 1024px; margin: 0 auto; padding: 0 15px; }
+            .container::after { content: ""; display: table; clear: both; }
+
+            .main { padding-bottom: 45px; }
+
+            header { background-color: #222; height: 33px; padding: 0; }
+            header .container { display: flex; fflex-direction: row; justify-content: space-between; }
+            .logo { color: #FFF; flex: 1; font-size: 16px; font-weight: normal; line-height: 33px; margin: 0; padding: 0; }
+            .logo span { color: #CCC; }
+            .logo svg { height: 21px; width: 21px; opacity: .8; vertical-align: -5px; }
+
+            .help-link { margin-left: 15px; }
+            .help-link a { color: #CCC; font-size: 14px; line-height: 33px; }
+            .help-link .icon svg { height: 16px; width: 16px; opacity: .7; vertical-align: -2px; }
+            .help-link a:hover { color: #EEE; text-decoration: none; }
+            .help-link a:hover svg { opacity: .9; }
+
+            .exception-summary { background: #B0413E; border-bottom: 2px solid rgba(0, 0, 0, 0.1); flex: 0 0 auto; margin-bottom: 15px; }
+            .exception-metadata { background: rgba(0, 0, 0, 0.1); padding: 7px 0; }
+            .exception-metadata .container { display: flex; flex-direction: row; justify-content: space-between; }
+            .exception-metadata h2 { color: rgba(255, 255, 255, 0.8); font-size: 14px; font-weight: 400; margin: 0; }
+            .exception-http small { color: inherit; font-size: 13px; }
+            .exception-hierarchy { flex: 1; }
+            .exception-hierarchy .icon { margin: 0 3px; opacity: .7; }
+            .exception-hierarchy .icon svg { height: 13px; width: 13px; vertical-align: -2px; }
+
+            .exception-message-wrapper { display: flex; align-items: center; min-height: 76px; padding: 8px 0 6px; }
+            .exception-message { flex-grow: 1; }
+            .exception-message, .exception-message a { color: #FFF; font-size: 21px; font-weight: 400; margin: 0; }
+            .exception-message a { text-decoration: none; }
+            .exception-message a:hover { text-decoration: underline; }
+
+            .exception-illustration { flex-basis: 111px; flex-shrink: 0; height: 66px; margin-left: 15px; opacity: .7; }
+
+            .trace + .trace { margin-top: 30px; }
+            .trace-head { -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+            .trace-head .trace-class { color: #222; font-size: 18px; font-weight: bold; line-height: 1.3; margin: 0; position: relative; }
+            .trace-head .trace-namespace { color: #999; display: block; font-size: 13px; }
+            .trace-head .icon { position: absolute; right: 0; top: 0; }
+            .trace-head .icon svg { height: 24px; width: 24px; }
+
+            .trace-message { font-size: 14px; font-weight: normal; margin: .5em 0 0; }
+
+            .trace-line { position: relative; padding-left: 36px; }
+            .trace-line.sf-toggle:hover { background: #F5F5F5; }
+            .trace-line a { color: #222; }
+            .trace-line .icon { opacity: .4; position: absolute; left: 10px; top: 11px; }
+            .trace-line .icon svg { height: 16px; width: 16px; }
+
+            .trace-file-path, .trace-file-path a { margin-top: 3px; color: #999; color: #795da3; color: #B0413E; color: #222; font-size: 13px; }
+            .trace-class { color: #B0413E; }
+            .trace-type { padding: 0 2px; }
+            .trace-method { color: #B0413E; color: #222; font-weight: bold; color: #B0413E; }
+            .trace-arguments { color: #222; color: #999; font-weight: normal; color: #795da3; color: #777; padding-left: 2px; }
+
+            .trace-code { background: #FFF; color: #CCC; font-size: 12px; margin: 10px 0; padding: 10px; }
+            .trace-code ol { margin: 0; }
+            .trace-code li { margin: 0; padding-left: 10px; }
+            .trace-code li + li { margin-top: 10px; }
+            .trace-code li.selected { background: #F8EEC7; padding: 3px 0 3px 10px; }
+
+            .trace-as-text .stacktrace { line-height: 1.8; margin: 0 0 15px; white-space: pre-wrap; }
+
+            @media (min-width: 575px) {
+                .hidden-xs-down { display: initial; }
+                .help-link { margin-left: 30px; }
             }
         </style>
         {% block head %}{% endblock %}
     </head>
     <body>
-        <div id="content">
-            <div class="header clear-fix">
-                <div class="header-logo">
-                    {{ include('@Twig/symfony.svg') }}
+        <header>
+            <div class="container">
+                <h1 class="logo">{{ block('symfony_logo', '@Twig/Exception/_images.twig') }} Symfony <span>Exception</span></h1>
+
+                <div class="help-link">
+                    <a href="https://symfony.com/doc">
+                        <span class="icon">{{ block('icon_book', '@Twig/Exception/_images.twig') }}</span>
+                        <span class="hidden-xs-down">Symfony</span> Docs
+                    </a>
                 </div>
 
-                <div class="search">
-                    <form method="get" action="https://symfony.com/search" target="_blank">
-                        <div class="form-row">
-                            <label for="search-id">
-                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAABUElEQVQoz2NgAIJ29iBdD0d7X2cPb+tY2f9MDMjgP2O2hKu7vS8CBlisZUNSMJ3fxRMkXO61wm2ue6I3iB1q8Z8ZriDZFCS03fm/wX+1/xp/TBo8QPxeqf+MUAW+QIFKj/+q/wX/c/3n/i/6Qd/bx943z/Q/K1SBI1D9fKv/AhCn/Wf5L5EHdFGKw39OqAIXoPpOMziX4T9/DFBBnuN/HqhAEtCKCNf/XDA/rZRyAmrpsvrPDVUw3wrkqCiLaewg6TohX1d7X0ffs5r/OaAKfinmgt3t4ulr4+Xg4ANip3j+l/zPArNT4LNOD0pAgWCSOUIBy3+h/+pXbBa5tni0eMx23+/mB1YSYnENroT5Pw/QSOX/mkCo+l/jgo0v2KJA643s8PgAmsMBDCbu/5xALHPB2husxN9uCzsDOgAq5kAoaZVnYMCh5Ky1r88Eh/+iABM8jUk7ClYIAAAAAElFTkSuQmCC" alt="Search on Symfony website" />
-                            </label>
-
-                            <input name="q" id="search-id" type="search" placeholder="Search on Symfony website" />
-
-                            <button type="submit" class="sf-button">
-                                <span class="border-l">
-                                    <span class="border-r">
-                                        <span class="btn-bg">OK</span>
-                                    </span>
-                                </span>
-                            </button>
-                        </div>
-                   </form>
+                <div class="help-link">
+                    <a href="https://symfony.com/support">
+                        <span class="icon">{{ block('icon_support', '@Twig/Exception/_images.twig') }}</span>
+                        <span class="hidden-xs-down">Symfony</span> Support
+                    </a>
                 </div>
             </div>
+        </header>
 
-            <div class="sf-reset">
-                {% block body %}{% endblock %}
-            </div>
-        </div>
+        {% block body %}{% endblock %}
     </body>
 </html>

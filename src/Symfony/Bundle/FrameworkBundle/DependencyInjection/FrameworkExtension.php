@@ -751,6 +751,10 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        if (!class_exists('Symfony\Component\Validator\Validation')) {
+            throw new LogicException('Validation support cannot be enabled as the Validator component is not installed.');
+        }
+
         $loader->load('validator.xml');
 
         $validatorBuilder = $container->getDefinition('validator.builder');

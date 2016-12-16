@@ -82,9 +82,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         if (!$synchronized) {
             $config->addViewTransformer(new CallbackTransformer(
-                function ($normData) { return $normData; },
-                function () { throw new TransformationFailedException(); }
-            ));
+                                            function ($normData) { return $normData; },
+                                            function () { throw new TransformationFailedException(); }
+                                        ));
         }
 
         return new Form($config);
@@ -212,7 +212,7 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testAbortMappingIfNotSubmitted()
+    public function testMappingIfNotSubmitted()
     {
         $violation = $this->getConstraintViolation('children[address].data.street');
         $parent = $this->getForm('parent');
@@ -230,12 +230,12 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
-        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error, but has one');
-        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error');
+        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error');
+        $this->assertCount(1, $grandChild->getErrors(), $grandChild->getName().' should have one error');
     }
 
-    public function testAbortDotRuleMappingIfNotSubmitted()
+    public function testDotRuleMappingIfNotSubmitted()
     {
         $violation = $this->getConstraintViolation('data.address');
         $parent = $this->getForm('parent');
@@ -255,9 +255,9 @@ class ViolationMapperTest extends \PHPUnit_Framework_TestCase
 
         $this->mapper->mapViolation($violation, $parent);
 
-        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error, but has one');
-        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error, but has one');
-        $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
+        $this->assertCount(0, $parent->getErrors(), $parent->getName().' should not have an error');
+        $this->assertCount(0, $child->getErrors(), $child->getName().' should not have an error');
+        $this->assertCount(1, $grandChild->getErrors(), $grandChild->getName().' should have an error');
     }
 
     public function provideDefaultTests()

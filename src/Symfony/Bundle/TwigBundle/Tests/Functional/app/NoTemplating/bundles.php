@@ -10,6 +10,5 @@
  */
 
 return array(
-    new Symfony\Bundle\SecurityBundle\SecurityBundle(),
-    new Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\FirewallEntryPointBundle(),
+    new \Symfony\Bundle\TwigBundle\TwigBundle(),
 );

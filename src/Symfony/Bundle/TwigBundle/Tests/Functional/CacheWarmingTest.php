@@ -11,108 +11,32 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests;
 
-use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class CacheWarmingTest extends TestCase
+class CacheWarmingTest extends WebTestCase
 {
     public function testCacheIsProperlyWarmedWhenTemplatingIsAvailable()
     {
-        $kernel = new CacheWarmingKernel(true);
-        $kernel->boot();
-
-        $warmer = $kernel->getContainer()->get('cache_warmer');
+        static::bootKernel(array('environment' => 'with_templating', 'root_config' => 'config_with_templating.yml'));
+        $warmer = static::$kernel->getContainer()->get('cache_warmer');
         $warmer->enableOptionalWarmers();
-        $warmer->warmUp($kernel->getCacheDir());
+        $warmer->warmUp(static::$kernel->getCacheDir());
 
-        $this->assertFileExists($kernel->getCacheDir().'/twig');
+        $this->assertFileExists(static::$kernel->getCacheDir() . '/twig');
     }
 
     public function testCacheIsProperlyWarmedWhenTemplatingIsDisabled()
     {
-        $kernel = new CacheWarmingKernel(false);
-        $kernel->boot();
-
-        $warmer = $kernel->getContainer()->get('cache_warmer');
+        static::bootKernel(array('environment' => 'without_templating'));
+        $warmer = static::$kernel->getContainer()->get('cache_warmer');
         $warmer->enableOptionalWarmers();
-        $warmer->warmUp($kernel->getCacheDir());
+        $warmer->warmUp(static::$kernel->getCacheDir());
 
-        $this->assertFileExists($kernel->getCacheDir().'/twig');
+        $this->assertFileExists(static::$kernel->getCacheDir() . '/twig');
     }
 
-    protected function setUp()
+    protected static function createKernel(array $options = array())
     {
-        $this->deleteTempDir();
-    }
-
-    protected function tearDown()
-    {
-        $this->deleteTempDir();
-    }
-
-    private function deleteTempDir()
-    {
-        if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/CacheWarmingKernel')) {
-            return;
-        }
-
-        $fs = new Filesystem();
-        $fs->remove($dir);
-    }
-}
-
-class CacheWarmingKernel extends Kernel
-{
-    private $withTemplating;
-
-    public function __construct($withTemplating)
-    {
-        $this->withTemplating = $withTemplating;
-
-        parent::__construct(($withTemplating ? 'with' : 'without').'_templating', true);
-    }
-
-    public function getName()
-    {
-        return 'CacheWarming';
-    }
-
-    public function registerBundles()
-    {
-        return array(new FrameworkBundle(), new TwigBundle());
-    }
-
-    public function registerContainerConfiguration(LoaderInterface $loader)
-    {
-        $loader->load(function ($container) {
-            $container->loadFromExtension('framework', array(
-                'secret' => '$ecret',
-                'form' => array('enabled' => false),
-            ));
-        });
-
-        if ($this->withTemplating) {
-            $loader->load(function ($container) {
-                $container->loadFromExtension('framework', array(
-                    'secret' => '$ecret',
-                    'templating' => array('engines' => array('twig')),
-                    'router' => array('resource' => '%kernel.root_dir%/Resources/config/empty_routing.yml'),
-                    'form' => array('enabled' => false),
-                ));
-            });
-        }
-    }
-
-    public function getCacheDir()
-    {
-        return sys_get_temp_dir().'/'.Kernel::VERSION.'/CacheWarmingKernel/cache/'.$this->environment;
-    }
-
-    public function getLogDir()
-    {
-        return sys_get_temp_dir().'/'.Kernel::VERSION.'/CacheWarmingKernel/logs';
+        return parent::createKernel(array('test_case' => 'CacheWarming', 'config_dir' => __DIR__ . '/app') + $options);
     }
 }

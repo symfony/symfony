@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ResettableContainerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -115,17 +116,20 @@ abstract class KernelTestCase extends TestCase
     protected static function getKernelClass()
     {
         if (isset($_SERVER['KERNEL_CLASS']) || isset($_ENV['KERNEL_CLASS'])) {
-            $class = isset($_SERVER['KERNEL_CLASS']) ? $_SERVER['KERNEL_CLASS'] : $_ENV['KERNEL_CLASS'];
-            if (!class_exists($class)) {
+            $kernelClass = isset($_SERVER['KERNEL_CLASS']) ? $_SERVER['KERNEL_CLASS'] : $_ENV['KERNEL_CLASS'];
+            if (!class_exists($kernelClass)) {
                 throw new \RuntimeException(sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the %s::createKernel() method.', $class, static::class));
             }
 
-            return $class;
-        } else {
-            @trigger_error(sprintf('Using the KERNEL_DIR environment variable or the automatic guessing based on the phpunit.xml / phpunit.xml.dist file location is deprecated since 3.4. Set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel instead. Not setting the KERNEL_CLASS environment variable will throw an exception on 4.0 unless you override the %1$::createKernel() or %1$::getKernelClass() method.', static::class), E_USER_DEPRECATED);
+            return $kernelClass;
         }
 
         if (isset($_SERVER['KERNEL_DIR']) || isset($_ENV['KERNEL_DIR'])) {
+            @trigger_error(
+                sprintf('Using the KERNEL_DIR environment variable or the automatic guessing based on the phpunit.xml / phpunit.xml.dist file location is deprecated since 3.4. '.
+                    'Set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel class or override the %1$::createKernel() or %1$::getKernelClass() method, otherwise default test kernel implementation would be used.',
+                    static::class),
+                E_USER_DEPRECATED);
             $dir = isset($_SERVER['KERNEL_DIR']) ? $_SERVER['KERNEL_DIR'] : $_ENV['KERNEL_DIR'];
 
             if (!is_dir($dir)) {
@@ -134,23 +138,60 @@ abstract class KernelTestCase extends TestCase
                     $dir = "$phpUnitDir/$dir";
                 }
             }
-        } else {
-            $dir = static::getPhpUnitXmlDir();
+
+            if ($kernelClass = static::findKernelClassInDirectory($dir)) {
+                throw new \RuntimeException(sprintf('There is no test kernel class in specified KERNEL_DIR "%s"', $_SERVER['KERNEL_CLASS']));
+            }
+
+            return $kernelClass;
         }
+
+        // try to find kernel class near phpunit.xml/phpunit.xml.dist files
+        // this functionality would be deleted in 4.0
+        if ($kernelClass = static::findKernelClassInDirectory(static::getPhpUnitXmlDir())) {
+            return $kernelClass;
+        }
+
+        // fallback to default kernel class
+        return static::getDefaultTestKernelClass();
+    }
+
+    /**
+     * Tries to find kernel class in directory. Returns null if no appropriative class found.
+     *
+     * @param string $dir directory to be processed
+     *
+     * @return string|null
+     */
+    protected static function findKernelClassInDirectory($dir)
+    {
+        $kernelClass = null;
 
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
+        if (count($results)) {
+            $file = current($results);
+
+            $classes = get_declared_classes();
+            require_once $file;
+            $newClasses = array_diff(get_declared_classes(), $classes);
+            if ($newClasses) {
+                $kernelClass = reset($newClasses);
+            }
         }
 
-        $file = current($results);
-        $class = $file->getBasename('.php');
+        return $kernelClass;
+    }
 
-        require_once $file;
-
-        return $class;
+    /**
+     * Returns default test kernel class FQCN.
+     *
+     * @var string
+     */
+    protected static function getDefaultTestKernelClass()
+    {
+        return TestKernel::class;
     }
 
     /**
@@ -208,7 +249,24 @@ abstract class KernelTestCase extends TestCase
             $debug = true;
         }
 
-        return new static::$class($env, $debug);
+        $kernel = new static::$class($env, $debug);
+
+        if ($kernel instanceof TestKernelInterface) {
+            if (!isset($options['test_case'])) {
+                throw new \InvalidArgumentException('The option "test_case" must be set.');
+            }
+            if (!isset($options['config_dir'])) {
+                throw new \InvalidArgumentException('The option "config_dir" must be set.');
+            }
+
+            $kernel->setTestKernelConfiguration(
+                $options['test_case'],
+                $options['config_dir'],
+                isset($options['root_config']) ? $options['root_config'] : 'config.yml',
+                isset($options['root_dir']) ? $options['root_dir'] : null);
+        }
+
+        return $kernel;
     }
 
     /**
@@ -218,9 +276,15 @@ abstract class KernelTestCase extends TestCase
     {
         if (null !== static::$kernel) {
             $container = static::$kernel->getContainer();
-            static::$kernel->shutdown();
+            $kernel = static::$kernel;
+            $kernel->shutdown();
             if ($container instanceof ResettableContainerInterface) {
                 $container->reset();
+            }
+
+            if ($kernel instanceof TestKernelInterface) {
+                $fs = new Filesystem();
+                $fs->remove($kernel->getTempAppDir());
             }
         }
     }

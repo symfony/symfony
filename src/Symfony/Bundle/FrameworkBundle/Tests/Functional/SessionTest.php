@@ -18,9 +18,9 @@ class SessionTest extends WebTestCase
      *
      * @dataProvider getConfigs
      */
-    public function testWelcome($config, $insulate)
+    public function testWelcome($insulate)
     {
-        $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        $client = $this->createClient(array('test_case' => 'Session'));
         if ($insulate) {
             $client->insulate();
         }
@@ -51,9 +51,9 @@ class SessionTest extends WebTestCase
      *
      * @dataProvider getConfigs
      */
-    public function testFlash($config, $insulate)
+    public function testFlash($insulate)
     {
-        $client = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        $client = $this->createClient(array('test_case' => 'Session'));
         if ($insulate) {
             $client->insulate();
         }
@@ -75,16 +75,16 @@ class SessionTest extends WebTestCase
      *
      * @dataProvider getConfigs
      */
-    public function testTwoClients($config, $insulate)
+    public function testTwoClients($insulate)
     {
         // start first client
-        $client1 = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        $client1 = $this->createClient(array('test_case' => 'Session'));
         if ($insulate) {
             $client1->insulate();
         }
 
         // start second client
-        $client2 = $this->createClient(array('test_case' => 'Session', 'root_config' => $config));
+        $client2 = $this->createClient(array('test_case' => 'Session'));
         if ($insulate) {
             $client2->insulate();
         }
@@ -129,9 +129,9 @@ class SessionTest extends WebTestCase
     public function getConfigs()
     {
         return array(
-            // configfile, insulate
-            array('config.yml', true),
-            array('config.yml', false),
+            // insulate
+            array(true),
+            array(false),
         );
     }
 }

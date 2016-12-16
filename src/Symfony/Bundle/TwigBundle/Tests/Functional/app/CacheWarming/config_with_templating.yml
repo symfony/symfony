@@ -1,0 +1,7 @@
+framework:
+    secret: $ecret
+    templating: { engines: [twig] }
+    router: { resource: "%kernel.config_dir%/Resources/config/empty_routing.yml" }
+    form:
+        enabled: false
+

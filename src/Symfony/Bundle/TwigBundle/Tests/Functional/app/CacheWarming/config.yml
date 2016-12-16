@@ -1,0 +1,4 @@
+framework:
+    secret: $ecret
+    form:
+        enabled: false

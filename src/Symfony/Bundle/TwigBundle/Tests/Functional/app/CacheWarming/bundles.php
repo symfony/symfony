@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-
 return array(
-    new FrameworkBundle(),
+    new \Symfony\Bundle\TwigBundle\TwigBundle(),
 );

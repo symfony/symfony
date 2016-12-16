@@ -524,6 +524,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
 
         $this->assertNull($form->getData());
         $this->assertEquals('foobar', $form->getViewData());
+        $this->assertFalse($form->isValid());
         $this->assertFalse($form->isSynchronized());
     }
 
@@ -945,6 +946,7 @@ class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
         $this->assertNull($form->getData());
         $this->assertSame('foobar', $form->getViewData());
         $this->assertEmpty($form->getExtraData());
+        $this->assertFalse($form->isValid());
         $this->assertFalse($form->isSynchronized());
 
         $this->assertFalse($form[0]->getData());

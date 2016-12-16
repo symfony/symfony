@@ -12,12 +12,10 @@
 namespace Symfony\Component\HttpFoundation\Exception;
 
 /**
- * The HTTP request contains headers with conflicting information.
+ * Base ExceptionInterface for the Request component.
  *
- * This exception should trigger an HTTP 400 response in your application code.
- *
- * @author Magnus Nordlander <magnus@fervo.se>
+ * @author SpacePossum
  */
-class ConflictingHeadersException extends \UnexpectedValueException implements ExceptionInterface
+interface ExceptionInterface
 {
 }

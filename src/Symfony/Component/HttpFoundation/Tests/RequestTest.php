@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use Symfony\Component\HttpFoundation\Exception\InvalidHostException;
+use Symfony\Component\HttpFoundation\Exception\UntrustedHostException;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
@@ -1871,8 +1873,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         try {
             $request->getHost();
             $this->fail('Request::getHost() should throw an exception when host is not trusted.');
-        } catch (\UnexpectedValueException $e) {
-            $this->assertEquals('Untrusted Host "evil.com"', $e->getMessage());
+        } catch (UntrustedHostException $e) {
+            $this->assertEquals('Untrusted Host "evil.com".', $e->getMessage());
         }
 
         // trusted hosts
@@ -1935,7 +1937,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame($expectedPort, $request->getPort());
             }
         } else {
-            $this->setExpectedException('UnexpectedValueException', 'Invalid Host');
+            $this->setExpectedException(InvalidHostException::class, 'Invalid Host');
             $request->getHost();
         }
     }

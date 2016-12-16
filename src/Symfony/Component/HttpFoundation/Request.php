@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
+use Symfony\Component\HttpFoundation\Exception\InvalidHostException;
+use Symfony\Component\HttpFoundation\Exception\UntrustedHostException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -788,6 +790,8 @@ class Request
      *
      * @return array The client IP addresses
      *
+     * @throws ConflictingHeadersException
+     *
      * @see getClientIp()
      */
     public function getClientIps()
@@ -819,7 +823,7 @@ class Request
         }
 
         if ($hasTrustedForwardedHeader && $hasTrustedClientIpHeader && $forwardedClientIps !== $xForwardedForClientIps) {
-            throw new ConflictingHeadersException('The request has both a trusted Forwarded header and a trusted Client IP header, conflicting with each other with regards to the originating IP addresses of the request. This is the result of a misconfiguration. You should either configure your proxy only to send one of these headers, or configure Symfony to distrust one of them.');
+            throw new ConflictingHeadersException('The request has both a trusted Forwarded header and a trusted Client IP header, conflicting with each other with regards to the originating IP addresses of the request. This is the result of a misconfiguration. You should either configure your proxy only to send one of these headers, or configure your project to distrust one of them.');
         }
 
         if (!$hasTrustedForwardedHeader && !$hasTrustedClientIpHeader) {
@@ -1198,7 +1202,8 @@ class Request
      *
      * @return string
      *
-     * @throws \UnexpectedValueException when the host name is invalid
+     * @throws InvalidHostException   when the host name is invalid
+     * @throws UntrustedHostException when the host is not trusted
      */
     public function getHost()
     {
@@ -1220,7 +1225,7 @@ class Request
         // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         if ($host && '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)) {
-            throw new \UnexpectedValueException(sprintf('Invalid Host "%s"', $host));
+            throw new InvalidHostException($host, sprintf('Invalid Host "%s".', $host));
         }
 
         if (count(self::$trustedHostPatterns) > 0) {
@@ -1238,7 +1243,7 @@ class Request
                 }
             }
 
-            throw new \UnexpectedValueException(sprintf('Untrusted Host "%s"', $host));
+            throw new UntrustedHostException($host, sprintf('Untrusted Host "%s".', $host));
         }
 
         return $host;
@@ -1529,7 +1534,7 @@ class Request
     {
         $currentContentIsResource = is_resource($this->content);
         if (PHP_VERSION_ID < 50600 && false === $this->content) {
-            throw new \LogicException('getContent() can only be called once when using the resource return type and PHP below 5.6.');
+            throw new \LogicException(sprintf('Method %s can only be called once when using the resource return type and PHP below 5.6.', __METHOD__));
         }
 
         if (true === $asResource) {
@@ -1954,7 +1959,12 @@ class Request
             $request = call_user_func(self::$requestFactory, $query, $request, $attributes, $cookies, $files, $server, $content);
 
             if (!$request instanceof self) {
-                throw new \LogicException('The Request factory must return an instance of Symfony\Component\HttpFoundation\Request.');
+                throw new \LogicException(
+                    sprintf(
+                        'The Request factory must return an instance of %s. Got %s.',
+                        self::class, is_object($request) ? get_class($request) : (null === $request ? 'null' : gettype($request))
+                    )
+                );
             }
 
             return $request;

@@ -12,12 +12,10 @@
 namespace Symfony\Component\HttpFoundation\Exception;
 
 /**
- * The HTTP request contains headers with conflicting information.
+ * The HTTP request contains host data which is not trusted.
  *
- * This exception should trigger an HTTP 400 response in your application code.
- *
- * @author Magnus Nordlander <magnus@fervo.se>
+ * @author SpacePossum
  */
-class ConflictingHeadersException extends \UnexpectedValueException implements ExceptionInterface
+final class UntrustedHostException extends AbstractHostException
 {
 }

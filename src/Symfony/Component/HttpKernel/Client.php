@@ -207,20 +207,11 @@ EOF;
      */
     protected function filterResponse($response)
     {
-        $headers = $response->headers->all();
-        if ($response->headers->getCookies()) {
-            $cookies = array();
-            foreach ($response->headers->getCookies() as $cookie) {
-                $cookies[] = new DomCookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
-            }
-            $headers['Set-Cookie'] = $cookies;
-        }
-
         // this is needed to support StreamedResponse
         ob_start();
         $response->sendContent();
         $content = ob_get_clean();
 
-        return new DomResponse($content, $response->getStatusCode(), $headers);
+        return new DomResponse($content, $response->getStatusCode(), $response->headers->all());
     }
 }

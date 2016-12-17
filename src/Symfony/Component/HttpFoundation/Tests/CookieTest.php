@@ -178,4 +178,13 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $cookie = new Cookie('foo', 'bar', $expire = time() - 100);
         $this->assertEquals($expire - time(), $cookie->getMaxAge());
     }
+
+    public function testFromString()
+    {
+        $cookie = Cookie::fromString('foo=bar; expires=Fri, 20-May-2011 15:25:52 GMT; path=/; domain=.myfoodomain.com; secure; httponly');
+        $this->assertEquals(new Cookie('foo', 'bar', strtotime('Fri, 20-May-2011 15:25:52 GMT'), '/', '.myfoodomain.com', true, true, true), $cookie);
+
+        $cookie = Cookie::fromString('foo=bar', true);
+        $this->assertEquals(new Cookie('foo', 'bar'), $cookie);
+    }
 }

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-15T20:18:18Z
+
+Good catch. I think it should still try to parse both at once, if possible. So :+1: for this approach.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-16T06:58:02Z
+
+Do we have a test which ensures that the name will be guessed properly if it isn't already set when `getNamespace()` is called?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-16T08:30:52Z
+
+@xabbuh : We don't. I've just added one, thanks (ideally those tests should be backported to lower branches I guess).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-16T10:08:46Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-16T12:32:34Z
+
+:+1:

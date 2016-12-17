@@ -122,7 +122,7 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
      */
     public function testSupportsAttribute($expected, $attribute, $message)
     {
-        $voter = new AbstractVoterTest_Voter();
+        $voter = new Fixtures\MyVoter();
 
         $this->assertEquals($expected, $voter->supportsAttribute($attribute), $message);
     }

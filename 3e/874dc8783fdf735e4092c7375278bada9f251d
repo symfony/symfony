@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-07T08:16:26Z
+
+When merging this PR in 3.2, we should add checks for each `if` with the new `ClassExistenceResource` resource.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-14T20:49:54Z
+
+ping @symfony/deciders :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-15T00:07:01Z
+
+And regarding the extensions, we already have checks in a compiler pass. So I would rather fix them here if they are missing some condition rather than  doing a second system in the DI extension itself.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-15T07:07:28Z
+
+I also moved most of the clean up logic into the compiler passes except for the `twig.translation.extractor` service which didn't fit well in any of the existing passes.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-17T11:42:25Z
+
+This one should be good to merge now.
+
+👍
+
+Status: Reviewed

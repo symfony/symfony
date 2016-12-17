@@ -14,6 +14,8 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
+class_alias(ChildDefinition::class, DefinitionDecorator::class);
+
 /**
  * This definition extends another definition.
  *

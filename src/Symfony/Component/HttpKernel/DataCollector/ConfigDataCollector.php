@@ -89,6 +89,11 @@ class ConfigDataCollector extends DataCollector
             $this->data['symfony_eom'] = $eom->format('F Y');
             $this->data['symfony_eol'] = $eol->format('F Y');
         }
+
+        if (preg_match('~^(\d+(?:\.\d+)*)(.+)?$~', $this->data['php_version'], $matches) && isset($matches[2])) {
+            $this->data['php_version'] = $matches[1];
+            $this->data['php_version_extra'] = $matches[2];
+        }
     }
 
     public function getApplicationName()
@@ -172,6 +177,16 @@ class ConfigDataCollector extends DataCollector
     public function getPhpVersion()
     {
         return $this->data['php_version'];
+    }
+
+    /**
+     * Gets the PHP version extra part.
+     *
+     * @return string|null The extra part
+     */
+    public function getPhpVersionExtra()
+    {
+        return isset($this->data['php_version_extra']) ? $this->data['php_version_extra'] : null;
     }
 
     /**

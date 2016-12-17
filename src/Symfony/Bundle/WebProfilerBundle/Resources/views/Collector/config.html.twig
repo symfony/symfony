@@ -75,7 +75,7 @@
         <div class="sf-toolbar-info-group">
             <div class="sf-toolbar-info-piece sf-toolbar-info-php">
                 <b>PHP version</b>
-                <span>
+                <span{% if collector.phpversionextra %} title="{{ collector.phpversion ~ collector.phpversionextra }}"{% endif %}>
                     {{ collector.phpversion }}
                     &nbsp; <a href="{{ path('_profiler_phpinfo') }}">View phpinfo()</a>
                 </span>
@@ -213,7 +213,7 @@
 
     <div class="metrics">
         <div class="metric">
-            <span class="value">{{ collector.phpversion }}</span>
+            <span class="value">{{ collector.phpversion }}{% if collector.phpversionextra %} <span class="unit">{{ collector.phpversionextra }}</span>{% endif %}</span>
             <span class="label">PHP version</span>
         </div>
 

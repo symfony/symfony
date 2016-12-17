@@ -20,6 +20,4 @@ namespace Symfony\Component\DependencyInjection;
  *
  * @deprecated The DefinitionDecorator class is deprecated since version 3.3 and will be removed in 4.0. Use the Symfony\Component\DependencyInjection\ChildDefinition class instead.
  */
-class DefinitionDecorator extends ChildDefinition
-{
-}
+class_exists(ChildDefinition::class);

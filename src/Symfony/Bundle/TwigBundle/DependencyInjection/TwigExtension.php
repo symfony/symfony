@@ -37,6 +37,18 @@ class TwigExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.xml');
 
+        if (class_exists('Symfony\Component\Form\Form')) {
+            $loader->load('form.xml');
+        }
+
+        if (interface_exists('Symfony\Component\Templating\EngineInterface')) {
+            $loader->load('templating.xml');
+        }
+
+        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
+            $container->removeDefinition('twig.translation.extractor');
+        }
+
         foreach ($configs as $key => $config) {
             if (isset($config['globals'])) {
                 foreach ($config['globals'] as $name => $value) {

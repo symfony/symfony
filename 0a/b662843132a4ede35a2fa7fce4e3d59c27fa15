@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-11-19T14:37:55Z
+
+It seems there is no deprecation in your PR, wrong description or WIP?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-19T14:48:37Z
+
+Not sure :) i tend to think it solves more then it would break. Right now all cookies are dealt with in a consistent manner, which is good.
+
+However we could lose some raw cookie attributes though, and people benefit from this bug before in terms of preserving those attributes. I think `Cookie` should fix this in terms of getting the same output string for the given input string. Which means no BC break :)
+
+@HeahDude
+
+> wrong description
+
+yes :) deprecation label should be removed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-19T15:08:01Z
+
+The synchronization is also missing in `all`, `has`, etc. Should this go all the way?
+
+Or what about the other way around? Add a `Set-Cookie` header from `setCookie()`.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-19T16:57:40Z
+
+Ready :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-20T10:34:19Z
+
+Green :)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-17T14:48:11Z
+
+Rebased with the latest cookie changes. Still all good :)

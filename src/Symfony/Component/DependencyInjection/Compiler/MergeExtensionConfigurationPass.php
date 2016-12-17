@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\ServiceAwareDefinition;
 
 /**
  * Merges extension configs into the container builder.
@@ -50,6 +51,10 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
 
             foreach ($exprLangProviders as $provider) {
                 $tmpContainer->addExpressionLanguageProvider($provider);
+            }
+
+            foreach ($container->getSynthetics() as $id => $service) {
+                $tmpContainer->set($id, $service);
             }
 
             $extension->load($config, $tmpContainer);

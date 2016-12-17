@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
+use Symfony\Component\DependencyInjection\ServiceAwareDefinition;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -447,6 +448,16 @@ abstract class Kernel implements KernelInterface, TerminableInterface
     }
 
     /**
+     * Gets the kernel service class.
+     *
+     * @return string The service class
+     */
+    protected function getServiceClass()
+    {
+        return __NAMESPACE__.'\\Service\\Kernel';
+    }
+
+    /**
      * Gets the container class.
      *
      * @return string The container class
@@ -480,7 +491,21 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
         $fresh = true;
         if (!$cache->isFresh()) {
+            $serviceClass = $this->getServiceClass();
+            $bundles = array();
+            foreach ($this->bundles as $name => $bundle) {
+                $bundles[$name] = array(
+                    'service_class' => method_exists($bundle, 'getServiceClass') ? $bundle->getServiceClass() : __NAMESPACE__.'\\Service\Bundle',
+                    'class' => get_class($bundle),
+                    'namespace' => $bundle->getNamespace(),
+                    'parent' => $bundle->getParent(),
+                    'path' => $bundle->getPath(),
+                );
+            }
+            $serviceDefinition = new ServiceAwareDefinition($serviceClass, array($this->environment, $this->debug, $bundles));
+            $serviceDefinition->setService(new $serviceClass($this->environment, $this->debug, $bundles));
             $container = $this->buildContainer();
+            $container->setDefinition('kernel_as_a_service', $serviceDefinition);
             $container->compile();
             $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
 

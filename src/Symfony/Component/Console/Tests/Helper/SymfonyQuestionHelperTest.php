@@ -79,9 +79,7 @@ class SymfonyQuestionHelperTest extends \PHPUnit_Framework_TestCase
         $questionHelper = new SymfonyQuestionHelper();
         $questionHelper->setInputStream($this->getInputStream("\n"));
         $question = new Question('What is your favorite superhero?');
-        $question->setValidator(function ($value) {
-            return $value;
-        });
+        $question->setValidator(function ($value) { return $value; });
         $this->assertNull($questionHelper->ask($this->createInputInterfaceMock(), $this->createOutputInterface(), $question));
     }
 
@@ -101,6 +99,15 @@ class SymfonyQuestionHelperTest extends \PHPUnit_Framework_TestCase
         $helper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), new Question('Do you want to use Foo\\Bar <comment>or</comment> Foo\\Baz\\?', 'Foo\\Baz'));
 
         $this->assertOutputContains('Do you want to use Foo\\Bar or Foo\\Baz\\? [Foo\\Baz]:', $output);
+    }
+
+    public function testLabelTrailingBackslash()
+    {
+        $helper = new SymfonyQuestionHelper();
+        $helper->setInputStream($this->getInputStream('sure'));
+        $helper->ask($this->createInputInterfaceMock(), $output = $this->createOutputInterface(), new Question('Question with a trailing \\'));
+
+        $this->assertOutputContains('Question with a trailing \\', $output);
     }
 
     /**

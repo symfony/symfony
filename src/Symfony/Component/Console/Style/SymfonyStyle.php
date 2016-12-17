@@ -121,7 +121,7 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependBlock();
         $this->writeln(array(
-            sprintf('<comment>%s</>', $message),
+            sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
             sprintf('<comment>%s</>', str_repeat('=', strlen($message))),
         ));
         $this->newLine();
@@ -134,7 +134,7 @@ class SymfonyStyle extends OutputStyle
     {
         $this->autoPrependBlock();
         $this->writeln(array(
-            sprintf('<comment>%s</>', $message),
+            sprintf('<comment>%s</>', OutputFormatter::escapeTrailingBackslash($message)),
             sprintf('<comment>%s</>', str_repeat('-', strlen($message))),
         ));
         $this->newLine();

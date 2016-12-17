@@ -100,7 +100,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();
         $strategy->expects($this->any())->method('supports')
-            ->will($this->returnCallback(function($workflow, $subject) use ($supportedClassName) {
+            ->will($this->returnCallback(function ($workflow, $subject) use ($supportedClassName) {
                 return $subject instanceof $supportedClassName;
             }));
 

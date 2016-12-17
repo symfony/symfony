@@ -6,12 +6,8 @@ use Symfony\Component\Workflow\Workflow;
 
 class ClassInstanceSupportStrategy implements SupportStrategyInterface
 {
-    /** @var string */
     private $className;
 
-    /**
-     * @param string $className
-     */
     public function __construct($className)
     {
         $this->className = $className;

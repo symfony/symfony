@@ -29,10 +29,6 @@ class Registry
     public function add(Workflow $workflow, $supportStrategy)
     {
         if (!$supportStrategy instanceof SupportStrategyInterface) {
-            if (!is_string($supportStrategy)) {
-                throw new InvalidArgumentException('Expecting instance of SupportStrategyInterface or class name as a string.');
-            }
-
             @trigger_error('Support of class name string was deprecated after version 3.2 and won\'t work anymore in 4.0.', E_USER_DEPRECATED);
         }
 
@@ -41,9 +37,10 @@ class Registry
 
     /**
      * @param object      $subject
-     * @param null|string $workflowName
+     * @param string|null $workflowName
      *
      * @return Workflow
+     * 
      * @throws InvalidArgumentException
      */
     public function get($subject, $workflowName = null)

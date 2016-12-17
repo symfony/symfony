@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Workflow;
+use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -436,7 +437,7 @@ class FrameworkExtension extends Extension
 
             // Create MarkingStore
             if (isset($workflow['marking_store']['type'])) {
-                $markingStoreDefinition = new DefinitionDecorator('workflow.marking_store.' . $workflow['marking_store']['type']);
+                $markingStoreDefinition = new DefinitionDecorator('workflow.marking_store.'.$workflow['marking_store']['type']);
                 foreach ($workflow['marking_store']['arguments'] as $argument) {
                     $markingStoreDefinition->addArgument($argument);
                 }
@@ -461,13 +462,12 @@ class FrameworkExtension extends Extension
             if (isset($workflow['supports'])) {
                 foreach ($workflow['supports'] as $supportedClassName) {
                     $strategyDefinition = new Definition(
-                        Workflow\SupportStrategy\ClassInstanceSupportStrategy::class, array($supportedClassName)
+                        ClassInstanceSupportStrategy::class, array($supportedClassName)
                     );
                     $strategyDefinition->setPublic(false);
                     $registryDefinition->addMethodCall('add', array(new Reference($workflowId), $strategyDefinition));
                 }
-            }
-            if (isset($workflow['support_strategy'])) {
+            } elseif (isset($workflow['support_strategy'])) {
                 $registryDefinition->addMethodCall('add', array(new Reference($workflowId), new Reference($workflow['support_strategy'])));
             }
         }

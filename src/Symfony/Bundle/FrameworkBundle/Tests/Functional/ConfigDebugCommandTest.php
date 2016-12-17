@@ -48,6 +48,16 @@ class ConfigDebugCommandTest extends WebTestCase
         $this->assertContains('foo', $tester->getDisplay());
     }
 
+    public function testParametersValuesAreResolved()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(array('name' => 'framework'));
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertContains("locale: '%env(LOCALE)%'", $tester->getDisplay());
+        $this->assertContains('secret: test', $tester->getDisplay());
+    }
+
     public function testDumpUndefinedBundleOption()
     {
         $tester = $this->createCommandTester();

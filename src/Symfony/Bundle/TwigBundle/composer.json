@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
+        "symfony/config": "~3.2",
         "symfony/twig-bridge": "^3.2.1",
         "symfony/http-foundation": "~2.8|~3.0",
         "symfony/http-kernel": "~2.8|~3.0",
@@ -27,7 +28,6 @@
         "symfony/stopwatch": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",
-        "symfony/config": "~3.2",
         "symfony/finder": "~2.8|~3.0",
         "symfony/routing": "~2.8|~3.0",
         "symfony/templating": "~2.8|~3.0",

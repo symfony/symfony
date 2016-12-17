@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -68,7 +69,11 @@ class RouterListener implements EventSubscriberInterface
     private function setCurrentRequest(Request $request = null)
     {
         if (null !== $request) {
-            $this->context->fromRequest($request);
+            try {
+                $this->context->fromRequest($request);
+            } catch (SuspiciousOperationException $e) {
+                // Do nothing.
+            }
         }
     }
 

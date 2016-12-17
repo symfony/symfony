@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-11-26T19:41:20Z
+
+Could you ensure it won't bring any regression in the profiler bar with popular css frameworks' rules like with Twitter Bootstrap? I'm mentioning this because of [this fix](https://github.com/symfony/symfony/pull/16183) I've provided some time ago and this: https://github.com/symfony/symfony/pull/16183#r41654623.
+
+Otherwise, we may have to set this only for the profiler pages or find a proper solution for both.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-26T20:10:18Z
+
+Hm, current master applies a `200px` width already; https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/toolbar.css.twig#L378
+
+Before
+
+![image](https://cloud.githubusercontent.com/assets/1047696/20642887/6289d810-b41b-11e6-9b68-d81555174e83.png)
+
+After
+
+![image](https://cloud.githubusercontent.com/assets/1047696/20642898/9d0139e8-b41b-11e6-9e6b-3d8ce5f27356.png)
+
+Chrome 54.0
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T08:58:26Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-17T08:18:09Z
+
+:+1:

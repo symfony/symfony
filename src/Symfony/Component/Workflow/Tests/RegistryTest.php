@@ -27,15 +27,6 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry = null;
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Expecting instance of SupportStrategyInterface or class name as a string.
-     */
-    public function testAddUnsupportedSupportStrategy()
-    {
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow4'), array(Subject1::class, Subject2::class));
-    }
-
     public function testGetWithSuccess()
     {
         $workflow = $this->registry->get(new Subject1());

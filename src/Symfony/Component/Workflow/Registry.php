@@ -40,7 +40,7 @@ class Registry
      * @param string|null $workflowName
      *
      * @return Workflow
-     * 
+     *
      * @throws InvalidArgumentException
      */
     public function get($subject, $workflowName = null)

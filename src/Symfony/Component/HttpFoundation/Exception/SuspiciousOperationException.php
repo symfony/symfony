@@ -12,10 +12,9 @@
 namespace Symfony\Component\HttpFoundation\Exception;
 
 /**
- * The HTTP request contains headers with conflicting information.
- *
- * @author Magnus Nordlander <magnus@fervo.se>
+ * Raised when a user has performed an operation that should be considered
+ * suspicious from a security perspective.
  */
-class ConflictingHeadersException extends \UnexpectedValueException implements RequestExceptionInterface
+class SuspiciousOperationException extends \UnexpectedValueException implements RequestExceptionInterface
 {
 }

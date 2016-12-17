@@ -53,7 +53,7 @@ class SymfonyQuestionHelper extends QuestionHelper
      */
     protected function writePrompt(OutputInterface $output, Question $question)
     {
-        $text = OutputFormatter::escape($question->getQuestion());
+        $text = $question->getQuestion();
         $default = $question->getDefault();
 
         switch (true) {

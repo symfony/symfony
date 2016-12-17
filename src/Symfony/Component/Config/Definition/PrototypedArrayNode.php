@@ -29,6 +29,10 @@ class PrototypedArrayNode extends ArrayNode
     protected $minNumberOfElements = 0;
     protected $defaultValue = array();
     protected $defaultChildren;
+    /**
+     * @var NodeInterface[] An array of the prototypes of the simplified value children
+     */
+    private $valuePrototypes = array();
 
     /**
      * Sets the minimum number of elements that a prototype based node must
@@ -194,9 +198,9 @@ class PrototypedArrayNode extends ArrayNode
         }
 
         foreach ($value as $k => $v) {
-            $this->prototype->setName($k);
+            $prototype = $this->getPrototypeForChild($k);
             try {
-                $value[$k] = $this->prototype->finalize($v);
+                $value[$k] = $prototype->finalize($v);
             } catch (UnsetKeyException $e) {
                 unset($value[$k]);
             }
@@ -250,8 +254,18 @@ class PrototypedArrayNode extends ArrayNode
                     }
 
                     // if only "value" is left
-                    if (1 == count($v) && isset($v['value'])) {
+                    if (array_keys($v) === array('value')) {
                         $v = $v['value'];
+                        if ($this->prototype instanceof ArrayNode && ($children = $this->prototype->getChildren()) && array_key_exists('value', $children)) {
+                            $valuePrototype = current($this->valuePrototypes) ?: clone $children['value'];
+                            $valuePrototype->parent = $this;
+                            $originalClosures = $this->prototype->normalizationClosures;
+                            if (is_array($originalClosures)) {
+                                $valuePrototypeClosures = $valuePrototype->normalizationClosures;
+                                $valuePrototype->normalizationClosures = is_array($valuePrototypeClosures) ? array_merge($originalClosures, $valuePrototypeClosures) : $originalClosures;
+                            }
+                            $this->valuePrototypes[$k] = $valuePrototype;
+                        }
                     }
                 }
 
@@ -264,11 +278,11 @@ class PrototypedArrayNode extends ArrayNode
                 }
             }
 
-            $this->prototype->setName($k);
+            $prototype = $this->getPrototypeForChild($k);
             if (null !== $this->keyAttribute || $isAssoc) {
-                $normalized[$k] = $this->prototype->normalize($v);
+                $normalized[$k] = $prototype->normalize($v);
             } else {
-                $normalized[] = $this->prototype->normalize($v);
+                $normalized[] = $prototype->normalize($v);
             }
         }
 
@@ -322,10 +336,54 @@ class PrototypedArrayNode extends ArrayNode
                 continue;
             }
 
-            $this->prototype->setName($k);
-            $leftSide[$k] = $this->prototype->merge($leftSide[$k], $v);
+            $prototype = $this->getPrototypeForChild($k);
+            $leftSide[$k] = $prototype->merge($leftSide[$k], $v);
         }
 
         return $leftSide;
+    }
+
+    /**
+     * Returns a prototype for the child node that is associated to $key in the value array.
+     * For general child nodes, this will be $this->prototype.
+     * But if $this->removeKeyAttribute is true and there are only two keys in the child node:
+     * one is same as this->keyAttribute and the other is 'value', then the prototype will be different.
+     *
+     * For example, assume $this->keyAttribute is 'name' and the value array is as follows:
+     * array(
+     *     array(
+     *         'name' => 'name001',
+     *         'value' => 'value001'
+     *     )
+     * )
+     *
+     * Now, the key is 0 and the child node is:
+     * array(
+     *    'name' => 'name001',
+     *    'value' => 'value001'
+     * )
+     *
+     * When normalizing the value array, the 'name' element will removed from the child node
+     * and its value becomes the new key of the child node:
+     * array(
+     *     'name001' => array('value' => 'value001')
+     * )
+     *
+     * Now only 'value' element is left in the child node which can be further simplified into a string:
+     * array('name001' => 'value001')
+     *
+     * Now, the key becomes 'name001' and the child node becomes 'value001' and
+     * the prototype of child node 'name001' should be a ScalarNode instead of an ArrayNode instance.
+     *
+     * @param string $key The key of the child node
+     *
+     * @return mixed The prototype instance
+     */
+    private function getPrototypeForChild($key)
+    {
+        $prototype = isset($this->valuePrototypes[$key]) ? $this->valuePrototypes[$key] : $this->prototype;
+        $prototype->setName($key);
+
+        return $prototype;
     }
 }

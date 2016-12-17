@@ -170,11 +170,11 @@ class ReflectionCaster
 
         foreach ($c->getParameters() as $v) {
             $k = '$'.$v->name;
-            if ($v->isPassedByReference()) {
-                $k = '&'.$k;
-            }
             if (method_exists($v, 'isVariadic') && $v->isVariadic()) {
                 $k = '...'.$k;
+            }
+            if ($v->isPassedByReference()) {
+                $k = '&'.$k;
             }
             $a[$prefix.'parameters'][$k] = $v;
         }

@@ -29,6 +29,7 @@ class Definition
     private $deprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will soon be removed.';
     private $properties = array();
     private $calls = array();
+    private $getters = array();
     private $configurator;
     private $tags = array();
     private $public = true;
@@ -317,6 +318,37 @@ class Definition
     public function getMethodCalls()
     {
         return $this->calls;
+    }
+
+    /**
+     * @experimental in version 3.3
+     */
+    public function setOverriddenGetter($name, $returnValue)
+    {
+        if (!$name) {
+            throw new InvalidArgumentException(sprintf('Getter name cannot be empty.'));
+        }
+        $this->getters[strtolower($name)] = $returnValue;
+
+        return $this;
+    }
+
+    /**
+     * @experimental in version 3.3
+     */
+    public function setOverriddenGetters(array $getters)
+    {
+        $this->getters = array_change_key_case($getters, CASE_LOWER);
+
+        return $this;
+    }
+
+    /**
+     * @experimental in version 3.3
+     */
+    public function getOverriddenGetters()
+    {
+        return $this->getters;
     }
 
     /**

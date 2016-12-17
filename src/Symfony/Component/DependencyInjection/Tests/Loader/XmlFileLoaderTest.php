@@ -576,6 +576,15 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('set*', 'bar'), $container->getDefinition('autowire_array')->getAutowiredMethods());
     }
 
+    public function testGetter()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services31.xml');
+
+        $this->assertEquals(array('getbar' => array('bar' => new Reference('bar'))), $container->getDefinition('foo')->getOverriddenGetters());
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */

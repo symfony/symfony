@@ -29,6 +29,7 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
+use Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -890,6 +891,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $arguments = $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getArguments())));
 
         if (null !== $factory = $definition->getFactory()) {
+            if ($definition->getOverriddenGetters()) {
+                throw new RuntimeException(sprintf('Cannot create service "%s": factories and overridden getters are incompatible with each other.', $id));
+            }
             if (is_array($factory)) {
                 $factory = array($this->resolveServices($parameterBag->resolveValue($factory[0])), $factory[1]);
             } elseif (!is_string($factory)) {
@@ -908,10 +912,30 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } else {
             $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
 
-            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
-
             if (!$definition->isDeprecated() && 0 < strpos($r->getDocComment(), "\n * @deprecated ")) {
                 @trigger_error(sprintf('The "%s" service relies on the deprecated "%s" class. It should either be deprecated or its implementation upgraded.', $id, $r->name), E_USER_DEPRECATED);
+            }
+            if ($definition->getOverriddenGetters()) {
+                static $salt;
+                if (null === $salt) {
+                    $salt = str_replace('.', '', uniqid('', true));
+                }
+                $service = sprintf('%s implements \\%s { private $container%4$s; private $values%4$s; %s }', $r->name, GetterProxyInterface::class, $this->generateOverriddenGetters($id, $definition, $r, $salt), $salt);
+                if (!class_exists($proxyClass = 'SymfonyProxy_'.md5($service), false)) {
+                    eval(sprintf('class %s extends %s', $proxyClass, $service));
+                }
+                $r = new \ReflectionClass($proxyClass);
+                $constructor = $r->getConstructor();
+                if ($constructor && !defined('HHVM_VERSION') && $constructor->getDeclaringClass()->isInternal()) {
+                    $constructor = null;
+                }
+                $service = $constructor ? $r->newInstanceWithoutConstructor() : $r->newInstanceArgs($arguments);
+                call_user_func(\Closure::bind(function ($c, $v, $s) { $this->{'container'.$s} = $c; $this->{'values'.$s} = $v; }, $service, $service), $this, $definition->getOverriddenGetters(), $salt);
+                if ($constructor) {
+                    $constructor->invokeArgs($service, $arguments);
+                }
+            } else {
+                $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
             }
         }
 
@@ -1153,6 +1177,102 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $this->envCounters;
+    }
+
+    private function generateOverriddenGetters($id, Definition $definition, \ReflectionClass $class, $salt)
+    {
+        if ($class->isFinal()) {
+            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": class "%s" cannot be marked as final.', $id, $class->name));
+        }
+        $getters = '';
+        foreach ($definition->getOverriddenGetters() as $name => $returnValue) {
+            $r = self::getGetterReflector($class, $name, $id, $type);
+            $visibility = $r->isProtected() ? 'protected' : 'public';
+            $name = var_export($name, true);
+            $getters .= <<<EOF
+
+{$visibility} function {$r->name}(){$type} {
+    \$c = \$this->container{$salt};
+    \$b = \$c->getParameterBag();
+    \$v = \$this->values{$salt}[{$name}];
+
+    foreach (\$c->getServiceConditionals(\$v) as \$s) {
+        if (!\$c->has(\$s)) {
+            return parent::{$r->name}();
+        }
+    }
+
+    return \$c->resolveServices(\$b->unescapeValue(\$b->resolveValue(\$v)));
+}
+EOF;
+        }
+
+        return $getters;
+    }
+
+    /**
+     * @internal
+     */
+    public static function getGetterReflector(\ReflectionClass $class, $name, $id, &$type)
+    {
+        if (!$class->hasMethod($name)) {
+            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" does not exist.', $id, $class->name, $name));
+        }
+        $r = $class->getMethod($name);
+        if ($r->isPrivate()) {
+            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" must be public or protected.', $id, $class->name, $r->name));
+        }
+        if ($r->isStatic()) {
+            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot be static.', $id, $class->name, $r->name));
+        }
+        if ($r->isFinal()) {
+            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot be marked as final.', $id, $class->name, $r->name));
+        }
+        if ($r->returnsReference()) {
+            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot return by reference.', $id, $class->name, $r->name));
+        }
+        if (0 < $r->getNumberOfParameters()) {
+            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot have any arguments.', $id, $class->name, $r->name));
+        }
+        if ($type = method_exists($r, 'getReturnType') ? $r->getReturnType() : null) {
+            $type = ': '.($type->allowsNull() ? '?' : '').self::generateTypeHint($type, $r);
+        }
+
+        return $r;
+    }
+
+    /**
+     * @internal
+     */
+    public static function generateTypeHint($type, \ReflectionFunctionAbstract $r)
+    {
+        if (is_string($type)) {
+            $name = $type;
+
+            if ('callable' === $name || 'array' === $name) {
+                return $name;
+            }
+        } else {
+            $name = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
+
+            if ($type->isBuiltin()) {
+                return $name;
+            }
+        }
+        $lcName = strtolower($name);
+
+        if ('self' !== $lcName && 'parent' !== $lcName) {
+            return '\\'.$name;
+        }
+        if (!$r instanceof \ReflectionMethod) {
+            return;
+        }
+        if ('self' === $lcName) {
+            return '\\'.$r->getDeclaringClass()->name;
+        }
+        if ($parent = $r->getDeclaringClass()->getParentClass()) {
+            return '\\'.$parent->name;
+        }
     }
 
     /**

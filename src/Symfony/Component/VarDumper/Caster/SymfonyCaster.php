@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
+use Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\VarDumper\Cloner\Stub;
 
@@ -35,6 +36,21 @@ class SymfonyCaster
                     $clone = clone $request;
                 }
                 $a[Caster::PREFIX_VIRTUAL.$prop] = $clone->{$getter}();
+            }
+        }
+
+        return $a;
+    }
+
+    public static function castGetterProxy(GetterProxyInterface $proxy, array $a, Stub $stub, $isNested)
+    {
+        $privatePrefix = sprintf("\0%s\0", $stub->class);
+        $stub->class = get_parent_class($proxy).'@proxy';
+
+        foreach ($a as $k => $v) {
+            if ("\0" === $k[0] && 0 === strpos($k, $privatePrefix)) {
+                ++$stub->cut;
+                unset($a[$k]);
             }
         }
 

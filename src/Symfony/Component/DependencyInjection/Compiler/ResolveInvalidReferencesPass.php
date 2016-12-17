@@ -59,6 +59,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             }
             $value->setArguments($this->processValue($value->getArguments(), 0));
             $value->setProperties($this->processValue($value->getProperties(), 1));
+            $value->setOverriddenGetters($this->processValue($value->getOverriddenGetters(), 1));
             $value->setMethodCalls($this->processValue($value->getMethodCalls(), 2));
         } elseif (is_array($value)) {
             $i = 0;

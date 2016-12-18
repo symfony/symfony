@@ -5,7 +5,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 /**
  * ProjectServiceContainer.
@@ -23,10 +23,28 @@ class ProjectServiceContainer extends Container
      */
     public function __construct()
     {
-        parent::__construct();
+        $this->services = array();
         $this->methodMap = array(
             'foo' => 'getFooService',
         );
+
+        $this->aliases = array();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped frozen container.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isFrozen()
+    {
+        return true;
     }
 
     /**

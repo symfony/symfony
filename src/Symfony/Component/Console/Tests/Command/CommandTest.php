@@ -167,7 +167,7 @@ class CommandTest extends \PHPUnit_Framework_TestCase
     public function testSetAliasesNull()
     {
         $command = new \TestCommand();
-        $this->expectException('InvalidArgumentException');
+        $this->setExpectedException('InvalidArgumentException');
         $command->setAliases(null);
     }
 

@@ -78,6 +78,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 key2: value2
 
 EOF;
+
+        // Ensure that user's editor didn't trimmed white spaces in Heredoc.
+        $this->assertSame($yaml, "\n \n# Two empty lines above (second - with one whitespace) and two below (first - with three whitespaces).\n   \n\n---\nkey2: value2\n");
         $this->parser->parse($yaml);
     }
 
@@ -94,6 +97,9 @@ EOF;
 key2: value2
 
 EOF;
+
+        // Ensure that user's editor didn't trimmed white spaces in Heredoc.
+        $this->assertSame($yaml, "   \n\n  ---\nkey2: value2\n");
         $this->parser->parse($yaml);
     }
 

@@ -12,10 +12,18 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\DataMapperInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Validator\Validation;
 
 class FormTest_AuthorWithoutRefSetter
 {
@@ -624,6 +632,32 @@ class FormTypeTest extends BaseTypeTest
         $this->assertSame('baz', $view->vars['value']);
     }
 
+    public function testDataMapperTransformationFailedExceptionInvalidMessageIsUsed()
+    {
+        $money = new Money(20.5, 'EUR');
+        $factory = Forms::createFormFactoryBuilder()
+            ->addExtensions([new ValidatorExtension(Validation::createValidator())])
+            ->getFormFactory()
+        ;
+
+        $builder = $factory
+            ->createBuilder(FormType::class, $money, ['invalid_message' => 'not the one to display'])
+            ->add('amount', TextType::class)
+            ->add('currency', CurrencyType::class)
+        ;
+        $builder->setDataMapper(new MoneyDataMapper());
+        $form = $builder->getForm();
+
+        $form->submit(['amount' => 'invalid_amount', 'currency' => 'USD']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertNull($form->getData());
+        $this->assertCount(1, $form->getErrors());
+        $this->assertSame('Expected numeric value', $form->getTransformationFailure()->getMessage());
+        $error = $form->getErrors()[0];
+        $this->assertSame('Money amount should be numeric. "invalid_amount" is invalid.', $error->getMessage());
+    }
+
     // https://github.com/symfony/symfony/issues/6862
     public function testPassZeroLabelToView()
     {
@@ -698,5 +732,55 @@ class FormTypeTest extends BaseTypeTest
             ->createView();
 
         $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['help_translation_parameters']);
+    }
+}
+
+class Money
+{
+    private $amount;
+    private $currency;
+
+    public function __construct($amount, $currency)
+    {
+        $this->amount = $amount;
+        $this->currency = $currency;
+    }
+
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+}
+
+class MoneyDataMapper implements DataMapperInterface
+{
+    public function mapDataToForms($data, $forms)
+    {
+        $forms = iterator_to_array($forms);
+        $forms['amount']->setData($data ? $data->getAmount() : 0);
+        $forms['currency']->setData($data ? $data->getCurrency() : 'EUR');
+    }
+
+    public function mapFormsToData($forms, &$data)
+    {
+        $forms = iterator_to_array($forms);
+
+        $amount = $forms['amount']->getData();
+        if (!is_numeric($amount)) {
+            $failure = new TransformationFailedException('Expected numeric value');
+            $failure->setInvalidMessage('Money amount should be numeric. {{ amount }} is invalid.', ['{{ amount }}' => json_encode($amount)]);
+
+            throw $failure;
+        }
+
+        $data = new Money(
+            $forms['amount']->getData(),
+            $forms['currency']->getData()
+        );
     }
 }

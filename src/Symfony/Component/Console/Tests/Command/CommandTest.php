@@ -327,7 +327,9 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command->setApplication(new Application());
         $command->setProcessTitle('foo');
         $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
-        $this->assertEquals('foo', cli_get_process_title());
+        if (function_exists('cli_set_process_title')) {
+            $this->assertEquals('foo', cli_get_process_title());
+        }
     }
 
     public function testSetCode()

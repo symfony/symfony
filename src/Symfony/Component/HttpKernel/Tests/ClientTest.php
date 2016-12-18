@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 
+/**
+ * @group time-sensitive
+ */
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
     public function testDoRequest()

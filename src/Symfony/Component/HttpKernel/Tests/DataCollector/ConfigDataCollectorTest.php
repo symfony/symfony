@@ -32,7 +32,7 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('testkernel', $c->getAppName());
         $this->assertSame(PHP_VERSION, $c->getPhpVersion());
         $this->assertSame(PHP_INT_SIZE * 8, $c->getPhpArchitecture());
-        $this->assertSame(\Locale::getDefault() ?: 'n/a', $c->getPhpIntlLocale());
+        $this->assertSame(class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a', $c->getPhpIntlLocale());
         $this->assertSame(date_default_timezone_get(), $c->getPhpTimezone());
         $this->assertSame(Kernel::VERSION, $c->getSymfonyVersion());
         $this->assertNull($c->getToken());

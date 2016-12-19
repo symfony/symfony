@@ -23,7 +23,7 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
      */
     public function testEmptyToken($token)
     {
-        $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
         $twig = $this->getMockBuilder('Twig_Environment')->disableOriginalConstructor()->getMock();
         $profiler = $this
             ->getMockBuilder('Symfony\Component\HttpKernel\Profiler\Profiler')
@@ -151,10 +151,10 @@ class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
 
     private function createController($profiler, $twig, $withCSP)
     {
-        $urlGenerator = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+        $urlGenerator = $this->getMockBuilder('Symfony\Component\Routing\Generator\UrlGeneratorInterface')->getMock();
 
         if ($withCSP) {
-            $nonceGenerator = $this->getMock('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator');
+            $nonceGenerator = $this->getMockBuilder('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator')->getMock();
 
             return new ProfilerController($urlGenerator, $profiler, $twig, array(), 'normal', new ContentSecurityPolicyHandler($nonceGenerator));
         }

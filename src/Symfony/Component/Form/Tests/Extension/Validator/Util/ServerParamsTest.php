@@ -31,7 +31,7 @@ class ServerParamsTest extends \PHPUnit_Framework_TestCase
     public function testGetContentLengthFromRequest()
     {
         $request = Request::create('http://foo', 'GET', array(), array(), array(), array('CONTENT_LENGTH' => 1024));
-        $requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack', array('getCurrentRequest'));
+        $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->setMethods(array('getCurrentRequest'))->getMock();
         $requestStack->expects($this->once())->method('getCurrentRequest')->will($this->returnValue($request));
         $serverParams = new ServerParams($requestStack);
 
@@ -41,7 +41,7 @@ class ServerParamsTest extends \PHPUnit_Framework_TestCase
     /** @dataProvider getGetPostMaxSizeTestData */
     public function testGetPostMaxSize($size, $bytes)
     {
-        $serverParams = $this->getMock('Symfony\Component\Form\Extension\Validator\Util\ServerParams', array('getNormalizedIniPostMaxSize'));
+        $serverParams = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\Util\ServerParams')->setMethods(array('getNormalizedIniPostMaxSize'))->getMock();
         $serverParams
             ->expects($this->any())
             ->method('getNormalizedIniPostMaxSize')

@@ -28,7 +28,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfCantConnectToLdap()
     {
-        $ldap = $this->getMock(LdapInterface::class);
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
             ->expects($this->once())
             ->method('bind')
@@ -44,8 +44,8 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfNoLdapEntries()
     {
-        $result = $this->getMock(CollectionInterface::class);
-        $query = $this->getMock(QueryInterface::class);
+        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
+        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
             ->expects($this->once())
             ->method('execute')
@@ -56,7 +56,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
             ->method('count')
             ->will($this->returnValue(0))
         ;
-        $ldap = $this->getMock(LdapInterface::class);
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -77,8 +77,8 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry()
     {
-        $result = $this->getMock(CollectionInterface::class);
-        $query = $this->getMock(QueryInterface::class);
+        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
+        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
             ->expects($this->once())
             ->method('execute')
@@ -89,7 +89,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
             ->method('count')
             ->will($this->returnValue(2))
         ;
-        $ldap = $this->getMock(LdapInterface::class);
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -110,14 +110,14 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfMoreThanOneLdapPasswordsInEntry()
     {
-        $result = $this->getMock(CollectionInterface::class);
-        $query = $this->getMock(QueryInterface::class);
+        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
+        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
             ->expects($this->once())
             ->method('execute')
             ->will($this->returnValue($result))
         ;
-        $ldap = $this->getMock(LdapInterface::class);
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
             ->expects($this->once())
             ->method('offsetGet')
@@ -156,14 +156,14 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfEntryHasNoPasswordAttribute()
     {
-        $result = $this->getMock(CollectionInterface::class);
-        $query = $this->getMock(QueryInterface::class);
+        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
+        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
             ->expects($this->once())
             ->method('execute')
             ->will($this->returnValue($result))
         ;
-        $ldap = $this->getMock(LdapInterface::class);
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
             ->expects($this->once())
             ->method('offsetGet')
@@ -198,14 +198,14 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttribute()
     {
-        $result = $this->getMock(CollectionInterface::class);
-        $query = $this->getMock(QueryInterface::class);
+        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
+        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
             ->expects($this->once())
             ->method('execute')
             ->will($this->returnValue($result))
         ;
-        $ldap = $this->getMock(LdapInterface::class);
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
             ->expects($this->once())
             ->method('offsetGet')
@@ -240,14 +240,14 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadUserByUsernameIsSuccessfulWithPasswordAttribute()
     {
-        $result = $this->getMock(CollectionInterface::class);
-        $query = $this->getMock(QueryInterface::class);
+        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
+        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
             ->expects($this->once())
             ->method('execute')
             ->will($this->returnValue($result))
         ;
-        $ldap = $this->getMock(LdapInterface::class);
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
             ->expects($this->once())
             ->method('offsetGet')

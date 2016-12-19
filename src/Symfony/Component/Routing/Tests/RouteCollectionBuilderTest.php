@@ -20,8 +20,8 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 {
     public function testImport()
     {
-        $resolvedLoader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
-        $resolver = $this->getMock('Symfony\Component\Config\Loader\LoaderResolverInterface');
+        $resolvedLoader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $resolver = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderResolverInterface')->getMock();
         $resolver->expects($this->once())
             ->method('resolve')
             ->with('admin_routing.yml', 'yaml')
@@ -38,7 +38,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
             ->with('admin_routing.yml', 'yaml')
             ->will($this->returnValue($expectedCollection));
 
-        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $loader->expects($this->any())
             ->method('getResolver')
             ->will($this->returnValue($resolver));
@@ -89,7 +89,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
         $importedCollection->add('imported_route1', new Route('/imported/foo1'));
         $importedCollection->add('imported_route2', new Route('/imported/foo2'));
 
-        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         // make this loader able to do the import - keeps mocking simple
         $loader->expects($this->any())
             ->method('supports')
@@ -252,7 +252,7 @@ class RouteCollectionBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testFlushSetsPrefixedWithMultipleLevels()
     {
-        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
         $routes = new RouteCollectionBuilder($loader);
 
         $routes->add('homepage', 'MainController::homepageAction', 'homepage');

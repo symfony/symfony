@@ -52,7 +52,7 @@ class HttpKernelExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getFragmentHandler($return)
     {
-        $strategy = $this->getMock('Symfony\\Component\\HttpKernel\\Fragment\\FragmentRendererInterface');
+        $strategy = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Fragment\\FragmentRendererInterface')->getMock();
         $strategy->expects($this->once())->method('getName')->will($this->returnValue('inline'));
         $strategy->expects($this->once())->method('render')->will($return);
 
@@ -74,7 +74,7 @@ class HttpKernelExtensionTest extends \PHPUnit_Framework_TestCase
         $twig = new \Twig_Environment($loader, array('debug' => true, 'cache' => false));
         $twig->addExtension(new HttpKernelExtension());
 
-        $loader = $this->getMock('Twig_RuntimeLoaderInterface');
+        $loader = $this->getMockBuilder('Twig_RuntimeLoaderInterface')->getMock();
         $loader->expects($this->any())->method('load')->will($this->returnValueMap(array(
             array('Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)),
         )));

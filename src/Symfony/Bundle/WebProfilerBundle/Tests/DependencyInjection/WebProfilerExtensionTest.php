@@ -45,7 +45,7 @@ class WebProfilerExtensionTest extends TestCase
     {
         parent::setUp();
 
-        $this->kernel = $this->getMock('Symfony\\Component\\HttpKernel\\KernelInterface');
+        $this->kernel = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\KernelInterface')->getMock();
 
         $this->container = new ContainerBuilder();
         $this->container->register('router', $this->getMockClass('Symfony\\Component\\Routing\\RouterInterface'));

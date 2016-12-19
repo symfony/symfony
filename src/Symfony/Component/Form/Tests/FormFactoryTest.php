@@ -54,11 +54,11 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->resolvedTypeFactory = $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactoryInterface');
-        $this->guesser1 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
-        $this->guesser2 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
-        $this->registry = $this->getMock('Symfony\Component\Form\FormRegistryInterface');
-        $this->builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $this->resolvedTypeFactory = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeFactoryInterface')->getMock();
+        $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
+        $this->guesser2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
+        $this->registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
+        $this->builder = $this->getMockBuilder('Symfony\Component\Form\Test\FormBuilderInterface')->getMock();
         $this->factory = new FormFactory($this->registry, $this->resolvedTypeFactory);
 
         $this->registry->expects($this->any())
@@ -241,7 +241,7 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateBuilderForPropertyWithoutTypeGuesser()
     {
-        $registry = $this->getMock('Symfony\Component\Form\FormRegistryInterface');
+        $registry = $this->getMockBuilder('Symfony\Component\Form\FormRegistryInterface')->getMock();
         $factory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
             ->setMethods(array('createNamedBuilder'))
             ->setConstructorArgs(array($registry, $this->resolvedTypeFactory))
@@ -480,6 +480,6 @@ class FormFactoryTest extends \PHPUnit_Framework_TestCase
 
     private function getMockResolvedType()
     {
-        return $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        return $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
     }
 }

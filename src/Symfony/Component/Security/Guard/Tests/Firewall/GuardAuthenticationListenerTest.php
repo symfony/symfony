@@ -31,8 +31,8 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleSuccess()
     {
-        $authenticator = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
-        $authenticateToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticateToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $providerKey = 'my_firewall';
 
         $credentials = array('username' => 'weaverryan', 'password' => 'all_your_base');
@@ -81,8 +81,8 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleSuccessStopsAfterResponseIsSet()
     {
-        $authenticator1 = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
-        $authenticator2 = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
+        $authenticator1 = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticator2 = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
 
         // mock the first authenticator to fail, and set a Response
         $authenticator1
@@ -111,8 +111,8 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleSuccessWithRememberMe()
     {
-        $authenticator = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
-        $authenticateToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticateToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $providerKey = 'my_firewall_with_rememberme';
 
         $authenticator
@@ -154,7 +154,7 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleCatchesAuthenticationException()
     {
-        $authenticator = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
+        $authenticator = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
         $providerKey = 'my_firewall2';
 
         $authException = new AuthenticationException('Get outta here crazy user with a bad password!');
@@ -186,8 +186,8 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testReturnNullToSkipAuth()
     {
-        $authenticatorA = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
-        $authenticatorB = $this->getMock('Symfony\Component\Security\Guard\GuardAuthenticatorInterface');
+        $authenticatorA = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
+        $authenticatorB = $this->getMockBuilder('Symfony\Component\Security\Guard\GuardAuthenticatorInterface')->getMock();
         $providerKey = 'my_firewall3';
 
         $authenticatorA
@@ -240,8 +240,8 @@ class GuardAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getRequest')
             ->will($this->returnValue($this->request));
 
-        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
-        $this->rememberMeServices = $this->getMock('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface');
+        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $this->rememberMeServices = $this->getMockBuilder('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface')->getMock();
     }
 
     protected function tearDown()

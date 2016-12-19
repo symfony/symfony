@@ -44,7 +44,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTest
             'form_table_layout.html.twig',
             'custom_widgets.html.twig',
         ), $environment);
-        $this->renderer = new TwigRenderer($rendererEngine, $this->getMock('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface'));
+        $this->renderer = new TwigRenderer($rendererEngine, $this->getMockBuilder('Symfony\Component\Security\Csrf\CsrfTokenManagerInterface')->getMock());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
     }
 

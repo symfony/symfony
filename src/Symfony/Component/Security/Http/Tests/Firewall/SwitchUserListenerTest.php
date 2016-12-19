@@ -32,13 +32,13 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
-        $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
-        $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
-        $this->accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
-        $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-        $this->request->query = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-        $this->request->server = $this->getMock('Symfony\Component\HttpFoundation\ServerBag');
+        $this->tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $this->userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+        $this->userChecker = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserCheckerInterface')->getMock();
+        $this->accessDecisionManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock();
+        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $this->request->query = $this->getMockBuilder('Symfony\Component\HttpFoundation\ParameterBag')->getMock();
+        $this->request->server = $this->getMockBuilder('Symfony\Component\HttpFoundation\ServerBag')->getMock();
         $this->event = $this->getEvent($this->request);
     }
 
@@ -105,8 +105,8 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testExitUserDispatchesEventWithRefreshedUser()
     {
-        $originalUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $refreshedUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $originalUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $refreshedUser = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $this
             ->userProvider
             ->expects($this->any())
@@ -146,7 +146,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->method('all')
             ->will($this->returnValue(array()));
 
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher
             ->expects($this->once())
             ->method('dispatch')
@@ -202,7 +202,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUri')
             ->willReturn('/');
 
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher
             ->expects($this->never())
             ->method('dispatch')
@@ -304,7 +304,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getToken(array $roles = array())
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token->expects($this->any())
             ->method('getRoles')
             ->will($this->returnValue($roles));

@@ -52,6 +52,6 @@ class ChainCacheClearerTest extends \PHPUnit_Framework_TestCase
 
     protected function getMockClearer()
     {
-        return $this->getMock('Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface');
+        return $this->getMockBuilder('Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface')->getMock();
     }
 }

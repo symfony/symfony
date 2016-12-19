@@ -29,7 +29,7 @@ class LdapClientTest extends LdapTestCase
 
     protected function setUp()
     {
-        $this->ldap = $this->getMock(LdapInterface::class);
+        $this->ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
 
         $this->client = new LdapClient(null, 389, 3, false, false, false, $this->ldap);
     }
@@ -66,7 +66,7 @@ class LdapClientTest extends LdapTestCase
 
     public function testLdapFind()
     {
-        $collection = $this->getMock(CollectionInterface::class);
+        $collection = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $collection
             ->expects($this->once())
             ->method('getIterator')
@@ -83,7 +83,7 @@ class LdapClientTest extends LdapTestCase
                 )),
             ))))
         ;
-        $query = $this->getMock(QueryInterface::class);
+        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
         $query
             ->expects($this->once())
             ->method('execute')

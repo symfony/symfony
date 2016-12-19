@@ -29,7 +29,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
+        $service = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
 
         $service
             ->expects($this->once())
@@ -50,7 +50,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\SubscriberService');
+        $service = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\SubscriberService')->getMock();
 
         $service
             ->expects($this->once())
@@ -85,7 +85,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
+        $service = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
 
         $service
             ->expects($this->once())
@@ -107,7 +107,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
     {
         $event = new Event();
 
-        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
+        $service = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
 
         $container = new Container();
         $container->set('service.listener', $service);
@@ -130,7 +130,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
 
     public function testGetListenersOnLazyLoad()
     {
-        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
+        $service = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
 
         $container = new Container();
         $container->set('service.listener', $service);
@@ -147,7 +147,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
 
     public function testRemoveAfterDispatch()
     {
-        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
+        $service = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
 
         $container = new Container();
         $container->set('service.listener', $service);
@@ -162,7 +162,7 @@ class ContainerAwareEventDispatcherTest extends AbstractEventDispatcherTest
 
     public function testRemoveBeforeDispatch()
     {
-        $service = $this->getMock('Symfony\Component\EventDispatcher\Tests\Service');
+        $service = $this->getMockBuilder('Symfony\Component\EventDispatcher\Tests\Service')->getMock();
 
         $container = new Container();
         $container->set('service.listener', $service);

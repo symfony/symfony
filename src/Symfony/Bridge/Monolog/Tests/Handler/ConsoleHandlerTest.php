@@ -45,7 +45,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testVerbosityMapping($verbosity, $level, $isHandling, array $map = array())
     {
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output
             ->expects($this->atLeastOnce())
             ->method('getVerbosity')
@@ -59,7 +59,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
         // check that the handler actually outputs the record if it handles it
         $levelName = Logger::getLevelName($level);
 
-        $realOutput = $this->getMock('Symfony\Component\Console\Output\Output', array('doWrite'));
+        $realOutput = $this->getMockBuilder('Symfony\Component\Console\Output\Output')->setMethods(array('doWrite'))->getMock();
         $realOutput->setVerbosity($verbosity);
         $realOutput
             ->expects($isHandling ? $this->once() : $this->never())
@@ -103,7 +103,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testVerbosityChanged()
     {
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output
             ->expects($this->at(0))
             ->method('getVerbosity')
@@ -133,7 +133,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testWritingAndFormatting()
     {
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output
             ->expects($this->any())
             ->method('getVerbosity')
@@ -188,12 +188,12 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
             $logger->addInfo('After terminate message.');
         });
 
-        $event = new ConsoleCommandEvent(new Command('foo'), $this->getMock('Symfony\Component\Console\Input\InputInterface'), $output);
+        $event = new ConsoleCommandEvent(new Command('foo'), $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock(), $output);
         $dispatcher->dispatch(ConsoleEvents::COMMAND, $event);
         $this->assertContains('Before command message.', $out = $output->fetch());
         $this->assertContains('After command message.', $out);
 
-        $event = new ConsoleTerminateEvent(new Command('foo'), $this->getMock('Symfony\Component\Console\Input\InputInterface'), $output, 0);
+        $event = new ConsoleTerminateEvent(new Command('foo'), $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock(), $output, 0);
         $dispatcher->dispatch(ConsoleEvents::TERMINATE, $event);
         $this->assertContains('Before terminate message.', $out = $output->fetch());
         $this->assertContains('After terminate message.', $out);

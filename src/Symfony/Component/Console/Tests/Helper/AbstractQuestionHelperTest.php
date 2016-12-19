@@ -17,7 +17,7 @@ abstract class AbstractQuestionHelperTest extends \PHPUnit_Framework_TestCase
 {
     protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
     {
-        $mock = $this->getMock(StreamableInputInterface::class);
+        $mock = $this->getMockBuilder(StreamableInputInterface::class)->getMock();
         $mock->expects($this->any())
             ->method('isInteractive')
             ->will($this->returnValue($interactive));

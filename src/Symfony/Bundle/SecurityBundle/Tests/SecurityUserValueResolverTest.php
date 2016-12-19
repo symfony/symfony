@@ -33,8 +33,8 @@ class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveNoUser()
     {
-        $mock = $this->getMock(UserInterface::class);
-        $token = $this->getMock(TokenInterface::class);
+        $mock = $this->getMockBuilder(UserInterface::class)->getMock();
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 
@@ -55,8 +55,8 @@ class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolve()
     {
-        $user = $this->getMock(UserInterface::class);
-        $token = $this->getMock(TokenInterface::class);
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
         $token->expects($this->any())->method('getUser')->willReturn($user);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -70,8 +70,8 @@ class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testIntegration()
     {
-        $user = $this->getMock(UserInterface::class);
-        $token = $this->getMock(TokenInterface::class);
+        $user = $this->getMockBuilder(UserInterface::class)->getMock();
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
         $token->expects($this->any())->method('getUser')->willReturn($user);
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -82,7 +82,7 @@ class SecurityUserValueResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testIntegrationNoUser()
     {
-        $token = $this->getMock(TokenInterface::class);
+        $token = $this->getMockBuilder(TokenInterface::class)->getMock();
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
 

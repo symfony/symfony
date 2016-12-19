@@ -24,7 +24,7 @@ class TransNodeTest extends \PHPUnit_Framework_TestCase
         $vars = new \Twig_Node_Expression_Name('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
-        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array('strict_variables' => true));
+        $env = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock(), array('strict_variables' => true));
         $compiler = new \Twig_Compiler($env);
 
         $this->assertEquals(

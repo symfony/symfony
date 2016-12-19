@@ -21,7 +21,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetControllerWithoutControllerParameter()
     {
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing.');
         $resolver = $this->createControllerResolver($logger);
 
@@ -219,7 +219,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateControllerCanReturnAnyCallable()
     {
-        $mock = $this->getMock('Symfony\Component\HttpKernel\Controller\ControllerResolver', array('createController'));
+        $mock = $this->getMockBuilder('Symfony\Component\HttpKernel\Controller\ControllerResolver')->setMethods(array('createController'))->getMock();
         $mock->expects($this->once())->method('createController')->will($this->returnValue('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function'));
 
         $request = Request::create('/');

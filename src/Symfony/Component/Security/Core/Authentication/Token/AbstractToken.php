@@ -110,9 +110,9 @@ abstract class AbstractToken implements TokenInterface
 
         if ($changed) {
             $this->setAuthenticated(false);
+        } else {
+            $this->user = $user;
         }
-
-        $this->user = $user;
     }
 
     /**

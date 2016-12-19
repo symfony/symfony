@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -24,8 +23,6 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
  */
 class FormPass implements CompilerPassInterface
 {
-    use PriorityTaggedServiceTrait;
-
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('form.extension')) {
@@ -49,23 +46,34 @@ class FormPass implements CompilerPassInterface
 
         $definition->replaceArgument(1, $types);
 
-        $typeExtensions = array();
+        $typeExtensionsToSort = array();
 
-        foreach ($this->findAndSortTaggedServices('form.type_extension', $container) as $reference) {
-            $serviceId = (string) $reference;
+        foreach ($container->findTaggedServiceIds('form.type_extension') as $serviceId => $tag) {
             $serviceDefinition = $container->getDefinition($serviceId);
             if (!$serviceDefinition->isPublic()) {
                 throw new InvalidArgumentException(sprintf('The service "%s" must be public as form type extensions are lazy-loaded.', $serviceId));
             }
 
-            $tag = $serviceDefinition->getTag('form.type_extension');
             if (isset($tag[0]['extended_type'])) {
                 $extendedType = $tag[0]['extended_type'];
             } else {
                 throw new InvalidArgumentException(sprintf('Tagged form type extension must have the extended type configured using the extended_type/extended-type attribute, none was configured for the "%s" service.', $serviceId));
             }
 
-            $typeExtensions[$extendedType][] = $serviceId;
+            $typeExtensionsToSort[isset($tag[0]['priority']) ? $tag[0]['priority'] : 0][] = array(
+                'service_id' => $serviceId,
+                'extended_type' => $extendedType,
+            );
+        }
+
+        $typeExtensions = array();
+        if ($typeExtensionsToSort) {
+            krsort($typeExtensionsToSort);
+            $typeExtensionsSorted = call_user_func_array('array_merge', $typeExtensionsToSort);
+
+            foreach ($typeExtensionsSorted as $typeExtension) {
+                $typeExtensions[$typeExtension['extended_type']][] = $typeExtension['service_id'];
+            }
         }
 
         $definition->replaceArgument(2, $typeExtensions);

@@ -30,7 +30,8 @@ class ConfigDataCollectorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($c->isDebug());
         $this->assertSame('config', $c->getName());
         $this->assertSame('testkernel', $c->getAppName());
-        $this->assertSame(PHP_VERSION, $c->getPhpVersion());
+        $this->assertRegExp('~^'.preg_quote($c->getPhpVersion(), '~').'~', PHP_VERSION);
+        $this->assertRegExp('~'.preg_quote((string) $c->getPhpVersionExtra(), '~').'$~', PHP_VERSION);
         $this->assertSame(PHP_INT_SIZE * 8, $c->getPhpArchitecture());
         $this->assertSame(class_exists('Locale', false) && \Locale::getDefault() ? \Locale::getDefault() : 'n/a', $c->getPhpIntlLocale());
         $this->assertSame(date_default_timezone_get(), $c->getPhpTimezone());

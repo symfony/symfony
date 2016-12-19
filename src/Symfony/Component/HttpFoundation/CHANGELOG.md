@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * added the `Cookie::fromString()` method that allows to create a cookie from a
+   raw header string
+
 3.1.0
 -----
 

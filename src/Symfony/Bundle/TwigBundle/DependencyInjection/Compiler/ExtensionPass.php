@@ -23,6 +23,25 @@ class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
+        if (!class_exists('Symfony\Component\Asset\Packages')) {
+            $container->removeDefinition('twig.extension.assets');
+        }
+
+        if (!class_exists('Symfony\Component\ExpressionLanguage\Expression')) {
+            $container->removeDefinition('twig.extension.expression');
+        }
+
+        if (!interface_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
+            $container->removeDefinition('twig.extension.routing');
+        }
+        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
+            $container->removeDefinition('twig.extension.trans');
+        }
+
+        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
+            $container->removeDefinition('twig.extension.yaml');
+        }
+
         if ($container->has('form.extension')) {
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');

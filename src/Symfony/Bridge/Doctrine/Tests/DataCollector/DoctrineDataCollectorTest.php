@@ -139,7 +139,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->method('getDatabasePlatform')
             ->will($this->returnValue(new MySqlPlatform()));
 
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
         $registry
                 ->expects($this->any())
                 ->method('getConnectionNames')
@@ -152,7 +152,7 @@ class DoctrineDataCollectorTest extends \PHPUnit_Framework_TestCase
             ->method('getConnection')
             ->will($this->returnValue($connection));
 
-        $logger = $this->getMock('Doctrine\DBAL\Logging\DebugStack');
+        $logger = $this->getMockBuilder('Doctrine\DBAL\Logging\DebugStack')->getMock();
         $logger->queries = $queries;
 
         $collector = new DoctrineDataCollector($registry);

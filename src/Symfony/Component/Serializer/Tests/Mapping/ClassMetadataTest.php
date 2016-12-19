@@ -28,10 +28,10 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $classMetadata = new ClassMetadata('c');
 
-        $a1 = $this->getMock('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface');
+        $a1 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $a1->method('getName')->willReturn('a1');
 
-        $a2 = $this->getMock('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface');
+        $a2 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $a2->method('getName')->willReturn('a2');
 
         $classMetadata->addAttributeMetadata($a1);
@@ -45,11 +45,11 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
         $classMetadata1 = new ClassMetadata('c1');
         $classMetadata2 = new ClassMetadata('c2');
 
-        $ac1 = $this->getMock('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface');
+        $ac1 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $ac1->method('getName')->willReturn('a1');
         $ac1->method('getGroups')->willReturn(array('a', 'b'));
 
-        $ac2 = $this->getMock('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface');
+        $ac2 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $ac2->method('getName')->willReturn('a1');
         $ac2->method('getGroups')->willReturn(array('b', 'c'));
 
@@ -67,10 +67,10 @@ class ClassMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $classMetadata = new ClassMetadata('a');
 
-        $a1 = $this->getMock('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface');
+        $a1 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $a1->method('getName')->willReturn('b1');
 
-        $a2 = $this->getMock('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface');
+        $a2 = $this->getMockBuilder('Symfony\Component\Serializer\Mapping\AttributeMetadataInterface')->getMock();
         $a2->method('getName')->willReturn('b2');
 
         $classMetadata->addAttributeMetadata($a1);

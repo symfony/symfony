@@ -105,9 +105,9 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testSubRequestFormat()
     {
-        $listener = new ExceptionListener('foo', $this->getMock('Psr\Log\LoggerInterface'));
+        $listener = new ExceptionListener('foo', $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock());
 
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $kernel->expects($this->once())->method('handle')->will($this->returnCallback(function (Request $request) {
             return new Response($request->getRequestFormat());
         }));

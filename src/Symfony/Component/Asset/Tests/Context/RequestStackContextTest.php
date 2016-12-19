@@ -17,7 +17,7 @@ class RequestStackContextTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetBasePathEmpty()
     {
-        $requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
+        $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
         $requestStackContext = new RequestStackContext($requestStack);
 
         $this->assertEmpty($requestStackContext->getBasePath());
@@ -27,10 +27,10 @@ class RequestStackContextTest extends \PHPUnit_Framework_TestCase
     {
         $testBasePath = 'test-path';
 
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $request->method('getBasePath')
             ->willReturn($testBasePath);
-        $requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
+        $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
         $requestStack->method('getMasterRequest')
             ->willReturn($request);
 
@@ -41,7 +41,7 @@ class RequestStackContextTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSecureFalse()
     {
-        $requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
+        $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
         $requestStackContext = new RequestStackContext($requestStack);
 
         $this->assertFalse($requestStackContext->isSecure());
@@ -49,10 +49,10 @@ class RequestStackContextTest extends \PHPUnit_Framework_TestCase
 
     public function testIsSecureTrue()
     {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $request->method('isSecure')
             ->willReturn(true);
-        $requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
+        $requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
         $requestStack->method('getMasterRequest')
             ->willReturn($request);
 

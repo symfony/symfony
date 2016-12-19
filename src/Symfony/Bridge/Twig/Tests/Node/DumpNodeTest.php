@@ -19,7 +19,7 @@ class DumpNodeTest extends \PHPUnit_Framework_TestCase
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
+        $env = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock());
         $compiler = new \Twig_Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -43,7 +43,7 @@ EOTXT;
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
+        $env = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock());
         $compiler = new \Twig_Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -70,7 +70,7 @@ EOTXT;
         ));
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
+        $env = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock());
         $compiler = new \Twig_Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -98,7 +98,7 @@ EOTXT;
         ));
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
+        $env = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock());
         $compiler = new \Twig_Compiler($env);
 
         $expected = <<<'EOTXT'

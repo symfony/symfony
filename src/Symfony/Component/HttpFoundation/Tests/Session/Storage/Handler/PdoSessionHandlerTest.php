@@ -140,7 +140,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         }
 
         $pdo = new MockPdo('pgsql');
-        $pdo->prepareResult = $this->getMock('PDOStatement');
+        $pdo->prepareResult = $this->getMockBuilder('PDOStatement')->getMock();
 
         $content = 'foobar';
         $stream = $this->createStream($content);
@@ -161,8 +161,8 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         }
 
         $pdo = new MockPdo('pgsql');
-        $selectStmt = $this->getMock('PDOStatement');
-        $insertStmt = $this->getMock('PDOStatement');
+        $selectStmt = $this->getMockBuilder('PDOStatement')->getMock();
+        $insertStmt = $this->getMockBuilder('PDOStatement')->getMock();
 
         $pdo->prepareResult = function ($statement) use ($selectStmt, $insertStmt) {
             return 0 === strpos($statement, 'INSERT') ? $insertStmt : $selectStmt;

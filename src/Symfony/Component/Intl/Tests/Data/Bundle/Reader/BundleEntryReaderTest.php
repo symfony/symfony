@@ -62,7 +62,7 @@ class BundleEntryReaderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->readerImpl = $this->getMock('Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface');
+        $this->readerImpl = $this->getMockBuilder('Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface')->getMock();
         $this->reader = new BundleEntryReader($this->readerImpl);
     }
 

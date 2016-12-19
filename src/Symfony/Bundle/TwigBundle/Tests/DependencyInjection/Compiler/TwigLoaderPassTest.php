@@ -31,10 +31,7 @@ class TwigLoaderPassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->builder = $this->getMock(
-            'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('hasDefinition', 'findTaggedServiceIds', 'setAlias', 'getDefinition')
-        );
+        $this->builder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'setAlias', 'getDefinition'))->getMock();
         $this->chainLoader = new Definition('loader');
         $this->pass = new TwigLoaderPass();
     }

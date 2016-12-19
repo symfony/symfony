@@ -37,7 +37,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock(__NAMESPACE__.'\SerializerNormalizer');
+        $this->serializer = $this->getMockBuilder(__NAMESPACE__.'\SerializerNormalizer')->getMock();
         $this->normalizer = new GetSetMethodNormalizer();
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -394,7 +394,7 @@ class GetSetMethodNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnableToNormalizeObjectAttribute()
     {
-        $serializer = $this->getMock('Symfony\Component\Serializer\SerializerInterface');
+        $serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')->getMock();
         $this->normalizer->setSerializer($serializer);
 
         $obj = new GetSetDummy();

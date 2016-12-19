@@ -44,7 +44,7 @@ class ResourceCheckerConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testCacheIsNotFreshIfEmpty()
     {
-        $checker = $this->getMock('\Symfony\Component\Config\ResourceCheckerInterface')
+        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock()
             ->expects($this->never())->method('supports');
 
         /* If there is nothing in the cache, it needs to be filled (and thus it's not fresh).
@@ -75,7 +75,7 @@ class ResourceCheckerConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testIsFreshWithchecker()
     {
-        $checker = $this->getMock('\Symfony\Component\Config\ResourceCheckerInterface');
+        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
 
         $checker->expects($this->once())
                   ->method('supports')
@@ -93,7 +93,7 @@ class ResourceCheckerConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNotFreshWithchecker()
     {
-        $checker = $this->getMock('\Symfony\Component\Config\ResourceCheckerInterface');
+        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
 
         $checker->expects($this->once())
                   ->method('supports')
@@ -111,7 +111,7 @@ class ResourceCheckerConfigCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testCacheIsNotFreshWhenUnserializeFails()
     {
-        $checker = $this->getMock('\Symfony\Component\Config\ResourceCheckerInterface');
+        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
         $cache = new ResourceCheckerConfigCache($this->cacheFile, array($checker));
         $cache->write('foo', array(new FileResource(__FILE__)));
 

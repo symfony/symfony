@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="twig.extension.form" class="%twig.extension.form.class%" public="false">
+            <argument type="service" id="twig.form.renderer" />
+        </service>
+
+        <service id="twig.form.engine" class="%twig.form.engine.class%" public="false">
+            <argument>%twig.form.resources%</argument>
+        </service>
+
+        <service id="twig.form.renderer" class="%twig.form.renderer.class%" public="false">
+            <argument type="service" id="twig.form.engine" />
+            <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
+        </service>
+    </services>
+</container>

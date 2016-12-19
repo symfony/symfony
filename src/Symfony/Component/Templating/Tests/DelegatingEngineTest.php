@@ -126,7 +126,7 @@ class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
 
     private function getEngineMock($template, $supports)
     {
-        $engine = $this->getMock('Symfony\Component\Templating\EngineInterface');
+        $engine = $this->getMockBuilder('Symfony\Component\Templating\EngineInterface')->getMock();
 
         $engine->expects($this->once())
             ->method('supports')

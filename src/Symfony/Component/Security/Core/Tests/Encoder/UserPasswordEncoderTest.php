@@ -17,18 +17,18 @@ class UserPasswordEncoderTest extends \PHPUnit_Framework_TestCase
 {
     public function testEncodePassword()
     {
-        $userMock = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $userMock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $userMock->expects($this->any())
             ->method('getSalt')
             ->will($this->returnValue('userSalt'));
 
-        $mockEncoder = $this->getMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
+        $mockEncoder = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface')->getMock();
         $mockEncoder->expects($this->any())
             ->method('encodePassword')
             ->with($this->equalTo('plainPassword'), $this->equalTo('userSalt'))
             ->will($this->returnValue('encodedPassword'));
 
-        $mockEncoderFactory = $this->getMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
+        $mockEncoderFactory = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface')->getMock();
         $mockEncoderFactory->expects($this->any())
             ->method('getEncoder')
             ->with($this->equalTo($userMock))
@@ -42,7 +42,7 @@ class UserPasswordEncoderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsPasswordValid()
     {
-        $userMock = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $userMock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $userMock->expects($this->any())
             ->method('getSalt')
             ->will($this->returnValue('userSalt'));
@@ -50,13 +50,13 @@ class UserPasswordEncoderTest extends \PHPUnit_Framework_TestCase
             ->method('getPassword')
             ->will($this->returnValue('encodedPassword'));
 
-        $mockEncoder = $this->getMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
+        $mockEncoder = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface')->getMock();
         $mockEncoder->expects($this->any())
             ->method('isPasswordValid')
             ->with($this->equalTo('encodedPassword'), $this->equalTo('plainPassword'), $this->equalTo('userSalt'))
             ->will($this->returnValue(true));
 
-        $mockEncoderFactory = $this->getMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
+        $mockEncoderFactory = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface')->getMock();
         $mockEncoderFactory->expects($this->any())
             ->method('getEncoder')
             ->with($this->equalTo($userMock))

@@ -47,7 +47,7 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase
             $this->assertContains('XSD file or callable', $e->getMessage());
         }
 
-        $mock = $this->getMock(__NAMESPACE__.'\Validator');
+        $mock = $this->getMockBuilder(__NAMESPACE__.'\Validator')->getMock();
         $mock->expects($this->exactly(2))->method('validate')->will($this->onConsecutiveCalls(false, true));
 
         try {

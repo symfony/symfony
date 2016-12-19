@@ -1274,7 +1274,7 @@ class EntityTypeTest extends TypeTestCase
 
     protected function createRegistryMock($name, $em)
     {
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
         $registry->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))

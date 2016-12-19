@@ -24,10 +24,10 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
-        $this->httpUtils = $this->getMock('Symfony\Component\Security\Http\HttpUtils');
-        $this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-        $this->request->headers = $this->getMock('Symfony\Component\HttpFoundation\HeaderBag');
-        $this->token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $this->httpUtils = $this->getMockBuilder('Symfony\Component\Security\Http\HttpUtils')->getMock();
+        $this->request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $this->request->headers = $this->getMockBuilder('Symfony\Component\HttpFoundation\HeaderBag')->getMock();
+        $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
     }
 
     public function testRequestIsRedirected()
@@ -101,7 +101,7 @@ class DefaultAuthenticationSuccessHandlerTest extends \PHPUnit_Framework_TestCas
 
     public function testTargetPathIsTakenFromTheSession()
     {
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
         $session->expects($this->once())
             ->method('get')->with('_security.admin.target_path')
             ->will($this->returnValue('/admin/dashboard'));

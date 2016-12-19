@@ -19,19 +19,17 @@ class UnusedTagsPassTest extends \PHPUnit_Framework_TestCase
     {
         $pass = new UnusedTagsPass();
 
-        $formatter = $this->getMock('Symfony\Component\DependencyInjection\Compiler\LoggingFormatter');
+        $formatter = $this->getMockBuilder('Symfony\Component\DependencyInjection\Compiler\LoggingFormatter')->getMock();
         $formatter
             ->expects($this->at(0))
             ->method('format')
             ->with($pass, 'Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?')
         ;
 
-        $compiler = $this->getMock('Symfony\Component\DependencyInjection\Compiler\Compiler');
+        $compiler = $this->getMockBuilder('Symfony\Component\DependencyInjection\Compiler\Compiler')->getMock();
         $compiler->expects($this->once())->method('getLoggingFormatter')->will($this->returnValue($formatter));
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('findTaggedServiceIds', 'getCompiler', 'findUnusedTags', 'findTags')
-        );
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds', 'getCompiler', 'findUnusedTags', 'findTags'))->getMock();
         $container->expects($this->once())->method('getCompiler')->will($this->returnValue($compiler));
         $container->expects($this->once())
             ->method('findTags')

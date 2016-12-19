@@ -22,6 +22,9 @@ Debug
 DependencyInjection
 -------------------
 
+ * Using the `PhpDumper` with an uncompiled `ContainerBuilder` is not supported
+   anymore.
+
  * The `DefinitionDecorator` class has been removed. Use the `ChildDefinition`
    class instead.
 

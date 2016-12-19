@@ -4,6 +4,9 @@ CHANGELOG
 3.3.0
 -----
 
+ * Using the `PhpDumper` with an uncompiled `ContainerBuilder` is deprecated and
+   will not be supported anymore in 4.0.
+
  * deprecated the `DefinitionDecorator` class in favor of `ChildDefinition`
 
 3.2.0

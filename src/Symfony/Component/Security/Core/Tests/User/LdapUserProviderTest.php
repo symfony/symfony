@@ -24,7 +24,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfCantConnectToLdap()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $ldap = $this->getMockBuilder('Symfony\Component\Ldap\LdapClientInterface')->getMock();
         $ldap
             ->expects($this->once())
             ->method('bind')
@@ -40,7 +40,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfNoLdapEntries()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $ldap = $this->getMockBuilder('Symfony\Component\Ldap\LdapClientInterface')->getMock();
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -56,7 +56,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $ldap = $this->getMockBuilder('Symfony\Component\Ldap\LdapClientInterface')->getMock();
         $ldap
             ->expects($this->once())
             ->method('escape')
@@ -78,7 +78,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccessfulLoadUserByUsername()
     {
-        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
+        $ldap = $this->getMockBuilder('Symfony\Component\Ldap\LdapClientInterface')->getMock();
         $ldap
             ->expects($this->once())
             ->method('escape')

@@ -33,7 +33,7 @@ class ExportCommandTest extends \PHPUnit_Framework_TestCase
         ;
 
         $helperSet = new HelperSet();
-        $helper = $this->getMock('Symfony\Component\Console\Helper\FormatterHelper');
+        $helper = $this->getMockBuilder('Symfony\Component\Console\Helper\FormatterHelper')->getMock();
         $helper->expects($this->any())->method('formatSection');
         $helperSet->set($helper, 'formatter');
 
@@ -56,7 +56,7 @@ class ExportCommandTest extends \PHPUnit_Framework_TestCase
         $profiler->expects($this->once())->method('loadProfile')->with('TOKEN')->will($this->returnValue($profile));
 
         $helperSet = new HelperSet();
-        $helper = $this->getMock('Symfony\Component\Console\Helper\FormatterHelper');
+        $helper = $this->getMockBuilder('Symfony\Component\Console\Helper\FormatterHelper')->getMock();
         $helper->expects($this->any())->method('formatSection');
         $helperSet->set($helper, 'formatter');
 

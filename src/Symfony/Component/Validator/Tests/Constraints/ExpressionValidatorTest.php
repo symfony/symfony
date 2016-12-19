@@ -224,7 +224,7 @@ class ExpressionValidatorTest extends AbstractConstraintValidatorTest
             'expression' => 'false',
         ));
 
-        $expressionLanguage = $this->getMock('Symfony\Component\ExpressionLanguage\ExpressionLanguage');
+        $expressionLanguage = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ExpressionLanguage')->getMock();
 
         $used = false;
 

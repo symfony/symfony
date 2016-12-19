@@ -69,9 +69,9 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->dataMapper = $this->getMock('Symfony\Component\Form\DataMapperInterface');
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $this->dataMapper = $this->getMockBuilder('Symfony\Component\Form\DataMapperInterface')->getMock();
         $this->parentType = $this->getMockFormType();
         $this->type = $this->getMockFormType();
         $this->extension1 = $this->getMockFormTypeExtension();
@@ -127,7 +127,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     {
         $givenOptions = array('a' => 'a_custom', 'c' => 'c_custom');
         $resolvedOptions = array('a' => 'a_custom', 'b' => 'b_default', 'c' => 'c_custom', 'd' => 'd_default');
-        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')->getMock();
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
             ->setConstructorArgs(array($this->type, array($this->extension1, $this->extension2), $this->parentResolvedType))
@@ -155,7 +155,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     {
         $givenOptions = array('data_class' => 'Foo');
         $resolvedOptions = array('data_class' => '\stdClass');
-        $optionsResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolverInterface')->getMock();
 
         $this->resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormType')
             ->setConstructorArgs(array($this->type, array($this->extension1, $this->extension2), $this->parentResolvedType))
@@ -194,7 +194,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
         };
 
         $options = array('a' => 'Foo', 'b' => 'Bar');
-        $builder = $this->getMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->getMockBuilder('Symfony\Component\Form\Test\FormBuilderInterface')->getMock();
 
         // First the form is built for the super type
         $this->parentType->expects($this->once())
@@ -224,7 +224,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateView()
     {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
 
         $view = $this->resolvedType->createView($form);
 
@@ -234,8 +234,8 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateViewWithParent()
     {
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $parentView = $this->getMock('Symfony\Component\Form\FormView');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $parentView = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
 
         $view = $this->resolvedType->createView($form, $parentView);
 
@@ -246,8 +246,8 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     public function testBuildView()
     {
         $options = array('a' => '1', 'b' => '2');
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $view = $this->getMock('Symfony\Component\Form\FormView');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $view = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
 
         $test = $this;
         $i = 0;
@@ -290,8 +290,8 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     public function testFinishView()
     {
         $options = array('a' => '1', 'b' => '2');
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $view = $this->getMock('Symfony\Component\Form\FormView');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $view = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
 
         $test = $this;
         $i = 0;
@@ -393,7 +393,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
     public function testBlockPrefixDefaultsToNameIfSet()
     {
         // Type without getBlockPrefix() method
-        $type = $this->getMock('Symfony\Component\Form\FormTypeInterface');
+        $type = $this->getMockBuilder('Symfony\Component\Form\FormTypeInterface')->getMock();
 
         $type->expects($this->once())
             ->method('getName')
@@ -431,7 +431,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
      */
     private function getMockFormType($typeClass = 'Symfony\Component\Form\AbstractType')
     {
-        return $this->getMock($typeClass, array('getName', 'getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'));
+        return $this->getMockBuilder($typeClass)->setMethods(array('getName', 'getBlockPrefix', 'configureOptions', 'finishView', 'buildView', 'buildForm'))->getMock();
     }
 
     /**
@@ -439,7 +439,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
      */
     private function getMockFormTypeExtension()
     {
-        return $this->getMock('Symfony\Component\Form\AbstractTypeExtension', array('getExtendedType', 'configureOptions', 'finishView', 'buildView', 'buildForm'));
+        return $this->getMockBuilder('Symfony\Component\Form\AbstractTypeExtension')->setMethods(array('getExtendedType', 'configureOptions', 'finishView', 'buildView', 'buildForm'))->getMock();
     }
 
     /**
@@ -447,7 +447,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
      */
     private function getMockFormFactory()
     {
-        return $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        return $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
     }
 
     /**

@@ -51,7 +51,7 @@ class ValidatorTypeGuesserTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->metadata = new ClassMetadata(self::TEST_CLASS);
-        $this->metadataFactory = $this->getMock('Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface');
+        $this->metadataFactory = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface')->getMock();
         $this->metadataFactory->expects($this->any())
             ->method('getMetadataFor')
             ->with(self::TEST_CLASS)

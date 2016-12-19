@@ -435,7 +435,7 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
 
         $bootLogger->log($expectedLog[0], $expectedLog[1], $expectedLog[2]);
 
-        $mockLogger = $this->getMock('Psr\Log\LoggerInterface');
+        $mockLogger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $mockLogger->expects($this->once())
             ->method('log')
             ->with(LogLevel::WARNING, 'Foo message', $expectedLog[2]);

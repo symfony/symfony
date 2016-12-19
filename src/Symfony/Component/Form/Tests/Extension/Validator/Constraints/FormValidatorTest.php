@@ -109,7 +109,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
     public function testValidateIfParentWithCascadeValidation()
     {
-        $object = $this->getMock('\stdClass');
+        $object = $this->getMockBuilder('\stdClass')->getMock();
 
         $parent = $this->getBuilder('parent', null, array('cascade_validation' => true))
             ->setCompound(true)
@@ -131,7 +131,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
 
     public function testValidateIfChildWithValidConstraint()
     {
-        $object = $this->getMock('\stdClass');
+        $object = $this->getMockBuilder('\stdClass')->getMock();
 
         $parent = $this->getBuilder('parent')
             ->setCompound(true)

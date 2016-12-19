@@ -75,7 +75,7 @@ class TraceableEventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function testGetListenerPriorityReturnsZeroWhenWrappedMethodDoesNotExist()
     {
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $traceableEventDispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
         $traceableEventDispatcher->addListener('foo', function () {}, 123);
         $listeners = $traceableEventDispatcher->getListeners('foo');

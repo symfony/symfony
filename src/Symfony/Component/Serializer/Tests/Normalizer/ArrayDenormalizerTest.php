@@ -28,7 +28,7 @@ class ArrayDenormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock('Symfony\Component\Serializer\Serializer');
+        $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\Serializer')->getMock();
         $this->denormalizer = new ArrayDenormalizer();
         $this->denormalizer->setSerializer($this->serializer);
     }

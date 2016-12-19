@@ -72,6 +72,10 @@ class PhpDumper extends Dumper
      */
     public function __construct(ContainerBuilder $container)
     {
+        if (!$container->isFrozen()) {
+            @trigger_error('Dumping an uncompiled ContainerBuilder is deprecated since version 3.3 and will not be supported anymore in 4.0. Compile the container beforehand.', E_USER_DEPRECATED);
+        }
+
         parent::__construct($container);
 
         $this->inlinedDefinitions = new \SplObjectStorage();

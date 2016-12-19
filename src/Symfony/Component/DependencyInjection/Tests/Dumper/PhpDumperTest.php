@@ -35,12 +35,15 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
     public function testDump()
     {
-        $dumper = new PhpDumper($container = new ContainerBuilder());
+        $container = new ContainerBuilder();
+        $container->compile();
+        $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1.php', $dumper->dump(), '->dump() dumps an empty container as an empty PHP class');
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services1-1.php', $dumper->dump(array('class' => 'Container', 'base_class' => 'AbstractContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Dump')), '->dump() takes a class and a base_class options');
 
         $container = new ContainerBuilder();
+        $container->compile();
         new PhpDumper($container);
     }
 
@@ -97,7 +100,9 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
      */
     public function testExportParameters($parameters)
     {
-        $dumper = new PhpDumper(new ContainerBuilder(new ParameterBag($parameters)));
+        $container = new ContainerBuilder(new ParameterBag($parameters));
+        $container->compile();
+        $dumper = new PhpDumper($container);
         $dumper->dump();
     }
 
@@ -114,25 +119,33 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     public function testAddParameters()
     {
         $container = include self::$fixturesPath.'/containers/container8.php';
+        $container->compile();
         $dumper = new PhpDumper($container);
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services8.php', $dumper->dump(), '->dump() dumps parameters');
     }
 
-    public function testAddService()
+    /**
+     * @group legacy
+     * @expectedDeprecation Dumping an uncompiled ContainerBuilder is deprecated since version 3.3 and will not be supported anymore in 4.0. Compile the container beforehand.
+     */
+    public function testAddServiceWithoutCompilation()
     {
-        // without compilation
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new PhpDumper($container);
         $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9.php')), $dumper->dump(), '->dump() dumps services');
+    }
 
-        // with compilation
+    public function testAddService()
+    {
         $container = include self::$fixturesPath.'/containers/container9.php';
         $container->compile();
         $dumper = new PhpDumper($container);
         $this->assertEquals(str_replace('%path%', str_replace('\\', '\\\\', self::$fixturesPath.DIRECTORY_SEPARATOR.'includes'.DIRECTORY_SEPARATOR), file_get_contents(self::$fixturesPath.'/php/services9_compiled.php')), $dumper->dump(), '->dump() dumps services');
 
-        $dumper = new PhpDumper($container = new ContainerBuilder());
+        $container = new ContainerBuilder();
         $container->register('foo', 'FooClass')->addArgument(new \stdClass());
+        $container->compile();
+        $dumper = new PhpDumper($container);
         try {
             $dumper->dump();
             $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
@@ -145,6 +158,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     public function testServicesWithAnonymousFactories()
     {
         $container = include self::$fixturesPath.'/containers/container19.php';
+        $container->compile();
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services19.php', $dumper->dump(), '->dump() dumps services with anonymous factories');
@@ -156,6 +170,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('bar$', 'FooClass');
         $container->register('bar$!', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => $class)));
 
@@ -169,6 +184,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('foo_bar', 'FooClass');
         $container->register('foobar', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => $class)));
 
@@ -182,6 +198,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('bar', 'FooClass');
         $container->register('foo_bar', 'FooClass');
+        $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array(
             'class' => $class,
@@ -203,6 +220,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $def = new Definition('stdClass');
         $def->setFactory($factory);
         $container->setDefinition('bar', $def);
+        $container->compile();
         $dumper = new PhpDumper($container);
         $dumper->dump();
     }
@@ -285,6 +303,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     public function testDumpAutowireData()
     {
         $container = include self::$fixturesPath.'/containers/container24.php';
+        $container->compile();
         $dumper = new PhpDumper($container);
 
         $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services24.php'), $dumper->dump());

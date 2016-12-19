@@ -42,7 +42,7 @@ class RecursiveValidatorTest extends AbstractTest
         $childB->name = 'fake';
         $entity->childA = array($childA);
         $entity->childB = array($childB);
-        $validatorContext = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+        $validatorContext = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
         $validatorContext
             ->expects($this->once())
             ->method('validate')
@@ -76,7 +76,7 @@ class RecursiveValidatorTest extends AbstractTest
         $entity->childA = array($childA);
         $entity->childB = array($childB);
 
-        $validatorContext = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+        $validatorContext = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
         $validatorContext
             ->expects($this->once())
             ->method('validate')

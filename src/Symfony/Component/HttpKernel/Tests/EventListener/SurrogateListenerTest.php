@@ -25,7 +25,7 @@ class SurrogateListenerTest extends \PHPUnit_Framework_TestCase
     public function testFilterDoesNothingForSubRequests()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $response = new Response('foo <esi:include src="" />');
         $listener = new SurrogateListener(new Esi());
 
@@ -39,7 +39,7 @@ class SurrogateListenerTest extends \PHPUnit_Framework_TestCase
     public function testFilterWhenThereIsSomeEsiIncludes()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $response = new Response('foo <esi:include src="" />');
         $listener = new SurrogateListener(new Esi());
 
@@ -53,7 +53,7 @@ class SurrogateListenerTest extends \PHPUnit_Framework_TestCase
     public function testFilterWhenThereIsNoEsiIncludes()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $response = new Response('foo');
         $listener = new SurrogateListener(new Esi());
 

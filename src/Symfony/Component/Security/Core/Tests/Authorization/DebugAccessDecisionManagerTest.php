@@ -23,7 +23,7 @@ class DebugAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     public function testDecideLog($expectedLog, $object)
     {
         $adm = new DebugAccessDecisionManager(new AccessDecisionManager());
-        $adm->decide($this->getMock(TokenInterface::class), array('ATTRIBUTE_1'), $object);
+        $adm->decide($this->getMockBuilder(TokenInterface::class)->getMock(), array('ATTRIBUTE_1'), $object);
 
         $this->assertSame($expectedLog, $adm->getDecisionLog());
     }

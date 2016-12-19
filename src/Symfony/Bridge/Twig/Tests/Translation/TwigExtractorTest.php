@@ -22,14 +22,14 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
      */
     public function testExtract($template, $messages)
     {
-        $loader = $this->getMock('Twig_LoaderInterface');
+        $loader = $this->getMockBuilder('Twig_LoaderInterface')->getMock();
         $twig = new \Twig_Environment($loader, array(
             'strict_variables' => true,
             'debug' => true,
             'cache' => false,
             'autoescape' => false,
         ));
-        $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
 
         $extractor = new TwigExtractor($twig);
         $extractor->setPrefix('prefix');
@@ -77,8 +77,8 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
      */
     public function testExtractSyntaxError($resources)
     {
-        $twig = new \Twig_Environment($this->getMock('Twig_LoaderInterface'));
-        $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
+        $twig = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock());
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
 
         $extractor = new TwigExtractor($twig);
 
@@ -120,7 +120,7 @@ class TwigExtractorTest extends \PHPUnit_Framework_TestCase
             'cache' => false,
             'autoescape' => false,
         ));
-        $twig->addExtension(new TranslationExtension($this->getMock('Symfony\Component\Translation\TranslatorInterface')));
+        $twig->addExtension(new TranslationExtension($this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock()));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');

@@ -66,14 +66,14 @@ class RedirectControllerTest extends TestCase
 
         $request->attributes = new ParameterBag($attributes);
 
-        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
         $router
             ->expects($this->once())
             ->method('generate')
             ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
             ->will($this->returnValue($url));
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
         $container
             ->expects($this->once())
@@ -230,7 +230,7 @@ class RedirectControllerTest extends TestCase
 
     private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
     {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
         $request
             ->expects($this->any())
             ->method('getScheme')
@@ -257,7 +257,7 @@ class RedirectControllerTest extends TestCase
 
     private function createRedirectController($httpPort = null, $httpsPort = null)
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
         if (null !== $httpPort) {
             $container

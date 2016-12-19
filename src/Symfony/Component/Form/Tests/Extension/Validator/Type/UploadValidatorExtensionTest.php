@@ -19,7 +19,7 @@ class UploadValidatorExtensionTest extends TypeTestCase
 {
     public function testPostMaxSizeTranslation()
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
 
         $translator->expects($this->any())
             ->method('trans')

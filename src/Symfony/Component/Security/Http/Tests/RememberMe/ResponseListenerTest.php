@@ -83,7 +83,7 @@ class ResponseListenerTest extends \PHPUnit_Framework_TestCase
     private function getResponse()
     {
         $response = new Response();
-        $response->headers = $this->getMock('Symfony\Component\HttpFoundation\ResponseHeaderBag');
+        $response->headers = $this->getMockBuilder('Symfony\Component\HttpFoundation\ResponseHeaderBag')->getMock();
 
         return $response;
     }

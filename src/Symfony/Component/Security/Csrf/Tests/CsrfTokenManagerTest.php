@@ -36,8 +36,8 @@ class CsrfTokenManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->generator = $this->getMock('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface');
-        $this->storage = $this->getMock('Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface');
+        $this->generator = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface')->getMock();
+        $this->storage = $this->getMockBuilder('Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface')->getMock();
         $this->manager = new CsrfTokenManager($this->generator, $this->storage);
     }
 

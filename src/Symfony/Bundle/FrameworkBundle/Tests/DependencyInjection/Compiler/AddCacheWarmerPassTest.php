@@ -24,11 +24,8 @@ class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
             'my_cache_warmer_service3' => array(0 => array()),
         );
 
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
-        $container = $this->getMock(
-            'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('findTaggedServiceIds', 'getDefinition', 'hasDefinition')
-        );
+        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds', 'getDefinition', 'hasDefinition'))->getMock();
 
         $container->expects($this->atLeastOnce())
             ->method('findTaggedServiceIds')
@@ -56,11 +53,8 @@ class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testThatCompilerPassIsIgnoredIfThereIsNoCacheWarmerDefinition()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
-        $container = $this->getMock(
-            'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
-        );
+        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition'))->getMock();
 
         $container->expects($this->never())->method('findTaggedServiceIds');
         $container->expects($this->never())->method('getDefinition');
@@ -76,11 +70,8 @@ class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
 
     public function testThatCacheWarmersMightBeNotDefined()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
-        $container = $this->getMock(
-            'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
-        );
+        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition'))->getMock();
 
         $container->expects($this->atLeastOnce())
             ->method('findTaggedServiceIds')

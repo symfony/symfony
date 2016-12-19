@@ -54,10 +54,10 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
-        $this->violationMapper = $this->getMock('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface');
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
+        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
+        $this->violationMapper = $this->getMockBuilder('Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface')->getMock();
         $this->listener = new ValidationListener($this->validator, $this->violationMapper);
         $this->message = 'Message';
         $this->messageTemplate = 'Message template';
@@ -87,7 +87,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     private function getMockForm()
     {
-        return $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        return $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
     }
 
     // More specific mapping tests can be found in ViolationMapperTest
@@ -161,7 +161,7 @@ class ValidationListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testValidatorInterface()
     {
-        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
 
         $listener = new ValidationListener($validator, $this->violationMapper);
         $this->assertAttributeSame($validator, 'validator', $listener);

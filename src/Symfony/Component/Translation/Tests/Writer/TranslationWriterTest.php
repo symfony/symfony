@@ -19,7 +19,7 @@ class TranslationWriterTest extends \PHPUnit_Framework_TestCase
 {
     public function testWriteTranslations()
     {
-        $dumper = $this->getMock('Symfony\Component\Translation\Dumper\DumperInterface');
+        $dumper = $this->getMockBuilder('Symfony\Component\Translation\Dumper\DumperInterface')->getMock();
         $dumper
             ->expects($this->once())
             ->method('dump');

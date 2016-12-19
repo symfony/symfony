@@ -32,7 +32,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
 
     protected function getExtensions()
     {
-        $manager = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')->getMock();
 
         $manager->expects($this->any())
             ->method('getManager')

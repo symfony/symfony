@@ -21,7 +21,7 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
     {
         $tmpProviders = array();
 
-        $extension = $this->getMock('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface');
+        $extension = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Extension\\ExtensionInterface')->getMock();
         $extension->expects($this->any())
             ->method('getXsdValidationBasePath')
             ->will($this->returnValue(false));
@@ -37,7 +37,7 @@ class MergeExtensionConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 $tmpProviders = $container->getExpressionLanguageProviders();
             }));
 
-        $provider = $this->getMock('Symfony\\Component\\ExpressionLanguage\\ExpressionFunctionProviderInterface');
+        $provider = $this->getMockBuilder('Symfony\\Component\\ExpressionLanguage\\ExpressionFunctionProviderInterface')->getMock();
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
         $container->prependExtensionConfig('foo', array('bar' => true));

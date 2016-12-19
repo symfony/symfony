@@ -75,7 +75,7 @@ class HIncludeFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderWithDefaultText()
     {
-        $engine = $this->getMock('Symfony\\Component\\Templating\\EngineInterface');
+        $engine = $this->getMockBuilder('Symfony\\Component\\Templating\\EngineInterface')->getMock();
         $engine->expects($this->once())
             ->method('exists')
             ->with('default')

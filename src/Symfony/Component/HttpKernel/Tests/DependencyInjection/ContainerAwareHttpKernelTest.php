@@ -34,7 +34,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             return $expected;
         };
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $this
             ->expectsEnterScopeOnce($container)
             ->expectsLeaveScopeOnce($container)
@@ -63,11 +63,11 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             return $expected;
         };
 
-        $stack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack', array('push', 'pop'));
+        $stack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->setMethods(array('push', 'pop'))->getMock();
         $stack->expects($this->at(0))->method('push')->with($this->equalTo($request));
         $stack->expects($this->at(1))->method('pop');
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $dispatcher = new EventDispatcher();
         $resolver = $this->getResolverMockFor($controller, $request);
         $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver, $stack);
@@ -86,7 +86,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
             throw $expected;
         };
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $this
             ->expectsEnterScopeOnce($container)
             ->expectsLeaveScopeOnce($container)
@@ -95,7 +95,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
         ;
 
         $dispatcher = new EventDispatcher();
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $resolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface')->getMock();
         $resolver = $this->getResolverMockFor($controller, $request);
         $stack = new RequestStack();
         $kernel = new ContainerAwareHttpKernel($dispatcher, $container, $resolver, $stack);
@@ -120,7 +120,7 @@ class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
 
     private function getResolverMockFor($controller, $request)
     {
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $resolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface')->getMock();
         $resolver->expects($this->once())
             ->method('getController')
             ->with($request)

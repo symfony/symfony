@@ -844,7 +844,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
     public function testLegacyValidatePropertyFailsIfPropertiesNotSupported()
     {
         // $metadata does not implement PropertyMetadataContainerInterface
-        $metadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
+        $metadata = $this->getMockBuilder('Symfony\Component\Validator\MetadataInterface')->getMock();
 
         $this->metadataFactory->addMetadataForValue('VALUE', $metadata);
 
@@ -975,7 +975,7 @@ abstract class AbstractValidatorTest extends \PHPUnit_Framework_TestCase
     public function testLegacyValidatePropertyValueFailsIfPropertiesNotSupported()
     {
         // $metadata does not implement PropertyMetadataContainerInterface
-        $metadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
+        $metadata = $this->getMockBuilder('Symfony\Component\Validator\MetadataInterface')->getMock();
 
         $this->metadataFactory->addMetadataForValue('VALUE', $metadata);
 

@@ -35,7 +35,7 @@ class MemcacheSessionHandlerTest extends \PHPUnit_Framework_TestCase
         }
 
         parent::setUp();
-        $this->memcache = $this->getMock('Memcache');
+        $this->memcache = $this->getMockBuilder('Memcache')->getMock();
         $this->storage = new MemcacheSessionHandler(
             $this->memcache,
             array('prefix' => self::PREFIX, 'expiretime' => self::TTL)

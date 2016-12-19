@@ -255,7 +255,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateDoesNothingWhenThereAreNoChanges()
     {
-        $con = $this->getMock('Doctrine\DBAL\Connection', array(), array(), '', false);
+        $con = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
         $con
             ->expects($this->never())
             ->method('beginTransaction')

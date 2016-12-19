@@ -51,7 +51,7 @@ class HttpKernelExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function getFragmentHandler($return)
     {
-        $strategy = $this->getMock('Symfony\\Component\\HttpKernel\\Fragment\\FragmentRendererInterface');
+        $strategy = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Fragment\\FragmentRendererInterface')->getMock();
         $strategy->expects($this->once())->method('getName')->will($this->returnValue('inline'));
         $strategy->expects($this->once())->method('render')->will($return);
 

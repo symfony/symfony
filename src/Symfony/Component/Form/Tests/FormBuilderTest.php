@@ -23,8 +23,8 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->builder = new FormBuilder('name', null, $this->dispatcher, $this->factory);
     }
 
@@ -120,7 +120,7 @@ class FormBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddFormType()
     {
         $this->assertFalse($this->builder->has('foo'));
-        $this->builder->add('foo', $this->getMock('Symfony\Component\Form\FormTypeInterface'));
+        $this->builder->add('foo', $this->getMockBuilder('Symfony\Component\Form\FormTypeInterface')->getMock());
         $this->assertTrue($this->builder->has('foo'));
     }
 

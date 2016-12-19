@@ -332,7 +332,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromLoader()
     {
-        $loader = $this->getMock('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
 
         $list = $this->factory->createListFromLoader($loader);
 
@@ -341,7 +341,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFromLoaderWithValues()
     {
-        $loader = $this->getMock('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
 
         $value = function () {};
         $list = $this->factory->createListFromLoader($loader, $value);
@@ -771,7 +771,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
         $preferred = array(new LegacyChoiceView('x', 'x', 'Preferred'));
         $other = array(new LegacyChoiceView('y', 'y', 'Other'));
 
-        $list = $this->getMock('Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface');
+        $list = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface')->getMock();
 
         $list->expects($this->once())
             ->method('getPreferredViews')
@@ -798,7 +798,7 @@ class DefaultChoiceListFactoryTest extends \PHPUnit_Framework_TestCase
             new LegacyChoiceView('z', 'z', 'Other one'),
         );
 
-        $list = $this->getMock('Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface');
+        $list = $this->getMockBuilder('Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface')->getMock();
 
         $list->expects($this->once())
             ->method('getPreferredViews')

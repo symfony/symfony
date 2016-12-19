@@ -19,7 +19,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     public function testGetSetLogger()
     {
         $loader = new ProjectTemplateLoader4();
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $loader->setLogger($logger);
         $this->assertSame($logger, $loader->getLogger(), '->setLogger() sets the logger instance');
     }
@@ -30,7 +30,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
     public function testLegacyGetSetDebugger()
     {
         $loader = new ProjectTemplateLoader4();
-        $debugger = $this->getMock('Symfony\Component\Templating\DebuggerInterface');
+        $debugger = $this->getMockBuilder('Symfony\Component\Templating\DebuggerInterface')->getMock();
         $loader->setDebugger($debugger);
         $this->assertSame($debugger, $loader->getDebugger(), '->setDebugger() sets the debugger instance');
     }

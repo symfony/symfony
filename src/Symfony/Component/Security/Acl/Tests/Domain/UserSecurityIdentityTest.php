@@ -52,7 +52,7 @@ class UserSecurityIdentityTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('foo'))
         ;
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token
             ->expects($this->any())
             ->method('getUser')

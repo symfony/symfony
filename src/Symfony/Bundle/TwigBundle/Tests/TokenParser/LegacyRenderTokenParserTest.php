@@ -25,7 +25,7 @@ class LegacyRenderTokenParserTest extends TestCase
      */
     public function testCompile($source, $expected)
     {
-        $env = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
+        $env = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock(), array('cache' => false, 'autoescape' => false, 'optimizations' => 0));
         $env->addTokenParser(new RenderTokenParser());
         $stream = $env->tokenize(new \Twig_Source($source, ''));
         $parser = new \Twig_Parser($env);

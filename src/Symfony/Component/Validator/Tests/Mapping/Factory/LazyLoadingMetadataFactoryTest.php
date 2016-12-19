@@ -76,7 +76,7 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteMetadataToCache()
     {
-        $cache = $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface');
+        $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();
         $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
 
         $parentClassConstraints = array(
@@ -115,8 +115,8 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testReadMetadataFromCache()
     {
-        $loader = $this->getMock('Symfony\Component\Validator\Mapping\Loader\LoaderInterface');
-        $cache = $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
+        $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();
         $factory = new LazyLoadingMetadataFactory($loader, $cache);
 
         $metadata = new ClassMetadata(self::PARENT_CLASS);

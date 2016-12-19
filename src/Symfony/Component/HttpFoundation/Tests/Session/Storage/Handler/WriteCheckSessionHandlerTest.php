@@ -20,7 +20,7 @@ class WriteCheckSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function test()
     {
-        $wrappedSessionHandlerMock = $this->getMock('SessionHandlerInterface');
+        $wrappedSessionHandlerMock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
         $writeCheckSessionHandler = new WriteCheckSessionHandler($wrappedSessionHandlerMock);
 
         $wrappedSessionHandlerMock
@@ -35,7 +35,7 @@ class WriteCheckSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testWrite()
     {
-        $wrappedSessionHandlerMock = $this->getMock('SessionHandlerInterface');
+        $wrappedSessionHandlerMock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
         $writeCheckSessionHandler = new WriteCheckSessionHandler($wrappedSessionHandlerMock);
 
         $wrappedSessionHandlerMock
@@ -50,7 +50,7 @@ class WriteCheckSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testSkippedWrite()
     {
-        $wrappedSessionHandlerMock = $this->getMock('SessionHandlerInterface');
+        $wrappedSessionHandlerMock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
         $writeCheckSessionHandler = new WriteCheckSessionHandler($wrappedSessionHandlerMock);
 
         $wrappedSessionHandlerMock
@@ -71,7 +71,7 @@ class WriteCheckSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testNonSkippedWrite()
     {
-        $wrappedSessionHandlerMock = $this->getMock('SessionHandlerInterface');
+        $wrappedSessionHandlerMock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
         $writeCheckSessionHandler = new WriteCheckSessionHandler($wrappedSessionHandlerMock);
 
         $wrappedSessionHandlerMock

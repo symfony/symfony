@@ -26,7 +26,7 @@ class ValidateRequestListenerTest extends \PHPUnit_Framework_TestCase
     public function testListenerThrowsWhenMasterRequestHasInconsistentClientIps()
     {
         $dispatcher = new EventDispatcher();
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
 
         $request = new Request();
         $request->setTrustedProxies(array('1.1.1.1'));

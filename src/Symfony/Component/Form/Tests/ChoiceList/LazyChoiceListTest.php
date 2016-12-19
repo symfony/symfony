@@ -37,8 +37,8 @@ class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->innerList = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
-        $this->loader = $this->getMock('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface');
+        $this->innerList = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
+        $this->loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
         $this->value = function () {};
         $this->list = new LazyChoiceList($this->loader, $this->value);
     }

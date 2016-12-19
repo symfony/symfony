@@ -71,7 +71,7 @@ class TwigEngineTest extends \PHPUnit_Framework_TestCase
             'index' => 'foo',
             'error' => '{{ foo }',
         )));
-        $parser = $this->getMock('Symfony\Component\Templating\TemplateNameParserInterface');
+        $parser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')->getMock();
 
         return new TwigEngine($twig, $parser);
     }

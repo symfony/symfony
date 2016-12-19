@@ -51,7 +51,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderWithObjectsAsAttributesPassedAsObjectsInTheController()
     {
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver', array('getController'));
+        $resolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolver')->setMethods(array('getController'))->getMock();
         $resolver
             ->expects($this->once())
             ->method('getController')
@@ -84,7 +84,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderExceptionNoIgnoreErrors()
     {
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher->expects($this->never())->method('dispatch');
 
         $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \RuntimeException('foo'))), $dispatcher);
@@ -94,7 +94,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderExceptionIgnoreErrors()
     {
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
         $dispatcher->expects($this->once())->method('dispatch')->with(KernelEvents::EXCEPTION);
 
         $strategy = new InlineFragmentRenderer($this->getKernel($this->throwException(new \RuntimeException('foo'))), $dispatcher);
@@ -114,7 +114,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
     private function getKernel($returnValue)
     {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $kernel
             ->expects($this->any())
             ->method('handle')
@@ -130,7 +130,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
      */
     private function getKernelExpectingRequest(Request $request)
     {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $kernel
             ->expects($this->any())
             ->method('handle')
@@ -142,7 +142,7 @@ class InlineFragmentRendererTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
     {
-        $resolver = $this->getMock('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface');
+        $resolver = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerResolverInterface')->getMock();
         $resolver
             ->expects($this->once())
             ->method('getController')

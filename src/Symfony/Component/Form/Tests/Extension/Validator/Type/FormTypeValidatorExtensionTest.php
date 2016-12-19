@@ -68,7 +68,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     public function testValidatorInterfaceSinceSymfony25()
     {
         // Mock of ValidatorInterface since apiVersion 2.5
-        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
 
         $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);
@@ -77,7 +77,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTest
     public function testValidatorInterfaceUntilSymfony24()
     {
         // Mock of ValidatorInterface until apiVersion 2.4
-        $validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\ValidatorInterface')->getMock();
 
         $formTypeValidatorExtension = new FormTypeValidatorExtension($validator);
         $this->assertAttributeSame($validator, 'validator', $formTypeValidatorExtension);

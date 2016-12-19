@@ -19,7 +19,7 @@ class TokenStorageTest extends \PHPUnit_Framework_TestCase
     {
         $tokenStorage = new TokenStorage();
         $this->assertNull($tokenStorage->getToken());
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $tokenStorage->setToken($token);
         $this->assertSame($token, $tokenStorage->getToken());
     }

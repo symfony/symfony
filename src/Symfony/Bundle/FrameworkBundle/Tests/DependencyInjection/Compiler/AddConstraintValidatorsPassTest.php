@@ -20,14 +20,11 @@ class AddConstraintValidatorsPassTest extends \PHPUnit_Framework_TestCase
             'my_constraint_validator_service2' => array(),
         );
 
-        $validatorFactoryDefinition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
-        $container = $this->getMock(
-            'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('findTaggedServiceIds', 'getDefinition', 'hasDefinition')
-        );
+        $validatorFactoryDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('findTaggedServiceIds', 'getDefinition', 'hasDefinition'))->getMock();
 
-        $validatorDefinition1 = $this->getMock('Symfony\Component\DependencyInjection\Definition', array('getClass'));
-        $validatorDefinition2 = $this->getMock('Symfony\Component\DependencyInjection\Definition', array('getClass'));
+        $validatorDefinition1 = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->setMethods(array('getClass'))->getMock();
+        $validatorDefinition2 = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->setMethods(array('getClass'))->getMock();
 
         $validatorDefinition1->expects($this->atLeastOnce())
             ->method('getClass')
@@ -67,11 +64,8 @@ class AddConstraintValidatorsPassTest extends \PHPUnit_Framework_TestCase
 
     public function testThatCompilerPassIsIgnoredIfThereIsNoConstraintValidatorFactoryDefinition()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
-        $container = $this->getMock(
-            'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
-        );
+        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'findTaggedServiceIds', 'getDefinition'))->getMock();
 
         $container->expects($this->never())->method('findTaggedServiceIds');
         $container->expects($this->never())->method('getDefinition');

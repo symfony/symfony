@@ -34,7 +34,7 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ProjectTemplateLoader($varLoader = new ProjectTemplateLoaderVar(), $dir);
         $this->assertFalse($loader->load(new TemplateReference('foo', 'php')), '->load() returns false if the embed loader is not able to load the template');
 
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger
             ->expects($this->once())
             ->method('debug')
@@ -42,7 +42,7 @@ class CacheLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->setLogger($logger);
         $loader->load(new TemplateReference('index'));
 
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger
             ->expects($this->once())
             ->method('debug')

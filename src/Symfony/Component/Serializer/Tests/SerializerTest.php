@@ -41,7 +41,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeNoMatch()
     {
-        $serializer = new Serializer(array($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer')));
+        $serializer = new Serializer(array($this->getMockBuilder('Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock()));
         $serializer->normalize(new \stdClass(), 'xml');
     }
 
@@ -73,7 +73,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDenormalizeNoMatch()
     {
-        $serializer = new Serializer(array($this->getMock('Symfony\Component\Serializer\Normalizer\CustomNormalizer')));
+        $serializer = new Serializer(array($this->getMockBuilder('Symfony\Component\Serializer\Normalizer\CustomNormalizer')->getMock()));
         $serializer->denormalize('foo', 'stdClass');
     }
 
@@ -98,14 +98,14 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizeWithSupportOnData()
     {
-        $normalizer1 = $this->getMock('Symfony\Component\Serializer\Normalizer\NormalizerInterface');
+        $normalizer1 = $this->getMockBuilder('Symfony\Component\Serializer\Normalizer\NormalizerInterface')->getMock();
         $normalizer1->method('supportsNormalization')
             ->willReturnCallback(function ($data, $format) {
                 return isset($data->test);
             });
         $normalizer1->method('normalize')->willReturn('test1');
 
-        $normalizer2 = $this->getMock('Symfony\Component\Serializer\Normalizer\NormalizerInterface');
+        $normalizer2 = $this->getMockBuilder('Symfony\Component\Serializer\Normalizer\NormalizerInterface')->getMock();
         $normalizer2->method('supportsNormalization')
             ->willReturn(true);
         $normalizer2->method('normalize')->willReturn('test2');
@@ -121,14 +121,14 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalizeWithSupportOnData()
     {
-        $denormalizer1 = $this->getMock('Symfony\Component\Serializer\Normalizer\DenormalizerInterface');
+        $denormalizer1 = $this->getMockBuilder('Symfony\Component\Serializer\Normalizer\DenormalizerInterface')->getMock();
         $denormalizer1->method('supportsDenormalization')
             ->willReturnCallback(function ($data, $type, $format) {
                 return isset($data['test1']);
             });
         $denormalizer1->method('denormalize')->willReturn('test1');
 
-        $denormalizer2 = $this->getMock('Symfony\Component\Serializer\Normalizer\DenormalizerInterface');
+        $denormalizer2 = $this->getMockBuilder('Symfony\Component\Serializer\Normalizer\DenormalizerInterface')->getMock();
         $denormalizer2->method('supportsDenormalization')
             ->willReturn(true);
         $denormalizer2->method('denormalize')->willReturn('test2');

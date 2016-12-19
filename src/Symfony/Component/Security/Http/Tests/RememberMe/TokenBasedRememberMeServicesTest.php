@@ -62,7 +62,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->cookies->set('foo', base64_encode('class:'.base64_encode('foouser').':123456789:fooHash'));
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user
             ->expects($this->once())
             ->method('getPassword')
@@ -87,7 +87,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->cookies->set('foo', $this->getCookie('fooclass', 'foouser', time() - 1, 'foopass'));
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user
             ->expects($this->once())
             ->method('getPassword')
@@ -112,7 +112,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
      */
     public function testAutoLogin($username)
     {
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user
             ->expects($this->once())
             ->method('getRoles')
@@ -156,7 +156,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => false));
         $request = new Request();
         $response = new Response();
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
 
         $service->logout($request, $response, $token);
 
@@ -186,7 +186,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $service = $this->getService(null, array('name' => 'foo', 'always_remember_me' => true, 'path' => null, 'domain' => null));
         $request = new Request();
         $response = new Response();
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token
             ->expects($this->once())
             ->method('getUser')
@@ -208,8 +208,8 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $response = new Response();
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user
             ->expects($this->once())
             ->method('getPassword')
@@ -272,7 +272,7 @@ class TokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 
     protected function getProvider()
     {
-        $provider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
+        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
         $provider
             ->expects($this->any())
             ->method('supportsClass')

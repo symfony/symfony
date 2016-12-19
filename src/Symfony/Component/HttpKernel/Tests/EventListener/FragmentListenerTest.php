@@ -116,6 +116,6 @@ class FragmentListenerTest extends \PHPUnit_Framework_TestCase
 
     private function createGetResponseEvent(Request $request, $requestType = HttpKernelInterface::MASTER_REQUEST)
     {
-        return new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, $requestType);
+        return new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, $requestType);
     }
 }

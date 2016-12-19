@@ -47,7 +47,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCacheExists()
     {
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')->getMock();
         $cache
             ->expects($this->once())
             ->method('fetch')
@@ -60,7 +60,7 @@ class ClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCacheNotExists()
     {
-        $cache = $this->getMock('Doctrine\Common\Cache\Cache');
+        $cache = $this->getMockBuilder('Doctrine\Common\Cache\Cache')->getMock();
         $cache
             ->method('fetch')
             ->will($this->returnValue(false))

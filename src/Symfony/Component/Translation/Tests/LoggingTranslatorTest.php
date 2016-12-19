@@ -19,7 +19,7 @@ class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
 {
     public function testTransWithNoTranslationIsLogged()
     {
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->exactly(2))
             ->method('warning')
             ->with('Translation not found.')
@@ -33,7 +33,7 @@ class LoggingTranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTransChoiceFallbackIsLogged()
     {
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->once())
             ->method('debug')
             ->with('Translation use fallback catalogue.')

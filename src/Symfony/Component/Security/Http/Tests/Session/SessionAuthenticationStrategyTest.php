@@ -43,7 +43,7 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('We cannot destroy the old session on PHP 5.4.0 - 5.4.10.');
         }
 
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
         $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
@@ -56,7 +56,7 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('This PHP version is not affected.');
         }
 
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
         $session->expects($this->once())->method('migrate')->with($this->equalTo(false));
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
@@ -65,7 +65,7 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testSessionIsInvalidated()
     {
-        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
+        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
         $session->expects($this->once())->method('invalidate');
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::INVALIDATE);
@@ -74,7 +74,7 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
 
     private function getRequest($session = null)
     {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
 
         if (null !== $session) {
             $request->expects($this->any())->method('getSession')->will($this->returnValue($session));
@@ -85,6 +85,6 @@ class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
 
     private function getToken()
     {
-        return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
     }
 }

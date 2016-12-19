@@ -685,8 +685,8 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testCreateView()
     {
-        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $view = $this->getMock('Symfony\Component\Form\FormView');
+        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $view = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
         $form = $this->getBuilder()->setType($type)->getForm();
 
         $type->expects($this->once())
@@ -699,10 +699,10 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testCreateViewWithParent()
     {
-        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $view = $this->getMock('Symfony\Component\Form\FormView');
-        $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-        $parentView = $this->getMock('Symfony\Component\Form\FormView');
+        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $view = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
+        $parentForm = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
+        $parentView = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
         $form = $this->getBuilder()->setType($type)->getForm();
         $form->setParent($parentForm);
 
@@ -720,9 +720,9 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testCreateViewWithExplicitParent()
     {
-        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $view = $this->getMock('Symfony\Component\Form\FormView');
-        $parentView = $this->getMock('Symfony\Component\Form\FormView');
+        $type = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $view = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
+        $parentView = $this->getMockBuilder('Symfony\Component\Form\FormView')->getMock();
         $form = $this->getBuilder()->setType($type)->getForm();
 
         $type->expects($this->once())
@@ -857,7 +857,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testViewDataMayBeArrayAccessIfDataClassIsNull()
     {
-        $arrayAccess = $this->getMock('\ArrayAccess');
+        $arrayAccess = $this->getMockBuilder('\ArrayAccess')->getMock();
         $config = new FormConfigBuilder('name', null, $this->dispatcher);
         $config->addViewTransformer(new FixedDataTransformer(array(
             '' => '',
@@ -921,7 +921,7 @@ class SimpleFormTest extends AbstractFormTest
 
     public function testHandleRequestForwardsToRequestHandler()
     {
-        $handler = $this->getMock('Symfony\Component\Form\RequestHandlerInterface');
+        $handler = $this->getMockBuilder('Symfony\Component\Form\RequestHandlerInterface')->getMock();
 
         $form = $this->getBuilder()
             ->setRequestHandler($handler)
@@ -1034,7 +1034,7 @@ class SimpleFormTest extends AbstractFormTest
     public function testInitializeSetsDefaultData()
     {
         $config = $this->getBuilder()->setData('DEFAULT')->getFormConfig();
-        $form = $this->getMock('Symfony\Component\Form\Form', array('setData'), array($config));
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->setMethods(array('setData'))->setConstructorArgs(array($config))->getMock();
 
         $form->expects($this->once())
             ->method('setData')

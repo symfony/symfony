@@ -39,7 +39,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testFixRadio()
     {
         $data = '1';
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
         $event = new FormEvent($form, $data);
 
         $listener = new FixRadioInputListener($this->choiceList, true);
@@ -51,7 +51,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testFixZero()
     {
         $data = '0';
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
         $event = new FormEvent($form, $data);
 
         $listener = new FixRadioInputListener($this->choiceList, true);
@@ -63,7 +63,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
     public function testFixEmptyString()
     {
         $data = '';
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
         $event = new FormEvent($form, $data);
 
         $listener = new FixRadioInputListener($this->choiceList, true);
@@ -77,7 +77,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $list = new ArrayKeyChoiceList(array(0 => 'A', 1 => 'B'));
 
         $data = '';
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
         $event = new FormEvent($form, $data);
 
         $listener = new FixRadioInputListener($list, true);
@@ -91,7 +91,7 @@ class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
         $list = new ArrayKeyChoiceList(array(0 => 'A', 1 => 'B'));
 
         $data = '';
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')->getMock();
         $event = new FormEvent($form, $data);
 
         $listener = new FixRadioInputListener($list, false);

@@ -22,7 +22,7 @@ class TemplateNameParserTest extends TestCase
 
     protected function setUp()
     {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel
             ->expects($this->any())
             ->method('getBundle')

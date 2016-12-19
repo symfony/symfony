@@ -63,7 +63,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
     public function testDump($context, $args, $expectedOutput, $debug = true)
     {
         $extension = new DumpExtension(new VarCloner());
-        $twig = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array(
+        $twig = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock(), array(
             'debug' => $debug,
             'cache' => false,
             'optimizations' => 0,

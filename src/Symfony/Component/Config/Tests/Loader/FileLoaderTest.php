@@ -18,9 +18,9 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testImportWithFileLocatorDelegation()
     {
-        $locatorMock = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+        $locatorMock = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
 
-        $locatorMockForAdditionalLoader = $this->getMock('Symfony\Component\Config\FileLocatorInterface');
+        $locatorMockForAdditionalLoader = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
         $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
                 array('path/to/file1'),                    // Default
                 array('path/to/file1', 'path/to/file2'),   // First is imported

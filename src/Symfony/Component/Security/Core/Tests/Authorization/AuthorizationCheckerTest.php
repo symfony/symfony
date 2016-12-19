@@ -23,8 +23,8 @@ class AuthorizationCheckerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
-        $this->accessDecisionManager = $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface');
+        $this->authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $this->accessDecisionManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')->getMock();
         $this->tokenStorage = new TokenStorage();
 
         $this->authorizationChecker = new AuthorizationChecker(
@@ -36,10 +36,10 @@ class AuthorizationCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testVoteAuthenticatesTokenIfNecessary()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $this->tokenStorage->setToken($token);
 
-        $newToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $newToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
 
         $this->authenticationManager
             ->expects($this->once())
@@ -78,7 +78,7 @@ class AuthorizationCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsGranted($decide)
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $token
             ->expects($this->once())
             ->method('isAuthenticated')

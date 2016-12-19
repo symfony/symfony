@@ -76,7 +76,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
 
         // do it another time as the cache is primed now
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $loader->expects($this->never())->method('load');
 
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir));
@@ -96,7 +96,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTransWithCachingWithInvalidLocale()
     {
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $translator = $this->getTranslator($loader, array('cache_dir' => $this->tmpDir), 'loader', '\Symfony\Bundle\FrameworkBundle\Tests\Translation\TranslatorWithInvalidLocale');
         $translator->setLocale('invalid locale');
 
@@ -121,7 +121,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDefaultLocale()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->once())
             ->method('getParameter')
@@ -149,7 +149,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     protected function getLoader()
     {
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $loader
             ->expects($this->at(0))
             ->method('load')
@@ -207,7 +207,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     protected function getContainer($loader)
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->any())
             ->method('get')
@@ -248,7 +248,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setFallbackLocales(array('fr'));
         $translator->warmup($this->tmpDir);
 
-        $loader = $this->getMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Translation\Loader\LoaderInterface')->getMock();
         $loader
             ->expects($this->never())
             ->method('load');

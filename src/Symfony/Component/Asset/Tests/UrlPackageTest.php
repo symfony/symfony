@@ -94,7 +94,7 @@ class UrlPackageTest extends \PHPUnit_Framework_TestCase
 
     private function getContext($secure)
     {
-        $context = $this->getMock('Symfony\Component\Asset\Context\ContextInterface');
+        $context = $this->getMockBuilder('Symfony\Component\Asset\Context\ContextInterface')->getMock();
         $context->expects($this->any())->method('isSecure')->will($this->returnValue($secure));
 
         return $context;

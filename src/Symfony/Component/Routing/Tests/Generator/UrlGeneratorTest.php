@@ -208,7 +208,7 @@ class UrlGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testGenerateForRouteWithInvalidOptionalParameterNonStrictWithLogger()
     {
         $routes = $this->getRoutes('test', new Route('/testing/{foo}', array('foo' => '1'), array('foo' => 'd+')));
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
         $logger->expects($this->once())
             ->method('error');
         $generator = $this->getGenerator($routes, array(), $logger);

@@ -64,7 +64,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testDebugCustomDirectory()
     {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
             ->with($this->equalTo($this->translationDir))
@@ -82,7 +82,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testDebugInvalidDirectory()
     {
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
         $kernel->expects($this->once())
             ->method('getBundle')
             ->with($this->equalTo('dir'))
@@ -130,7 +130,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getFallbackLocales')
             ->will($this->returnValue(array('en')));
 
-        $extractor = $this->getMock('Symfony\Component\Translation\Extractor\ExtractorInterface');
+        $extractor = $this->getMockBuilder('Symfony\Component\Translation\Extractor\ExtractorInterface')->getMock();
         $extractor
             ->expects($this->any())
             ->method('extract')
@@ -140,7 +140,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
                 })
             );
 
-        $loader = $this->getMock('Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader');
+        $loader = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader')->getMock();
         $loader
             ->expects($this->any())
             ->method('loadMessages')
@@ -151,7 +151,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
             );
 
         if (null === $kernel) {
-            $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
+            $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
             $kernel
                 ->expects($this->any())
                 ->method('getBundle')
@@ -166,7 +166,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
             ->method('getRootDir')
             ->will($this->returnValue($this->translationDir));
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->any())
             ->method('get')
@@ -182,7 +182,7 @@ class TranslationDebugCommandTest extends \PHPUnit_Framework_TestCase
 
     private function getBundle($path)
     {
-        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
         $bundle
             ->expects($this->any())
             ->method('getPath')

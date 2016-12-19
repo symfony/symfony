@@ -117,7 +117,7 @@ class DoctrineChoiceLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLegacyLoadChoiceList()
     {
-        $factory = $this->getMock('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface');
+        $factory = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface')->getMock();
         $loader = new DoctrineChoiceLoader(
             $factory,
             $this->om,

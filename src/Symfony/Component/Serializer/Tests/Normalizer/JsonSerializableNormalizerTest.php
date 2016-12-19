@@ -33,7 +33,7 @@ class JsonSerializableNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->serializer = $this->getMock(JsonSerializerNormalizer::class);
+        $this->serializer = $this->getMockBuilder(JsonSerializerNormalizer::class)->getMock();
         $this->normalizer = new JsonSerializableNormalizer();
         $this->normalizer->setSerializer($this->serializer);
     }

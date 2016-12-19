@@ -132,7 +132,7 @@ class ControllerTest extends TestCase
 
     public function testJson()
     {
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $container
             ->expects($this->once())
             ->method('has')
@@ -149,14 +149,14 @@ class ControllerTest extends TestCase
 
     public function testJsonWithSerializer()
     {
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $container
             ->expects($this->once())
             ->method('has')
             ->with('serializer')
             ->will($this->returnValue(true));
 
-        $serializer = $this->getMock(SerializerInterface::class);
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $serializer
             ->expects($this->once())
             ->method('serialize')
@@ -179,14 +179,14 @@ class ControllerTest extends TestCase
 
     public function testJsonWithSerializerContextOverride()
     {
-        $container = $this->getMock(ContainerInterface::class);
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $container
             ->expects($this->once())
             ->method('has')
             ->with('serializer')
             ->will($this->returnValue(true));
 
-        $serializer = $this->getMock(SerializerInterface::class);
+        $serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $serializer
             ->expects($this->once())
             ->method('serialize')

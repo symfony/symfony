@@ -69,7 +69,7 @@ class ExceptionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $event = $this->createEvent(new AuthenticationException());
 
-        $entryPoint = $this->getMock('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface');
+        $entryPoint = $this->getMockBuilder('Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface')->getMock();
         $entryPoint->expects($this->once())->method('start')->will($this->returnValue('NOT A RESPONSE'));
 
         $listener = $this->createExceptionListener(null, null, null, $entryPoint);

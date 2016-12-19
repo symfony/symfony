@@ -97,7 +97,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateFromLoaderPropertyPathWithCallableString()
     {
-        $loader = $this->getMock('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface');
+        $loader = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface')->getMock();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createListFromLoader')
@@ -173,7 +173,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateViewPreferredChoicesAsPropertyPathWithCallableString()
     {
-        $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
+        $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -244,7 +244,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateViewLabelsAsPropertyPathWithCallableString()
     {
-        $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
+        $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -300,7 +300,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateViewIndicesAsPropertyPathWithCallableString()
     {
-        $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
+        $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -359,7 +359,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateViewGroupsAsPropertyPathWithCallableString()
     {
-        $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
+        $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')
@@ -442,7 +442,7 @@ class PropertyAccessDecoratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateViewAttrAsPropertyPathWithCallableString()
     {
-        $list = $this->getMock('Symfony\Component\Form\ChoiceList\ChoiceListInterface');
+        $list = $this->getMockBuilder('Symfony\Component\Form\ChoiceList\ChoiceListInterface')->getMock();
 
         $this->decoratedFactory->expects($this->once())
             ->method('createView')

@@ -31,7 +31,7 @@ class MergeDoctrineCollectionListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->collection = new ArrayCollection(array('test'));
         $this->dispatcher = new EventDispatcher();
-        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
         $this->form = $this->getBuilder()
             ->getForm();
     }

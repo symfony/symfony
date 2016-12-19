@@ -319,7 +319,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testNormalizerAware()
     {
-        $normalizerAware = $this->getMock(NormalizerAwareInterface::class);
+        $normalizerAware = $this->getMockBuilder(NormalizerAwareInterface::class)->getMock();
         $normalizerAware->expects($this->once())
             ->method('setNormalizer')
             ->with($this->isInstanceOf(NormalizerInterface::class));
@@ -329,7 +329,7 @@ class SerializerTest extends \PHPUnit_Framework_TestCase
 
     public function testDenormalizerAware()
     {
-        $denormalizerAware = $this->getMock(DenormalizerAwareInterface::class);
+        $denormalizerAware = $this->getMockBuilder(DenormalizerAwareInterface::class)->getMock();
         $denormalizerAware->expects($this->once())
             ->method('setDenormalizer')
             ->with($this->isInstanceOf(DenormalizerInterface::class));

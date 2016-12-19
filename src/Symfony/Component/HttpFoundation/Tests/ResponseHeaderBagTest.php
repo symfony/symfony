@@ -294,7 +294,7 @@ class ResponseHeaderBagTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function assertSetCookieHeader($expected, ResponseHeaderBag $actual)
+    private function assertSetCookieHeader($expected, ResponseHeaderBag $actual)
     {
         $this->assertRegExp('#^Set-Cookie:\s+'.preg_quote($expected, '#').'$#m', str_replace("\r\n", "\n", (string) $actual));
     }

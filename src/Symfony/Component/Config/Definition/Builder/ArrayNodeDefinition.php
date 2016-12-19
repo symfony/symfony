@@ -80,6 +80,62 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
+     * @return VariableNodeDefinition
+     */
+    public function variablePrototype()
+    {
+        return $this->prototype('variable');
+    }
+
+    /**
+     * @return ScalarNodeDefinition
+     */
+    public function scalarPrototype()
+    {
+        return $this->prototype('scalar');
+    }
+
+    /**
+     * @return BooleanNodeDefinition
+     */
+    public function booleanPrototype()
+    {
+        return $this->prototype('boolean');
+    }
+
+    /**
+     * @return IntegerNodeDefinition
+     */
+    public function integerPrototype()
+    {
+        return $this->prototype('integer');
+    }
+
+    /**
+     * @return FloatNodeDefinition
+     */
+    public function floatPrototype()
+    {
+        return $this->prototype('float');
+    }
+
+    /**
+     * @return ArrayNodeDefinition
+     */
+    public function arrayPrototype()
+    {
+        return $this->prototype('array');
+    }
+
+    /**
+     * @return EnumNodeDefinition
+     */
+    public function enumPrototype()
+    {
+        return $this->prototype('enum');
+    }
+
+    /**
      * Adds the default value if the node is not set in the configuration.
      *
      * This method is applicable to concrete nodes only (not to prototype nodes).

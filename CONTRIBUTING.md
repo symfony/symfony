@@ -5,6 +5,7 @@ Symfony is an open source, community-driven project.
 
 If you'd like to contribute, please read the following documents:
 
+* [Reviewing issues/pull requests][0]
 * [Reporting a Bug][1]
 * [Submitting a Patch][2]
 * [Symfony Core Team][3]
@@ -14,6 +15,7 @@ If you'd like to contribute, please read the following documents:
 * [Coding Standards][7]
 * [Conventions][8]
 
+[0]: https://symfony.com/doc/current/contributing/community/reviews.html
 [1]: https://symfony.com/doc/current/contributing/code/bugs.html
 [2]: https://symfony.com/doc/current/contributing/code/patches.html
 [3]: https://symfony.com/doc/current/contributing/code/core_team.html

@@ -10,6 +10,9 @@ ClassLoader
 DependencyInjection
 -------------------
 
+ * Using the `PhpDumper` with an uncompiled `ContainerBuilder` is deprecated and
+   will not be supported anymore in 4.0.
+
  * The `DefinitionDecorator` class is deprecated and will be removed in 4.0, use
    the `ChildDefinition` class instead.
 

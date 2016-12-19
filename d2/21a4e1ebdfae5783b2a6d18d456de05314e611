@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by skafandri at 2016-12-15T08:35:56Z
+
+I don't understand the generated diff of fabbot.io Is that hook open source? :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-18T08:43:33Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-18T10:44:25Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by skafandri at 2016-12-18T17:46:18Z
+
+A single test with multiple asserts to cover all the cases. I am fine with that. What do you think guys?

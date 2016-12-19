@@ -20,8 +20,8 @@ abstract class TypeTestCase extends BaseTypeTestCase
 
     protected function setUp()
     {
-        $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
-        $metadataFactory = $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface');
+        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\ValidatorInterface')->getMock();
+        $metadataFactory = $this->getMockBuilder('Symfony\Component\Validator\MetadataFactoryInterface')->getMock();
         $this->validator->expects($this->once())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
         $metadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')->disableOriginalConstructor()->getMock();
         $metadataFactory->expects($this->once())->method('getMetadataFor')->will($this->returnValue($metadata));

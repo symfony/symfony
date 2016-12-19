@@ -73,7 +73,7 @@ class AuditLoggerTest extends \PHPUnit_Framework_TestCase
 
     protected function getEntry()
     {
-        return $this->getMock('Symfony\Component\Security\Acl\Model\AuditableEntryInterface');
+        return $this->getMockBuilder('Symfony\Component\Security\Acl\Model\AuditableEntryInterface')->getMock();
     }
 
     protected function getLogger()

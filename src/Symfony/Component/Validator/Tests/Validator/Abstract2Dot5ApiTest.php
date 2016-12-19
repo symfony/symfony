@@ -550,7 +550,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
     {
         $entity = new Entity();
 
-        $metadata = $this->getMock('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata');
+        $metadata = $this->getMockBuilder('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata')->getMock();
         $metadata->expects($this->any())
             ->method('getClassName')
             ->will($this->returnValue(get_class($entity)));
@@ -569,7 +569,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $entity = new Entity();
         $entity->reference = new Reference();
 
-        $metadata = $this->getMock('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata');
+        $metadata = $this->getMockBuilder('Symfony\Component\Validator\Tests\Fixtures\LegacyClassMetadata')->getMock();
         $metadata->expects($this->any())
             ->method('getClassName')
             ->will($this->returnValue(get_class($entity->reference)));
@@ -590,7 +590,7 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $entity = new Entity();
 
         // Legacy interface
-        $propertyMetadata = $this->getMock('Symfony\Component\Validator\MetadataInterface');
+        $propertyMetadata = $this->getMockBuilder('Symfony\Component\Validator\MetadataInterface')->getMock();
         $metadata = new FakeClassMetadata(get_class($entity));
         $metadata->addCustomPropertyMetadata('firstName', $propertyMetadata);
 
@@ -672,8 +672,8 @@ abstract class Abstract2Dot5ApiTest extends AbstractValidatorTest
         $entity->initialized = false;
 
         // prepare initializers that set "initialized" to true
-        $initializer1 = $this->getMock('Symfony\\Component\\Validator\\ObjectInitializerInterface');
-        $initializer2 = $this->getMock('Symfony\\Component\\Validator\\ObjectInitializerInterface');
+        $initializer1 = $this->getMockBuilder('Symfony\\Component\\Validator\\ObjectInitializerInterface')->getMock();
+        $initializer2 = $this->getMockBuilder('Symfony\\Component\\Validator\\ObjectInitializerInterface')->getMock();
 
         $initializer1->expects($this->once())
             ->method('initialize')

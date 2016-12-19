@@ -107,7 +107,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl = $this->getAcl($strategy);
         $sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+        $logger = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\AuditLoggerInterface')->getMock();
         $logger
             ->expects($this->once())
             ->method('logIfNeeded')
@@ -126,7 +126,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $acl = $this->getAcl($strategy);
         $sid = new UserSecurityIdentity('johannes', 'Foo');
 
-        $logger = $this->getMock('Symfony\Component\Security\Acl\Model\AuditLoggerInterface');
+        $logger = $this->getMockBuilder('Symfony\Component\Security\Acl\Model\AuditLoggerInterface')->getMock();
         $logger
             ->expects($this->once())
             ->method('logIfNeeded')

@@ -95,7 +95,7 @@ abstract class UserPasswordValidatorTest extends AbstractConstraintValidatorTest
      */
     public function testUserIsNotValid()
     {
-        $user = $this->getMock('Foo\Bar\User');
+        $user = $this->getMockBuilder('Foo\Bar\User')->getMock();
 
         $this->tokenStorage = $this->createTokenStorage($user);
         $this->validator = $this->createValidator();
@@ -106,7 +106,7 @@ abstract class UserPasswordValidatorTest extends AbstractConstraintValidatorTest
 
     protected function createUser()
     {
-        $mock = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
 
         $mock
             ->expects($this->any())
@@ -125,12 +125,12 @@ abstract class UserPasswordValidatorTest extends AbstractConstraintValidatorTest
 
     protected function createPasswordEncoder($isPasswordValid = true)
     {
-        return $this->getMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
+        return $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface')->getMock();
     }
 
     protected function createEncoderFactory($encoder = null)
     {
-        $mock = $this->getMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
+        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface')->getMock();
 
         $mock
             ->expects($this->any())
@@ -145,7 +145,7 @@ abstract class UserPasswordValidatorTest extends AbstractConstraintValidatorTest
     {
         $token = $this->createAuthenticationToken($user);
 
-        $mock = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $mock
             ->expects($this->any())
             ->method('getToken')
@@ -157,7 +157,7 @@ abstract class UserPasswordValidatorTest extends AbstractConstraintValidatorTest
 
     protected function createAuthenticationToken($user = null)
     {
-        $mock = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $mock
             ->expects($this->any())
             ->method('getUser')

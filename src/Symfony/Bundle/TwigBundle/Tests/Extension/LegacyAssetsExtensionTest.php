@@ -84,7 +84,7 @@ class LegacyAssetsExtensionTest extends TestCase
 
     private function createContainerMock($helper)
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container->expects($this->any())
             ->method('get')
             ->with('templating.helper.assets')

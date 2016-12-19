@@ -22,7 +22,7 @@ class BundleTest extends \PHPUnit_Framework_TestCase
     public function testRegisterCommands()
     {
         $cmd = new FooCommand();
-        $app = $this->getMock('Symfony\Component\Console\Application');
+        $app = $this->getMockBuilder('Symfony\Component\Console\Application')->getMock();
         $app->expects($this->once())->method('add')->with($this->equalTo($cmd));
 
         $bundle = new ExtensionPresentBundle();
@@ -48,7 +48,7 @@ class BundleTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
         $container->register('console.command.Symfony_Component_HttpKernel_Tests_Fixtures_ExtensionPresentBundle_Command_FooCommand', 'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand');
 
-        $application = $this->getMock('Symfony\Component\Console\Application');
+        $application = $this->getMockBuilder('Symfony\Component\Console\Application')->getMock();
         // add() is never called when the found command classes are already registered as services
         $application->expects($this->never())->method('add');
 

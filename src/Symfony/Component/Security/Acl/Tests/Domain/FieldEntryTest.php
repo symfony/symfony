@@ -64,11 +64,11 @@ class FieldEntryTest extends \PHPUnit_Framework_TestCase
 
     protected function getAcl()
     {
-        return $this->getMock('Symfony\Component\Security\Acl\Model\AclInterface');
+        return $this->getMockBuilder('Symfony\Component\Security\Acl\Model\AclInterface')->getMock();
     }
 
     protected function getSid()
     {
-        return $this->getMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        return $this->getMockBuilder('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface')->getMock();
     }
 }

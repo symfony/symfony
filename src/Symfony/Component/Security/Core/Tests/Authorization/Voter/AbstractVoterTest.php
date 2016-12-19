@@ -23,7 +23,7 @@ class AbstractVoterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $this->token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
     }
 
     /**

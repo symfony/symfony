@@ -43,6 +43,6 @@ class FilesLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function getFileLoader()
     {
-        return $this->getMock('Symfony\Component\Validator\Mapping\Loader\LoaderInterface');
+        return $this->getMockBuilder('Symfony\Component\Validator\Mapping\Loader\LoaderInterface')->getMock();
     }
 }

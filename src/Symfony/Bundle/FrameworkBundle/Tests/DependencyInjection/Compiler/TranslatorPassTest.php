@@ -18,7 +18,7 @@ class TranslatorPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testValidCollector()
     {
-        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock();
         $definition->expects($this->at(0))
             ->method('addMethodCall')
             ->with('addLoader', array('xliff', new Reference('xliff')));
@@ -26,10 +26,7 @@ class TranslatorPassTest extends \PHPUnit_Framework_TestCase
             ->method('addMethodCall')
             ->with('addLoader', array('xlf', new Reference('xliff')));
 
-        $container = $this->getMock(
-            'Symfony\Component\DependencyInjection\ContainerBuilder',
-            array('hasDefinition', 'getDefinition', 'findTaggedServiceIds', 'findDefinition')
-        );
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->setMethods(array('hasDefinition', 'getDefinition', 'findTaggedServiceIds', 'findDefinition'))->getMock();
         $container->expects($this->any())
             ->method('hasDefinition')
             ->will($this->returnValue(true));
@@ -41,7 +38,7 @@ class TranslatorPassTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array('xliff' => array(array('alias' => 'xliff', 'legacy-alias' => 'xlf')))));
         $container->expects($this->once())
             ->method('findDefinition')
-            ->will($this->returnValue($this->getMock('Symfony\Component\DependencyInjection\Definition')));
+            ->will($this->returnValue($this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')->getMock()));
         $pass = new TranslatorPass();
         $pass->process($container);
     }

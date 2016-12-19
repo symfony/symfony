@@ -23,13 +23,7 @@ class LegacySessionCsrfProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->session = $this->getMock(
-            'Symfony\Component\HttpFoundation\Session\Session',
-            array(),
-            array(),
-            '',
-            false // don't call constructor
-        );
+        $this->session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')->disableOriginalConstructor()->getMock();
         $this->provider = new SessionCsrfProvider($this->session, 'SECRET');
     }
 

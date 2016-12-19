@@ -57,9 +57,9 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->resolvedTypeFactory = $this->getMock('Symfony\Component\Form\ResolvedFormTypeFactory');
-        $this->guesser1 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
-        $this->guesser2 = $this->getMock('Symfony\Component\Form\FormTypeGuesserInterface');
+        $this->resolvedTypeFactory = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeFactory')->getMock();
+        $this->guesser1 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
+        $this->guesser2 = $this->getMockBuilder('Symfony\Component\Form\FormTypeGuesserInterface')->getMock();
         $this->extension1 = new TestExtension($this->guesser1);
         $this->extension2 = new TestExtension($this->guesser2);
         $this->registry = new FormRegistry(array(
@@ -71,7 +71,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetTypeFromExtension()
     {
         $type = new FooType();
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
 
         $this->extension2->addType($type);
 
@@ -94,7 +94,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $type = new FooType();
         $ext1 = new FooTypeBarExtension();
         $ext2 = new FooTypeBazExtension();
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
 
         $this->extension2->addType($type);
         $this->extension1->addTypeExtension($ext1);
@@ -116,8 +116,8 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $parentType = new FooType();
         $type = new FooSubType();
-        $parentResolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $parentResolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
 
         $this->extension1->addType($parentType);
         $this->extension2->addType($type);
@@ -146,8 +146,8 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetTypeConnectsParentIfGetParentReturnsInstance()
     {
         $type = new FooSubTypeWithParentInstance();
-        $parentResolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $parentResolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
+        $resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
 
         $this->extension1->addType($type);
 
@@ -183,7 +183,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
     public function testHasTypeAfterLoadingFromExtension()
     {
         $type = new FooType();
-        $resolvedType = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $resolvedType = $this->getMockBuilder('Symfony\Component\Form\ResolvedFormTypeInterface')->getMock();
 
         $this->resolvedTypeFactory->expects($this->once())
             ->method('createResolvedType')
@@ -208,7 +208,7 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedGuesser, $this->registry->getTypeGuesser());
 
         $registry = new FormRegistry(
-            array($this->getMock('Symfony\Component\Form\FormExtensionInterface')),
+            array($this->getMockBuilder('Symfony\Component\Form\FormExtensionInterface')->getMock()),
             $this->resolvedTypeFactory);
 
         $this->assertNull($registry->getTypeGuesser());

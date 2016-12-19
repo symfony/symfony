@@ -94,9 +94,9 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
 
     protected function createContext()
     {
-        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
-        $contextualValidator = $this->getMock('Symfony\Component\Validator\Validator\ContextualValidatorInterface');
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
+        $validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')->getMock();
+        $contextualValidator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ContextualValidatorInterface')->getMock();
 
         switch ($this->getApiVersion()) {
             case Validation::API_VERSION_2_5:
@@ -111,7 +111,7 @@ abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCa
                 $context = new LegacyExecutionContext(
                     $validator,
                     $this->root,
-                    $this->getMock('Symfony\Component\Validator\MetadataFactoryInterface'),
+                    $this->getMockBuilder('Symfony\Component\Validator\MetadataFactoryInterface')->getMock(),
                     $translator
                 );
                 break;

@@ -63,7 +63,7 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
-        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMock();
         $router
             ->expects($this->any())
             ->method('getRouteCollection')
@@ -74,7 +74,7 @@ class RouterDebugCommandTest extends \PHPUnit_Framework_TestCase
              ->disableOriginalConstructor()
              ->getMock();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $container
             ->expects($this->once())
             ->method('has')

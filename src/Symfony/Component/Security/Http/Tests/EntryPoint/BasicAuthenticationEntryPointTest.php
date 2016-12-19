@@ -18,7 +18,7 @@ class BasicAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
 {
     public function testStart()
     {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
 
         $authException = new AuthenticationException('The exception message');
 
@@ -31,7 +31,7 @@ class BasicAuthenticationEntryPointTest extends \PHPUnit_Framework_TestCase
 
     public function testStartWithoutAuthException()
     {
-        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
+        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
 
         $entryPoint = new BasicAuthenticationEntryPoint('TheRealmName');
 

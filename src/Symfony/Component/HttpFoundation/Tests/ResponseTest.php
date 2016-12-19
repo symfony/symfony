@@ -846,7 +846,7 @@ class ResponseTest extends ResponseTestCase
     public function testNoDeprecationsAreTriggered()
     {
         new DefaultResponse();
-        $this->getMock(Response::class);
+        $this->getMockBuilder(Response::class)->getMock();
     }
 
     /**

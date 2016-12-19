@@ -120,7 +120,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
             '</pre><script>Sfdump("%s")</script>'
         );
         $extension = new DumpExtension(new VarCloner(), $dumper);
-        $twig = new \Twig_Environment($this->getMock('Twig_LoaderInterface'), array(
+        $twig = new \Twig_Environment($this->getMockBuilder('Twig_LoaderInterface')->getMock(), array(
             'debug' => true,
             'cache' => false,
             'optimizations' => 0,

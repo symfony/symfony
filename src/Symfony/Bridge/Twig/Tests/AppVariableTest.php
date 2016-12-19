@@ -69,10 +69,10 @@ class AppVariableTest extends \PHPUnit_Framework_TestCase
 
     public function testGetToken()
     {
-        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->appVariable->setTokenStorage($tokenStorage);
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
         $tokenStorage->method('getToken')->willReturn($token);
 
         $this->assertEquals($token, $this->appVariable->getToken());
@@ -94,7 +94,7 @@ class AppVariableTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTokenWithNoToken()
     {
-        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->appVariable->setTokenStorage($tokenStorage);
 
         $this->assertNull($this->appVariable->getToken());

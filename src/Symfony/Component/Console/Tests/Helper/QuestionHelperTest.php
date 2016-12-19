@@ -730,7 +730,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTest
             '  [<info>żółw  </info>] bar',
             '  [<info>łabądź</info>] baz',
         );
-        $output = $this->getMock('\Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('\Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output->method('getFormatter')->willReturn(new OutputFormatter());
 
         $dialog = new QuestionHelper();

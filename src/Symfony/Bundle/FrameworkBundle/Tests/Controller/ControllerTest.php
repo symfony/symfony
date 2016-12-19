@@ -215,8 +215,8 @@ class ControllerTest extends TestCase
     public function testFile()
     {
         /* @var ContainerInterface $container */
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $kernel = $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
         $container->set('kernel', $kernel);
 
         $controller = new TestController();
@@ -235,7 +235,7 @@ class ControllerTest extends TestCase
 
     public function testFileAsInline()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $controller = new TestController();
         $controller->setContainer($container);
 
@@ -253,7 +253,7 @@ class ControllerTest extends TestCase
 
     public function testFileWithOwnFileName()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $controller = new TestController();
         $controller->setContainer($container);
 
@@ -272,7 +272,7 @@ class ControllerTest extends TestCase
 
     public function testFileWithOwnFileNameAsInline()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
         $controller = new TestController();
         $controller->setContainer($container);
 

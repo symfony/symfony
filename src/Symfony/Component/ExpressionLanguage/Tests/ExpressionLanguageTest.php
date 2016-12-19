@@ -19,8 +19,8 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
 {
     public function testCachedParse()
     {
-        $cacheMock = $this->getMock('Psr\Cache\CacheItemPoolInterface');
-        $cacheItemMock = $this->getMock('Psr\Cache\CacheItemInterface');
+        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
+        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
         $savedParsedExpression = null;
         $expressionLanguage = new ExpressionLanguage($cacheMock);
 
@@ -66,9 +66,9 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
      */
     public function testCachedParseWithDeprecatedParserCacheInterface()
     {
-        $cacheMock = $this->getMock('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface');
+        $cacheMock = $this->getMockBuilder('Symfony\Component\ExpressionLanguage\ParserCache\ParserCacheInterface')->getMock();
 
-        $cacheItemMock = $this->getMock('Psr\Cache\CacheItemInterface');
+        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
         $savedParsedExpression = null;
         $expressionLanguage = new ExpressionLanguage($cacheMock);
 
@@ -98,7 +98,7 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrongCacheImplementation()
     {
-        $cacheMock = $this->getMock('Psr\Cache\CacheItemSpoolInterface');
+        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemSpoolInterface')->getMock();
         $expressionLanguage = new ExpressionLanguage($cacheMock);
     }
 
@@ -172,8 +172,8 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
 
     public function testCachingWithDifferentNamesOrder()
     {
-        $cacheMock = $this->getMock('Psr\Cache\CacheItemPoolInterface');
-        $cacheItemMock = $this->getMock('Psr\Cache\CacheItemInterface');
+        $cacheMock = $this->getMockBuilder('Psr\Cache\CacheItemPoolInterface')->getMock();
+        $cacheItemMock = $this->getMockBuilder('Psr\Cache\CacheItemInterface')->getMock();
         $expressionLanguage = new ExpressionLanguage($cacheMock);
         $savedParsedExpressions = array();
 

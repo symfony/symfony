@@ -188,7 +188,7 @@ class ContentSecurityPolicyHandlerTest extends \PHPUnit_Framework_TestCase
 
     private function mockNonceGenerator($value)
     {
-        $generator = $this->getMock('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator');
+        $generator = $this->getMockBuilder('Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator')->getMock();
 
         $generator->expects($this->any())
             ->method('generate')

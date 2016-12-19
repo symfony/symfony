@@ -59,7 +59,7 @@ class ConsoleHandlerTest extends \PHPUnit_Framework_TestCase
         // check that the handler actually outputs the record if it handles it
         $levelName = Logger::getLevelName($level);
 
-        $realOutput = $this->getMock('Symfony\Component\Console\Output\Output', array('doWrite'));
+        $realOutput = $this->getMockBuilder('Symfony\Component\Console\Output\Output')->setMethods(array('doWrite'))->getMock();
         $realOutput->setVerbosity($verbosity);
         $realOutput
             ->expects($isHandling ? $this->once() : $this->never())

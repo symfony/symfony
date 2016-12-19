@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-25T20:26:32Z
+
+Why? Dumping a container to YAML or XML is perfectly valid for a non-compiled container. How is that a bug fix?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-25T20:40:17Z
+
+This is not a bug fix for sure.
+Without compiler passes applied, the container is really in some intermediary "bootstrapping" state. For XML & Yaml, we don't care. But for the PhpDumper?
+Anyway, I've no strong opinion on this, I'm just explaining the reasoning I had :-)
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-26T07:27:03Z
+
+Updated. I think indeed it make no sense for YAML, etc.
+
+Also no strong opinion on this (as compared to  #19673) however it would simplify the PHP Dumper in 4.0 a lot.
+
+Also tests are unclear about this, some call `compile` beforehand others dont.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-26T08:06:23Z
+
+> it would simplify the PHP Dumper in 4.0 a lot.
+
+I forgot to mention this argument and it was really the beginning of the idea: PhpDumper is already complex enough, there is no need to have all these `!isFrozen` code paths in the code. Thus I'm :+1: (when tests will be green of course).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-26T09:48:48Z
+
+There are some bottlenecks.. which im not sure how to solve;
+
+```
+Dumping an uncompiled ContainerBuilder is deprecated since version 3.3 and will not be supported anymore in 4.0. Compile the container beforehand: 7x
+    2x in PhpDumperTest::testAddService from Symfony\Component\DependencyInjection\Tests\Dumper
+    2x in PhpDumperTest::testDump from Symfony\Component\DependencyInjection\Tests\Dumper
+    1x in PhpDumperTest::testDumpAutowireData from Symfony\Component\DependencyInjection\Tests\Dumper
+    1x in PhpDumperTest::testAddParameters from Symfony\Component\DependencyInjection\Tests\Dumper
+    1x in PhpDumperTest::testServicesWithAnonymousFactories from Symfony\Component\DependencyInjection\Tests\Dumper
+
+```
+
+Basically all service fixtures (`Fixtures/php/`) must be revised to compiled containers. ie. `testAddService` tests both variants rather explicitly (`services9.php` vs `services9_compiled.php`).
+
+We need to separate these tests for legacy and add a `services[0-9]_compiled.php` variant for each one.  Right?
+
+Im still :+1: for deprecating this feature though.
+
+> PhpDumper is already complex enough, there is no need to have all these !isFrozen code paths in the code
+
+Agree, this makes it a real burden to maintain.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T09:08:55Z
+
+👍 for doing this on PhpDumper only.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-18T12:44:37Z
+
+Looks like tests are passing :)

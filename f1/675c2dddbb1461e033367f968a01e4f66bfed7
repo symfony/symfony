@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-22T19:24:25Z
+
+FYI, I moved the logic in the request collector: https://github.com/symfony/symfony/pull/20595/files#diff-e8f5b14fbfbbeac60fc9f3abe310c3b0R128
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-22T19:33:17Z
+
+Updated, rebasing should be easy now.

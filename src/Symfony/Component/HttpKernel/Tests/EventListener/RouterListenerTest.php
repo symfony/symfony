@@ -165,7 +165,7 @@ class RouterListenerTest extends \PHPUnit_Framework_TestCase
     {
         $requestStack = new RequestStack();
 
-        $requestMatcher = $this->getMock('Symfony\Component\Routing\Matcher\RequestMatcherInterface');
+        $requestMatcher = $this->getMockBuilder('Symfony\Component\Routing\Matcher\RequestMatcherInterface')->getMock();
         $requestMatcher->expects($this->never())->method('matchRequest');
 
         $dispatcher = new EventDispatcher();

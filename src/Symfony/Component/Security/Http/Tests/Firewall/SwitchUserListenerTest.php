@@ -233,7 +233,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
     public function testSwitchUser()
     {
         $token = $this->getToken(array(new Role('the role')));
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->any())->method('getRoles')->will($this->returnValue(array()));
 
         $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));
@@ -263,7 +263,7 @@ class SwitchUserListenerTest extends \PHPUnit_Framework_TestCase
     public function testSwitchUserKeepsOtherQueryStringParameters()
     {
         $token = $this->getToken(array(new Role('the role')));
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
         $user->expects($this->any())->method('getRoles')->will($this->returnValue(array()));
 
         $this->tokenStorage->expects($this->any())->method('getToken')->will($this->returnValue($token));

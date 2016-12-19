@@ -35,8 +35,8 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
 
     private function createListener(array $options = array(), $success = true)
     {
-        $tokenStorage = $this->getMock(TokenStorageInterface::class);
-        $authenticationManager = $this->getMock(AuthenticationManagerInterface::class);
+        $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
+        $authenticationManager = $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock();
 
         if ($success) {
             $authenticationManager->method('authenticate')->willReturn(true);
@@ -44,9 +44,9 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
             $authenticationManager->method('authenticate')->willThrowException(new AuthenticationException());
         }
 
-        $authenticationSuccessHandler = $this->getMock(AuthenticationSuccessHandlerInterface::class);
+        $authenticationSuccessHandler = $this->getMockBuilder(AuthenticationSuccessHandlerInterface::class)->getMock();
         $authenticationSuccessHandler->method('onAuthenticationSuccess')->willReturn(new Response('ok'));
-        $authenticationFailureHandler = $this->getMock(AuthenticationFailureHandlerInterface::class);
+        $authenticationFailureHandler = $this->getMockBuilder(AuthenticationFailureHandlerInterface::class)->getMock();
         $authenticationFailureHandler->method('onAuthenticationFailure')->willReturn(new Response('ko'));
 
         $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, 'providerKey',  $authenticationSuccessHandler, $authenticationFailureHandler, $options);
@@ -56,7 +56,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": "foo"}');
-        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
         $this->assertEquals('ok', $event->getResponse()->getContent());
@@ -66,7 +66,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
     {
         $this->createListener(array(), false);
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": "foo"}');
-        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
         $this->assertEquals('ko', $event->getResponse()->getContent());
@@ -76,7 +76,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
     {
         $this->createListener(array('username_path' => 'user.login', 'password_path' => 'user.pwd'));
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"user": {"login": "dunglas", "pwd": "foo"}}');
-        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
         $this->assertEquals('ok', $event->getResponse()->getContent());
@@ -89,7 +89,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"usr": "dunglas", "password": "foo"}');
-        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
     }
@@ -101,7 +101,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "pass": "foo"}');
-        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
     }
@@ -113,7 +113,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": 1, "password": "foo"}');
-        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
     }
@@ -125,7 +125,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
     {
         $this->createListener();
         $request = new Request(array(), array(), array(), array(), array(), array(), '{"username": "dunglas", "password": 1}');
-        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
     }
@@ -138,7 +138,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
         $this->createListener();
         $username = str_repeat('x', Security::MAX_USERNAME_LENGTH + 1);
         $request = new Request(array(), array(), array(), array(), array(), array(), sprintf('{"username": "%s", "password": 1}', $username));
-        $event = new GetResponseEvent($this->getMock(KernelInterface::class), $request, KernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMockBuilder(KernelInterface::class)->getMock(), $request, KernelInterface::MASTER_REQUEST);
 
         $this->listener->handle($event);
     }

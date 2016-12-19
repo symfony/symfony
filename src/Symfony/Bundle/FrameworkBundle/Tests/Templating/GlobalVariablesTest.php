@@ -33,14 +33,14 @@ class GlobalVariablesTest extends TestCase
 
     public function testGetTokenNoToken()
     {
-        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
         $this->container->set('security.token_storage', $tokenStorage);
         $this->assertNull($this->globals->getToken());
     }
 
     public function testGetToken()
     {
-        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
 
         $this->container->set('security.token_storage', $tokenStorage);
 

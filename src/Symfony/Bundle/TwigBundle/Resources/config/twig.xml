@@ -49,22 +49,7 @@
             <argument /> <!-- project's root dir -->
         </service>
 
-        <service id="twig.loader.filesystem" class="Symfony\Bundle\TwigBundle\Loader\FilesystemLoader" public="false">
-            <argument type="service" id="templating.locator" />
-            <argument type="service" id="templating.name_parser" />
-            <argument /> <!-- project's root dir -->
-            <tag name="twig.loader"/>
-        </service>
-
         <service id="twig.loader.chain" class="Twig_Loader_Chain" public="false"/>
-
-        <service id="twig.loader" alias="twig.loader.filesystem" />
-
-        <service id="templating.engine.twig" class="Symfony\Bundle\TwigBundle\TwigEngine" public="false">
-            <argument type="service" id="twig" />
-            <argument type="service" id="templating.name_parser" />
-            <argument type="service" id="templating.locator" />
-        </service>
 
         <service id="twig.extension.profiler" class="Symfony\Bridge\Twig\Extension\ProfilerExtension" public="false">
             <argument type="service" id="twig.profile" />
@@ -118,25 +103,7 @@
             <argument type="service" id="router.request_context" on-invalid="ignore" />
         </service>
 
-        <service id="twig.extension.form" class="Symfony\Bridge\Twig\Extension\FormExtension" public="false">
-            <argument type="collection">
-                <argument type="service" id="service_container" />
-                <argument>twig.form.renderer</argument>
-            </argument>
-        </service>
-
         <service id="twig.extension.debug" class="Twig_Extension_Debug" public="false" />
-
-        <service id="twig.form.engine" class="Symfony\Bridge\Twig\Form\TwigRendererEngine" public="false">
-            <argument>%twig.form.resources%</argument>
-            <argument type="service" id="twig" />
-        </service>
-
-        <service id="twig.form.renderer" class="Symfony\Bridge\Twig\Form\TwigRenderer">
-            <argument type="service" id="twig.form.engine" />
-            <argument type="service" id="security.csrf.token_manager" on-invalid="null" />
-            <tag name="twig.runtime" />
-        </service>
 
         <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor">
             <argument type="service" id="twig" />

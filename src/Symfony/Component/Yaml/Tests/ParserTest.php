@@ -68,9 +68,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testLineBreaksBeforeDocumentSeparatorAndComment()
     {
-        $this->assertSame($this->parser->parse("\n \n# Two empty lines above (second - with one whitespace) and two below (first - with three whitespaces).\n   \n\n---\nkey2: value2\n"), [
-          'key2' => 'value2',
-        ]);
+        $this->assertSame($this->parser->parse("\n \n# Two empty lines above (second - with one whitespace) and two below (first - with three whitespaces).\n   \n\n---\nkey2: value2\n"), array(
+            'key2' => 'value2',
+        ));
     }
 
     /**

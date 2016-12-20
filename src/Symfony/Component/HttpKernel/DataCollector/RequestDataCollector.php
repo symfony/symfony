@@ -39,15 +39,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $responseHeaders = $response->headers->all();
-        $cookies = array();
-        foreach ($response->headers->getCookies() as $cookie) {
-            $cookies[] = $this->getCookieHeader($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
-        }
-        if (count($cookies) > 0) {
-            $responseHeaders['Set-Cookie'] = $cookies;
-        }
-
         // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
         $route = '';
@@ -99,7 +90,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'request_cookies' => $request->cookies->all(),
             'request_attributes' => $attributes,
             'route' => $route,
-            'response_headers' => $responseHeaders,
+            'response_headers' => $response->headers->all(),
             'session_metadata' => $sessionMetadata,
             'session_attributes' => $sessionAttributes,
             'flashes' => $flashes,
@@ -402,42 +393,5 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         return is_string($controller) ? $controller : 'n/a';
-    }
-
-    private function getCookieHeader($name, $value, $expires, $path, $domain, $secure, $httponly)
-    {
-        $cookie = sprintf('%s=%s', $name, urlencode($value));
-
-        if (0 !== $expires) {
-            if (is_numeric($expires)) {
-                $expires = (int) $expires;
-            } elseif ($expires instanceof \DateTime) {
-                $expires = $expires->getTimestamp();
-            } else {
-                $tmp = strtotime($expires);
-                if (false === $tmp || -1 == $tmp) {
-                    throw new \InvalidArgumentException(sprintf('The "expires" cookie parameter is not valid (%s).', $expires));
-                }
-                $expires = $tmp;
-            }
-
-            $cookie .= '; expires='.str_replace('+0000', '', \DateTime::createFromFormat('U', $expires, new \DateTimeZone('GMT'))->format('D, d-M-Y H:i:s T'));
-        }
-
-        if ($domain) {
-            $cookie .= '; domain='.$domain;
-        }
-
-        $cookie .= '; path='.$path;
-
-        if ($secure) {
-            $cookie .= '; secure';
-        }
-
-        if ($httponly) {
-            $cookie .= '; httponly';
-        }
-
-        return $cookie;
     }
 }

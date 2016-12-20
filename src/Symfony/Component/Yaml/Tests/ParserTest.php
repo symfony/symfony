@@ -68,20 +68,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testLineBreaksBeforeDocumentSeparatorAndComment()
     {
-        $yaml = <<<'EOF'
-
- 
-# Two empty lines above (second - with one whitespace) and two below (first - with three whitespaces).
-   
-
----
-key2: value2
-
-EOF;
-
-        // Ensure that user's editor didn't trimmed white spaces in Heredoc.
-        $this->assertSame($yaml, "\n \n# Two empty lines above (second - with one whitespace) and two below (first - with three whitespaces).\n   \n\n---\nkey2: value2\n");
-        $this->parser->parse($yaml);
+        $this->assertSame($this->parser->parse("\n \n# Two empty lines above (second - with one whitespace) and two below (first - with three whitespaces).\n   \n\n---\nkey2: value2\n"), [
+          'key2' => 'value2',
+        ]);
     }
 
     /**
@@ -90,17 +79,7 @@ EOF;
      */
     public function testSpacesBeforeDocumentSeparator()
     {
-        $yaml = <<<'EOF'
-   
-
-  ---
-key2: value2
-
-EOF;
-
-        // Ensure that user's editor didn't trimmed white spaces in Heredoc.
-        $this->assertSame($yaml, "   \n\n  ---\nkey2: value2\n");
-        $this->parser->parse($yaml);
+      $this->parser->parse("   \n\n  ---\nkey2: value2\n");
     }
 
     public function testTabsInYaml()

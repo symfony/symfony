@@ -12,58 +12,37 @@
 namespace Symfony\Component\Console\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Console exception listener.
- *
- * Attempts to log exceptions or abnormal terminations of console commands.
- *
  * @author James Halsall <james.t.halsall@googlemail.com>
+ * @author Robin Chalas <robin.chalas@gmail.com>
  */
 class ExceptionListener implements EventSubscriberInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    private $logger;
 
-    /**
-     * Constructor.
-     *
-     * @param LoggerInterface $logger A logger
-     */
     public function __construct(LoggerInterface $logger = null)
     {
         $this->logger = $logger;
     }
 
-    /**
-     * Handles console command exception.
-     *
-     * @param ConsoleExceptionEvent $event Console event
-     */
-    public function onKernelException(ConsoleExceptionEvent $event)
+    public function onConsoleException(ConsoleExceptionEvent $event)
     {
         if (null === $this->logger) {
             return;
         }
 
         $exception = $event->getException();
-        $input = (string) $event->getInput();
 
-        $this->logger->error('Exception thrown while running command: "{command}". Message: "{message}"', array('exception' => $exception, 'command' => $input, 'message' => $exception->getMessage()));
+        $this->logger->error('Exception thrown while running command "{command}". Message: "{message}"', array('exception' => $exception, 'command' => $this->getInputString($event), 'message' => $exception->getMessage()));
     }
 
-    /**
-     * Handles termination of console command.
-     *
-     * @param ConsoleTerminateEvent $event Console event
-     */
-    public function onKernelTerminate(ConsoleTerminateEvent $event)
+    public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
         if (null === $this->logger) {
             return;
@@ -71,20 +50,30 @@ class ExceptionListener implements EventSubscriberInterface
 
         $exitCode = $event->getExitCode();
 
-        if ($exitCode === 0) {
+        if (0 === $exitCode) {
             return;
         }
 
-        $input = (string) $event->getInput();
-
-        $this->logger->error('Command "{command}" exited with status code "{code}"', array('command' => (string) $input, 'code' => $exitCode));
+        $this->logger->error('Command "{command}" exited with code "{code}"', array('command' => $this->getInputString($event), 'code' => $exitCode));
     }
 
     public static function getSubscribedEvents()
     {
         return array(
-            ConsoleEvents::EXCEPTION => array('onKernelException', -128),
-            ConsoleEvents::TERMINATE => array('onKernelTerminate', -128),
+            ConsoleEvents::EXCEPTION => array('onConsoleException', -128),
+            ConsoleEvents::TERMINATE => array('onConsoleTerminate', -128),
         );
+    }
+
+    private static function getInputString(ConsoleEvent $event)
+    {
+        $commandName = $event->getCommand()->getName();
+        $input = $event->getInput();
+
+        if (method_exists($input, '__toString')) {
+            return str_replace(array("'$commandName'", "\"$commandName\""), $commandName, (string) $input);
+        }
+
+        return $commandName;
     }
 }

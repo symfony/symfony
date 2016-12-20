@@ -79,7 +79,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
      */
     public function testSpacesBeforeDocumentSeparator()
     {
-      $this->parser->parse("   \n\n  ---\nkey2: value2\n");
+        $this->parser->parse("   \n\n  ---\nkey2: value2\n");
     }
 
     public function testTabsInYaml()

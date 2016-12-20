@@ -77,7 +77,16 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
                 } catch (\ReflectionException $e) {
                     // ignore failing reflection
                 } catch (AnnotationException $e) {
-
+                    /*
+                     * Ignore any AnnotationException to not break the cache warming process if an Annotation is badly
+                     * configured or could not be found / read / etc.
+                     *
+                     * In particular cases, an Annotation in your code can be used and defined only for a specific
+                     * environment but is always added to the annotations.map file by some Symfony default behaviors,
+                     * and you always end up with a not found Annotation.
+                     *
+                     * cf https://github.com/symfony/symfony/pull/20959 for a longer explanation.
+                     */
                 }
             }
         } finally {

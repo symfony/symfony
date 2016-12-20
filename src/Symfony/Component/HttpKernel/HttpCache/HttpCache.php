@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpCache implements HttpKernelInterface, TerminableInterface
 {
+    const HEADER_ORIGINAL_METHOD = 'X-Symfony-Cache-Original-Method';
+
     private $kernel;
     private $store;
     private $request;
@@ -92,6 +94,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'allow_revalidate' => false,
             'stale_while_revalidate' => 2,
             'stale_if_error' => 60,
+            'head_method_passthrough' => false,
         ), $options);
     }
 
@@ -188,6 +191,9 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $response = $this->pass($request, $catch);
         } else {
             $response = $this->lookup($request, $catch);
+            if ($this->isHeadMethodPassthrough()) {
+                $response->headers->remove(self::HEADER_ORIGINAL_METHOD);
+            }
         }
 
         $this->restoreResponseBody($request, $response);
@@ -318,7 +324,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             return $this->pass($request, $catch);
         }
 
-        if (null === $entry) {
+        if (null === $entry
+            // make sure we do not return a cached entry for a previous HEAD request for the current GET request
+            || $this->isHeadMethodPassthrough() && 'GET' === $request->getMethod() && 'HEAD' === $entry->headers->get(self::HEADER_ORIGINAL_METHOD)
+        ) {
             $this->record($request, 'miss');
 
             return $this->fetch($request, $catch);
@@ -354,7 +363,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $subRequest = clone $request;
 
         // send no head requests because we want content
-        if ('HEAD' === $request->getMethod()) {
+        if (!$this->isHeadMethodPassthrough() && 'HEAD' === $request->getMethod()) {
             $subRequest->setMethod('GET');
         }
 
@@ -417,7 +426,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $subRequest = clone $request;
 
         // send no head requests because we want content
-        if ('HEAD' === $request->getMethod()) {
+        if (!$this->isHeadMethodPassthrough() && 'HEAD' === $request->getMethod()) {
             $subRequest->setMethod('GET');
         }
 
@@ -584,6 +593,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      */
     protected function store(Request $request, Response $response)
     {
+        if ($this->isHeadMethodPassthrough()) {
+            $response->headers->set(self::HEADER_ORIGINAL_METHOD, $request->getMethod());
+        }
+
         if (!$response->headers->has('Date')) {
             $response->setDate(\DateTime::createFromFormat('U', time()));
         }
@@ -689,5 +702,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $path .= '?'.$qs;
         }
         $this->traces[$request->getMethod().' '.$path][] = $event;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isHeadMethodPassthrough()
+    {
+        return $this->options['head_method_passthrough'];
     }
 }

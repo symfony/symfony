@@ -108,6 +108,28 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($workflow->can($subject, 't2'));
     }
 
+    public function testCanWithDifferentMatchTypes()
+    {
+        $subject = new \stdClass();
+        $subject->marking = array('b' => 1);
+
+        $definition = $this->createComplexWorkflowDefinition();
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $this->assertFalse($workflow->can($subject, 't2'));
+
+        $definition = $this->createComplexWorkflowDefinition(Transition::MATCH_ONE);
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $this->assertTrue($workflow->can($subject, 't2'));
+
+        $subject->marking = array('c' => 1);
+        $this->assertTrue($workflow->can($subject, 't2'));
+
+        $subject->marking = array('b' => 1, 'c' => 1);
+        $this->assertTrue($workflow->can($subject, 't2'));
+    }
+
     public function testCanWithGuard()
     {
         $definition = $this->createComplexWorkflowDefinition();

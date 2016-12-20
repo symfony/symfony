@@ -7,13 +7,13 @@ use Symfony\Component\Workflow\Transition;
 
 trait WorkflowBuilderTrait
 {
-    private function createComplexWorkflowDefinition()
+    private function createComplexWorkflowDefinition($matchType = Transition::MATCH_ALL)
     {
         $places = range('a', 'g');
 
         $transitions = array();
         $transitions[] = new Transition('t1', 'a', array('b', 'c'));
-        $transitions[] = new Transition('t2', array('b', 'c'), 'd');
+        $transitions[] = new Transition('t2', array('b', 'c'), 'd', $matchType);
         $transitions[] = new Transition('t3', 'd', 'e');
         $transitions[] = new Transition('t4', 'd', 'f');
         $transitions[] = new Transition('t5', 'e', 'g');

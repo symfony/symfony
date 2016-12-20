@@ -287,13 +287,17 @@ class Workflow
     private function getTransitionForSubject($subject, Marking $marking, array $transitions)
     {
         foreach ($transitions as $transition) {
+            $match = false;
+
             foreach ($transition->getFroms() as $place) {
-                if (!$marking->has($place)) {
+                if ($marking->has($place)) {
+                    $match = true;
+                } elseif ($transition->getMatchType() === Transition::MATCH_ALL) {
                     continue 2;
                 }
             }
 
-            if (true !== $this->guardTransition($subject, $marking, $transition)) {
+            if ($match && true !== $this->guardTransition($subject, $marking, $transition)) {
                 return $transition;
             }
         }

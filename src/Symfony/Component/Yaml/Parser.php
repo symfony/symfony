@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml;
 
 use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Util\StringReader;
 
 /**
  * Parser parses YAML strings to convert them to PHP arrays.
@@ -154,10 +155,10 @@ class Parser
                 $context = 'mapping';
 
                 // force correct settings
-                Inline::parse(null, $flags, $this->refs);
+                Inline::parse(null);
                 try {
                     Inline::$parsedLineNumber = $this->getRealCurrentLineNb();
-                    $key = Inline::parseScalar($values['key']);
+                    $key = Inline::parseScalar(new StringReader($values['key']));
                 } catch (ParseException $e) {
                     $e->setParsedLine($this->getRealCurrentLineNb() + 1);
                     $e->setSnippet($this->currentLine);
@@ -544,7 +545,8 @@ class Parser
      */
     private function parseValue($value, $flags, $context)
     {
-        if (0 === strpos($value, '*')) {
+        $reader = new StringReader($value);
+        if ($reader->readChar('*')) {
             if (false !== $pos = strpos($value, '#')) {
                 $value = substr($value, 1, $pos - 2);
             } else {
@@ -575,7 +577,7 @@ class Parser
 
             // do not take following lines into account when the current line is a quoted single line value
             if (null !== $quotation && preg_match('/^'.$quotation.'.*'.$quotation.'(\s*#.*)?$/', $value)) {
-                return Inline::parse($value, $flags, $this->refs);
+                return Inline::parse($reader, $flags, $this->refs);
             }
 
             while ($this->moveToNextLine()) {
@@ -799,30 +801,27 @@ class Parser
         $value = str_replace(array("\r\n", "\r"), "\n", $value);
 
         // strip YAML header
-        $count = 0;
-        $value = preg_replace('#^\%YAML[: ][\d\.]+.*\n#u', '', $value, -1, $count);
-        $this->offset += $count;
+        $reader = new StringReader($value);
+        while ($reader->readString('%yaml', true) || $reader->readChar('#')) {
+            $reader->readCSpan("\n");
+            $reader->readChar("\n");
 
-        // remove leading comments
-        $trimmedValue = preg_replace('#^(\#.*?\n)+#s', '', $value, -1, $count);
-        if ($count == 1) {
-            // items have been removed, update the offset
-            $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
-            $value = $trimmedValue;
+            ++$this->offset;
         }
 
         // remove start of the document marker (---)
-        $trimmedValue = preg_replace('#^\-\-\-.*?\n#s', '', $value, -1, $count);
-        if ($count == 1) {
-            // items have been removed, update the offset
-            $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
-            $value = $trimmedValue;
+        if ($reader->readString('---')) {
+            $reader->readCSpan("\n");
+            $reader->readChar("\n");
 
+            $yaml = $reader->read(max(0, $reader->getRemainingByteCount() - 3));
             // remove end of the document marker (...)
-            $value = preg_replace('#\.\.\.\s*$#', '', $value);
+            $reader->readString('...');
+
+            return $yaml.$reader->readToEnd();
         }
 
-        return $value;
+        return $reader->readToEnd();
     }
 
     /**
@@ -864,7 +863,7 @@ class Parser
      */
     private function isStringUnIndentedCollectionItem()
     {
-        return '-' === rtrim($this->currentLine) || 0 === strpos($this->currentLine, '- ');
+        return $this->currentLine && '-' === $this->currentLine[0];
     }
 
     /**

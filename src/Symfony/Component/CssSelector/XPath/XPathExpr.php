@@ -87,7 +87,7 @@ class XPathExpr
     public function addNameTest()
     {
         if ('*' !== $this->element) {
-            $this->addCondition('name() = '.Translator::getXpathLiteral($this->element));
+            $this->addCondition('local-name() = '.Translator::getXpathLiteral($this->element));
             $this->element = '*';
         }
 

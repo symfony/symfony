@@ -25,9 +25,11 @@ if ('phpdbg' === PHP_SAPI) {
     $PHP .= ' -qrr';
 }
 
-$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') || ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar`))
-    ? $PHP.' '.escapeshellarg($COMPOSER)
-    : 'composer';
+$COMPOSER = file_exists($COMPOSER = $oldPwd.'/composer.phar') ||
+    file_exists($COMPOSER = getenv("COMPOSER_BIN")) ||
+    ($COMPOSER = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar`))
+        ? $PHP.' '.escapeshellarg(realpath($COMPOSER))
+        : 'composer';
 
 if (!file_exists("$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit") || md5_file(__FILE__)."\n".getenv('SYMFONY_PHPUNIT_REMOVE') !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default

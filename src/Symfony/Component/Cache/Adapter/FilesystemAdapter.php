@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 /**
@@ -39,9 +40,7 @@ class FilesystemAdapter extends AbstractAdapter
         if (false === $dir = realpath($dir) ?: (file_exists($dir) ? $dir : false)) {
             throw new InvalidArgumentException(sprintf('Cache directory does not exist (%s)', $directory));
         }
-        if (!is_writable($dir .= DIRECTORY_SEPARATOR)) {
-            throw new InvalidArgumentException(sprintf('Cache directory is not writable (%s)', $directory));
-        }
+        $dir .= DIRECTORY_SEPARATOR;
         // On Windows the whole path is limited to 258 chars
         if ('\\' === DIRECTORY_SEPARATOR && strlen($dir) > 234) {
             throw new InvalidArgumentException(sprintf('Cache directory too long (%s)', $directory));
@@ -139,6 +138,10 @@ class FilesystemAdapter extends AbstractAdapter
             } else {
                 $ok = false;
             }
+        }
+
+        if (!$ok && !is_writable($this->directory)) {
+            throw new CacheException(sprintf('Cache directory is not writable (%s)', $this->directory));
         }
 
         return $ok;

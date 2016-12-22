@@ -16,6 +16,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Exception\CacheException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -129,6 +130,8 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
      * @param int   $lifetime The lifetime of the cached values, 0 for persisting until manual cleaning
      *
      * @return array|bool The identifiers that failed to be cached or a boolean stating if caching succeeded or not
+     *
+     * @throws CacheException If write can not be performed
      */
     abstract protected function doSave(array $values, $lifetime);
 

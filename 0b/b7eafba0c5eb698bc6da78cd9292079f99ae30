@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-17T12:07:13Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-12-17T15:30:54Z
+
+So to be clear, if you have a value with backslashes like a namespace you need to replace these before usage?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-17T15:34:37Z
+
+@sstok: You'll at least need to escape the last character if it's a backslash using `OutputFormatter::escape()`, or replace it by `<<`. If backslashes are not at the end (which means right before a `</info>` tag for instance here), it should not be an issue.
+
+Maybe we can do this check before wrapping any user text into tags, and replace it automatically, but that probably means searching and updating a lot more places.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-17T20:43:26Z
+
+After all, I think there is only a few places that would require this special check, so it might be worth it and can be fixed within this very same PR IMHO.
+
+@chalasr You can apply https://github.com/symfony/symfony/compare/2.7...ogizanagi:fix/2.7/console/trailing_backslashes if you think it makes sense, or I'll submit another PR once this one is merged.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-18T11:38:28Z
+
+@ogizanagi It makes good sense to me, thank you for the patch, applied.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-22T12:02:26Z
+
+This is ready to go

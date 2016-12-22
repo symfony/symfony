@@ -173,6 +173,9 @@ HttpFoundation
     - `isInvalid`/`isSuccessful`/`isRedirection`/`isClientError`/`isServerError`
     - `isOk`/`isForbidden`/`isNotFound`/`isRedirect`/`isEmpty`
 
+ * The ability to check only for cacheable HTTP methods using `Request::isMethodSafe()` is
+   not supported anymore, use `Request::isMethodCacheable()` instead.
+
 HttpKernel
 ----------
 

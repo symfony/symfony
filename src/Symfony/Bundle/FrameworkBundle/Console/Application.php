@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class Application extends BaseApplication
 {
     private $kernel;
-    private $commandsRegistered = false;
+    private $commandsRegistered;
 
     /**
      * Constructor.

@@ -41,9 +41,15 @@ class TwigRendererEngine extends AbstractRendererEngine implements TwigRendererE
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated since version 3.3, to be removed in 4.0
      */
     public function setEnvironment(\Twig_Environment $environment)
     {
+        if ($this->environment) {
+            @trigger_error(sprintf('The "%s()" method is deprecated since version 3.3 and will be removed in 4.0. Pass the Twig Environment as second argument of the constructor instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         $this->environment = $environment;
     }
 

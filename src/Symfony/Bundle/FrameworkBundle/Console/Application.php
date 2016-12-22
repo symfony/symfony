@@ -34,8 +34,8 @@ class Application extends BaseApplication
     /**
      * Constructor.
      *
-     * @param KernelInterface $kernel               A KernelInterface instance
-     * @param bool            $loadDefaultCommands  Load all the default commands
+     * @param KernelInterface $kernel              A KernelInterface instance
+     * @param bool            $loadDefaultCommands Load all the default commands
      */
     public function __construct(KernelInterface $kernel, $loadDefaultCommands = true)
     {

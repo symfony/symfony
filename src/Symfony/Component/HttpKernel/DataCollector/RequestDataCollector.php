@@ -39,11 +39,6 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $responseHeaders = $response->headers->all();
-        foreach ($response->headers->getCookies() as $cookie) {
-            $responseHeaders['set-cookie'][] = (string) $cookie;
-        }
-
         // attributes are serialized and as they can be anything, they need to be converted to strings.
         $attributes = array();
         $route = '';
@@ -95,7 +90,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             'request_cookies' => $request->cookies->all(),
             'request_attributes' => $attributes,
             'route' => $route,
-            'response_headers' => $responseHeaders,
+            'response_headers' => $response->headers->all(),
             'session_metadata' => $sessionMetadata,
             'session_attributes' => $sessionAttributes,
             'flashes' => $flashes,

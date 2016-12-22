@@ -33,11 +33,13 @@ class Application extends BaseApplication
     /**
      * Constructor.
      *
-     * @param KernelInterface $kernel A KernelInterface instance
+     * @param KernelInterface $kernel              A KernelInterface instance
+     * @param bool            $loadDefaultCommands Load all the default commands
      */
-    public function __construct(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel, $loadDefaultCommands = true)
     {
         $this->kernel = $kernel;
+        $this->commandsRegistered = !$loadDefaultCommands;
 
         parent::__construct('Symfony', Kernel::VERSION);
 

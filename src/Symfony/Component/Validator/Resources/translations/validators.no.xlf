@@ -12,11 +12,11 @@
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>Verdien må være av typen {{ type }}.</target>
+                <target>Verdien skal ha typen {{ type }}.</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>
-                <target>Verdien må være blank.</target>
+                <target>Verdien skal være blank.</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
@@ -88,19 +88,19 @@
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
-                <target>Verdien må ikke være blank.</target>
+                <target>Verdien kan ikke være blank.</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>Verdien må ikke være tom (null).</target>
+                <target>Verdien kan ikke være tom (null).</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
-                <target>Verdien må være tom (null).</target>
+                <target>Verdien skal være tom (null).</target>
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>Verdien er ikke gyldig.</target>
+                <target>Verdien er ugyldig.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
@@ -112,7 +112,7 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
-                <target>Verdiene må være identiske.</target>
+                <target>Verdiene skal være identiske.</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
@@ -128,7 +128,7 @@
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
-                <target>Verdien må være et gyldig tall.</target>
+                <target>Verdien skal være et gyldig tall.</target>
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
@@ -176,11 +176,11 @@
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
-                <target>Verdien må være brukerens sitt nåværende passord.</target>
+                <target>Verdien skal være brukerens sitt nåværende passord.</target>
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>Verdien må være nøyaktig {{ limit }} tegn.</target>
+                <target>Verdien skal være nøyaktig {{ limit }} tegn.</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
@@ -220,11 +220,11 @@
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>Korttypen er ikke støttet eller ugyldig kortnummer.</target>
+                <target>Korttypen er ikke støttet eller kortnummeret er ugyldig.</target>
             </trans-unit>
             <trans-unit id="59">
                 <source>This is not a valid International Bank Account Number (IBAN).</source>
-                <target>Dette er ikke en gyldig IBAN.</target>
+                <target>Dette er ikke et gyldig IBAN-nummer.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -248,43 +248,43 @@
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>Verdien må være lik {{ compared_value }}.</target>
+                <target>Verdien skal være lik {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
-                <target>Verdien må være større enn {{ compared_value }}.</target>
+                <target>Verdien skal være større enn {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>Verdien må være større enn eller lik {{ compared_value }}.</target>
+                <target>Verdien skal være større enn eller lik {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Verdien må være identisk med {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Verdien skal være identisk med {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
-                <target>Verdien må være mindre enn {{ compared_value }}.</target>
+                <target>Verdien skal være mindre enn {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>Verdien må være mindre enn eller lik {{ compared_value }}.</target>
+                <target>Verdien skal være mindre enn eller lik {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>Verdien må ikke være lik {{ compared_value }}.</target>
+                <target>Verdien skal ikke være lik {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Verdien må ikke være identisk med {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Verdien skal ikke være identisk med {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>Bildeforholdet er for stort ({{ ratio }}). Tillatt maksimumsbildeforhold er {{ max_ratio }}.</target>
+                <target>Bildeforholdet er for stort ({{ ratio }}). Tillatt bildeforhold er maks {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>Bildeforholdet er for lite ({{ ratio }}). Forventet maksimumsbildeforhold er {{ min_ratio }}.</target>
+                <target>Bildeforholdet er for lite ({{ ratio }}). Forventet bildeforhold er minst {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>

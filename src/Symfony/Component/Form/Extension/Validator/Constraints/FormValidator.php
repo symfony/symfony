@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Validator\Constraints;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -47,8 +48,8 @@ class FormValidator extends ConstraintValidator
 
             // Validate the data against its own constraints
             if ($form->isRoot() && (is_object($data) || is_array($data))) {
-                foreach ($groups as $group) {
-                    $validator->atPath('data')->validate($form->getData(), null, $group);
+                if (is_array($groups) && count($groups) > 0 || $groups instanceof GroupSequence && count($groups->groups) > 0) {
+                    $validator->atPath('data')->validate($form->getData(), null, $groups);
                 }
             }
 
@@ -164,6 +165,10 @@ class FormValidator extends ConstraintValidator
     {
         if (!is_string($groups) && is_callable($groups)) {
             $groups = call_user_func($groups, $form);
+        }
+
+        if ($groups instanceof GroupSequence) {
+            return $groups;
         }
 
         return (array) $groups;

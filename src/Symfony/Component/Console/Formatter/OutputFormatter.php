@@ -35,6 +35,20 @@ class OutputFormatter implements OutputFormatterInterface
     {
         $text = preg_replace('/([^\\\\]?)</', '$1\\<', $text);
 
+        return self::escapeTrailingBackslash($text);
+    }
+
+    /**
+     * Escapes trailing "\" in given text.
+     *
+     * @param string $text Text to escape
+     *
+     * @return string Escaped text
+     *
+     * @internal
+     */
+    public static function escapeTrailingBackslash($text)
+    {
         if ('\\' === substr($text, -1)) {
             $len = strlen($text);
             $text = rtrim($text, '\\');

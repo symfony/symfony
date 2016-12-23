@@ -33,6 +33,14 @@ please read the [Contributing Code][3] part of the documentation. If you're subm
 a pull request, please follow the guidelines in the [Submitting a Patch][4] section
 and use [Pull Request Template][5].
 
+Community Reviews
+-----------------
+
+If you don't feel ready to contribute code or patches, reviewing issues and pull 
+requests can be a great start to get involved and give back. In fact, people who 
+"triage" issues are the backbone to Symfony's success!  
+More information can be found in the [Community Reviews][8] guide.
+
 Running Symfony Tests
 ----------------------
 
@@ -46,3 +54,4 @@ Information on how to run the Symfony test suite can be found in the
 [5]: https://symfony.com/doc/current/contributing/code/patches.html#make-a-pull-request
 [6]: https://symfony.com/doc/master/contributing/code/tests.html
 [7]: https://symfony.com/doc/current/book/installation.html#installing-the-symfony-installer
+[8]: https://symfony.com/doc/current/contributing/community/reviews.html

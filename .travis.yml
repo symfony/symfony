@@ -18,7 +18,7 @@ env:
 matrix:
     include:
         # Use the newer stack for HHVM as HHVM does not support Precise anymore since a long time and so Precise has an outdated version
-        - php: hhvm-stable
+        - php: hhvm-3.15
           sudo: required
           dist: trusty
           group: edge

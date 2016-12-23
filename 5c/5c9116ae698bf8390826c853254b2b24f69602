@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-22T10:42:59Z
+
+Not sure about this one. AFAIU, the user will now receive two deprecation notices as if they don't pass Twig env as a constructor argument, they probably call the setter.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-22T10:45:18Z
+
+well, if they pass it in the constructor and still call the setter later, removing the setter would break their app without warning. So we need a deprecation warning there (to avoid the double deprecation warning, we may trigger it only when we already have an environment)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-22T10:54:00Z
+
+Indeed, updated to avoid the double warning. Should this target 3.2? If so I'll update the corresponding UPGRADE file
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-22T10:55:42Z
+
+3.3 is fine.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-22T11:02:10Z
+
+UPGRADE files updated
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-22T11:10:44Z
+
+👍

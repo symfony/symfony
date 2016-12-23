@@ -33,7 +33,6 @@ class TemplateController extends ContainerAware
      */
     public function templateAction($template, $maxAge = null, $sharedAge = null, $private = null)
     {
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
         if ($this->container->has('templating')) {
             $response = $this->container->get('templating')->renderResponse($template);
         } elseif ($this->container->has('twig')) {

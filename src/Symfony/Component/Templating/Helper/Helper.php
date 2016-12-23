@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating\Helper;
 
+@trigger_error('The '.Helper::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * Helper is the base class for all helper classes.
  *
@@ -18,6 +20,8 @@ namespace Symfony\Component\Templating\Helper;
  * class that exposes a read-only interface for templates.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The Helper class will be removed in Symfony 4.0. You should use Twig instead.
  */
 abstract class Helper implements HelperInterface
 {

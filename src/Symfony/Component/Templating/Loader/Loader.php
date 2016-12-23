@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\Templating\Loader;
 
+@trigger_error('The '.Loader::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 use Psr\Log\LoggerInterface;
 
 /**
  * Loader is the base class for all template loader classes.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The Loader class will be removed in Symfony 4.0. You should use Twig instead.
  */
 abstract class Loader implements LoaderInterface
 {

@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating;
 
+@trigger_error('The '.DelegatingEngine::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * DelegatingEngine selects an engine for a given template.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The DelegatingEngine class will be removed in Symfony 4.0. You should use Twig instead.
  */
 class DelegatingEngine implements EngineInterface, StreamingEngineInterface
 {

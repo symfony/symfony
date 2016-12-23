@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating\Loader;
 
+@trigger_error('The '.LoaderInterface::class.' interface is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\Templating\Storage\Storage;
 
@@ -18,6 +20,8 @@ use Symfony\Component\Templating\Storage\Storage;
  * LoaderInterface is the interface all loaders must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The LoaderInterface interface will be removed in Symfony 4.0. You should use Twig instead.
  */
 interface LoaderInterface
 {

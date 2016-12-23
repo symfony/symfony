@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Templating\Loader;
 
+@trigger_error('The '.FilesystemLoader::class.' class is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
@@ -19,6 +21,8 @@ use Symfony\Component\Templating\TemplateReferenceInterface;
  * FilesystemLoader is a loader that read templates from the filesystem.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The FilesystemLoader class will be removed in Symfony 4.0. You should use Twig instead.
  */
 class FilesystemLoader extends Loader
 {

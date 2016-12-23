@@ -19,6 +19,9 @@ use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\Templating\TemplateReference;
 
+/**
+ * @group legacy
+ */
 class PhpEngineTest extends \PHPUnit_Framework_TestCase
 {
     protected $loader;

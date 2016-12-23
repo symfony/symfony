@@ -17,6 +17,9 @@ use Symfony\Component\Templating\Storage\StringStorage;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Component\Templating\TemplateReference;
 
+/**
+ * @group legacy
+ */
 class CacheLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()

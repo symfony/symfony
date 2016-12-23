@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\Templating\Helper;
 
+@trigger_error('The '.HelperInterface::class.' interface is deprecated since version 3.3 and will be removed in 4.0. Use Twig instead.', E_USER_DEPRECATED);
+
 /**
  * HelperInterface is the interface all helpers must implement.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated The HelperInterface interface will be removed in Symfony 4.0. You should use Twig instead.
  */
 interface HelperInterface
 {

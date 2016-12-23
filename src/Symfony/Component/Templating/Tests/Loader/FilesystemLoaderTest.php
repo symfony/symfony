@@ -14,6 +14,9 @@ namespace Symfony\Component\Templating\Tests\Loader;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\TemplateReference;
 
+/**
+ * @group legacy
+ */
 class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase
 {
     protected static $fixturesPath;

@@ -13,6 +13,9 @@ namespace Symfony\Component\Templating\Tests\Helper;
 
 use Symfony\Component\Templating\Helper\SlotsHelper;
 
+/**
+ * @group legacy
+ */
 class SlotsHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testHasGetSet()

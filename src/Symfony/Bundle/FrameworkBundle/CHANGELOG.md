@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * Deprecated `cache:clear` with warmup (always call it with `--no-warmup`)
  * Changed default configuration for
    assets/forms/validation/translation/serialization/csrf from `canBeEnabled()` to
    `canBeDisabled()` when Flex is used

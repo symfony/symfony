@@ -123,6 +123,9 @@ Finder
 FrameworkBundle
 ---------------
 
+ * The `cache:clear` command should always be called with the `--no-warmup` option.
+   Warmup should be done via the `cache:warmup` command.
+
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been deprecated. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\SerializerPass` class has been

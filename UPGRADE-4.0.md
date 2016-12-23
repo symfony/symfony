@@ -124,7 +124,7 @@ EventDispatcher
    Use `EventDispatcher` with closure-proxy injection instead.
 
 ExpressionLanguage
-----------
+------------------
 
  * The ability to pass a `ParserCacheInterface` instance to the `ExpressionLanguage`
    class has been removed. You should use the `CacheItemPoolInterface` interface
@@ -186,6 +186,9 @@ Form
 
 FrameworkBundle
 ---------------
+
+ * The `cache:clear` command does not warmup the cache anymore. Warmup should
+   be done via the `cache:warmup` command.
 
  * Support for absolute template paths has been removed.
 

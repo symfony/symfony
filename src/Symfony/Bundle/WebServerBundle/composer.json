@@ -1,0 +1,35 @@
+{
+    "name": "symfony/web-server-bundle",
+    "type": "web-server-bundle",
+    "description": "Symfony WebServerBundle",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/console": "~2.8.8|~3.0.8|~3.1.2|~3.2",
+        "symfony/process": "~2.8|~3.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bundle\\WebServerBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.3-dev"
+        }
+    }
+}

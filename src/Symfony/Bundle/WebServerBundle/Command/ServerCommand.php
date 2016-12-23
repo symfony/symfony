@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Command;
+namespace Symfony\Bundle\WebServerBundle\Command;
 
 /**
  * Base methods for commands related to PHP's built-in web server.

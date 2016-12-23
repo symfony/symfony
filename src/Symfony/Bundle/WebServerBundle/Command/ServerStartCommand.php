@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Command;
+namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -190,7 +190,7 @@ EOF
             $router = $this
                 ->getContainer()
                 ->get('kernel')
-                ->locateResource(sprintf('@FrameworkBundle/Resources/config/router_%s.php', $env))
+                ->locateResource(sprintf('@FrameworkBundle/Resources/router_%s.php', $env))
             ;
         }
 

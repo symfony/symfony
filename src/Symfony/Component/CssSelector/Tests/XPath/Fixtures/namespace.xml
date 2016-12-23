@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root xmlns:fruits="http://www.w3schools.com/fruits">
+  <table id="table1" xmlns="http://www.w3.org/TR/html4">
+    <tr>
+      <td>Apples 1</td>
+      <td>Bananas 1</td>
+    </tr>
+  </table>
+
+  <fruits:table id="table2">
+    <fruits:tr>
+      <fruits:td>Apples 2</fruits:td>
+      <fruits:td>Bananas 2</fruits:td>
+    </fruits:tr>
+  </fruits:table>
+</root>

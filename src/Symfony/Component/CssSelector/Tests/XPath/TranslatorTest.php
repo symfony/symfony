@@ -42,6 +42,20 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /** @dataProvider getXmlNamespaceTestData */
+    public function testXmlNamespace($css, $value, $xpath, $namespace)
+    {
+        $translator = new Translator();
+        $document = new \SimpleXMLElement(file_get_contents(__DIR__.'/Fixtures/namespace.xml'));
+
+        $this->assertSame($xpath, $translator->cssToXPath($css, ''));
+
+        foreach ($document->xpath($xpath) as $element) {
+            $this->assertSame($namespace, $element->getNamespaces());
+            $this->assertSame($value, (string) $element);
+        }
+    }
+
     /** @dataProvider getHtmlIdsTestData */
     public function testHtmlIds($css, array $elementsId)
     {
@@ -144,6 +158,14 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             array(':lang(de) :lang(zh)', array('eighth')),
             array(':lang(en), :lang(zh)', array('first', 'second', 'third', 'fourth', 'eighth')),
             array(':lang(es)', array()),
+        );
+    }
+
+    public function getXmlNamespaceTestData()
+    {
+        return array(
+            array('#table1 td:nth-child(2)', 'Bananas 1', "*[@id = 'table1']/descendant-or-self::*/*[local-name() = 'td' and (position() = 2)]", array('' => 'http://www.w3.org/TR/html4')),
+            array('#table2 > tr > td:nth-child(1)', 'Apples 2', "*[@id = 'table2']/tr/*[local-name() = 'td' and (position() = 1)]", array('fruits' => 'http://www.w3schools.com/fruits')),
         );
     }
 

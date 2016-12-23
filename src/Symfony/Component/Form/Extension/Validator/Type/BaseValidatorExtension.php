@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Validator\Type;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * Encapsulates common logic of {@link FormTypeValidatorExtension} and
@@ -39,6 +40,10 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
             }
 
             if (is_callable($groups)) {
+                return $groups;
+            }
+
+            if ($groups instanceof GroupSequence) {
                 return $groups;
             }
 

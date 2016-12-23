@@ -5,6 +5,8 @@ return PhpCsFixer\Config::create()
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'array_syntax' => array('syntax' => 'long'),
+        'no_unreachable_default_argument_value' => false,
+        'heredoc_to_nowdoc' => false,
     ))
     ->setRiskyAllowed(true)
     ->setFinder(

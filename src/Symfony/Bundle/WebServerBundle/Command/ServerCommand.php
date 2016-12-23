@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\WebServerBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+
 /**
  * Base methods for commands related to PHP's built-in web server.
  *
@@ -58,6 +60,52 @@ abstract class ServerCommand extends ContainerAwareCommand
             fclose($fp);
 
             return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine the absolute file path for the router script, using the environment to choose a standard script
+     * if no custom router script is specified.
+     *
+     * @param string       $documentRoot Document root
+     * @param string|null  $router       File path of the custom router script, if set by the user; otherwise null
+     * @param string       $env          The application environment
+     *
+     * @return string|bool The absolute file path of the router script, or false on failure
+     */
+    protected function determineRouterScript($documentRoot, $router, $env)
+    {
+        if (null !== $router) {
+            return realpath($router);
+        }
+
+        if (false === $frontController = $this->guessFrontController($documentRoot, $env)) {
+            return false;
+        }
+
+        putenv('APP_FRONT_CONTROLLER='.$frontController);
+
+        return realpath($this
+            ->getContainer()
+            ->get('kernel')
+            ->locateResource(sprintf('@WebServerBundle/Resources/router.php'))
+        );
+    }
+
+    private function guessFrontController($documentRoot, $env)
+    {
+        foreach (array('app', 'index') as $prefix) {
+            $file = sprintf('%s_%s.php', $prefix, $env);
+            if (file_exists($documentRoot.'/'.$file)) {
+                return $file;
+            }
+
+            $file = sprintf('%s.php', $prefix);
+            if (file_exists($documentRoot.'/'.$file)) {
+                return $file;
+            }
         }
 
         return false;

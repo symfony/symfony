@@ -91,24 +91,17 @@ EOF
             return 1;
         }
 
-        $documentRoot = $input->getOption('docroot');
-
-        if (null === $documentRoot) {
+        if (null === $documentRoot = $input->getOption('docroot')) {
             $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
         }
 
         if (!is_dir($documentRoot)) {
-            $io->error(sprintf('The given document root directory "%s" does not exist.', $documentRoot));
+            $io->error(sprintf('The document root directory "%s" does not exist.', $documentRoot));
 
             return 1;
         }
 
         $env = $this->getContainer()->getParameter('kernel.environment');
-
-        if (false === $router = $this->determineRouterScript($input->getOption('router'), $env, $io)) {
-            return 1;
-        }
-
         $address = $input->getArgument('address');
 
         if (false === strpos($address, ':')) {
@@ -120,6 +113,12 @@ EOF
                 sprintf('A process is already listening on http://%s.', $address),
                 'Use the --force option if the server process terminated unexpectedly to start a new web server process.',
             ));
+
+            return 1;
+        }
+
+        if (false === $router = $this->determineRouterScript($documentRoot, $input->getOption('router'), $env)) {
+            $io->error('Unable to guess the front controller file.');
 
             return 1;
         }
@@ -137,7 +136,7 @@ EOF
         }
 
         if ($pid > 0) {
-            $io->success(sprintf('Web server listening on http://%s', $address));
+            $io->success(sprintf('Server listening on http://%s', $address));
 
             return;
         }
@@ -172,35 +171,6 @@ EOF
 
             sleep(1);
         }
-    }
-
-    /**
-     * Determine the absolute file path for the router script, using the environment to choose a standard script
-     * if no custom router script is specified.
-     *
-     * @param string|null  $router File path of the custom router script, if set by the user; otherwise null
-     * @param string       $env    The application environment
-     * @param SymfonyStyle $io     An SymfonyStyle instance
-     *
-     * @return string|bool The absolute file path of the router script, or false on failure
-     */
-    private function determineRouterScript($router, $env, SymfonyStyle $io)
-    {
-        if (null === $router) {
-            $router = $this
-                ->getContainer()
-                ->get('kernel')
-                ->locateResource(sprintf('@FrameworkBundle/Resources/router_%s.php', $env))
-            ;
-        }
-
-        if (false === $path = realpath($router)) {
-            $io->error(sprintf('The given router script "%s" does not exist.', $router));
-
-            return false;
-        }
-
-        return $path;
     }
 
     /**

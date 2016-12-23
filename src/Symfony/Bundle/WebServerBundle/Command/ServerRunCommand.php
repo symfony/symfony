@@ -77,14 +77,13 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $documentRoot = $input->getOption('docroot');
 
-        if (null === $documentRoot) {
+        if (null === $documentRoot = $input->getOption('docroot')) {
             $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
         }
 
         if (!is_dir($documentRoot)) {
-            $io->error(sprintf('The given document root directory "%s" does not exist', $documentRoot));
+            $io->error(sprintf('The document root directory "%s" does not exist', $documentRoot));
 
             return 1;
         }
@@ -102,14 +101,20 @@ EOF
             return 1;
         }
 
+        if (false === $router = $this->determineRouterScript($documentRoot, $input->getOption('router'), $env)) {
+            $io->error('Unable to guess the front controller file.');
+
+            return 1;
+        }
+
         if ('prod' === $env) {
             $io->error('Running PHP built-in server in production environment is NOT recommended!');
         }
 
-        $io->success(sprintf('Server running on http://%s', $address));
+        $io->success(sprintf('Server listening on http://%s', $address));
         $io->comment('Quit the server with CONTROL-C.');
 
-        if (null === $builder = $this->createPhpProcessBuilder($io, $address, $input->getOption('router'), $env)) {
+        if (null === $builder = $this->createPhpProcessBuilder($io, $address, $router, $env)) {
             return 1;
         }
 
@@ -149,19 +154,6 @@ EOF
 
     private function createPhpProcessBuilder(SymfonyStyle $io, $address, $router, $env)
     {
-        $router = $router ?: $this
-            ->getContainer()
-            ->get('kernel')
-            ->locateResource(sprintf('@FrameworkBundle/Resources/router_%s.php', $env))
-        ;
-
-        if (!file_exists($router)) {
-            $io->error(sprintf('The given router script "%s" does not exist.', $router));
-
-            return;
-        }
-
-        $router = realpath($router);
         $finder = new PhpExecutableFinder();
 
         if (false === $binary = $finder->find()) {

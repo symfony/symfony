@@ -18,6 +18,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
 
+/**
+ * @deprecated since version 4.3, to be removed in 5.0; use Twig instead.
+ */
 class TemplatingPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
@@ -34,7 +37,12 @@ class TemplatingPass implements CompilerPassInterface
         if ($container->hasDefinition('templating.engine.php')) {
             $refs = [];
             $helpers = [];
+
             foreach ($container->findTaggedServiceIds('templating.helper', true) as $id => $attributes) {
+                if (!$container->getDefinition($id)->isDeprecated()) {
+                    @trigger_error('The "templating.helper" tag is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', E_USER_DEPRECATED);
+                }
+
                 if (isset($attributes[0]['alias'])) {
                     $helpers[$attributes[0]['alias']] = $id;
                     $refs[$id] = new Reference($id);

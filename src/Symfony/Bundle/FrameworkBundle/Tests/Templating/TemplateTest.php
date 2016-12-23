@@ -14,6 +14,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Templating;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
+/**
+ * @group legacy
+ */
 class TemplateTest extends TestCase
 {
     /**

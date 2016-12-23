@@ -16,6 +16,9 @@ use Symfony\Bundle\FrameworkBundle\Templating\TimedPhpEngine;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * @group legacy
+ */
 class TimedPhpEngineTest extends TestCase
 {
     public function testThatRenderLogsTime()

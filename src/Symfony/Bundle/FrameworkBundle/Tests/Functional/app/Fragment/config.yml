@@ -1,7 +1,9 @@
 imports:
     - { resource: ../config/default.yml }
+    - { resource: services.yml }
 
 framework:
     fragments: ~
-    templating:
-        engines: ['php']
+
+twig:
+    strict_variables: '%kernel.debug%'

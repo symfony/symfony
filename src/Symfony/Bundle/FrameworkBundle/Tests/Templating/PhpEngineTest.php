@@ -21,6 +21,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Templating\TemplateNameParser;
 
+/**
+ * @group legacy
+ */
 class PhpEngineTest extends TestCase
 {
     public function testEvaluateAddsAppGlobal()

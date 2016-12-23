@@ -15,6 +15,9 @@ use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * @group legacy
+ */
 class GlobalVariablesTest extends TestCase
 {
     private $container;

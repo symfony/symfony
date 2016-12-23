@@ -20,6 +20,9 @@ use Symfony\Component\Form\Tests\AbstractDivLayoutTest;
 use Symfony\Component\Templating\Loader\FilesystemLoader;
 use Symfony\Component\Templating\PhpEngine;
 
+/**
+ * @group legacy
+ */
 class FormHelperDivLayoutTest extends AbstractDivLayoutTest
 {
     /**

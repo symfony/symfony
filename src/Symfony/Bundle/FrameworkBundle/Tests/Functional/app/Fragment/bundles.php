@@ -11,8 +11,10 @@
 
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 
 return [
     new FrameworkBundle(),
+    new TwigBundle(),
     new TestBundle(),
 ];

@@ -1,0 +1,9 @@
+framework:
+    templating:
+        engines:          [php, twig]
+        loader:           [loader.foo, loader.bar]
+        cache:            /path/to/cache
+        form:
+            resources:    [theme1, theme2]
+        hinclude_default_template: global_hinclude_template
+    assets: ~

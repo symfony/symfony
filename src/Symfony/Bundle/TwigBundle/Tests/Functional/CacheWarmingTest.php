@@ -18,6 +18,9 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Kernel;
 
+/**
+ * @group legacy
+ */
 class CacheWarmingTest extends TestCase
 {
     public function testCacheIsProperlyWarmedWhenTemplatingIsAvailable()

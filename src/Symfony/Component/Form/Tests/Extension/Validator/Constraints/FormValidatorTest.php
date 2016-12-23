@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\Constraints\FormValidator;
 use Symfony\Component\Form\SubmitButtonBuilder;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -65,8 +66,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setData($object)
             ->getForm();
 
-        $this->expectValidateAt(0, 'data', $object, 'group1');
-        $this->expectValidateAt(1, 'data', $object, 'group2');
+        $this->expectValidateAt(0, 'data', $object, array('group1', 'group2'));
 
         $this->validator->validate($form, new Form());
 
@@ -88,12 +88,11 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->getForm();
 
         // First default constraints
-        $this->expectValidateAt(0, 'data', $object, 'group1');
-        $this->expectValidateAt(1, 'data', $object, 'group2');
+        $this->expectValidateAt(0, 'data', $object, array('group1', 'group2'));
 
         // Then custom constraints
-        $this->expectValidateValueAt(2, 'data', $object, $constraint1, 'group1');
-        $this->expectValidateValueAt(3, 'data', $object, $constraint2, 'group2');
+        $this->expectValidateValueAt(1, 'data', $object, $constraint1, 'group1');
+        $this->expectValidateValueAt(2, 'data', $object, $constraint2, 'group2');
 
         $this->validator->validate($form, new Form());
 
@@ -151,7 +150,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $form = new FormBuilder('name', '\stdClass', $this->dispatcher, $this->factory);
         $form = $form->setData($object)->getForm();
 
-        $this->expectValidateAt(0, 'data', $object, 'Default');
+        $this->expectValidateAt(0, 'data', $object, array('Default'));
 
         $this->validator->validate($form, new Form());
 
@@ -362,6 +361,21 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
         $this->assertNoViolation();
     }
 
+    public function testHandleGroupSequenceValidationGroups()
+    {
+        $object = $this->getMockBuilder('\stdClass')->getMock();
+        $options = array('validation_groups' => new GroupSequence(array('group1', 'group2')));
+        $form = $this->getBuilder('name', '\stdClass', $options)
+            ->setData($object)
+            ->getForm();
+
+        $this->expectValidateAt(0, 'data', $object, new GroupSequence(array('group1', 'group2')));
+
+        $this->validator->validate($form, new Form());
+
+        $this->assertNoViolation();
+    }
+
     public function testHandleCallbackValidationGroups()
     {
         $object = $this->getMockBuilder('\stdClass')->getMock();
@@ -370,8 +384,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setData($object)
             ->getForm();
 
-        $this->expectValidateAt(0, 'data', $object, 'group1');
-        $this->expectValidateAt(1, 'data', $object, 'group2');
+        $this->expectValidateAt(0, 'data', $object, array('group1', 'group2'));
 
         $this->validator->validate($form, new Form());
 
@@ -386,7 +399,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setData($object)
             ->getForm();
 
-        $this->expectValidateAt(0, 'data', $object, 'header');
+        $this->expectValidateAt(0, 'data', $object, array('header'));
 
         $this->validator->validate($form, new Form());
 
@@ -403,8 +416,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setData($object)
             ->getForm();
 
-        $this->expectValidateAt(0, 'data', $object, 'group1');
-        $this->expectValidateAt(1, 'data', $object, 'group2');
+        $this->expectValidateAt(0, 'data', $object, array('group1', 'group2'));
 
         $this->validator->validate($form, new Form());
 
@@ -542,7 +554,7 @@ class FormValidatorTest extends AbstractConstraintValidatorTest
             ->setData($object)
             ->getForm();
 
-        $this->expectValidateAt(0, 'data', $object, 'Default');
+        $this->expectValidateAt(0, 'data', $object, array('Default'));
 
         $this->validator->validate($form, new Form());
 

@@ -38,3 +38,9 @@ SecurityBundle
 
  * The `FirewallContext::getContext()` method has been deprecated and will be removed in 4.0.
    Use the `getListeners()` method instead.
+
+TwigBridge
+----------
+
+ * The `TwigRendererEngine::setEnvironment()` method has been deprecated and will be removed
+   in 4.0. Pass the Twig Environment as second argument of the constructor instead.

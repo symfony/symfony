@@ -220,6 +220,9 @@ TwigBridge
  * The possibility to inject the Form Twig Renderer into the form extension
    has been removed. Inject it into the `TwigRendererEngine` instead.
 
+ * The `TwigRendererEngine::setEnvironment()` method has been removed.
+   Pass the Twig Environment as second argument of the constructor instead.
+
 Validator
 ---------
 

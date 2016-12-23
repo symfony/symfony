@@ -36,7 +36,7 @@ class AutowirePass extends AbstractRecursivePass
         try {
             parent::process($container);
         } finally {
-            // Free memory and remove circular reference to container
+            // Free memory
             $this->definedTypes = array();
             $this->types = null;
             $this->ambiguousServiceTypes = array();
@@ -90,6 +90,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         $methodCalls = $this->autowireMethodCalls($reflectionClass, $methodCalls, $autowiredMethods);
+        $overriddenGetters = $this->autowireOverridenGetters($value->getOverriddenGetters(), $autowiredMethods);
 
         if ($constructor) {
             list(, $arguments) = array_shift($methodCalls);
@@ -101,6 +102,10 @@ class AutowirePass extends AbstractRecursivePass
 
         if ($methodCalls !== $value->getMethodCalls()) {
             $value->setMethodCalls($methodCalls);
+        }
+
+        if ($overriddenGetters !== $value->getOverriddenGetters()) {
+            $value->setOverriddenGetters($overriddenGetters);
         }
 
         return parent::processValue($value, $isRoot);
@@ -124,7 +129,7 @@ class AutowirePass extends AbstractRecursivePass
             $regexList[] = '/^'.str_replace('\*', '.*', preg_quote($pattern, '/')).'$/i';
         }
 
-        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+        foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $reflectionMethod) {
             if ($reflectionMethod->isStatic()) {
                 continue;
             }
@@ -164,7 +169,7 @@ class AutowirePass extends AbstractRecursivePass
             list($method, $arguments) = $call;
             $method = $parameterBag->resolveValue($method);
 
-            if (isset($autowiredMethods[$lcMethod = strtolower($method)])) {
+            if (isset($autowiredMethods[$lcMethod = strtolower($method)]) && $autowiredMethods[$lcMethod]->isPublic()) {
                 $reflectionMethod = $autowiredMethods[$lcMethod];
                 unset($autowiredMethods[$lcMethod]);
             } else {
@@ -177,7 +182,7 @@ class AutowirePass extends AbstractRecursivePass
                 }
             }
 
-            $arguments = $this->autowireMethod($reflectionMethod, $arguments, true);
+            $arguments = $this->autowireMethodCall($reflectionMethod, $arguments, true);
 
             if ($arguments !== $call[1]) {
                 $methodCalls[$i][1] = $arguments;
@@ -185,7 +190,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         foreach ($autowiredMethods as $reflectionMethod) {
-            if ($arguments = $this->autowireMethod($reflectionMethod, array(), false)) {
+            if ($reflectionMethod->isPublic() && $arguments = $this->autowireMethodCall($reflectionMethod, array(), false)) {
                 $methodCalls[] = array($reflectionMethod->name, $arguments);
             }
         }
@@ -194,7 +199,7 @@ class AutowirePass extends AbstractRecursivePass
     }
 
     /**
-     * Autowires the constructor or a setter.
+     * Autowires the constructor or a method.
      *
      * @param \ReflectionMethod $reflectionMethod
      * @param array             $arguments
@@ -204,7 +209,7 @@ class AutowirePass extends AbstractRecursivePass
      *
      * @throws RuntimeException
      */
-    private function autowireMethod(\ReflectionMethod $reflectionMethod, array $arguments, $mustAutowire)
+    private function autowireMethodCall(\ReflectionMethod $reflectionMethod, array $arguments, $mustAutowire)
     {
         $didAutowire = false; // Whether any arguments have been autowired or not
         foreach ($reflectionMethod->getParameters() as $index => $parameter) {
@@ -296,6 +301,55 @@ class AutowirePass extends AbstractRecursivePass
         ksort($arguments);
 
         return $arguments;
+    }
+
+    /**
+     * Autowires getters.
+     *
+     * @param array $overridenGetters
+     * @param array $autowiredMethods
+     *
+     * @return array
+     */
+    private function autowireOverridenGetters(array $overridenGetters, array $autowiredMethods)
+    {
+        foreach ($autowiredMethods as $reflectionMethod) {
+            if (isset($overridenGetters[strtolower($reflectionMethod->name)])
+                || !method_exists($reflectionMethod, 'getReturnType')
+                || 0 !== $reflectionMethod->getNumberOfParameters()
+                || $reflectionMethod->isFinal()
+                || $reflectionMethod->returnsReference()
+                || !$returnType = $reflectionMethod->getReturnType()
+            ) {
+                continue;
+            }
+            $typeName = $returnType instanceof \ReflectionNamedType ? $returnType->getName() : $returnType->__toString();
+
+            if ($this->container->has($typeName) && !$this->container->findDefinition($typeName)->isAbstract()) {
+                $overridenGetters[$reflectionMethod->name] = new Reference($typeName);
+                continue;
+            }
+
+            if (null === $this->types) {
+                $this->populateAvailableTypes();
+            }
+
+            if (isset($this->types[$typeName])) {
+                $value = new Reference($this->types[$typeName]);
+            } elseif ($returnType = $this->container->getReflectionClass($typeName, true)) {
+                try {
+                    $value = $this->createAutowiredDefinition($returnType);
+                } catch (RuntimeException $e) {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+
+            $overridenGetters[$reflectionMethod->name] = $value;
+        }
+
+        return $overridenGetters;
     }
 
     /**

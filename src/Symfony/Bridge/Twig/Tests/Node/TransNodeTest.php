@@ -53,7 +53,7 @@ class TransNodeTest extends \PHPUnit_Framework_TestCase
     protected function getVariableGetterWithStrictCheck($name)
     {
         if (\Twig_Environment::MAJOR_VERSION >= 2) {
-            return sprintf('(isset($context["%s"]) || array_key_exists("%s", $context) ? $context["%s"] : $this->notFound("%s", 0))', $name, $name, $name, $name);
+            return sprintf('(isset($context["%s"]) || array_key_exists("%s", $context) ? $context["%s"] : (function () { throw new Twig_Error_Runtime(\'Variable "%s" does not exist.\', 0, $this->getSourceContext()); })())', $name, $name, $name, $name);
         }
 
         if (PHP_VERSION_ID >= 70000) {

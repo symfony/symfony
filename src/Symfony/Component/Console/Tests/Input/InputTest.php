@@ -114,6 +114,95 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input->validate();
     }
 
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Invalid value.
+     */
+    public function testValidateLetsArgumentValidatorsThrow()
+    {
+        $argument = new InputArgument('bar', InputArgument::REQUIRED);
+        $argument->setValidator(function ($bar) {
+            if ('baz' === $bar) {
+                throw new \InvalidArgumentException('Invalid value.');
+            }
+
+            return $bar;
+        });
+
+        $input = new ArrayInput(array('bar' => 'baz'));
+        $input->bind(new InputDefinition(array($argument)));
+        $input->validate();
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Invalid value.
+     */
+    public function testValidateLetsOptionValidatorsThrow()
+    {
+        $option = new InputOption('bar', '', InputOption::VALUE_REQUIRED);
+        $option->setValidator(function ($bar) {
+            if ('baz' === $bar) {
+                throw new \InvalidArgumentException('Invalid value.');
+            }
+
+            return $bar;
+        });
+
+        $input = new ArrayInput(array('--bar' => 'baz'));
+        $input->bind(new InputDefinition(array($option)));
+        $input->validate();
+    }
+
+    public function testValidateSetValuesFromValidatorReturnValues()
+    {
+        $prefixer = function ($v) { return 'prefixed_'.$v; };
+
+        $option = new InputOption('bar', '', InputOption::VALUE_REQUIRED);
+        $option->setValidator($prefixer);
+
+        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+        $argument->setValidator($prefixer);
+
+        $input = new ArrayInput(array('--bar' => 'baz', 'foo' => 'bar'));
+        $input->bind(new InputDefinition(array($option, $argument)));
+        $input->validate();
+
+        $this->assertSame('prefixed_baz', $input->getOption('bar'));
+        $this->assertSame('prefixed_bar', $input->getArgument('foo'));
+    }
+
+    public function testValidatePassOtherArgumentsAndOptionsToValidator()
+    {
+        $optValidator = function ($v, $options, $arguments) {
+            $this->assertContains($v, $options);
+            $this->assertNotContains($v, $arguments);
+            $this->assertSame('bar', $arguments['foo']);
+            $this->assertSame('baz', $options['bar']);
+
+            return $v;
+        };
+
+        $argValidator = function ($v, $options, $arguments) {
+            $this->assertContains($v, $arguments);
+            $this->assertNotContains($v, $options);
+            $this->assertSame('bar', $arguments['foo']);
+            $this->assertSame('baz', $options['bar']);
+
+            return $v;
+        };
+
+        $option = new InputOption('bar', '', InputOption::VALUE_REQUIRED);
+        $option->setValidator($optValidator);
+
+        $argument = new InputArgument('foo', InputArgument::REQUIRED);
+        $argument->setValidator($argValidator);
+
+        $input = new ArrayInput(array('--bar' => 'baz', 'foo' => 'bar'));
+        $input->bind(new InputDefinition(array($option, $argument)));
+        $input->validate();
+    }
+
     public function testValidate()
     {
         $input = new ArrayInput(array('name' => 'foo'));

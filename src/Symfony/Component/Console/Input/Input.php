@@ -73,15 +73,32 @@ abstract class Input implements InputInterface, StreamableInputInterface
      */
     public function validate()
     {
-        $definition = $this->definition;
-        $givenArguments = $this->arguments;
+        $missingArguments = array();
 
-        $missingArguments = array_filter(array_keys($definition->getArguments()), function ($argument) use ($definition, $givenArguments) {
-            return !array_key_exists($argument, $givenArguments) && $definition->getArgument($argument)->isRequired();
-        });
+        foreach ($this->definition->getArguments() as $name => $argument) {
+            if (!array_key_exists($name, $this->arguments) && $argument->isRequired()) {
+                $missingArguments[] = $name;
+
+                continue;
+            }
+
+            if ($validator = $argument->getValidator()) {
+                $this->arguments[$name] = call_user_func($validator, $this->arguments[$name], $this->options, $this->arguments);
+            }
+        }
 
         if (count($missingArguments) > 0) {
             throw new RuntimeException(sprintf('Not enough arguments (missing: "%s").', implode(', ', $missingArguments)));
+        }
+
+        foreach ($this->definition->getOptions() as $name => $option) {
+            if (!array_key_exists($name, $this->options)) {
+                continue;
+            }
+
+            if ($validator = $option->getValidator()) {
+                $this->options[$name] = call_user_func($validator, $this->options[$name], $this->options, $this->arguments);
+            }
         }
     }
 

@@ -108,4 +108,23 @@ class InputArgumentTest extends \PHPUnit_Framework_TestCase
         $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
         $argument->setDefault('default');
     }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Invalid value "value".
+     */
+    public function testGetSetValidator()
+    {
+        $argument = new InputArgument('foo');
+        $argument->setValidator(function ($v) {
+            if ('value' === $v) {
+                throw new \InvalidArgumentException(sprintf('Invalid value "%s".', $v));
+            }
+
+            return $v;
+        });
+
+        $validator = $argument->getValidator();
+        $validator('value');
+    }
 }

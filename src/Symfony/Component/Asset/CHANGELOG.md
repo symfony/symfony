@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.4.0
+-----
+
+ * added optional arguments `$basePath` and `$secure` in `RequestStackContext::__construct()`
+   to provide a default request context in case the stack is empty
+
 3.3.0
 -----
  * Added `JsonManifestVersionStrategy` as a way to read final,

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Stops a background process running PHP's built-in web server.
+ * Stops a background process running a local web server.
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
@@ -35,9 +35,9 @@ class ServerStopCommand extends ServerCommand
                 new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
             ))
             ->setName('server:stop')
-            ->setDescription('Stops PHP\'s built-in web server that was started with the server:start command')
+            ->setDescription('Stops the local web server that was started with the server:start command')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> stops PHP's built-in web server:
+The <info>%command.name%</info> stops the local web server:
 
   <info>php %command.full_name%</info>
 

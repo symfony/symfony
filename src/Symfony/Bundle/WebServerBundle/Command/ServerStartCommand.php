@@ -20,7 +20,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 /**
- * Runs PHP's built-in web server in a background process.
+ * Runs a local web server in a background process.
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
@@ -40,9 +40,9 @@ class ServerStartCommand extends ServerCommand
                 new InputOption('force', 'f', InputOption::VALUE_NONE, 'Force web server startup'),
             ))
             ->setName('server:start')
-            ->setDescription('Starts PHP built-in web server in the background')
+            ->setDescription('Starts a local web server in the background')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> runs PHP's built-in web server:
+The <info>%command.name%</info> runs a local web server:
 
   <info>php %command.full_name%</info>
 
@@ -79,7 +79,7 @@ EOF
         if (!extension_loaded('pcntl')) {
             $io->error(array(
                 'This command needs the pcntl extension to run.',
-                'You can either install it or use the "server:run" command instead to run the built-in web server.',
+                'You can either install it or use the "server:run" command instead.',
             ));
 
             if ($io->ask('Do you want to execute <info>server:run</info> immediately? [Yn] ', true)) {
@@ -124,7 +124,7 @@ EOF
         }
 
         if ('prod' === $env) {
-            $io->error('Running PHP built-in server in production environment is NOT recommended!');
+            $io->error('Running this server in production environment is NOT recommended!');
         }
 
         $pid = pcntl_fork();
@@ -154,7 +154,7 @@ EOF
         $process->disableOutput();
         $process->start();
         $lockFile = $this->getLockFile($address);
-        touch($lockFile);
+        file_put_contents($lockFile, $documentRoot);
 
         if (!$process->isRunning()) {
             $io->error('Unable to start the server process');
@@ -174,7 +174,7 @@ EOF
     }
 
     /**
-     * Creates a process to start PHP's built-in web server.
+     * Creates a process to start a local web server.
      *
      * @param SymfonyStyle $io           A SymfonyStyle instance
      * @param string       $address      IP address and port to listen to

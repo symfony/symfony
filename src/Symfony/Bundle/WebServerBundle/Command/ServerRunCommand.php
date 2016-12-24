@@ -23,7 +23,7 @@ use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * Runs Symfony application using PHP built-in web server.
+ * Runs Symfony application using a local web server.
  *
  * @author Michał Pipa <michal.pipa.xsolve@gmail.com>
  */
@@ -42,9 +42,9 @@ class ServerRunCommand extends ServerCommand
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:run')
-            ->setDescription('Runs PHP built-in web server')
+            ->setDescription('Runs a local web server')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> runs PHP built-in web server:
+The <info>%command.name%</info> runs a local web server:
 
   <info>%command.full_name%</info>
 
@@ -108,7 +108,7 @@ EOF
         }
 
         if ('prod' === $env) {
-            $io->error('Running PHP built-in server in production environment is NOT recommended!');
+            $io->error('Running this server in production environment is NOT recommended!');
         }
 
         $io->success(sprintf('Server listening on http://%s', $address));
@@ -140,7 +140,7 @@ EOF
         $process->run($callback);
 
         if (!$process->isSuccessful()) {
-            $errorMessages = array('Built-in server terminated unexpectedly.');
+            $errorMessages = array('Server terminated unexpectedly.');
 
             if ($process->isOutputDisabled()) {
                 $errorMessages[] = 'Run the command again with -v option for more details.';

@@ -14,7 +14,7 @@ namespace Symfony\Bundle\WebServerBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 /**
- * Base methods for commands related to PHP's built-in web server.
+ * Base methods for commands related to a local web server.
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
@@ -47,7 +47,6 @@ abstract class ServerCommand extends ContainerAwareCommand
     protected function isOtherServerProcessRunning($address)
     {
         $lockFile = $this->getLockFile($address);
-
         if (file_exists($lockFile)) {
             return true;
         }

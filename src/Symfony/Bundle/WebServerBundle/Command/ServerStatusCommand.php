@@ -36,7 +36,7 @@ class ServerStatusCommand extends ServerCommand
                 new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
             ))
             ->setName('server:status')
-            ->setDescription('Outputs the status of the built-in web server for the given address')
+            ->setDescription('Outputs the status of the local web server for the given address')
         ;
     }
 

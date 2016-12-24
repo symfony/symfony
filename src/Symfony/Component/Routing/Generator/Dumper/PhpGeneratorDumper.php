@@ -93,11 +93,16 @@ EOF;
             $properties[] = $compiledRoute->getHostTokens();
             $properties[] = $route->getSchemes();
 
-            $routes .= sprintf("        '%s' => %s,\n", $name, str_replace("\n", '', var_export($properties, true)));
+            $routes .= sprintf("                '%s' => %s,\n", $name, $this->exportArray($properties));
         }
-        $routes .= '    )';
+        $routes .= '            )';
 
         return $routes;
+    }
+
+    protected function exportArray($array)
+    {
+        return preg_replace(array('/array \(/', '/,\n *\)/', '/,\n */', '/\n */'), array('array(', ')', ', ', ''), var_export($array, true));
     }
 
     /**

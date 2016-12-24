@@ -98,7 +98,7 @@ EOF;
      */
     private function generateMatchMethod($supportsRedirections)
     {
-        $code = rtrim($this->compileRoutes($this->getRoutes(), $supportsRedirections), "\n");
+        $code = $this->compileRoutes($this->getRoutes(), $supportsRedirections);
 
         return <<<EOF
     public function match(\$pathinfo)
@@ -147,13 +147,15 @@ EOF;
                 // apply extra indention at each line (except empty ones)
                 $groupCode = preg_replace('/^.{2,}$/m', '    $0', $groupCode);
                 $code .= $groupCode;
-                $code .= "        }\n\n";
+                $code .= "\n        }";
             } else {
                 $code .= $groupCode;
             }
+
+            $code .= "\n\n";
         }
 
-        return $code;
+        return rtrim($code, "\n");
     }
 
     /**
@@ -182,12 +184,15 @@ EOF;
             if ($route instanceof DumperCollection) {
                 $code .= $this->compilePrefixRoutes($route, $supportsRedirections, $optimizedPrefix);
             } else {
-                $code .= $this->compileRoute($route->getRoute(), $route->getName(), $supportsRedirections, $optimizedPrefix)."\n";
+                $code .= $this->compileRoute($route->getRoute(), $route->getName(), $supportsRedirections, $optimizedPrefix);
             }
+            $code .= "\n\n";
         }
 
+        $code = rtrim($code, "\n");
+
         if ($optimizable) {
-            $code .= "    }\n\n";
+            $code .= "\n    }";
             // apply extra indention at each line (except empty ones)
             $code = preg_replace('/^.{2,}$/m', '    $0', $code);
         }
@@ -300,7 +305,7 @@ EOF;
             if (!$supportsRedirections) {
                 throw new \LogicException('The "schemes" requirement is only supported for URL matchers that implement RedirectableUrlMatcherInterface.');
             }
-            $schemes = str_replace("\n", '', var_export(array_flip($schemes), true));
+            $schemes = $this->exportArray(array_flip($schemes));
             $code .= <<<EOF
             \$requiredSchemes = $schemes;
             if (!isset(\$requiredSchemes[\$this->context->getScheme()])) {
@@ -325,17 +330,17 @@ EOF;
             $code .= sprintf(
                 "            return \$this->mergeDefaults(array_replace(%s), %s);\n",
                 implode(', ', $vars),
-                str_replace("\n", '', var_export($route->getDefaults(), true))
+                $this->exportArray($route->getDefaults())
             );
         } elseif ($route->getDefaults()) {
-            $code .= sprintf("            return %s;\n", str_replace("\n", '', var_export(array_replace($route->getDefaults(), array('_route' => $name)), true)));
+            $code .= sprintf("            return %s;\n", $this->exportArray(array_replace($route->getDefaults(), array('_route' => $name))));
         } else {
             $code .= sprintf("            return array('_route' => '%s');\n", $name);
         }
-        $code .= "        }\n";
+        $code .= '        }';
 
         if ($methods) {
-            $code .= "        $gotoname:\n";
+            $code .= "\n        $gotoname:";
         }
 
         return $code;
@@ -369,6 +374,11 @@ EOF;
         }
 
         return $groups;
+    }
+
+    protected function exportArray($array)
+    {
+        return preg_replace(array('/array \(/', '/,\n *\)/', '/,\n */', '/\n */'), array('array(', ')', ', ', ''), var_export($array, true));
     }
 
     /**

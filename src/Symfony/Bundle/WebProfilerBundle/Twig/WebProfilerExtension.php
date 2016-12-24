@@ -131,7 +131,7 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
             return '';
         }
 
-        $attrs = [];
+        $attrs = array();
 
         if (isset($links['doc'])) {
             $attrs['data-help-doc'] = sprintf(
@@ -156,7 +156,6 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
 
         return $html;
     }
-
 
     /**
      * {@inheritdoc}

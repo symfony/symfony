@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 
 /**
  * FrameworkExtension configuration structure.
@@ -480,34 +481,82 @@ class Configuration implements ConfigurationInterface
 
     private function addAssetsSection(ArrayNodeDefinition $rootNode)
     {
+        $hasBcOption = function (array $value) {
+            foreach (array('version_strategy', 'version', 'version_format', 'base_path', 'base_urls', 'base_url') as $key) {
+                if (array_key_exists($key, $value)) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
         $rootNode
             ->children()
                 ->arrayNode('assets')
                     ->info('assets configuration')
+                    ->fixXmlConfig('package')
                     ->canBeEnabled()
-                    ->fixXmlConfig('base_url')
-                    ->children()
-                        ->scalarNode('version_strategy')->defaultNull()->end()
-                        ->scalarNode('version')->defaultNull()->end()
-                        ->scalarNode('version_format')->defaultValue('%%s?%%s')->end()
-                        ->scalarNode('base_path')->defaultValue('')->end()
-                        ->arrayNode('base_urls')
-                            ->requiresAtLeastOneElement()
-                            ->beforeNormalization()
-                                ->ifTrue(function ($v) { return !is_array($v); })
-                                ->then(function ($v) { return array($v); })
-                            ->end()
-                            ->prototype('scalar')->end()
-                        ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) {
+                            return is_array($v) && isset($v['package']);
+                        })
+                        ->then(function ($v) {
+                            $v['packages'] = Processor::normalizeConfig($v, 'package');
+                            unset($v['package']);
+
+                            return $v;
+                        })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) use ($hasBcOption) {
+                            return is_array($v) && (isset($v['default_package']) || $hasBcOption($v));
+                        })
+                        ->then(function ($v) use ($hasBcOption) {
+                            if (isset($v['default_package']) && $hasBcOption($v)) {
+                                throw new \InvalidArgumentException('Cannot mix old and new configuration at the same time.');
+                            }
+
+                            @trigger_error("Setting the 'version_strategy', 'version', 'version_format', 'base_path', or 'base_urls' configuration key under assets is deprecated since version 3.3 and will be removed in 4.0. Use the 'default_package' configuration key instead.", E_USER_DEPRECATED);
+
+                            $v['default_package'] = hash('sha256', uniqid(mt_rand(), true));
+                            foreach (array('version_strategy', 'version', 'version_format', 'base_path', 'base_urls', 'base_url') as $key) {
+                                if (array_key_exists($key, $v)) {
+                                    $v['packages'][$v['default_package']][$key] = $v[$key];
+                                } elseif ('version_format' === $key) {
+                                    $v['packages'][$v['default_package']][$key] = '%%s?%%s'; // for BC
+                                }
+                                unset($v[$key]);
+                            }
+
+                            return $v;
+                        })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) {
+                            return null === $v || true === $v || (is_array($v) && !isset($v['default_package']));
+                        })
+                        ->then(function ($v) {
+                            if (!is_array($v)) {
+                                $v = array('enabled' => true);
+                            }
+
+                            if ($v['enabled']) {
+                                $v['default_package'] = hash('sha256', uniqid(mt_rand(), true));
+                                $v['packages'][$v['default_package']] = array('version_format' => '%%s?%%s'); // for BC
+                            }
+
+                            return $v;
+                        })
                     ->end()
                     ->validate()
                         ->ifTrue(function ($v) {
-                            return isset($v['version_strategy']) && isset($v['version']);
+                            return isset($v['default_package']) && !isset($v['packages'][$v['default_package']]);
                         })
-                        ->thenInvalid('You cannot use both "version_strategy" and "version" at the same time under "assets".')
+                        ->thenInvalid('Unknown default package configured under "assets".')
                     ->end()
-                    ->fixXmlConfig('package')
                     ->children()
+                        ->scalarNode('default_package')->defaultNull()->end()
                         ->arrayNode('packages')
                             ->useAttributeAsKey('name')
                             ->prototype('array')
@@ -516,9 +565,10 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('version_strategy')->defaultNull()->end()
                                     ->scalarNode('version')
                                         ->beforeNormalization()
-                                        ->ifTrue(function ($v) { return '' === $v; })
-                                        ->then(function ($v) { return; })
+                                            ->ifTrue(function ($v) { return '' === $v; })
+                                            ->then(function ($v) { return; })
                                         ->end()
+                                        ->defaultNull()
                                     ->end()
                                     ->scalarNode('version_format')->defaultNull()->end()
                                     ->scalarNode('base_path')->defaultValue('')->end()

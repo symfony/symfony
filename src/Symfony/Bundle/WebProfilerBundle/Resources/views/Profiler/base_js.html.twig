@@ -491,6 +491,69 @@
                         toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
                     });
                 }
+            },
+
+            createIdeLinks: function() {
+                var links = document.querySelectorAll('a[href^="'+window.location.protocol+'//'+window.location.host+'/_profiler/open"]');
+                if (links.length === 0) {
+                    return;
+                }
+
+                var target = document.getElementById('sfpreview');
+                if (!target) {
+                    target = document.createElement('iframe');
+                    target.setAttribute('id', 'sfpreview');
+                    target.setAttribute('src', 'javascript:;');
+
+                    addEventListener(target, 'load', function() {
+                        if (target.src === 'javascript:;') {
+                            return;
+                        }
+
+                        var contentDoc = (target.contentDocument || target.contentWindow.document),
+                            close = contentDoc.querySelector('a.close');
+                        addEventListener(close, 'click', function() {
+                            target.style.display = 'none';
+                        });
+                        addEventListener(contentDoc.body, 'click', function() {
+                            target.style.height = '80%';
+                            target.setAttribute('scrolling', 'auto');
+                        });
+                        close.style.display = 'block';
+                        target.style.display = 'block';
+                    });
+
+                    var toolbar = document.querySelector('.sf-toolbar');
+                    addEventListener(document.body, 'click', function(e) {
+                        if (toolbar) {
+                            var node = e.target.parentNode;
+                            while (node) {
+                                if (node === toolbar) {
+                                    return;
+                                }
+                                node = node.parentNode;
+                            }
+                        }
+
+                        target.style.height = '20%';
+                        target.setAttribute('scrolling', 'no');
+                    });
+
+                    (toolbar || document.body).appendChild(target);
+                }
+
+                for (var i = 0; i < links.length; i++) {
+                    addEventListener(links[i], 'click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        if (target.getAttribute('src') === this.getAttribute('href')) {
+                            target.style.display = 'block';
+                        } else {
+                            target.setAttribute('src', this.getAttribute('href'));
+                        }
+                    })
+                }
             }
         };
     })();
@@ -498,6 +561,7 @@
     Sfjs.addEventListener(window, 'load', function() {
         Sfjs.createTabs();
         Sfjs.createToggles();
+        Sfjs.createIdeLinks();
         Sfjs.renderAjaxRequests();
     });
 

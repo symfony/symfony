@@ -53,6 +53,7 @@ CHANGELOG
    `EventDispatcherDebugCommand`, `RouterDebugCommand`, `RouterMatchCommand`,
    `TranslationDebugCommand`, `TranslationUpdateCommand`, `XliffLintCommand`
     and `YamlLintCommand` classes have been marked as final
+ * Added `asset.request_context.base_path` and `asset.request_context.secure` parameters to provide a request context on e.g. CLI (similar to `router.request_context.*` parameters)
 
 3.3.0
 -----

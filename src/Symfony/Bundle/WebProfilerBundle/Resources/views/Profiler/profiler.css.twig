@@ -994,3 +994,60 @@ table.logs .metadata {
         margin-left: 2px;
     }
 }
+
+{# Help tooltip
+   ========================================================================= #}
+
+.help {
+    display: inline-block;
+    text-align: center;
+    background-color: #6da581;
+    border-radius: 50%;
+    width: 21px;
+    height: 21px;
+    font-size: 13px;
+    line-height: 23px;
+    cursor: default;
+    margin: 0 5px;
+}
+
+.help:before {
+    content: '?';
+    font-weight: bold;
+    color: #fff;
+}
+
+.help:hover div {
+    display: block;
+    transform-origin: 100% 0;
+}
+
+.help div {
+    display: none;
+    background-color: #444444;
+    padding: 8px;
+    width: auto;
+    position: absolute;
+    border-radius: 3px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+    color: #FFF;
+    font-size: 13px;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.help div a {
+    color: white;
+    padding: 0 5px;
+}
+
+.help div:before {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-bottom-color: #444444;
+    left: 5px;
+    top: -12px;
+}

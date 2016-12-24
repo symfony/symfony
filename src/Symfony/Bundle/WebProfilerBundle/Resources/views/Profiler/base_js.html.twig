@@ -491,6 +491,32 @@
                         toggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
                     });
                 }
+            },
+
+            createHelp: function() {
+                var attributes = ['data-help-doc', 'data-help-api'];
+                var labels = { doc: 'Doc', api: 'API' };
+                var query = attributes.map(function (attr) { return '[' + attr + ']'; }).join(', ');
+                var helps = document.querySelectorAll(query);
+
+                for (var i = 0; i < helps.length; i++) {
+                    var root = document.createElement('div');
+                    Sfjs.addClass(root, 'help');
+                    var container = document.createElement('div');
+                    root.appendChild(container);
+                    helps[i].appendChild(root);
+
+                    // Add links
+                    for (var j = 0; j < attributes.length; j++) {
+                        if (helps[i].hasAttribute(attributes[j])) {
+                            var link = document.createElement('a');
+                            link.textContent = labels[attributes[j].substr('data-help-'.length)];
+                            link.setAttribute('href', helps[i].getAttribute(attributes[j]));
+                            link.setAttribute('target', '_blank');
+                            container.appendChild(link);
+                        }
+                    }
+                }
             }
         };
     })();
@@ -499,6 +525,7 @@
         Sfjs.createTabs();
         Sfjs.createToggles();
         Sfjs.renderAjaxRequests();
+        Sfjs.createHelp();
     });
 
 /*]]>*/</script>

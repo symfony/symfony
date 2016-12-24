@@ -34,6 +34,7 @@
         </service>
 
         <service id="twig.extension.webprofiler" class="Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension" public="false">
+            <argument>%web_profiler.debug_toolbar.help%</argument>
             <tag name="twig.extension" />
             <argument type="service">
                 <service class="Symfony\Component\VarDumper\Dumper\HtmlDumper">

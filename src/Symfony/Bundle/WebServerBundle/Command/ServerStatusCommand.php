@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebServerBundle\Command;
 
+use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -31,11 +32,10 @@ class ServerStatusCommand extends ServerCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1:8000'),
-                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
-            ))
             ->setName('server:status')
+            ->setDefinition(array(
+                new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)', '127.0.0.1:8000'),
+            ))
             ->setDescription('Outputs the status of the local web server for the given address')
         ;
     }
@@ -46,34 +46,11 @@ class ServerStatusCommand extends ServerCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $address = $input->getArgument('address');
-
-        if (false === strpos($address, ':')) {
-            $address = $address.':'.$input->getOption('port');
-        }
-
-        // remove an orphaned lock file
-        if (file_exists($this->getLockFile($address)) && !$this->isServerRunning($address)) {
-            unlink($this->getLockFile($address));
-        }
-
-        if (file_exists($this->getLockFile($address))) {
-            $io->success(sprintf('Web server still listening on http://%s', $address));
+        $server = new WebServer($input->getArgument('addressport'));
+        if ($server->isRunning()) {
+            $io->success(sprintf('Web server still listening on http://%s', $server->getAddress()));
         } else {
-            $io->warning(sprintf('No web server is listening on http://%s', $address));
+            $io->warning(sprintf('No web server is listening on http://%s', $server->getAddress()));
         }
-    }
-
-    private function isServerRunning($address)
-    {
-        list($hostname, $port) = explode(':', $address);
-
-        if (false !== $fp = @fsockopen($hostname, $port, $errno, $errstr, 1)) {
-            fclose($fp);
-
-            return true;
-        }
-
-        return false;
     }
 }

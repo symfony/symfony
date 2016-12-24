@@ -11,16 +11,13 @@
 
 namespace Symfony\Bundle\WebServerBundle\Command;
 
+use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Runs Symfony application using a local web server.
@@ -36,10 +33,9 @@ class ServerRunCommand extends ServerCommand
     {
         $this
             ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1'),
-                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
+                new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)', '127.0.0.1:8000'),
                 new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
-                new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+                new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script', dirname(__DIR__).'/Resources/router.php'),
             ))
             ->setName('server:run')
             ->setDescription('Runs a local web server')
@@ -65,7 +61,6 @@ Specifing a router script is required when the used environment is not "dev",
 "prod", or "test".
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
-
 EOF
             )
         ;
@@ -83,85 +78,45 @@ EOF
         }
 
         if (!is_dir($documentRoot)) {
-            $io->error(sprintf('The document root directory "%s" does not exist', $documentRoot));
+            $io->error(sprintf('The document root directory "%s" does not exist.', $documentRoot));
 
             return 1;
         }
 
         $env = $this->getContainer()->getParameter('kernel.environment');
-        $address = $input->getArgument('address');
-
-        if (false === strpos($address, ':')) {
-            $address = $address.':'.$input->getOption('port');
-        }
-
-        if ($this->isOtherServerProcessRunning($address)) {
-            $io->error(sprintf('A process is already listening on http://%s.', $address));
-
-            return 1;
-        }
-
-        if (false === $router = $this->determineRouterScript($documentRoot, $input->getOption('router'), $env)) {
-            $io->error('Unable to guess the front controller file.');
-
-            return 1;
-        }
-
         if ('prod' === $env) {
             $io->error('Running this server in production environment is NOT recommended!');
         }
 
-        $io->success(sprintf('Server listening on http://%s', $address));
-        $io->comment('Quit the server with CONTROL-C.');
+        $router = $input->getOption('router');
 
-        if (null === $builder = $this->createPhpProcessBuilder($io, $address, $router, $env)) {
+        $callback = null;
+        $disableOutput = false;
+        if ($output->isQuiet()) {
+            $disableOutput = true;
+        } else {
+            $callback = function ($type, $buffer) use ($output) {
+                if (Process::ERR === $type && $output instanceof ConsoleOutputInterface) {
+                    $output = $output->getErrorOutput();
+                }
+                $output->write($buffer, false, OutputInterface::OUTPUT_RAW);
+            };
+        }
+
+        try {
+            $server = new WebServer($input->getArgument('addressport'));
+            $server->setConfig($documentRoot, $env);
+
+            $io->success(sprintf('Server listening on http://%s', $server->getAddress()));
+            $io->comment('Quit the server with CONTROL-C.');
+
+            $exitCode = $server->run($router, $disableOutput, $callback);
+        } catch (\Exception $e) {
+            $io->error($e->getMessage());
+
             return 1;
         }
 
-        $builder->setWorkingDirectory($documentRoot);
-        $builder->setTimeout(null);
-        $process = $builder->getProcess();
-        $callback = null;
-
-        if (OutputInterface::VERBOSITY_NORMAL > $output->getVerbosity()) {
-            $process->disableOutput();
-        } else {
-            try {
-                $process->setTty(true);
-            } catch (RuntimeException $e) {
-                $callback = function ($type, $buffer) use ($output) {
-                    if (Process::ERR === $type && $output instanceof ConsoleOutputInterface) {
-                        $output = $output->getErrorOutput();
-                    }
-                    $output->write($buffer, false, OutputInterface::OUTPUT_RAW);
-                };
-            }
-        }
-        $process->run($callback);
-
-        if (!$process->isSuccessful()) {
-            $errorMessages = array('Server terminated unexpectedly.');
-
-            if ($process->isOutputDisabled()) {
-                $errorMessages[] = 'Run the command again with -v option for more details.';
-            }
-
-            $io->error($errorMessages);
-        }
-
-        return $process->getExitCode();
-    }
-
-    private function createPhpProcessBuilder(SymfonyStyle $io, $address, $router, $env)
-    {
-        $finder = new PhpExecutableFinder();
-
-        if (false === $binary = $finder->find()) {
-            $io->error('Unable to find PHP binary to run server.');
-
-            return;
-        }
-
-        return new ProcessBuilder(array($binary, '-S', $address, $router));
+        return $exitCode;
     }
 }

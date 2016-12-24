@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebServerBundle\Command;
 
+use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,11 +31,10 @@ class ServerStopCommand extends ServerCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1'),
-                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
-            ))
             ->setName('server:stop')
+            ->setDefinition(array(
+                new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)', '127.0.0.1:8000'),
+            ))
             ->setDescription('Stops the local web server that was started with the server:start command')
             ->setHelp(<<<'EOF'
 The <info>%command.name%</info> stops the local web server:
@@ -44,7 +44,6 @@ The <info>%command.name%</info> stops the local web server:
 To change the default bind address and the default port use the <info>address</info> argument:
 
   <info>php %command.full_name% 127.0.0.1:8080</info>
-
 EOF
             )
         ;
@@ -57,20 +56,14 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $address = $input->getArgument('address');
-        if (false === strpos($address, ':')) {
-            $address = $address.':'.$input->getOption('port');
-        }
-
-        $lockFile = $this->getLockFile($address);
-
-        if (!file_exists($lockFile)) {
-            $io->error(sprintf('No web server is listening on http://%s', $address));
+        try {
+            $server = new WebServer($input->getArgument('addressport'));
+            $server->stop();
+            $io->success(sprintf('Stopped the web server listening on http://%s', $server->getAddress()));
+        } catch (\Exception $e) {
+            $io->error($e->getMessage());
 
             return 1;
         }
-
-        unlink($lockFile);
-        $io->success(sprintf('Stopped the web server listening on http://%s', $address));
     }
 }

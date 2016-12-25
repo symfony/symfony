@@ -52,8 +52,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function preNormalize($value)
     {
-        if (!$this->normalizeKeys || !is_array($value)) {
+        if (!is_array($value)) {
             return $value;
+        }
+
+        if (!$this->normalizeKeys) {
+            return $this->remapXml($value);
         }
 
         $normalized = array();
@@ -66,7 +70,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             }
         }
 
-        return $normalized;
+        return $this->remapXml($normalized);
     }
 
     /**
@@ -298,8 +302,6 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         if (false === $value) {
             return $value;
         }
-
-        $value = $this->remapXml($value);
 
         $normalized = array();
         foreach ($value as $name => $val) {

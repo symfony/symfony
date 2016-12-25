@@ -233,8 +233,6 @@ class PrototypedArrayNode extends ArrayNode
             return $value;
         }
 
-        $value = $this->remapXml($value);
-
         $isAssoc = array_keys($value) !== range(0, count($value) - 1);
         $normalized = array();
         foreach ($value as $k => $v) {

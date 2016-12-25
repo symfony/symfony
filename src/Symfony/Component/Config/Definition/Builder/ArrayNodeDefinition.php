@@ -35,6 +35,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected $addDefaultChildren = false;
     protected $nodeBuilder;
     protected $normalizeKeys = true;
+    private $deprecations;
 
     /**
      * {@inheritdoc}
@@ -45,6 +46,7 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
 
         $this->nullEquivalent = array();
         $this->trueEquivalent = array();
+        $this->deprecations = array();
     }
 
     /**
@@ -390,6 +392,22 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     }
 
     /**
+     * Deprecate child definition(s)
+     *
+     * @param string[]      $names
+     * @param callable|null $handler
+     * @param string|null   $message
+     *
+     * @return $this
+     */
+    public function deprecate(array $names, callable $handler = null, $message = null)
+    {
+        $this->deprecations[] = array(array_unique($names), $handler, $message);
+
+        return $this;
+    }
+
+    /**
      * Returns a node builder to be used to add children and prototype.
      *
      * @return NodeBuilder The node builder
@@ -412,6 +430,24 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             $node = new ArrayNode($this->name, $this->parent);
 
             $this->validateConcreteNode($node);
+
+            $deprecated = array();
+            foreach ($this->deprecations as $deprecation) {
+                $deprecated = array_merge($deprecated, $deprecation[0]);
+            }
+            $existing = array_intersect($deprecated, array_keys($this->children));
+            if ($existing) {
+                throw new InvalidDefinitionException(
+                    sprintf('->deprecate() cannot reference existing child nodes ("%s") at path "%s"', implode('", "', $existing), $node->getPath())
+                );
+            }
+            $duplicates = array_diff_assoc($deprecated, array_unique($deprecated));
+            if ($duplicates) {
+                throw new InvalidDefinitionException(
+                    sprintf('->deprecate() cannot reference child nodes ("%s") multiple times at path "%s"', implode('", "', $duplicates), $node->getPath())
+                );
+            }
+            $node->setDeprecations($this->deprecations);
 
             $node->setAddIfNotSet($this->addDefaults);
 
@@ -519,6 +555,12 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
     protected function validatePrototypeNode(PrototypedArrayNode $node)
     {
         $path = $node->getPath();
+
+        if ($this->deprecations) {
+            throw new InvalidDefinitionException(
+                sprintf('->deprecate() is not applicable to prototype nodes at path "%s"', $path)
+            );
+        }
 
         if ($this->addDefaults) {
             throw new InvalidDefinitionException(

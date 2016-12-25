@@ -31,6 +31,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     protected $ignoreExtraKeys = false;
     protected $removeExtraKeys = true;
     protected $normalizeKeys = true;
+    private $deprecations = array();
 
     public function setNormalizeKeys($normalizeKeys)
     {
@@ -52,17 +53,41 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function preNormalize($value)
     {
-        if (!$this->normalizeKeys || !is_array($value)) {
+        if (!is_array($value)) {
             return $value;
         }
 
-        $normalized = array();
+        $normalized = $value;
+        if ($this->normalizeKeys) {
+            $normalized = array();
 
-        foreach ($value as $k => $v) {
-            if (false !== strpos($k, '-') && false === strpos($k, '_') && !array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)) {
-                $normalized[$normalizedKey] = $v;
-            } else {
-                $normalized[$k] = $v;
+            foreach ($value as $k => $v) {
+                if (false !== strpos($k, '-') && false === strpos($k, '_') && !array_key_exists($normalizedKey = str_replace('-', '_', $k), $value)) {
+                    $normalized[$normalizedKey] = $v;
+                } else {
+                    $normalized[$k] = $v;
+                }
+            }
+        }
+
+        foreach ($this->deprecations as $deprecation) {
+            list($names, $handler, $message) = $deprecation;
+
+            $given = array_intersect(array_keys($normalized), $names);
+            if (!$given) {
+                continue;
+            }
+
+            if (null === $message) {
+                $message = sprintf(1 === count($given) ? 'The node "%s" is deprecated at path "%s".' : 'The nodes "%s" are deprecated at path "%s".',  implode('", "', $given), $this->getPath());
+            }
+            @trigger_error($message, E_USER_DEPRECATED);
+
+            if (null !== $handler) {
+                $normalized = $handler($this->remapXml($normalized));
+                foreach ($given as $name) {
+                    unset($normalized[$name]);
+                }
             }
         }
 
@@ -214,6 +239,16 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
         }
 
         $this->children[$name] = $node;
+    }
+
+    /**
+     * Set child node deprecations
+     *
+     * @param array $deprecations
+     */
+    public function setDeprecations(array $deprecations)
+    {
+        $this->deprecations = $deprecations;
     }
 
     /**

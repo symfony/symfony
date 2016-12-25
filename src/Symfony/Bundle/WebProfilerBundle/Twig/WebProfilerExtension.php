@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Twig extension for the profiler.
@@ -28,7 +29,10 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
      */
     private $valueExporter;
 
-    private $help;
+    /**
+     * @var array
+     */
+    private $helpLinks;
 
     /**
      * @var HtmlDumper
@@ -45,11 +49,10 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
      */
     private $stackLevel = 0;
 
-    public function __construct(HtmlDumper $dumper = null, $help = false)
+    public function __construct(HtmlDumper $dumper = null)
     {
         $this->dumper = $dumper ?: new HtmlDumper();
         $this->dumper->setOutput($this->output = fopen('php://memory', 'r+b'));
-        $this->help = $help;
     }
 
     public function enter(\Twig_Profiler_Profile $profile)
@@ -76,7 +79,7 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         return array(
             new \Twig_SimpleFunction('profiler_dump', $profilerDump, array('is_safe' => array('html'), 'needs_environment' => true)),
             new \Twig_SimpleFunction('profiler_dump_log', array($this, 'dumpLog'), array('is_safe' => array('html'), 'needs_environment' => true)),
-            new \Twig_SimpleFunction('help', array($this, 'help'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('help_attrs', array($this, 'help'), array('is_safe' => array('html'))),
         );
     }
 
@@ -125,34 +128,22 @@ class WebProfilerExtension extends \Twig_Extension_Profiler
         return $this->valueExporter->exportValue($value);
     }
 
-    public function help($links)
+    public function help($category)
     {
-        if (!$this->help) {
-            return '';
+        if (!$this->helpLinks) {
+            $this->helpLinks = Yaml::parse(file_get_contents(__DIR__.'/../Resources/config/help.yml'));
         }
 
-        $attrs = array();
-
-        if (isset($links['doc'])) {
-            $attrs['data-help-doc'] = sprintf(
-                'https://symfony.com/doc/%s/%s',
-                Kernel::MAJOR_VERSION.'.'.Kernel::MINOR_VERSION,
-                $links['doc']
-            );
+        if (!isset($this->helpLinks[$category])) {
+            throw new \Exception(sprintf('Help "%s" not found', $category));
         }
 
-        if (isset($links['api'])) {
-            $attrs['data-help-api'] = sprintf(
-                'http://api.symfony.com/%s/%s',
-                Kernel::MAJOR_VERSION.'.'.Kernel::MINOR_VERSION,
-                $links['api']
-            );
-        }
+        $links = $this->helpLinks[$category];
+        array_walk($links, function (&$link) {
+            $link = sprintf($link, Kernel::MAJOR_VERSION.'.'.Kernel::MINOR_VERSION);
+        });
 
-        $html = '';
-        foreach ($attrs as $k => $v) {
-            $html .= $k.'="'.$v.'" ';
-        }
+        $html = 'data-help = "'.htmlspecialchars(json_encode($links, JSON_UNESCAPED_SLASHES)).'"';
 
         return $html;
     }

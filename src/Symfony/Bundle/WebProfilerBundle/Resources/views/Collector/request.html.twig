@@ -143,10 +143,7 @@
                     {{ include('@WebProfiler/Profiler/bag.html.twig', { bag: collector.requestattributes }, with_context = false) }}
                 {% endif %}
 
-                <h3 {{ help({
-                        doc: 'components/http_foundation.html#setting-cookies',
-                        api: 'Symfony/Component/HttpFoundation/Cookie.html'
-                }) }}>Cookies</h3>
+                <h3 {{ help_attrs('cookies') }}>Cookies</h3>
 
                 {% if collector.requestcookies.all is empty %}
                     <div class="empty">

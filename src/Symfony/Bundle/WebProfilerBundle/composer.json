@@ -22,7 +22,8 @@
         "symfony/routing": "~2.8|~3.0",
         "symfony/twig-bridge": "~2.8|~3.0",
         "twig/twig": "~1.28|~2.0",
-        "symfony/var-dumper": "~3.2"
+        "symfony/var-dumper": "~3.2",
+        "symfony/yaml": "~2.8|~3.0"
     },
     "require-dev": {
         "symfony/config": "~2.8|~3.0",

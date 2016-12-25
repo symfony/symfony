@@ -1001,7 +1001,7 @@ table.logs .metadata {
 .help {
     display: inline-block;
     text-align: center;
-    background-color: #6da581;
+    background-color: #e0e0e0;
     border-radius: 50%;
     width: 21px;
     height: 21px;
@@ -1009,6 +1009,9 @@ table.logs .metadata {
     line-height: 23px;
     cursor: default;
     margin: 0 5px;
+    vertical-align: middle;
+    border: 1px solid #c1c1c1;
+    text-shadow: 0 0 2px #444444;
 }
 
 .help:before {
@@ -1019,26 +1022,21 @@ table.logs .metadata {
 
 .help:hover div {
     display: block;
-    transform-origin: 100% 0;
 }
 
 .help div {
     display: none;
-    background-color: #444444;
+    background-color: #e0e0e0;
     padding: 8px;
     width: auto;
     position: absolute;
     border-radius: 3px;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+    border: 1px solid #444444;
     color: #FFF;
     font-size: 13px;
     margin-top: 5px;
     line-height: 1.4;
-}
-
-.help div a {
-    color: white;
-    padding: 0 5px;
 }
 
 .help div:before {
@@ -1048,6 +1046,13 @@ table.logs .metadata {
     height: 0;
     border: 6px solid transparent;
     border-bottom-color: #444444;
-    left: 5px;
+    left: 4px;
     top: -12px;
+}
+
+.help div a {
+    color: black;
+    padding: 0 5px;
+    text-shadow: none;
+    font-weight: bold;
 }

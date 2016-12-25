@@ -1,0 +1,3 @@
+cookies:
+    Doc: 'https://symfony.com/doc/%s/components/http_foundation.html#setting-cookies'
+    API: 'http://api.symfony.com/%s/Symfony/Component/HttpFoundation/Cookie.html'

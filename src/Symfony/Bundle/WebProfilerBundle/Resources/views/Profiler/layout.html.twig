@@ -86,6 +86,7 @@
         <div id="main">
             <div id="collector-wrapper">
                 <div id="collector-content">
+                    <script src="{{ path('_profiler_js_file', {file: 'profiler'}) }}"{% if csp_script_nonce is defined and csp_script_nonce %} nonce={{ csp_script_nonce }}{% endif %}></script>
                     {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
                     {% block panel '' %}
                 </div>

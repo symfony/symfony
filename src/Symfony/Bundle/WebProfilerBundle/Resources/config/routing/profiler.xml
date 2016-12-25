@@ -36,6 +36,10 @@
         <default key="_controller">web_profiler.controller.profiler:panelAction</default>
     </route>
 
+    <route id="_profiler_js_file" path="/js/{file}.js">
+        <default key="_controller">web_profiler.controller.profiler:jsAction</default>
+    </route>
+
     <route id="_profiler_router" path="/{token}/router">
         <default key="_controller">web_profiler.controller.router:panelAction</default>
     </route>

@@ -430,6 +430,24 @@ class ProfilerController
          )), 200, array('Content-Type' => 'text/html'));
     }
 
+    public function jsAction(Request $request, $file)
+    {
+        switch ($file) {
+            case 'toolbar':
+                $files = array(dirname(__DIR__).'/Resources/js/base.js');
+                break;
+            case 'profiler':
+                $files = array(dirname(__DIR__).'/Resources/js/base.js');
+                break;
+            default:
+                throw new NotFoundHttpException(sprintf('The file "%s.js" cannot be found.', $file));
+        }
+
+        return new Response(implode("\n\n", array_map(function ($file) {
+            return file_get_contents($file);
+        }, $files)), 200, array('Content-Type' => 'application/javascript'));
+    }
+
     /**
      * Gets the Template Manager.
      *

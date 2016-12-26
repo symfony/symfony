@@ -48,7 +48,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      *
      * @return string The SHA-256 hash
      *
-     * @internal Should not be used by user-land code.
+     * @internal should not be used by user-land code
      */
     public static function generateHash($value, $namespace = '')
     {

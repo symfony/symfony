@@ -40,8 +40,8 @@ class ChoiceListView
      * Creates a new choice list view.
      *
      * @param ChoiceGroupView[]|ChoiceView[] $choices          The choice views
-     * @param ChoiceGroupView[]|ChoiceView[] $preferredChoices The preferred
-     *                                                         choice views.
+     * @param ChoiceGroupView[]|ChoiceView[] $preferredChoices the preferred
+     *                                                         choice views
      */
     public function __construct(array $choices = array(), array $preferredChoices = array())
     {

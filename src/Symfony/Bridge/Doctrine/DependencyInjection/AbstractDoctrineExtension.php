@@ -301,7 +301,7 @@ abstract class AbstractDoctrineExtension extends Extension
      * @param ContainerBuilder $container     A ContainerBuilder instance
      * @param string           $cacheName
      *
-     * @throws \InvalidArgumentException In case of unknown driver type.
+     * @throws \InvalidArgumentException in case of unknown driver type
      */
     protected function loadObjectManagerCacheDriver(array $objectManager, ContainerBuilder $container, $cacheName)
     {

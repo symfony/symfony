@@ -39,7 +39,7 @@ interface ConstraintViolationListInterface extends \Traversable, \Countable, \Ar
      *
      * @return ConstraintViolationInterface The violation
      *
-     * @throws \OutOfBoundsException If the offset does not exist.
+     * @throws \OutOfBoundsException if the offset does not exist
      */
     public function get($offset);
 

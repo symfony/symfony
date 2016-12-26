@@ -107,8 +107,8 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
     /**
      * Returns the current element of the iterator.
      *
-     * @return FormError|FormErrorIterator An error or an iterator containing
-     *                                     nested errors.
+     * @return FormError|FormErrorIterator an error or an iterator containing
+     *                                     nested errors
      */
     public function current()
     {

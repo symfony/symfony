@@ -51,8 +51,8 @@ class ValueToDuplicatesTransformer implements DataTransformerInterface
      *
      * @return mixed The value
      *
-     * @throws TransformationFailedException If the given value is not an array or
-     *                                       if the given array can not be transformed.
+     * @throws TransformationFailedException if the given value is not an array or
+     *                                       if the given array can not be transformed
      */
     public function reverseTransform($array)
     {

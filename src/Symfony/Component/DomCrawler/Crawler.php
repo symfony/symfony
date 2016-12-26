@@ -71,7 +71,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param \DOMNodeList|\DOMNode|array|string|null $node A node
      *
-     * @throws \InvalidArgumentException When node is not the expected type.
+     * @throws \InvalidArgumentException when node is not the expected type
      */
     public function add($node)
     {

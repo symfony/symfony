@@ -27,7 +27,7 @@ class SyntaxErrorException extends ParseException
      * @param string $expectedValue
      * @param Token  $foundToken
      *
-     * @return SyntaxErrorException
+     * @return self
      */
     public static function unexpectedToken($expectedValue, Token $foundToken)
     {
@@ -38,7 +38,7 @@ class SyntaxErrorException extends ParseException
      * @param string $pseudoElement
      * @param string $unexpectedLocation
      *
-     * @return SyntaxErrorException
+     * @return self
      */
     public static function pseudoElementFound($pseudoElement, $unexpectedLocation)
     {
@@ -48,7 +48,7 @@ class SyntaxErrorException extends ParseException
     /**
      * @param int $position
      *
-     * @return SyntaxErrorException
+     * @return self
      */
     public static function unclosedString($position)
     {
@@ -56,7 +56,7 @@ class SyntaxErrorException extends ParseException
     }
 
     /**
-     * @return SyntaxErrorException
+     * @return self
      */
     public static function nestedNot()
     {
@@ -64,7 +64,7 @@ class SyntaxErrorException extends ParseException
     }
 
     /**
-     * @return SyntaxErrorException
+     * @return self
      */
     public static function stringAsFunctionArgument()
     {

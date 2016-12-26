@@ -324,7 +324,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param int $position The position
      *
-     * @return Crawler A new instance of the Crawler with the selected node, or an empty Crawler if it does not exist
+     * @return self
      */
     public function eq($position)
     {
@@ -369,7 +369,7 @@ class Crawler extends \SplObjectStorage
      * @param int $offset
      * @param int $length
      *
-     * @return Crawler A Crawler instance with the sliced nodes
+     * @return self
      */
     public function slice($offset = 0, $length = -1)
     {
@@ -383,7 +383,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param \Closure $closure An anonymous function
      *
-     * @return Crawler A Crawler instance with the selected nodes
+     * @return self
      */
     public function reduce(\Closure $closure)
     {
@@ -400,7 +400,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns the first node of the current selection.
      *
-     * @return Crawler A Crawler instance with the first selected node
+     * @return self
      */
     public function first()
     {
@@ -410,7 +410,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns the last node of the current selection.
      *
-     * @return Crawler A Crawler instance with the last selected node
+     * @return self
      */
     public function last()
     {
@@ -420,7 +420,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns the siblings nodes of the current selection.
      *
-     * @return Crawler A Crawler instance with the sibling nodes
+     * @return self
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -436,7 +436,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns the next siblings nodes of the current selection.
      *
-     * @return Crawler A Crawler instance with the next sibling nodes
+     * @return self
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -452,7 +452,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns the previous sibling nodes of the current selection.
      *
-     * @return Crawler A Crawler instance with the previous sibling nodes
+     * @return self
      *
      * @throws \InvalidArgumentException
      */
@@ -468,7 +468,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns the parents nodes of the current selection.
      *
-     * @return Crawler A Crawler instance with the parents nodes of the current selection
+     * @return self
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -493,7 +493,7 @@ class Crawler extends \SplObjectStorage
     /**
      * Returns the children nodes of the current selection.
      *
-     * @return Crawler A Crawler instance with the children nodes
+     * @return self
      *
      * @throws \InvalidArgumentException When current node is empty
      */
@@ -626,7 +626,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param string $xpath An XPath expression
      *
-     * @return Crawler A new instance of Crawler with the filtered list of nodes
+     * @return self
      */
     public function filterXPath($xpath)
     {
@@ -647,7 +647,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param string $selector A CSS selector
      *
-     * @return Crawler A new instance of Crawler with the filtered list of nodes
+     * @return self
      *
      * @throws \RuntimeException if the CssSelector Component is not available
      */
@@ -666,7 +666,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param string $value The link text
      *
-     * @return Crawler A new instance of Crawler with the filtered list of nodes
+     * @return self
      */
     public function selectLink($value)
     {
@@ -681,7 +681,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param string $value The button text
      *
-     * @return Crawler A new instance of Crawler with the filtered list of nodes
+     * @return self
      */
     public function selectButton($value)
     {
@@ -826,7 +826,7 @@ class Crawler extends \SplObjectStorage
      *
      * @param string $xpath
      *
-     * @return Crawler
+     * @return self
      */
     private function filterRelativeXPath($xpath)
     {

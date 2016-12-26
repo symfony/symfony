@@ -25,7 +25,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param FormInterface|null $parent The parent form or null if it's the root
      *
-     * @return FormInterface The form instance
+     * @return self
      *
      * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      * @throws Exception\LogicException            When trying to set a parent for a form with
@@ -36,7 +36,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the parent form.
      *
-     * @return FormInterface|null The parent form or null if there is none
+     * @return self|null The parent form or null if there is none
      */
     public function getParent();
 
@@ -47,7 +47,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      * @param string|null              $type    The child's type, if a name was passed
      * @param array                    $options The child's options, if a name was passed
      *
-     * @return FormInterface The form instance
+     * @return self
      *
      * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      * @throws Exception\LogicException            When trying to add a child to a non-compound form.
@@ -60,7 +60,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param string $name The name of the child
      *
-     * @return FormInterface The child form
+     * @return self
      *
      * @throws \OutOfBoundsException If the named child does not exist.
      */
@@ -80,7 +80,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param string $name The name of the child to remove
      *
-     * @return FormInterface The form instance
+     * @return $this
      *
      * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      */
@@ -89,7 +89,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns all children in this group.
      *
-     * @return FormInterface[] An array of FormInterface instances
+     * @return self[]
      */
     public function all();
 
@@ -110,7 +110,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param mixed $modelData The data formatted as expected for the underlying object
      *
-     * @return FormInterface The form instance
+     * @return $this
      *
      * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      * @throws Exception\LogicException            If listeners try to call setData in a cycle. Or if
@@ -182,7 +182,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param FormError $error
      *
-     * @return FormInterface The form instance
+     * @return $this
      */
     public function addError(FormError $error);
 
@@ -248,7 +248,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * Should be called on the root form after constructing the tree.
      *
-     * @return FormInterface The form instance
+     * @return $this
      */
     public function initialize();
 
@@ -262,7 +262,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *
      * @param mixed $request The request to handle
      *
-     * @return FormInterface The form instance
+     * @return $this
      */
     public function handleRequest($request = null);
 
@@ -274,7 +274,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
      *                                         when they are missing in the
      *                                         submitted data.
      *
-     * @return FormInterface The form instance
+     * @return $this
      *
      * @throws Exception\AlreadySubmittedException If the form has already been submitted.
      */
@@ -283,7 +283,7 @@ interface FormInterface extends \ArrayAccess, \Traversable, \Countable
     /**
      * Returns the root of the form tree.
      *
-     * @return FormInterface The root of the tree
+     * @return self The root of the tree
      */
     public function getRoot();
 

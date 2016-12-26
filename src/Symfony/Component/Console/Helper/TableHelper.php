@@ -48,7 +48,7 @@ class TableHelper extends Helper
      *
      * @param int $layout self::LAYOUT_*
      *
-     * @return TableHelper
+     * @return $this
      *
      * @throws \InvalidArgumentException when the table layout is not known
      */
@@ -114,7 +114,7 @@ class TableHelper extends Helper
      *
      * @param string $paddingChar
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setPaddingChar($paddingChar)
     {
@@ -128,7 +128,7 @@ class TableHelper extends Helper
      *
      * @param string $horizontalBorderChar
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setHorizontalBorderChar($horizontalBorderChar)
     {
@@ -142,7 +142,7 @@ class TableHelper extends Helper
      *
      * @param string $verticalBorderChar
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setVerticalBorderChar($verticalBorderChar)
     {
@@ -156,7 +156,7 @@ class TableHelper extends Helper
      *
      * @param string $crossingChar
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setCrossingChar($crossingChar)
     {
@@ -170,7 +170,7 @@ class TableHelper extends Helper
      *
      * @param string $cellHeaderFormat
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setCellHeaderFormat($cellHeaderFormat)
     {
@@ -184,7 +184,7 @@ class TableHelper extends Helper
      *
      * @param string $cellRowFormat
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setCellRowFormat($cellRowFormat)
     {
@@ -198,7 +198,7 @@ class TableHelper extends Helper
      *
      * @param string $cellRowContentFormat
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setCellRowContentFormat($cellRowContentFormat)
     {
@@ -212,7 +212,7 @@ class TableHelper extends Helper
      *
      * @param string $borderFormat
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setBorderFormat($borderFormat)
     {
@@ -226,7 +226,7 @@ class TableHelper extends Helper
      *
      * @param int $padType STR_PAD_*
      *
-     * @return TableHelper
+     * @return $this
      */
     public function setPadType($padType)
     {

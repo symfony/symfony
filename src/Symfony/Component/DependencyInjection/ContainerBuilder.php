@@ -196,7 +196,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param ResourceInterface $resource A resource instance
      *
-     * @return ContainerBuilder The current instance
+     * @return $this
      */
     public function addResource(ResourceInterface $resource)
     {
@@ -214,7 +214,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param ResourceInterface[] $resources An array of resources
      *
-     * @return ContainerBuilder The current instance
+     * @return $this
      */
     public function setResources(array $resources)
     {
@@ -232,7 +232,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param object $object An object instance
      *
-     * @return ContainerBuilder The current instance
+     * @return $this
      */
     public function addObjectResource($object)
     {
@@ -248,7 +248,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @param \ReflectionClass $class
      *
-     * @return ContainerBuilder The current instance
+     * @return $this
      */
     public function addClassResource(\ReflectionClass $class)
     {
@@ -271,7 +271,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $extension The extension alias or namespace
      * @param array  $values    An array of values that customizes the extension
      *
-     * @return ContainerBuilder The current instance
+     * @return $this
      *
      * @throws BadMethodCallException When this ContainerBuilder is frozen
      * @throws \LogicException        if the container is frozen
@@ -295,7 +295,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param CompilerPassInterface $pass A compiler pass
      * @param string                $type The type of compiler pass
      *
-     * @return ContainerBuilder The current instance
+     * @return $this
      */
     public function addCompilerPass(CompilerPassInterface $pass, $type = PassConfig::TYPE_BEFORE_OPTIMIZATION)
     {

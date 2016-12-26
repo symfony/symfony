@@ -31,7 +31,7 @@ interface TemplateReferenceInterface
      * @param string $name  The parameter name
      * @param string $value The parameter value
      *
-     * @return TemplateReferenceInterface The TemplateReferenceInterface instance
+     * @return $this
      *
      * @throws \InvalidArgumentException if the parameter name is not supported
      */

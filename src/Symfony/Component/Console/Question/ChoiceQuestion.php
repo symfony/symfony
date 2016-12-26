@@ -56,7 +56,7 @@ class ChoiceQuestion extends Question
      *
      * @param bool $multiselect
      *
-     * @return ChoiceQuestion The current instance
+     * @return $this
      */
     public function setMultiselect($multiselect)
     {
@@ -91,7 +91,7 @@ class ChoiceQuestion extends Question
      *
      * @param string $prompt
      *
-     * @return ChoiceQuestion The current instance
+     * @return $this
      */
     public function setPrompt($prompt)
     {
@@ -107,7 +107,7 @@ class ChoiceQuestion extends Question
      *
      * @param string $errorMessage
      *
-     * @return ChoiceQuestion The current instance
+     * @return $this
      */
     public function setErrorMessage($errorMessage)
     {

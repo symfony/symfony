@@ -19,4 +19,9 @@ namespace Symfony\Component\OptionsResolver;
  */
 interface Options extends \ArrayAccess, \Countable
 {
+    const NONE = 0;
+    const ALL = 1;
+    const DEFINED = 2;
+    const NESTED = 3;
+    const EXTRA = 4;
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\OptionsResolver;
 
 use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
@@ -39,6 +40,13 @@ class OptionsResolver implements Options
      * @var array
      */
     private $defaults = array();
+
+    /**
+     * The nested options.
+     *
+     * @var NestedOptions[]
+     */
+    private $nested = array();
 
     /**
      * The names of required options.
@@ -69,11 +77,32 @@ class OptionsResolver implements Options
     private $allowedValues = array();
 
     /**
+     * A list of accepted values for all options.
+     *
+     * @var array
+     */
+    private $allowedValuesForAll = array();
+
+    /**
      * A list of accepted types for each option.
      *
      * @var array
      */
     private $allowedTypes = array();
+
+    /**
+     * A list of accepted types for all options.
+     *
+     * @var array
+     */
+    private $allowedTypesForAll = array();
+
+    /**
+     * Whether to resolve undefined options.
+     *
+     * @var bool
+     */
+    private $resolveUndefined = false;
 
     /**
      * A list of closures for evaluating lazy options.
@@ -142,10 +171,23 @@ class OptionsResolver implements Options
      * is spread across different locations of your code, such as base and
      * sub-classes.
      *
+     * If you set default values of nested options, this method will return the
+     * nested instance for the same convenience as above.
+     *
+     *     // Master class
+     *     $options->setNested('connexion', array('port' => '80'));
+     *
+     *     // Sub class inheriting $options
+     *     $nestedOptions = $options->setDefault('connexion', array(
+     *                               'port' => '443', // overrides default
+     *                           ));
+     *
+     *     $nestedOptions->setRequired('type');
+     *
      * @param string $option The name of the option
      * @param mixed  $value  The default value of the option
      *
-     * @return OptionsResolver This instance
+     * @return OptionsResolver|NestedOptions This instance or the nested instance
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -167,7 +209,7 @@ class OptionsResolver implements Options
             if (isset($params[0]) && null !== ($class = $params[0]->getClass()) && Options::class === $class->name) {
                 // Initialize the option if no previous value exists
                 if (!isset($this->defaults[$option])) {
-                    $this->defaults[$option] = null;
+                    $this->defaults[$option] = $this->isNested($option) ? array() : null;
                 }
 
                 // Ignore previous lazy options if the closure has no second parameter
@@ -188,6 +230,18 @@ class OptionsResolver implements Options
 
         // This option is not lazy anymore
         unset($this->lazy[$option]);
+
+        if ($this->isNested($option)) {
+            $defaults = isset($this->defaults[$option]) ? $this->defaults[$option] : array();
+            $this->defaults[$option] = array_replace($defaults, $value);
+            $this->defined[$option] = true;
+            // Make sure the nested options are processed
+            unset($this->resolved[$option]);
+
+            // Returning the nested options here is convenient when we need to
+            // override them from a sub class
+            return $this->nested[$option];
+        }
 
         // Yet undefined options can be marked as resolved, because we only need
         // to resolve options with lazy closures, normalizers or validation
@@ -234,6 +288,82 @@ class OptionsResolver implements Options
     public function hasDefault($option)
     {
         return array_key_exists($option, $this->defaults);
+    }
+
+    /**
+     * Defines an option as a new NestedOptions instance.
+     *
+     * Returns a new NestedOptions instance to configure nested options.
+     *
+     *     $nestedOptions = $options->setNested('connexion', array(
+     *         'host' => 'localhost',
+     *         'port' => 80,
+     *     );
+     *
+     *     $nestedOptions->setRequired('user');
+     *     $nestedOptions->setDefault('password', function (Options $nested) {
+     *         return isset($nested['user']) ? '' : null;
+     *     });
+     *     $nestedOptions->setDefined(array('secure'));
+     *     $nestedOptions->setNormalizer('secure', function (Options $nested, $secure) {
+     *         return 443 === $nested['port'] ?: $secure;
+     *     });
+     *     $nestedOptions->setAllowedTypes('port', 'int');
+     *
+     * @param string $option   The option name
+     * @param array  $defaults The default nested options
+     *
+     * @return NestedOptions The nested options resolver
+     *
+     * @throws AccessException If called from a lazy option or normalizer
+     */
+    public function setNested($option, array $defaults = array())
+    {
+        if ($this->locked) {
+            throw new AccessException('Options cannot be made nested from a lazy option or normalizer.');
+        }
+
+        $nestedOptions = new NestedOptions($option);
+
+        foreach ($defaults as $name => $default) {
+            $nestedOptions->setDefault($name, $default);
+        }
+
+        // Keep a raw copy of defaults until nested options are resolved allowing to
+        // easily override them, even using lazy definition with {@link setDefault()}
+        $this->defaults[$option] = $defaults;
+        $this->defined[$option] = true;
+
+        // Make sure the nested options are processed
+        unset($this->resolved[$option]);
+
+        return $this->nested[$option] = $nestedOptions;
+    }
+
+    /**
+     * Returns whether an option is nested.
+     *
+     * An option is nested if it was passed to {@link setNested()}.
+     *
+     * @param string $option The name of the option
+     *
+     * @return bool Whether the option is nested
+     */
+    public function isNested($option)
+    {
+        return isset($this->nested[$option]);
+    }
+
+    /**
+     * Returns the names of all nested options.
+     *
+     * @return string[] The names of the nested options
+     *
+     * @see isNested()
+     */
+    public function getNestedOptions()
+    {
+        return array_keys($this->nested);
     }
 
     /**
@@ -443,7 +573,13 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed values cannot be set from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
+        if ($this->isNested($option)) {
+            @trigger_error(sprintf('The "%s" method should not be used with nested options. A failed attempt occurred with the option "%" for values %s', __METHOD__, $option, $this->formatValues($allowedValues)), E_USER_WARNING);
+
+            return $this;
+        }
+
+        if (!isset($this->defined[$option]) && !$this->resolveUndefined && Options::EXTRA !== $option) {
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
@@ -488,7 +624,13 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed values cannot be added from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
+        if ($this->isNested($option)) {
+            @trigger_error(sprintf('The "%s" method should not be used with nested options. A failed attempt occurred with the option "%" for values %s', __METHOD__, $option, $this->formatValues($allowedValues)), E_USER_WARNING);
+
+            return $this;
+        }
+
+        if (!isset($this->defined[$option]) && !$this->resolveUndefined && Options::EXTRA !== $option) {
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
@@ -508,6 +650,98 @@ class OptionsResolver implements Options
 
         // Make sure the option is processed
         unset($this->resolved[$option]);
+
+        return $this;
+    }
+
+    /**
+     * Adds allowed values for one or more options.
+     *
+     * First argument may be a name or an array of option names.
+     *
+     * You can pass a constant of Options interface as first argument to target
+     * a group of options. Supported values are:
+     *
+     *   - Options::ALL Defined and extra options
+     *   - Options::DEFINED
+     *   - Options::NESTED
+     *   - Options::EXTRA
+     *
+     * If a nested option name is passed it will apply to all nested options.
+     * You can prevent it by passing Options::NONE as fourth argument.
+     *
+     * Instead of passing values, you may also pass a closures with the
+     * following signature:
+     *
+     *     function ($value) {
+     *         // return true or false
+     *     }
+     *
+     * The closure receives the value as argument and should return true to
+     * accept the value and false to reject the value.
+     *
+     * @param string|string[]|int $optionNames   One or more option names
+     *                                           or an Options constant
+     * @param mixed               $allowedValues One or more accepted values
+     *                                           or closures
+     * @param bool                $replace       Whether to replace previous
+     *                                           values
+     * @param int                 $nested        This method is recursive for
+     *                                           nested options which is the
+     *                                           default. Pass Options::NONE
+     *                                           to change it.
+     *
+     * @return OptionsResolver This instance
+     *
+     * @throws UndefinedOptionsException If an option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     */
+    public function addAllowedValuesForAll($optionNames, $allowedValues, $replace = false, $nested = Options::ALL)
+    {
+        if ($this->locked) {
+            throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
+        }
+
+        switch ($optionNames) {
+            case Options::ALL:
+                // Use this values for all defined and extra options
+                // except nested which are always arrays.
+                $this->allowedValuesForAll = $replace
+                    ? $allowedValues : array_merge($this->allowedValuesForAll, $allowedValues);
+
+                // If not recursive return
+                if (Options::NONE === $nested) {
+                    return $this;
+                }
+
+                $optionNames = $this->getNestedOptions();
+                break;
+            case Options::NESTED:
+                $optionNames = $this->getNestedOptions();
+                break;
+            case Options::DEFINED:
+                $optionNames = $this->getDefinedOptions();
+                break;
+            case Options::NONE:
+                // Not supported
+                return $this;
+            default:
+                // A custom array of option names or
+                // one option name or Options::EXTRA
+                $optionNames = (array) $optionNames;
+        }
+
+        foreach ($optionNames as $option) {
+            if ($this->isNested($option) && Options::NONE !== $nested) {
+                $this->nested[$option]->addAllowedValuesForAll($nested, $allowedValues, $replace);
+            } else {
+                if ($replace) {
+                    $this->setAllowedValues($option, $allowedValues);
+                } else {
+                    $this->addAllowedValues($option, $allowedValues);
+                }
+            }
+        }
 
         return $this;
     }
@@ -533,7 +767,13 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed types cannot be set from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
+        if ($this->isNested($option)) {
+            @trigger_error(sprintf('The "%s" method should not be used with nested options. A failed attempt occurred with the option "%" for types %s', __METHOD__, $option, $this->formatValues($allowedTypes)), E_USER_WARNING);
+
+            return $this;
+        }
+
+        if (!isset($this->defined[$option]) && !$this->resolveUndefined && Options::EXTRA !== $option) {
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
@@ -572,7 +812,13 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
+        if ($this->isNested($option)) {
+            @trigger_error(sprintf('The "%s" method should not be used with nested options. A failed attempt occurred with the option "%" for types %s', __METHOD__, $option, $this->formatValues($allowedTypes)), E_USER_WARNING);
+
+            return $this;
+        }
+
+        if (!isset($this->defined[$option]) && !$this->resolveUndefined && Options::EXTRA !== $option) {
             throw new UndefinedOptionsException(sprintf(
                 'The option "%s" does not exist. Defined options are: "%s".',
                 $option,
@@ -593,6 +839,159 @@ class OptionsResolver implements Options
     }
 
     /**
+     * Adds allowed types for one or more options.
+     *
+     * First argument may be a name or an array of option names.
+     *
+     * You can pass a constant of Options interface as first argument to target
+     * a group of options. Supported values are:
+     *
+     *   - Options::ALL Defined and extra options
+     *   - Options::DEFINED
+     *   - Options::NESTED
+     *
+     * If a nested option name is passed it will apply to all nested options.
+     * You can prevent it by passing Options::NONE as fourth argument.
+     *
+     * Any type for which a corresponding is_<type>() function exists is
+     * acceptable. Additionally, fully-qualified class or interface names may
+     * be passed.
+     *
+     * @param string|string[]|int $optionNames  One or more option names
+     *                                          or Options::ALL
+     * @param string|string[]     $allowedTypes One or more accepted types
+     * @param bool                $replace      Whether to replace previous
+     *                                          value
+     * @param int                 $nested       This method is recursive for
+     *                                          nested options which is the
+     *                                          default. Pass Options::NONE
+     *                                          to change it.
+     *
+     * @return OptionsResolver This instance
+     *
+     * @throws UndefinedOptionsException If an option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     */
+    public function addAllowedTypesForAll($optionNames, $allowedTypes, $replace = false, $nested = Options::ALL)
+    {
+        if ($this->locked) {
+            throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
+        }
+
+        switch ($optionNames) {
+            case Options::ALL:
+                // Use this values for all defined and extra options
+                // except nested which are always arrays.
+                $this->allowedTypesForAll = $replace
+                    ? array_merge($this->allowedTypesForAll, $allowedTypes) : $allowedTypes;
+
+                // If not recursive return
+                if (Options::NONE === $nested) {
+                    return $this;
+                }
+
+                $optionNames = $this->getNestedOptions();
+                break;
+            case Options::NESTED:
+                $optionNames = $this->getNestedOptions();
+                break;
+            case Options::DEFINED:
+                $optionNames = $this->getDefinedOptions();
+                break;
+            case Options::NONE:
+                // Not supported
+                return $this;
+            default:
+                // A custom array of option names or
+                // one option name or Options::EXTRA
+                $optionNames = (array) $optionNames;
+        }
+
+        foreach ($optionNames as $option) {
+            if ($this->isNested($option) && Options::NONE !== $nested) {
+                $this->nested[$option]->addAllowedTypesForAll($nested, $allowedTypes, $replace);
+            } else {
+                if ($replace) {
+                    $this->setAllowedTypes($option, $allowedTypes);
+                } else {
+                    $this->addAllowedTypes($option, $allowedTypes);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a prototype for extra or all options.
+     *
+     * If this instance was not accepting extra options before, this method
+     * allows it by default.
+     *
+     * First argument is an allowed type and second is one more values/closures.
+     * By default it only applies on undefined options, to validate previous defaults
+     * as well, pass Options::ALL as third argument.
+     *
+     * This method overrides previous allowed type and values for concerned options.
+     *
+     *     $resolver->setNested('emails')
+     *         ->setPrototype(array(
+     *             'string' => function ($email) use ($regex) {
+     *                 return preg_match($regex, $email);
+     *             },
+     *         );
+     *
+     * @param string $type    A string defining an allowed type
+     * @param mixed  $values  One or more allowed values/closures
+     * @param int    $options Options::EXTRA by default, but you can pass
+     *                        Options::ALL to apply the rule on previous defaults
+     *
+     * @return OptionsResolver This instance
+     *
+     * @throws UndefinedOptionsException If an option is undefined
+     * @throws AccessException           If called from a lazy option or normalizer
+     */
+    public function setPrototype($type, $values, $options = Options::EXTRA)
+    {
+        if ($this->locked) {
+            throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
+        }
+
+        $this->resolveUndefined = true;
+
+        $this->addAllowedTypesForAll($options, $type, true, Options::NONE);
+        $this->addAllowedValuesForAll($options, $values, true, Options::NONE);
+
+        return $this;
+    }
+
+    /**
+     * Defines whether undefined options should be resolved.
+     *
+     * @param bool $allow Whether to resolve undefined options
+     *
+     * @return OptionsResolver This instance
+     */
+    public function allowExtraOptions($allow = true)
+    {
+        $this->resolveUndefined = $allow;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether this instance is locked.
+     *
+     * @return bool Whether this instance is locked
+     *
+     * @internal Used by {@see NestedOptions} to prevent external resolving
+     */
+    public function isLocked()
+    {
+        return $this->locked;
+    }
+
+    /**
      * Removes the option with the given name.
      *
      * Undefined options are ignored.
@@ -610,8 +1009,9 @@ class OptionsResolver implements Options
         }
 
         foreach ((array) $optionNames as $option) {
-            unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option]);
-            unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option]);
+            unset($this->defined[$option], $this->defaults[$option], $this->nested[$option]);
+            unset($this->required[$option], $this->resolved[$option], $this->lazy[$option]);
+            unset($this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option]);
         }
 
         return $this;
@@ -632,6 +1032,7 @@ class OptionsResolver implements Options
 
         $this->defined = array();
         $this->defaults = array();
+        $this->nested = array();
         $this->required = array();
         $this->resolved = array();
         $this->lazy = array();
@@ -678,7 +1079,7 @@ class OptionsResolver implements Options
         // Make sure that no unknown options are passed
         $diff = array_diff_key($options, $clone->defined);
 
-        if (count($diff) > 0) {
+        if (count($diff) > 0 && false === $this->resolveUndefined) {
             ksort($clone->defined);
             ksort($diff);
 
@@ -691,7 +1092,13 @@ class OptionsResolver implements Options
 
         // Override options set by the user
         foreach ($options as $option => $value) {
-            $clone->defaults[$option] = $value;
+            if ($clone->isNested($option)) {
+                $defaults = isset($clone->defaults[$option]) ? $clone->defaults[$option] : array();
+                $clone->defaults[$option] = array_replace($defaults, $value);
+            } else {
+                $clone->defaults[$option] = $value;
+            }
+
             unset($clone->resolved[$option], $clone->lazy[$option]);
         }
 
@@ -789,11 +1196,30 @@ class OptionsResolver implements Options
             // END
         }
 
+        if ($this->isNested($option)) {
+            try {
+                $value = $this->nested[$option]->resolve($value);
+            } catch (ExceptionInterface $e) {
+                throw new InvalidOptionsException(sprintf('The nested options in the option "%s" could not be resolved.', $option), 0, $e);
+            }
+        }
+
         // Validate the type of the resolved option
-        if (isset($this->allowedTypes[$option])) {
+        if (isset($this->allowedTypes[$option])
+            || ($this->allowedTypesForAll && false === $this->isNested($option))
+            || $extra = (isset($this->allowedTypes[Options::EXTRA]) && false === $this->isDefined($option))
+        ) {
             $valid = false;
 
-            foreach ($this->allowedTypes[$option] as $type) {
+            if (isset($extra) && $extra && $this->resolveUndefined) {
+                $allowedTypes = $this->allowedTypes[Options::EXTRA];
+            } else {
+                $allowedTypes = isset($this->allowedTypes[$option]) ? $this->allowedTypes[$option] : array();
+            }
+
+            $allowedTypes = array_unique(array_merge($allowedTypes, $this->allowedTypesForAll));
+
+            foreach ($allowedTypes as $type) {
                 $type = isset(self::$typeAliases[$type]) ? self::$typeAliases[$type] : $type;
 
                 if (function_exists($isFunction = 'is_'.$type)) {
@@ -824,11 +1250,22 @@ class OptionsResolver implements Options
         }
 
         // Validate the value of the resolved option
-        if (isset($this->allowedValues[$option])) {
+        if (isset($this->allowedValues[$option])
+            || ($this->allowedValuesForAll && false === $this->isNested($option))
+            || $extra = (isset($this->allowedValues[Options::EXTRA]) && false === $this->isDefined($option))
+        ) {
             $success = false;
             $printableAllowedValues = array();
 
-            foreach ($this->allowedValues[$option] as $allowedValue) {
+            if (isset($extra) && $extra && $this->resolveUndefined) {
+                $allowedValues = $this->allowedTypes[Options::EXTRA];
+            } else {
+                $allowedValues = isset($this->allowedValues[$option]) ? $this->allowedValues[$option] : array();
+            }
+
+            $allowedValues = array_merge($allowedValues, $this->allowedValuesForAll);
+
+            foreach ($allowedValues as $allowedValue) {
                 if ($allowedValue instanceof \Closure) {
                     if ($allowedValue($value)) {
                         $success = true;
@@ -882,7 +1319,7 @@ class OptionsResolver implements Options
             // BEGIN
             $this->calling[$option] = true;
             try {
-                $value = $normalizer($this, $value);
+                $value = $this->normalize($normalizer, $value);
             } finally {
                 unset($this->calling[$option]);
             }
@@ -953,6 +1390,29 @@ class OptionsResolver implements Options
         }
 
         return count($this->defaults);
+    }
+
+    public function __clone()
+    {
+        foreach ($this->nested as $name => $options) {
+            $nestedOptions = clone $options;
+            $this->nested[$name] = $nestedOptions->setRoot($this);
+        }
+    }
+
+    /**
+     * Executes the normalizer on the validated option value.
+     *
+     * Extract this bit of logic in order to override it in NestedOptions.
+     *
+     * @param \Closure $normalizer The option normalizer
+     * @param mixed    $value      The validated option value to normalize
+     *
+     * @return mixed The normalized option value
+     */
+    protected function normalize(\Closure $normalizer, $value)
+    {
+        return $normalizer($this, $value);
     }
 
     /**

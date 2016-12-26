@@ -1,0 +1,111 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-13T09:57:42Z
+
+ping @lyrixx
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-13T15:03:04Z
+
+Hello @Padam87
+
+Thanks for your PR. I added 2 comments about the code. Could you please update your code with my patch?
+
+BTW, with my patch, there is no need to use a key anymore. All the following syntax works:
+
+```yaml
+transitions:
+    request_review:
+        from: draft
+        to:
+            - wait_for_journalist
+            - wait_for_spellchecker
+```
+or
+```yaml
+transitions:
+    request_review:
+        from: draft
+        to:
+            - wait_for_journalist
+            - wait_for_spellchecker
+        name: this is the new name, it override request_review
+```
+or
+```yaml
+transitions:
+    -
+        from: draft
+        to:
+            - wait_for_journalist
+            - wait_for_spellchecker
+        name: here I MUST specify a name
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-13T15:04:35Z
+
+We should still validate that you don't have 2 transitions with the same name and a common from node though.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-13T15:06:34Z
+
+> We should still validate that you don't have 2 transitions with the same name
+
+Yes, indeed
+
+> and a common from node though.
+
+Why? it's possible to have 2 transitions, with the same "from" name.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-13T15:12:56Z
+
+@lyrixx your ``Yes indeed`` being in the middle of the ``and`` qualifying transitions makes me think that you misunderstood my comment entirely (your ``Yes indeed`` looks like you want to forbid exactly what this PR is about allowing to configure)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-13T15:17:20Z
+
+Oups, yes, you are right ;) Sorry.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-13T15:18:09Z
+
+But i'm not sure we should validate the "name + from" here. It should be done in the symfony/component validator instead.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-13T15:35:18Z
+
+@lyrixx it indeed must be done in the workflow validator.
+But it would not be bad to have an early validation in the DI class if it is easy to do (forbidding to configure an invalid workflow which would fail only later on). Validation during the compile time of the container would give early feedback without performance impact at runtime (as it happens at build time).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-13T15:45:22Z
+
+@stof All validations are already done in a compiler pass ;)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-13T16:03:43Z
+
+then fine. I forgot that
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-26T18:51:22Z
+
+Hello @Padam87
+
+I'm sorry, I totally forgot this PR because it was not tagged with `Workflow`.
+
+Thanks for this PR!
+
+:+1:

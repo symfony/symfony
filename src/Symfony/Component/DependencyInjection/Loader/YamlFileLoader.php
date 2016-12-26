@@ -147,8 +147,10 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The "services" key should contain an array in %s. Check your YAML syntax.', $file));
         }
 
+        $idPrefix = isset($content['service_id_prefix']) ? $content['service_id_prefix'] : '';
+
         foreach ($content['services'] as $id => $service) {
-            $this->parseDefinition($id, $service, $file);
+            $this->parseDefinition($idPrefix.$id, $service, $file);
         }
     }
 
@@ -491,7 +493,7 @@ class YamlFileLoader extends FileLoader
     private function loadFromExtensions($content)
     {
         foreach ($content as $namespace => $values) {
-            if (in_array($namespace, array('imports', 'parameters', 'services'))) {
+            if (in_array($namespace, array('imports', 'parameters', 'services', 'service_id_prefix'))) {
                 continue;
             }
 

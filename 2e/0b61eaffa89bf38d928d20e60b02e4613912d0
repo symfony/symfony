@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-10T17:53:44Z
+
+> As PHP does not lazily execute conditions, FormUtil::isEmtpy($data) || 0 === count($data) will cause both conditions to be executed. This means count($data) errors when $data is empty.
+
+I'm quite surprised by your statement and the fact it solves your issue, because AFAIK php does execute lazily expressions (short circuit evaluation): https://3v4l.org/V4H6E.
+So it should execute `0 === count($data)` only when `FormUtil::isEmtpy($data)` is `false`.
+
+See also http://php.net/manual/en/language.operators.logical.php#example-103
+
+Am I missing something?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-12-10T18:18:18Z
+
+Oh, indeed. You're completely correct, I interpreted the erroring build incorrectly. The problem is actually when counting non-empty strings or the like.
+
+Updated the PR with the correct change.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-10T18:24:03Z
+
+👍
+
+Status: Reviewed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-25T18:28:13Z
+
+What is the state here?
+
+---------------------------------------------------------------------------
+
+by wouterj at 2016-12-25T22:13:21Z
+
+@xabbuh PR is ready to merge imo. @nicolas-grekas's comment seems to be more related to a change in coding standard (`array() === $var` instead of `0 === count($var)`). This should be moved into a separate issue, to discuss it and fix it throughout the code base consistently.

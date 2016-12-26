@@ -5,4 +5,4 @@ option description
 * Accept value: yes
 * Is value required: yes
 * Is multiple: yes
-* Default: `array (  0 => '<comment>Hello</comment>',  1 => '<info>world</info>',)`
+* Default: `array (  0 => 'Hello',  1 => 'world',)`

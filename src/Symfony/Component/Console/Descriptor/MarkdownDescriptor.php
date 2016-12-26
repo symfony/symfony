@@ -17,6 +17,7 @@ use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Markdown descriptor.
@@ -27,6 +28,27 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class MarkdownDescriptor extends Descriptor
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function describe(OutputInterface $output, $object, array $options = array())
+    {
+        $decorated = $output->isDecorated();
+        $output->setDecorated(false);
+
+        parent::describe($output, $object, $options);
+
+        $output->setDecorated($decorated);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function write($content, $decorated = true)
+    {
+        parent::write($content, $decorated);
+    }
+
     /**
      * {@inheritdoc}
      */

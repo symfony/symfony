@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Tests\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -54,6 +55,14 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication($application);
         $this->assertEquals($application, $command->getApplication(), '->setApplication() sets the current application');
+        $this->assertEquals($application->getHelperSet(), $command->getHelperSet());
+    }
+
+    public function testSetApplicationNull()
+    {
+        $command = new \TestCommand();
+        $command->setApplication(null);
+        $this->assertNull($command->getHelperSet());
     }
 
     public function testSetGetDefinition()
@@ -82,6 +91,13 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $ret = $command->addOption('foo');
         $this->assertEquals($command, $ret, '->addOption() implements a fluent interface');
         $this->assertTrue($command->getDefinition()->hasOption('foo'), '->addOption() adds an option to the command');
+    }
+
+    public function testSetHidden()
+    {
+        $command = new \TestCommand();
+        $command->setHidden(true);
+        $this->assertTrue($command->isHidden());
     }
 
     public function testGetNamespaceGetNameSetName()
@@ -156,12 +172,28 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('name1'), $command->getAliases(), '->setAliases() sets the aliases');
     }
 
+    public function testSetAliasesNull()
+    {
+        $command = new \TestCommand();
+        $this->expectException(InvalidArgumentException::class);
+        $command->setAliases(null);
+    }
+
     public function testGetSynopsis()
     {
         $command = new \TestCommand();
         $command->addOption('foo');
         $command->addArgument('bar');
         $this->assertEquals('namespace:name [--foo] [--] [<bar>]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
+    }
+
+    public function testAddGetUsages()
+    {
+        $command = new \TestCommand();
+        $command->addUsage('foo1');
+        $command->addUsage('foo2');
+        $this->assertContains('namespace:name foo1', $command->getUsages());
+        $this->assertContains('namespace:name foo2', $command->getUsages());
     }
 
     public function testGetHelper()
@@ -295,6 +327,15 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
 
         $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
+    }
+
+    public function testRunWithProcessTitle()
+    {
+        $command = new \TestCommand();
+        $command->setApplication(new Application());
+        $command->setProcessTitle('foo');
+        $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
+        $this->assertEquals('foo', cli_get_process_title());
     }
 
     public function testSetCode()

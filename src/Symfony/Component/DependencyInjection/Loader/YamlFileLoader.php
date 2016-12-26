@@ -471,14 +471,12 @@ class YamlFileLoader extends FileLoader
             }
 
             if ('=' === substr($value, -1)) {
+                @trigger_error(sprintf('The "=" suffix that used to disable strict references in Symfony 2.x is deprecated since 3.3 and will be unsupported in 4.0. Remove it in "%s".', $value), E_USER_DEPRECATED);
                 $value = substr($value, 0, -1);
-                $strict = false;
-            } else {
-                $strict = true;
             }
 
             if (null !== $invalidBehavior) {
-                $value = new Reference($value, $invalidBehavior, $strict);
+                $value = new Reference($value, $invalidBehavior);
             }
         }
 

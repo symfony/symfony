@@ -387,13 +387,7 @@ class XmlFileLoader extends FileLoader
                         $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
                     }
 
-                    if ($strict = $arg->getAttribute('strict')) {
-                        $strict = XmlUtils::phpize($strict);
-                    } else {
-                        $strict = true;
-                    }
-
-                    $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior, $strict);
+                    $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior);
                     break;
                 case 'expression':
                     $arguments[$key] = new Expression($arg->nodeValue);

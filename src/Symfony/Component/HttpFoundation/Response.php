@@ -465,6 +465,8 @@ class Response
      * @param string $version The HTTP protocol version
      *
      * @return Response
+     *
+     * @final
      */
     public function setProtocolVersion($version)
     {
@@ -477,6 +479,8 @@ class Response
      * Gets the HTTP protocol version.
      *
      * @return string The HTTP protocol version
+     *
+     * @final
      */
     public function getProtocolVersion()
     {
@@ -495,6 +499,8 @@ class Response
      * @return Response
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
+     *
+     * @final
      */
     public function setStatusCode($code, $text = null)
     {
@@ -524,6 +530,8 @@ class Response
      * Retrieves the status code for the current web response.
      *
      * @return int Status code
+     *
+     * @final
      */
     public function getStatusCode()
     {
@@ -548,6 +556,8 @@ class Response
      * Retrieves the response charset.
      *
      * @return string Character set
+     *
+     * @final
      */
     public function getCharset()
     {
@@ -609,6 +619,8 @@ class Response
      * It makes the response ineligible for serving other clients.
      *
      * @return Response
+     *
+     * @final
      */
     public function setPrivate()
     {
@@ -624,6 +636,8 @@ class Response
      * It makes the response eligible for serving other clients.
      *
      * @return Response
+     *
+     * @final
      */
     public function setPublic()
     {
@@ -654,6 +668,8 @@ class Response
      * @return \DateTime A \DateTime instance
      *
      * @throws \RuntimeException When the header is not parseable
+     *
+     * @final
      */
     public function getDate()
     {
@@ -670,6 +686,8 @@ class Response
      * @param \DateTime $date A \DateTime instance
      *
      * @return Response
+     *
+     * @final
      */
     public function setDate(\DateTime $date)
     {
@@ -683,6 +701,8 @@ class Response
      * Returns the age of the response.
      *
      * @return int The age of the response in seconds
+     *
+     * @final
      */
     public function getAge()
     {
@@ -711,6 +731,8 @@ class Response
      * Returns the value of the Expires header as a DateTime instance.
      *
      * @return \DateTime|null A DateTime instance or null if the header does not exist
+     *
+     * @final
      */
     public function getExpires()
     {
@@ -730,6 +752,8 @@ class Response
      * @param \DateTime|null $date A \DateTime instance or null to remove the header
      *
      * @return Response
+     *
+     * @final
      */
     public function setExpires(\DateTime $date = null)
     {
@@ -752,6 +776,8 @@ class Response
      * back on an expires header. It returns null when no maximum age can be established.
      *
      * @return int|null Number of seconds
+     *
+     * @final
      */
     public function getMaxAge()
     {
@@ -776,6 +802,8 @@ class Response
      * @param int $value Number of seconds
      *
      * @return Response
+     *
+     * @final
      */
     public function setMaxAge($value)
     {
@@ -792,6 +820,8 @@ class Response
      * @param int $value Number of seconds
      *
      * @return Response
+     *
+     * @final
      */
     public function setSharedMaxAge($value)
     {
@@ -810,6 +840,8 @@ class Response
      * revalidating with the origin.
      *
      * @return int|null The TTL in seconds
+     *
+     * @final
      */
     public function getTtl()
     {
@@ -826,6 +858,8 @@ class Response
      * @param int $seconds Number of seconds
      *
      * @return Response
+     *
+     * @final
      */
     public function setTtl($seconds)
     {
@@ -842,6 +876,8 @@ class Response
      * @param int $seconds Number of seconds
      *
      * @return Response
+     *
+     * @final
      */
     public function setClientTtl($seconds)
     {
@@ -856,6 +892,8 @@ class Response
      * @return \DateTime|null A DateTime instance or null if the header does not exist
      *
      * @throws \RuntimeException When the HTTP header is not parseable
+     *
+     * @final
      */
     public function getLastModified()
     {
@@ -870,6 +908,8 @@ class Response
      * @param \DateTime|null $date A \DateTime instance or null to remove the header
      *
      * @return Response
+     *
+     * @final
      */
     public function setLastModified(\DateTime $date = null)
     {
@@ -888,6 +928,8 @@ class Response
      * Returns the literal value of the ETag HTTP header.
      *
      * @return string|null The ETag HTTP header or null if it does not exist
+     *
+     * @final
      */
     public function getEtag()
     {
@@ -901,6 +943,8 @@ class Response
      * @param bool        $weak Whether you want a weak ETag or not
      *
      * @return Response
+     *
+     * @final
      */
     public function setEtag($etag = null, $weak = false)
     {
@@ -996,6 +1040,8 @@ class Response
      * Returns true if the response includes a Vary header.
      *
      * @return bool true if the response includes a Vary header, false otherwise
+     *
+     * @final
      */
     public function hasVary()
     {
@@ -1006,6 +1052,8 @@ class Response
      * Returns an array of header names given in the Vary header.
      *
      * @return array An array of Vary names
+     *
+     * @final
      */
     public function getVary()
     {
@@ -1028,6 +1076,8 @@ class Response
      * @param bool         $replace Whether to replace the actual value or not (true by default)
      *
      * @return Response
+     *
+     * @final
      */
     public function setVary($headers, $replace = true)
     {
@@ -1078,6 +1128,8 @@ class Response
      * @return bool
      *
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+     *
+     * @final
      */
     public function isInvalid()
     {
@@ -1098,6 +1150,8 @@ class Response
      * Is response successful?
      *
      * @return bool
+     *
+     * @final
      */
     public function isSuccessful()
     {
@@ -1108,6 +1162,8 @@ class Response
      * Is the response a redirect?
      *
      * @return bool
+     *
+     * @final
      */
     public function isRedirection()
     {
@@ -1118,6 +1174,8 @@ class Response
      * Is there a client error?
      *
      * @return bool
+     *
+     * @final
      */
     public function isClientError()
     {
@@ -1138,6 +1196,8 @@ class Response
      * Is the response OK?
      *
      * @return bool
+     *
+     * @final
      */
     public function isOk()
     {
@@ -1148,6 +1208,8 @@ class Response
      * Is the response forbidden?
      *
      * @return bool
+     *
+     * @final
      */
     public function isForbidden()
     {
@@ -1158,6 +1220,8 @@ class Response
      * Is the response a not found error?
      *
      * @return bool
+     *
+     * @final
      */
     public function isNotFound()
     {
@@ -1170,6 +1234,8 @@ class Response
      * @param string $location
      *
      * @return bool
+     *
+     * @final
      */
     public function isRedirect($location = null)
     {
@@ -1180,6 +1246,8 @@ class Response
      * Is the response empty?
      *
      * @return bool
+     *
+     * @final
      */
     public function isEmpty()
     {

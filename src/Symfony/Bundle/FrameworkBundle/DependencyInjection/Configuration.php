@@ -296,11 +296,33 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->arrayNode('transitions')
-                                ->useAttributeAsKey('name')
+                                ->beforeNormalization()
+                                    ->always()
+                                    ->then(function ($transitions) {
+                                        // It's an indexed array, we let the validation occurs
+                                        if (isset($transitions[0])) {
+                                            return $transitions;
+                                        }
+
+                                        foreach ($transitions as $name => $transition) {
+                                            if (array_key_exists('name', $transition)) {
+                                                continue;
+                                            }
+                                            $transition['name'] = $name;
+                                            $transitions[$name] = $transition;
+                                        }
+
+                                        return $transitions;
+                                    })
+                                ->end()
                                 ->isRequired()
                                 ->requiresAtLeastOneElement()
                                 ->prototype('array')
                                     ->children()
+                                        ->scalarNode('name')
+                                            ->isRequired()
+                                            ->cannotBeEmpty()
+                                        ->end()
                                         ->arrayNode('from')
                                             ->beforeNormalization()
                                                 ->ifString()

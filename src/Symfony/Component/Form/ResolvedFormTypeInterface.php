@@ -30,7 +30,7 @@ interface ResolvedFormTypeInterface
     /**
      * Returns the parent type.
      *
-     * @return ResolvedFormTypeInterface|null The parent type or null
+     * @return self|null The parent type or null
      */
     public function getParent();
 

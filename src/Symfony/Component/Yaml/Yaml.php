@@ -80,6 +80,29 @@ class Yaml
     }
 
     /**
+     * Parses YAML file into a PHP value.
+     *
+     *  Usage:
+     *  <code>
+     *   $array = Yaml::parseFile('config.yml');
+     *   print_r($array);
+     *  </code>
+     *
+     * @param string $fileName A file containing YAML
+     * @param int    $flags A bit field of PARSE_* constants to customize the YAML parser behavior
+     *
+     * @return mixed The YAML converted to a PHP value
+     *
+     * @throws ParseException If the YAML is not valid
+     */
+    public static function parseFile ($fileName, $flags = 0)
+    {
+        $input = file_get_contents($fileName);
+
+        return self::parse($input, $flags = 0);
+    }
+    
+    /**
      * Dumps a PHP value to a YAML string.
      *
      * The dump method, when supplied with an array, will do its best

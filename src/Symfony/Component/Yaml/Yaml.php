@@ -101,7 +101,7 @@ class Yaml
 
         return self::parse($input, $flags);
     }
-    
+
     /**
      * Dumps a PHP value to a YAML string.
      *

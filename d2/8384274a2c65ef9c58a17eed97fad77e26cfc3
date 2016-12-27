@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Nicofuma at 2016-12-19T16:06:44Z
+
+There is also an issue with read_timeout as predis uses read_write_timeout (and again, with predis, 0 means 0s), but just renaming the option would be a BC break

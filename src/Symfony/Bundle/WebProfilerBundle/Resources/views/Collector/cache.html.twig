@@ -1,0 +1,111 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.totals.calls > 0 %}
+        {% set icon %}
+            {{ include('@WebProfiler/Icon/cache.svg') }}
+            <span class="sf-toolbar-value">{{ collector.totals.calls }}</span>
+            <span class="sf-toolbar-info-piece-additional-detail">
+                <span class="sf-toolbar-label">in</span>
+                <span class="sf-toolbar-value">{{ '%0.2f'|format(collector.totals.time * 1000) }}</span>
+                <span class="sf-toolbar-label">ms</span>
+            </span>
+        {% endset %}
+        {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Cache Calls</b>
+            <span>{{ collector.totals.calls }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Total time</b>
+            <span>{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Cache hits</b>
+            <span>{{ collector.totals.hits }}/{{ collector.totals.reads }} ({{ collector.totals['hits/reads'] }})</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Cache writes</b>
+            <span>{{ collector.totals.writes }}</span>
+        </div>
+        {% endset %}
+        {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.totals.calls == 0 ? 'disabled' }}">
+    <span class="icon">
+        {{ include('@WebProfiler/Icon/cache.svg') }}
+    </span>
+    <strong>Cache</strong>
+    <span class="count">
+        <span>{{ collector.totals.calls }}</span>
+        <span>{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Cache</h2>
+    {% for name, calls in collector.calls %}
+        <h3>Statistics for '{{ name }}'</h3>
+        <div class="metrics">
+            {% for key, value in collector.statistics[name] %}
+                <div class="metric">
+                    <span class="value">
+                        {% if key == 'time' %}
+                            <td>{{ '%0.2f'|format(1000*value) }} ms</td>
+                        {% else %}
+                            <td>{{ value }}</td>
+                        {% endif %}
+                    </span>
+                    <span class="label">{{ key|capitalize }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <h4>Calls for '{{ name }}'</h4>
+
+        {% if not collector.totals.calls %}
+            <p>
+                <em>No calls.</em>
+            </p>
+        {% else %}
+            <table>
+                <thead>
+                <tr>
+                    <th style="width: 5rem;">Key</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for i, call in calls %}
+                    <tr>
+                        <th style="padding-top:2rem">#{{ i }}</th>
+                        <th style="padding-top:2rem">Pool::{{ call.name }}</th>
+                    </tr>
+                    <tr>
+                        <th>Argument</th>
+                        <td>{{ profiler_dump(call.argument, maxDepth=2) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Results</th>
+                        <td>
+                            {% if call.result != false %}
+                                {{ profiler_dump(call.result, maxDepth=1) }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Time</th>
+                        <td>{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                    </tr>
+
+                {% endfor %}
+                </tbody>
+
+            </table>
+        {% endif %}
+    {% endfor %}
+
+{% endblock %}

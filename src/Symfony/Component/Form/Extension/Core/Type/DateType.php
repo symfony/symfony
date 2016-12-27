@@ -51,11 +51,11 @@ class DateType extends AbstractType
             throw new InvalidOptionsException('The "format" option must be one of the IntlDateFormatter constants (FULL, LONG, MEDIUM, SHORT) or a string representing a custom format.');
         }
 
-        if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd'))) {
-            throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
-        }
-
         if ('single_text' === $options['widget']) {
+            if (null !== $pattern && false === strpos($pattern, 'y') && false === strpos($pattern, 'M') && false === strpos($pattern, 'd')) {
+                throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" or "d". Its current value is "%s".', $pattern));
+            }
+
             $builder->addViewTransformer(new DateTimeToLocalizedStringTransformer(
                 $options['model_timezone'],
                 $options['view_timezone'],
@@ -65,6 +65,10 @@ class DateType extends AbstractType
                 $pattern
             ));
         } else {
+            if (null !== $pattern && (false === strpos($pattern, 'y') || false === strpos($pattern, 'M') || false === strpos($pattern, 'd'))) {
+                throw new InvalidOptionsException(sprintf('The "format" option should contain the letters "y", "M" and "d". Its current value is "%s".', $pattern));
+            }
+
             $yearOptions = $monthOptions = $dayOptions = array(
                 'error_bubbling' => true,
             );

@@ -92,6 +92,13 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($command->getDefinition()->hasOption('foo'), '->addOption() adds an option to the command');
     }
 
+    public function testSetHidden()
+    {
+        $command = new \TestCommand();
+        $command->setHidden(true);
+        $this->assertTrue($command->isHidden());
+    }
+
     public function testGetNamespaceGetNameSetName()
     {
         $command = new \TestCommand();

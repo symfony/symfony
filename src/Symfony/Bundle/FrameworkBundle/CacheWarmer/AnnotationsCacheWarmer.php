@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
+use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
@@ -75,6 +76,15 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
                     $this->readAllComponents($reader, $class);
                 } catch (\ReflectionException $e) {
                     // ignore failing reflection
+                } catch (AnnotationException $e) {
+                    /*
+                     * Ignore any AnnotationException to not break the cache warming process if an Annotation is badly
+                     * configured or could not be found / read / etc.
+                     *
+                     * In particular cases, an Annotation in your code can be used and defined only for a specific
+                     * environment but is always added to the annotations.map file by some Symfony default behaviors,
+                     * and you always end up with a not found Annotation.
+                     */
                 }
             }
         } finally {

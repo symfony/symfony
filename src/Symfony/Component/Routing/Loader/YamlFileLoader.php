@@ -43,7 +43,9 @@ class YamlFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $path = $this->locator->locate($file);
+        $this->setCurrentResource($file);
+
+        $path = $this->locate($file);
 
         if (!stream_is_local($path)) {
             throw new \InvalidArgumentException(sprintf('This is not a local file "%s".', $path));
@@ -140,9 +142,8 @@ class YamlFileLoader extends FileLoader
         $schemes = isset($config['schemes']) ? $config['schemes'] : null;
         $methods = isset($config['methods']) ? $config['methods'] : null;
 
-        $this->setCurrentDir(dirname($path));
+        $subCollection = $this->import($config['resource'], $type);
 
-        $subCollection = $this->import($config['resource'], $type, false, $file);
         /* @var $subCollection RouteCollection */
         $subCollection->addPrefix($prefix);
         if (null !== $host) {

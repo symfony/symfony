@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Loader;
 
+use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 
@@ -22,6 +23,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $locatorMockForAdditionalLoader = $this->getMockBuilder('Symfony\Component\Config\FileLocatorInterface')->getMock();
         $locatorMockForAdditionalLoader->expects($this->any())->method('locate')->will($this->onConsecutiveCalls(
+                'path/to/file1',                           // Default
                 array('path/to/file1'),                    // Default
                 array('path/to/file1', 'path/to/file2'),   // First is imported
                 array('path/to/file1', 'path/to/file2'),   // Second is imported
@@ -31,10 +33,8 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $fileLoader = new TestFileLoader($locatorMock);
         $fileLoader->setSupports(false);
-        $fileLoader->setCurrentDir('.');
 
         $additionalLoader = new TestFileLoader($locatorMockForAdditionalLoader);
-        $additionalLoader->setCurrentDir('.');
 
         $fileLoader->setResolver($loaderResolver = new LoaderResolver(array($fileLoader, $additionalLoader)));
 
@@ -70,6 +70,13 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
 class TestFileLoader extends FileLoader
 {
     private $supports = true;
+
+    public function __construct(FileLocatorInterface $locator, $currentResource = './foo')
+    {
+        parent::__construct($locator);
+
+        $this->setCurrentResource($currentResource);
+    }
 
     public function load($resource, $type = null)
     {

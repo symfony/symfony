@@ -32,6 +32,7 @@ abstract class FileLoader extends Loader
      */
     protected $locator;
 
+    private $currentResource;
     private $currentDir;
 
     /**
@@ -49,9 +50,20 @@ abstract class FileLoader extends Loader
      *
      * @param string $dir
      */
-    public function setCurrentDir($dir)
+    public function setCurrentDir($dir) //deprecate
     {
         $this->currentDir = $dir;
+    }
+
+    /**
+     * Sets the current resource being loaded.
+     *
+     * @param string $resource
+     */
+    public function setCurrentResource($resource)
+    {
+        $this->currentResource = $this->locate($resource);
+        $this->currentDir = '/' === substr($this->currentResource, -1) || is_dir($this->currentResource) ? rtrim($this->currentResource, '/') : dirname($this->currentResource);
     }
 
     /**
@@ -65,25 +77,23 @@ abstract class FileLoader extends Loader
     }
 
     /**
-     * Imports a resource.
-     *
-     * @param mixed       $resource       A Resource
-     * @param string|null $type           The resource type or null if unknown
-     * @param bool        $ignoreErrors   Whether to ignore import errors or not
-     * @param string|null $sourceResource The original resource importing the new resource
-     *
-     * @return mixed
+     * {@inheritdoc}
      *
      * @throws FileLoaderLoadException
      * @throws FileLoaderImportCircularReferenceException
      */
-    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
+    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)  // deprecate $sourceResource
     {
+        $currentResource = $sourceResource ?: $this->currentResource;
+        $currentDir = $this->currentDir;
+
         try {
             $loader = $this->resolve($resource, $type);
 
-            if ($loader instanceof self && null !== $this->currentDir) {
-                $resource = $loader->getLocator()->locate($resource, $this->currentDir, false);
+            if ($loader instanceof self && $this !== $loader) {
+                $resource = $loader->getLocator()->locate($resource, $currentDir, false);
+            } else {
+                $resource = $this->locate($resource, $currentDir, false);
             }
 
             $resources = is_array($resource) ? $resource : array($resource);
@@ -100,9 +110,11 @@ abstract class FileLoader extends Loader
             self::$loading[$resource] = true;
 
             try {
+                $this->setCurrentResource($resource);
                 $ret = $loader->load($resource, $type);
             } finally {
                 unset(self::$loading[$resource]);
+                $this->setCurrentResource($currentResource);
             }
 
             return $ret;
@@ -115,8 +127,13 @@ abstract class FileLoader extends Loader
                     throw $e;
                 }
 
-                throw new FileLoaderLoadException($resource, $sourceResource, null, $e);
+                throw new FileLoaderLoadException($resource, $currentResource, null, $e);
             }
         }
+    }
+
+    protected function locate($file, $currentDir = null, $first = true)
+    {
+        return $this->locator->locate($file, $currentDir ?: $this->currentDir, $first);
     }
 }

@@ -34,7 +34,9 @@ class AnnotationDirectoryLoader extends AnnotationFileLoader
      */
     public function load($path, $type = null)
     {
-        $dir = $this->locator->locate($path);
+        $this->setCurrentResource($path);
+
+        $dir = $this->locate($path);
 
         $collection = new RouteCollection();
         $collection->addResource(new DirectoryResource($dir, '/\.php$/'));

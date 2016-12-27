@@ -18,7 +18,7 @@ use Symfony\Component\Config\Exception\FileLoaderLoadException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Loader implements LoaderInterface
+abstract class Loader implements ImportingLoaderInterface
 {
     protected $resolver;
 
@@ -39,16 +39,19 @@ abstract class Loader implements LoaderInterface
     }
 
     /**
-     * Imports a resource.
+     * {@inheritdoc}
      *
-     * @param mixed       $resource A resource
-     * @param string|null $type     The resource type or null if unknown
-     *
-     * @return mixed
+     * @throws \Exception
      */
-    public function import($resource, $type = null)
+    public function import($resource, $type = null, $ignoreErrors = false)
     {
-        return $this->resolve($resource, $type)->load($resource, $type);
+        try {
+            return $this->resolve($resource, $type)->load($resource, $type);
+        } catch (\Exception $e) {
+            if (!$ignoreErrors) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -70,7 +73,7 @@ abstract class Loader implements LoaderInterface
         $loader = null === $this->resolver ? false : $this->resolver->resolve($resource, $type);
 
         if (false === $loader) {
-            throw new FileLoaderLoadException($resource);
+            throw new FileLoaderLoadException($resource); // @FIXME
         }
 
         return $loader;

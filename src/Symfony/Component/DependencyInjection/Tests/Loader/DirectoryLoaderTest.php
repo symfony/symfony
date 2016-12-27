@@ -59,7 +59,7 @@ class DirectoryLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "foo" does not exist (in:
+     * @expectedExceptionMessage The file "foo/" does not exist (in:
      */
     public function testExceptionIsRaisedWhenDirectoryDoesNotExist()
     {

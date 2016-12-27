@@ -22,24 +22,24 @@ class DirectoryLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $path = $this->locator->locate($file);
+        $file = rtrim($file, '/');
+
+        $this->setCurrentResource($file.'/');
+
+        $path = $this->locate($file);
 
         $collection = new RouteCollection();
         $collection->addResource(new DirectoryResource($path));
 
         foreach (scandir($path) as $dir) {
             if ('.' !== $dir[0]) {
-                $this->setCurrentDir($path);
-                $subPath = $path.'/'.$dir;
-                $subType = null;
-
-                if (is_dir($subPath)) {
-                    $subPath .= '/';
-                    $subType = 'directory';
+                $type = null;
+                if (is_dir($path.'/'.$dir)) {
+                    $dir .= '/';
+                    $type = 'directory';
                 }
 
-                $subCollection = $this->import($subPath, $subType, false, $path);
-                $collection->addCollection($subCollection);
+                $collection->addCollection($this->import($dir, $type));
             }
         }
 

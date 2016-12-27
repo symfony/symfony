@@ -28,7 +28,7 @@ interface ValidatorBuilderInterface
      *
      * @param ObjectInitializerInterface $initializer The initializer
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function addObjectInitializer(ObjectInitializerInterface $initializer);
 
@@ -37,7 +37,7 @@ interface ValidatorBuilderInterface
      *
      * @param array $initializers The initializer
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function addObjectInitializers(array $initializers);
 
@@ -46,7 +46,7 @@ interface ValidatorBuilderInterface
      *
      * @param string $path The path to the mapping file
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function addXmlMapping($path);
 
@@ -55,7 +55,7 @@ interface ValidatorBuilderInterface
      *
      * @param array $paths The paths to the mapping files
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function addXmlMappings(array $paths);
 
@@ -64,7 +64,7 @@ interface ValidatorBuilderInterface
      *
      * @param string $path The path to the mapping file
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function addYamlMapping($path);
 
@@ -73,7 +73,7 @@ interface ValidatorBuilderInterface
      *
      * @param array $paths The paths to the mapping files
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function addYamlMappings(array $paths);
 
@@ -82,7 +82,7 @@ interface ValidatorBuilderInterface
      *
      * @param string $methodName The name of the method
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function addMethodMapping($methodName);
 
@@ -91,7 +91,7 @@ interface ValidatorBuilderInterface
      *
      * @param array $methodNames The names of the methods
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function addMethodMappings(array $methodNames);
 
@@ -100,14 +100,14 @@ interface ValidatorBuilderInterface
      *
      * @param Reader $annotationReader The annotation reader to be used
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function enableAnnotationMapping(Reader $annotationReader = null);
 
     /**
      * Disables annotation based constraint mapping.
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function disableAnnotationMapping();
 
@@ -116,7 +116,7 @@ interface ValidatorBuilderInterface
      *
      * @param MetadataFactoryInterface $metadataFactory The metadata factory
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function setMetadataFactory(MetadataFactoryInterface $metadataFactory);
 
@@ -125,7 +125,7 @@ interface ValidatorBuilderInterface
      *
      * @param CacheInterface $cache The cache instance
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function setMetadataCache(CacheInterface $cache);
 
@@ -134,7 +134,7 @@ interface ValidatorBuilderInterface
      *
      * @param ConstraintValidatorFactoryInterface $validatorFactory The validator factory
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function setConstraintValidatorFactory(ConstraintValidatorFactoryInterface $validatorFactory);
 
@@ -143,7 +143,7 @@ interface ValidatorBuilderInterface
      *
      * @param TranslatorInterface $translator The translator instance
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function setTranslator(TranslatorInterface $translator);
 
@@ -156,7 +156,7 @@ interface ValidatorBuilderInterface
      *
      * @param string $translationDomain The translation domain of the violation messages
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      */
     public function setTranslationDomain($translationDomain);
 
@@ -165,7 +165,7 @@ interface ValidatorBuilderInterface
      *
      * @param PropertyAccessorInterface $propertyAccessor The property accessor
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      *
      * @deprecated since version 2.5, to be removed in 3.0.
      */
@@ -176,7 +176,7 @@ interface ValidatorBuilderInterface
      *
      * @param int $apiVersion The required API version
      *
-     * @return ValidatorBuilderInterface The builder object
+     * @return $this
      *
      * @see Validation::API_VERSION_2_5
      * @see Validation::API_VERSION_2_5_BC

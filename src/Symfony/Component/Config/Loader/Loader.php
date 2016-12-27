@@ -57,7 +57,7 @@ abstract class Loader implements LoaderInterface
      * @param mixed       $resource A resource
      * @param string|null $type     The resource type or null if unknown
      *
-     * @return LoaderInterface A LoaderInterface instance
+     * @return $this|LoaderInterface
      *
      * @throws FileLoaderLoadException If no loader is found
      */

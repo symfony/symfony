@@ -59,7 +59,7 @@ class Specificity
     /**
      * @param Specificity $specificity
      *
-     * @return Specificity
+     * @return self
      */
     public function plus(Specificity $specificity)
     {

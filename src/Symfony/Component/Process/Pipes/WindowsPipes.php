@@ -183,7 +183,7 @@ class WindowsPipes extends AbstractPipes
      * @param Process $process The process
      * @param $input
      *
-     * @return WindowsPipes
+     * @return static
      */
     public static function create(Process $process, $input)
     {

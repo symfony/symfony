@@ -56,7 +56,7 @@ class Definition
      *
      * @param string|array $factory A PHP function or an array containing a class/Reference and a method to call
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setFactory($factory)
     {
@@ -85,7 +85,7 @@ class Definition
      *
      * @param string $factoryClass The factory class name
      *
-     * @return Definition The current instance
+     * @return $this
      *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
@@ -119,7 +119,7 @@ class Definition
      *
      * @param string $factoryMethod The factory method name
      *
-     * @return Definition The current instance
+     * @return $this
      *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
@@ -138,7 +138,7 @@ class Definition
      * @param null|string $id        The decorated service id, use null to remove decoration
      * @param null|string $renamedId The new decorated service id
      *
-     * @return Definition The current instance
+     * @return $this
      *
      * @throws InvalidArgumentException In case the decorated service id and the new decorated service id are equals.
      */
@@ -188,7 +188,7 @@ class Definition
      *
      * @param string $factoryService The factory service id
      *
-     * @return Definition The current instance
+     * @return $this
      *
      * @deprecated since version 2.6, to be removed in 3.0.
      */
@@ -224,7 +224,7 @@ class Definition
      *
      * @param string $class The service class
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setClass($class)
     {
@@ -248,7 +248,7 @@ class Definition
      *
      * @param array $arguments An array of arguments
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setArguments(array $arguments)
     {
@@ -281,7 +281,7 @@ class Definition
      *
      * @param mixed $argument An argument
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function addArgument($argument)
     {
@@ -296,7 +296,7 @@ class Definition
      * @param int   $index
      * @param mixed $argument
      *
-     * @return Definition The current instance
+     * @return $this
      *
      * @throws OutOfBoundsException When the replaced argument does not exist
      */
@@ -344,7 +344,7 @@ class Definition
      *
      * @param array $calls An array of method calls
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setMethodCalls(array $calls = array())
     {
@@ -362,7 +362,7 @@ class Definition
      * @param string $method    The method name to call
      * @param array  $arguments An array of arguments to pass to the method call
      *
-     * @return Definition The current instance
+     * @return $this
      *
      * @throws InvalidArgumentException on empty $method param
      */
@@ -381,7 +381,7 @@ class Definition
      *
      * @param string $method The method name to remove
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function removeMethodCall($method)
     {
@@ -428,7 +428,7 @@ class Definition
      *
      * @param array $tags
      *
-     * @return Definition the current instance
+     * @return $this
      */
     public function setTags(array $tags)
     {
@@ -465,7 +465,7 @@ class Definition
      * @param string $name       The tag name
      * @param array  $attributes An array of attributes
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function addTag($name, array $attributes = array())
     {
@@ -491,7 +491,7 @@ class Definition
      *
      * @param string $name The tag name
      *
-     * @return Definition
+     * @return $this
      */
     public function clearTag($name)
     {
@@ -503,7 +503,7 @@ class Definition
     /**
      * Clears the tags for this definition.
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function clearTags()
     {
@@ -517,7 +517,7 @@ class Definition
      *
      * @param string $file A full pathname to include
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setFile($file)
     {
@@ -541,7 +541,7 @@ class Definition
      *
      * @param string $scope Whether the service must be shared or not
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setScope($scope)
     {
@@ -565,7 +565,7 @@ class Definition
      *
      * @param bool $boolean
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setPublic($boolean)
     {
@@ -589,7 +589,7 @@ class Definition
      *
      * @param bool $boolean
      *
-     * @return Definition The current instance
+     * @return $this
      *
      * @deprecated since version 2.7, will be removed in 3.0.
      */
@@ -625,7 +625,7 @@ class Definition
      *
      * @param bool $lazy
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setLazy($lazy)
     {
@@ -650,7 +650,7 @@ class Definition
      *
      * @param bool $boolean
      *
-     * @return Definition the current instance
+     * @return $this
      */
     public function setSynthetic($boolean)
     {
@@ -676,7 +676,7 @@ class Definition
      *
      * @param bool $boolean
      *
-     * @return Definition the current instance
+     * @return $this
      */
     public function setAbstract($boolean)
     {
@@ -701,7 +701,7 @@ class Definition
      *
      * @param callable $callable A PHP callable
      *
-     * @return Definition The current instance
+     * @return $this
      */
     public function setConfigurator($callable)
     {

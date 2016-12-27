@@ -35,7 +35,7 @@ abstract class Helper implements HelperInterface
     /**
      * Gets the helper set associated with this helper.
      *
-     * @return HelperSet A HelperSet instance
+     * @return HelperSet|null
      */
     public function getHelperSet()
     {

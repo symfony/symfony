@@ -36,8 +36,13 @@ class TemplateController implements ContainerAwareInterface
      */
     public function templateAction($template, $maxAge = null, $sharedAge = null, $private = null)
     {
-        /** @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->container->get('templating')->renderResponse($template);
+        if ($this->container->has('templating')) {
+            $response = $this->container->get('templating')->renderResponse($template);
+        } elseif ($this->container->has('twig')) {
+            $response = new Response($this->container->get('twig')->render($template));
+        } else {
+            throw new \LogicException('You can not use the TemplateController if the Templating Component or the Twig Bundle are not available.');
+        }
 
         if ($maxAge) {
             $response->setMaxAge($maxAge);

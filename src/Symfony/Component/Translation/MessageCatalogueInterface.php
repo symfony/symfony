@@ -105,7 +105,7 @@ interface MessageCatalogueInterface
      *
      * The two catalogues must have the same locale.
      *
-     * @param MessageCatalogueInterface $catalogue A MessageCatalogueInterface instance
+     * @param self $catalogue
      */
     public function addCatalogue(MessageCatalogueInterface $catalogue);
 
@@ -115,14 +115,14 @@ interface MessageCatalogueInterface
      *
      * This is used to provide default translations when they do not exist for the current locale.
      *
-     * @param MessageCatalogueInterface $catalogue A MessageCatalogueInterface instance
+     * @param self $catalogue
      */
     public function addFallbackCatalogue(MessageCatalogueInterface $catalogue);
 
     /**
      * Gets the fallback catalogue.
      *
-     * @return MessageCatalogueInterface|null A MessageCatalogueInterface instance or null when no fallback has been set
+     * @return self|null A MessageCatalogueInterface instance or null when no fallback has been set
      */
     public function getFallbackCatalogue();
 

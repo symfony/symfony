@@ -145,7 +145,7 @@ class OptionsResolver implements Options
      * @param string $option The name of the option
      * @param mixed  $value  The default value of the option
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -208,7 +208,7 @@ class OptionsResolver implements Options
      *
      * @param array $defaults The default values to set
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -241,7 +241,7 @@ class OptionsResolver implements Options
      *
      * @param string|string[] $optionNames One or more option names
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -322,7 +322,7 @@ class OptionsResolver implements Options
      *
      * @param string|string[] $optionNames One or more option names
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -389,7 +389,7 @@ class OptionsResolver implements Options
      * @param string   $option     The option name
      * @param \Closure $normalizer The normalizer
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
@@ -432,7 +432,7 @@ class OptionsResolver implements Options
      * @param string $option        The option name
      * @param mixed  $allowedValues One or more acceptable values/closures
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
@@ -477,7 +477,7 @@ class OptionsResolver implements Options
      * @param string $option        The option name
      * @param mixed  $allowedValues One or more acceptable values/closures
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
@@ -522,7 +522,7 @@ class OptionsResolver implements Options
      * @param string          $option       The option name
      * @param string|string[] $allowedTypes One or more accepted types
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
@@ -561,7 +561,7 @@ class OptionsResolver implements Options
      * @param string          $option       The option name
      * @param string|string[] $allowedTypes One or more accepted types
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws UndefinedOptionsException If the option is undefined
      * @throws AccessException           If called from a lazy option or normalizer
@@ -599,7 +599,7 @@ class OptionsResolver implements Options
      *
      * @param string|string[] $optionNames One or more option names
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */
@@ -620,7 +620,7 @@ class OptionsResolver implements Options
     /**
      * Removes all options.
      *
-     * @return OptionsResolver This instance
+     * @return $this
      *
      * @throws AccessException If called from a lazy option or normalizer
      */

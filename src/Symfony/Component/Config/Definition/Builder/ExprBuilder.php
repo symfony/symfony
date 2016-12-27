@@ -40,7 +40,7 @@ class ExprBuilder
      *
      * @param \Closure $then
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function always(\Closure $then = null)
     {
@@ -60,7 +60,7 @@ class ExprBuilder
      *
      * @param \Closure $closure
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function ifTrue(\Closure $closure = null)
     {
@@ -76,7 +76,7 @@ class ExprBuilder
     /**
      * Tests if the value is a string.
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function ifString()
     {
@@ -88,7 +88,7 @@ class ExprBuilder
     /**
      * Tests if the value is null.
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function ifNull()
     {
@@ -112,7 +112,7 @@ class ExprBuilder
     /**
      * Tests if the value is an array.
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function ifArray()
     {
@@ -126,7 +126,7 @@ class ExprBuilder
      *
      * @param array $array
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function ifInArray(array $array)
     {
@@ -140,7 +140,7 @@ class ExprBuilder
      *
      * @param array $array
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function ifNotInArray(array $array)
     {
@@ -154,7 +154,7 @@ class ExprBuilder
      *
      * @param \Closure $closure
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function then(\Closure $closure)
     {
@@ -166,7 +166,7 @@ class ExprBuilder
     /**
      * Sets a closure returning an empty array.
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function thenEmptyArray()
     {
@@ -182,7 +182,7 @@ class ExprBuilder
      *
      * @param string $message
      *
-     * @return ExprBuilder
+     * @return $this
      *
      * @throws \InvalidArgumentException
      */
@@ -196,7 +196,7 @@ class ExprBuilder
     /**
      * Sets a closure unsetting this key of the array at validation time.
      *
-     * @return ExprBuilder
+     * @return $this
      *
      * @throws UnsetKeyException
      */

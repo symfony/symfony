@@ -173,7 +173,7 @@ class IntlDateFormatter
      *                         One of the calendar constants.
      * @param string $pattern  Optional pattern to use when formatting
      *
-     * @return IntlDateFormatter
+     * @return self
      *
      * @see http://www.php.net/manual/en/intldateformatter.create.php
      * @see http://userguide.icu-project.org/formatparse/datetime

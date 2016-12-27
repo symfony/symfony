@@ -66,7 +66,7 @@ class RequestContext
      *
      * @param Request $request A Request instance
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function fromRequest(Request $request)
     {
@@ -97,7 +97,7 @@ class RequestContext
      *
      * @param string $baseUrl The base URL
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setBaseUrl($baseUrl)
     {
@@ -121,7 +121,7 @@ class RequestContext
      *
      * @param string $pathInfo The path info
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setPathInfo($pathInfo)
     {
@@ -147,7 +147,7 @@ class RequestContext
      *
      * @param string $method The HTTP method
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setMethod($method)
     {
@@ -173,7 +173,7 @@ class RequestContext
      *
      * @param string $host The HTTP host
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setHost($host)
     {
@@ -197,7 +197,7 @@ class RequestContext
      *
      * @param string $scheme The HTTP scheme
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setScheme($scheme)
     {
@@ -221,7 +221,7 @@ class RequestContext
      *
      * @param int $httpPort The HTTP port
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setHttpPort($httpPort)
     {
@@ -245,7 +245,7 @@ class RequestContext
      *
      * @param int $httpsPort The HTTPS port
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setHttpsPort($httpsPort)
     {
@@ -269,7 +269,7 @@ class RequestContext
      *
      * @param string $queryString The query string (after "?")
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setQueryString($queryString)
     {
@@ -294,7 +294,7 @@ class RequestContext
      *
      * @param array $parameters The parameters
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setParameters(array $parameters)
     {
@@ -333,7 +333,7 @@ class RequestContext
      * @param string $name      A parameter name
      * @param mixed  $parameter The parameter value
      *
-     * @return RequestContext The current instance, implementing a fluent interface
+     * @return $this
      */
     public function setParameter($name, $parameter)
     {

@@ -38,7 +38,7 @@ class PropertyAccessorBuilder
     /**
      * Enables the use of "__call" by the PropertyAccessor.
      *
-     * @return PropertyAccessorBuilder The builder object
+     * @return $this
      */
     public function enableMagicCall()
     {
@@ -50,7 +50,7 @@ class PropertyAccessorBuilder
     /**
      * Disables the use of "__call" by the PropertyAccessor.
      *
-     * @return PropertyAccessorBuilder The builder object
+     * @return $this
      */
     public function disableMagicCall()
     {
@@ -73,7 +73,7 @@ class PropertyAccessorBuilder
      * This has no influence on writing non-existing indices with PropertyAccessorInterface::setValue()
      * which are always created on-the-fly.
      *
-     * @return PropertyAccessorBuilder The builder object
+     * @return $this
      */
     public function enableExceptionOnInvalidIndex()
     {
@@ -87,7 +87,7 @@ class PropertyAccessorBuilder
      *
      * Instead, null is returned when calling PropertyAccessorInterface::getValue() on a non-existing index.
      *
-     * @return PropertyAccessorBuilder The builder object
+     * @return $this
      */
     public function disableExceptionOnInvalidIndex()
     {

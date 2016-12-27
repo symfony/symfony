@@ -95,7 +95,7 @@ class Yaml
      *
      * @throws ParseException If the YAML is not valid
      */
-    public static function parseFile ($fileName, $flags = 0)
+    public static function parseFile($fileName, $flags = 0)
     {
         $input = file_get_contents($fileName);
 

@@ -63,7 +63,7 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
     public function testGetLogs()
     {
         $logger = new Logger('test');
-        $logger->pushHandler(new DebugHandler());
+        $logger->pushHandler(new DebugHandler(Logger::DEBUG, true, false));
 
         $logger->addInfo('test');
         $this->assertCount(1, $logger->getLogs());
@@ -85,7 +85,7 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
     public function testCountErrors()
     {
         $logger = new Logger('test');
-        $logger->pushHandler(new DebugHandler());
+        $logger->pushHandler(new DebugHandler(Logger::DEBUG, true, false));
 
         $logger->addInfo('test');
         $logger->addError('uh-oh');
@@ -102,5 +102,14 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
         $logger->addError('uh-oh');
 
         $this->assertEquals(0, $logger->countErrors());
+    }
+
+    public function testDebugHandlerAbstainsInCliEnvironments()
+    {
+        $logger = new Logger('test');
+        $logger->pushHandler(new DebugHandler(Logger::DEBUG, true));
+
+        $logger->addInfo('test');
+        $this->assertCount(0, $logger->getLogs());
     }
 }

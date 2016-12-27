@@ -182,7 +182,7 @@ class DefinitionDecorator extends Definition
      * @param int   $index
      * @param mixed $value
      *
-     * @return DefinitionDecorator the current instance
+     * @return $this
      *
      * @throws InvalidArgumentException when $index isn't an integer
      */

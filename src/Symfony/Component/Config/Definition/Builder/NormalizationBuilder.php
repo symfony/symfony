@@ -38,7 +38,7 @@ class NormalizationBuilder
      * @param string $key    The key to remap
      * @param string $plural The plural of the key in case of irregular plural
      *
-     * @return NormalizationBuilder
+     * @return $this
      */
     public function remap($key, $plural = null)
     {
@@ -52,7 +52,7 @@ class NormalizationBuilder
      *
      * @param \Closure $closure
      *
-     * @return ExprBuilder|NormalizationBuilder
+     * @return ExprBuilder|$this
      */
     public function before(\Closure $closure = null)
     {

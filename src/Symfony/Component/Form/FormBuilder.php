@@ -248,7 +248,7 @@ class FormBuilder extends FormConfigBuilder implements \IteratorAggregate, FormB
      *
      * @param string $name The name of the unresolved child
      *
-     * @return FormBuilder The created instance
+     * @return self The created instance
      */
     private function resolveChild($name)
     {

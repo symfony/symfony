@@ -286,7 +286,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @param bool $disabled Whether the button is disabled
      *
-     * @return ButtonBuilder The button builder
+     * @return $this
      */
     public function setDisabled($disabled)
     {
@@ -398,7 +398,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @param ResolvedFormTypeInterface $type The type of the button
      *
-     * @return ButtonBuilder The button builder
+     * @return $this
      */
     public function setType(ResolvedFormTypeInterface $type)
     {
@@ -490,7 +490,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      *
      * @param bool $initialize
      *
-     * @return ButtonBuilder
+     * @return $this
      *
      * @throws BadMethodCallException
      */

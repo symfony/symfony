@@ -85,7 +85,7 @@ class File extends \SplFileInfo
      * @param string $directory The destination folder
      * @param string $name      The new file name
      *
-     * @return File A File object representing the new file
+     * @return self A File object representing the new file
      *
      * @throws FileException if the target file could not be created
      */

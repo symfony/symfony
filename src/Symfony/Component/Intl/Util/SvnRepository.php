@@ -42,7 +42,7 @@ class SvnRepository
      * @param string $url       The URL to download from
      * @param string $targetDir The directory in which to store the repository
      *
-     * @return SvnRepository The directory where the data is stored
+     * @return static
      *
      * @throws RuntimeException If an error occurs during the download.
      */

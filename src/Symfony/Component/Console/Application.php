@@ -751,7 +751,7 @@ class Application
      * @param int $width  The width
      * @param int $height The height
      *
-     * @return Application The current application
+     * @return $this
      *
      * @deprecated since version 3.2, to be removed in 4.0. Set the COLUMNS and LINES env vars instead.
      */

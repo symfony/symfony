@@ -208,7 +208,7 @@ class OutputFormatter implements OutputFormatterInterface
      *
      * @param string $string
      *
-     * @return OutputFormatterStyle|bool false if string is not format string
+     * @return OutputFormatterStyle|false false if string is not format string
      */
     private function createStyleFromString($string)
     {

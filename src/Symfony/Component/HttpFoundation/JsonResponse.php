@@ -62,7 +62,7 @@ class JsonResponse extends Response
      * @param int   $status  The response status code
      * @param array $headers An array of response headers
      *
-     * @return JsonResponse
+     * @return static
      */
     public static function create($data = null, $status = 200, $headers = array())
     {
@@ -82,7 +82,7 @@ class JsonResponse extends Response
      *
      * @param string|null $callback The JSONP callback or null to use none
      *
-     * @return JsonResponse
+     * @return $this
      *
      * @throws \InvalidArgumentException When the callback name is not valid
      */
@@ -133,7 +133,7 @@ class JsonResponse extends Response
      *
      * @param mixed $data
      *
-     * @return JsonResponse
+     * @return $this
      *
      * @throws \InvalidArgumentException
      */
@@ -180,7 +180,7 @@ class JsonResponse extends Response
      *
      * @param int $encodingOptions
      *
-     * @return JsonResponse
+     * @return $this
      */
     public function setEncodingOptions($encodingOptions)
     {
@@ -192,7 +192,7 @@ class JsonResponse extends Response
     /**
      * Updates the content and headers according to the JSON data and callback.
      *
-     * @return JsonResponse
+     * @return $this
      */
     protected function update()
     {

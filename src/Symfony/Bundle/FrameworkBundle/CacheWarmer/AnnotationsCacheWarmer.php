@@ -84,8 +84,6 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
                      * In particular cases, an Annotation in your code can be used and defined only for a specific
                      * environment but is always added to the annotations.map file by some Symfony default behaviors,
                      * and you always end up with a not found Annotation.
-                     *
-                     * cf https://github.com/symfony/symfony/pull/20959 for a longer explanation.
                      */
                 }
             }

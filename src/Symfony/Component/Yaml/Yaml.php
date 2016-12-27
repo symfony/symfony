@@ -89,7 +89,7 @@ class Yaml
      *  </code>
      *
      * @param string $fileName A file containing YAML
-     * @param int    $flags A bit field of PARSE_* constants to customize the YAML parser behavior
+     * @param int    $flags    A bit field of PARSE_* constants to customize the YAML parser behavior
      *
      * @return mixed The YAML converted to a PHP value
      *

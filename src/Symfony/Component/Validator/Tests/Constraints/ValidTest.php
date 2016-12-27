@@ -19,11 +19,17 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class ValidTest extends TestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     */
-    public function testRejectGroupsOption()
+    public function testGroupsCanBeSet()
     {
-        new Valid(array('groups' => 'foo'));
+        $constraint = new Valid(array('groups' => 'foo'));
+
+        $this->assertSame(array('foo'), $constraint->groups);
+    }
+
+    public function testGroupsAreNullByDefault()
+    {
+        $constraint = new Valid();
+
+        $this->assertNull($constraint->groups);
     }
 }

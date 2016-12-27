@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Validator;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
@@ -669,5 +670,39 @@ abstract class AbstractTest extends AbstractValidatorTest
 
         $this->assertCount(1, $violations);
         $this->assertSame($constraint, $violations[0]->getConstraint());
+    }
+
+    public function testNestedObjectIsNotValidatedIfGroupInValidConstraintIsNotValidated()
+    {
+        $entity = new Entity();
+        $entity->firstName = '';
+        $reference = new Reference();
+        $reference->value = '';
+        $entity->childA = $reference;
+
+        $this->metadata->addPropertyConstraint('firstName', new NotBlank(array('groups' => 'group1')));
+        $this->metadata->addPropertyConstraint('childA', new Valid(array('groups' => 'group1')));
+        $this->referenceMetadata->addPropertyConstraint('value', new NotBlank());
+
+        $violations = $this->validator->validate($entity, null, array());
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function testNestedObjectIsValidatedIfGroupInValidConstraintIsValidated()
+    {
+        $entity = new Entity();
+        $entity->firstName = '';
+        $reference = new Reference();
+        $reference->value = '';
+        $entity->childA = $reference;
+
+        $this->metadata->addPropertyConstraint('firstName', new NotBlank(array('groups' => 'group1')));
+        $this->metadata->addPropertyConstraint('childA', new Valid(array('groups' => 'group1')));
+        $this->referenceMetadata->addPropertyConstraint('value', new NotBlank(array('groups' => 'group1')));
+
+        $violations = $this->validator->validate($entity, null, array('Default', 'group1'));
+
+        $this->assertCount(2, $violations);
     }
 }

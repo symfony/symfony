@@ -356,6 +356,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('profiling.xml');
         $loader->load('collectors.xml');
+        $loader->load('cache_debug.xml');
 
         if ($this->formConfigEnabled) {
             $loader->load('form_debug.xml');

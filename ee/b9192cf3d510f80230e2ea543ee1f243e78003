@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-26T08:04:31Z
+
+With #21047 i also spotted some cases where `@return FQCN|$this` is used. (FQCN from the current class file, ie. the same ;-))
+
+I have no clear ref on this, but PhpStorm really doesnt seem to like it. Or at least not when used inconsistently so it seems :confused: (1 class mixing `$this`, `FQCN` and/or `FQCN|$this[|...]`).
+
+Perhaps worth looking at.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-26T10:47:33Z
+
+I would appreciate some careful review before merging as re-reading the PR several times allowed me to fix some issues I introduced. I know, this is quite painful to do, but let's try to do it well.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-26T18:31:53Z
+
+@wouterj @ogizanagi @ro0NL Thank you very much for your reviews. I think we're good now.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-26T18:43:12Z
+
+@fabpot are you planning to do all branches?

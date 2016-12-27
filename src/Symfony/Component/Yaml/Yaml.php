@@ -99,7 +99,7 @@ class Yaml
     {
         $input = file_get_contents($fileName);
 
-        return self::parse($input, $flags = 0);
+        return self::parse($input, $flags);
     }
     
     /**

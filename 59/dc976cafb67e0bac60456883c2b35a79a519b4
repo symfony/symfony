@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by fancyweb at 2016-12-16T14:01:25Z
+
+Coding standard issues are unrelated to my change, should I still apply them ?
+
+---------------------------------------------------------------------------
+
+by fancyweb at 2016-12-20T07:15:06Z
+
+@fabpot I added a short explanation and a link that reference this PR.
+
+Also I will ask again, should I apply the suggested coding standard changes even if they are not related to my code ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-21T09:58:56Z
+
+@fancyweb No, please ignore them.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-27T09:54:15Z
+
+Isn't this a bug fix?

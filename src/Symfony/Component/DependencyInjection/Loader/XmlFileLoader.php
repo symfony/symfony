@@ -474,6 +474,10 @@ class XmlFileLoader extends FileLoader
 
             switch ($arg->getAttribute('type')) {
                 case 'service':
+                    if ($arg->hasAttribute('strict')) {
+                        @trigger_error(sprintf('The "strict" attribute used when referencing the "%s" service is deprecated since version 3.3 and will be removed in 4.0.', $arg->getAttribute('id')), E_USER_DEPRECATED);
+                    }
+
                     $arguments[$key] = new Reference($arg->getAttribute('id'), $invalidBehavior);
                     break;
                 case 'expression':

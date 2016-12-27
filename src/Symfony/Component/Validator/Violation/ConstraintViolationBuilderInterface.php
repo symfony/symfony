@@ -31,7 +31,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @param string $path The property path
      *
-     * @return ConstraintViolationBuilderInterface This builder
+     * @return $this
      */
     public function atPath($path);
 
@@ -41,7 +41,7 @@ interface ConstraintViolationBuilderInterface
      * @param string $key   The name of the parameter
      * @param string $value The value to be inserted in the parameter's place
      *
-     * @return ConstraintViolationBuilderInterface This builder
+     * @return $this
      */
     public function setParameter($key, $value);
 
@@ -52,7 +52,7 @@ interface ConstraintViolationBuilderInterface
      *                          the values to be inserted in their place as
      *                          values
      *
-     * @return ConstraintViolationBuilderInterface This builder
+     * @return $this
      */
     public function setParameters(array $parameters);
 
@@ -62,7 +62,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @param string $translationDomain The translation domain
      *
-     * @return ConstraintViolationBuilderInterface This builder
+     * @return $this
      *
      * @see \Symfony\Component\Translation\TranslatorInterface
      */
@@ -73,7 +73,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @param mixed $invalidValue The invalid value
      *
-     * @return ConstraintViolationBuilderInterface This builder
+     * @return $this
      */
     public function setInvalidValue($invalidValue);
 
@@ -83,7 +83,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @param int $number The number for determining the plural form
      *
-     * @return ConstraintViolationBuilderInterface This builder
+     * @return $this
      *
      * @see \Symfony\Component\Translation\TranslatorInterface::transChoice()
      */
@@ -94,7 +94,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @param string|null $code The violation code
      *
-     * @return ConstraintViolationBuilderInterface This builder
+     * @return $this
      */
     public function setCode($code);
 
@@ -103,7 +103,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @param mixed $cause The cause of the violation
      *
-     * @return ConstraintViolationBuilderInterface This builder
+     * @return $this
      */
     public function setCause($cause);
 

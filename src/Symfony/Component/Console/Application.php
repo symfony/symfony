@@ -775,7 +775,7 @@ class Application
      * @param int $width  The width
      * @param int $height The height
      *
-     * @return Application The current application
+     * @return $this
      */
     public function setTerminalDimensions($width, $height)
     {

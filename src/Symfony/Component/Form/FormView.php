@@ -81,7 +81,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
     /**
      * Marks the view as rendered.
      *
-     * @return FormView The view object
+     * @return $this
      */
     public function setRendered()
     {
@@ -95,7 +95,7 @@ class FormView implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name The child name
      *
-     * @return FormView The child view
+     * @return self The child view
      */
     public function offsetGet($name)
     {

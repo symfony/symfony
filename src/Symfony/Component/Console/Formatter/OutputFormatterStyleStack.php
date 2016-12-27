@@ -104,7 +104,7 @@ class OutputFormatterStyleStack
     /**
      * @param OutputFormatterStyleInterface $emptyStyle
      *
-     * @return OutputFormatterStyleStack
+     * @return $this
      */
     public function setEmptyStyle(OutputFormatterStyleInterface $emptyStyle)
     {

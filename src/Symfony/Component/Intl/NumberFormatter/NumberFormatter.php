@@ -304,7 +304,7 @@ class NumberFormatter
      *                        NumberFormat::PATTERN_RULEBASED. It must conform to  the syntax
      *                        described in the ICU DecimalFormat or ICU RuleBasedNumberFormat documentation
      *
-     * @return NumberFormatter
+     * @return self
      *
      * @see http://www.php.net/manual/en/numberformatter.create.php
      * @see http://www.icu-project.org/apiref/icu4c/classDecimalFormat.html#_details

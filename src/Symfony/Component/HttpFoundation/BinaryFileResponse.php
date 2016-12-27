@@ -66,7 +66,7 @@ class BinaryFileResponse extends Response
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
      *
-     * @return BinaryFileResponse The created response
+     * @return static
      */
     public static function create($file = null, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
@@ -81,7 +81,7 @@ class BinaryFileResponse extends Response
      * @param bool                $autoEtag
      * @param bool                $autoLastModified
      *
-     * @return BinaryFileResponse
+     * @return $this
      *
      * @throws FileException
      */
@@ -153,7 +153,7 @@ class BinaryFileResponse extends Response
      * @param string $filename         Optionally use this filename instead of the real name of the file
      * @param string $filenameFallback A fallback filename, containing only ASCII characters. Defaults to an automatically encoded filename
      *
-     * @return BinaryFileResponse
+     * @return $this
      */
     public function setContentDisposition($disposition, $filename = '', $filenameFallback = '')
     {
@@ -348,7 +348,7 @@ class BinaryFileResponse extends Response
      *
      * @param bool $shouldDelete
      *
-     * @return BinaryFileResponse
+     * @return $this
      */
     public function deleteFileAfterSend($shouldDelete)
     {

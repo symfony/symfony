@@ -349,7 +349,7 @@ class FormConfigBuilder implements FormConfigBuilderInterface
     /**
      * Alias of {@link getInheritData()}.
      *
-     * @return FormConfigBuilder The configuration object
+     * @return bool
      *
      * @deprecated since version 2.3, to be removed in 3.0.
      *             Use {@link getInheritData()} instead.
@@ -714,8 +714,6 @@ class FormConfigBuilder implements FormConfigBuilderInterface
      * Alias of {@link setInheritData()}.
      *
      * @param bool $inheritData Whether the form should inherit its parent's data
-     *
-     * @return FormConfigBuilder The configuration object
      *
      * @deprecated since version 2.3, to be removed in 3.0.
      *             Use {@link setInheritData()} instead.

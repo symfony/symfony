@@ -43,7 +43,7 @@ interface OptionsResolverInterface
      * @param array $defaultValues A list of option names as keys and default
      *                             values or closures as values.
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      */
     public function setDefaults(array $defaultValues);
 
@@ -58,7 +58,7 @@ interface OptionsResolverInterface
      * @param array $defaultValues A list of option names as keys and default
      *                             values or closures as values.
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      */
     public function replaceDefaults(array $defaultValues);
 
@@ -73,7 +73,7 @@ interface OptionsResolverInterface
      *
      * @param array $optionNames A list of option names
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      */
     public function setOptional(array $optionNames);
 
@@ -85,7 +85,7 @@ interface OptionsResolverInterface
      *
      * @param array $optionNames A list of option names
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      */
     public function setRequired($optionNames);
 
@@ -96,7 +96,7 @@ interface OptionsResolverInterface
      *                             with values acceptable for that option as
      *                             values.
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      *
      * @throws InvalidOptionsException If an option has not been defined
      *                                 (see {@link isKnown()}) for which
@@ -113,7 +113,7 @@ interface OptionsResolverInterface
      *                             with values acceptable for that option as
      *                             values.
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      *
      * @throws InvalidOptionsException If an option has not been defined
      *                                 (see {@link isKnown()}) for which
@@ -127,7 +127,7 @@ interface OptionsResolverInterface
      * @param array $allowedTypes A list of option names as keys and type
      *                            names passed as string or array as values.
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      *
      * @throws InvalidOptionsException If an option has not been defined for
      *                                 which an allowed type is set.
@@ -142,7 +142,7 @@ interface OptionsResolverInterface
      * @param array $allowedTypes A list of option names as keys and type
      *                            names passed as string or array as values.
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      *
      * @throws InvalidOptionsException If an option has not been defined for
      *                                 which an allowed type is set.
@@ -165,7 +165,7 @@ interface OptionsResolverInterface
      *
      * @param array $normalizers An array of closures
      *
-     * @return OptionsResolverInterface The resolver instance
+     * @return $this
      */
     public function setNormalizers(array $normalizers);
 

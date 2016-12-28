@@ -89,14 +89,39 @@ class TwigExtension extends Extension
         }
 
         // register bundles as Twig namespaces
+        $pathsByBundle = array();
+        $overriddenPathsByBundle = array();
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
-                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+            $reflection = new \ReflectionClass($class);
+            $bundleInstance = $reflection->newInstanceWithoutConstructor();
+            $dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views';
+            $pathsByBundle[$bundle][] = $dir;
+
+            if (null !== $parentBundle = $bundleInstance->getParent()) {
+                $overriddenPathsByBundle[$parentBundle][] = $dir;
             }
 
-            $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/views')) {
-                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+            $dir = dirname($reflection->getFileName()).'/Resources/views';
+            $pathsByBundle[$bundle][] = $dir;
+
+            if (null !== $parentBundle = $bundleInstance->getParent()) {
+                $overriddenPathsByBundle[$parentBundle][] = $dir;
+            }
+        }
+
+        foreach ($overriddenPathsByBundle as $bundle => $paths) {
+            foreach ($paths as $path) {
+                if (is_dir($path)) {
+                    $this->addTwigPath($twigFilesystemLoaderDefinition, $path, $bundle);
+                }
+            }
+        }
+
+        foreach ($pathsByBundle as $bundle => $paths) {
+            foreach ($paths as $path) {
+                if (is_dir($path)) {
+                    $this->addTwigPath($twigFilesystemLoaderDefinition, $path, $bundle);
+                }
             }
         }
 

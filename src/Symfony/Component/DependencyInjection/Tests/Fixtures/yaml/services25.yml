@@ -1,0 +1,4 @@
+services:
+    bar:
+        interface: BarInterface
+        abstract: true

@@ -240,6 +240,38 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->getDefinition('child1')->isAutowired());
     }
 
+    public function testServiceOverrideParentInterfaceHasNoEffect()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent')
+            ->setInterface('Serializable')
+        ;
+
+        $container->setDefinition('child1', new DefinitionDecorator('parent'))
+            ->setInterface('ArrayAccess')
+        ;
+
+        $this->process($container);
+
+        $this->assertSame('Serializable', $container->getDefinition('child1')->getInterface());
+    }
+
+    public function testSetInterfaceOnServiceIsParent()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('parent', 'ArrayObject')
+            ->setInterface('Serializable')
+        ;
+
+        $container->setDefinition('child1', new DefinitionDecorator('parent'));
+
+        $this->process($container);
+
+        $this->assertSame('Serializable', $container->getDefinition('child1')->getInterface());
+    }
+
     public function testDeepDefinitionsResolving()
     {
         $container = new ContainerBuilder();

@@ -570,6 +570,15 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services28.xml');
     }
 
+    public function testGetInterface()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services25.xml');
+
+        $this->assertSame('BarInterface', $container->getDefinition('bar')->getInterface());
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation Using the attribute "class" is deprecated for the service "bar" which is defined as an alias %s.

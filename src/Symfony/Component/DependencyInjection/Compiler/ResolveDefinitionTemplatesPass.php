@@ -142,6 +142,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setPublic($parentDef->isPublic());
         $def->setLazy($parentDef->isLazy());
         $def->setAutowired($parentDef->isAutowired());
+        $def->setInterface($parentDef->getInterface());
 
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();

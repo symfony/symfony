@@ -117,8 +117,10 @@ if ($components) {
         }
 
         $c = escapeshellarg($component);
+        $executedCommand = sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr");
+        echo "Run \e[32m".$executedCommand."\e[0m\n\n";
 
-        if ($proc = proc_open(sprintf($cmd, $c, " > $c/phpunit.stdout 2> $c/phpunit.stderr"), array(), $pipes)) {
+        if ($proc = proc_open($executedCommand, array(), $pipes)) {
             $runningProcs[$component] = $proc;
         } else {
             $exit = 1;
@@ -183,7 +185,10 @@ if ($components) {
     // Run regular phpunit in a subprocess
 
     $errFile = tempnam(sys_get_temp_dir(), 'phpunit.stderr.');
-    if ($proc = proc_open(sprintf($cmd, '', ' 2> '.escapeshellarg($errFile)), array(1 => array('pipe', 'w')), $pipes)) {
+    $executedCommand = sprintf($cmd, '', ' 2> '.escapeshellarg($errFile));
+    echo "Run \e[32m".$executedCommand."\e[0m\n\n";
+
+    if ($proc = proc_open($executedCommand, array(1 => array('pipe', 'w')), $pipes)) {
         stream_copy_to_stream($pipes[1], STDOUT);
         fclose($pipes[1]);
         $exit = proc_close($proc);

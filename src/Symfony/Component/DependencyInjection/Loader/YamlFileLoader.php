@@ -52,6 +52,7 @@ class YamlFileLoader extends FileLoader
         'configurator' => 'configurator',
         'calls' => 'calls',
         'tags' => 'tags',
+        'inherit_tags' => 'inherit_tags',
         'decorates' => 'decorates',
         'decoration_inner_name' => 'decoration_inner_name',
         'decoration_priority' => 'decoration_priority',
@@ -156,7 +157,7 @@ class YamlFileLoader extends FileLoader
                 @trigger_error('Giving a service the "_defaults" name is deprecated since Symfony 3.3 and will be forbidden in 4.0. Rename your service.', E_USER_DEPRECATED);
                 $defaults = array();
             } else {
-                $defaultKeys = array('public', 'tags', 'autowire');
+                $defaultKeys = array('public', 'tags', 'inherit_tags', 'autowire');
                 unset($content['services']['_defaults']);
 
                 foreach ($defaults as $key => $default) {
@@ -240,6 +241,11 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['parent'])) {
             $definition = new ChildDefinition($service['parent']);
+
+            $inheritTag = isset($service['inherit_tags']) ? $service['inherit_tags'] : (isset($defaults['inherit_tags']) ? $defaults['inherit_tags'] : null);
+            if (null !== $inheritTag) {
+                $definition->setInheritTags($inheritTag);
+            }
             $defaults = array();
         } else {
             $definition = new Definition();
@@ -312,7 +318,18 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        $tags = isset($service['tags']) ? $service['tags'] : (isset($defaults['tags']) ? $defaults['tags'] : null);
+        $tags = isset($service['tags']) ? $service['tags'] : array();
+
+        if (!isset($defaults['tags'])) {
+            // no-op
+        } elseif (!isset($service['inherit_tags'])) {
+            if (!isset($service['tags'])) {
+                $tags = $defaults['tags'];
+            }
+        } elseif ($service['inherit_tags']) {
+            $tags = array_merge($tags, $defaults['tags']);
+        }
+
         if (null !== $tags) {
             if (!is_array($tags)) {
                 throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));

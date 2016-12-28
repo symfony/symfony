@@ -359,22 +359,26 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services28.yml');
 
         $this->assertFalse($container->getDefinition('with_defaults')->isPublic());
-        $this->assertFalse($container->getDefinition('with_null')->isPublic());
+        $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_defaults')->getTags());
+        $this->assertTrue($container->getDefinition('with_defaults')->isAutowired());
+
+        $this->assertArrayNotHasKey('public', $container->getDefinition('no_defaults_child')->getChanges());
+        $this->assertArrayNotHasKey('autowire', $container->getDefinition('no_defaults_child')->getChanges());
+
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('with_null')->isPublic());
         $this->assertTrue($container->getDefinition('no_defaults')->isPublic());
         $this->assertTrue($container->getDefinition('no_defaults_child')->isPublic());
-        $this->assertArrayNotHasKey('public', $container->getDefinition('no_defaults_child')->getChanges());
 
-        $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_defaults')->getTags());
-        $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_null')->getTags());
+        $this->assertSame(array(), $container->getDefinition('with_null')->getTags());
         $this->assertSame(array(), $container->getDefinition('no_defaults')->getTags());
         $this->assertSame(array('bar' => array(array())), $container->getDefinition('no_defaults_child')->getTags());
-        $this->assertSame(array(), $container->getDefinition('with_defaults_child')->getTags());
+        $this->assertSame(array('baz' => array(array()), 'foo' => array(array())), $container->getDefinition('with_defaults_child')->getTags());
 
-        $this->assertTrue($container->getDefinition('with_defaults')->isAutowired());
         $this->assertTrue($container->getDefinition('with_null')->isAutowired());
         $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());
         $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
-        $this->assertArrayNotHasKey('autowire', $container->getDefinition('no_defaults_child')->getChanges());
     }
 
     /**

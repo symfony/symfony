@@ -10,9 +10,9 @@ services:
 
     with_null:
         class: Foo
-        public: ~
+        public: true
         autowire: ~
-        tags: ~
+        inherit_tags: false
 
     no_defaults:
         class: Foo
@@ -28,3 +28,7 @@ services:
 
     with_defaults_child:
         parent: with_defaults
+        public: true
+        inherit_tags: true
+        tags:
+            - name: baz

@@ -6,12 +6,13 @@
         </defaults>
 
         <service id="with_defaults" class="Foo" />
-        <service id="no_defaults" class="Foo" public="true" autowire="false">
-            <tag name="bar" />
+        <service id="no_defaults" class="Foo" public="true" autowire="false" inherit-tags="false">
         </service>
         <service id="no_defaults_child" class="Foo" parent="no_defaults">
             <tag name="bar" />
         </service>
-        <service id="with_defaults_child" class="Foo" parent="with_defaults" />
+        <service id="with_defaults_child" class="Foo" parent="with_defaults" public="true" inherit-tags="true">
+            <tag name="baz" />
+        </service>
     </services>
 </container>

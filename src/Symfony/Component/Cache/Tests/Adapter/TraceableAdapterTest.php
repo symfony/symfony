@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
-use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;
 
 /**
@@ -19,18 +19,9 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
  */
 class TraceableAdapterTest extends AdapterTestCase
 {
-    private static $redis;
-
-    public static function setupBeforeClass()
-    {
-        parent::setupBeforeClass();
-        self::$redis = new \Redis();
-        self::$redis->connect(getenv('REDIS_HOST'));
-    }
-
     public function createCachePool($defaultLifetime = 0)
     {
-        return new TraceableAdapter(new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), $defaultLifetime));
+        return new TraceableAdapter(new FilesystemAdapter('', $defaultLifetime));
     }
 
     public function testGetItemMiss()

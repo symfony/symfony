@@ -123,11 +123,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new Container();
         $sc->set('foo', $obj = new \stdClass());
         $sc->set('bar', $obj = new \stdClass());
-        $this->assertEquals(array('service_container', 'foo', 'bar'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
+        $this->assertEquals(array('foo', 'bar', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns all defined service ids');
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(array('scoped', 'scoped_foo', 'scoped_synchronized_foo', 'inactive', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container', 'foo'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids by getXXXService() methods, followed by service ids defined by set()');
+        $this->assertEquals(array('mapped_method_id', 'mapped_method_id2', 'foo', 'scoped', 'scoped_foo', 'scoped_synchronized_foo', 'inactive', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'service_container'), $sc->getServiceIds(), '->getServiceIds() returns defined service ids resolved from methods, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -202,6 +202,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
         $this->assertEquals($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
         $this->assertEquals($sc->__foo_baz, $sc->get('foo\\baz'), '->get() returns the service if a get*Method() is defined');
+        $this->assertEquals(new \stdClass(), $sc->get('mapped_method_id2'), '->get() returns the service if a method is mapped custom');
 
         $sc->set('bar', $bar = new \stdClass());
         $this->assertEquals($bar, $sc->get('bar'), '->get() prefers to return a service defined with set() than one defined with a getXXXMethod()');
@@ -234,7 +235,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->fail('->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException if the key does not exist');
-            $this->assertEquals('You have requested a non-existent service "bag". Did you mean one of these: "bar", "baz"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
+            $this->assertEquals('You have requested a non-existent service "bag". Did you mean one of these: "baz", "bar"?', $e->getMessage(), '->get() throws an Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException with some advices');
         }
     }
 
@@ -278,6 +279,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($sc->has('foo_bar'), '->has() returns true if a get*Method() is defined');
         $this->assertTrue($sc->has('foo.baz'), '->has() returns true if a get*Method() is defined');
         $this->assertTrue($sc->has('foo\\baz'), '->has() returns true if a get*Method() is defined');
+        $this->assertTrue($sc->has('mapped_method_id'), '->has() returns true if a method is mapped custom');
     }
 
     public function testInitialized()
@@ -626,6 +628,10 @@ class ProjectServiceContainer extends Container
         $this->__foo_bar = new \stdClass();
         $this->__foo_baz = new \stdClass();
         $this->synchronized = false;
+        $this->methodMap = array(
+            'mapped_method_id' => 'get_CamelcasedMethodEndingWith_Service',
+            'mapped_method_id2' => '_get_by_different_convention',
+        );
         $this->aliases = array('alias' => 'bar');
     }
 
@@ -670,6 +676,16 @@ class ProjectServiceContainer extends Container
     protected function getInactiveService()
     {
         throw new InactiveScopeException('request', 'request');
+    }
+
+    protected function get_camelcasedmethodendingwith_Service()
+    {
+        return new \stdClass();
+    }
+
+    protected function _get_by_different_convention()
+    {
+        return new \stdClass();
     }
 
     protected function getBarService()

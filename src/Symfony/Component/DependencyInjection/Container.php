@@ -191,9 +191,7 @@ class Container implements IntrospectableContainerInterface
             $this->scopedServices[$scope][$id] = $service;
         }
 
-        if (isset($this->aliases[$id])) {
-            unset($this->aliases[$id]);
-        }
+        unset($this->aliases[$id], $this->methodMap[$id]);
 
         $this->services[$id] = $service;
 
@@ -222,6 +220,7 @@ class Container implements IntrospectableContainerInterface
         for ($i = 2;;) {
             if ('service_container' === $id
                 || isset($this->aliases[$id])
+                || isset($this->methodMap[$id])
                 || isset($this->services[$id])
                 || array_key_exists($id, $this->services)
             ) {
@@ -358,15 +357,20 @@ class Container implements IntrospectableContainerInterface
      */
     public function getServiceIds()
     {
-        $ids = array();
+        $ids = array_keys($this->methodMap + $this->services);
+        $reversedMethodMap = array_change_key_case(array_flip($this->methodMap), \CASE_LOWER);
         foreach (get_class_methods($this) as $method) {
             if (preg_match('/^get(.+)Service$/', $method, $match)) {
-                $ids[] = self::underscore($match[1]);
+                if (isset($reversedMethodMap[$methodLc = 'get'.strtolower($match[1]).'service'])) {
+                    $ids[] = $reversedMethodMap[$methodLc];
+                } else {
+                    $ids[] = self::underscore($match[1]);
+                }
             }
         }
         $ids[] = 'service_container';
 
-        return array_unique(array_merge($ids, array_keys($this->services)));
+        return array_values(array_unique($ids));
     }
 
     /**

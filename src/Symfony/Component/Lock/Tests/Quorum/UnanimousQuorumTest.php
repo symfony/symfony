@@ -1,0 +1,88 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Lock\Tests\Quorum;
+
+use Symfony\Component\Lock\Quorum\UnanimousQuorum;
+
+/**
+ * @author Jérémy Derussé <jeremy@derusse.com>
+ */
+class UnanimousQuorumTest extends \PHPUnit_Framework_TestCase
+{
+    /** @var UnanimousQuorum */
+    private $quorum;
+
+    public function setup()
+    {
+        $this->quorum = new UnanimousQuorum();
+    }
+
+    public function provideMetResults()
+    {
+        // success, failure, total, isMet
+        yield array(3, 0, 3, true);
+        yield array(2, 1, 3, false);
+        yield array(2, 0, 3, false);
+        yield array(1, 2, 3, false);
+        yield array(1, 1, 3, false);
+        yield array(1, 0, 3, false);
+        yield array(0, 3, 3, false);
+        yield array(0, 2, 3, false);
+        yield array(0, 1, 3, false);
+        yield array(0, 0, 3, false);
+
+        yield array(2, 0, 2, true);
+        yield array(1, 1, 2, false);
+        yield array(1, 0, 2, false);
+        yield array(0, 2, 2, false);
+        yield array(0, 1, 2, false);
+        yield array(0, 0, 2, false);
+    }
+
+    public function provideIndeterminate()
+    {
+        // success, failure, total, canBeMet
+        yield array(3, 0, 3, true);
+        yield array(2, 1, 3, false);
+        yield array(2, 0, 3, true);
+        yield array(1, 2, 3, false);
+        yield array(1, 1, 3, false);
+        yield array(1, 0, 3, true);
+        yield array(0, 3, 3, false);
+        yield array(0, 2, 3, false);
+        yield array(0, 1, 3, false);
+        yield array(0, 0, 3, true);
+
+        yield array(2, 0, 2, true);
+        yield array(1, 1, 2, false);
+        yield array(1, 0, 2, true);
+        yield array(0, 2, 2, false);
+        yield array(0, 1, 2, false);
+        yield array(0, 0, 2, true);
+    }
+
+    /**
+     * @dataProvider provideMetResults
+     */
+    public function testMet($success, $failure, $total, $isMet)
+    {
+        $this->assertSame($isMet, $this->quorum->isMet($success, $total));
+    }
+
+    /**
+     * @dataProvider provideIndeterminate
+     */
+    public function canBeMet($success, $failure, $total, $isMet)
+    {
+        $this->assertSame($isMet, $this->quorum->canBeMet($failure, $total));
+    }
+}

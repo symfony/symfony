@@ -63,7 +63,9 @@ class TraceableAdapter implements AdapterInterface
             $event->end = microtime(true);
         }
 
-        if (!$event->result) {
+        if ($event->result) {
+            ++$event->hits;
+        } else {
             ++$event->misses;
         }
 

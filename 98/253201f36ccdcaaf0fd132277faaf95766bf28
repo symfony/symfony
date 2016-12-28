@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by 4rthem at 2016-12-23T12:02:45Z
+
+OK but currently, the `doSave` method iterates over all the values to save, even if one fails. It's only at the end that we have `return $ok;`.
+
+Adding an exception in this method will conflict with the boolean return IMO.
+We should either throw an exception at the first fail or analyze why `file_put_contents` or `rename` has failed. Maybe an `is_writable` call if `$ok` is false?
+
+```php
+// Symfony\Component\Cache\Adapter\FilesystemAdapter::doSave
+if (!$ok && !is_writable($this->directory)) {
+    throw new CacheException(sprintf('Cache directory is not writable (%s)', $this->directory));
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-23T13:26:14Z
+
+True concern, and AbstractAdapter already has the required logic to do what you say: it retries saving each key individually when batch save fails.

@@ -54,6 +54,7 @@
         "symfony/inflector": "self.version",
         "symfony/intl": "self.version",
         "symfony/ldap": "self.version",
+        "symfony/lock": "self.version",
         "symfony/monolog-bridge": "self.version",
         "symfony/options-resolver": "self.version",
         "symfony/process": "self.version",

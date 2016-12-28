@@ -141,7 +141,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setFile($parentDef->getFile());
         $def->setPublic($parentDef->isPublic());
         $def->setLazy($parentDef->isLazy());
-        $def->setAutowired($parentDef->isAutowired());
+        $def->setAutowiredMethods($parentDef->getAutowiredMethods());
 
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
@@ -166,8 +166,8 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         if (isset($changes['deprecated'])) {
             $def->setDeprecated($definition->isDeprecated(), $definition->getDeprecationMessage('%service_id%'));
         }
-        if (isset($changes['autowire'])) {
-            $def->setAutowired($definition->isAutowired());
+        if (isset($changes['autowired_methods'])) {
+            $def->setAutowiredMethods($definition->getAutowiredMethods());
         }
         if (isset($changes['decorated_service'])) {
             $decoratedService = $definition->getDecoratedService();
@@ -199,7 +199,7 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         }
 
         // append method calls
-        if (count($calls = $definition->getMethodCalls()) > 0) {
+        if ($calls = $definition->getMethodCalls()) {
             $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
         }
 

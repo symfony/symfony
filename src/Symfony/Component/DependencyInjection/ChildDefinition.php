@@ -139,11 +139,11 @@ class ChildDefinition extends Definition
     /**
      * {@inheritdoc}
      */
-    public function setAutowired($autowired)
+    public function setAutowiredMethods(array $autowiredMethods)
     {
-        $this->changes['autowire'] = true;
+        $this->changes['autowired_methods'] = true;
 
-        return parent::setAutowired($autowired);
+        return parent::setAutowiredMethods($autowiredMethods);
     }
 
     /**

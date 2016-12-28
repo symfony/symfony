@@ -58,18 +58,10 @@ class TraceableAdapter implements AdapterInterface
     {
         $event = $this->start(__FUNCTION__, $key);
         try {
-            $event->result = $this->pool->hasItem($key);
+            return $event->result = $this->pool->hasItem($key);
         } finally {
             $event->end = microtime(true);
         }
-
-        if ($event->result) {
-            ++$event->hits;
-        } else {
-            ++$event->misses;
-        }
-
-        return $event->result;
     }
 
     /**

@@ -133,8 +133,36 @@ Serializer
 TwigBridge
 ----------
 
- * Deprecated the possibility to inject the Form Twig Renderer into the form
-   extension. Inject it into the `TwigRendererEngine` instead.
+ * Injecting the Form `TwigRenderer` into the `FormExtension` is deprecated and has no more effect.
+   Upgrade Twig to `^1.30`, inject the `Twig_Environment` into the `TwigRendererEngine` and load
+   the `TwigRenderer` using the `Twig_FactoryRuntimeLoader` instead.
+
+   Before:
+
+   ```php
+   use Symfony\Bridge\Twig\Extension\FormExtension;
+   use Symfony\Bridge\Twig\Form\TwigRenderer;
+   use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+
+   // ...
+   $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'));
+   $rendererEngine->setEnvironment($twig);
+   $twig->addExtension(new FormExtension(new TwigRenderer($rendererEngine, $csrfTokenManager)));
+   ```
+
+   After:
+
+   ```php
+   $rendererEngine = new TwigRendererEngine(array('form_div_layout.html.twig'), $twig);
+   $twig->addRuntimeLoader(new \Twig_FactoryRuntimeLoader(array(
+       TwigRenderer::class => function () use ($rendererEngine, $csrfTokenManager) {
+           return new TwigRenderer($rendererEngine, $csrfTokenManager);
+       },
+   )));
+   $twig->addExtension(new FormExtension());
+   ```
+
+ * Deprecated the `TwigRendererEngineInterface` interface, it will be removed in 4.0.
 
 Validator
 ---------

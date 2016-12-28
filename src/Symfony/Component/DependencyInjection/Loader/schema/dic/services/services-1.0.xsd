@@ -52,8 +52,9 @@
         Enclosing element for the definition of all services
       ]]></xsd:documentation>
     </xsd:annotation>
-    <xsd:choice minOccurs="1" maxOccurs="unbounded">
-      <xsd:element name="service" type="service" />
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="service" type="service" minOccurs="1" />
+      <xsd:element name="defaults" type="defaults" minOccurs="0" maxOccurs="1" />
     </xsd:choice>
   </xsd:complexType>
 
@@ -87,6 +88,20 @@
     <xsd:attribute name="class" type="xsd:string" />
     <xsd:attribute name="method" type="xsd:string" />
     <xsd:attribute name="function" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:complexType name="defaults">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        Enclosing element for the service definitions' defaults for the current file
+      ]]></xsd:documentation>
+    </xsd:annotation>
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="autowire" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="public" type="boolean" />
+    <xsd:attribute name="autowire" type="boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="service">

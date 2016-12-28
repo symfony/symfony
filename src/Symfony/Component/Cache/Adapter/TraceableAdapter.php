@@ -185,9 +185,6 @@ class TraceableAdapter implements AdapterInterface
     }
 }
 
-/**
- * @internal
- */
 class TraceableAdapterEvent
 {
     public $name;

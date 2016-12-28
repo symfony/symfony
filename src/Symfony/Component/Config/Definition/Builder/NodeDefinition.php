@@ -13,6 +13,7 @@ namespace Symfony\Component\Config\Definition\Builder;
 
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * This class provides a fluent interface for defining a node.
@@ -340,4 +341,25 @@ abstract class NodeDefinition implements NodeParentInterface
      * @throws InvalidDefinitionException When the definition is invalid
      */
     abstract protected function createNode();
+
+    /**
+     * Sets doc configuration.
+     *
+     * @param string $doc
+     *
+     * @return NodeDefinition|$this
+     */
+    public function doc($doc)
+    {
+        if (false === filter_var($doc, FILTER_VALIDATE_URL)) {
+            throw new \InvalidArgumentException(sprintf('The "%s" is not a valid documentation URL.', $doc));
+        }
+
+        // Adds sf version
+        if (false !== strpos($doc, 'https://symfony.com/doc/')) {
+            $doc = sprintf($doc, Kernel::MAJOR_VERSION.'.'.Kernel::MINOR_VERSION);
+        }
+
+        return $this->attribute('doc', $doc);
+    }
 }

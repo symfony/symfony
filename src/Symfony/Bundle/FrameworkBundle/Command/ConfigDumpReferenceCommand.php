@@ -37,7 +37,6 @@ class ConfigDumpReferenceCommand extends AbstractConfigCommand
             ->setName('config:dump-reference')
             ->setDefinition(array(
                 new InputArgument('name', InputArgument::OPTIONAL, 'The Bundle name or the extension alias'),
-                new InputArgument('path', InputArgument::OPTIONAL, 'The configuration option path'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (yaml or xml)', 'yaml'),
             ))
             ->setDescription('Dumps the default configuration for an extension')
@@ -59,6 +58,10 @@ When the option is not provided, <comment>yaml</comment> is used.
 For dumping a specific option, add its path as second argument (only available for the yaml format):
 
   <info>php %command.full_name% framework profiler.matcher</info>
+
+The <info>--with-doc</info> option dumps nodes with documentation URL.
+
+  <info>php %command.full_name% FrameworkBundle --with-doc</info>
 
 EOF
             )
@@ -110,14 +113,15 @@ EOF
             $message .= sprintf(' at path "%s"', $path);
         }
 
+        $withDoc = $input->getOption('with-doc');
         switch ($format) {
             case 'yaml':
                 $io->writeln(sprintf('# %s', $message));
-                $dumper = new YamlReferenceDumper();
+                $dumper = new YamlReferenceDumper($withDoc);
                 break;
             case 'xml':
                 $io->writeln(sprintf('<!-- %s -->', $message));
-                $dumper = new XmlReferenceDumper();
+                $dumper = new XmlReferenceDumper($withDoc);
                 break;
             default:
                 $io->writeln($message);

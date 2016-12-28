@@ -83,8 +83,7 @@ class TraceableAdapterTest extends AdapterTestCase
         $call = $calls[0];
         $this->assertEquals('hasItem', $call->name);
         $this->assertEquals('k', $call->argument);
-        $this->assertEquals(0, $call->hits);
-        $this->assertEquals(1, $call->misses);
+        $this->assertFalse($call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
@@ -101,8 +100,7 @@ class TraceableAdapterTest extends AdapterTestCase
         $call = $calls[2];
         $this->assertEquals('hasItem', $call->name);
         $this->assertEquals('k', $call->argument);
-        $this->assertEquals(1, $call->hits);
-        $this->assertEquals(0, $call->misses);
+        $this->assertTrue($call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }

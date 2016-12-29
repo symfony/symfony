@@ -133,8 +133,10 @@ class CacheDataCollector extends DataCollector
                     $statistics[$name]['misses'] += $count - $call->misses;
                 } elseif ($call->name === 'hasItem') {
                     $statistics[$name]['reads'] += 1;
-                    if ($call->result === false) {
+                    if ($call->result->getRawData()[0][0] === false) {
                         $statistics[$name]['misses'] += 1;
+                    } else {
+                        $statistics[$name]['hits'] += 1;
                     }
                 } elseif ($call->name === 'save') {
                     $statistics[$name]['writes'] += 1;

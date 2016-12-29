@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-29T15:23:19Z
+
+renaming is hard :)
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-29T15:24:33Z
+
+Maybe we should add the process to the docs. :D
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-29T16:42:21Z
+
+Because 1e29773 doesn't work: the alias must be defined alongside the aliased class so that `instanceof` checks work as expected.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2016-12-29T16:50:27Z
+
+But @nicolas-grekas the change does work! See the build status in my PR #21088 from which I extracted the prev. commit.
+
+If you look at 41f995e92e3d7d0227b6fe009737cf5ea27b9449 I've added new assertion to the test to see that the `instanceof` works for both class definitions, the old (deprecated) and the new; it should work since the autoloader will attempt to load the old definition, finding the old file, which contains the `class_alias`, hence making it work.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-29T17:01:21Z
+
+It works because you already loaded everything.
+The broken scenario is:
+load TraceableAccessDecisionManager (but NOT DebugAccessDecisionManager)
+check an instance of it against DebugAccessDecisionManager

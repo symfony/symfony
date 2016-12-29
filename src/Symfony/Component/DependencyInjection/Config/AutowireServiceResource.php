@@ -60,7 +60,11 @@ class AutowireServiceResource implements SelfCheckingResourceInterface, \Seriali
 
     public function unserialize($serialized)
     {
-        list($this->class, $this->filePath, $this->autowiringMetadata) = unserialize($serialized);
+        if (PHP_VERSION_ID >= 70000) {
+            list($this->class, $this->filePath, $this->autowiringMetadata) = unserialize($serialized, array('allowed_classes' => false));
+        } else {
+            list($this->class, $this->filePath, $this->autowiringMetadata) = unserialize($serialized);
+        }
     }
 
     /**

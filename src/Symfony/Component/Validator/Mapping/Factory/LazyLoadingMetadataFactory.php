@@ -99,8 +99,12 @@ class LazyLoadingMetadataFactory implements MetadataFactoryInterface
             return $this->loadedClasses[$class];
         }
 
-        if (null !== $this->cache && false !== ($this->loadedClasses[$class] = $this->cache->read($class))) {
-            return $this->loadedClasses[$class];
+        if (null !== $this->cache) {
+            $cached = $this->cache->read($class);
+
+            if (false !== $cached) {
+                return $this->loadedClasses[$class] = $cached;
+            }
         }
 
         if (!class_exists($class) && !interface_exists($class)) {

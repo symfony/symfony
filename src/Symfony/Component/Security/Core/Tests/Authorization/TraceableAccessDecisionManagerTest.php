@@ -46,6 +46,7 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $adm = new DebugAccessDecisionManager(new AccessDecisionManager());
 
+        $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm);
         $this->assertInstanceOf(TraceableAccessDecisionManager::class, $adm);
     }
 }

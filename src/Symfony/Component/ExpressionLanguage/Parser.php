@@ -214,6 +214,7 @@ class Parser
                             } else {
                                 throw new SyntaxError(sprintf('The function "%s" does not exist', $token->value), $token->cursor);
                             }
+
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
                             if (!in_array($token->value, $this->names, true)) {

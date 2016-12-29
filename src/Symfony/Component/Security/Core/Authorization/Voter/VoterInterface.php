@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Result\VoterResultInterface;
 
 /**
  * VoterInterface is the interface implemented by all voters.
@@ -34,7 +35,7 @@ interface VoterInterface
      * @param mixed          $subject    The subject to secure
      * @param array          $attributes An array of attributes associated with the method being invoked
      *
-     * @return int either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
+     * @return VoterResultInterface contains either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED as result
      */
     public function vote(TokenInterface $token, $subject, array $attributes);
 }

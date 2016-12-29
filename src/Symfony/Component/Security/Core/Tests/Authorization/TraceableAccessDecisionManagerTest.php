@@ -23,7 +23,7 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecideLog($expectedLog, $object)
     {
-        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
+        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager(array(), $this->getVoteReportBuilder()));
         $adm->decide($this->getMockBuilder(TokenInterface::class)->getMock(), array('ATTRIBUTE_1'), $object);
 
         $this->assertSame($expectedLog, $adm->getDecisionLog());
@@ -44,10 +44,17 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testDebugAccessDecisionManagerAliasExistsForBC()
     {
-        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
+        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager(array(), $this->getVoteReportBuilder()));
 
         if (!$adm instanceof DebugAccessDecisionManager) {
             $this->fail('For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
         }
+    }
+
+    protected function getVoteReportBuilder()
+    {
+        $contextFactory = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\Report\VoteReportBuilderInterface')->getMock();
+
+        return $contextFactory;
     }
 }

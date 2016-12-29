@@ -66,12 +66,20 @@
         <!-- Authorization related services -->
         <service id="security.access.decision_manager" class="Symfony\Component\Security\Core\Authorization\AccessDecisionManager" public="false">
             <argument type="collection" />
+            <argument type="service" id="security.access.vote_report_builder" />
         </service>
 
         <service id="security.role_hierarchy" class="Symfony\Component\Security\Core\Role\RoleHierarchy" public="false">
             <argument>%security.role_hierarchy.roles%</argument>
         </service>
 
+        <service id="security.access.vote_report_builder" class="Symfony\Component\Security\Core\Authorization\Voter\Report\VoteReportBuilder" public="false">
+            <argument type="service" id="security.access.vote_report_collector" />
+            <argument type="service" id="translator" />
+            <argument>%security.access.translation_domain%</argument>
+        </service>
+
+        <service id="security.access.vote_report_collector" class="Symfony\Component\Security\Core\Authorization\Voter\Report\VoteReportCollector" public="false" />
 
         <!-- Security Voters -->
         <service id="security.access.simple_role_voter" class="Symfony\Component\Security\Core\Authorization\Voter\RoleVoter" public="false">

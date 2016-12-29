@@ -437,7 +437,7 @@ class Definition
      *
      * @param bool $shared Whether the service must be shared or not
      *
-     * @return Definition The current instance
+     * @return self
      */
     public function setShared($shared)
     {
@@ -563,7 +563,7 @@ class Definition
      * @param bool   $status
      * @param string $template Template message to use if the definition is deprecated
      *
-     * @return Definition the current instance
+     * @return self
      *
      * @throws InvalidArgumentException When the message template is invalid.
      */
@@ -638,7 +638,7 @@ class Definition
      *
      * @param string[] $types
      *
-     * @return Definition The current instance
+     * @return self
      */
     public function setAutowiringTypes(array $types)
     {
@@ -666,7 +666,7 @@ class Definition
      *
      * @param bool $autowired
      *
-     * @return Definition The current instance
+     * @return self
      */
     public function setAutowired($autowired)
     {
@@ -690,7 +690,7 @@ class Definition
      *
      * @param string $type
      *
-     * @return Definition The current instance
+     * @return self
      */
     public function addAutowiringType($type)
     {
@@ -704,7 +704,7 @@ class Definition
      *
      * @param string $type
      *
-     * @return Definition The current instance
+     * @return self
      */
     public function removeAutowiringType($type)
     {

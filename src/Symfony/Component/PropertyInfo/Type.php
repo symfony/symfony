@@ -148,7 +148,7 @@ class Type
      *
      * Only applicable for a collection type.
      *
-     * @return Type|null
+     * @return self|null
      */
     public function getCollectionKeyType()
     {
@@ -160,7 +160,7 @@ class Type
      *
      * Only applicable for a collection type.
      *
-     * @return Type|null
+     * @return self|null
      */
     public function getCollectionValueType()
     {

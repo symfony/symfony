@@ -36,8 +36,8 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
 
     /**
      * @param Reader                 $annotationReader
-     * @param string                 $phpArrayFile     the PHP file where annotations are cached
-     * @param CacheItemPoolInterface $fallbackPool     the pool where runtime-discovered annotations are cached
+     * @param string                 $phpArrayFile     The PHP file where annotations are cached
+     * @param CacheItemPoolInterface $fallbackPool     The pool where runtime-discovered annotations are cached
      */
     public function __construct(Reader $annotationReader, $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {

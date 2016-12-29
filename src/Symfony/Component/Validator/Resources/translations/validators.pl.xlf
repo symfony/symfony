@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>To pole jest brakujące.</target>
+                <target>Tego pola brakuje.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -39,5 +40,12 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $x = fopen(__FILE__, 'r'), 'result' => false)), $x);
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $x = array(), 'result' => false)), $x);
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $object, 'result' => false)), $object);
+    }
+
+    public function testDebugAccessDecisionManagerAliasExistsForBC()
+    {
+        $adm = new DebugAccessDecisionManager(new AccessDecisionManager());
+
+        $this->assertInstanceOf(TraceableAccessDecisionManager::class, $adm);
     }
 }

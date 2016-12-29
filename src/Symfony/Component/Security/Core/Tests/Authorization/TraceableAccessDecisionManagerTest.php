@@ -12,17 +12,17 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
-use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class DebugAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
+class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider provideObjectsAndLogs
      */
     public function testDecideLog($expectedLog, $object)
     {
-        $adm = new DebugAccessDecisionManager(new AccessDecisionManager());
+        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
         $adm->decide($this->getMockBuilder(TokenInterface::class)->getMock(), array('ATTRIBUTE_1'), $object);
 
         $this->assertSame($expectedLog, $adm->getDecisionLog());

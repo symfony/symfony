@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * @internal
  */
-class DebugAccessDecisionManager implements AccessDecisionManagerInterface
+class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 {
     private $manager;
     private $strategy;

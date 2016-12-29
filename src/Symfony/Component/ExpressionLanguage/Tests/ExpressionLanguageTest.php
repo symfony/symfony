@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
+use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
@@ -217,5 +218,23 @@ class ExpressionLanguageTest extends TestCase
         $expression = 'a + b';
         $expressionLanguage->compile($expression, array('a', 'B' => 'b'));
         $expressionLanguage->compile($expression, array('B' => 'b', 'a'));
+    }
+
+    public function testAddingFunctionAfterEval()
+    {
+        $el = new ExpressionLanguage();
+        $el->evaluate('1 + 1');
+        $el->addFunction(new ExpressionFunction('fn', function () {}, function () {}));
+        $result = $el->evaluate('fn()');
+        $this->assertNull($result);
+    }
+
+    public function testAddingFunctionAfterCompile()
+    {
+        $el = new ExpressionLanguage();
+        $el->compile('1 + 1');
+        $el->addFunction(new ExpressionFunction('fn', function () {}, function () {}));
+        $result = $el->compile('fn()');
+        $this->assertEmpty($result);
     }
 }

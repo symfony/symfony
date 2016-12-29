@@ -295,6 +295,42 @@ class Parser
                     return $value;
                 }
 
+                // try to parse the value as a multi-line string as a last resort
+                if (0 === $this->currentLineNb) {
+                    $parseError = false;
+                    $previousLineWasNewline = false;
+                    $value = '';
+
+                    foreach ($this->lines as $line) {
+                        try {
+                            $parsedLine = Inline::parse($line, $flags, $this->refs);
+
+                            if (!is_string($value)) {
+                                $parseError = true;
+                                break;
+                            }
+
+                            if ('' === trim($parsedLine)) {
+                                $value .= "\n";
+                                $previousLineWasNewline = true;
+                            } elseif ($previousLineWasNewline) {
+                                $value .= trim($parsedLine);
+                                $previousLineWasNewline = false;
+                            } else {
+                                $value .= ' '.trim($parsedLine);
+                                $previousLineWasNewline = false;
+                            }
+                        } catch (ParseException $e) {
+                            $parseError = true;
+                            break;
+                        }
+                    }
+
+                    if (!$parseError) {
+                        return trim($value);
+                    }
+                }
+
                 switch (preg_last_error()) {
                     case PREG_INTERNAL_ERROR:
                         $error = 'Internal PCRE error.';
@@ -462,7 +498,7 @@ class Parser
 
             $previousLineIndentation = $indent;
 
-            if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
+            if ($isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
                 $this->moveToPreviousLine();
                 break;
             }

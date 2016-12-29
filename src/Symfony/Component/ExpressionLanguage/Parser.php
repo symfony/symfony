@@ -31,10 +31,12 @@ class Parser
     private $binaryOperators;
     private $functions;
     private $names;
+    private $parsePhpFunctions;
 
-    public function __construct(array $functions)
+    public function __construct(array &$functions, $parsePhpFunctions = false)
     {
-        $this->functions = $functions;
+        $this->functions = &$functions;
+        $this->parsePhpFunctions = $parsePhpFunctions;
 
         $this->unaryOperators = array(
             'not' => array('precedence' => 50),
@@ -194,10 +196,24 @@ class Parser
 
                     default:
                         if ('(' === $this->stream->current->value) {
-                            if (false === isset($this->functions[$token->value])) {
+                            if (false === isset($this->functions[$token->value])
+                                || $this->parsePhpFunctions
+                                && function_exists($token->value)
+                            ) {
+                                // Adds PHP function
+                                $this->functions[$token->value] = array(
+                                    'compiler' => function () use ($token) {
+                                        return sprintf('%s(%s)', $token->value, implode(', ', func_get_args()));
+                                    },
+                                    'evaluator' => function () use ($token) {
+                                        $args = func_get_args();
+
+                                        return call_user_func_array($token->value, array_splice($args, 1));
+                                    },
+                                );
+                            } else {
                                 throw new SyntaxError(sprintf('The function "%s" does not exist', $token->value), $token->cursor);
                             }
-
                             $node = new Node\FunctionNode($token->value, $this->parseArguments());
                         } else {
                             if (!in_array($token->value, $this->names, true)) {

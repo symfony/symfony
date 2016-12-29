@@ -32,12 +32,14 @@ class ExpressionLanguage
     private $compiler;
 
     protected $functions = array();
+    protected $parsePhpFunctions;
 
     /**
      * @param CacheItemPoolInterface                $cache
      * @param ExpressionFunctionProviderInterface[] $providers
+     * @param bool                                  $parsePhpFunctions Parse PHP functions like <code>strtoupper()</code>
      */
-    public function __construct($cache = null, array $providers = array())
+    public function __construct($cache = null, array $providers = array(), $parsePhpFunctions = false)
     {
         if (null !== $cache) {
             if ($cache instanceof ParserCacheInterface) {
@@ -53,6 +55,8 @@ class ExpressionLanguage
         foreach ($providers as $provider) {
             $this->registerProvider($provider);
         }
+
+        $this->parsePhpFunctions = $parsePhpFunctions;
     }
 
     /**
@@ -162,7 +166,7 @@ class ExpressionLanguage
     private function getParser()
     {
         if (null === $this->parser) {
-            $this->parser = new Parser($this->functions);
+            $this->parser = new Parser($this->functions, $this->parsePhpFunctions);
         }
 
         return $this->parser;

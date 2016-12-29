@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
@@ -120,7 +120,7 @@ class SecurityDataCollector extends DataCollector
         }
 
         // collect voters and access decision manager information
-        if ($this->accessDecisionManager instanceof DebugAccessDecisionManager) {
+        if ($this->accessDecisionManager instanceof TraceableAccessDecisionManager) {
             $this->data['access_decision_log'] = array_map(function ($decision) {
                 $decision['object'] = $this->cloneVar($decision['object']);
 

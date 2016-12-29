@@ -13,6 +13,8 @@ namespace Symfony\Component\Security\Core\Authorization;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+class_alias(TraceableAccessDecisionManager::class, DebugAccessDecisionManager::class);
+
 /**
  * Decorates the original AccessDecisionManager class to log information
  * about the security voters and the decisions made by them.

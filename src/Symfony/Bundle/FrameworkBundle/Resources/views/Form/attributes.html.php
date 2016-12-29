@@ -1,9 +1,9 @@
 <?php foreach ($attr as $k => $v): ?>
-<?php if (in_array($k, array('placeholder', 'title'), true)): ?>
+<?php if ('placeholder' === $k || 'title' === $k): ?>
 <?php printf('%s="%s" ', $view->escape($k), $view->escape(false !== $translation_domain ? $view['translator']->trans($v, array(), $translation_domain) : $v)) ?>
-<?php elseif ($v === true): ?>
+<?php elseif (true === $v): ?>
 <?php printf('%s="%s" ', $view->escape($k), $view->escape($k)) ?>
-<?php elseif ($v !== false): ?>
+<?php elseif (false !== $v): ?>
 <?php printf('%s="%s" ', $view->escape($k), $view->escape($v)) ?>
 <?php endif ?>
 <?php endforeach ?>

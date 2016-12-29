@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -138,6 +139,7 @@ class FrameworkExtension extends Extension
             $this->registerSessionConfiguration($config['session'], $container, $loader);
         }
 
+        $container->setParameter('request', $config['request']);
         if ($this->isConfigEnabled($container, $config['request'])) {
             $this->registerRequestConfiguration($config['request'], $container, $loader);
         }

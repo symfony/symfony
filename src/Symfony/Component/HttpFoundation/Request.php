@@ -1792,6 +1792,10 @@ class Request
      */
     protected function prepareBaseUrl()
     {
+        if ($this->server->has('SF_BASE_URL')) {
+            return $this->server->get('SF_BASE_URL');
+        }
+
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
 
         if (basename($this->server->get('SCRIPT_NAME')) === $filename) {
@@ -1858,6 +1862,10 @@ class Request
      */
     protected function prepareBasePath()
     {
+        if ($this->server->has('SF_BASE_PATH')) {
+            return $this->server->get('SF_BASE_PATH');
+        }
+
         $filename = basename($this->server->get('SCRIPT_FILENAME'));
         $baseUrl = $this->getBaseUrl();
         if (empty($baseUrl)) {

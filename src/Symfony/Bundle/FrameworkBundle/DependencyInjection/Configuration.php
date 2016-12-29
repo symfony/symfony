@@ -419,7 +419,25 @@ class Configuration implements ConfigurationInterface
                     ->info('request configuration')
                     ->canBeEnabled()
                     ->fixXmlConfig('format')
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return is_array($v) && !isset($v['base_url']); })
+                        ->then(function (array $v) {
+                            $v['base_url'] = isset($v['base_path']) ? $v['base_path'] : null;
+
+                            return $v;
+                        })
+                    ->end()
                     ->children()
+                        ->scalarNode('scheme')->defaultValue('http')->end()
+                        ->scalarNode('host')->defaultValue('localhost')->end()
+                        ->scalarNode('base_url')
+                            ->beforeNormalization()->ifString()->then(function ($v) { return '/'.trim($v, '/'); })->end()
+                            ->defaultValue('/')
+                        ->end()
+                        ->scalarNode('base_path')
+                            ->beforeNormalization()->ifString()->then(function ($v) { return '/'.trim($v, '/'); })->end()
+                            ->defaultValue('/')
+                        ->end()
                         ->arrayNode('formats')
                             ->useAttributeAsKey('name')
                             ->prototype('array')

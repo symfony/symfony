@@ -120,6 +120,17 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $bundle->boot();
         }
 
+        // initialize request on CLI
+        if ('cli' === PHP_SAPI && $this->container->hasParameter('request')) {
+            $config = $this->container->getParameter('request');
+            $request = Request::create($config['scheme'].'://'.$config['host'].$config['base_url']);
+            $request->server->set('REQUEST_URI', $config['base_url']);
+            $request->server->set('SF_BASE_URL', $config['base_url']);
+            $request->server->set('SF_BASE_PATH', $config['base_path']);
+
+            $this->container->get('request_stack')->push($request);
+        }
+
         $this->booted = true;
     }
 

@@ -145,7 +145,7 @@ class Table
      * @param int               $columnIndex Column index
      * @param TableStyle|string $name        The style name or a TableStyle instance
      *
-     * @return self
+     * @return $this
      */
     public function setColumnStyle($columnIndex, $name)
     {

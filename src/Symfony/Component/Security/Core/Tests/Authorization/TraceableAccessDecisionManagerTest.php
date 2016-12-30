@@ -42,19 +42,15 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $object, 'result' => false)), $object);
     }
 
+    /**
+     * @group this
+     */
     public function testDebugAccessDecisionManagerAliasExistsForBC()
-    {
-        $adm = new DebugAccessDecisionManager(new AccessDecisionManager());
-
-        $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm);
-        $this->assertInstanceOf(TraceableAccessDecisionManager::class, $adm);
-    }
-
-    public function testDebugAccessDecisionManagerInstanceOfForBC()
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
 
-        $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm);
-        $this->assertInstanceOf(TraceableAccessDecisionManager::class, $adm);
+        if (! $adm instanceof DebugAccessDecisionManager) {
+            $this->fail('Doesn\'t work, BC with SecurityBundle broken, see PR #21088');
+        }
     }
 }

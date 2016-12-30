@@ -12,4 +12,4 @@ namespace Symfony\Component\Security\Core\Authorization;
  * This is a placeholder for the old class, that got renamed; this is not a BC break since the class is internal, this 
  * placeholder is here just to help backward compatibility with older SecurityBundle versions. 
  */
-class_alias(TraceableAccessDecisionManager::class, DebugAccessDecisionManager::class);
+class_exists(TraceableAccessDecisionManager::class);

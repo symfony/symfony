@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-28T15:08:35Z
+
+The same will apply to arguments (fixed by this patch, but no there is no fixture covering it).
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-28T15:09:39Z
+
+> The same will apply to arguments (fixed by this patch, but no there is no fixture covering it).
+
+I know. Adding test is a bit boring + it's already fixed. That's why I did not added fixtures for that.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T19:18:58Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-30T10:23:01Z
+
+:+1:
+
+Status: Reviewed

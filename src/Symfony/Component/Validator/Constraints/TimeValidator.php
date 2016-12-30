@@ -47,7 +47,7 @@ class TimeValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Time');
         }
 
-        if (null === $value || '' === $value || $value instanceof \DateTime) {
+        if (null === $value || '' === $value || $value instanceof \DateTimeInterface) {
             return;
         }
 

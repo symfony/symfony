@@ -120,13 +120,12 @@ class WebServer
         $process->disableOutput();
         $process->start();
 
-        $lockFile = $this->getLockFile();
-        touch($lockFile);
-
         if (!$process->isRunning()) {
-            unlink($lockFile);
             throw new \RuntimeException('Unable to start the server process.');
         }
+
+        $lockFile = $this->getLockFile();
+        touch($lockFile);
 
         // stop the web server when the lock file is removed
         while ($process->isRunning()) {

@@ -44,21 +44,17 @@ The <info>%command.name%</info> runs a local web server:
 
   <info>%command.full_name%</info>
 
-To change default bind address and port use the <info>address</info> argument:
+Change the default address and port by passing them as an argument:
 
   <info>%command.full_name% 127.0.0.1:8080</info>
 
-To change default docroot directory use the <info>--docroot</info> option:
+Use the <info>--docroot</info> option to change the default docroot directory:
 
   <info>%command.full_name% --docroot=htdocs/</info>
 
-If you have custom docroot directory layout, you can specify your own
-router script using <info>--router</info> option:
+Specify your own router script via the <info>--router</info> option:
 
   <info>%command.full_name% --router=app/config/router.php</info>
-
-Specifing a router script is required when the used environment is not "dev",
-"prod", or "test".
 
 See also: http://www.php.net/manual/en/features.commandline.webserver.php
 EOF

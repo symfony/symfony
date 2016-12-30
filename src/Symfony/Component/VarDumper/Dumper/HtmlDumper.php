@@ -24,7 +24,7 @@ class HtmlDumper extends CliDumper
     public static $defaultOutput = 'php://output';
 
     protected $dumpHeader;
-    protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s" tabindex="0">';
+    protected $dumpPrefix = '<pre class=sf-dump id=%s data-indent-pad="%s">';
     protected $dumpSuffix = '</pre><script>Sfdump(%s)</script>';
     protected $dumpId = 'sf-dump';
     protected $colors = true;
@@ -152,45 +152,6 @@ if (!doc.addEventListener) {
     };
 }
 
-SearchState = function () {
-    this.nodes = [];
-    this.idx = 0;
-};
-SearchState.prototype = {
-    next: function () {
-        if (this.isEmpty()) {
-            return this.current();
-        }
-        this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : this.idx;
-
-        return this.current();
-    },
-    previous: function () {
-        if (this.isEmpty()) {
-            return this.current();
-        }
-        this.idx = this.idx > 0 ? this.idx - 1 : this.idx;
-
-        return this.current();
-    },
-    isEmpty: function () {
-        return 0 === this.count();
-    },
-    current: function () {
-        if (this.isEmpty()) {
-            return null;
-        }
-        return this.nodes[this.idx];
-    },
-    reset: function () {
-        this.nodes = [];
-        this.idx = 0;
-    },
-    count: function () {
-        return this.nodes.length;
-    },
-};
-
 function toggle(a, recursive) {
     var s = a.nextSibling || {}, oldClass = s.className, arrow, newClass;
 
@@ -209,7 +170,7 @@ function toggle(a, recursive) {
 
     if (recursive) {
         try {
-            a = s.querySelectorAll('.' + oldClass);
+            a = s.querySelectorAll('.'+oldClass);
             for (s = 0; s < a.length; ++s) {
                 if (a[s].className !== newClass) {
                     a[s].className = newClass;
@@ -247,8 +208,7 @@ function expand(a, recursive) {
     return false;
 };
 
-function collapseAll(root)
-{
+function collapseAll(root) {
     var a = root.querySelector('a.sf-dump-toggle');
     if (a) {
         collapse(a, true);
@@ -266,7 +226,7 @@ function reveal(node) {
     var previous = null;
     var parent = null;
 
-    while ((parent = current.parentNode || {}) && (previous = parent.previousSibling)) {
+    while ((parent = current.parentNode || {}) && (previous = parent.previousSibling) && 'A' === previous.tagName) {
         current = current.parentNode;
         parents.push(previous);
     }
@@ -282,11 +242,10 @@ function reveal(node) {
     return false;
 }
 
-function highlight(root, activeNode, nodes)
-{
+function highlight(root, activeNode, nodes) {
     resetHighlightedNodes(root);
 
-    (nodes||[]).forEach(function (node) {
+    Array.from(nodes||[]).forEach(function (node) {
         if (!/\bsf-dump-highlight\b/.test(node.className)) {
             node.className = node.className + ' sf-dump-highlight';
         }
@@ -297,9 +256,8 @@ function highlight(root, activeNode, nodes)
     }
 }
 
-function resetHighlightedNodes(root)
-{
-    root.querySelectorAll('.sf-dump-str, .sf-dump-key, .sf-dump-public, .sf-dump-protected, .sf-dump-private').forEach(function (strNode) {
+function resetHighlightedNodes(root) {
+    Array.from(root.querySelectorAll('.sf-dump-str, .sf-dump-key, .sf-dump-public, .sf-dump-protected, .sf-dump-private')).forEach(function (strNode) {
         strNode.className = strNode.className.replace(/\b sf-dump-highlight\b/, '');
         strNode.className = strNode.className.replace(/\b sf-dump-highlight-active\b/, '');
     });
@@ -321,14 +279,6 @@ return function (root, x) {
         options[i] = x[i];
     }
 
-    var delay = (function () {
-        var timer = 0;
-        return function (callback, ms) {
-            clearTimeout(timer);
-            timer = setTimeout(callback, ms);
-        };
-    })();
-
     function a(e, f) {
         addEventListener(root, e, function (e) {
             if ('A' == e.target.tagName) {
@@ -342,6 +292,20 @@ return function (root, x) {
     };
     function isCtrlKey(e) {
         return e.ctrlKey || e.metaKey;
+    }
+    function xpathString(str) {
+        var parts = str.match(/[^'"]+|['"]/g).map(function (part) {
+            if ("'" == part)  {
+                return '"\'"';
+            }
+            if ('"' == part) {
+                return "'\"'";
+            }
+
+            return "'" + part + "'";
+        });
+
+        return "concat(" + parts.join(",") + ", '')";
     }
     addEventListener(root, 'mouseover', function (e) {
         if ('' != refStyle.innerHTML) {
@@ -393,87 +357,6 @@ return function (root, x) {
             e.preventDefault();
             e = a.parentNode.parentNode;
             e.className = e.className.replace(/sf-dump-str-(expand|collapse)/, a.parentNode.className);
-        }
-    });
-
-    root.addEventListener('keydown', function (e) {
-        if (114 === e.keyCode || (isCtrlKey(e) && 70 === e.keyCode)) {
-            /* CTRL + F or CMD + F */
-            e.preventDefault();
-            if (!root.querySelector('.sf-dump-search-wrapper')) {
-                var search = document.createElement('div');
-                search.className = 'sf-dump-search-wrapper';
-                search.innerHTML = `
-                    <input type="text" class="sf-dump-search-input">
-                    <button type="button" class="sf-dump-search-input-previous" tabindex="-1">▲</button>
-                    <button type="button" class="sf-dump-search-input-next" tabindex="-1">▼</button>
-                    <span class="sf-dump-search-count">0 on 0</span>
-                `;
-                root.appendChild(search);
-
-                var state = new SearchState();
-                var searchInput = search.querySelector('.sf-dump-search-input');
-                var counter = search.querySelector('.sf-dump-search-count');
-
-                searchInput.addEventListener('keydown', function (e) {
-                    /* Don't intercept escape key in order to not start a search */
-                    if (27 === e.keyCode) {
-                        return;
-                    }
-
-                    delay(function () {
-                        state.reset();
-                        collapseAll(root);
-                        resetHighlightedNodes(root);
-                        var searchQuery = e.target.value;
-                        if ('' === searchQuery) {
-                            counter.textContent = '0 on 0';
-
-                            return;
-                        }
-
-                        var xpathResult = document.evaluate('//pre[@id="' + root.id + '"]//span[@class="sf-dump-str" or @class="sf-dump-key" or @class="sf-dump-public" or @class="sf-dump-protected" or @class="sf-dump-private"][contains(child::text(), \"' + searchQuery + '\")]', document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE);
-
-                        while (node = xpathResult.iterateNext()) {
-                            state.nodes.push(node);
-                        }
-
-                        var currentNode = state.current();
-                        if (currentNode) {
-                            reveal(currentNode);
-                            highlight(root, currentNode, state.nodes);
-                        }
-
-                        counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' on ' + state.count();
-                    }, 400);
-                });
-                search.querySelectorAll('.sf-dump-search-input-next, .sf-dump-search-input-previous').forEach(function (btn) {
-                    btn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        var direction = -1 !== e.target.className.indexOf('next') ? 'next' : 'previous';
-                        'next' === direction ? state.next() : state.previous();
-                        searchInput.focus();
-                        collapseAll(root);
-                        var currentNode = state.current();
-                        if (currentNode) {
-                            reveal(currentNode);
-                            highlight(root, currentNode, state.nodes);
-                        }
-
-                        counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' on ' + state.count();
-                    })
-                });
-            }
-
-            root.querySelector('.sf-dump-search-input').focus();
-        } else if (27 === e.keyCode) {
-            /* ESC key */
-            e.preventDefault();
-            var search = root.querySelector('.sf-dump-search-wrapper');
-            if (search) {
-                root.removeChild(search);
-            }
-            resetHighlightedNodes(root);
         }
     });
 
@@ -534,6 +417,135 @@ return function (root, x) {
         }
     }
 
+    if (doc.evaluate && Array.from && root.children.length > 1) {
+        root.setAttribute('tabindex', 0);
+
+        SearchState = function () {
+            this.nodes = [];
+            this.idx = 0;
+        };
+        SearchState.prototype = {
+            next: function () {
+                if (this.isEmpty()) {
+                    return this.current();
+                }
+                this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : this.idx;
+        
+                return this.current();
+            },
+            previous: function () {
+                if (this.isEmpty()) {
+                    return this.current();
+                }
+                this.idx = this.idx > 0 ? this.idx - 1 : this.idx;
+        
+                return this.current();
+            },
+            isEmpty: function () {
+                return 0 === this.count();
+            },
+            current: function () {
+                if (this.isEmpty()) {
+                    return null;
+                }
+                return this.nodes[this.idx];
+            },
+            reset: function () {
+                this.nodes = [];
+                this.idx = 0;
+            },
+            count: function () {
+                return this.nodes.length;
+            },
+        };
+
+        var search = doc.createElement('div');
+        search.className = 'sf-dump-search-wrapper sf-dump-search-hidden';
+        search.innerHTML = '
+            <input type="text" class="sf-dump-search-input">
+            <button type="button" class="sf-dump-search-input-previous" tabindex="-1">
+                <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1683 1331l-166 165q-19 19-45 19t-45-19l-531-531-531 531q-19 19-45 19t-45-19l-166-165q-19-19-19-45.5t19-45.5l742-741q19-19 45-19t45 19l742 741q19 19 19 45.5t-19 45.5z"\/>
+                <\/svg>
+            <\/button>
+            <button type="button" class="sf-dump-search-input-next" tabindex="-1">
+                <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1683 808l-742 741q-19 19-45 19t-45-19l-742-741q-19-19-19-45.5t19-45.5l166-165q19-19 45-19t45 19l531 531 531-531q19-19 45-19t45 19l166 165q19 19 19 45.5t-19 45.5z"\/>
+                <\/svg>
+            <\/button>
+            <span class="sf-dump-search-count">0 on 0<\/span>
+        ';
+        root.insertBefore(search, root.firstChild);
+
+        var state = new SearchState();
+        var searchInput = search.querySelector('.sf-dump-search-input');
+        var counter = search.querySelector('.sf-dump-search-count');
+        var searchInputTimer = 0;
+
+        addEventListener(searchInput, 'keydown', function (e) {
+            /* Don't intercept escape key in order to not start a search */
+            if (27 === e.keyCode) {
+                return;
+            }
+
+            clearTimeout(searchInputTimer);
+            searchInputTimer = setTimeout(function () {
+                state.reset();
+                collapseAll(root);
+                resetHighlightedNodes(root);
+                var searchQuery = e.target.value;
+                if ('' === searchQuery) {
+                    counter.textContent = '0 on 0';
+
+                    return;
+                }
+
+                var xpathResult = doc.evaluate('//pre[@id="' + root.id + '"]//span[@class="sf-dump-str" or @class="sf-dump-key" or @class="sf-dump-public" or @class="sf-dump-protected" or @class="sf-dump-private"][contains(child::text(), ' + xpathString(searchQuery) + ')]', document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+
+                while (node = xpathResult.iterateNext()) state.nodes.push(node);
+                var currentNode = state.current();
+                if (currentNode) {
+                    reveal(currentNode);
+                    highlight(root, currentNode, state.nodes);
+                }
+
+                counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' on ' + state.count();
+            }, 400);
+        });
+
+        Array.from(search.querySelectorAll('.sf-dump-search-input-next, .sf-dump-search-input-previous')).forEach(function (btn) {
+            addEventListener(btn, 'click', function (e) {
+                e.preventDefault();
+                var direction = -1 !== e.target.className.indexOf('next') ? 'next' : 'previous';
+                'next' === direction ? state.next() : state.previous();
+                searchInput.focus();
+                collapseAll(root);
+                var currentNode = state.current();
+                if (currentNode) {
+                    reveal(currentNode);
+                    highlight(root, currentNode, state.nodes);
+                }
+
+                counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' on ' + state.count();
+            })
+        });
+
+        addEventListener(root, 'keydown', function (e) {
+            if (114 === e.keyCode || (isCtrlKey(e) && 70 === e.keyCode)) {
+                /* CTRL + F or CMD + F */
+                e.preventDefault();
+                search.className = search.className.replace(/\bsf-dump-search-hidden\b/, '');
+                searchInput.focus();
+            } else if (27 === e.keyCode && !/\bsf-dump-search-hidden\b/.test(search.className)) {
+                /* ESC key */
+                search.className += ' sf-dump-search-hidden';
+                e.preventDefault();
+                resetHighlightedNodes(root);
+                searchInput.value = '';
+            }
+        });
+    }
+
     if (0 >= options.maxStringLength) {
         return;
     }
@@ -589,6 +601,7 @@ pre.sf-dump a {
 }
 pre.sf-dump .sf-dump-ellipsis {
     display: inline-block;
+    overflow: visible;
     text-overflow: ellipsis;
     max-width: 5em;
     white-space: nowrap;
@@ -624,24 +637,30 @@ pre.sf-dump code {
     border: 1px solid #FFA500;
     border-radius: 3px;
 }
+.sf-dump-search-hidden {
+    display: none;
+}
 .sf-dump-search-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    min-width: 180px;
+    float: right;
+    margin-top: -5px;
+    margin-right: -5px;
+    text-align: right;
+    max-width: 100%;
     font-size: 0;
     padding: 5px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 0 0 0 3px;
 }
 .sf-dump-search-wrapper > input.sf-dump-search-input {
-    min-width: 150px;
     color: #333;
     padding: 3px;
     height: 21px;
     border: 1px solid #bbb;
     box-sizing: border-box;
     font-size: 12px;
+    max-width: 150px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
 }
 .sf-dump-search-wrapper > .sf-dump-search-input-next,
 .sf-dump-search-wrapper > .sf-dump-search-input-previous {
@@ -651,10 +670,20 @@ pre.sf-dump code {
     border: 1px solid #bbb;
     border-left: none;
     height: 21px;
-    font-size: 12px;
+    font-size: 0;
     color: #333;
     vertical-align: top;
     box-sizing: border-box;
+}
+.sf-dump-search-wrapper > .sf-dump-search-input-next {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.sf-dump-search-wrapper > .sf-dump-search-input-next > svg,
+.sf-dump-search-wrapper > .sf-dump-search-input-previous > svg {
+    pointer-events: none;
+    width: 12px;
+    height: 12px;
 }
 .sf-dump-search-wrapper > .sf-dump-search-count {
     font-size: 12px;
@@ -662,7 +691,6 @@ pre.sf-dump code {
     font-weight: normal;
     margin-top: 5px;
     display: block;
-    text-align: right;
 }
 EOHTML
         );

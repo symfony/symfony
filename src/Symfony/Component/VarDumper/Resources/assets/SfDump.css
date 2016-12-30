@@ -1,0 +1,100 @@
+pre.sf-dump {
+    display: block;
+    white-space: pre;
+    padding: 5px;
+}
+pre.sf-dump span {
+    display: inline;
+}
+pre.sf-dump .sf-dump-compact {
+    display: none;
+}
+pre.sf-dump abbr {
+    text-decoration: none;
+    border: none;
+    cursor: help;
+}
+pre.sf-dump a {
+    text-decoration: none;
+    cursor: pointer;
+    border: 0;
+    outline: none;
+    color: inherit;
+}
+pre.sf-dump .sf-dump-ellipsis {
+    display: inline-block;
+    text-overflow: ellipsis;
+    max-width: 5em;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: top;
+}
+pre.sf-dump code {
+    display:inline;
+    padding:0;
+    background:none;
+}
+.sf-dump-str-collapse .sf-dump-str-collapse {
+    display: none;
+}
+.sf-dump-str-expand .sf-dump-str-expand {
+    display: none;
+}
+.sf-dump-public.sf-dump-highlight,
+.sf-dump-protected.sf-dump-highlight,
+.sf-dump-private.sf-dump-highlight,
+.sf-dump-str.sf-dump-highlight,
+.sf-dump-key.sf-dump-highlight {
+    background: rgba(111, 172, 204, 0.3);
+    border: 1px solid #7da0b1;
+    border-radius: 3px;
+}
+.sf-dump-public.sf-dump-highlight-active,
+.sf-dump-protected.sf-dump-highlight-active,
+.sf-dump-private.sf-dump-highlight-active,
+.sf-dump-str.sf-dump-highlight-active,
+.sf-dump-key.sf-dump-highlight-active {
+    background: rgba(253, 175, 0, 0.4);
+    border: 1px solid #FFA500;
+    border-radius: 3px;
+}
+.sf-dump-search-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 180px;
+    font-size: 0;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 0 0 0 3px;
+}
+.sf-dump-search-wrapper > input.sf-dump-search-input {
+    min-width: 150px;
+    color: #333;
+    padding: 3px;
+    height: 21px;
+    border: 1px solid #bbb;
+    box-sizing: border-box;
+    font-size: 12px;
+}
+.sf-dump-search-wrapper > .sf-dump-search-input-next,
+.sf-dump-search-wrapper > .sf-dump-search-input-previous {
+    border-radius: 0;
+    background: white;
+    outline: none;
+    border: 1px solid #bbb;
+    border-left: none;
+    height: 21px;
+    font-size: 12px;
+    color: #333;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+.sf-dump-search-wrapper > .sf-dump-search-count {
+    font-size: 12px;
+    color: #FFF;
+    font-weight: normal;
+    margin-top: 5px;
+    display: block;
+    text-align: right;
+}

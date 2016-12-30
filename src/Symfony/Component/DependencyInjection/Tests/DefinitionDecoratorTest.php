@@ -72,14 +72,14 @@ class DefinitionDecoratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('lazy' => true), $def->getChanges());
     }
 
-    public function testSetAutowired()
+    public function testSetAutowiredMethods()
     {
         $def = new DefinitionDecorator('foo');
 
         $this->assertFalse($def->isAutowired());
-        $this->assertSame($def, $def->setAutowired(false));
-        $this->assertFalse($def->isAutowired());
-        $this->assertEquals(array('autowire' => true), $def->getChanges());
+        $this->assertSame($def, $def->setAutowiredMethods(array('foo', 'bar')));
+        $this->assertEquals(array('foo', 'bar'), $def->getAutowiredMethods());
+        $this->assertEquals(array('autowired_methods' => true), $def->getChanges());
     }
 
     public function testSetArgument()

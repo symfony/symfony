@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-28T10:22:20Z
+
+Should we remove https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/ChildDefinition.php#L142-L148?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T10:23:57Z
+
+@dunglas `s/setAutowired/setAutowiredMethods`
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-28T10:24:54Z
+
+@nicolas-grekas it's not necessary because we do a merge now.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-28T10:52:46Z
+
+Switched from a merge to a full replacement.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T10:57:41Z
+
+:+1:

@@ -42,9 +42,6 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $object, 'result' => false)), $object);
     }
 
-    /**
-     * @group this
-     */
     public function testDebugAccessDecisionManagerAliasExistsForBC()
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());

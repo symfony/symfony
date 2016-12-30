@@ -49,4 +49,12 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm);
         $this->assertInstanceOf(TraceableAccessDecisionManager::class, $adm);
     }
+
+    public function testDebugAccessDecisionManagerInstanceOfForBC()
+    {
+        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
+
+        $this->assertInstanceOf(DebugAccessDecisionManager::class, $adm);
+        $this->assertInstanceOf(TraceableAccessDecisionManager::class, $adm);
+    }
 }

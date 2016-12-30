@@ -184,6 +184,81 @@ function toggle(a, recursive) {
     return true;
 };
 
+function collapse(a, recursive) {
+    var s = a.nextSibling || {}, oldClass = s.className;
+
+    if ('sf-dump-expanded' == oldClass) {
+        toggle(a, recursive);
+
+        return true;
+    }
+
+    return false;
+};
+
+function expand(a, recursive) {
+    var s = a.nextSibling || {}, oldClass = s.className;
+
+    if ('sf-dump-compact' == oldClass) {
+        toggle(a, recursive);
+
+        return true;
+    }
+
+    return false;
+};
+
+function collapseAll(root) {
+    var a = root.querySelector('a.sf-dump-toggle');
+    if (a) {
+        collapse(a, true);
+        expand(a);
+
+        return true;
+    }
+
+    return false;
+}
+
+function reveal(node) {
+    var previous, parents = [];
+
+    while ((node = node.parentNode || {}) && (previous = node.previousSibling) && 'A' === previous.tagName) {
+        parents.push(previous);
+    }
+
+    if (0 !== parents.length) {
+        parents.forEach(function (parent) {
+            expand(parent);
+        });
+
+        return true;
+    }
+
+    return false;
+}
+
+function highlight(root, activeNode, nodes) {
+    resetHighlightedNodes(root);
+
+    Array.from(nodes||[]).forEach(function (node) {
+        if (!/\bsf-dump-highlight\b/.test(node.className)) {
+            node.className = node.className + ' sf-dump-highlight';
+        }
+    });
+
+    if (!/\bsf-dump-highlight-active\b/.test(activeNode.className)) {
+        activeNode.className = activeNode.className + ' sf-dump-highlight-active';
+    }
+}
+
+function resetHighlightedNodes(root) {
+    Array.from(root.querySelectorAll('.sf-dump-str, .sf-dump-key, .sf-dump-public, .sf-dump-protected, .sf-dump-private')).forEach(function (strNode) {
+        strNode.className = strNode.className.replace(/\b sf-dump-highlight\b/, '');
+        strNode.className = strNode.className.replace(/\b sf-dump-highlight-active\b/, '');
+    });
+}
+
 return function (root, x) {
     root = doc.getElementById(root);
 
@@ -213,6 +288,20 @@ return function (root, x) {
     };
     function isCtrlKey(e) {
         return e.ctrlKey || e.metaKey;
+    }
+    function xpathString(str) {
+        var parts = str.match(/[^'"]+|['"]/g).map(function (part) {
+            if ("'" == part)  {
+                return '"\'"';
+            }
+            if ('"' == part) {
+                return "'\"'";
+            }
+
+            return "'" + part + "'";
+        });
+
+        return "concat(" + parts.join(",") + ", '')";
     }
     addEventListener(root, 'mouseover', function (e) {
         if ('' != refStyle.innerHTML) {
@@ -324,6 +413,134 @@ return function (root, x) {
         }
     }
 
+    if (doc.evaluate && Array.from && root.children.length > 1) {
+        root.setAttribute('tabindex', 0);
+
+        SearchState = function () {
+            this.nodes = [];
+            this.idx = 0;
+        };
+        SearchState.prototype = {
+            next: function () {
+                if (this.isEmpty()) {
+                    return this.current();
+                }
+                this.idx = this.idx < (this.nodes.length - 1) ? this.idx + 1 : this.idx;
+        
+                return this.current();
+            },
+            previous: function () {
+                if (this.isEmpty()) {
+                    return this.current();
+                }
+                this.idx = this.idx > 0 ? this.idx - 1 : this.idx;
+        
+                return this.current();
+            },
+            isEmpty: function () {
+                return 0 === this.count();
+            },
+            current: function () {
+                if (this.isEmpty()) {
+                    return null;
+                }
+                return this.nodes[this.idx];
+            },
+            reset: function () {
+                this.nodes = [];
+                this.idx = 0;
+            },
+            count: function () {
+                return this.nodes.length;
+            },
+        };
+
+        function showCurrent(state)
+        {
+            var currentNode = state.current();
+            if (currentNode) {
+                reveal(currentNode);
+                highlight(root, currentNode, state.nodes);
+            }
+            counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' on ' + state.count();
+        }
+
+        var search = doc.createElement('div');
+        search.className = 'sf-dump-search-wrapper sf-dump-search-hidden';
+        search.innerHTML = '
+            <input type="text" class="sf-dump-search-input">
+            <span class="sf-dump-search-count">0 on 0<\/span>
+            <button type="button" class="sf-dump-search-input-previous" tabindex="-1">
+                <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1683 1331l-166 165q-19 19-45 19t-45-19l-531-531-531 531q-19 19-45 19t-45-19l-166-165q-19-19-19-45.5t19-45.5l742-741q19-19 45-19t45 19l742 741q19 19 19 45.5t-19 45.5z"\/>
+                <\/svg>
+            <\/button>
+            <button type="button" class="sf-dump-search-input-next" tabindex="-1">
+                <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1683 808l-742 741q-19 19-45 19t-45-19l-742-741q-19-19-19-45.5t19-45.5l166-165q19-19 45-19t45 19l531 531 531-531q19-19 45-19t45 19l166 165q19 19 19 45.5t-19 45.5z"\/>
+                <\/svg>
+            <\/button>
+        ';
+        root.insertBefore(search, root.firstChild);
+
+        var state = new SearchState();
+        var searchInput = search.querySelector('.sf-dump-search-input');
+        var counter = search.querySelector('.sf-dump-search-count');
+        var searchInputTimer = 0;
+
+        addEventListener(searchInput, 'keydown', function (e) {
+            /* Don't intercept escape key in order to not start a search */
+            if (27 === e.keyCode) {
+                return;
+            }
+
+            clearTimeout(searchInputTimer);
+            searchInputTimer = setTimeout(function () {
+                state.reset();
+                collapseAll(root);
+                resetHighlightedNodes(root);
+                var searchQuery = e.target.value;
+                if ('' === searchQuery) {
+                    counter.textContent = '0 on 0';
+
+                    return;
+                }
+
+                var xpathResult = doc.evaluate('//pre[@id="' + root.id + '"]//span[@class="sf-dump-str" or @class="sf-dump-key" or @class="sf-dump-public" or @class="sf-dump-protected" or @class="sf-dump-private"][contains(child::text(), ' + xpathString(searchQuery) + ')]', document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+
+                while (node = xpathResult.iterateNext()) state.nodes.push(node);
+                
+                showCurrent(state);
+            }, 400);
+        });
+
+        Array.from(search.querySelectorAll('.sf-dump-search-input-next, .sf-dump-search-input-previous')).forEach(function (btn) {
+            addEventListener(btn, 'click', function (e) {
+                e.preventDefault();
+                var direction = -1 !== e.target.className.indexOf('next') ? 'next' : 'previous';
+                'next' === direction ? state.next() : state.previous();
+                searchInput.focus();
+                collapseAll(root);
+                showCurrent(state);
+            })
+        });
+
+        addEventListener(root, 'keydown', function (e) {
+            if (114 === e.keyCode || (isCtrlKey(e) && 70 === e.keyCode)) {
+                /* CTRL + F or CMD + F */
+                e.preventDefault();
+                search.className = search.className.replace(/\bsf-dump-search-hidden\b/, '');
+                searchInput.focus();
+            } else if (27 === e.keyCode && !/\bsf-dump-search-hidden\b/.test(search.className)) {
+                /* ESC key */
+                search.className += ' sf-dump-search-hidden';
+                e.preventDefault();
+                resetHighlightedNodes(root);
+                searchInput.value = '';
+            }
+        });
+    }
+
     if (0 >= options.maxStringLength) {
         return;
     }
@@ -358,6 +575,13 @@ pre.sf-dump {
     display: block;
     white-space: pre;
     padding: 5px;
+}
+pre.sf-dump:after {
+   content: "";
+   visibility: hidden;
+   display: block;
+   height: 0;
+   clear: both;
 }
 pre.sf-dump span {
     display: inline;
@@ -396,6 +620,80 @@ pre.sf-dump code {
 }
 .sf-dump-str-expand .sf-dump-str-expand {
     display: none;
+}
+.sf-dump-public.sf-dump-highlight,
+.sf-dump-protected.sf-dump-highlight,
+.sf-dump-private.sf-dump-highlight,
+.sf-dump-str.sf-dump-highlight,
+.sf-dump-key.sf-dump-highlight {
+    background: rgba(111, 172, 204, 0.3);
+    border: 1px solid #7DA0B1;
+    border-radius: 3px;
+}
+.sf-dump-public.sf-dump-highlight-active,
+.sf-dump-protected.sf-dump-highlight-active,
+.sf-dump-private.sf-dump-highlight-active,
+.sf-dump-str.sf-dump-highlight-active,
+.sf-dump-key.sf-dump-highlight-active {
+    background: rgba(253, 175, 0, 0.4);
+    border: 1px solid #ffa500;
+    border-radius: 3px;
+}
+.sf-dump-search-hidden {
+    display: none;
+}
+.sf-dump-search-wrapper {
+    float: right;
+    font-size: 0;
+    white-space: nowrap;
+    max-width: 100%;
+    text-align: right;
+}
+.sf-dump-search-wrapper > * {
+    vertical-align: top;
+    box-sizing: border-box;
+    height: 21px;
+    font-weight: normal;
+    border-radius: 0;
+    background: #FFF;
+    color: #757575;
+    border: 1px solid #BBB;
+}
+.sf-dump-search-wrapper > input.sf-dump-search-input {
+    padding: 3px;
+    height: 21px;
+    font-size: 12px;
+    border-right: none;
+    width: 140px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    color: #000;
+}
+.sf-dump-search-wrapper > .sf-dump-search-input-next,
+.sf-dump-search-wrapper > .sf-dump-search-input-previous {
+    background: #F2F2F2;
+    outline: none;
+    border-left: none;
+    font-size: 0;
+    line-height: 0;
+}
+.sf-dump-search-wrapper > .sf-dump-search-input-next {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+.sf-dump-search-wrapper > .sf-dump-search-input-next > svg,
+.sf-dump-search-wrapper > .sf-dump-search-input-previous > svg {
+    pointer-events: none;
+    width: 12px;
+    height: 12px;
+}
+.sf-dump-search-wrapper > .sf-dump-search-count {
+    display: inline-block;
+    padding: 0 5px;
+    margin: 0;
+    border-left: none;
+    line-height: 21px;
+    font-size: 12px;
 }
 EOHTML
         );

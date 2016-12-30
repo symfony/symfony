@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Monolog\Formatter;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Logger;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\Stub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -66,6 +67,9 @@ class ConsoleFormatter implements FormatterInterface
             }
             if (isset($args[1])) {
                 $options['date_format'] = $args[1];
+            }
+            if (isset($args[2])) {
+                $options['multiline'] = $args[2];
             }
         }
 
@@ -175,7 +179,10 @@ class ConsoleFormatter implements FormatterInterface
 
         $replacements = array();
         foreach ($context as $k => $v) {
-            $replacements['{'.$k.'}'] = sprintf('<comment>%s</>', $this->dumpData($v, false));
+            // Remove quotes added by the dumper around string.
+            $v = trim($this->dumpData($v, false), '"');
+            $v = OutputFormatter::escape($v);
+            $replacements['{'.$k.'}'] = sprintf('<comment>%s</>', $v);
         }
 
         $record['message'] = strtr($message, $replacements);

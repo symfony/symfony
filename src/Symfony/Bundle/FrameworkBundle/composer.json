@@ -23,7 +23,7 @@
         "symfony/event-dispatcher": "~2.5",
         "symfony/finder": "~2.0,>=2.0.5",
         "symfony/http-foundation": "~2.7",
-        "symfony/http-kernel": "~2.7.15|~2.8.8",
+        "symfony/http-kernel": "~2.7.23|~2.8.16",
         "symfony/filesystem": "~2.3",
         "symfony/routing": "~2.6,>2.6.4",
         "symfony/security-core": "~2.6.13|~2.7.9|~2.8",

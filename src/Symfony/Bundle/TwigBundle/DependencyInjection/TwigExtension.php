@@ -89,14 +89,13 @@ class TwigExtension extends Extension
         }
 
         // register bundles as Twig namespaces
-        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$bundle.'/views')) {
-                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+        foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
+                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $name);
             }
 
-            $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/views')) {
-                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle);
+            if (is_dir($dir = $bundle['path'].'/Resources/views')) {
+                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $name);
             }
         }
 

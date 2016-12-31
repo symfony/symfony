@@ -255,6 +255,7 @@ class TwigExtensionTest extends TestCase
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => false,
             'kernel.bundles' => array('TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle'),
+            'kernel.bundles_metadata' => array('TwigBundle' => array('namespace' => 'Symfony\\Bundle\\TwigBundle', 'parent' => null, 'path' => realpath(__DIR__.'/../..'))),
         )));
 
         return $container;

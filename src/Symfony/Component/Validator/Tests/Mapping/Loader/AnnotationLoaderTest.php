@@ -68,7 +68,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
             'choices' => array('A', 'B'),
         )));
         $expected->addGetterConstraint('lastName', new NotNull());
-        $expected->addGetterConstraint('valid', new IsTrue());
+        $expected->addGetterMethodConstraint('valid', 'isValid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
 
         // load reflection class so that the comparison passes
@@ -138,7 +138,7 @@ class AnnotationLoaderTest extends \PHPUnit_Framework_TestCase
             'choices' => array('A', 'B'),
         )));
         $expected->addGetterConstraint('lastName', new NotNull());
-        $expected->addGetterConstraint('valid', new IsTrue());
+        $expected->addGetterMethodConstraint('valid', 'isValid', new IsTrue());
         $expected->addGetterConstraint('permissions', new IsTrue());
 
         // load reflection class so that the comparison passes

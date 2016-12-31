@@ -35,25 +35,30 @@ class GetterMetadata extends MemberMetadata
     /**
      * Constructor.
      *
-     * @param string $class    The class the getter is defined on
-     * @param string $property The property which the getter returns
+     * @param string      $class    The class the getter is defined on
+     * @param string      $property The property which the getter returns
+     * @param string|null $method   The method that is called to retrieve the value being validated (null for auto-detection)
      *
      * @throws ValidatorException
      */
-    public function __construct($class, $property)
+    public function __construct($class, $property, $method = null)
     {
-        $getMethod = 'get'.ucfirst($property);
-        $isMethod = 'is'.ucfirst($property);
-        $hasMethod = 'has'.ucfirst($property);
+        if (null === $method) {
+            $getMethod = 'get'.ucfirst($property);
+            $isMethod = 'is'.ucfirst($property);
+            $hasMethod = 'has'.ucfirst($property);
 
-        if (method_exists($class, $getMethod)) {
-            $method = $getMethod;
-        } elseif (method_exists($class, $isMethod)) {
-            $method = $isMethod;
-        } elseif (method_exists($class, $hasMethod)) {
-            $method = $hasMethod;
-        } else {
-            throw new ValidatorException(sprintf('Neither of these methods exist in class %s: %s, %s, %s', $class, $getMethod, $isMethod, $hasMethod));
+            if (method_exists($class, $getMethod)) {
+                $method = $getMethod;
+            } elseif (method_exists($class, $isMethod)) {
+                $method = $isMethod;
+            } elseif (method_exists($class, $hasMethod)) {
+                $method = $hasMethod;
+            } else {
+                throw new ValidatorException(sprintf('Neither of these methods exist in class %s: %s, %s, %s', $class, $getMethod, $isMethod, $hasMethod));
+            }
+        } elseif (!method_exists($class, $method)) {
+            throw new ValidatorException(sprintf('The %s() method does not exist in class %s.', $method, $class));
         }
 
         parent::__construct($class, $method, $property);

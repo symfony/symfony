@@ -47,7 +47,7 @@ class GetterMetadataTest extends \PHPUnit_Framework_TestCase
     public function testGetPropertyValueFromIsser()
     {
         $entity = new Entity();
-        $metadata = new GetterMetadata(self::CLASSNAME, 'valid');
+        $metadata = new GetterMetadata(self::CLASSNAME, 'valid', 'isValid');
 
         $this->assertEquals('valid', $metadata->getPropertyValue($entity));
     }
@@ -58,5 +58,14 @@ class GetterMetadataTest extends \PHPUnit_Framework_TestCase
         $metadata = new GetterMetadata(self::CLASSNAME, 'permissions');
 
         $this->assertEquals('permissions', $metadata->getPropertyValue($entity));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ValidatorException
+     * @expectedExceptionMessage The hasLastName() method does not exist in class Symfony\Component\Validator\Tests\Fixtures\Entity.
+     */
+    public function testUndefinedMethodNameThrowsException()
+    {
+        new GetterMetadata(self::CLASSNAME, 'lastName', 'hasLastName');
     }
 }

@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-29T13:16:26Z
+
+Fabbot is wrong.
+Tests are green ;)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-29T15:44:52Z
+
+When can the collection be non-unique? Can we add a test covering this?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-29T16:11:05Z
+
+> When can the collection be non-unique?
+
+If you have many authentication provider in a firewall that use the same user provider
+
+> Can we add a test covering this?
+
+yes, I guess ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-30T14:15:34Z
+
+I wanted to add tests, but for now, there are no tests on this class. IMHO, we can merge this one as this.

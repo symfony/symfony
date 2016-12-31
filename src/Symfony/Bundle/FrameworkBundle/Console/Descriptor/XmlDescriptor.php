@@ -62,13 +62,13 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
-        $this->writeDocument($this->getContainerServiceDocument($service, $options['id']));
+        $this->writeDocument($this->getContainerServiceDocument($service, $options['id'], $builder));
     }
 
     /**
@@ -90,9 +90,18 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerAlias(Alias $alias, array $options = array())
+    protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null)
     {
-        $this->writeDocument($this->getContainerAliasDocument($alias, isset($options['id']) ? $options['id'] : null));
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->appendChild($dom->importNode($this->getContainerAliasDocument($alias, isset($options['id']) ? $options['id'] : null)->childNodes->item(0), true));
+
+        if (!$builder) {
+            return $this->writeDocument($dom);
+        }
+
+        $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($builder->getDefinition((string) $alias), (string) $alias)->childNodes->item(0), true));
+
+        $this->writeDocument($dom);
     }
 
     /**
@@ -261,17 +270,21 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param mixed  $service
-     * @param string $id
+     * @param mixed                 $service
+     * @param string                $id
+     * @param ContainerBuilder|null $builder
      *
      * @return \DOMDocument
      */
-    private function getContainerServiceDocument($service, $id)
+    private function getContainerServiceDocument($service, $id, ContainerBuilder $builder = null)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
 
         if ($service instanceof Alias) {
             $dom->appendChild($dom->importNode($this->getContainerAliasDocument($service, $id)->childNodes->item(0), true));
+            if ($builder) {
+                $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($builder->getDefinition((string) $service), (string) $service)->childNodes->item(0), true));
+            }
         } elseif ($service instanceof Definition) {
             $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($service, $id)->childNodes->item(0), true));
         } else {

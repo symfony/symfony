@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -38,8 +39,10 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
         $tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)->getMock();
         $authenticationManager = $this->getMockBuilder(AuthenticationManagerInterface::class)->getMock();
 
+        $authenticatedToken = $this->getMockBuilder(TokenInterface::class)->getMock();
+
         if ($success) {
-            $authenticationManager->method('authenticate')->willReturn(true);
+            $authenticationManager->method('authenticate')->willReturn($authenticatedToken);
         } else {
             $authenticationManager->method('authenticate')->willThrowException(new AuthenticationException());
         }

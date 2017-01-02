@@ -101,8 +101,8 @@ class UsernamePasswordJsonAuthenticationListener implements ListenerInterface
         try {
             $token = new UsernamePasswordToken($username, $password, $this->providerKey);
 
-            $this->authenticationManager->authenticate($token);
-            $response = $this->onSuccess($request, $token);
+            $authenticatedToken = $this->authenticationManager->authenticate($token);
+            $response = $this->onSuccess($request, $authenticatedToken);
         } catch (AuthenticationException $e) {
             $response = $this->onFailure($request, $e);
         }

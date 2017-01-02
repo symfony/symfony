@@ -23,7 +23,7 @@ class ExpressionPhpFunction extends ExpressionFunction
      *
      * @param string $name The PHP function name
      *
-     * @throws \InvalidArgumentException if given function name does not exist.
+     * @throws \InvalidArgumentException if given function name does not exist
      */
     public function __construct($name)
     {

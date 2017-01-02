@@ -52,7 +52,7 @@ final class ObjectIdentity implements ObjectIdentityInterface
      *
      * @param object $domainObject
      *
-     * @return ObjectIdentity
+     * @return self
      *
      * @throws InvalidDomainObjectException
      */

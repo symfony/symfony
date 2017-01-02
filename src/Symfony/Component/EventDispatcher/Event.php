@@ -33,7 +33,7 @@ class Event
     private $propagationStopped = false;
 
     /**
-     * @var EventDispatcher Dispatcher that dispatched this event
+     * @var EventDispatcherInterface Dispatcher that dispatched this event
      */
     private $dispatcher;
 

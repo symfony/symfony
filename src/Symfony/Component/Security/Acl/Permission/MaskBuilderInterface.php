@@ -21,7 +21,7 @@ interface MaskBuilderInterface
      *
      * @param int $mask
      *
-     * @return MaskBuilderInterface
+     * @return $this
      *
      * @throws \InvalidArgumentException if $mask is not an integer
      */
@@ -39,7 +39,7 @@ interface MaskBuilderInterface
      *
      * @param mixed $mask
      *
-     * @return MaskBuilderInterface
+     * @return $this
      *
      * @throws \InvalidArgumentException
      */
@@ -50,7 +50,7 @@ interface MaskBuilderInterface
      *
      * @param mixed $mask
      *
-     * @return MaskBuilderInterface
+     * @return $this
      *
      * @throws \InvalidArgumentException
      */
@@ -59,7 +59,7 @@ interface MaskBuilderInterface
     /**
      * Resets the PermissionBuilder.
      *
-     * @return MaskBuilderInterface
+     * @return $this
      */
     public function reset();
 

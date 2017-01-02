@@ -149,7 +149,7 @@ class UnixPipes extends AbstractPipes
      * @param Process         $process
      * @param string|resource $input
      *
-     * @return UnixPipes
+     * @return static
      */
     public static function create(Process $process, $input)
     {

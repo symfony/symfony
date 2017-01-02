@@ -42,7 +42,7 @@ class ExtensionGuesser implements ExtensionGuesserInterface
     /**
      * Returns the singleton instance.
      *
-     * @return ExtensionGuesser
+     * @return self
      */
     public static function getInstance()
     {

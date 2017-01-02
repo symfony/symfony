@@ -54,6 +54,14 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
         $command->setApplication($application);
         $this->assertEquals($application, $command->getApplication(), '->setApplication() sets the current application');
+        $this->assertEquals($application->getHelperSet(), $command->getHelperSet());
+    }
+
+    public function testSetApplicationNull()
+    {
+        $command = new \TestCommand();
+        $command->setApplication(null);
+        $this->assertNull($command->getHelperSet());
     }
 
     public function testSetGetDefinition()
@@ -156,12 +164,28 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('name1'), $command->getAliases(), '->setAliases() sets the aliases');
     }
 
+    public function testSetAliasesNull()
+    {
+        $command = new \TestCommand();
+        $this->setExpectedException('InvalidArgumentException');
+        $command->setAliases(null);
+    }
+
     public function testGetSynopsis()
     {
         $command = new \TestCommand();
         $command->addOption('foo');
         $command->addArgument('bar');
         $this->assertEquals('namespace:name [--foo] [--] [<bar>]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
+    }
+
+    public function testAddGetUsages()
+    {
+        $command = new \TestCommand();
+        $command->addUsage('foo1');
+        $command->addUsage('foo2');
+        $this->assertContains('namespace:name foo1', $command->getUsages());
+        $this->assertContains('namespace:name foo2', $command->getUsages());
     }
 
     public function testGetHelper()
@@ -275,8 +299,8 @@ class CommandTest extends \PHPUnit_Framework_TestCase
 
         $command = $this->getMockBuilder('TestCommand')->setMethods(array('execute'))->getMock();
         $command->expects($this->once())
-             ->method('execute')
-             ->will($this->returnValue('2.3'));
+            ->method('execute')
+            ->will($this->returnValue('2.3'));
         $exitCode = $command->run(new StringInput(''), new NullOutput());
         $this->assertSame(2, $exitCode, '->run() returns integer exit code (casts numeric to int)');
     }
@@ -295,6 +319,20 @@ class CommandTest extends \PHPUnit_Framework_TestCase
         $command = new \TestCommand();
 
         $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
+    }
+
+    public function testRunWithProcessTitle()
+    {
+        $command = new \TestCommand();
+        $command->setApplication(new Application());
+        $command->setProcessTitle('foo');
+        $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
+        if (function_exists('cli_set_process_title')) {
+            if (null === @cli_get_process_title() && 'Darwin' === PHP_OS) {
+                $this->markTestSkipped('Running "cli_get_process_title" as an unprivileged user is not supported on MacOS.');
+            }
+            $this->assertEquals('foo', cli_get_process_title());
+        }
     }
 
     public function testSetCode()

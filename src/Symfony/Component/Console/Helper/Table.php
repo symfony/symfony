@@ -93,7 +93,7 @@ class Table
      *
      * @param string $name The style name
      *
-     * @return TableStyle A TableStyle instance
+     * @return TableStyle
      */
     public static function getStyleDefinition($name)
     {
@@ -113,7 +113,7 @@ class Table
      *
      * @param TableStyle|string $name The style name or a TableStyle instance
      *
-     * @return Table
+     * @return $this
      */
     public function setStyle($name)
     {

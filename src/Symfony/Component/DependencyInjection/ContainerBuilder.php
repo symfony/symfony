@@ -91,12 +91,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $usedTags = array();
 
     /**
-     * @var string[][] A map of env var names to their placeholders
+     * @var string[][] a map of env var names to their placeholders
      */
     private $envPlaceholders = array();
 
     /**
-     * @var int[] A map of env vars to their resolution counter.
+     * @var int[] a map of env vars to their resolution counter
      */
     private $envCounters = array();
 

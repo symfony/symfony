@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-31T11:27:40Z
+
+@julienfalque Can you check if this change solves the issue you described in https://github.com/symfony/symfony/pull/21083#issuecomment-269696733 too?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-31T12:41:10Z
+
+This currently breaks the handling of the exit code (see var $exit). Otherwise I think that's a good way to go. Maybe see if we can do something with OK/KO in a shutdown function ? Or deal with it in .travis.yml file as it was done before.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-31T13:17:12Z
+
+Unfortunately, we cannot detect the exit code inside a shutdown function. So we will need to update our Travis CI config after this has been merged.
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2017-01-02T07:58:10Z
+
+@xabbuh I confirm this solves my issue too :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-02T08:20:08Z
+
+@julienfalque Thanks! Happy new year to you! 🎉
+
+---------------------------------------------------------------------------
+
+by julienfalque at 2017-01-02T08:28:16Z
+
+Happy new year :) 🎉
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-02T16:59:46Z
+
+:+1:

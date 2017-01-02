@@ -104,6 +104,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $envCounters = array();
 
     /**
+     * @var array a map of case less to case sensitive ids
+     */
+    private $caseSensitiveIds = array();
+
+    /**
      * Sets the track resources flag.
      *
      * If you are not using the loaders and therefore don't want
@@ -367,7 +372,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function set($id, $service)
     {
-        $id = strtolower($id);
+        $caseSensitiveId = $id;
+        $id = strtolower($caseSensitiveId);
 
         if ($this->isFrozen() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
             // setting a synthetic service on a frozen container is alright
@@ -375,6 +381,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         unset($this->definitions[$id], $this->aliasDefinitions[$id]);
+        if ($id !== $caseSensitiveId) {
+            $this->caseSensitiveIds[$id] = $caseSensitiveId;
+        }
 
         parent::set($id, $service);
     }
@@ -628,7 +637,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setAlias($alias, $id)
     {
-        $alias = strtolower($alias);
+        $caseSensitiveAlias = $alias;
+        $alias = strtolower($caseSensitiveAlias);
 
         if (is_string($id)) {
             $id = new Alias($id);
@@ -641,6 +651,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         unset($this->definitions[$alias]);
+        if ($alias !== $caseSensitiveAlias) {
+            $this->caseSensitiveIds[$alias] = $caseSensitiveAlias;
+        }
 
         $this->aliasDefinitions[$alias] = $id;
     }
@@ -778,9 +791,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Adding definition to a frozen container is not allowed');
         }
 
-        $id = strtolower($id);
+        $caseSensitiveId = $id;
+        $id = strtolower($caseSensitiveId);
 
         unset($this->aliasDefinitions[$id]);
+        if ($id !== $caseSensitiveId) {
+            $this->caseSensitiveIds[$id] = $caseSensitiveId;
+        }
 
         return $this->definitions[$id] = $definition;
     }
@@ -837,6 +854,20 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         return $this->getDefinition($id);
+    }
+
+    /**
+     * Returns the case sensitive id used at registration time.
+     *
+     * @param string $id
+     *
+     * @return string
+     */
+    public function getCaseSensitiveId($id)
+    {
+        $id = strtolower($id);
+
+        return isset($this->caseSensitiveIds[$id]) ? $this->caseSensitiveIds[$id] : $id;
     }
 
     /**

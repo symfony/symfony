@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Dumper;
 
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use Symfony\Component\Translation\Exception\RuntimeException;
 
 /**
  * FileDumper is an implementation of DumperInterface that dump a message catalogue to file(s).

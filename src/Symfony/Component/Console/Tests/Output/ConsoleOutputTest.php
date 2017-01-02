@@ -35,7 +35,7 @@ class ConsoleOutputTest extends \PHPUnit_Framework_TestCase
     public function testSetVerbosity()
     {
         $output = new ConsoleOutput();
-        $output->setVerbosity(1);
-        $this->assertSame(1, $output->getVerbosity());
+        $output->setVerbosity(Output::VERBOSITY_VERBOSE);
+        $this->assertSame(Output::VERBOSITY_VERBOSE, $output->getVerbosity());
     }
 }

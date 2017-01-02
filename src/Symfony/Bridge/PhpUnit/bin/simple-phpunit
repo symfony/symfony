@@ -180,27 +180,7 @@ if ($components) {
         }
     }
 } elseif (!isset($argv[1]) || 'install' !== $argv[1] || file_exists('install')) {
-    // Run regular phpunit in a subprocess
-
-    $errFile = tempnam(sys_get_temp_dir(), 'phpunit.stderr.');
-    if ($proc = proc_open(sprintf($cmd, '', ' 2> '.escapeshellarg($errFile)), array(1 => array('pipe', 'w')), $pipes)) {
-        stream_copy_to_stream($pipes[1], STDOUT);
-        fclose($pipes[1]);
-        $exit = proc_close($proc);
-
-        readfile($errFile);
-        unlink($errFile);
-    }
-
-    if (!file_exists($component = array_pop($argv))) {
-        $component = basename($oldPwd);
-    }
-
-    if ($exit) {
-        echo "\033[41mKO\033[0m $component\n\n";
-    } else {
-        echo "\033[32mOK\033[0m $component\n\n";
-    }
+    include "$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit";
 }
 
 exit($exit);

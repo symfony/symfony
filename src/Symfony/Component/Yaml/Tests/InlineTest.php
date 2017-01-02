@@ -34,6 +34,35 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(serialize($value), serialize($actual));
     }
 
+    public function testUnsupportedTag()
+    {
+        $this->assertEquals('!unsupported', Inline::parse('!unsupported'));
+    }
+
+    public function testTagSupport()
+    {
+        $this->assertEquals(array('foo' => 'bar'), Inline::parse('{!str foo: bar}'));
+        $this->assertEquals(array(4 => 3.3), Inline::parse('{4: !!float 3.3}'));
+
+        // Non-specific tag
+        $this->assertEquals(array('foo' => 'bar'), Inline::parse('! {foo: bar}'));
+        $this->assertEquals(2, Inline::parse('! "2f"'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage Expected "]", got "d".
+     */
+    public function testUnexpectedCharactersAfterQuotes()
+    {
+        $this->assertEquals(array('foo', 'bar'), Inline::parse('["foo"d]'));
+    }
+
+    public function testParseConsecutiveCommas()
+    {
+        $this->assertEquals(array('foo', 'bar'), Inline::parse('[foo,, bar,]'));
+    }
+
     /**
      * @dataProvider getTestsForParsePhpConstants
      */
@@ -195,7 +224,7 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         $value = "'don''t do somthin'' like that'";
         $expect = "don't do somthin' like that";
 
-        $this->assertSame($expect, Inline::parseScalar($value));
+        $this->assertSame($expect, Inline::parse($value));
     }
 
     /**
@@ -459,6 +488,9 @@ class InlineTest extends \PHPUnit_Framework_TestCase
             array('{\'foo\'\'\': \'bar\', "bar\"": \'foo: bar\'}', (object) array('foo\'' => 'bar', 'bar"' => 'foo: bar')),
             array('{\'foo: \': \'bar\', "bar: ": \'foo: bar\'}', (object) array('foo: ' => 'bar', 'bar: ' => 'foo: bar')),
 
+            // mapping with implicit values
+            array('{fo o, bar, q uz : bar}', (object) array('fo o' => null, 'bar' => null, 'q uz' => 'bar')),
+
             // nested sequences and mappings
             array('[foo, [bar, foo]]', array('foo', array('bar', 'foo'))),
             array('[foo, {bar: foo}]', array('foo', (object) array('bar' => 'foo'))),
@@ -668,12 +700,8 @@ class InlineTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Malformed inline YAML string: {this, is not, supported}.
-     */
-    public function testNotSupportedMissingValue()
+    public function testMappingWithMissingValues()
     {
-        Inline::parse('{this, is not, supported}');
+        $this->assertEquals(array('values' => null, 'are' => null, 'guessed' => null), Inline::parse('{values, are, guessed}'));
     }
 }

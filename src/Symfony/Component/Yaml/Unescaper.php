@@ -12,6 +12,7 @@
 namespace Symfony\Component\Yaml;
 
 use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Util\StringReader;
 
 /**
  * Unescaper encapsulates unescaping rules for single and double-quoted
@@ -24,37 +25,44 @@ use Symfony\Component\Yaml\Exception\ParseException;
 class Unescaper
 {
     /**
-     * Regex fragment that matches an escaped character in a double quoted string.
-     */
-    const REGEX_ESCAPED_CHARACTER = '\\\\(x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|.)';
-
-    /**
      * Unescapes a single quoted string.
-     *
-     * @param string $value A single quoted string
      *
      * @return string The unescaped string
      */
-    public function unescapeSingleQuotedString($value)
+    public function unescapeSingleQuotedString(StringReader $reader)
     {
-        return str_replace('\'\'', '\'', $value);
+        $value = $reader->readCSpan('\'');
+        $reader->expectChar('\'');
+
+        while ($reader->readChar('\'')) {
+            $value .= '\'';
+            $value .= $reader->readCSpan('\'');
+            $reader->expectChar('\'');
+        }
+
+        return $value;
     }
 
     /**
      * Unescapes a double quoted string.
      *
-     * @param string $value A double quoted string
-     *
      * @return string The unescaped string
      */
-    public function unescapeDoubleQuotedString($value)
+    public function unescapeDoubleQuotedString(StringReader $reader)
     {
-        $callback = function ($match) {
-            return $this->unescapeCharacter($match[0]);
-        };
+        $value = $reader->readCSpan('"\\');
+        while (true) {
+            if ($reader->readChar('\\')) {
+                $value .= $this->unescapeCharacter($reader);
+            } else {
+                $reader->expectChar('"');
+                break;
+            }
 
-        // evaluate the string
-        return preg_replace_callback('/'.self::REGEX_ESCAPED_CHARACTER.'/u', $callback, $value);
+            $value .= $reader->readCSpan('"\\');
+        }
+
+        return $value;
     }
 
     /**
@@ -64,9 +72,10 @@ class Unescaper
      *
      * @return string The unescaped character
      */
-    private function unescapeCharacter($value)
+    private function unescapeCharacter(StringReader $reader)
     {
-        switch ($value[1]) {
+        $character = $reader->read(1);
+        switch ($character) {
             case '0':
                 return "\x0";
             case 'a':
@@ -108,13 +117,13 @@ class Unescaper
                 // U+2029 PARAGRAPH SEPARATOR
                 return "\xE2\x80\xA9";
             case 'x':
-                return self::utf8chr(hexdec(substr($value, 2, 2)));
+                return self::utf8chr(hexdec($reader->read(2)));
             case 'u':
-                return self::utf8chr(hexdec(substr($value, 2, 4)));
+                return self::utf8chr(hexdec($reader->read(4)));
             case 'U':
-                return self::utf8chr(hexdec(substr($value, 2, 8)));
+                return self::utf8chr(hexdec($reader->read(8)));
             default:
-                throw new ParseException(sprintf('Found unknown escape character "%s".', $value));
+                throw new ParseException(sprintf('Found unknown escape character "\\%s".', $character));
         }
     }
 

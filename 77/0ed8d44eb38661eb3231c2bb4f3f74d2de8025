@@ -1,0 +1,6 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-01T14:01:28Z
+
+👍  It seems to fix tests on 2.7.
+However this change concerns the Form component more than the TwigBridge, right?

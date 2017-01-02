@@ -46,8 +46,8 @@ class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
 
-        if (! $adm instanceof DebugAccessDecisionManager) {
-            $this->fail('Doesn\'t work, BC with SecurityBundle broken, see PR #21088');
+        if (!$adm instanceof DebugAccessDecisionManager) {
+            $this->fail('For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
         }
     }
 }

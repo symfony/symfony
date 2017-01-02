@@ -99,4 +99,11 @@ class TimeValidatorTest extends ConstraintValidatorTestCase
             array('00:00:60', Time::INVALID_TIME_ERROR),
         );
     }
+
+    public function testDateTimeImmutableIsValid()
+    {
+        $this->validator->validate(new \DateTimeImmutable(), new Time());
+
+        $this->assertNoViolation();
+    }
 }

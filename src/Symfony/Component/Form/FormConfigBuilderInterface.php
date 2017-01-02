@@ -28,7 +28,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *                            with a higher priority are called before
      *                            listeners with a lower priority.
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function addEventListener($eventName, $listener, $priority = 0);
 
@@ -37,7 +37,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param EventSubscriberInterface $subscriber The subscriber to attach
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function addEventSubscriber(EventSubscriberInterface $subscriber);
 
@@ -52,14 +52,14 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param DataTransformerInterface $viewTransformer
      * @param bool                     $forcePrepend    if set to true, prepend instead of appending
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function addViewTransformer(DataTransformerInterface $viewTransformer, $forcePrepend = false);
 
     /**
      * Clears the view transformers.
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function resetViewTransformers();
 
@@ -74,14 +74,14 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param DataTransformerInterface $modelTransformer
      * @param bool                     $forceAppend      if set to true, append instead of prepending
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function addModelTransformer(DataTransformerInterface $modelTransformer, $forceAppend = false);
 
     /**
      * Clears the normalization transformers.
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function resetModelTransformers();
 
@@ -91,7 +91,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param string $name  The name of the attribute
      * @param mixed  $value The value of the attribute
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setAttribute($name, $value);
 
@@ -100,7 +100,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param array $attributes The attributes
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setAttributes(array $attributes);
 
@@ -109,7 +109,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param DataMapperInterface $dataMapper
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setDataMapper(DataMapperInterface $dataMapper = null);
 
@@ -118,7 +118,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param bool $disabled Whether the form is disabled
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setDisabled($disabled);
 
@@ -127,7 +127,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param mixed $emptyData The empty data
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setEmptyData($emptyData);
 
@@ -136,7 +136,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param bool $errorBubbling
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setErrorBubbling($errorBubbling);
 
@@ -145,7 +145,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param bool $required
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setRequired($required);
 
@@ -156,7 +156,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *                                                        The property path or null if the path should be set
      *                                                        automatically based on the form's name.
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setPropertyPath($propertyPath);
 
@@ -166,7 +166,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param bool $mapped Whether the form should be mapped
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setMapped($mapped);
 
@@ -176,7 +176,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      * @param bool $byReference Whether the data should be
      *                          modified by reference.
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setByReference($byReference);
 
@@ -185,7 +185,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param bool $inheritData Whether the form should inherit its parent's data
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setInheritData($inheritData);
 
@@ -194,7 +194,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param bool $compound Whether the form should be compound
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      *
      * @see FormConfigInterface::getCompound()
      */
@@ -205,7 +205,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param ResolvedFormTypeInterface $type The type of the form
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setType(ResolvedFormTypeInterface $type);
 
@@ -214,7 +214,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param mixed $data The data of the form in application format
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setData($data);
 
@@ -227,7 +227,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param bool $locked Whether to lock the default data
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setDataLocked($locked);
 
@@ -243,7 +243,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param string $action The target URL of the form
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setAction($action);
 
@@ -252,7 +252,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param string $method The HTTP method of the form
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setMethod($method);
 
@@ -261,7 +261,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *
      * @param RequestHandlerInterface $requestHandler
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setRequestHandler(RequestHandlerInterface $requestHandler);
 
@@ -275,7 +275,7 @@ interface FormConfigBuilderInterface extends FormConfigInterface
      *                         In the second case, you need to call
      *                         {@link FormInterface::initialize()} manually.
      *
-     * @return self The configuration object
+     * @return $this The configuration object
      */
     public function setAutoInitialize($initialize);
 

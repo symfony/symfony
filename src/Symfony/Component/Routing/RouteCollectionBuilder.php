@@ -55,7 +55,7 @@ class RouteCollectionBuilder
      * @param string|null $prefix
      * @param string      $type
      *
-     * @return RouteCollectionBuilder
+     * @return self
      *
      * @throws FileLoaderLoadException
      */
@@ -101,7 +101,7 @@ class RouteCollectionBuilder
     /**
      * Returns a RouteCollectionBuilder that can be configured and then added with mount().
      *
-     * @return RouteCollectionBuilder
+     * @return self
      */
     public function createBuilder()
     {

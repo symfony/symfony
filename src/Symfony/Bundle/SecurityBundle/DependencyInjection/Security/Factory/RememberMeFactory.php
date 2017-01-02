@@ -97,7 +97,8 @@ class RememberMeFactory implements SecurityFactoryInterface
         if (count($userProviders) === 0) {
             throw new \RuntimeException('You must configure at least one remember-me aware listener (such as form-login) for each firewall that has remember-me enabled.');
         }
-        $rememberMeServices->replaceArgument(0, $userProviders);
+
+        $rememberMeServices->replaceArgument(0, array_unique($userProviders));
 
         // remember-me listener
         $listenerId = 'security.authentication.listener.rememberme.'.$id;

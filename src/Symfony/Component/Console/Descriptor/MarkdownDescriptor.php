@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -96,7 +97,7 @@ class MarkdownDescriptor extends Descriptor
 
         $this->write(
             '`'.$command->getName()."`\n"
-            .str_repeat('-', strlen($command->getName()) + 2)."\n\n"
+            .str_repeat('-', Helper::strlen($command->getName()) + 2)."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             .'### Usage'."\n\n"
             .array_reduce(array_merge(array($command->getSynopsis()), $command->getAliases(), $command->getUsages()), function ($carry, $usage) {
@@ -123,7 +124,7 @@ class MarkdownDescriptor extends Descriptor
         $describedNamespace = isset($options['namespace']) ? $options['namespace'] : null;
         $description = new ApplicationDescription($application, $describedNamespace);
 
-        $this->write($application->getLongVersion()."\n".str_repeat('=', strlen($application->getLongVersion())));
+        $this->write($application->getLongVersion()."\n".str_repeat('=', Helper::strlen($application->getLongVersion())));
 
         foreach ($description->getNamespaces() as $namespace) {
             if (ApplicationDescription::GLOBAL_NAMESPACE !== $namespace['id']) {

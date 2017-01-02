@@ -117,7 +117,7 @@ class JsonResponse extends Response
      *
      * @param string $json
      *
-     * @return JsonResponse
+     * @return $this
      *
      * @throws \InvalidArgumentException
      */

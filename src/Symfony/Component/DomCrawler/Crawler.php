@@ -724,7 +724,7 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @param string $value The image alt
      *
-     * @return Crawler A new instance of Crawler with the filtered list of nodes
+     * @return self A new instance of Crawler with the filtered list of nodes
      */
     public function selectImage($value)
     {

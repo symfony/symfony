@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-02T15:20:50Z
+
+this will have an effect only when using ``simple-phpunit``, not when registering the listener explicitly to be used for normal phpunit runs.
+
+couldn't this be handled by the listener constructor instead ?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-02T15:32:15Z
+
+For our use cases that will work. But since the blacklist is only evaluated once I wanted to add the listener class as soon as possible. Do you think it's safe to always do that in the listener's constructor?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-02T15:35:44Z
+
+Well, when using the simple-phpunit runner, it would still work (as the constructor is invoked before the line you added).
+For usage through the config file, I don't know. It depends when the instantiation takes place. You would need to try it. See Swiftmailer for a project using the bridge through normal PHPUnit usage and registering the listener in the config file for instance.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-02T17:35:48Z
+
+I can confirm that moving the modification of the blacklist to the listener's constructor still leads to the expected effect.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-02T17:39:10Z
+
+:+1:

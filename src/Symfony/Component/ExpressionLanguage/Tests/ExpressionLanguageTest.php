@@ -116,6 +116,8 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
         $expressionLanguage = new ExpressionLanguage(null, array(new TestProvider()));
         $this->assertEquals('foo', $expressionLanguage->evaluate('identity("foo")'));
         $this->assertEquals('"foo"', $expressionLanguage->compile('identity("foo")'));
+        $this->assertEquals('FOO', $expressionLanguage->evaluate('strtoupper("foo")'));
+        $this->assertEquals('strtoupper("foo")', $expressionLanguage->compile('strtoupper("foo")'));
     }
 
     /**

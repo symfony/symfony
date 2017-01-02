@@ -13,6 +13,7 @@ namespace Symfony\Component\ExpressionLanguage\Tests\Fixtures;
 
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionPhpFunction;
 
 class TestProvider implements ExpressionFunctionProviderInterface
 {
@@ -24,6 +25,8 @@ class TestProvider implements ExpressionFunctionProviderInterface
             }, function (array $values, $input) {
                 return $input;
             }),
+
+            new ExpressionPhpFunction('strtoupper'),
         );
     }
 }

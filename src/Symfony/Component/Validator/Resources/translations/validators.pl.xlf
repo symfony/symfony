@@ -36,11 +36,11 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>To pole nie spodziewano.</target>
+                <target>Tego pola się nie spodziewano.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>To pole jest chybianie.</target>
+                <target>Tego pola brakuje.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>

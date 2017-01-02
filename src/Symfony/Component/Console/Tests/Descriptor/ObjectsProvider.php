@@ -31,6 +31,7 @@ class ObjectsProvider
             'input_argument_2' => new InputArgument('argument_name', InputArgument::IS_ARRAY, 'argument description'),
             'input_argument_3' => new InputArgument('argument_name', InputArgument::OPTIONAL, 'argument description', 'default_value'),
             'input_argument_4' => new InputArgument('argument_name', InputArgument::REQUIRED, "multiline\nargument description"),
+            'input_argument_with_style' => new InputArgument('argument_name', InputArgument::OPTIONAL, 'argument description', '<comment>style</>'),
         );
     }
 
@@ -43,6 +44,8 @@ class ObjectsProvider
             'input_option_4' => new InputOption('option_name', 'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'option description', array()),
             'input_option_5' => new InputOption('option_name', 'o', InputOption::VALUE_REQUIRED, "multiline\noption description"),
             'input_option_6' => new InputOption('option_name', array('o', 'O'), InputOption::VALUE_REQUIRED, 'option with multiple shortcuts'),
+            'input_option_with_style' => new InputOption('option_name', 'o', InputOption::VALUE_REQUIRED, 'option description', '<comment>style</>'),
+            'input_option_with_style_array' => new InputOption('option_name', 'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'option description', array('<comment>Hello</comment>', '<info>world</info>')),
         );
     }
 

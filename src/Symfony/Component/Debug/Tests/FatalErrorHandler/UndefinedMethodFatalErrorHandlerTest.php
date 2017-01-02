@@ -61,6 +61,15 @@ class UndefinedMethodFatalErrorHandlerTest extends \PHPUnit_Framework_TestCase
                 ),
                 "Attempted to call an undefined method named \"offsetFet\" of class \"SplObjectStorage\".\nDid you mean to call e.g. \"offsetGet\", \"offsetSet\" or \"offsetUnset\"?",
             ),
+            array(
+                array(
+                  'type' => 1,
+                  'message' => 'Call to undefined method class@anonymous::test()',
+                  'file' => '/home/possum/work/symfony/test.php',
+                  'line' => 11,
+                ),
+                'Attempted to call an undefined method named "test" of class "class@anonymous".',
+            ),
         );
     }
 }

@@ -34,6 +34,8 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
      */
     public function __construct(array $mockedNamespaces = array())
     {
+        \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
+
         $warn = false;
         foreach ($mockedNamespaces as $type => $namespaces) {
             if (!is_array($namespaces)) {

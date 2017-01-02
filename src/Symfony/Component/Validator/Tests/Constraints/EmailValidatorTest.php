@@ -96,6 +96,8 @@ class EmailValidatorTest extends AbstractConstraintValidatorTest
             array('example@'),
             array('example@localhost'),
             array('foo@example.com bar'),
+            array('foo@@example.com'),
+            array('foo@example..com'),
         );
     }
 

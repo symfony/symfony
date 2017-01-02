@@ -58,7 +58,7 @@ class FactoryReturnTypePass implements CompilerPassInterface
             if ($factory[0] instanceof Reference) {
                 $previous[$id] = true;
                 $factoryDefinition = $container->findDefinition((string) $factory[0]);
-                $this->updateDefinition($container, (string) $factory[0], $factoryDefinition, $previous);
+                $this->updateDefinition($container, strtolower($factory[0]), $factoryDefinition, $previous);
                 $class = $factoryDefinition->getClass();
             } else {
                 $class = $factory[0];
@@ -73,12 +73,12 @@ class FactoryReturnTypePass implements CompilerPassInterface
 
         $returnType = $m->getReturnType();
         if (null !== $returnType && !$returnType->isBuiltin()) {
-            $returnType = (string) $returnType;
+            $returnType = $returnType instanceof \ReflectionNamedType ? $returnType->getName() : $returnType->__toString();
             if (null !== $class) {
                 $declaringClass = $m->getDeclaringClass()->getName();
-                if ('self' === $returnType) {
+                if ('self' === strtolower($returnType)) {
                     $returnType = $declaringClass;
-                } elseif ('parent' === $returnType) {
+                } elseif ('parent' === strtolower($returnType)) {
                     $returnType = get_parent_class($declaringClass) ?: null;
                 }
             }

@@ -77,6 +77,10 @@ class FilesystemAdapter extends AbstractAdapter
             $ok = $this->write($this->getFile($id, true), $expiresAt."\n".rawurlencode($id)."\n".serialize($value), $expiresAt) && $ok;
         }
 
+        if (!$ok && !is_writable($this->directory)) {
+            throw new CacheException(sprintf('Cache directory is not writable (%s)', $this->directory));
+        }
+
         return $ok;
     }
 }

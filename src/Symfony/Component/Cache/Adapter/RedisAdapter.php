@@ -26,7 +26,7 @@ class RedisAdapter extends AbstractAdapter
         'class' => null,
         'persistent' => 0,
         'persistent_id' => null,
-        'timeout' => 0,
+        'timeout' => 30,
         'read_timeout' => 0,
         'retry_interval' => 0,
     );

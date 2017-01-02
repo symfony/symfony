@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-07T13:54:24Z
+
+What do you think about to move the code to `convertController()` method to cover `bin/console debug:router` too (i.e. without `name` argument) ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-07T14:15:53Z
+
+@yceruto I did it at the first attempt, but the output was really ugly :/
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-08T19:20:29Z
+
+@yceruto Thanks for the review. I have addressed your comments.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-08T19:26:03Z
+
+Actually, I would like to propose a new approach for this comment. Instead of displaying:
+```
+| Defaults     | _controller: AppBundle:Default:index                    |
+```
+Could we display:
+```
+| Defaults     | _controller: AppBundle:Default:index                              |
+                      (class: AppBundle\Controller\DefaultController::indexAction) |
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-09T07:28:38Z
+
+What about removing the parentheses?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-09T11:22:39Z
+
+This implementation has a drawback: it instantiate the controller (and of its dependencies).
+could we use the dumped ContainerBuilder (used by ``debug:container``) to look at the service definition instead (and skipping this enhanced behavior when we don't have this dumped ContainerBuilder) ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-13T17:42:54Z
+
+@stof I think using the "dev" container is not a good idea, because some route could only exist in production, and it will became hard to debug. Thus, here we only instantiate **one** controller (and yes all deps). IMHO It's not a big deal.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-13T18:01:11Z
+
+I update the code to always display the class name (`a:b:c` or `service:method` notation).
+And I updated the screenshot.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2016-12-22T15:44:13Z
+
+I think this PR is ready

@@ -338,11 +338,15 @@ class AutowirePass implements CompilerPassInterface
      */
     private function createAutowiredDefinition(\ReflectionClass $typeHint, $id)
     {
-        if (isset($this->ambiguousServiceTypes[$typeHint->name])) {
+        if (isset($this->ambiguousServiceTypes[$typeHintName = $typeHint->name])) {
+            if ($this->container->has($typeHintName)) {
+                return new Reference($typeHintName);
+            }
+
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
             $matchingServices = implode(', ', $this->ambiguousServiceTypes[$typeHint->name]);
 
-            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $typeHint->name, $id, $classOrInterface, $matchingServices), 1);
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $typeHintName, $id, $classOrInterface, $matchingServices));
         }
 
         if (!$typeHint->isInstantiable()) {

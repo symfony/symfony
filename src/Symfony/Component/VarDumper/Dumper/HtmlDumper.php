@@ -580,6 +580,13 @@ pre.sf-dump {
     white-space: pre;
     padding: 5px;
 }
+pre.sf-dump:after {
+   content: " ";
+   visibility: hidden;
+   display: block;
+   height: 0;
+   clear: both;
+}
 pre.sf-dump span {
     display: inline;
 }

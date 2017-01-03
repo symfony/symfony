@@ -642,6 +642,10 @@ pre.sf-dump code {
 .sf-dump-search-wrapper {
     float: right;
     font-size: 0;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: scroll;
+    text-align: right;
 }
 .sf-dump-search-wrapper > * {
     vertical-align: top;
@@ -658,7 +662,7 @@ pre.sf-dump code {
     height: 21px;
     font-size: 12px;
     border-right: none;
-    max-width: 150px;
+    width: 140px;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
     color: #000;

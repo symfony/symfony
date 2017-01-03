@@ -180,6 +180,9 @@ if ($components) {
         }
     }
 } elseif (!isset($argv[1]) || 'install' !== $argv[1] || file_exists('install')) {
+    array_splice($argv, 1, 0, array('--colors=always'));
+    $_SERVER['argv'] = $argv;
+    $_SERVER['argc'] = ++$argc;
     include "$PHPUNIT_DIR/phpunit-$PHPUNIT_VERSION/phpunit";
 }
 

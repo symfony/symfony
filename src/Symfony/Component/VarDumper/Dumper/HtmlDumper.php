@@ -463,6 +463,7 @@ return function (root, x) {
         search.className = 'sf-dump-search-wrapper sf-dump-search-hidden';
         search.innerHTML = '
             <input type="text" class="sf-dump-search-input">
+            <span class="sf-dump-search-count">0 on 0<\/span>
             <button type="button" class="sf-dump-search-input-previous" tabindex="-1">
                 <svg viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
                     <path d="M1683 1331l-166 165q-19 19-45 19t-45-19l-531-531-531 531q-19 19-45 19t-45-19l-166-165q-19-19-19-45.5t19-45.5l742-741q19-19 45-19t45 19l742 741q19 19 19 45.5t-19 45.5z"\/>
@@ -473,7 +474,6 @@ return function (root, x) {
                     <path d="M1683 808l-742 741q-19 19-45 19t-45-19l-742-741q-19-19-19-45.5t19-45.5l166-165q19-19 45-19t45 19l531 531 531-531q19-19 45-19t45 19l166 165q19 19 19 45.5t-19 45.5z"\/>
                 <\/svg>
             <\/button>
-            <span class="sf-dump-search-count">0 on 0<\/span>
         ';
         root.insertBefore(search, root.firstChild);
 
@@ -625,7 +625,7 @@ pre.sf-dump code {
 .sf-dump-str.sf-dump-highlight,
 .sf-dump-key.sf-dump-highlight {
     background: rgba(111, 172, 204, 0.3);
-    border: 1px solid #7da0b1;
+    border: 1px solid #7DA0B1;
     border-radius: 3px;
 }
 .sf-dump-public.sf-dump-highlight-active,
@@ -634,7 +634,7 @@ pre.sf-dump code {
 .sf-dump-str.sf-dump-highlight-active,
 .sf-dump-key.sf-dump-highlight-active {
     background: rgba(253, 175, 0, 0.4);
-    border: 1px solid #FFA500;
+    border: 1px solid #ffa500;
     border-radius: 3px;
 }
 .sf-dump-search-hidden {
@@ -642,38 +642,35 @@ pre.sf-dump code {
 }
 .sf-dump-search-wrapper {
     float: right;
-    margin-top: -5px;
-    margin-right: -5px;
-    text-align: right;
-    max-width: 100%;
     font-size: 0;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 0 0 0 3px;
+}
+.sf-dump-search-wrapper > * {
+    vertical-align: top;
+    box-sizing: border-box;
+    height: 21px;
+    font-weight: normal;
+    border-radius: 0;
+    background: #FFF;
+    color: #757575;
+    border: 1px solid #BBB;
 }
 .sf-dump-search-wrapper > input.sf-dump-search-input {
-    color: #333;
     padding: 3px;
     height: 21px;
-    border: 1px solid #bbb;
-    box-sizing: border-box;
     font-size: 12px;
+    border-right: none;
     max-width: 150px;
     border-top-left-radius: 3px;
     border-bottom-left-radius: 3px;
+    color: #000;
 }
 .sf-dump-search-wrapper > .sf-dump-search-input-next,
 .sf-dump-search-wrapper > .sf-dump-search-input-previous {
-    border-radius: 0;
-    background: white;
+    background: #F2F2F2;
     outline: none;
-    border: 1px solid #bbb;
     border-left: none;
-    height: 21px;
     font-size: 0;
-    color: #333;
-    vertical-align: top;
-    box-sizing: border-box;
+    line-height: 0;
 }
 .sf-dump-search-wrapper > .sf-dump-search-input-next {
     border-top-right-radius: 3px;
@@ -686,11 +683,12 @@ pre.sf-dump code {
     height: 12px;
 }
 .sf-dump-search-wrapper > .sf-dump-search-count {
+    display: inline-block;
+    padding: 0 5px;
+    margin: 0;
+    border-left: none;
+    line-height: 21px;
     font-size: 12px;
-    color: #FFF;
-    font-weight: normal;
-    margin-top: 5px;
-    display: block;
 }
 EOHTML
         );

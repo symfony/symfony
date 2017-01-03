@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by wouterj at 2016-12-29T09:59:59Z
+
+Tests seem to pass on Travis. So maybe a local problem? I think you're correct about not having to care about BC here as it's `@internal`.
+
+status: reviewed
+
+(btw, you can ignore fabbot.io's coding style error)
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2016-12-29T10:22:08Z
+
+Well, it was not a local error but a fail of the Travis build on my fork, here: https://travis-ci.org/Jean85/symfony/builds/187412622
+
+If we need a BC class, I will add it. In fact, mixing versions of the bundles may break stuff like in my build, you're right!
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2016-12-30T09:02:02Z
+
+Latests commits are coming from the discussion with @nicolas-grekas in #21096.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-30T09:34:26Z
+
+@Jean85 In your test, the `DebugAccessDecisionManager` class was already loaded in line 47.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2016-12-30T11:03:50Z
+
+You're right; I've tested locally and it works even if I launch the single tests method, so it's just a test issue, to avoid future regressions.
+
+Maybe it's better if I move the tests to the top of the class, and I use a simple `class_exist`, to avoid this issue?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-30T14:24:49Z
+
+@Jean85 Not sure I completely understood what you meant with your last question. I suggest to simply follow the approach from #20967 though.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2016-12-30T15:37:41Z
+
+I've reverted to the suggested approach, an rewrote the test to avoid triggering the autoload of the deprecated class.
+
+Sorry if I was so stubborn @xabbuh , now I've rewritten the test to show how my approach was flawed. PHPUnit's `assertInstanceOf` was doing a `class_exist` behind the scene, triggering the autoload and hiding my mistake.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-30T16:37:52Z
+
+@Jean85 Don't worry about that. Renaming is actually not so easy and it's always good to think about the approaches we use.
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2016-12-30T16:58:20Z
+
+Thanks! I've removed the annotation that I left behind by mistake!
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2017-01-02T16:54:49Z
+
+Fixes committed! The style checker is having some false positive I think...
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2017-01-03T08:20:27Z
+
+@xabbuh done!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-03T09:36:22Z
+
+👍
+
+Status: Reviewed

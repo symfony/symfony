@@ -43,16 +43,20 @@ foreach ($dirs as $k => $dir) {
         echo "Missing \"dev-master\" branch-alias in composer.json extra.\n";
         exit(1);
     }
-    $package->version = str_replace('-dev', '.999', $package->extra->{'branch-alias'}->{'dev-master'});
+    $package->version = str_replace('-dev', '.x-dev', $package->extra->{'branch-alias'}->{'dev-master'});
     $package->dist['type'] = 'tar';
     $package->dist['url'] = 'file://'.str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__))."/$dir/package.tar";
 
     $packages[$package->name][$package->version] = $package;
 
     $versions = file_get_contents('https://packagist.org/packages/'.$package->name.'.json');
-    $versions = json_decode($versions);
+    $versions = json_decode($versions)->package->versions;
 
-    foreach ($versions->package->versions as $v => $package) {
+    if ($package->version === str_replace('-dev', '.x-dev', $versions->{'dev-master'}->extra->{'branch-alias'}->{'dev-master'})) {
+        unset($versions->{'dev-master'});
+    }
+
+    foreach ($versions as $v => $package) {
         $packages[$package->name] += array($v => $package);
     }
 }

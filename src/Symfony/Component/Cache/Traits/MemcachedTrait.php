@@ -35,7 +35,7 @@ trait MemcachedTrait
         return extension_loaded('memcached') && version_compare(phpversion('memcached'), '2.2.0', '>=');
     }
 
-    public function __construct(\Memcached $client, $namespace = '', $defaultLifetime = 0)
+    private function init(\Memcached $client, $namespace, $defaultLifetime)
     {
         if (!static::isSupported()) {
             throw new CacheException('Memcached >= 2.2.0 is required');

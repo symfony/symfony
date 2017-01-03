@@ -26,7 +26,7 @@ trait ApcuTrait
         return function_exists('apcu_fetch') && ini_get('apc.enabled') && !('cli' === PHP_SAPI && !ini_get('apc.enable_cli'));
     }
 
-    public function __construct($namespace = '', $defaultLifetime = 0, $version = null)
+    private function init($namespace, $defaultLifetime, $version)
     {
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled');

@@ -9,18 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Adapter;
+namespace Symfony\Component\Cache\Tests\Simple;
 
 use Symfony\Component\Cache\Simple\FilesystemCache;
-use Symfony\Component\Cache\Adapter\SimpleCacheAdapter;
 
 /**
  * @group time-sensitive
  */
-class SimpleCacheAdapterTest extends AdapterTestCase
+class FilesystemCacheTest extends CacheTestCase
 {
-    public function createCachePool($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0)
     {
-        return new SimpleCacheAdapter(new FilesystemCache(), '', $defaultLifetime);
+        return new FilesystemCache('', $defaultLifetime);
     }
 }

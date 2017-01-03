@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Adapter;
+namespace Symfony\Component\Cache\Tests\Simple;
 
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Symfony\Component\Cache\Simple\MemcachedCache;
 
-class MemcachedAdapterTest extends AdapterTestCase
+class MemcachedCacheTest extends CacheTestCase
 {
     protected $skippedTests = array(
-        'testExpiration' => 'Testing expiration slows down the test suite',
-        'testHasItemReturnsFalseWhenDeferredItemIsExpired' => 'Testing expiration slows down the test suite',
+        'testSetTtl' => 'Testing expiration slows down the test suite',
+        'testSetMultipleTtl' => 'Testing expiration slows down the test suite',
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
     );
 
@@ -26,10 +26,10 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public static function setupBeforeClass()
     {
-        if (!MemcachedAdapter::isSupported()) {
+        if (!MemcachedCache::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');
         }
-        self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false));
+        self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'));
         self::$client->get('foo');
         $code = self::$client->getResultCode();
 
@@ -38,16 +38,16 @@ class MemcachedAdapterTest extends AdapterTestCase
         }
     }
 
-    public function createCachePool($defaultLifetime = 0)
+    public function createSimpleCache($defaultLifetime = 0)
     {
-        $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
+        $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false)) : self::$client;
 
-        return new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        return new MemcachedCache($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
     public function testOptions()
     {
-        $client = MemcachedAdapter::createConnection(array(), array(
+        $client = MemcachedCache::createConnection(array(), array(
             'libketama_compatible' => false,
             'distribution' => 'modula',
             'compression' => true,
@@ -69,7 +69,7 @@ class MemcachedAdapterTest extends AdapterTestCase
      */
     public function testBadOptions($name, $value)
     {
-        MemcachedAdapter::createConnection(array(), array($name => $value));
+        MemcachedCache::createConnection(array(), array($name => $value));
     }
 
     public function provideBadOptions()
@@ -84,9 +84,9 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function testDefaultOptions()
     {
-        $this->assertTrue(MemcachedAdapter::isSupported());
+        $this->assertTrue(MemcachedCache::isSupported());
 
-        $client = MemcachedAdapter::createConnection(array());
+        $client = MemcachedCache::createConnection(array());
 
         $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
         $this->assertSame(1, $client->getOption(\Memcached::OPT_BINARY_PROTOCOL));
@@ -103,7 +103,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             $this->markTestSkipped('Memcached::HAVE_JSON required');
         }
 
-        new MemcachedAdapter(MemcachedAdapter::createConnection(array(), array('serializer' => 'json')));
+        new MemcachedCache(MemcachedCache::createConnection(array(), array('serializer' => 'json')));
     }
 
     /**
@@ -111,9 +111,9 @@ class MemcachedAdapterTest extends AdapterTestCase
      */
     public function testServersSetting($dsn, $host, $port)
     {
-        $client1 = MemcachedAdapter::createConnection($dsn);
-        $client2 = MemcachedAdapter::createConnection(array($dsn));
-        $client3 = MemcachedAdapter::createConnection(array(array($host, $port)));
+        $client1 = MemcachedCache::createConnection($dsn);
+        $client2 = MemcachedCache::createConnection(array($dsn));
+        $client3 = MemcachedCache::createConnection(array(array($host, $port)));
         $expect = array(
             'host' => $host,
             'port' => $port,

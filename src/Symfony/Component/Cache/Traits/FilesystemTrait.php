@@ -22,12 +22,6 @@ trait FilesystemTrait
 {
     use FilesystemCommonTrait;
 
-    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
-    {
-        parent::__construct('', $defaultLifetime);
-        $this->init($namespace, $directory);
-    }
-
     /**
      * {@inheritdoc}
      */

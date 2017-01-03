@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-use Doctrine\Common\Cache\CacheProvider;
-
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -21,13 +19,6 @@ use Doctrine\Common\Cache\CacheProvider;
 trait DoctrineTrait
 {
     private $provider;
-
-    public function __construct(CacheProvider $provider, $namespace = '', $defaultLifetime = 0)
-    {
-        parent::__construct('', $defaultLifetime);
-        $this->provider = $provider;
-        $provider->setNamespace($namespace);
-    }
 
     /**
      * {@inheritdoc}

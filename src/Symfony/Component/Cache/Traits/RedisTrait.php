@@ -37,7 +37,7 @@ trait RedisTrait
     /**
      * @param \Redis|\RedisArray|\RedisCluster|\Predis\Client $redisClient
      */
-    public function __construct($redisClient, $namespace = '', $defaultLifetime = 0)
+    public function init($redisClient, $namespace = '', $defaultLifetime = 0)
     {
         parent::__construct($namespace, $defaultLifetime);
 

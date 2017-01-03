@@ -31,18 +31,6 @@ trait PhpFilesTrait
         return function_exists('opcache_compile_file') && ini_get('opcache.enable');
     }
 
-    public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
-    {
-        if (!static::isSupported()) {
-            throw new CacheException('OPcache is not enabled');
-        }
-        parent::__construct('', $defaultLifetime);
-        $this->init($namespace, $directory);
-
-        $e = new \Exception();
-        $this->includeHandler = function () use ($e) { throw $e; };
-    }
-
     /**
      * {@inheritdoc}
      */

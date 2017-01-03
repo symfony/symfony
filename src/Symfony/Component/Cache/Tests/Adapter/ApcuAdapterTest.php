@@ -48,7 +48,7 @@ class ApcuAdapterTest extends AdapterTestCase
 
     public function testVersion()
     {
-        $namespace = str_replace('\\', '.', __CLASS__);
+        $namespace = str_replace('\\', '.', get_class($this));
 
         $pool1 = new ApcuAdapter($namespace, 0, 'p1');
 

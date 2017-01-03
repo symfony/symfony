@@ -13,16 +13,17 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\DebugAccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class DebugAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
+class TraceableAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider provideObjectsAndLogs
      */
     public function testDecideLog($expectedLog, $object)
     {
-        $adm = new DebugAccessDecisionManager(new AccessDecisionManager());
+        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
         $adm->decide($this->getMockBuilder(TokenInterface::class)->getMock(), array('ATTRIBUTE_1'), $object);
 
         $this->assertSame($expectedLog, $adm->getDecisionLog());
@@ -39,5 +40,14 @@ class DebugAccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $x = fopen(__FILE__, 'r'), 'result' => false)), $x);
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $x = array(), 'result' => false)), $x);
         yield array(array(array('attributes' => array('ATTRIBUTE_1'), 'object' => $object, 'result' => false)), $object);
+    }
+
+    public function testDebugAccessDecisionManagerAliasExistsForBC()
+    {
+        $adm = new TraceableAccessDecisionManager(new AccessDecisionManager());
+
+        if (!$adm instanceof DebugAccessDecisionManager) {
+            $this->fail('For BC, TraceableAccessDecisionManager must be an instance of DebugAccessDecisionManager');
+        }
     }
 }

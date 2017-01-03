@@ -123,13 +123,13 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $container->register('c1', __NAMESPACE__.'\CollisionA');
-        $container->register('c2', __NAMESPACE__.'\CollisionB');
-        $container->register('c3', __NAMESPACE__.'\CollisionB');
+        $container->register('c1', CollisionA::class);
+        $container->register('c2', CollisionB::class);
+        $container->register('c3', CollisionB::class);
 
-        $container->register(__NAMESPACE__.'\CollisionInterface', 'c3');
+        $container->register(CollisionInterface::class, 'c3');
 
-        $aDefinition = $container->register('a', __NAMESPACE__.'\AutowiredInterface');
+        $aDefinition = $container->register('a', AutowiredInterface::class);
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();

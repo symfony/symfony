@@ -459,6 +459,16 @@ return function (root, x) {
             },
         };
 
+        function showCurrent(state)
+        {
+            var currentNode = state.current();
+            if (currentNode) {
+                reveal(currentNode);
+                highlight(root, currentNode, state.nodes);
+            }
+            counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' on ' + state.count();
+        }
+
         var search = doc.createElement('div');
         search.className = 'sf-dump-search-wrapper sf-dump-search-hidden';
         search.innerHTML = '
@@ -503,13 +513,8 @@ return function (root, x) {
                 var xpathResult = doc.evaluate('//pre[@id="' + root.id + '"]//span[@class="sf-dump-str" or @class="sf-dump-key" or @class="sf-dump-public" or @class="sf-dump-protected" or @class="sf-dump-private"][contains(child::text(), ' + xpathString(searchQuery) + ')]', document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
 
                 while (node = xpathResult.iterateNext()) state.nodes.push(node);
-                var currentNode = state.current();
-                if (currentNode) {
-                    reveal(currentNode);
-                    highlight(root, currentNode, state.nodes);
-                }
-
-                counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' on ' + state.count();
+                
+                showCurrent(state);
             }, 400);
         });
 
@@ -520,13 +525,7 @@ return function (root, x) {
                 'next' === direction ? state.next() : state.previous();
                 searchInput.focus();
                 collapseAll(root);
-                var currentNode = state.current();
-                if (currentNode) {
-                    reveal(currentNode);
-                    highlight(root, currentNode, state.nodes);
-                }
-
-                counter.textContent = (state.isEmpty() ? 0 : state.idx + 1) + ' on ' + state.count();
+                showCurrent(state);
             })
         });
 

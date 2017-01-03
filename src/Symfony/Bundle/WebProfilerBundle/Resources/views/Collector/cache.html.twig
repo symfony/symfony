@@ -48,6 +48,33 @@
 
 {% block panel %}
     <h2>Cache</h2>
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.totals.calls }}</span>
+            <span class="label">Total calls</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
+            <span class="label">Total time</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.calls }}</span>
+            <span class="label">Total hits</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.reads }}</span>
+            <span class="label">Total reads</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals['hits/reads'] }}</span>
+            <span class="label">Hits/reads</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.writes }}</span>
+            <span class="label">Total writes</span>
+        </div>
+    </div>
+
     {% for name, calls in collector.calls %}
         <h3>Statistics for '{{ name }}'</h3>
         <div class="metrics">
@@ -55,9 +82,9 @@
                 <div class="metric">
                     <span class="value">
                         {% if key == 'time' %}
-                            <td>{{ '%0.2f'|format(1000*value) }} ms</td>
+                            {{ '%0.2f'|format(1000*value) }} ms
                         {% else %}
-                            <td>{{ value }}</td>
+                            {{ value }}
                         {% endif %}
                     </span>
                     <span class="label">{{ key|capitalize }}</span>

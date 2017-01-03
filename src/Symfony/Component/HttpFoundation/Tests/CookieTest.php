@@ -52,7 +52,14 @@ class CookieTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidExpiration()
     {
-        $cookie = new Cookie('MyCookie', 'foo', 'bar');
+        new Cookie('MyCookie', 'foo', 'bar');
+    }
+
+    public function testNegativeExpirationIsNotPossible()
+    {
+        $cookie = new Cookie('foo', 'bar', -100);
+
+        $this->assertSame(0, $cookie->getExpiresTime());
     }
 
     public function testGetValue()
@@ -79,6 +86,13 @@ class CookieTest extends \PHPUnit_Framework_TestCase
         $cookie = new Cookie('foo', 'bar', $expire = time() + 3600);
 
         $this->assertEquals($expire, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date');
+    }
+
+    public function testGetExpiresTimeIsCastToInt()
+    {
+        $cookie = new Cookie('foo', 'bar', 3600.9);
+
+        $this->assertSame(3600, $cookie->getExpiresTime(), '->getExpiresTime() returns the expire date as an integer');
     }
 
     public function testConstructorWithDateTime()

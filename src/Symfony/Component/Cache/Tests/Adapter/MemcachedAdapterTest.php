@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use Symfony\Component\Cache\Adapter\Client\MemcachedClient;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 
 class MemcachedAdapterTest extends AdapterTestCase
@@ -23,17 +24,20 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     private static $client;
 
+    public static function defaultConnectionServers()
+    {
+        return array(
+            sprintf('memcached://%s:%d', getenv('MEMCACHED_HOST') ?: '127.0.0.1', getenv('MEMCACHED_PORT') ?: 11211),
+        );
+    }
+
     public static function setupBeforeClass()
     {
-        if (!MemcachedAdapter::isSupported()) {
-            self::markTestSkipped('Extension memcached >=2.2.0 required.');
+        if (!MemcachedClient::isSupported()) {
+            self::markTestSkipped('Memcached extension >= 2.2.0 required for test.');
         }
 
-        self::$client = new \Memcached();
-        self::$client->addServers(array(array(
-            getenv('MEMCACHED_HOST') ?: '127.0.0.1',
-            getenv('MEMCACHED_PORT') ?: 11211,
-        )));
+        self::$client = MemcachedClient::create(static::defaultConnectionServers());
 
         parent::setupBeforeClass();
     }
@@ -43,8 +47,20 @@ class MemcachedAdapterTest extends AdapterTestCase
         return new MemcachedAdapter(self::$client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
-    public function testIsSupported()
+    public function testCreateConnection()
     {
-        $this->assertTrue(MemcachedAdapter::isSupported());
+        $servers = static::defaultConnectionServers();
+        $options = array('compression' => true);
+
+        $expect = array(array(
+            'host' => parse_url($servers[0], PHP_URL_HOST),
+            'port' => parse_url($servers[0], PHP_URL_PORT),
+            'type' => 'TCP',
+        ));
+
+        $client = MemcachedAdapter::createConnection($servers, $options);
+
+        $this->assertSame($expect, $client->getServerList());
+        $this->assertTrue($client->getOption(\Memcached::OPT_COMPRESSION));
     }
 }

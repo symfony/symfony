@@ -423,7 +423,7 @@ class Parser
 
             $previousLineIndentation = $indent;
 
-            if ($isItUnindentedCollection && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
+            if ($isItUnindentedCollection && !$this->isCurrentLineEmpty() && !$this->isStringUnIndentedCollectionItem() && $newIndent === $indent) {
                 $this->moveToPreviousLine();
                 break;
             }

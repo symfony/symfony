@@ -190,6 +190,22 @@ EOF;
         $tests['Literal block chomping clip with multiple trailing newlines'] = array($expected, $yaml);
 
         $yaml = <<<'EOF'
+foo:
+- bar: |
+    one
+
+    two
+EOF;
+        $expected = array(
+            'foo' => array(
+                array(
+                    'bar' => "one\n\ntwo",
+                ),
+            ),
+        );
+        $tests['Literal block chomping clip with embedded blank line inside unindented collection'] = array($expected, $yaml);
+
+        $yaml = <<<'EOF'
 foo: |
     one
     two

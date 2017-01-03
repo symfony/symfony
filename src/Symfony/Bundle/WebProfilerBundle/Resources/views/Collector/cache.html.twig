@@ -66,12 +66,20 @@
             <span class="label">Total hits</span>
         </div>
         <div class="metric">
-            <span class="value">{{ collector.totals['hits/reads'] }}</span>
-            <span class="label">Hits/reads</span>
+            <span class="value">{{ collector.totals.misses }}</span>
+            <span class="label">Total misses</span>
         </div>
         <div class="metric">
             <span class="value">{{ collector.totals.writes }}</span>
             <span class="label">Total writes</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals.deletes }}</span>
+            <span class="label">Total deletes</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.totals['hits/reads'] }}</span>
+            <span class="label">Hits/reads</span>
         </div>
     </div>
 

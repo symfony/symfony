@@ -160,7 +160,15 @@ class CacheDataCollector extends DataCollector
     private function calculateTotalStatistics()
     {
         $statistics = $this->getStatistics();
-        $totals = array('calls' => 0, 'time' => 0, 'reads' => 0, 'hits' => 0, 'misses' => 0, 'writes' => 0);
+        $totals = array(
+            'calls' => 0,
+            'time' => 0,
+            'reads' => 0,
+            'hits' => 0,
+            'misses' => 0,
+            'writes' => 0,
+            'deletes' => 0,
+        );
         foreach ($statistics as $name => $values) {
             foreach ($totals as $key => $value) {
                 $totals[$key] += $statistics[$name][$key];

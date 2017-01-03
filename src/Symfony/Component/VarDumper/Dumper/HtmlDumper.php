@@ -651,7 +651,6 @@ pre.sf-dump code {
     font-size: 0;
     white-space: nowrap;
     max-width: 100%;
-    overflow: scroll;
     text-align: right;
 }
 .sf-dump-search-wrapper > * {

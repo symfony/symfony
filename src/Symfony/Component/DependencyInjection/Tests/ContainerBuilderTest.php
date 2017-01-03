@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
@@ -842,6 +843,19 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $container->compile();
 
         $this->assertEquals('a', (string) $container->getDefinition('b')->getArgument(0));
+    }
+
+    public function testClassFromId()
+    {
+        $container = new ContainerBuilder();
+
+        $unknown = $container->register('unknown_class');
+        $class = $container->register(\stdClass::class);
+        $autoloadClass = $container->register(CaseSensitiveClass::class);
+
+        $this->assertNull($unknown->getClass());
+        $this->assertEquals(\stdClass::class, $class->getClass());
+        $this->assertEquals(CaseSensitiveClass::class, $autoloadClass->getClass());
     }
 }
 

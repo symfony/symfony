@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
@@ -327,6 +328,15 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $loader->load('services27.yml');
         $this->assertEquals(array('set*', 'bar'), $container->getDefinition('autowire_array')->getAutowiredMethods());
+    }
+
+    public function testClassFromId()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('class_from_id.yml');
+
+        $this->assertEquals(CaseSensitiveClass::class, $container->getDefinition(CaseSensitiveClass::class)->getClass());
     }
 
     /**

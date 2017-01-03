@@ -49,7 +49,7 @@ class UsernamePasswordJsonAuthenticationListenerTest extends \PHPUnit_Framework_
         $authenticationFailureHandler = $this->getMockBuilder(AuthenticationFailureHandlerInterface::class)->getMock();
         $authenticationFailureHandler->method('onAuthenticationFailure')->willReturn(new Response('ko'));
 
-        $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, 'providerKey',  $authenticationSuccessHandler, $authenticationFailureHandler, $options);
+        $this->listener = new UsernamePasswordJsonAuthenticationListener($tokenStorage, $authenticationManager, 'providerKey', $authenticationSuccessHandler, $authenticationFailureHandler, $options);
     }
 
     public function testHandleSuccess()

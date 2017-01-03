@@ -1,0 +1,296 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-20T10:01:34Z
+
+Please add a test to prevent future regressions.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T10:06:06Z
+
+@xabbuh I do it right away.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T10:19:04Z
+
+@nicolas-grekas @xabbuh Test added.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T10:20:15Z
+
+The test does not work with `SplPriorityQueue`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-20T10:31:00Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-20T10:39:09Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-12-20T11:16:47Z
+
+maybe better also add note iside trait why `SplPriorityQueue` not used.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-20T12:07:01Z
+
+Will this be added back for 4.0? As @francoispluchino said we're using this in other places and we're promoting it with a special trait.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-20T12:13:26Z
+
+@javiereguiluz the SplPriorityQueue does not give any additional feature compared to the implementation used here (and which was used almost everywhere in Symfony before adding the trait btw, which is why switching to SplPriorityQueue was a BC break due to unstable sorting). So there is no drawback keeping this code in 4.0 (except it could use ``array_merge(...$services)`` instead of ``call_user_func_array`` to be faster once PHP 5.5 does not need to be supported anymore)
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T12:15:02Z
+
+@javiereguiluz See this [commit](https://github.com/symfony/symfony/commit/778a70ba9842ebbc081e0c82a3f46cb2d3f385c5).
+
+I do not think we need to use `SplPriorityQueue`, see my [comment](https://github.com/symfony/symfony/issues/20332#issuecomment-268038680).
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T12:22:04Z
+
+@Koc It's done.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-20T12:31:52Z
+
+Another minor comment: if the problem is that `A` and `B` passes have `100` priority and previously  they were executed in `A` -> `B` order and now they are executed in `B` -> `A` order ... then the real problem is that they should have a different priority, right?
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T12:55:54Z
+
+Yes and no. Let me explain, ideally, I agree with you, but in reality, when you use different Bundles, it happens very often (if not all the time) that no priority is defined in the services. Priority is defined only when it is really necessary.
+
+I'm not saying it's a good practice or not, but it's just an observation.
+
+However, there is some kind of implicit priority, namely the order of adding the bundles (and others, as explained in this [comment](https://github.com/symfony/symfony/issues/20332#issuecomment-268038680)). It is therefore necessary to keep this order for services with the same priority.
+
+In addition, we can more easily debug a priority error, because from what I understood on the tracker of PHP, is that the `SplPriorityQueue` class destroys the order arbitrarily, and therefore unpredictable (see the [last comment on PHP Bugs](https://bugs.php.net/bug.php?id=53710)).
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-20T13:27:32Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-20T13:55:07Z
+
+**Update:** I change my vote to "abstain". Thanks!
+
+~~My vote is -1 for now.~~
+
+~~Reasons:~~
+
+~~1. As the author of this PR recognized, this reverts the new behavior in some part of Symfony ... but leaves the rest of Symfony using the new behavior.~~
+~~2. I still think that the reason to revert the new behavior looks weak and fragile. You say that if you change the order of your bundles in the kernel, you may break the application. But we provided features like priorities to avoid those problems.~~
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T13:57:38Z
+
+Why some [tests of Form Component](https://travis-ci.org/symfony/symfony/jobs/185456247#L2872) are marked incomplete, while I have corrected a one line phpdoc, and that the previous tests were ok?
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T13:59:14Z
+
+@javiereguiluz Why? Your arguments?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-20T14:02:45Z
+
+>1. As the author of this PR recognized, this reverts the new behavior in some part of Symfony ... but leaves the rest of Symfony using the new behavior.
+>2. I still think that the reason to revert the new behavior looks weak and fragile. You say that if you change the order of your bundles in the kernel, you may break the application. But we provided features like priorities to avoid those problems.
+
+1. This does not revert the behavior, as I understand it, it keeps the feature, allowing to handle priorities AND keeps the original order for identical priorities.
+
+2. Yes but this problem was already there and is actually solved by this feature.
+
+Am I missing something?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-20T14:07:19Z
+
+>Why some tests of Form Component are marked incomplete, while I have corrected a one line phpdoc, and that the previous tests were ok?
+
+@francoispluchino This has nothing to do with your PR, some tests are skipped in the form component depending of the installed version of ICU.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T14:07:24Z
+
+Yes, the addition of the new priority option is present, and in addition, we maintain order for services with the same priority.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-20T14:07:30Z
+
+@javiereguiluz there was no priority for form extensions in Symfony 3.1, and so bundles were not defining a priority, but the order of registration was preserved. This PR is about reverting a BC break where a project would stop working when updating to 3.2 because the order of extensions defined without priority would be different (and unknown btw, making things hard to debug as it could change over time)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-20T14:56:28Z
+
+@javiereguiluz please reconsider. Stof is right.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-12-20T16:58:40Z
+
+:+1:, this should also fix https://github.com/FriendsOfSymfony/FOSRestBundle/issues/1602.
+
+To complete the other arguments, even inside a bundle, someone might rely on the order of his services definition (when using normalizers for instance):
+```yml
+services:
+    foo:
+        // ...
+        tags: [ serializer.normalizer ]
+
+    bar:
+        // ...
+        tags: [ serializer.normalizer ]
+```
+
+`foo` would be expected to be called before `bar`.
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T17:41:39Z
+
+The most disturbing, is that the behavior of the `SplPriorityQueue` class is not really intuitive: the first item will be emitted first, and then the remaining items in reverse order of when enqueued.
+
+**2 tests to illustrate this affirmation:**
+
+```php
+class SplPriorityQueueTest extends \PHPUnit_Framework_TestCase
+{
+    public function testSinglePriority()
+    {
+        $queue = new \SplPriorityQueue();
+        $values = array();
+
+        $queue->insert('foo', 1000);// 0
+        $queue->insert('bar', 1000);// 1
+        $queue->insert('baz', 1000);// 2
+        $queue->insert('bat', 1000);// 3
+        $queue->insert('tar', 1000);// 4
+
+        foreach ($queue as $value) {
+            $values[] = $value;
+        }
+
+        // The obtained result
+        $this->assertSame(array(
+            'foo',// 0
+            'tar',// 4
+            'bat',// 3
+            'baz',// 2
+            'bar',// 1
+        ), $values);
+
+        // The expected result
+        $this->assertSame(array(
+            'foo',// 0
+            'bar',// 1
+            'baz',// 2
+            'bat',// 3
+            'tar',// 4
+        ), $values);
+    }
+
+    public function testSeveralPriorities()
+    {
+        $queue = new \SplPriorityQueue();
+        $values = array();
+
+        $queue->insert('foo', 1000);// 0
+        $queue->insert('bar', 1000);// 1
+        $queue->insert('baz', 1000);// 2
+        $queue->insert('bat', 1000);// 3
+        $queue->insert('tar', 2000);// 4
+
+        foreach ($queue as $value) {
+            $values[] = $value;
+        }
+
+        // The obtained result
+        $this->assertSame(array(
+            'tar',// 4
+            'bar',// 1
+            'bat',// 3
+            'baz',// 2
+            'foo',// 0
+        ), $values);
+
+        // The expected result
+        $this->assertSame(array(
+            'tar',// 4
+            'foo',// 0
+            'bar',// 1
+            'baz',// 2
+            'bat',// 3
+        ), $values);
+    }
+}
+```
+
+@nicolas-grekas To answer of your [comment](https://github.com/symfony/symfony/issues/20332#issuecomment-268064883), the result is same in PHP 5.6 and PHP 7.0.
+
+And the [PHP doc](http://php.net/manual/en/class.splpriorityqueue.php) is not very detailed on this, there is only the description for the `insert` method: `Inserts an element in the queue by sifting it up`.
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2016-12-20T18:03:06Z
+
+I actually noticed this behaviour when working on the priorities for form type extensions and had some concerns regarding BC :cry:
+
+https://github.com/symfony/symfony/pull/19790#issuecomment-243568757
+
+---------------------------------------------------------------------------
+
+by francoispluchino at 2016-12-20T18:11:44Z
+
+There is other compiler passes that uses either `SplPriorityQueue` or the old method:
+- [Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass::process()](https://github.com/symfony/symfony/blob/3.2/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Compiler/AddSecurityVotersPass.php)
+- [Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass::process()](https://github.com/symfony/symfony/blob/3.2/src/Symfony/Bundle/TwigBundle/DependencyInjection/Compiler/TwigLoaderPass.php)
+
+If we later simplify the code using the `PriorityTaggedServiceTrait` trait, we may encounter the same problem with the `TwigLoaderPass` class without this fix.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-20T18:53:54Z
+
+Thanks for providing more examples and comments about this. I've removed my `-1` vote and now I abstain.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-20T20:36:57Z
+
+> https://bugs.php.net/bug.php?id=60926
+
+Cool.. that's mine :) I also settled with arrays back then.
+
+Good fix :+1:

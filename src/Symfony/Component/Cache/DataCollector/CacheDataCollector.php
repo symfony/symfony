@@ -119,28 +119,28 @@ class CacheDataCollector extends DataCollector
             foreach ($calls as $call) {
                 $statistics[$name]['calls'] += 1;
                 $statistics[$name]['time'] += $call->end - $call->start;
-                if ($call->name === 'getItem') {
+                if ('getItem' === $call->name) {
                     $statistics[$name]['reads'] += 1;
                     if ($call->hits) {
                         $statistics[$name]['hits'] += 1;
                     } else {
                         $statistics[$name]['misses'] += 1;
                     }
-                } elseif ($call->name === 'getItems') {
+                } elseif ('getItems' === $call->name) {
                     $count = $call->hits + $call->misses;
                     $statistics[$name]['reads'] += $count;
                     $statistics[$name]['hits'] += $call->hits;
                     $statistics[$name]['misses'] += $count - $call->misses;
-                } elseif ($call->name === 'hasItem') {
+                } elseif ('hasItem' === $call->name) {
                     $statistics[$name]['reads'] += 1;
-                    if ($call->result->getRawData()[0][0] === false) {
+                    if (false === $call->result->getRawData()[0][0]) {
                         $statistics[$name]['misses'] += 1;
                     } else {
                         $statistics[$name]['hits'] += 1;
                     }
-                } elseif ($call->name === 'save') {
+                } elseif ('save' === $call->name) {
                     $statistics[$name]['writes'] += 1;
-                } elseif ($call->name === 'deleteItem') {
+                } elseif ('deleteItem' === $call->name) {
                     $statistics[$name]['deletes'] += 1;
                 }
             }

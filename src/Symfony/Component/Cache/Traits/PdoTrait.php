@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Traits;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
@@ -17,10 +17,11 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
-class PdoAdapter extends AbstractAdapter
+/**
+ * @internal
+ */
+trait PdoTrait
 {
-    protected $maxIdLength = 255;
-
     private $conn;
     private $dsn;
     private $driver;

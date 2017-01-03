@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -17,16 +17,16 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
-class MemcachedAdapter extends AbstractAdapter
+trait MemcachedTrait
 {
     private static $defaultClientOptions = array(
         'persistent_id' => null,
         'username' => null,
         'password' => null,
     );
-
-    protected $maxIdLength = 250;
 
     private $client;
 

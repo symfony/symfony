@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -17,10 +17,12 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @author Piotr Stankowski <git@trakos.pl>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
-class PhpFilesAdapter extends AbstractAdapter
+trait PhpFilesTrait
 {
-    use FilesystemAdapterTrait;
+    use FilesystemCommonTrait;
 
     private $includeHandler;
 

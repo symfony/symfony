@@ -9,16 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\CacheException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
-class FilesystemAdapter extends AbstractAdapter
+trait FilesystemTrait
 {
-    use FilesystemAdapterTrait;
+    use FilesystemCommonTrait;
 
     public function __construct($namespace = '', $defaultLifetime = 0, $directory = null)
     {

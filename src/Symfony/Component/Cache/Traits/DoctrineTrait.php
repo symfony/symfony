@@ -9,14 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Traits;
 
 use Doctrine\Common\Cache\CacheProvider;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
-class DoctrineAdapter extends AbstractAdapter
+trait DoctrineTrait
 {
     private $provider;
 

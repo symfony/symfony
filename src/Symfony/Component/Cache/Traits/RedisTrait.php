@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Traits;
 
 use Predis\Connection\Factory;
 use Predis\Connection\Aggregate\PredisCluster;
@@ -19,8 +19,10 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 /**
  * @author Aurimas Niekis <aurimas@niekis.lt>
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
  */
-class RedisAdapter extends AbstractAdapter
+trait RedisTrait
 {
     private static $defaultConnectionOptions = array(
         'class' => null,

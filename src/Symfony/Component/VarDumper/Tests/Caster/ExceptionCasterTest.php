@@ -160,7 +160,7 @@ EODUMP;
   -<span class=sf-dump-private title="Private property defined in class:&#10;`Exception`">trace</span>: {<samp>
     <span class=sf-dump-meta title="%sExceptionCasterTest.php
 Stack level %d."><span class=sf-dump-ellipsis>%sVarDumper%eTests</span>%eCaster%eExceptionCasterTest.php</span>: <span class=sf-dump-num>26</span>
-     &hellip;12
+     &hellip;%d
   </samp>}
 </samp>}
 </bar>

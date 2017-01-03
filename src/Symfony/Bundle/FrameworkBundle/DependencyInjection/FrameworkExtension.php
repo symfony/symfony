@@ -693,8 +693,8 @@ class FrameworkExtension extends Extension
         }
         $rootDir = $container->getParameter('kernel.root_dir');
         foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
-            $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/translations')) {
+            $dirname = $this->getBundlePath($class);
+            if (is_dir($dir = $dirname.'/Resources/translations')) {
                 $dirs[] = $dir;
             }
             if (is_dir($dir = $rootDir.sprintf('/Resources/%s/translations', $bundle))) {
@@ -811,8 +811,7 @@ class FrameworkExtension extends Extension
 
         $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFileName());
+            $dirname = $this->getBundlePath($bundle);
 
             if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
                 $files[0][] = $file;
@@ -926,8 +925,7 @@ class FrameworkExtension extends Extension
 
         $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFileName());
+            $dirname = $this->getBundlePath($bundle);
 
             if (is_file($file = $dirname.'/Resources/config/serialization.xml')) {
                 $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file));
@@ -991,6 +989,32 @@ class FrameworkExtension extends Extension
         }
 
         return $this->kernelRootHash;
+    }
+
+    /**
+     * Gets the path of a given bundle using Bundle::getPath() when usable.
+     *
+     * WARNING:
+     * Calling this may cause a fatal error if the getPath method contains call(s)
+     * of constructor argument's methods, e.g. Bundle::$foo->bar() called in Bundle::getPath()
+     *
+     * @param string $fqcn The bundle FQCN
+     *
+     * @return string
+     */
+    private function getBundlePath($fqcn)
+    {
+        $reflection = new \ReflectionClass($fqcn);
+        $defaultPath = dirname($reflection->getFilename());
+
+        if (PHP_VERSION_ID < 50400) {
+            return $defaultPath;
+        }
+
+        $reflectionInstance = $reflection->newInstanceWithoutConstructor();
+        $reflectedPathGetter = new \ReflectionMethod($fqcn, 'getPath');
+
+        return $reflectedPathGetter->invoke($reflectionInstance) ?: $defaultPath;
     }
 
     /**

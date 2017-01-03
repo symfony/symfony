@@ -3,7 +3,7 @@ clone_depth: 1
 clone_folder: c:\projects\symfony
 
 cache:
-    - c:\projects\symfony\composer.phar
+    - composer.phar
     - .phpunit -> phpunit
 
 init:
@@ -44,13 +44,12 @@ install:
     - echo curl.cainfo=c:\php\cacert.pem >> php.ini-max
     - copy /Y php.ini-max php.ini
     - cd c:\projects\symfony
-    - IF NOT EXIST composer.phar (appveyor DownloadFile https://getcomposer.org/download/1.2.1/composer.phar)
+    - IF NOT EXIST composer.phar (appveyor DownloadFile https://getcomposer.org/download/1.3.0/composer.phar)
     - php composer.phar self-update
     - copy /Y .composer\* %APPDATA%\Composer\
     - php .github/build-packages.php "HEAD^" src\Symfony\Bridge\PhpUnit
     - IF %APPVEYOR_REPO_BRANCH%==master (SET COMPOSER_ROOT_VERSION=dev-master) ELSE (SET COMPOSER_ROOT_VERSION=%APPVEYOR_REPO_BRANCH%.x-dev)
     - php composer.phar update --no-progress --ansi
-    - SET COMPOSER_ROOT_VERSION=
     - php phpunit install
 
 test_script:

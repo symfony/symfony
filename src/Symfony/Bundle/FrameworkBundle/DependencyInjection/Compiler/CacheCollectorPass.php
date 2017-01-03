@@ -33,9 +33,7 @@ class CacheCollectorPass implements CompilerPassInterface
         }
 
         $collectorDefinition = $container->getDefinition('data_collector.cache');
-        $serviceIds = $container->findTaggedServiceIds('cache.pool');
-
-        foreach (array_keys($serviceIds) as $id) {
+        foreach ($container->findTaggedServiceIds('cache.pool') as $id => $attributes) {
             if ($container->getDefinition($id)->isAbstract()) {
                 continue;
             }

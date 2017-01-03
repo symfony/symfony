@@ -581,7 +581,7 @@ pre.sf-dump {
     padding: 5px;
 }
 pre.sf-dump:after {
-   content: " ";
+   content: "";
    visibility: hidden;
    display: block;
    height: 0;

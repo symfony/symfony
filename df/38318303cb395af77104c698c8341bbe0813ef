@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T12:41:09Z
+
+Nice :+1: what about `bin/console list --show-hidden`? The idea of hidden commands was to exclude them by default (for not having a contextual relevance).
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-28T14:37:00Z
+
+Looks like an idea to me :)
+
+But I'd like to keep meaningful defaults based on the format unless the `--show-hidden` flag is provided/explicitly set to `true/false` (`InputOption::VALUE_OPTIONAL` with default acting as auto).
+
+Anyway, let's first approve this one before.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T15:08:46Z
+
+> meaningful defaults based on the format
+
+Technically they dont know about each other.. they should not make assumptions regarding context imo. The only context we do have is "hidden", probably meaning; dont bother the user with it.
+
+So :+1: for defaulting to false, where defaulting is needed. But i understand you actually chose to differ between XML/JSON and markdown here. Always providing the information technically in that case.
+
+I think we should do format based decision making at command level. More close to real user decision making. Although it could still be experienced counter-intuitive. No real opinion here :)
+
+> Anyway, let's first approve this one before.
+
+Im not sure you wanna do 2 PR's? But imo. it can be 1, doing the feature as a whole. Right now master is good (imo.); consistently hidden by default. Not sure we want this intermediate step, or as final solution for that matter, again imo.
+
+For me :+1: adding `--show-hidden` to bypass the hardcoded default.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-28T16:45:41Z
+
+> Im not sure you wanna do 2 PR's? But imo. it can be 1, doing the feature as a whole.
+
+Just waiting for some more feedbacks on this and the option suggestion.
+
+But ok, done.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-28T16:56:39Z
+
+I think I'm :-1: on the `--show-hidden` option. That would defeat the whole purpose of the hidden feature as accepted when it was introduced.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T17:09:39Z
+
+Sounds reasonable. But it really depends what "hidden" means. Is it only from a end-user perspective? GUI-wise?
+
+Then the initial (by now ;-)) approach makes sense. Including for technical formats, excluding for human formats.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-28T18:32:39Z
+
+There is one more thing to consider regarding the `--show-hidden` option: It feels strange for both `xml` and `json` formats to get the `hidden` information always added as an attribute. If it doesn't include hidden commands, this is pretty useless.
+
+I'll wait some more opinions and remove the option if it doesn't seem appropriated.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T18:42:14Z
+
+Not sure, we wanna micro optimize that? The definition is clear, allowing everybody to rely on it consistently.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-30T06:29:53Z
+
+"Then the initial (by now ;-)) approach makes sense. Including for technical formats, excluding for human formats." -> like that.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-30T10:22:59Z
+
+`--show-hidden` option removed :)

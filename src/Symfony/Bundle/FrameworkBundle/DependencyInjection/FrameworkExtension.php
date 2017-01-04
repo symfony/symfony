@@ -690,12 +690,11 @@ class FrameworkExtension extends Extension
             $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
         }
         $rootDir = $container->getParameter('kernel.root_dir');
-        foreach ($container->getParameter('kernel.bundles') as $bundle => $class) {
-            $reflection = new \ReflectionClass($class);
-            if (is_dir($dir = dirname($reflection->getFileName()).'/Resources/translations')) {
+        foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
+            if (is_dir($dir = $bundle['path'].'/Resources/translations')) {
                 $dirs[] = $dir;
             }
-            if (is_dir($dir = $rootDir.sprintf('/Resources/%s/translations', $bundle))) {
+            if (is_dir($dir = $rootDir.sprintf('/Resources/%s/translations', $name))) {
                 $dirs[] = $dir;
             }
         }
@@ -810,11 +809,8 @@ class FrameworkExtension extends Extension
             $container->addResource(new FileResource($files[0][0]));
         }
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFileName());
-
+        foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
+            $dirname = $bundle['path'];
             if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
                 $files[0][] = $file;
                 $container->addResource(new FileResource($file));
@@ -947,10 +943,8 @@ class FrameworkExtension extends Extension
             $serializerLoaders[] = $annotationLoader;
         }
 
-        $bundles = $container->getParameter('kernel.bundles');
-        foreach ($bundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $dirname = dirname($reflection->getFileName());
+        foreach ($container->getParameter('kernel.bundles_metadata') as $bundle) {
+            $dirname = $bundle['path'];
 
             if (is_file($file = $dirname.'/Resources/config/serialization.xml')) {
                 $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file));

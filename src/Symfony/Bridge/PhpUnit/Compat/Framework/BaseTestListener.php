@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\PhpUnit\Compat\Framework;
 
 if (class_exists(PHPUnit\Framework\BaseTestListener::class)) {
-    abstract class BaseTestListener extends PHPUnit\Framework\BaseTestListener
+    abstract class BaseTestListener extends \PHPUnit\Framework\BaseTestListener
     {}
 } else {
     abstract class BaseTestListener extends \PHPUnit_Framework_BaseTestListener

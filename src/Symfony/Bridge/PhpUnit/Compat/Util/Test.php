@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\PhpUnit\Compat\Util;
 
 if (class_exists(PHPUnit\Util\Test::class)) {
-    class Test extends PHPUnit\Util\Test
+    class Test extends \PHPUnit\Util\Test
     {}
 } else {
     class Test extends \PHPUnit_Util_Test

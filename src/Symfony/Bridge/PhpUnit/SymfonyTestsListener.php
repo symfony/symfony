@@ -84,7 +84,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function startTestSuite(TestSuite $suite)
+    public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
     {
         $suiteName = $suite->getName();
         $this->testsWithWarnings = array();

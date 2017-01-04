@@ -135,14 +135,14 @@ class ArrayChoiceListTest extends AbstractChoiceListTest
     {
         $choiceList = new ArrayChoiceList(array('Null' => null));
 
-        $this->assertSame(array(0 => null), $choiceList->getChoicesForValues(array('0')));
+        $this->assertSame(array(0 => null), $choiceList->getChoicesForValues(array('')));
     }
 
     public function testGetChoicesForValuesWithContainingFalseAndNull()
     {
         $choiceList = new ArrayChoiceList(array('False' => false, 'Null' => null));
 
-        $this->assertSame(array(0 => null), $choiceList->getChoicesForValues(array('1')));
+        $this->assertSame(array(0 => null), $choiceList->getChoicesForValues(array('')));
         $this->assertSame(array(0 => false), $choiceList->getChoicesForValues(array('0')));
     }
 

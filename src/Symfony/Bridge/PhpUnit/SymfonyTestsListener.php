@@ -112,7 +112,7 @@ class SymfonyTestsListener extends BaseTestListener
             $testSuites = array($suite);
             for ($i = 0; isset($testSuites[$i]); ++$i) {
                 foreach ($testSuites[$i]->tests() as $test) {
-                    if ($this->isInstanceOfPHPUnitTestSuite($test)) {
+                    if ($this->isInstanceOfPHPUnitTestCase($test)) {
                         if (!class_exists($test->getName(), false)) {
                             $testSuites[] = $test;
                             continue;

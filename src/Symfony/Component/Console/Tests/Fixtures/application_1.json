@@ -2,6 +2,7 @@
     "commands": [
         {
             "name": "help",
+            "hidden": false,
             "usage": [
                 "help [--format FORMAT] [--raw] [--] [<command_name>]"
             ],
@@ -104,6 +105,7 @@
         },
         {
             "name": "list",
+            "hidden": false,
             "usage": [
                 "list [--raw] [--format FORMAT] [--] [<namespace>]"
             ],

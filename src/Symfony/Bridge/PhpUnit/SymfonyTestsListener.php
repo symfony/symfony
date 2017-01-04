@@ -17,7 +17,6 @@ use PHPUnit\Framework\TestCase as TestCase6;
 use PHPUnit\Framework\TestSuite as TestSuite6;
 use Symfony\Bridge\PhpUnit\Compat\Framework\AssertionFailedError;
 use Symfony\Bridge\PhpUnit\Compat\Framework\BaseTestListener;
-use Symfony\Bridge\PhpUnit\Compat\Framework\TestSuite;
 use Symfony\Bridge\PhpUnit\Compat\Runner\BaseTestRunner;
 use Symfony\Bridge\PhpUnit\Compat\Util\Blacklist;
 use Symfony\Bridge\PhpUnit\Compat\Util\Test;
@@ -112,7 +111,7 @@ class SymfonyTestsListener extends BaseTestListener
             $testSuites = array($suite);
             for ($i = 0; isset($testSuites[$i]); ++$i) {
                 foreach ($testSuites[$i]->tests() as $test) {
-                    if ($this->isInstanceOfPHPUnitTestCase($test)) {
+                    if ($this->isInstanceOfPHPUnitTestSuite($test)) {
                         if (!class_exists($test->getName(), false)) {
                             $testSuites[] = $test;
                             continue;
@@ -130,7 +129,7 @@ class SymfonyTestsListener extends BaseTestListener
         } elseif (2 === $this->state) {
             $skipped = array();
             foreach ($suite->tests() as $test) {
-                if (!$this->isInstanceOfPHPUnitTestSuite($test)
+                if (!$this->isInstanceOfPHPUnitTestCase($test)
                     || isset($this->wasSkipped[$suiteName]['*'])
                     || isset($this->wasSkipped[$suiteName][$test->getName()])) {
                     $skipped[] = $test;

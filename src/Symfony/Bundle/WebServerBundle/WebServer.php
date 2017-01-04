@@ -26,53 +26,13 @@ class WebServer
     const STARTED = 0;
     const STOPPED = 1;
 
-    private $hostname;
-    private $port;
-    private $documentRoot;
-    private $env;
-
-    public function __construct($address = '127.0.0.1:8000')
-    {
-        if (false !== $pos = strrpos($address, ':')) {
-            $this->hostname = substr($address, 0, $pos);
-            $this->port = substr($address, $pos + 1);
-        } elseif (ctype_digit($address)) {
-            $this->hostname = '127.0.0.1';
-            $this->port = $address;
-        } else {
-            $this->hostname = $address;
-            $this->port = 80;
-        }
-    }
-
-    public function getAddress()
-    {
-        return $this->hostname.':'.$this->port;
-    }
-
-    public function setConfig($documentRoot, $env)
-    {
-        if (!is_dir($documentRoot)) {
-            throw new \InvalidArgumentException(sprintf('The document root directory "%s" does not exist.', $documentRoot));
-        }
-
-        if (null === $file = $this->guessFrontController($documentRoot, $env)) {
-            throw new \InvalidArgumentException(sprintf('Unable to guess the front controller under "%s".', $documentRoot));
-        }
-
-        putenv('APP_FRONT_CONTROLLER='.$file);
-
-        $this->documentRoot = $documentRoot;
-        $this->env = $env;
-    }
-
-    public function run($router = null, $disableOutput = true, callable $callback = null)
+    public function run(WebServerConfig $config, $disableOutput = true, callable $callback = null)
     {
         if ($this->isRunning()) {
-            throw new \RuntimeException(sprintf('A process is already listening on http://%s.', $this->getAddress()));
+            throw new \RuntimeException(sprintf('A process is already listening on http://%s.', $config->getAddress()));
         }
 
-        $process = $this->createServerProcess($router);
+        $process = $this->createServerProcess($config);
         if ($disableOutput) {
             $process->disableOutput();
             $callback = null;
@@ -96,10 +56,10 @@ class WebServer
         }
     }
 
-    public function start($router = null)
+    public function start(WebServerConfig $config, $pidFile = null)
     {
         if ($this->isRunning()) {
-            throw new \RuntimeException(sprintf('A process is already listening on http://%s.', $this->getAddress()));
+            throw new \RuntimeException(sprintf('A process is already listening on http://%s.', $config->getAddress()));
         }
 
         $pid = pcntl_fork();
@@ -116,7 +76,7 @@ class WebServer
             throw new \RuntimeException('Unable to set the child process as session leader.');
         }
 
-        $process = $this->createServerProcess($router);
+        $process = $this->createServerProcess($config);
         $process->disableOutput();
         $process->start();
 
@@ -124,12 +84,12 @@ class WebServer
             throw new \RuntimeException('Unable to start the server process.');
         }
 
-        $lockFile = $this->getLockFile();
-        touch($lockFile);
+        $pidFile = $pidFile ?: $this->getDefaultPidFile();
+        file_put_contents($pidFile, $config->getAddress());
 
         // stop the web server when the lock file is removed
         while ($process->isRunning()) {
-            if (!file_exists($lockFile)) {
+            if (!file_exists($pidFile)) {
                 $process->stop();
             }
 
@@ -139,26 +99,34 @@ class WebServer
         return self::STOPPED;
     }
 
-    public function stop()
+    public function stop($pidFile = null)
     {
-        if (!file_exists($lockFile = $this->getLockFile())) {
-            throw new \RuntimeException(sprintf('No web server is listening on http://%s.', $this->getAddress()));
+        $pidFile = $pidFile ?: $this->getDefaultPidFile();
+        if (!file_exists($pidFile)) {
+            throw new \RuntimeException('No web server is listening.');
         }
 
-        unlink($lockFile);
+        unlink($pidFile);
     }
 
-    public function isRunning()
+    public function isRunning($pidFile = null)
     {
-        if (false !== $fp = @fsockopen($this->hostname, $this->port, $errno, $errstr, 1)) {
+        $pidFile = $pidFile ?: $this->getDefaultPidFile();
+        if (!file_exists($pidFile)) {
+            return false;
+        }
+
+        $address = file_get_contents($pidFile);
+        $pos = strrpos($address, ':');
+        $hostname = substr($address, 0, $pos);
+        $port = substr($address, $pos + 1);
+        if (false !== $fp = @fsockopen($hostname, $port, $errno, $errstr, 1)) {
             fclose($fp);
 
             return true;
         }
 
-        if (file_exists($lockFile = $this->getLockFile())) {
-            unlink($lockFile);
-        }
+        unlink($pidFile);
 
         return false;
     }
@@ -166,42 +134,22 @@ class WebServer
     /**
      * @return Process The process
      */
-    private function createServerProcess($router = null)
+    private function createServerProcess(WebServerConfig $config)
     {
         $finder = new PhpExecutableFinder();
         if (false === $binary = $finder->find()) {
             throw new \RuntimeException('Unable to find the PHP binary.');
         }
 
-        $builder = new ProcessBuilder(array($binary, '-S', $this->getAddress(), $router));
-        $builder->setWorkingDirectory($this->documentRoot);
+        $builder = new ProcessBuilder(array($binary, '-S', $config->getAddress(), $config->getRouter()));
+        $builder->setWorkingDirectory($config->getDocumentRoot());
         $builder->setTimeout(null);
 
         return $builder->getProcess();
     }
 
-    /**
-     * Determines the name of the lock file for a particular PHP web server process.
-     *
-     * @return string The filename
-     */
-    private function getLockFile()
+    private function getDefaultPidFile()
     {
-        return sys_get_temp_dir().'/'.strtr($this->getAddress(), '.:', '--').'.pid';
-    }
-
-    private function guessFrontController($documentRoot, $env)
-    {
-        foreach (array('app', 'index') as $prefix) {
-            $file = sprintf('%s_%s.php', $prefix, $env);
-            if (file_exists($documentRoot.'/'.$file)) {
-                return $file;
-            }
-
-            $file = sprintf('%s.php', $prefix);
-            if (file_exists($documentRoot.'/'.$file)) {
-                return $file;
-            }
-        }
+        return getcwd().'/.web-server-pid';
     }
 }

@@ -34,7 +34,7 @@ class ServerStatusCommand extends ServerCommand
         $this
             ->setName('server:status')
             ->setDefinition(array(
-                new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)', '127.0.0.1:8000'),
+                new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
             ))
             ->setDescription('Outputs the status of the local web server for the given address')
         ;
@@ -46,11 +46,11 @@ class ServerStatusCommand extends ServerCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $server = new WebServer($input->getArgument('addressport'));
-        if ($server->isRunning()) {
-            $io->success(sprintf('Web server still listening on http://%s', $server->getAddress()));
+        $server = new WebServer();
+        if ($server->isRunning($input->getOption('pidfile'))) {
+            $io->success('Web server still listening.');
         } else {
-            $io->warning(sprintf('No web server is listening on http://%s', $server->getAddress()));
+            $io->warning('No web server is listening.');
         }
     }
 }

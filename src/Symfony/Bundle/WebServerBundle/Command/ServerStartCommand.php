@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
+use Symfony\Bundle\WebServerBundle\WebServerConfig;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,8 +35,9 @@ class ServerStartCommand extends ServerCommand
             ->setName('server:start')
             ->setDefinition(array(
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)', '127.0.0.1:8000'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root'),
                 new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
+                new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
             ))
             ->setDescription('Starts a local web server in the background')
             ->setHelp(<<<'EOF'
@@ -96,14 +98,12 @@ EOF
             $io->error('Running this server in production environment is NOT recommended!');
         }
 
-        $router = $input->getOption('router');
-
         try {
-            $server = new WebServer($input->getArgument('addressport'));
-            $server->setConfig($documentRoot, $env);
+            $server = new WebServer();
+            $config = new WebServerConfig($documentRoot, $env, $input->getArgument('addressport'), $input->getOption('router'));
 
-            if (WebServer::STARTED === $server->start($router)) {
-                $io->success(sprintf('Server listening on http://%s', $server->getAddress()));
+            if (WebServer::STARTED === $server->start($config, $input->getOption('pidfile'))) {
+                $io->success(sprintf('Server listening on http://%s', $config->getAddress()));
             }
         } catch (\Exception $e) {
             $io->error($e->getMessage());

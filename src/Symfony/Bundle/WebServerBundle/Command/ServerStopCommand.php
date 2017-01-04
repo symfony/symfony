@@ -33,7 +33,7 @@ class ServerStopCommand extends ServerCommand
         $this
             ->setName('server:stop')
             ->setDefinition(array(
-                new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)', '127.0.0.1:8000'),
+                new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
             ))
             ->setDescription('Stops the local web server that was started with the server:start command')
             ->setHelp(<<<'EOF'
@@ -57,9 +57,9 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $server = new WebServer($input->getArgument('addressport'));
-            $server->stop();
-            $io->success(sprintf('Stopped the web server listening on http://%s', $server->getAddress()));
+            $server = new WebServer();
+            $server->stop($input->getOption('pidfile'));
+            $io->success('Stopped the web server.');
         } catch (\Exception $e) {
             $io->error($e->getMessage());
 

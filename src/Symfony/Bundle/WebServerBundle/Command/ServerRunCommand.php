@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebServerBundle\Command;
 
 use Symfony\Bundle\WebServerBundle\WebServer;
+use Symfony\Bundle\WebServerBundle\WebServerConfig;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,8 +35,8 @@ class ServerRunCommand extends ServerCommand
         $this
             ->setDefinition(array(
                 new InputArgument('addressport', InputArgument::OPTIONAL, 'The address to listen to (can be address:port, address, or port)', '127.0.0.1:8000'),
-                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root', null),
-                new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script', dirname(__DIR__).'/Resources/router.php'),
+                new InputOption('docroot', 'd', InputOption::VALUE_REQUIRED, 'Document root'),
+                new InputOption('router', 'r', InputOption::VALUE_REQUIRED, 'Path to custom router script'),
             ))
             ->setName('server:run')
             ->setDescription('Runs a local web server')
@@ -84,8 +85,6 @@ EOF
             $io->error('Running this server in production environment is NOT recommended!');
         }
 
-        $router = $input->getOption('router');
-
         $callback = null;
         $disableOutput = false;
         if ($output->isQuiet()) {
@@ -100,13 +99,13 @@ EOF
         }
 
         try {
-            $server = new WebServer($input->getArgument('addressport'));
-            $server->setConfig($documentRoot, $env);
+            $server = new WebServer();
+            $config = new WebServerConfig($documentRoot, $env, $input->getArgument('addressport'), $input->getOption('router'));
 
-            $io->success(sprintf('Server listening on http://%s', $server->getAddress()));
+            $io->success(sprintf('Server listening on http://%s', $config->getAddress()));
             $io->comment('Quit the server with CONTROL-C.');
 
-            $exitCode = $server->run($router, $disableOutput, $callback);
+            $exitCode = $server->run($config, $disableOutput, $callback);
         } catch (\Exception $e) {
             $io->error($e->getMessage());
 

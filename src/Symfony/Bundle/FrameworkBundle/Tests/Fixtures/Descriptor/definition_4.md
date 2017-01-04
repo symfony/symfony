@@ -1,0 +1,8 @@
+- Class: `Full\Qualified\Class4`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Call: `setFoo`

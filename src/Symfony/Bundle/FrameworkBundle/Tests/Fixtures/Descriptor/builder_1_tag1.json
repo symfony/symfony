@@ -35,7 +35,8 @@
                 "setMailer"
             ],
             "autowire": false,
-            "autowiring_types": []
+            "autowiring_types": [],
+            "usages": ["definition_4"]
         }
     },
     "aliases": [

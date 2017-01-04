@@ -1,0 +1,17 @@
+{
+    "class": "Full\\Qualified\\Class4",
+    "public": true,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "file": null,
+    "tags": [
+
+    ],
+    "calls": [
+        "setFoo"
+    ],
+    "autowire": false,
+    "autowiring_types": []
+}

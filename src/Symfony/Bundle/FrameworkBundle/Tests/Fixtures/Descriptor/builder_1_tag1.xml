@@ -15,5 +15,8 @@
       </tag>
       <tag name="tag2"/>
     </tags>
+    <usages>
+      <usage>definition_4</usage>
+    </usages>
   </definition>
 </container>

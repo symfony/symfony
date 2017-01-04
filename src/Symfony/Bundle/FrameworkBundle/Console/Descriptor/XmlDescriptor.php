@@ -62,13 +62,13 @@ class XmlDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService(ContainerBuilder $builder, $service, array $options = array())
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
-        $this->writeDocument($this->getContainerServiceDocument($service, $options['id']));
+        $this->writeDocument($this->getContainerServiceDocument($builder, $service, $options['id']));
     }
 
     /**
@@ -261,19 +261,20 @@ class XmlDescriptor extends Descriptor
     }
 
     /**
-     * @param mixed  $service
-     * @param string $id
+     * @param ContainerBuilder $builder
+     * @param mixed            $service
+     * @param string           $id
      *
      * @return \DOMDocument
      */
-    private function getContainerServiceDocument($service, $id)
+    private function getContainerServiceDocument(ContainerBuilder $builder, $service, $id)
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
 
         if ($service instanceof Alias) {
             $dom->appendChild($dom->importNode($this->getContainerAliasDocument($service, $id)->childNodes->item(0), true));
         } elseif ($service instanceof Definition) {
-            $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($service, $id)->childNodes->item(0), true));
+            $dom->appendChild($dom->importNode($this->getContainerDefinitionDocumentWithUsages($builder, $service, $id)->childNodes->item(0), true));
         } else {
             $dom->appendChild($serviceXML = $dom->createElement('service'));
             $serviceXML->setAttribute('id', $id);
@@ -304,7 +305,7 @@ class XmlDescriptor extends Descriptor
                 continue;
             }
 
-            $serviceXML = $this->getContainerServiceDocument($service, $serviceId);
+            $serviceXML = $this->getContainerServiceDocument($builder, $service, $serviceId);
             $containerXML->appendChild($containerXML->ownerDocument->importNode($serviceXML->childNodes->item(0), true));
         }
 
@@ -386,6 +387,30 @@ class XmlDescriptor extends Descriptor
                     }
                 }
             }
+        }
+
+        return $dom;
+    }
+
+    /**
+     * @param ContainerBuilder $builder
+     * @param Definition       $definition
+     * @param string           $id
+     * @param bool             $omitTags
+     *
+     * @return \DOMDocument
+     */
+    private function getContainerDefinitionDocumentWithUsages(ContainerBuilder $builder, Definition $definition, $id, $omitTags = false)
+    {
+        $usages = $this->findServiceIdsUsages($builder, $id);
+
+        $dom = $this->getContainerDefinitionDocument($definition, $id, $omitTags);
+        $serviceXML = $dom->getElementsByTagName('definition')->item(0);
+
+        $serviceXML->appendChild($usagesXML = $dom->createElement('usages'));
+        foreach ($usages as $usage) {
+            $usagesXML->appendChild($usageXML = $dom->createElement('usage'));
+            $usageXML->appendChild(new \DOMText($this->formatParameter($usage)));
         }
 
         return $dom;

@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -54,7 +55,7 @@ abstract class Descriptor implements DescriptorInterface
                 $this->describeContainerTags($object, $options);
                 break;
             case $object instanceof ContainerBuilder && isset($options['id']):
-                $this->describeContainerService($this->resolveServiceDefinition($object, $options['id']), $options);
+                $this->describeContainerService($object, $this->resolveServiceDefinition($object, $options['id']), $options);
                 break;
             case $object instanceof ContainerBuilder && isset($options['parameter']):
                 $this->describeContainerParameter($object->resolveEnvPlaceholders($object->getParameter($options['parameter'])), $options);
@@ -138,10 +139,11 @@ abstract class Descriptor implements DescriptorInterface
      * Common options are:
      * * name: name of described service
      *
+     * @param ContainerBuilder        $builder
      * @param Definition|Alias|object $service
      * @param array                   $options
      */
-    abstract protected function describeContainerService($service, array $options = array());
+    abstract protected function describeContainerService(ContainerBuilder $builder, $service, array $options = array());
 
     /**
      * Describes container services.
@@ -293,6 +295,47 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         return $definitions;
+    }
+
+    /**
+     * Find all services where the service $name is used.
+     * Can be either by the constructor, by a setter or by a public property.
+     *
+     * @param ContainerBuilder $builder
+     * @param string           $name
+     *
+     * @return array
+     */
+    protected function findServiceIdsUsages(ContainerBuilder $builder, $name)
+    {
+        $usages = array();
+
+        foreach ($builder->getDefinitions() as $service => $definition) {
+            if ($name === $service) {
+                continue;
+            }
+
+            foreach ($definition->getArguments() as $argument) {
+                if ($argument instanceof Reference && (string) $argument === $name) {
+                    $usages[] = $service;
+                }
+            }
+            foreach ($definition->getMethodCalls() as $methodCall) {
+                $methodParameters = $methodCall[1];
+                foreach ($methodParameters as $methodParameter) {
+                    if ($methodParameter instanceof Reference && (string) $methodParameter === $name) {
+                        $usages[] = $service;
+                    }
+                }
+            }
+            foreach ($definition->getProperties() as $property) {
+                if ($property instanceof Reference && (string) $property === $name) {
+                    $usages[] = $service;
+                }
+            }
+        }
+
+        return $usages;
     }
 
     protected function sortParameters(ParameterBag $parameters)

@@ -14,7 +14,8 @@
 
             ],
             "autowire": false,
-            "autowiring_types": []
+            "autowiring_types": [],
+            "usages": ["definition_3", "definition_4"]
         },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
@@ -51,7 +52,41 @@
                 "setMailer"
             ],
             "autowire": false,
-            "autowiring_types": []
+            "autowiring_types": [],
+            "usages": ["definition_4"]
+        },
+        "definition_3":{
+            "class": "Full\\Qualified\\Class3",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "file": null,
+            "tags": [
+
+            ],
+            "autowire": false,
+            "autowiring_types": [],
+            "usages": ["definition_4"]
+        },
+        "definition_4":{
+            "class": "Full\\Qualified\\Class4",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "file": null,
+            "tags": [
+
+            ],
+            "calls": [
+                "setFoo"
+            ],
+            "autowire": false,
+            "autowiring_types": [],
+            "usages": []
         }
     },
     "aliases": {

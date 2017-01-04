@@ -8,6 +8,8 @@
   alias_1             alias for "service_1"                                   
   alias_2             alias for "service_2"                                   
   definition_1        Full\Qualified\Class1                                   
+  definition_3        Full\Qualified\Class3                                   
+  definition_4        Full\Qualified\Class4                                   
   service_container   Symfony\Component\DependencyInjection\ContainerBuilder  
  ------------------- -------------------------------------------------------- 
 

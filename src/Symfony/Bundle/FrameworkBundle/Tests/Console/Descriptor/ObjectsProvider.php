@@ -98,6 +98,8 @@ class ObjectsProvider
     {
         $definition1 = new Definition('Full\\Qualified\\Class1');
         $definition2 = new Definition('Full\\Qualified\\Class2');
+        $definition3 = new Definition('Full\\Qualified\\Class3');
+        $definition4 = new Definition('Full\\Qualified\\Class4');
 
         return array(
             'definition_1' => $definition1
@@ -117,6 +119,12 @@ class ObjectsProvider
                 ->addTag('tag2')
                 ->addMethodCall('setMailer', array(new Reference('mailer')))
                 ->setFactory(array(new Reference('factory.service'), 'get')),
+            'definition_3' => $definition3
+                ->setArguments(array(new Reference('definition_1'))),
+            'definition_4' => $definition4
+                ->setArguments(array(new Reference('definition_1')))
+                ->addMethodCall('setFoo', array(new Reference('definition_2')))
+                ->setProperty('bar', new Reference('definition_3')),
         );
     }
 
@@ -133,7 +141,9 @@ class ObjectsProvider
         $eventDispatcher = new EventDispatcher();
 
         $eventDispatcher->addListener('event1', 'global_function', 255);
-        $eventDispatcher->addListener('event1', function () { return 'Closure'; }, -1);
+        $eventDispatcher->addListener('event1', function () {
+            return 'Closure';
+        }, -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
         return array('event_dispatcher_1' => $eventDispatcher);
@@ -147,7 +157,9 @@ class ObjectsProvider
             'callable_3' => array(new CallableClass(), 'method'),
             'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
             'callable_5' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'),
-            'callable_6' => function () { return 'Closure'; },
+            'callable_6' => function () {
+                return 'Closure';
+            },
             'callable_7' => new CallableClass(),
         );
     }

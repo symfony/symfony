@@ -1173,7 +1173,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function shareService(Definition $definition, $service, $id)
     {
         if ($definition->isShared()) {
-            $this->services[$lowerId = strtolower($id)] = $service;
+            $this->services[strtolower($id)] = $service;
         }
     }
 

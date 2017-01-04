@@ -298,7 +298,7 @@ class OptionsResolver implements Options
      */
     public function isMissing($option)
     {
-        return isset($this->required[$option]) && !array_key_exists($option, $this->defaults);
+        return $this->isRequired($option) && !$this->hasDefault($option);
     }
 
     /**
@@ -400,12 +400,8 @@ class OptionsResolver implements Options
             throw new AccessException('Normalizers cannot be set from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+        if (!$this->isDefined($option)) {
+            throw $this->createUndefinedOptionException($option);
         }
 
         $this->normalizers[$option] = $normalizer;
@@ -443,12 +439,8 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed values cannot be set from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+        if (!$this->isDefined($option)) {
+            throw $this->createUndefinedOptionException($option);
         }
 
         $this->allowedValues[$option] = is_array($allowedValues) ? $allowedValues : array($allowedValues);
@@ -488,12 +480,8 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed values cannot be added from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+        if (!$this->isDefined($option)) {
+            throw $this->createUndefinedOptionException($option);
         }
 
         if (!is_array($allowedValues)) {
@@ -533,12 +521,8 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed types cannot be set from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+        if (!$this->isDefined($option)) {
+            throw $this->createUndefinedOptionException($option);
         }
 
         $this->allowedTypes[$option] = (array) $allowedTypes;
@@ -572,12 +556,8 @@ class OptionsResolver implements Options
             throw new AccessException('Allowed types cannot be added from a lazy option or normalizer.');
         }
 
-        if (!isset($this->defined[$option])) {
-            throw new UndefinedOptionsException(sprintf(
-                'The option "%s" does not exist. Defined options are: "%s".',
-                $option,
-                implode('", "', array_keys($this->defined))
-            ));
+        if (!$this->isDefined($option)) {
+            throw $this->createUndefinedOptionException($option);
         }
 
         if (!isset($this->allowedTypes[$option])) {
@@ -953,6 +933,23 @@ class OptionsResolver implements Options
         }
 
         return count($this->defaults);
+    }
+
+    /**
+     * Helper method, which returns UndefinedOptionsException.
+     * Returned exception can be thrown from methods, which
+     * require option to be set, such like setNormalizer(), addAllowedTypes() etc.
+     *
+     * @param string $option The undefined option name, which will be used in exception message
+     * @return UndefinedOptionsException
+     */
+    private function createUndefinedOptionException($option)
+    {
+        return new UndefinedOptionsException(sprintf(
+            'The option "%s" does not exist. Defined options are: "%s".',
+            $option,
+            implode('", "', array_keys($this->defined))
+        ));
     }
 
     /**

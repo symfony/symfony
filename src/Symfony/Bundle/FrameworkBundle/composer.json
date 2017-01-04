@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/cache": "~3.2",
+        "symfony/cache": "~3.3",
         "symfony/class-loader": "~3.2",
         "symfony/dependency-injection": "~3.3",
         "symfony/config": "~2.8|~3.0",

@@ -115,6 +115,21 @@ abstract class AbstractAdapter implements AdapterInterface, LoggerAwareInterface
         return new ChainAdapter(array($apcu, $fs));
     }
 
+    public static function createConnection($dsn, array $options = array())
+    {
+        if (!is_string($dsn)) {
+            throw new InvalidArgumentException(sprintf('The %s() method expect argument #1 to be string, %s given.', __METHOD__, gettype($dsn)));
+        }
+        if (0 === strpos($dsn, 'redis://')) {
+            return RedisAdapter::createConnection($dsn, $options);
+        }
+        if (0 === strpos($dsn, 'memcached://')) {
+            return MemcachedAdapter::createConnection($dsn, $options);
+        }
+
+        throw new InvalidArgumentException(sprintf('Unsupported DSN: %s.', $dsn));
+    }
+
     /**
      * Fetches several cache items.
      *

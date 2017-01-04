@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -108,13 +108,13 @@ class CachePoolPass implements CompilerPassInterface
     {
         $container->resolveEnvPlaceholders($name, null, $usedEnvs);
 
-        if (0 === strpos($name, 'redis://') || $usedEnvs) {
+        if ($usedEnvs || preg_match('#^[a-z]++://#', $name)) {
             $dsn = $name;
 
             if (!$container->hasDefinition($name = md5($dsn))) {
-                $definition = new Definition(\Redis::class);
+                $definition = new Definition(AbstractAdapter::class);
                 $definition->setPublic(false);
-                $definition->setFactory(array(RedisAdapter::class, 'createConnection'));
+                $definition->setFactory(array(AbstractAdapter::class, 'createConnection'));
                 $definition->setArguments(array($dsn));
                 $container->setDefinition($name, $definition);
             }

@@ -706,6 +706,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_doctrine_provider')->end()
                         ->scalarNode('default_psr6_provider')->end()
                         ->scalarNode('default_redis_provider')->defaultValue('redis://localhost')->end()
+                        ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
                         ->arrayNode('pools')
                             ->useAttributeAsKey('name')
                             ->prototype('array')

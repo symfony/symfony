@@ -272,6 +272,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'system' => 'cache.adapter.system',
                 'directory' => '%kernel.cache_dir%/pools',
                 'default_redis_provider' => 'redis://localhost',
+                'default_memcached_provider' => 'memcached://localhost',
             ),
             'workflows' => array(),
             'php_errors' => array(

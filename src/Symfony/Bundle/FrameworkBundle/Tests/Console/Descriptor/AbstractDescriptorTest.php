@@ -90,6 +90,35 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $this->getDescriptionTestData(ObjectsProvider::getContainerAliases());
     }
 
+    /** @dataProvider getDescribeContainerDefinitionWhichIsAnAliasTestData */
+    public function testDescribeContainerDefinitionWhichIsAnAlias(Alias $alias, $expectedDescription, ContainerBuilder $builder, $options = array())
+    {
+        $this->assertDescription($expectedDescription, $builder, $options);
+    }
+
+    public function getDescribeContainerDefinitionWhichIsAnAliasTestData()
+    {
+        $builder = current(ObjectsProvider::getContainerBuilders());
+        $builder->setDefinition('service_1', $builder->getDefinition('definition_1'));
+        $builder->setDefinition('service_2', $builder->getDefinition('definition_2'));
+
+        $aliases = ObjectsProvider::getContainerAliases();
+        $aliasesWithDefinitions = array();
+        foreach ($aliases as $name => $alias) {
+            $aliasesWithDefinitions[str_replace('alias_', 'alias_with_definition_', $name)] = $alias;
+        }
+
+        $i = 0;
+        $data = $this->getDescriptionTestData($aliasesWithDefinitions);
+        foreach ($aliases as $name => $alias) {
+            $data[$i][] = $builder;
+            $data[$i][] = array('id' => $name);
+            ++$i;
+        }
+
+        return $data;
+    }
+
     /** @dataProvider getDescribeContainerParameterTestData */
     public function testDescribeContainerParameter($parameter, $expectedDescription, array $options)
     {
@@ -146,7 +175,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         if ('json' === $this->getFormat()) {
             $this->assertEquals(json_decode($expectedDescription), json_decode($output->fetch()));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(PHP_EOL, "\n", $output->fetch())));
+            $this->assertEquals(trim(preg_replace('/[\s\t\r]+/', ' ', $expectedDescription)), trim(preg_replace('/[\s\t\r]+/', ' ', str_replace(PHP_EOL, "\n", $output->fetch()))));
         }
     }
 

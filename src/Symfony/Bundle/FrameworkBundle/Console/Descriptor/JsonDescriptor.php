@@ -77,14 +77,14 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
         if ($service instanceof Alias) {
-            $this->writeData($this->getContainerAliasData($service), $options);
+            $this->describeContainerAlias($service, $options, $builder);
         } elseif ($service instanceof Definition) {
             $this->writeData($this->getContainerDefinitionData($service), $options);
         } else {
@@ -129,9 +129,16 @@ class JsonDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerAlias(Alias $alias, array $options = array())
+    protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null)
     {
-        $this->writeData($this->getContainerAliasData($alias), $options);
+        if (!$builder) {
+            return $this->writeData($this->getContainerAliasData($alias), $options);
+        }
+
+        $this->writeData(
+            array($this->getContainerAliasData($alias), $this->getContainerDefinitionData($builder->getDefinition((string) $alias))),
+            array_merge($options, array('id' => (string) $alias))
+        );
     }
 
     /**

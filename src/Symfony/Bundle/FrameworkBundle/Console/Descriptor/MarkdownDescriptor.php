@@ -97,7 +97,7 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerService($service, array $options = array())
+    protected function describeContainerService($service, array $options = array(), ContainerBuilder $builder = null)
     {
         if (!isset($options['id'])) {
             throw new \InvalidArgumentException('An "id" option must be provided.');
@@ -106,7 +106,7 @@ class MarkdownDescriptor extends Descriptor
         $childOptions = array('id' => $options['id'], 'as_array' => true);
 
         if ($service instanceof Alias) {
-            $this->describeContainerAlias($service, $childOptions);
+            $this->describeContainerAlias($service, $childOptions, $builder);
         } elseif ($service instanceof Definition) {
             $this->describeContainerDefinition($service, $childOptions);
         } else {
@@ -236,12 +236,23 @@ class MarkdownDescriptor extends Descriptor
     /**
      * {@inheritdoc}
      */
-    protected function describeContainerAlias(Alias $alias, array $options = array())
+    protected function describeContainerAlias(Alias $alias, array $options = array(), ContainerBuilder $builder = null)
     {
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
 
-        $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
+        if (!isset($options['id'])) {
+            return $this->write($output);
+        }
+
+        $this->write(sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output));
+
+        if (!$builder) {
+            return;
+        }
+
+        $this->write("\n");
+        $this->describeContainerDefinition($builder->getDefinition((string) $alias), array_merge($options, array('id' => (string) $alias)));
     }
 
     /**

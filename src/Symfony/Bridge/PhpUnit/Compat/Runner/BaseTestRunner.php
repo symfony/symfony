@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\Compat\Runner;
 
-if (class_exists(PHPUnit\Runner\BaseTestRunner::class)) {
+if (class_exists('PHPUnit\Runner\BaseTestRunner')) {
     abstract class BaseTestRunner extends \PHPUnit\Runner\BaseTestRunner
     {}
 } else {

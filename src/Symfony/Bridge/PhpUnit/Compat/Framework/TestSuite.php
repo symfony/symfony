@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\Compat\Framework;
 
-if (class_exists(PHPUnit\Framework\TestSuite::class)) {
+if (class_exists('PHPUnit\Framework\TestSuite')) {
     class TestSuite extends \PHPUnit\Framework\TestSuite
     {}
 } else {

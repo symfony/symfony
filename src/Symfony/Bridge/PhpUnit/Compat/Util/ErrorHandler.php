@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\Compat\Util;
 
-if (class_exists(PHPUnit\Util\ErrorHandler::class)) {
+if (class_exists('PHPUnit\Util\ErrorHandler')) {
     class ErrorHandler extends \PHPUnit\Util\ErrorHandler
     {}
 } else {

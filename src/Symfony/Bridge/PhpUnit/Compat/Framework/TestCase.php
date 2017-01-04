@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\Compat\Framework;
 
-if (class_exists(PHPUnit\Framework\TestCase::class)) {
+if (class_exists('PHPUnit\Framework\TestCase')) {
     class TestCase extends \PHPUnit\Framework\TestCase
     {}
 } else {

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit\Compat\TextUI;
 
-if (class_exists(PHPUnit\TextUI\Command::class)) {
+if (class_exists('PHPUnit\TextUI\Command')) {
     class Command extends \PHPUnit\TextUI\Command
     {}
 } else {

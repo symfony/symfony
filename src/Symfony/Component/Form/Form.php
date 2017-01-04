@@ -575,6 +575,8 @@ class Form implements \IteratorAggregate, FormInterface
                         if (method_exists($child, 'getClickedButton') && null !== $child->getClickedButton()) {
                             $this->clickedButton = $child->getClickedButton();
                         }
+                    } elseif (!$isSubmitted && !$clearMissing && !empty($submittedData)) {
+                        $child->submit($submittedData, $clearMissing);
                     }
                 }
 

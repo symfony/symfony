@@ -12,9 +12,19 @@
 namespace Symfony\Bridge\PhpUnit\Compat\Framework;
 
 if (class_exists('PHPUnit\Framework\TestCase')) {
+    /**
+     * Class TestCase
+     * @package Symfony\Bridge\PhpUnit\Compat\Framework
+     * @internal
+     */
     class TestCase extends \PHPUnit\Framework\TestCase
     {}
 } else {
+    /**
+     * Class TestCase
+     * @package Symfony\Bridge\PhpUnit\Compat\Framework
+     * @internal
+     */
     class TestCase extends \PHPUnit_Framework_TestCase
     {}
 }

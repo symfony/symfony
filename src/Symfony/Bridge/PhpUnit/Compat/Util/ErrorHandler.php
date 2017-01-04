@@ -12,9 +12,19 @@
 namespace Symfony\Bridge\PhpUnit\Compat\Util;
 
 if (class_exists('PHPUnit\Util\ErrorHandler')) {
+    /**
+     * Class ErrorHandler
+     * @package Symfony\Bridge\PhpUnit\Compat\Util
+     * @internal
+     */
     class ErrorHandler extends \PHPUnit\Util\ErrorHandler
     {}
 } else {
+    /**
+     * Class ErrorHandler
+     * @package Symfony\Bridge\PhpUnit\Compat\Util
+     * @internal
+     */
     class ErrorHandler extends \PHPUnit_Util_ErrorHandler
     {}
 }

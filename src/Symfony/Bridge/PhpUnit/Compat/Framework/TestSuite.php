@@ -12,9 +12,19 @@
 namespace Symfony\Bridge\PhpUnit\Compat\Framework;
 
 if (class_exists('PHPUnit\Framework\TestSuite')) {
+    /**
+     * Class TestSuite
+     * @package Symfony\Bridge\PhpUnit\Compat\Framework
+     * @internal
+     */
     class TestSuite extends \PHPUnit\Framework\TestSuite
     {}
 } else {
+    /**
+     * Class TestSuite
+     * @package Symfony\Bridge\PhpUnit\Compat\Framework
+     * @internal
+     */
     class TestSuite extends \PHPUnit_Framework_TestSuite
     {}
 }

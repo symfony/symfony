@@ -12,9 +12,19 @@
 namespace Symfony\Bridge\PhpUnit\Compat\Util;
 
 if (class_exists('PHPUnit\Util\Test')) {
+    /**
+     * Class Test
+     * @package Symfony\Bridge\PhpUnit\Compat\Util
+     * @internal
+     */
     class Test extends \PHPUnit\Util\Test
     {}
 } else {
+    /**
+     * Class Test
+     * @package Symfony\Bridge\PhpUnit\Compat\Util
+     * @internal
+     */
     class Test extends \PHPUnit_Util_Test
     {}
 }

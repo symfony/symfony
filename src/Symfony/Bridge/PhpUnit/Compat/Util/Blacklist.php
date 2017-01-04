@@ -12,9 +12,19 @@
 namespace Symfony\Bridge\PhpUnit\Compat\Util;
 
 if (class_exists('PHPUnit\Util\Blacklist')) {
+    /**
+     * Class Blacklist
+     * @package Symfony\Bridge\PhpUnit\Compat\Util
+     * @internal
+     */
     class Blacklist extends \PHPUnit\Util\Blacklist
     {}
 } else {
+    /**
+     * Class Blacklist
+     * @package Symfony\Bridge\PhpUnit\Compat\Util
+     * @internal
+     */
     class Blacklist extends \PHPUnit_Util_Blacklist
     {}
 }

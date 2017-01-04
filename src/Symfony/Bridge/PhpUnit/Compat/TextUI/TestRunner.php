@@ -12,9 +12,19 @@
 namespace Symfony\Bridge\PhpUnit\Compat\TextUI;
 
 if (class_exists('PHPUnit\TextUI\TestRunner')) {
+    /**
+     * Class TestRunner
+     * @package Symfony\Bridge\PhpUnit\Compat\TextUI
+     * @internal
+     */
     class TestRunner extends \PHPUnit\TextUI\TestRunner
     {}
 } else {
+    /**
+     * Class TestRunner
+     * @package Symfony\Bridge\PhpUnit\Compat\TextUI
+     * @internal
+     */
     class TestRunner extends \PHPUnit_TextUI_TestRunner
     {}
 }

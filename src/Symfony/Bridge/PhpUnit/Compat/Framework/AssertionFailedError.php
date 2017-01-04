@@ -12,9 +12,19 @@
 namespace Symfony\Bridge\PhpUnit\Compat\Framework;
 
 if (class_exists('PHPUnit\Framework\AssertionFailedError')) {
+    /**
+     * Class AssertionFailedError
+     * @package Symfony\Bridge\PhpUnit\Compat\Framework
+     * @internal
+     */
     class AssertionFailedError extends \PHPUnit\Framework\AssertionFailedError
     {}
 } else {
+    /**
+     * Class AssertionFailedError
+     * @package Symfony\Bridge\PhpUnit\Compat\Framework
+     * @internal
+     */
     class AssertionFailedError extends \PHPUnit_Framework_AssertionFailedError
     {}
 }

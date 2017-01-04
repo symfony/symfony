@@ -17,9 +17,9 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
     {
         $this->registry = new Registry();
 
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->getSupportStrategy(Subject1::class));
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), $this->getSupportStrategy(Subject2::class));
-        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->getSupportStrategy(Subject2::class));
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow1'), $this->createSupportStrategy(Subject1::class));
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow2'), $this->createSupportStrategy(Subject2::class));
+        $this->registry->add(new Workflow(new Definition(array(), array()), $this->getMockBuilder(MarkingStoreInterface::class)->getMock(), $this->getMockBuilder(EventDispatcherInterface::class)->getMock(), 'workflow3'), $this->createSupportStrategy(Subject2::class));
     }
 
     protected function tearDown()
@@ -87,7 +87,7 @@ class RegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('workflow2', $workflow->getName());
     }
 
-    private function getSupportStrategy($supportedClassName)
+    private function createSupportStrategy($supportedClassName)
     {
         $strategy = $this->getMockBuilder(SupportStrategyInterface::class)->getMock();
         $strategy->expects($this->any())->method('supports')

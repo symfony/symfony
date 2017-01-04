@@ -11,11 +11,6 @@
 
 namespace Symfony\Bundle\WebServerBundle;
 
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
-use Symfony\Component\Process\Exception\RuntimeException;
-
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
@@ -27,7 +22,7 @@ class WebServerConfig
     private $env;
     private $router;
 
-    public function __construct($documentRoot, $env, $address = '127.0.0.1:8000', $router = null)
+    public function __construct($documentRoot, $env, $address = null, $router = null)
     {
         if (!is_dir($documentRoot)) {
             throw new \InvalidArgumentException(sprintf('The document root directory "%s" does not exist.', $documentRoot));
@@ -43,7 +38,10 @@ class WebServerConfig
         $this->env = $env;
         $this->router = $router ?: __DIR__.'/Resources/router.php';
 
-        if (false !== $pos = strrpos($address, ':')) {
+        if (null === $address) {
+            $this->hostname = '127.0.0.1';
+            $this->port = $this->findBestPort();
+        } elseif (false !== $pos = strrpos($address, ':')) {
             $this->hostname = substr($address, 0, $pos);
             $this->port = substr($address, $pos + 1);
         } elseif (ctype_digit($address)) {
@@ -51,7 +49,11 @@ class WebServerConfig
             $this->port = $address;
         } else {
             $this->hostname = $address;
-            $this->port = 80;
+            $this->port = $this->findBestPort();
+        }
+
+        if (!ctype_digit($this->port)) {
+            throw new \InvalidArgumentException(sprintf('Port "%s" is not valid.', $this->port));
         }
     }
 
@@ -98,5 +100,18 @@ class WebServerConfig
                 return $file;
             }
         }
+    }
+
+    private function findBestPort()
+    {
+        $port = 8000;
+        while (false !== $fp = @fsockopen('127.0.0.1', $port, $errno, $errstr, 1)) {
+            fclose($fp);
+            if ($port++ >= 8100) {
+                throw new \RuntimeException('Unable to find a port available to run the web server.');
+            }
+        }
+
+        return $port;
     }
 }

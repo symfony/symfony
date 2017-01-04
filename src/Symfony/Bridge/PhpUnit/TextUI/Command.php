@@ -14,7 +14,7 @@ namespace Symfony\Bridge\PhpUnit\TextUI;
 /**
  * {@inheritdoc}
  */
-class Command extends \PHPUnit_TextUI_Command
+class Command extends \Symfony\Bridge\PhpUnit\Compat\TextUI\Command
 {
     /**
      * {@inheritdoc}

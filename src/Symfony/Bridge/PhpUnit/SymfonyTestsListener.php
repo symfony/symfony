@@ -12,13 +12,22 @@
 namespace Symfony\Bridge\PhpUnit;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use PHPUnit\Framework\AssertionFailedError as AssertionFailedError6;
+use PHPUnit\Framework\TestCase as TestCase6;
+use PHPUnit\Framework\TestSuite as TestSuite6;
+use Symfony\Bridge\PhpUnit\Compat\Framework\AssertionFailedError;
+use Symfony\Bridge\PhpUnit\Compat\Framework\BaseTestListener;
+use Symfony\Bridge\PhpUnit\Compat\Framework\TestSuite;
+use Symfony\Bridge\PhpUnit\Compat\Runner\BaseTestRunner;
+use Symfony\Bridge\PhpUnit\Compat\Util\Blacklist;
+use Symfony\Bridge\PhpUnit\Compat\Util\Test;
 
 /**
  * Collects and replays skipped tests.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
+class SymfonyTestsListener extends BaseTestListener
 {
     private static $globallyEnabled = false;
     private $state = -1;
@@ -35,7 +44,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
      */
     public function __construct(array $mockedNamespaces = array())
     {
-        \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
+        Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
 
         $warn = false;
         foreach ($mockedNamespaces as $type => $namespaces) {
@@ -75,7 +84,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
-    public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
+    public function startTestSuite(TestSuite $suite)
     {
         $suiteName = $suite->getName();
         $this->testsWithWarnings = array();
@@ -103,12 +112,12 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             $testSuites = array($suite);
             for ($i = 0; isset($testSuites[$i]); ++$i) {
                 foreach ($testSuites[$i]->tests() as $test) {
-                    if ($test instanceof \PHPUnit_Framework_TestSuite) {
+                    if ($this->isInstanceOfPHPUnitTestSuite($test)) {
                         if (!class_exists($test->getName(), false)) {
                             $testSuites[] = $test;
                             continue;
                         }
-                        $groups = \PHPUnit_Util_Test::getGroups($test->getName());
+                        $groups = Test::getGroups($test->getName());
                         if (in_array('time-sensitive', $groups, true)) {
                             ClockMock::register($test->getName());
                         }
@@ -121,7 +130,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         } elseif (2 === $this->state) {
             $skipped = array();
             foreach ($suite->tests() as $test) {
-                if (!$test instanceof \PHPUnit_Framework_TestCase
+                if (!$this->isInstanceOfPHPUnitTestSuite($test)
                     || isset($this->wasSkipped[$suiteName]['*'])
                     || isset($this->wasSkipped[$suiteName][$test->getName()])) {
                     $skipped[] = $test;
@@ -148,8 +157,8 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
 
     public function startTest(\PHPUnit_Framework_Test $test)
     {
-        if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
-            $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName(false));
+        if (-2 < $this->state && $this->isInstanceOfPHPUnitTestCase($test)) {
+            $groups = Test::getGroups(get_class($test), $test->getName(false));
 
             if (in_array('time-sensitive', $groups, true)) {
                 ClockMock::register(get_class($test));
@@ -159,14 +168,14 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                 DnsMock::register(get_class($test));
             }
 
-            $annotations = \PHPUnit_Util_Test::parseTestMethodAnnotations(get_class($test), $test->getName(false));
+            $annotations = Test::parseTestMethodAnnotations(get_class($test), $test->getName(false));
 
             if (isset($annotations['class']['expectedDeprecation'])) {
-                $test->getTestResultObject()->addError($test, new \PHPUnit_Framework_AssertionFailedError('`@expectedDeprecation` annotations are not allowed at the class level.'), 0);
+                $test->getTestResultObject()->addError($test, new AssertionFailedError('`@expectedDeprecation` annotations are not allowed at the class level.'), 0);
             }
             if (isset($annotations['method']['expectedDeprecation'])) {
                 if (!in_array('legacy', $groups, true)) {
-                    $test->getTestResultObject()->addError($test, new \PHPUnit_Framework_AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.'), 0);
+                    $test->getTestResultObject()->addError($test, new AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.'), 0);
                 }
                 $this->expectedDeprecations = $annotations['method']['expectedDeprecation'];
                 $this->previousErrorHandler = set_error_handler(array($this, 'handleError'));
@@ -190,11 +199,13 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         if ($this->expectedDeprecations) {
             restore_error_handler();
 
-            if (!in_array($test->getStatus(), array(\PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED, \PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE, \PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE, \PHPUnit_Runner_BaseTestRunner::STATUS_ERROR), true)) {
+            if (!in_array($test->getStatus(), array(BaseTestRunner::STATUS_SKIPPED, BaseTestRunner::STATUS_INCOMPLETE, BaseTestRunner::STATUS_FAILURE, BaseTestRunner::STATUS_ERROR), true)) {
                 try {
                     $prefix = "@expectedDeprecation:\n";
                     $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", $this->expectedDeprecations)."\n%A", $prefix.'  '.implode("\n  ", $this->gatheredDeprecations)."\n");
                 } catch (\PHPUnit_Framework_AssertionFailedError $e) {
+                    $test->getTestResultObject()->addFailure($test, $e, $time);
+                } catch (AssertionFailedError6 $e) {
                     $test->getTestResultObject()->addFailure($test, $e, $time);
                 }
             }
@@ -202,7 +213,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             $this->expectedDeprecations = $this->gatheredDeprecations = array();
             $this->previousErrorHandler = null;
         }
-        if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
+        if (-2 < $this->state && $this->isInstanceOfPHPUnitTestCase($test)) {
             if (in_array('time-sensitive', $groups, true)) {
                 ClockMock::withClockMock(false);
             }
@@ -239,5 +250,15 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             $msg = 'Unsilenced deprecation: '.$msg;
         }
         $this->gatheredDeprecations[] = $msg;
+    }
+
+    private function isInstanceOfPHPUnitTestSuite($object)
+    {
+        return $object instanceof \PHPUnit_Framework_TestSuite || $object instanceof TestSuite6;
+    }
+
+    private function isInstanceOfPHPUnitTestCase($object)
+    {
+        return $object instanceof \PHPUnit_Framework_TestCase || $object instanceof TestCase6;
     }
 }

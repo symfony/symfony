@@ -189,9 +189,12 @@ class TwigExtensionTest extends TestCase
 
         $def = $container->getDefinition('twig.loader.filesystem');
         $paths = array();
+        $prependPaths = array();
         foreach ($def->getMethodCalls() as $call) {
             if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
                 $paths[] = $call[1];
+            } elseif ('prependPath' === $call[0]) {
+                $prependPaths[] = $call[1];
             }
         }
 
@@ -203,8 +206,16 @@ class TwigExtensionTest extends TestCase
             array('namespaced_path3', 'namespace3'),
             array(__DIR__.'/Fixtures/Resources/TwigBundle/views', 'Twig'),
             array(realpath(__DIR__.'/../..').'/Resources/views', 'Twig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'ChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildChildTwig'),
             array(__DIR__.'/Fixtures/Resources/views'),
         ), $paths);
+
+        $this->assertEquals(array(
+            array(__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'Twig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'Twig'),
+        ), $prependPaths);
     }
 
     public function getFormats()
@@ -254,8 +265,28 @@ class TwigExtensionTest extends TestCase
             'kernel.root_dir' => __DIR__.'/Fixtures',
             'kernel.charset' => 'UTF-8',
             'kernel.debug' => false,
-            'kernel.bundles' => array('TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle'),
-            'kernel.bundles_metadata' => array('TwigBundle' => array('namespace' => 'Symfony\\Bundle\\TwigBundle', 'parent' => null, 'path' => realpath(__DIR__.'/../..'))),
+            'kernel.bundles' => array(
+                'TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle',
+                'ChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildTwigBundle\\ChildTwigBundle',
+                'ChildChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildTwigBundle\\ChildChildTwigBundle',
+            ),
+            'kernel.bundles_metadata' => array(
+                'TwigBundle' => array(
+                    'namespace' => 'Symfony\\Bundle\\TwigBundle',
+                    'parent' => null,
+                    'path' => realpath(__DIR__.'/../..'),
+                ),
+                'ChildTwigBundle' => array(
+                    'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildTwigBundle\\ChildTwigBundle',
+                    'parent' => 'TwigBundle',
+                    'path' => __DIR__.'/Fixtures/Bundle/ChildTwigBundle',
+                ),
+                'ChildChildTwigBundle' => array(
+                    'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildTwigBundle\\ChildChildTwigBundle',
+                    'parent' => 'ChildTwigBundle',
+                    'path' => __DIR__.'/Fixtures/Bundle/ChildChildTwigBundle',
+                ),
+            ),
         )));
 
         return $container;

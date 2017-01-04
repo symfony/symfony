@@ -97,6 +97,10 @@ class TwigExtension extends Extension
             if (is_dir($dir = $bundle['path'].'/Resources/views')) {
                 $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $name);
             }
+
+            if (null !== $bundle['parent']) {
+                $this->prependParentPaths($twigFilesystemLoaderDefinition, $container, $name, $bundle['parent']);
+            }
         }
 
         if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {
@@ -141,11 +145,43 @@ class TwigExtension extends Extension
 
     private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
     {
-        $name = $bundle;
+        $name = $this->normalizeBundleName($bundle);
+        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
+    }
+
+    private function prependTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
+    {
+        $name = $this->normalizeBundleName($bundle);
+        $twigFilesystemLoaderDefinition->addMethodCall('prependPath', array($dir, $name));
+    }
+
+    private function prependParentPaths($twigFilesystemLoaderDefinition, ContainerBuilder $container, $name, $parentName)
+    {
+        $bundleMetadata = $container->getParameter('kernel.bundles_metadata');
+        $bundle = $bundleMetadata[$name];
+
+        if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
+            $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentName);
+        }
+
+        if (is_dir($dir = $bundle['path'].'/Resources/views')) {
+            $this->prependTwigPath($twigFilesystemLoaderDefinition, $dir, $parentName);
+        }
+
+        $parentBundle = $bundleMetadata[$parentName];
+
+        if (null !== $parentBundle['parent']) {
+            $this->prependParentPaths($twigFilesystemLoaderDefinition, $container, $name, $parentBundle['parent']);
+        }
+    }
+
+    private function normalizeBundleName($name)
+    {
         if ('Bundle' === substr($name, -6)) {
             $name = substr($name, 0, -6);
         }
-        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
+
+        return $name;
     }
 
     /**

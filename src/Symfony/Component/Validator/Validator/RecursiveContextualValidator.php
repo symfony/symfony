@@ -746,7 +746,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         // The $cascadedGroups property is set, if the "Default" group is
         // overridden by a group sequence
         // See validateClassNode()
-        $cascadedGroups = count($cascadedGroups) > 0
+        $cascadedGroups = ((is_array($cascadedGroups) || $cascadedGroups instanceof \Countable) && count($cascadedGroups) > 0)
             ? $cascadedGroups
             : $groups;
 

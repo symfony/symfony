@@ -1,0 +1,46 @@
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-30T19:24:13Z
+
+A documentation PR for #20863 is already open (see issue symfony/symfony-docs#7256 and PR symfony/symfony-docs#7265) and it doesn't require much at all to update it for this PR. I will ensure it is accurate after the implementation details I've asked about are handled/clarified. Thanks!
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-30T23:24:19Z
+
+I'd add a test to cover the serialize requirement:
+
+```php
+    /**
+     * @expectedException \Symfony\Component\Cache\Exception\CacheException
+     * @expectedExceptionMessage MemcachedAdapter: PHP or IGBINARY must be used.
+     */
+    public function testOptionSerializer()
+    {
+        new MemcachedAdapter(MemcachedAdapter::createConnection(array(), array('serializer' => 'json')));
+    }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-31T09:19:19Z
+
+@robfrawley test case added, thanks. Note also that considering your comment about no block, and the use case here (a cache layer), I enabled no-block by default. Tests are green which means it's good for PSR-6!
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2016-12-31T17:38:15Z
+
+Platform.sh is not properly building the documentation for a bunch of PRs ATM, but I think the docs are accurate with regard to this PR (updated to show correct defaults per your latest updates): [give it a look here](https://github.com/symfony/symfony-docs/blob/703aa325de0455db41dae1d7b06f223bca270851/components/cache/adapters/memcached_adapter.rst).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-03T16:58:23Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by robfrawley at 2017-01-03T19:59:08Z
+
+@nicolas-grekas Do we want the RedisAdapter to accept an array of DSNs like the MemcacheAdapter; I'm looking into bringing the RedisAdapter documentation in-line with the new MemcacheAdapter documentation, re: [symfony/symfony-docs/#7265@269875795](https://github.com/symfony/symfony-docs/pull/7265#issuecomment-269875795). It appears it does not at this time.

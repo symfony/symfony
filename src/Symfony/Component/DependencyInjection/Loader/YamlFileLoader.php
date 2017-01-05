@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -455,7 +456,17 @@ class YamlFileLoader extends FileLoader
     private function resolveServices($value)
     {
         if (is_array($value)) {
-            $value = array_map(array($this, 'resolveServices'), $value);
+            if (array_key_exists('=iterator', $value)) {
+                if (1 !== count($value)) {
+                    throw new InvalidArgumentException('Arguments typed "=iterator" must have no sibling keys.');
+                }
+                if (!is_array($value['=iterator'])) {
+                    throw new InvalidArgumentException('Arguments typed "=iterator" must be arrays.');
+                }
+                $value = new IteratorArgument(array_map(array($this, 'resolveServices'), $value['=iterator']));
+            } else {
+                $value = array_map(array($this, 'resolveServices'), $value);
+            }
         } elseif (is_string($value) && 0 === strpos($value, '@=')) {
             return new Expression(substr($value, 2));
         } elseif (is_string($value) && 0 === strpos($value, '@')) {

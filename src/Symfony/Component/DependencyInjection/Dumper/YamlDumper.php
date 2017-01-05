@@ -247,7 +247,7 @@ class YamlDumper extends Dumper
     private function dumpValue($value)
     {
         if ($value instanceof IteratorArgument) {
-            $value = $value->getValues();
+            $value = array('=iterator' => $value->getValues());
         }
 
         if (is_array($value)) {

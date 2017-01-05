@@ -4,6 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
+ * Add "iterator" argument type for lazy iteration over a set of values and services
+
  * Using the `PhpDumper` with an uncompiled `ContainerBuilder` is deprecated and
    will not be supported anymore in 4.0.
 

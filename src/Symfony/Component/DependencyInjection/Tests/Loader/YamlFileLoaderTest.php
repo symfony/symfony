@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -314,6 +315,17 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('Foo', 'Bar'), $container->getDefinition('foo_service')->getAutowiringTypes());
         $this->assertEquals(array('Foo'), $container->getDefinition('baz_service')->getAutowiringTypes());
+    }
+
+    public function testParsesIteratorArgument()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services9.yml');
+
+        $lazyDefinition = $container->getDefinition('lazy_context');
+
+        $this->assertEquals(array(new IteratorArgument(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))), $lazyDefinition->getArguments(), '->load() parses lazy arguments');
     }
 
     public function testAutowire()

@@ -221,13 +221,9 @@ function collapseAll(root) {
 }
 
 function reveal(node) {
-    var current = node;
-    var parents = [];
-    var previous = null;
-    var parent = null;
+    var previous, parents = [];
 
-    while ((parent = current.parentNode || {}) && (previous = parent.previousSibling) && 'A' === previous.tagName) {
-        current = current.parentNode;
+    while ((node = node.parentNode || {}) && (previous = node.previousSibling) && 'A' === previous.tagName) {
         parents.push(previous);
     }
 

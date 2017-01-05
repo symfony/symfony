@@ -33,7 +33,7 @@
         "symfony/routing": "~2.8|~3.0",
         "symfony/templating": "~2.8|~3.0",
         "symfony/yaml": "~2.8|~3.0",
-        "symfony/framework-bundle": "~3.2",
+        "symfony/framework-bundle": "^3.2.2",
         "doctrine/annotations": "~1.0"
     },
     "autoload": {

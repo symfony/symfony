@@ -109,6 +109,16 @@ class WebServer
         unlink($pidFile);
     }
 
+    public function getAddress($pidFile = null)
+    {
+        $pidFile = $pidFile ?: $this->getDefaultPidFile();
+        if (!file_exists($pidFile)) {
+            return false;
+        }
+
+        return file_get_contents($pidFile);
+    }
+
     public function isRunning($pidFile = null)
     {
         $pidFile = $pidFile ?: $this->getDefaultPidFile();

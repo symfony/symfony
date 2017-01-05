@@ -47,7 +47,7 @@ class ServerStatusCommand extends ServerCommand
         $io = new SymfonyStyle($input, $output);
         $server = new WebServer();
         if ($server->isRunning($input->getOption('pidfile'))) {
-            $io->success('Web server still listening.');
+            $io->success(sprintf('Web server still listening on http://%s', $server->getAddress($input->getOption('pidfile'))));
         } else {
             $io->warning('No web server is listening.');
         }

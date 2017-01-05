@@ -100,6 +100,12 @@ EOF
 
         try {
             $server = new WebServer();
+            if ($server->isRunning($input->getOption('pidfile'))) {
+                $io->error(sprintf('The web server is already running (listening on http://%s).', $server->getAddress($input->getOption('pidfile'))));
+
+                return 1;
+            }
+
             $config = new WebServerConfig($documentRoot, $env, $input->getArgument('addressport'), $input->getOption('router'));
 
             if (WebServer::STARTED === $server->start($config, $input->getOption('pidfile'))) {

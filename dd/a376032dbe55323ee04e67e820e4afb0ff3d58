@@ -1,0 +1,118 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-03T11:48:05Z
+
+That's a good first step, but there are other parts of the code to change, like any usages of `ClassCollectionLoader` like in `ClassCacheCacheWarmer`.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-03T11:55:42Z
+
+The `ClassCacheCacheWarmer` should be deprecated as well, and the same goes for `Kernel::setClassCache()`.
+
+The `Symfony\Component\HttpKernel\DependencyInjection\Extension::addClassesToCompile()` method should also be deprecated.
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2016-12-03T14:32:27Z
+
+I still have some issues in functional tests probably related to deprecating ClassCacheWarmer (see [AppVeyor results](https://ci.appveyor.com/project/fabpot/symfony/build/1.0.14977)). For instance I assume that I have to adjust FrameworkBundle's AddCacheWarmerPass to exclude `kernel.class_cache.cache_warmer` when PHP 7.x is being used?
+
+Another question that remains for me is how we will address deprecation warnings in tests for php versions lower than PHP 7 as these should still use the depreacted class cache. I don't think it's practical to annotate these tests with `@group legacy`. @nicolas-grekas maybe you have an advice how to approach this?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-06T11:07:01Z
+
+``Kernel::addAnnotatedClassesToCompile`` must also be deprecated
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-06T11:09:19Z
+
+@nicolas-grekas can you reproduce your benchmark on PHP 5.6 as well ? I would really prefer to stop using it for all PHP versions rather than keeping usage of deprecated APIs in the core on PHP 5.6 (which would mean that users cannot get rid of deprecation warnings)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-06T11:11:47Z
+
+We could think about triggering the deprecations on PHP < 7.0 (or maybe < 5.6) only. Besides that we have to realise that Symfony 4.0 will have to drop support for PHP versions < 7.0 (or < 5.6 if the benchmark turns out to be promising for it too). Otherwise the deprecations wouldn't make much sense.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T11:11:57Z
+
+> Kernel::addAnnotatedClassesToCompile must also be deprecated
+
+I don't think so. Why?
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-06T11:13:21Z
+
+@nicolas-grekas isn't it part of the same feature set ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T11:42:13Z
+
+@xabbuh do you mean triggering them on PHP >= 7.0? That's a good idea! Moving to 4.0 is going to require moving to PHP 7 before so it really makes sense. @dbrumann can you take care of that also please?
+
+ @stof Kernel::addAnnotatedClassesToCompile is especially usefull on PHP 7, so we should keep it.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-06T11:47:04Z
+
+@nicolas-grekas have you tried the same benchmark on PHP 5.6 to see whether we could deprecate the feature for all PHP versions instead, which would be much simpler ?
+
+Regarding addAnnotatedClassesToCompile, I was confused about what it does due to its naming: it does not compile the classes at all. These classes are just classes for which the annotation cache is warmed up.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-06T11:53:57Z
+
+@stof you mean PHP 5.5 (our lowest supported version?) I didn't check but the optims that allow PHP7 to be faster do not exists on 5.5 so I'm pretty sure inlining still wins on 5.5.
+
+About addAnnotatedClassesToCompile, you're right.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-06T11:56:23Z
+
+hmm yeah, I forgot the lowest bound in 5.5.9, not 5.6.
+Would still be good to know what happens on 5.6 (which has the composer classmap optimization).
+If we only need it for PHP 5.5, we might stop using the deprecated feature for it IMO, as PHP 5.5 is already EOLed (and people really caring about such autoloading performance improvement should update to 5.6+ to have the composer optims)
+
+---------------------------------------------------------------------------
+
+by derrabus at 2016-12-06T21:09:05Z
+
+@stof I would not want to give php 5.5 users a sudden performance penalty just because we don't like that feature anymore. People who are pinned to php 5.5 (for whatever reason) are thankful for optimizations like this one.
+
+---------------------------------------------------------------------------
+
+by dbrumann at 2016-12-11T09:03:17Z
+
+@xabbuh and @nicolas-grekas is there already a way to trigger deprecation warnings conditionally? If not, what would be the best way to go about it?
+
+@stof we had the discussion about performance penalty on older php versions during the SymfonyCon hackday and consensus seemed to be that we should avoid it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-11T09:58:56Z
+
+This would be the first time, but it should be just a matter of wrapping the deprecation in a check against `PHP_VERSION_ID` as you already did in other places.
+For php 5.5, I don't have recent numbers, but I saw several benchs that demonstrated the benefit of inlining, so we should keep it I agree.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-11T10:03:36Z
+
+I don't have 5.6 anymore so if someone could give it a try, please do.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T13:46:01Z
+
+:+1:

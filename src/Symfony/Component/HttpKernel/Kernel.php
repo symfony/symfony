@@ -321,17 +321,29 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      *
      * @param string $name      The cache name prefix
      * @param string $extension File extension of the resulting file
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function loadClassCache($name = 'classes', $extension = '.php')
     {
+        if (PHP_VERSION_ID >= 70000) {
+            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
         $this->loadClassCache = array($name, $extension);
     }
 
     /**
      * @internal
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function setClassCache(array $classes)
     {
+        if (PHP_VERSION_ID >= 70000) {
+            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
         file_put_contents($this->getCacheDir().'/classes.map', sprintf('<?php return %s;', var_export($classes, true)));
     }
 
@@ -375,8 +387,15 @@ abstract class Kernel implements KernelInterface, TerminableInterface
         return 'UTF-8';
     }
 
+    /**
+     * @deprecated since version 3.3, to be removed in 4.0.
+     */
     protected function doLoadClassCache($name, $extension)
     {
+        if (PHP_VERSION_ID >= 70000) {
+            @trigger_error(__METHOD__.'() is deprecated since version 3.3, to be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
         if (!$this->booted && is_file($this->getCacheDir().'/classes.map')) {
             ClassCollectionLoader::load(include($this->getCacheDir().'/classes.map'), $this->getCacheDir(), $name, $this->debug, false, $extension);
         }
@@ -579,7 +598,9 @@ abstract class Kernel implements KernelInterface, TerminableInterface
             $container->merge($cont);
         }
 
-        $container->addCompilerPass(new AddClassesToCachePass($this));
+        if (PHP_VERSION_ID < 70000) {
+            $container->addCompilerPass(new AddClassesToCachePass($this));
+        }
         $container->addResource(new EnvParametersResource('SYMFONY__'));
 
         return $container;

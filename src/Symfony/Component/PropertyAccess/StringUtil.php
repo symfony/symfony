@@ -18,7 +18,7 @@ use Symfony\Component\Inflector\Inflector;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @deprecated Deprecated since version 3.1, to be removed in 4.0. Use {@see Symfony\Component\Inflector\Inflector} instead.
+ * @deprecated since version 3.1, to be removed in 4.0. Use {@see Symfony\Component\Inflector\Inflector} instead.
  */
 class StringUtil
 {
@@ -40,7 +40,7 @@ class StringUtil
      * @return string|array The singular form or an array of possible singular
      *                      forms
      *
-     * @deprecated Deprecated since version 3.1, to be removed in 4.0. Use {@see Symfony\Component\Inflector\Inflector::singularize} instead.
+     * @deprecated since version 3.1, to be removed in 4.0. Use {@see Symfony\Component\Inflector\Inflector::singularize} instead.
      */
     public static function singularify($plural)
     {

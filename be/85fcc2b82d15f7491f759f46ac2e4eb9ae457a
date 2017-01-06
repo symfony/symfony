@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-26T22:12:59Z
+
+I would not need really the commands by default, i guess.
+
+What about moving `WebServer` to symfony/process. As it already uses that, there's no real dependency issue or so. `PhpServerProcess`?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-04T19:08:25Z
+
+Auto-port detection has just been added. I've also updated the description to describe usage and differences with current commands.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-05T17:30:04Z
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-05T18:35:02Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2017-01-05T18:42:28Z
+
+Also, as the behavior have changed this need - at least - an issue to document it :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-05T19:06:23Z
+
+I've found a minor error when using `server:start` repeatedly in the same project:
+
+![server-start-error](https://cloud.githubusercontent.com/assets/73419/21693733/5d01de34-d382-11e6-8e4a-d23526d542ea.png)
+
+The error message says that the server is listening on 8001 instead of 8000.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-05T19:39:22Z
+
+👍
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-05T19:45:34Z
+
+@javiereguiluz  `server:start` command fixed when the web server is already running.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-05T19:50:35Z
+
+All comments taken into account now.

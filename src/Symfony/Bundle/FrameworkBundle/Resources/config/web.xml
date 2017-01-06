@@ -32,6 +32,10 @@
             <tag name="controller.argument_value_resolver" priority="50" />
         </service>
 
+        <service id="argument_resolver.session" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\SessionValueResolver" public="false">
+            <tag name="controller.argument_value_resolver" priority="50" />
+        </service>
+
         <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver" public="false">
             <tag name="controller.argument_value_resolver" priority="-100" />
         </service>

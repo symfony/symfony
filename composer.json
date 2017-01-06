@@ -73,6 +73,7 @@
         "symfony/validator": "self.version",
         "symfony/var-dumper": "self.version",
         "symfony/web-profiler-bundle": "self.version",
+        "symfony/web-server-bundle": "self.version",
         "symfony/workflow": "self.version",
         "symfony/yaml": "self.version"
     },

@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Command;
+namespace Symfony\Bundle\WebServerBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Bundle\WebServerBundle\WebServer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Stops a background process running PHP's built-in web server.
+ * Stops a background process running a local web server.
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
@@ -30,21 +30,19 @@ class ServerStopCommand extends ServerCommand
     protected function configure()
     {
         $this
-            ->setDefinition(array(
-                new InputArgument('address', InputArgument::OPTIONAL, 'Address:port', '127.0.0.1'),
-                new InputOption('port', 'p', InputOption::VALUE_REQUIRED, 'Address port number', '8000'),
-            ))
             ->setName('server:stop')
-            ->setDescription('Stops PHP\'s built-in web server that was started with the server:start command')
+            ->setDefinition(array(
+                new InputOption('pidfile', null, InputOption::VALUE_REQUIRED, 'PID file'),
+            ))
+            ->setDescription('Stops the local web server that was started with the server:start command')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> stops PHP's built-in web server:
+The <info>%command.name%</info> stops the local web server:
 
   <info>php %command.full_name%</info>
 
 To change the default bind address and the default port use the <info>address</info> argument:
 
   <info>php %command.full_name% 127.0.0.1:8080</info>
-
 EOF
             )
         ;
@@ -57,20 +55,14 @@ EOF
     {
         $io = new SymfonyStyle($input, $output);
 
-        $address = $input->getArgument('address');
-        if (false === strpos($address, ':')) {
-            $address = $address.':'.$input->getOption('port');
-        }
-
-        $lockFile = $this->getLockFile($address);
-
-        if (!file_exists($lockFile)) {
-            $io->error(sprintf('No web server is listening on http://%s', $address));
+        try {
+            $server = new WebServer();
+            $server->stop($input->getOption('pidfile'));
+            $io->success('Stopped the web server.');
+        } catch (\Exception $e) {
+            $io->error($e->getMessage());
 
             return 1;
         }
-
-        unlink($lockFile);
-        $io->success(sprintf('Stopped the web server listening on http://%s', $address));
     }
 }

@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * The server:* commands and their associated router files were moved to WebServerBundle
  * Translation related services are not loaded anymore when the `framework.translator` option
    is disabled.
  * Added `GlobalVariables::getToken()`

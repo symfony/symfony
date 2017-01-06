@@ -107,22 +107,21 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, array(array('assets' => null)));
 
-        $defaultConfig = array(
-            'enabled' => true,
+        $this->assertTrue($config['assets']['enabled']);
+        $this->assertArrayHasKey($config['assets']['default_package'], $config['assets']['packages']);
+        $this->assertSame(array(
+            'version_format' => '%%s?%%s',
             'version_strategy' => null,
             'version' => null,
-            'version_format' => '%%s?%%s',
             'base_path' => '',
             'base_urls' => array(),
-            'packages' => array(),
-        );
-
-        $this->assertEquals($defaultConfig, $config['assets']);
+        ), $config['assets']['packages'][$config['assets']['default_package']]);
     }
 
     /**
+     * @group legacy
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage You cannot use both "version_strategy" and "version" at the same time under "assets".
+     * @expectedExceptionMessage You cannot use both "version_strategy" and "version" at the same time under "assets" packages.
      */
     public function testInvalidVersionStrategy()
     {
@@ -151,8 +150,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor->processConfiguration($configuration, array(
             array(
                 'assets' => array(
-                    'base_urls' => '//example.com',
-                    'version' => 1,
+                    'default_package' => 'foo',
                     'packages' => array(
                         'foo' => array(
                             'base_urls' => '//example.com',
@@ -259,11 +257,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ),
             'assets' => array(
                 'enabled' => false,
-                'version_strategy' => null,
-                'version' => null,
-                'version_format' => '%%s?%%s',
-                'base_path' => '',
-                'base_urls' => array(),
+                'default_package' => null,
                 'packages' => array(),
             ),
             'cache' => array(

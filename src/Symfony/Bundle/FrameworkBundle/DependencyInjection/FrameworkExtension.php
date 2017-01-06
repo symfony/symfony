@@ -729,26 +729,17 @@ class FrameworkExtension extends Extension
     {
         $loader->load('assets.xml');
 
-        $defaultVersion = null;
-
-        if ($config['version_strategy']) {
-            $defaultVersion = new Reference($config['version_strategy']);
-        } else {
-            $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
-        }
-
-        $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
-        $container->setDefinition('assets._default_package', $defaultPackage);
-
         $namedPackages = array();
+        $defaultPackage = $config['packages'][$config['default_package']];
+        $defaultVersion = null !== $defaultPackage['version_strategy'] ? new Reference($defaultPackage['version_strategy']) : $this->createVersion($container, $defaultPackage['version'], $defaultPackage['version_format'], $config['default_package']);
+
         foreach ($config['packages'] as $name => $package) {
             if (null !== $package['version_strategy']) {
                 $version = new Reference($package['version_strategy']);
-            } elseif (!array_key_exists('version', $package)) {
+            } elseif (null === $package['version']) {
                 $version = $defaultVersion;
             } else {
-                $format = $package['version_format'] ?: $config['version_format'];
-                $version = $this->createVersion($container, $package['version'], $format, $name);
+                $version = $this->createVersion($container, $package['version'], $package['version_format'] ?: $defaultPackage['version_format'], $name);
             }
 
             $container->setDefinition('assets._package_'.$name, $this->createPackageDefinition($package['base_path'], $package['base_urls'], $version));
@@ -756,7 +747,7 @@ class FrameworkExtension extends Extension
         }
 
         $container->getDefinition('assets.packages')
-            ->replaceArgument(0, new Reference('assets._default_package'))
+            ->replaceArgument(0, new Reference('assets._package_'.$config['default_package']))
             ->replaceArgument(1, $namedPackages)
         ;
     }

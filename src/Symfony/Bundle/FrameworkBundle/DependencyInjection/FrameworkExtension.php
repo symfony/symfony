@@ -206,9 +206,6 @@ class FrameworkExtension extends Extension
             'Symfony\\Component\\EventDispatcher\\Event',
             'Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher',
 
-            'Symfony\\Component\\HttpFoundation\\Response',
-            'Symfony\\Component\\HttpFoundation\\ResponseHeaderBag',
-
             'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener',
             'Symfony\\Component\\HttpKernel\\EventListener\\RouterListener',
             'Symfony\\Component\\HttpKernel\\Bundle\\Bundle',

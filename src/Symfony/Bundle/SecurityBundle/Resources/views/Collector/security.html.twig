@@ -205,8 +205,8 @@
 
         <div class="metrics">
             <div class="metric">
-                <span class="value">{{ collector.voterStrategy|default('unknown') }}</span>
-                <span class="label">Strategy</span>
+                <span class="value">{{ collector.voterDefaultStrategy|default('unknown') }}</span>
+                <span class="label">Default strategy</span>
             </div>
         </div>
 
@@ -235,13 +235,15 @@
         <table class="decision-log">
             <col style="width: 30px">
             <col style="width: 120px">
+            <col style="width: 120px">
             <col style="width: 25%">
-            <col style="width: 60%">
+            <col style="width: 50%">
 
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Result</th>
+                    <th>Strategy</th>
                     <th>Attributes</th>
                     <th>Object</th>
                 </tr>
@@ -257,6 +259,7 @@
                                 : '<span class="label status-error same-width">DENIED</span>'
                             }}
                         </td>
+                        <td>{{ decision.strategy }}</td>
                         <td>{{ decision.attributes|length == 1 ? decision.attributes|first : profiler_dump(decision.attributes) }}</td>
                         <td>{{ profiler_dump(decision.object) }}</td>
                     </tr>

@@ -27,7 +27,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     const STRATEGY_UNANIMOUS = 'unanimous';
 
     private $voters;
-    private $defaultStrategyMethod;
+    private $defaultStrategy;
     private $allowIfAllAbstainDecisions;
     private $allowIfEqualGrantedDeniedDecisions;
 
@@ -49,15 +49,19 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function __construct(array $voters = array(), $defaultStrategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true, array $strategyResolvers = array())
     {
-        $defaultStrategyMethod = $this->getStrategyMethod($defaultStrategy);
-        if (!is_callable(array($this, $defaultStrategyMethod))) {
+        if (!in_array($defaultStrategy, array(
+            self::STRATEGY_AFFIRMATIVE,
+            self::STRATEGY_CONSENSUS,
+            self::STRATEGY_UNANIMOUS
+        ))) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $defaultStrategy));
         }
 
         $this->voters = $voters;
-        $this->defaultStrategyMethod = $defaultStrategyMethod;
+        $this->defaultStrategy = $defaultStrategy;
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
+        $this->strategyResolvers = $strategyResolvers;
     }
 
     /**
@@ -75,27 +79,40 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
-        $strategyMethod = $this->defaultStrategyMethod;
+        $strategyMethod = 'decide' . ucfirst($this->getStrategy($token, $attributes, $object));
+
+        return $this->{$strategyMethod}($token, $attributes, $object);
+    }
+
+    /**
+     * @param TokenInterface $token
+     * @param array $attributes
+     * @param mixed $object
+     *
+     * @return string
+     */
+    public function getStrategy(TokenInterface $token, array $attributes, $object = null)
+    {
+        $strategy = $this->defaultStrategy;
         /* @var $strategyResolver StrategyResolverInterface */
         foreach ($this->strategyResolvers as $strategyResolver) {
             if ($strategyResolver->supports($token, $attributes, $object)) {
                 $resolvedStrategy = $strategyResolver->getStrategy($token, $attributes, $object);
-                if (!is_string($resolvedStrategy)) {
+                if (!in_array($resolvedStrategy, array(
+                    self::STRATEGY_AFFIRMATIVE,
+                    self::STRATEGY_CONSENSUS,
+                    self::STRATEGY_UNANIMOUS
+                ))) {
                     continue;
                 }
 
-                $resolvedStrategyMethod = $this->getStrategyMethod($resolvedStrategy);
-                if (!is_callable(array($this, $resolvedStrategyMethod))) {
-                    continue;
-                }
-
-                $strategyMethod = $resolvedStrategyMethod;
+                $strategy = $resolvedStrategy;
 
                 break;
             }
         }
 
-        return $this->{$strategyMethod}($token, $attributes, $object);
+        return $strategy;
     }
 
     /**
@@ -213,15 +230,5 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->allowIfAllAbstainDecisions;
-    }
-
-    /**
-     * @param string $strategy
-     *
-     * @return string
-     */
-    private function getStrategyMethod($strategy)
-    {
-        return 'decide' . ucfirst($strategy);
     }
 }

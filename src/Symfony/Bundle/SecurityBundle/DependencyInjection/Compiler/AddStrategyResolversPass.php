@@ -11,12 +11,15 @@
 
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\Security\Core\Authorization\StrategyResolverInterface;
 
 class AddStrategyResolversPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -26,21 +29,15 @@ class AddStrategyResolversPass implements CompilerPassInterface
             return;
         }
 
-        $strategyResolvers = new \SplPriorityQueue();
-        foreach ($container->findTaggedServiceIds('security.strategy_resolver') as $id => $attributes) {
-            $class = $container->getDefinition($id)->getClass();
-            $interface = 'Symfony\Component\Security\Core\Authorization\StrategyResolverInterface';
-            if (!is_subclass_of($class, $interface)) {
-                throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+        $strategyResolverReferences = $this->findAndSortTaggedServices('security.strategy_resolver', $container);
+        foreach ($strategyResolverReferences as $strategyResolverReference) {
+            $strategyResolverServiceId = $strategyResolverReference->__toString();
+            $class = $container->getDefinition($strategyResolverServiceId)->getClass();
+            if (!is_subclass_of($class, StrategyResolverInterface::class)) {
+                throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $strategyResolverServiceId, StrategyResolverInterface::class));
             }
-
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $strategyResolvers->insert(new Reference($id), $priority);
         }
 
-        $strategyResolvers = iterator_to_array($strategyResolvers);
-        ksort($strategyResolvers);
-
-        $container->getDefinition('security.access.decision_manager')->replaceArgument(4, array_values($strategyResolvers));
+        $container->getDefinition('security.access.decision_manager')->replaceArgument(4, $strategyResolverReferences);
     }
 }

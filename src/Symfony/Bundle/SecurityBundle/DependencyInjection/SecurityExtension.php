@@ -84,6 +84,7 @@ class SecurityExtension extends Extension
             ->addArgument($config['access_decision_manager']['strategy'])
             ->addArgument($config['access_decision_manager']['allow_if_all_abstain'])
             ->addArgument($config['access_decision_manager']['allow_if_equal_granted_denied'])
+            ->addArgument(array());
         ;
         $container->setParameter('security.access.always_authenticate_before_granting', $config['always_authenticate_before_granting']);
         $container->setParameter('security.authentication.hide_user_not_found', $config['hide_user_not_found']);

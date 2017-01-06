@@ -27,29 +27,35 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     const STRATEGY_UNANIMOUS = 'unanimous';
 
     private $voters;
-    private $strategy;
+    private $defaultStrategyMethod;
     private $allowIfAllAbstainDecisions;
     private $allowIfEqualGrantedDeniedDecisions;
 
     /**
+     * @var array
+     */
+    private $strategyResolvers;
+
+    /**
      * Constructor.
      *
-     * @param VoterInterface[] $voters                             An array of VoterInterface instances
-     * @param string           $strategy                           The vote strategy
-     * @param bool             $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
-     * @param bool             $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
+     * @param VoterInterface[]            $voters                             An array of VoterInterface instances
+     * @param string                      $defaultStrategy                    The vote default strategy
+     * @param bool                        $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
+     * @param bool                        $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
+     * @param StrategyResolverInterface[] $strategyResolvers                  An array of StrategyResolver instances
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $voters = array(), $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
+    public function __construct(array $voters = array(), $defaultStrategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true, array $strategyResolvers = array())
     {
-        $strategyMethod = 'decide'.ucfirst($strategy);
-        if (!is_callable(array($this, $strategyMethod))) {
-            throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
+        $defaultStrategyMethod = $this->getStrategyMethod($defaultStrategy);
+        if (!is_callable(array($this, $defaultStrategyMethod))) {
+            throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $defaultStrategy));
         }
 
         $this->voters = $voters;
-        $this->strategy = $strategyMethod;
+        $this->defaultStrategyMethod = $defaultStrategyMethod;
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
     }
@@ -69,7 +75,27 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
      */
     public function decide(TokenInterface $token, array $attributes, $object = null)
     {
-        return $this->{$this->strategy}($token, $attributes, $object);
+        $strategyMethod = $this->defaultStrategyMethod;
+        /* @var $strategyResolver StrategyResolverInterface */
+        foreach ($this->strategyResolvers as $strategyResolver) {
+            if ($strategyResolver->supports($token, $attributes, $object)) {
+                $resolvedStrategy = $strategyResolver->getStrategy($token, $attributes, $object);
+                if (!is_string($resolvedStrategy)) {
+                    continue;
+                }
+
+                $resolvedStrategyMethod = $this->getStrategyMethod($resolvedStrategy);
+                if (!is_callable(array($this, $resolvedStrategyMethod))) {
+                    continue;
+                }
+
+                $strategyMethod = $resolvedStrategyMethod;
+
+                break;
+            }
+        }
+
+        return $this->{$strategyMethod}($token, $attributes, $object);
     }
 
     /**
@@ -187,5 +213,15 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->allowIfAllAbstainDecisions;
+    }
+
+    /**
+     * @param string $strategy
+     *
+     * @return string
+     */
+    private function getStrategyMethod($strategy)
+    {
+        return 'decide' . ucfirst($strategy);
     }
 }

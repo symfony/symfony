@@ -893,6 +893,7 @@ class FrameworkExtension extends Extension
 
             $files = array();
             $finder = Finder::create()
+                ->followLinks()
                 ->files()
                 ->filter(function (\SplFileInfo $file) {
                     return 2 === substr_count($file->getBasename(), '.') && preg_match('/\.\w+$/', $file->getBasename());
@@ -1004,10 +1005,10 @@ class FrameworkExtension extends Extension
             }
 
             if (is_dir($dir = $dirname.'/Resources/config/validation')) {
-                foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
+                foreach (Finder::create()->followLinks()->files()->in($dir)->name('*.xml') as $file) {
                     $files[0][] = $file->getPathname();
                 }
-                foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
+                foreach (Finder::create()->followLinks()->files()->in($dir)->name('*.yml') as $file) {
                     $files[1][] = $file->getPathname();
                 }
 
@@ -1187,13 +1188,13 @@ class FrameworkExtension extends Extension
             }
 
             if (is_dir($dir = $dirname.'/Resources/config/serialization')) {
-                foreach (Finder::create()->files()->in($dir)->name('*.xml') as $file) {
+                foreach (Finder::create()->followLinks()->files()->in($dir)->name('*.xml') as $file) {
                     $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader', array($file->getPathname()));
                     $definition->setPublic(false);
 
                     $serializerLoaders[] = $definition;
                 }
-                foreach (Finder::create()->files()->in($dir)->name('*.yml') as $file) {
+                foreach (Finder::create()->followLinks()->files()->in($dir)->name('*.yml') as $file) {
                     $definition = new Definition('Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader', array($file->getPathname()));
                     $definition->setPublic(false);
 

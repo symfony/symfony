@@ -338,6 +338,16 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
+     * Returns a new instance which makes use of stderr if available.
+     *
+     * @return self
+     */
+    public function getErrorStyle()
+    {
+        return new self($this->input, $this->getErrorOutput());
+    }
+
+    /**
      * @return ProgressBar
      */
     private function getProgressBar()

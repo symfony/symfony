@@ -212,11 +212,19 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
 
         if ($test instanceof \PHPUnit_Framework_TestCase && 0 === strpos($test->getName(), 'testLegacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $groups, true)) {
-            $test->getTestResultObject()->addWarning($test, new \PHPUnit_Framework_Warning('Using the "testLegacy" prefix to mark tests as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
+            $result = $test->getTestResultObject();
+
+            if (method_exists($result, 'addWarning')) {
+                $result->addWarning($test, new \PHPUnit_Framework_Warning('Using the "testLegacy" prefix to mark tests as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
+            }
         }
 
         if ($test instanceof \PHPUnit_Framework_TestCase && strpos($className, '\Legacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $classGroups, true)) {
-            $test->getTestResultObject()->addWarning($test, new \PHPUnit_Framework_Warning('Using the "Legacy" prefix to mark all tests of a class as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
+            $result = $test->getTestResultObject();
+
+            if (method_exists($result, 'addWarning')) {
+                $result->addWarning($test, new \PHPUnit_Framework_Warning('Using the "Legacy" prefix to mark all tests of a class as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
+            }
         }
     }
 

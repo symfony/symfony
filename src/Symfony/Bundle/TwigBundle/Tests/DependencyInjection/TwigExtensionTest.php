@@ -189,12 +189,9 @@ class TwigExtensionTest extends TestCase
 
         $def = $container->getDefinition('twig.loader.filesystem');
         $paths = array();
-        $prependPaths = array();
         foreach ($def->getMethodCalls() as $call) {
             if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {
                 $paths[] = $call[1];
-            } elseif ('prependPath' === $call[0]) {
-                $prependPaths[] = $call[1];
             }
         }
 
@@ -204,18 +201,24 @@ class TwigExtensionTest extends TestCase
             array('namespaced_path1', 'namespace1'),
             array('namespaced_path2', 'namespace2'),
             array('namespaced_path3', 'namespace3'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildChildChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildChildChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'Twig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'Twig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'Twig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'Twig'),
             array(__DIR__.'/Fixtures/Resources/TwigBundle/views', 'Twig'),
             array(realpath(__DIR__.'/../..').'/Resources/views', 'Twig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildTwig'),
             array(__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'ChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle/Resources/views', 'ChildChildTwig'),
+            array(__DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle/Resources/views', 'ChildChildTwig'),
             array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildChildTwig'),
             array(__DIR__.'/Fixtures/Resources/views'),
         ), $paths);
-
-        $this->assertEquals(array(
-            array(__DIR__.'/Fixtures/Bundle/ChildTwigBundle/Resources/views', 'Twig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'ChildTwig'),
-            array(__DIR__.'/Fixtures/Bundle/ChildChildTwigBundle/Resources/views', 'Twig'),
-        ), $prependPaths);
     }
 
     public function getFormats()
@@ -269,8 +272,15 @@ class TwigExtensionTest extends TestCase
                 'TwigBundle' => 'Symfony\\Bundle\\TwigBundle\\TwigBundle',
                 'ChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildTwigBundle\\ChildTwigBundle',
                 'ChildChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildTwigBundle\\ChildChildTwigBundle',
+                'ChildChildChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildChildTwigBundle\\ChildChildChildTwigBundle',
+                'ChildChildChildChildTwigBundle' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildChildChildTwigBundle\\ChildChildChildChildTwigBundle',
             ),
             'kernel.bundles_metadata' => array(
+                'ChildChildChildChildTwigBundle' => array(
+                    'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildChildChildTwigBundle\\ChildChildChildChildTwigBundle',
+                    'parent' => 'ChildChildChildTwigBundle',
+                    'path' => __DIR__.'/Fixtures/Bundle/ChildChildChildChildTwigBundle',
+                ),
                 'TwigBundle' => array(
                     'namespace' => 'Symfony\\Bundle\\TwigBundle',
                     'parent' => null,
@@ -280,6 +290,11 @@ class TwigExtensionTest extends TestCase
                     'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildTwigBundle\\ChildTwigBundle',
                     'parent' => 'TwigBundle',
                     'path' => __DIR__.'/Fixtures/Bundle/ChildTwigBundle',
+                ),
+                'ChildChildChildTwigBundle' => array(
+                    'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildChildTwigBundle\\ChildChildChildTwigBundle',
+                    'parent' => 'ChildChildTwigBundle',
+                    'path' => __DIR__.'/Fixtures/Bundle/ChildChildChildTwigBundle',
                 ),
                 'ChildChildTwigBundle' => array(
                     'namespace' => 'Symfony\\Bundle\\TwigBundle\\Tests\\DependencyInjection\\Fixtures\\Bundle\\ChildChildTwigBundle\\ChildChildTwigBundle',

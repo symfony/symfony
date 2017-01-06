@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-11-21T23:55:58Z
+
+Can't be in 2.8, should be in master
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-22T10:07:13Z
+
+Changed the scope then, proposing `SymfonyStyle::getErrorIo()` to ease writing to stderr using styles (feature), and secondly made built-in commands using it when it's relevant. Let me know if it should be done in two PRs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-25T10:21:43Z
+
+@chalasr you decide :)
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-25T10:24:03Z
+
+Even adding a new method must be in master, as it is a new feature
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-25T11:02:02Z
+
+@stof It was about proposing the new method here and fixing the existing commands in another PR by creating the instance of `SymfonyStyle` in the commands themselves. see #20632

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -63,6 +64,8 @@ class CheckReferenceValidityPass implements CompilerPassInterface
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
                 $this->validateReferences($argument);
+            } elseif ($argument instanceof ArgumentInterface) {
+                $this->validateReferences($argument->getValues());
             } elseif ($argument instanceof Reference) {
                 $targetDefinition = $this->getDefinition((string) $argument);
 

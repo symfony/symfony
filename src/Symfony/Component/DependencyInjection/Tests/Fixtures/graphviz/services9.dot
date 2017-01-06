@@ -26,10 +26,13 @@ digraph sc {
   node_service_from_static_method [label="service_from_static_method\nBar\\FooClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_factory_simple [label="factory_simple\nSimpleFactoryClass\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_factory_service_simple [label="factory_service_simple\nBar\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_lazy_context [label="lazy_context\nLazyContext\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_lazy_context_ignore_invalid_ref [label="lazy_context_ignore_invalid_ref\nLazyContext\n", shape=record, fillcolor="#eeeeee", style="filled"];
   node_service_container [label="service_container\nSymfony\\Component\\DependencyInjection\\ContainerBuilder\n", shape=record, fillcolor="#9999ff", style="filled"];
   node_foo2 [label="foo2\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo3 [label="foo3\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foobaz [label="foobaz\n\n", shape=record, fillcolor="#ff9999", style="filled"];
+  node_invalid [label="invalid\n\n", shape=record, fillcolor="#ff9999", style="filled"];
   node_foo -> node_foo_baz [label="" style="filled"];
   node_foo -> node_service_container [label="" style="filled"];
   node_foo -> node_foo_baz [label="" style="dashed"];
@@ -43,4 +46,8 @@ digraph sc {
   node_inlined -> node_baz [label="setBaz()" style="dashed"];
   node_baz -> node_foo_with_inline [label="setFoo()" style="dashed"];
   node_configurator_service -> node_baz [label="setFoo()" style="dashed"];
+  node_lazy_context -> node_foo_baz [label="" style="filled" color="#9999ff"];
+  node_lazy_context -> node_service_container [label="" style="filled" color="#9999ff"];
+  node_lazy_context_ignore_invalid_ref -> node_foo_baz [label="" style="filled" color="#9999ff"];
+  node_lazy_context_ignore_invalid_ref -> node_invalid [label="" style="filled" color="#9999ff"];
 }

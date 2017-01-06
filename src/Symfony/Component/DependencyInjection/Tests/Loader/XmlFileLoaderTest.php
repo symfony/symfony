@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -255,6 +256,17 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('decorated', null, 0), $services['decorator_service']->getDecoratedService());
         $this->assertEquals(array('decorated', 'decorated.pif-pouf', 0), $services['decorator_service_with_name']->getDecoratedService());
         $this->assertEquals(array('decorated', 'decorated.pif-pouf', 5), $services['decorator_service_with_name_and_priority']->getDecoratedService());
+    }
+
+    public function testParsesIteratorArgument()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services9.xml');
+
+        $lazyDefinition = $container->getDefinition('lazy_context');
+
+        $this->assertEquals(array(new IteratorArgument(array('foo', new Reference('foo.baz'), array('%foo%' => 'foo is %foo%', 'foobar' => '%foo%'), true, new Reference('service_container')))), $lazyDefinition->getArguments(), '->load() parses lazy arguments');
     }
 
     public function testParsesTags()

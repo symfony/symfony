@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -67,6 +68,8 @@ class InlineServiceDefinitionsPass implements RepeatablePassInterface
             }
             if (is_array($argument)) {
                 $arguments[$k] = $this->inlineArguments($container, $argument);
+            } elseif ($argument instanceof ArgumentInterface) {
+                $argument->setValues($this->inlineArguments($container, $argument->getValues()));
             } elseif ($argument instanceof Reference) {
                 if (!$container->hasDefinition($id = (string) $argument)) {
                     continue;

@@ -13,8 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use DummyProxyDumper;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
@@ -409,5 +411,52 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper->setProxyDumper(new DummyProxyDumper());
         $dumper->dump();
+    }
+
+    public function testLazyArgumentProvideGenerator()
+    {
+        require_once self::$fixturesPath.'/includes/classes.php';
+
+        $container = new ContainerBuilder();
+        $container->register('lazy_referenced', 'stdClass');
+        $container
+            ->register('lazy_context', 'LazyContext')
+            ->setArguments(array(new IteratorArgument(array('foo', new Reference('lazy_referenced'), 'k1' => array('foo' => 'bar'), true, 'k2' => new Reference('service_container')))))
+        ;
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator')));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator();
+        $lazyContext = $container->get('lazy_context');
+
+        $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyValues);
+
+        $i = -1;
+        foreach ($lazyContext->lazyValues as $k => $v) {
+            switch (++$i) {
+                case 0:
+                    $this->assertEquals(0, $k);
+                    $this->assertEquals('foo', $v);
+                    break;
+                case 1:
+                    $this->assertEquals(1, $k);
+                    $this->assertInstanceOf('stdClass', $v);
+                    break;
+                case 2:
+                    $this->assertEquals('k1', $k);
+                    $this->assertEquals(array('foo' => 'bar'), $v);
+                    break;
+                case 3:
+                    $this->assertEquals(2, $k);
+                    $this->assertTrue($v);
+                    break;
+                case 4:
+                    $this->assertEquals('k2', $k);
+                    $this->assertInstanceOf('\Symfony_DI_PhpDumper_Test_Lazy_Argument_Provide_Generator', $v);
+                    break;
+            }
+        }
     }
 }

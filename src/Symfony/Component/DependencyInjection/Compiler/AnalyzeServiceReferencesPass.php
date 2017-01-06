@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -91,19 +92,25 @@ class AnalyzeServiceReferencesPass implements RepeatablePassInterface
      * Processes service definitions for arguments to find relationships for the service graph.
      *
      * @param array $arguments An array of Reference or Definition objects relating to service definitions
+     * @param bool  $lazy      Whether the references nested in the arguments should be considered lazy or not
      */
-    private function processArguments(array $arguments)
+    private function processArguments(array $arguments, $lazy = false)
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
-                $this->processArguments($argument);
+                $this->processArguments($argument, $lazy);
+            } elseif ($argument instanceof ArgumentInterface) {
+                $this->processArguments($argument->getValues(), true);
             } elseif ($argument instanceof Reference) {
+                $targetDefinition = $this->getDefinition((string) $argument);
+
                 $this->graph->connect(
                     $this->currentId,
                     $this->currentDefinition,
                     $this->getDefinitionId((string) $argument),
-                    $this->getDefinition((string) $argument),
-                    $argument
+                    $targetDefinition,
+                    $argument,
+                    $lazy || ($targetDefinition && $targetDefinition->isLazy())
                 );
             } elseif ($argument instanceof Definition) {
                 $this->processArguments($argument->getArguments());

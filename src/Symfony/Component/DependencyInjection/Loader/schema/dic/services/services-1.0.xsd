@@ -189,6 +189,7 @@
       <xsd:enumeration value="expression" />
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
+      <xsd:enumeration value="iterator" />
     </xsd:restriction>
   </xsd:simpleType>
 

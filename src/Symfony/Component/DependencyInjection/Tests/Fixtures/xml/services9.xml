@@ -115,6 +115,24 @@
     <service id="factory_service_simple" class="Bar">
       <factory service="factory_simple" method="getInstance"/>
     </service>
+    <service id="lazy_context" class="LazyContext">
+      <argument type="iterator">
+        <argument>foo</argument>
+        <argument type="service" id="foo.baz"/>
+        <argument type="collection">
+          <argument key="%foo%">foo is %foo%</argument>
+          <argument key="foobar">%foo%</argument>
+        </argument>
+        <argument>true</argument>
+        <argument type="service" id="service_container"/>
+      </argument>
+    </service>
+    <service id="lazy_context_ignore_invalid_ref" class="LazyContext">
+      <argument type="iterator">
+        <argument type="service" id="foo.baz"/>
+        <argument type="service" id="invalid" on-invalid="ignore"/>
+      </argument>
+    </service>
     <service id="alias_for_foo" alias="foo"/>
     <service id="alias_for_alias" alias="foo"/>
   </services>

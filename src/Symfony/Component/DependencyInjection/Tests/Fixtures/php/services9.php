@@ -1,5 +1,6 @@
 <?php
 
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -43,6 +44,8 @@ class ProjectServiceContainer extends Container
             'foo_bar' => 'getFooBarService',
             'foo_with_inline' => 'getFooWithInlineService',
             'inlined' => 'getInlinedService',
+            'lazy_context' => 'getLazyContextService',
+            'lazy_context_ignore_invalid_ref' => 'getLazyContextIgnoreInvalidRefService',
             'method_call1' => 'getMethodCall1Service',
             'new_factory' => 'getNewFactoryService',
             'new_factory_service' => 'getNewFactoryServiceService',
@@ -282,6 +285,43 @@ class ProjectServiceContainer extends Container
         $instance->setBar(${($_ = isset($this->services['inlined']) ? $this->services['inlined'] : $this->getInlinedService()) && false ?: '_'});
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'lazy_context' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \LazyContext A LazyContext instance
+     */
+    protected function getLazyContextService()
+    {
+        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function() {
+            yield 0 => 'foo';
+            yield 1 => $this->get('foo.baz');
+            yield 2 => array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo'));
+            yield 3 => true;
+            yield 4 => $this;
+        }));
+    }
+
+    /**
+     * Gets the 'lazy_context_ignore_invalid_ref' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \LazyContext A LazyContext instance
+     */
+    protected function getLazyContextIgnoreInvalidRefService()
+    {
+        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function() {
+            yield 0 => $this->get('foo.baz');
+            if ($this->has('invalid')) {
+                yield 1 => $this->get('invalid', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+            }
+        }));
     }
 
     /**

@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-12-14T13:06:14Z
+
+IMO this is ready for review. The Travis failure is not llinked to this PR.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-12-14T13:18:17Z
+
+I fixed some issues found by fabbot.io.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-14T15:50:43Z
+
+We miss an equivalent to #19902, which means we miss a way to walk through the values in IteratorArgument in compiler passes.
+We need a new ArgumentInterface to allow compiler passes to do that. IteratorArgument would be the first to implement it, but more should come soon (see my other RFCs).
+
+---------------------------------------------------------------------------
+
+by jvasseur at 2016-12-15T10:34:29Z
+
+Using generators has one downside, they aren't rewindable meaning services using it will only be able to iterate on them once.
+
+If we keep it like this developers will have store the result of the iteration into another variable. This means we will lose in terms of DX and that we will lose the possibility to stop iterating mid-collection (event with stoped propagation, stopping at the first service that accept the input, etc...) losing the laziness of only instantiating the first services.
+
+A solution would be to wrap the generator into a class like this one https://github.com/nikic/iter/blob/master/src/iter.rewindable.php#L85-L136 to create rewindable generators.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-15T12:46:41Z
+
+@jvasseur good point! We just don't need so much code to create a rewindable generator in our case.
+
+Here is what I came up with:
+```php
+/**
+ * @internal
+ */
+class RewindableGenerator implements \IteratorAggregate
+{
+    private $generator;
+
+    public function __construct(callable $generator)
+    {
+        $this->generator = $generator;
+    }
+
+    public function getIterator()
+    {
+        $g = $this->generator;
+
+        return $g();
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-17T08:22:04Z
+
+Some tests are missing, but I think this PR is still ready for review.
+
+---------------------------------------------------------------------------
+
+by tgalopin at 2016-12-18T14:15:19Z
+
+I added tests
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T23:25:24Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-20T09:08:29Z
+
+👍 great!
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-05T03:04:03Z
+
+Great job so far!
+
+Some remarks:
+
+* We need to define the format for YAML as it should definitely be part of this PR;
+* This feature should be added to the CHANGELOG file.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-05T19:02:44Z
+
+Yaml done, eg:
+```
+my_service:
+    class: FooBar
+    arguments:
+        - '@service1'
+        - =iterator:
+            - '@service2'
+            - '@service3'
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-05T20:45:37Z
+
+👍

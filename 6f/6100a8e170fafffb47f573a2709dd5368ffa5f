@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-17T16:01:55Z
+
+If we want to allow symlinks here, we should do the same for the validation files. What do you think?
+
+---------------------------------------------------------------------------
+
+by tifabien at 2016-11-17T16:20:36Z
+
+I agree. What about serialization files?
+
+---------------------------------------------------------------------------
+
+by tifabien at 2016-11-17T16:25:18Z
+
+I added the followLinks on both serialization and validation files
+
+---------------------------------------------------------------------------
+
+by tifabien at 2016-11-22T20:26:49Z
+
+@xabbuh Is it OK for you? Note that I don't understand why the travis build is in error for PHP5.3.
+Any idea?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-25T10:24:13Z
+
+Looks like a new behavior, thus new feature to me. Am I wrong?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-25T11:00:01Z
+
+Agreed, to treat this as a new features.
+
+Besides that 👍 from me.
+
+---------------------------------------------------------------------------
+
+by tifabien at 2016-11-25T11:06:23Z
+
+If you consider this as a new feature, do I need to rebase my branch on top of master or 3.2(as it's not released yet)?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-11-25T11:08:01Z
+
+New features should now go to `master` because `3.2` entered its "code freeze" period.
+
+---------------------------------------------------------------------------
+
+by tifabien at 2016-11-25T11:33:11Z
+
+OK for me I changed the destination branch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T14:04:09Z
+
+:+1:

@@ -1,0 +1,197 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-30T15:27:01Z
+
+Nice!
+> I moved javascript and css into dedicated files, as I find it easier to maintain
+
+please revert this part, it makes reviewing impossible
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-30T15:37:02Z
+
+@nicolas-grekas : Done
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2016-12-30T18:53:22Z
+
+nice @ogizanagi ..
+
+I integrated this into my app .. I guess the search might be breaking because I have multiple var-dumper outputs?
+
+![2016-12-30_19-52-26](https://cloud.githubusercontent.com/assets/300279/21570786/95094302-cec9-11e6-8b8a-cc7a3169a2d3.png)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-30T20:42:16Z
+
+@lsmith77 No. It should work properly with multiple outputs. However, the width of the dump in the profiler bar might be to small and cause issues. We should fix that by applying a greater min width.
+
+But I don't understand your screenshot. How did you get it? I never have multiple dumps side by side. Only top to bottom. Is it by using the twig function?
+
+Screens in the PR description are taken while using the `dump()` function directly.
+
+We may have to fine tune the css a lot for other cases, but we'll never reach a perfect fit for each IMHO 😕 . Also, for my own usages, I know I'll mainly use this feature by using `dump($var);die();` and thus get the full page width. Same for the profiler page, it should not be really problematic with the current style.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2016-12-30T22:02:22Z
+
+@ogizanagi I am using the var-dumper inside a custom app used for debugging data structures in various systems.
+
+Note that ``var-dump()`` is essentially a copy of the ``dump()`` twig function without the ``isDump()`` check:
+
+```
+            <table>
+                <tr>
+                    {% for key in data | keys %}
+                    <th>{{ key }}</th>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for values in data %}
+                    <td style="vertical-align: top;">{{ var_dump(values)}}</td>
+                    {% endfor %}
+                </tr>
+            </table>
+```
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2016-12-30T22:11:49Z
+
+hmm seems like it isn't caused by multiple dumps on one screen:
+
+![2016-12-30_23-10-34](https://cloud.githubusercontent.com/assets/300279/21573495/4d6307e2-cee5-11e6-8142-55a254eef09c.gif)
+
+I set a fixed with of 1000px ..
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-30T22:15:54Z
+
+Do you have any error message in the console?
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2016-12-30T22:17:45Z
+
+Ah .. I didn't check properly first time around .. getting ``Not enough arguments to Document.evaluate.``
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-30T22:18:40Z
+
+On which browser? Might be the last argument that should be provided, but `null`... 😅
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2016-12-30T22:20:15Z
+
+using FF .. let me try Safari and Chrome
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2016-12-30T22:22:17Z
+
+boom .. its working!
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2016-12-30T22:25:40Z
+
+also tested on Safari and Chrome .. works there too. awesome stuff! min width wasn't needed.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2016-12-30T22:31:34Z
+
+I cannot attest to the quality if the javascript code, given that I am out of the javascript loop for years .. but as stated above it works as expected.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-02T18:19:40Z
+
+Can you please try on some old browsers where the existing JS used to work, and verify that things degrade gracefully if they can't be made to work?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-02T20:31:21Z
+
+Chrome, Firefox, and Edge release frequent updates and keep themselves up-to-date automatically. Also, used APIs are implemented since a while in these browsers AFAIK. Hence I think we're safe for those ones.
+IE11 does not support [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#Browser_compatibility) (which I'll remove), nor [`document.evaluate`](https://developer.mozilla.org/en-US/docs/Web/API/Document/evaluate#Browser_compatibility). The browser is EOL anyway, but we should still support it, as some applications may still have to run on it. So I'll disable this feature in the case `document.evaluate` is undefined.
+
+Remains Safari. I think we should try to support the previous major version (i.e Safari 9). I don't know anything used here not supported by this browser, but we should ensure that. I don't have a computer nor a VM with this version installed, so I can't try right now.
+If anyone could give a try in case he's still running Mac OS X Yosemite (10.11), that'll be great :) (otherwise I'll try anyway later)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-03T08:18:36Z
+
+@ogizanagi I just tried it with safari 9.1.3 and there is some issues, here is the trace:
+
+![safari-9](http://image.prntscr.com/image/cf36c87554d84324a7d0c36210a8d834.png)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-03T08:20:12Z
+
+Thank you @chalasr :) . I'll give a look soon.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-03T08:31:47Z
+
+@chalasr : Could please you check if 69719e8 solves the issue?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-03T08:45:43Z
+
+@ogizanagi It fixed it 👍
+
+Btw, really nice one. Hope it's merged soon so we can perfect it for 3.3.
+For now I only spotted that the result for one-line dumps is not optimal, the line is too thin for the search block:
+
+![one-line](http://image.prntscr.com/image/bd3078657d034570a12e8bc65422dc8f.png)
+I think we can improve it (or forbid it).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-03T08:46:51Z
+
+maybe we should disable the search box for non-nested structures?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-03T09:17:18Z
+
+> maybe we should disable the search box for non-nested structures?
+
+agreed
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-03T14:38:29Z
+
+I've removed the ability to focus non-nested structures dumps or for unsupported browsers by adding the `tabindex` only when required.
+The `delay` function has been removed to be inlined in the listener with a dedicated timer.
+The search bar is now positioned using float rather than absolute in order to avoid overlapping the dump (and ensuring min-width/height).
+
+I plan to update the rendering of the search bar to something like:
+
+![sfdump](https://cloud.githubusercontent.com/assets/2211145/21609435/b1754634-d1c2-11e6-9f18-c8666fe19104.gif)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-03T15:31:00Z
+
+The new output is available (screens in the PR description).
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-01-04T20:54:39Z
+
+👍

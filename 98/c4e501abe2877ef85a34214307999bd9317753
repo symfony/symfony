@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-02T22:32:09Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-03T17:35:09Z
+
+The `provideLegacy` and `getLegacy` prefixes are not used to make the test belong to the legacy group, but can be used if your data provider triggers deprecations itself. This is something that needs to be fixed in the documentation (see symfony/symfony-docs#7312 for the bug report). Thus, this PR is finished and ready to be reviewed.
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-03T18:01:42Z
+
+After talking to @nicolas-grekas the warnings will now only be triggered if the `@group` annotation was not used. So you can get rid of the warnings simply by adding the group without the need to rename your test methods.

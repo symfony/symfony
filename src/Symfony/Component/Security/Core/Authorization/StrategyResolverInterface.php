@@ -30,7 +30,7 @@ interface StrategyResolverInterface
     /**
      * @param TokenInterface $token
      * @param array $attributes
-     * @param null $object
+     * @param mixed $object
      *
      * @return bool
      */

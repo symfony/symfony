@@ -41,10 +41,11 @@ class PassConfig
 
         $this->optimizationPasses = array(array(
             new ExtensionCompilerPass(),
+            $resolveClassPass = new ResolveClassPass(),
             new ResolveDefinitionTemplatesPass(),
             new DecoratorServicePass(),
             new ResolveParameterPlaceHoldersPass(),
-            new FactoryReturnTypePass(),
+            new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),

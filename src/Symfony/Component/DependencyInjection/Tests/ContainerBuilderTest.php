@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
@@ -925,6 +926,44 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         ;
 
         $container->get('foo');
+    }
+
+    public function testClassFromId()
+    {
+        $container = new ContainerBuilder();
+
+        $unknown = $container->register('unknown_class');
+        $class = $container->register(\stdClass::class);
+        $autoloadClass = $container->register(CaseSensitiveClass::class);
+        $container->compile();
+
+        $this->assertSame('unknown_class', $unknown->getClass());
+        $this->assertEquals(\stdClass::class, $class->getClass());
+        $this->assertEquals(CaseSensitiveClass::class, $autoloadClass->getClass());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The definition for "123_abc" has no class.
+     */
+    public function testNoClassFromNonClassId()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register('123_abc');
+        $container->compile();
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The definition for "\foo" has no class.
+     */
+    public function testNoClassFromNsSeparatorId()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register('\\foo');
+        $container->compile();
     }
 }
 

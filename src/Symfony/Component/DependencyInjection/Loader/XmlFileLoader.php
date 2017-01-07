@@ -303,7 +303,7 @@ class XmlFileLoader extends FileLoader
         if (false !== $nodes = $xpath->query('//container:argument[@type="service"][not(@id)]|//container:property[@type="service"][not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $id = sprintf('%s_%d', hash('sha256', $file), ++$count);
+                $id = sprintf('%d_%s', ++$count, hash('sha256', $file));
                 $node->setAttribute('id', $id);
 
                 if ($services = $this->getChildren($node, 'service')) {
@@ -321,15 +321,15 @@ class XmlFileLoader extends FileLoader
         if (false !== $nodes = $xpath->query('//container:services/container:service[not(@id)]')) {
             foreach ($nodes as $node) {
                 // give it a unique name
-                $id = sprintf('%s_%d', hash('sha256', $file), ++$count);
+                $id = sprintf('%d_%s', ++$count, hash('sha256', $file));
                 $node->setAttribute('id', $id);
                 $definitions[$id] = array($node, $file, true);
             }
         }
 
         // resolve definitions
-        krsort($definitions);
-        foreach ($definitions as $id => list($domElement, $file, $wild)) {
+        uksort($definitions, 'strnatcmp');
+        foreach (array_reverse($definitions) as $id => list($domElement, $file, $wild)) {
             if (null !== $definition = $this->parseDefinition($domElement, $file)) {
                 $this->container->setDefinition($id, $definition);
             }

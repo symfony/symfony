@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-16T11:33:33Z
+
+should this deprecate the ContainerAwareEventDispatcher ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-17T08:24:13Z
+
+fancy use case: `<argument type="closure-proxy" id="service_container" method="get" />`
+ping @unkind
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-12-17T09:25:06Z
+
+Referenced PR with Drupal event dispatcher also reduces addListener calls by injecting map with listeners in constructor
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-17T09:55:17Z
+
+@Koc, true, but I really doubt there is anything to save here. I think most of the perf gain came from turning subscribers into listeners at compile time instead, which this PR does. Would you like to confirm?
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-12-17T12:51:05Z
+
+> fancy use case: `<argument type="closure-proxy" id="service_container" method="get" />`
+
+If I get your right, it allows to access private services. But they can be inlined (and most likely they would).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T08:47:37Z
+
+> it allows to access private service
+
+of course closure proxies work with private services, but the example you quoted (`<argument type="closure-proxy" id="service_container" method="get" />` doesn't, since it gets through the public interface of the container).
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-12-18T09:13:16Z
+
+@nicolas-grekas well, I don't understand the purpose on this code then :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T09:16:41Z
+
+Maybe it has none, that's maybe why I added "fancy" in front :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-27T12:48:19Z
+
+Tests added. PR embeds #20907 for now, waiting for it to be merged beforehand.
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T08:11:47Z
+
+PR rebased & ready.
+The yaml loader expects `=closure_proxy` to define the proxies.
+Eg.
+
+```yaml
+    foo:
+        class: FooClass
+        arguments:
+            - =closure_proxy: ['@bar', getBuz]
+```
+xml is:
+```xml
+    <service id="foo" class="FooClass">
+      <argument type="closure-proxy" id="bar" method="getBuz"/>
+    </service>
+```
+
+Status: needs review

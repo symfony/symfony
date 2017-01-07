@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 class ChildDefinition extends Definition
 {
     private $parent;
+    private $inheritTags = false;
     private $changes = array();
 
     /**
@@ -52,6 +53,30 @@ class ChildDefinition extends Definition
     public function getChanges()
     {
         return $this->changes;
+    }
+
+    /**
+     * Sets whether tags should be inherited from the parent or not.
+     *
+     * @param bool $boolean
+     *
+     * @return $this
+     */
+    public function setInheritTags($boolean)
+    {
+        $this->inheritTags = (bool) $boolean;
+
+        return $this;
+    }
+
+    /**
+     * Returns whether tags should be inherited from the parent or not.
+     *
+     * @return bool
+     */
+    public function getInheritTags()
+    {
+        return $this->inheritTags;
     }
 
     /**

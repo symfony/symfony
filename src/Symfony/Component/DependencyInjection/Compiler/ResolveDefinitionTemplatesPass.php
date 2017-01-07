@@ -216,6 +216,15 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         $def->setShared($definition->isShared());
         $def->setTags($definition->getTags());
 
+        // append parent tags when inheriting is enabled
+        if ($definition->getInheritTags()) {
+            foreach ($parentDef->getTags() as $k => $v) {
+                foreach ($v as $v) {
+                    $def->addTag($k, $v);
+                }
+            }
+        }
+
         return $def;
     }
 }

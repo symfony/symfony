@@ -617,4 +617,42 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(array('type' => 'foo', 'bar'), $container->getDefinition('foo')->getArguments());
     }
+
+    public function testDefaults()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services29.xml');
+
+        $this->assertFalse($container->getDefinition('with_defaults')->isPublic());
+        $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_defaults')->getTags());
+        $this->assertTrue($container->getDefinition('with_defaults')->isAutowired());
+
+        $this->assertArrayNotHasKey('public', $container->getDefinition('no_defaults_child')->getChanges());
+        $this->assertArrayNotHasKey('autowire', $container->getDefinition('no_defaults_child')->getChanges());
+
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('no_defaults')->isPublic());
+        $this->assertTrue($container->getDefinition('no_defaults_child')->isPublic());
+
+        $this->assertSame(array(), $container->getDefinition('no_defaults')->getTags());
+        $this->assertSame(array('bar' => array(array())), $container->getDefinition('no_defaults_child')->getTags());
+        $this->assertSame(array('baz' => array(array()), 'foo' => array(array())), $container->getDefinition('with_defaults_child')->getTags());
+
+        $this->assertFalse($container->getDefinition('no_defaults')->isAutowired());
+        $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
+    }
+
+    public function testDefaultsWithAutowiredMethods()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services30.xml');
+
+        $this->assertSame(array('__construct'), $container->getDefinition('with_defaults')->getAutowiredMethods());
+        $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults')->getAutowiredMethods());
+        $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults_child')->getAutowiredMethods());
+        $this->assertSame(array(), $container->getDefinition('with_defaults_child')->getAutowiredMethods());
+    }
 }

@@ -4,11 +4,13 @@ CHANGELOG
 3.3.0
 -----
 
- * Add "iterator" argument type for lazy iteration over a set of values and services
-
- * Using the `PhpDumper` with an uncompiled `ContainerBuilder` is deprecated and
-   will not be supported anymore in 4.0.
-
+ * added "iterator" argument type for lazy iteration over a set of values and services
+ * added "closure-proxy" argument type for turning services' methods into lazy callables
+ * added file-wide configurable defaults for service attributes "public", "tags",
+   "autowire" and a new "inherit-tags"
+ * made the "class" attribute optional, using the "id" as fallback
+ * using the `PhpDumper` with an uncompiled `ContainerBuilder` is deprecated and
+   will not be supported anymore in 4.0
  * deprecated the `DefinitionDecorator` class in favor of `ChildDefinition`
 
 3.2.0

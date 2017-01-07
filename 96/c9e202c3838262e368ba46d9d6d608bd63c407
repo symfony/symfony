@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-07T12:26:30Z
+
+@lyrixx unfortunately I had to revert to the previous syntax to make it work on PHP 5
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-07T13:36:02Z
+
+👍

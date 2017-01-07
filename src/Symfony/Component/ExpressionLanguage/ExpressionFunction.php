@@ -62,4 +62,32 @@ class ExpressionFunction
     {
         return $this->evaluator;
     }
+
+    /**
+     * Creates an ExpressionFunction from a PHP function name.
+     *
+     * @param string $name The PHP function name
+     *
+     * @return self
+     *
+     * @throws \InvalidArgumentException if given function name does not exist
+     */
+    public static function php($name)
+    {
+        if (!function_exists($name)) {
+            throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $name));
+        }
+
+        $compiler = function () use ($name) {
+            return sprintf('%s(%s)', $name, implode(', ', func_get_args()));
+        };
+
+        $evaluator = function () use ($name) {
+            $args = func_get_args();
+
+            return call_user_func_array($name, array_splice($args, 1));
+        };
+
+        return new self($name, $compiler, $evaluator);
+    }
 }

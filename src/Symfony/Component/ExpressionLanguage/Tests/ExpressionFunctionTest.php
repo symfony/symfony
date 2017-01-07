@@ -41,5 +41,4 @@ class ExpressionFunctionTest extends \PHPUnit_Framework_TestCase
 
 function fn_namespaced()
 {
-
 }

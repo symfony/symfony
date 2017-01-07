@@ -1,6 +1,6 @@
 {
     "name": "symfony/web-server-bundle",
-    "type": "web-server-bundle",
+    "type": "symfony-bundle",
     "description": "Symfony WebServerBundle",
     "keywords": [],
     "homepage": "https://symfony.com",

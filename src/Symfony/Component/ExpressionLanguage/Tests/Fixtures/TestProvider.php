@@ -27,6 +27,8 @@ class TestProvider implements ExpressionFunctionProviderInterface
             }),
 
             ExpressionFunction::php('strtoupper'),
+
+            ExpressionFunction::php('\strtolower'),
         );
     }
 }

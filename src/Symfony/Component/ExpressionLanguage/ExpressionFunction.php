@@ -64,13 +64,14 @@ class ExpressionFunction
     }
 
     /**
-     * Creates an ExpressionFunction from a PHP function name.
+     * Creates an ExpressionFunction from a global PHP function name.
      *
      * @param string $name The PHP function name
      *
      * @return self
      *
      * @throws \InvalidArgumentException if given function name does not exist
+     * @throws \InvalidArgumentException if given function name is not in global namespace
      */
     public static function php($name)
     {
@@ -78,8 +79,15 @@ class ExpressionFunction
             throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $name));
         }
 
+        $reflection = new \ReflectionFunction($name);
+        if ($reflection->inNamespace()) {
+            throw new \InvalidArgumentException(sprintf('PHP function "%s" is not in global namespace.', $name));
+        }
+
+        $name = $reflection->getShortName();
+
         $compiler = function () use ($name) {
-            return sprintf('%s(%s)', $name, implode(', ', func_get_args()));
+            return sprintf('\%s(%s)', $name, implode(', ', func_get_args()));
         };
 
         $evaluator = function () use ($name) {

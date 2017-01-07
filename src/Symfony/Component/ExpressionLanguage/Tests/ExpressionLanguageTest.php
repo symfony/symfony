@@ -108,7 +108,7 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(PHP_VERSION, $expressionLanguage->evaluate('constant("PHP_VERSION")'));
 
         $expressionLanguage = new ExpressionLanguage();
-        $this->assertEquals('constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
+        $this->assertEquals('\constant("PHP_VERSION")', $expressionLanguage->compile('constant("PHP_VERSION")'));
     }
 
     public function testProviders()

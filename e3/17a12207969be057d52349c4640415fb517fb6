@@ -1,0 +1,345 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-27T18:23:58Z
+
+Looks like a good idea to me. What about aliases, though?
+Should we provide a way to let them public by default while services will be private?
+
+```yml
+service_defaults:
+    public: ['aliases'] # aliases are public whereas services are private
+
+service_defaults:
+    public: true # default: aliases and services are public <=> ['aliases', 'services']
+
+service_defaults:
+    public: false # aliases and services are private <=> []
+```
+
+(It'll need a special treatment for the `service_defaults.public` key, but as we won't generalize the `service_defaults` for every definition keys, I'd rather see this as a `loader_config` key than a "parent definition" one)
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-12-27T18:27:39Z
+
+What about adding tags like this? I often find myself with a specific service definition file that contains a specific type of services. Think of a file for form types, they all have the same tag. It would be really nice if I could use this feature to automatically tag all definitions in that file by this implicit parent definition.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-12-27T18:35:06Z
+
+👍, you should add this new section [here](https://github.com/nicolas-grekas/symfony/blob/ebcc45eeb07952c6266dbac6bb8897cf871cf4a6/src/Symfony/Component/DependencyInjection/Loader/YamlFileLoader.php#L498) or the ContainerBuilder will throw an exception.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-27T18:44:14Z
+
+*Minor comment*: could we please take some time to think about this proposal before merging it? This kind of changes can have a deep impact in how developers use Symfony. Personally I don't have an opinion about the idea yet ... but I don't like the implementation. It doesn't feel "natural" for Symfony.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-27T18:49:48Z
+
+As soon as it doesn't behaves blindly as a pseudo parent definition, but rather as a context/configuration exploitable by the loaders, it looks good to me. Hence, I don't really like the `service_defaults` naming, but rather see something like `loader_config/context` or whatever.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-27T19:00:57Z
+
+@javiereguiluz don't worry we have a process for that, this PR is no exception.
+
+@ogizanagi I'm :-1: on `loader_config` because this is just leaking internal vocabulary that users don't necessarily know about.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-27T19:27:21Z
+
+PR completed for YamlLoader. If someone would like to work on XmlLoader, I'd happily accept a PR against [my branch](https://github.com/nicolas-grekas/symfony/tree/di-pragma)!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-28T09:15:00Z
+
+I like the idea!
+
+What about using just `defaults` as key? `service_defaults` is a bit redundant with `service`:
+
+```yaml
+defaults:
+    public: false
+    autowire: ['_construct', 'set*']
+
+services:
+    foo:
+        class: Foo
+```
+
+The best looking config is:
+
+```yaml
+services:
+   defaults:
+        public: false
+        autowire: ['_construct', 'set*']
+
+    'Foo\Bar': {}
+```
+
+But I'm not sure that it's ok to deprecate some services names like `default` for this example.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T09:17:18Z
+
+> The best looking config is:
+
+Really? The one above looks more intuitive to me...
+
+```yaml
+defaults: #...
+services: #...
+```
+
+that is.
+
+Looking at it like this looks good... then again; if parameters are involved (`parameters: #...`) it may work counter-intuitive.
+
+Meaning either `service_defaults` (:+1:), or indeed `service.defaults`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T09:29:28Z
+
+The root namespace is used for container extensions configuration, that means there is a potential for collision with an existing bundle that uses this "defaults" name.
+This leads to another reason pro-`service_defaults`: the defaults we're talking about are related to `services` only.
+If you have eg:
+```yaml
+framework: #...
+services: #...
+defaults: #...
+```
+it's not intuitive at all that `defaults` applies only to `services`.
+That's why I agree with @dunglas that `defaults` inside `services` is the best of the two proposals.
+*But* is it worth the potential collision?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T09:45:54Z
+
+What about adding an underscore in this way?
+```yaml
+services:
+    _defaults:
+        #...
+```
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T09:48:38Z
+
+Perhaps `*` works out as well? It looks nicer then `_defaults` at least :) and seems to fit the case perfectly?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T09:49:42Z
+
+I doubt `*` would be friendly to anyone not familiar with what it does.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T09:51:15Z
+
+Think you're right.. just typed it out to visualize in fact. It looks good (imo.) but indeed.. _you need to know it_.
+
+`service._defaults` :+1:
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-12-28T10:18:33Z
+
+What about using something that sounds more specific to yaml such as `!defaults` (as a key of `services`)?
+It would also decrease the risk of conflicts.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T10:29:52Z
+
+`!defaults` must be quoted in yaml, not very friendly. And we already use `_` prefixes for special keys in eg routing yaml.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-12-28T10:40:06Z
+
+@nicolas-grekas I was thinking about a tag returning something similar to the JavaScript `Symbol` but yes custom tags aren't supported yet.
+Currently, unknown tags are considered as part of the scalar (e.g. `!defaults` remains `!defaults` as it is not known) so it's possible to use them and we could later migrate to a better tags system, wdyt?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-28T10:51:53Z
+
++1 for `services._defaults`. Btw we should take this occasion to deprecate any service name starting by a `_`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T13:22:29Z
+
+Let's go for `services._defaults`, PR updated.
+I'll let someone else do the deprecation for `_`-prefixed services if one thinks this should be done (not convinced myself.)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T17:33:58Z
+
+XmlLoader updated thanks to @ogizanagi in https://github.com/nicolas-grekas/symfony/pull/9
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-28T18:24:01Z
+
+Note that this can still create conflicts for a service named ``_defaults`` in Yaml (no issue in XML as it would not use the ``<service>`` tag.
+
+~~@nicolas-grekas I'm starting the work on the XML loader.~~ already done in the meantime
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-28T20:02:18Z
+
+Note that I'm working on a following PR already: in XML, there is no way currently to *not* inherit the tags when one set some in `<defaults>`. But controlling tag inheritance would also be a nice addition to child definitions. That's why I'd like to make another PR for that feat.
+
+This means this PR is ready.
+
+---------------------------------------------------------------------------
+
+by sstok at 2016-12-29T10:28:34Z
+
+I like @ogizanagi idea about contexts, which would make it also work for the PHP loader 👍
+
+```yaml
+services_contexts:
+    form_extensions: // name, for clearance only
+        defaults:
+            public: false
+            autowire: ['_construct', 'set*']
+        services:
+            foo:
+                class: Foo
+```
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <service-contexts>
+        <context name=""> <!-- name is optional -->
+            <defaults public="false">
+                <autowire>__construct</autowire>
+                <tag name="foo"/>
+            </defaults>
+
+            <services>
+            ...
+            </services>
+        </context>
+    </service-contexts>
+</container>
+
+<!-- alternatively with multiple services nodes -->
+
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <defaults public="false">
+            <autowire>__construct</autowire>
+            <tag name="foo"/>
+        </defaults>
+    </services>
+
+    <services>
+        <defaults public="false">
+            <autowire>__construct</autowire>
+            <tag name="foo"/>
+        </defaults>
+    </services>
+</container>
+```
+
+You could even consider adding support for contextual parameters, that only exists in that context (but not in the Containers ParametersBag).
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T10:35:02Z
+
+Imo. separate files means separate context.
+
+> You could even consider adding support for contextual parameters, that only exists in that context (but not in the Containers ParametersBag).
+
+We could indeed allow to mark parameters for disposal :+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-29T16:07:57Z
+
+Eventually, I decide to add this feature in this PR.
+So now, one is able to use the "inherit-tags" setting to force/disable tags inheritance from the parent context. The "parent context" for definitions with no "parent" attributes is the "defaults" context.
+"inherit-tags" can be configured in the "defaults" section so that one can set `inherit_tags: true` in `_defaults` and have all definitions with `parent: ...` inherit tags from their parent.
+See fixtures for examples.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-12-29T18:54:01Z
+
+👍 from me for how the feature is designed. Later, we can discuss / discover what recommendations we'll give to our users in the docs and in the SE, but even if we did nothing else, I think this is useful (I would certainly use it - I autowire everything + setter autowiring is almost unusable if you need to manually set it on *every* service - this fixes that).
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2016-12-30T00:15:22Z
+
+Just for inspiration from @Nette, there is similar tool, that decorates specific classes/types of classes:
+
+See [this article](http://www.tomasvotruba.cz/blog/2016/12/24/how-to-avoid-inject-thanks-to-decorator-feature-in-nette/) - jump to "Decorator Extension to the Rescue" headline.
+
+And this Tweet: https://twitter.com/VotrubaT/status/812802092356276224
+
+![decorator](https://cloud.githubusercontent.com/assets/924196/21557516/6cfcbe3a-ce2d-11e6-8f91-824cac3463ed.jpg)
+
+I'm amazed, how similar these tools are :)
+
+---------------------------------------------------------------------------
+
+by grachevko at 2016-12-30T23:34:36Z
+
+What about add `factory` to list of _default options?
+It can be useful to define doctrine repositories as service for example.
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2016-12-31T01:30:20Z
+
+@grachevko How would that look like? From example I understand it's global setup for all services.
+
+---------------------------------------------------------------------------
+
+by grachevko at 2016-12-31T09:01:25Z
+
+@TomasVotruba not a global. This PR add `_default` options which have affect only on file where it.
+We can create `subscribers.yml` and set `_default.tags: [{ name: kernel.event_subscriber }]` for all subscribers in this file without typing same `tag` to each.
+Just the same we could create `repositories.yml` and set `_default.factory: ['@doctrine', 'getRepository']` without typing same `factory`.
+
+---------------------------------------------------------------------------
+
+by TomasVotruba at 2016-12-31T12:53:17Z
+
+@grachevko Ah. That's a pity. I was looking forward to get rid of Console, EventSubscriber, FormType etc. tags.
+
+I'll work on that Decorator feature then :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-07T14:37:50Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-07T14:48:22Z
+
+👍

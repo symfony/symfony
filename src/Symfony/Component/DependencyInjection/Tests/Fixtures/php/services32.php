@@ -62,11 +62,11 @@ class ProjectServiceContainer extends Container
         $this->services['bar'] = $instance = new \stdClass();
 
         $instance->foo = array(0 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container32\Foo::withVariadic */ function ($a, &...$c) {
-            return $this->get('foo')->withVariadic($a, ...$c);
+            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withVariadic($a, ...$c);
         }, 1 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container32\Foo::withNullable */ function (?int $a) {
-            return $this->get('foo')->withNullable($a);
+            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withNullable($a);
         }, 2 => /** @closure-proxy Symfony\Component\DependencyInjection\Tests\Fixtures\Container32\Foo::withReturnType */ function () {
-            return $this->get('foo')->withReturnType();
+            return ${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'}->withReturnType();
         });
 
         return $instance;

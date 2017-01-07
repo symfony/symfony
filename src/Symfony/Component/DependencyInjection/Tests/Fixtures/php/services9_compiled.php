@@ -82,7 +82,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getBarService()
     {
-        $a = $this->get('foo.baz');
+        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
 
         $this->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $this->getParameter('foo_bar'));
 
@@ -103,7 +103,7 @@ class ProjectServiceContainer extends Container
     {
         $this->services['baz'] = $instance = new \Baz();
 
-        $instance->setFoo($this->get('foo_with_inline'));
+        $instance->setFoo(${($_ = isset($this->services['foo_with_inline']) ? $this->services['foo_with_inline'] : $this->get('foo_with_inline')) && false ?: '_'});
 
         return $instance;
     }
@@ -119,7 +119,7 @@ class ProjectServiceContainer extends Container
     protected function getClosureProxyService()
     {
         return $this->services['closure_proxy'] = new \BarClass(/** @closure-proxy BarClass::getBaz */ function () {
-            return $this->get('closure_proxy')->getBaz();
+            return ${($_ = isset($this->services['closure_proxy']) ? $this->services['closure_proxy'] : $this->get('closure_proxy')) && false ?: '_'}->getBaz();
         });
     }
 
@@ -134,7 +134,7 @@ class ProjectServiceContainer extends Container
     protected function getConfiguredServiceService()
     {
         $a = new \ConfClass();
-        $a->setFoo($this->get('baz'));
+        $a->setFoo(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->get('baz')) && false ?: '_'});
 
         $this->services['configured_service'] = $instance = new \stdClass();
 
@@ -213,7 +213,7 @@ class ProjectServiceContainer extends Container
      */
     protected function getFactoryServiceService()
     {
-        return $this->services['factory_service'] = $this->get('foo.baz')->getInstance();
+        return $this->services['factory_service'] = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'}->getInstance();
     }
 
     /**
@@ -239,14 +239,14 @@ class ProjectServiceContainer extends Container
      */
     protected function getFooService()
     {
-        $a = $this->get('foo.baz');
+        $a = ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
 
         $this->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, array('bar' => 'foo is bar', 'foobar' => 'bar'), true, $this);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
         $instance->qux = array('bar' => 'foo is bar', 'foobar' => 'bar');
-        $instance->setBar($this->get('bar'));
+        $instance->setBar(${($_ = isset($this->services['bar']) ? $this->services['bar'] : $this->get('bar')) && false ?: '_'});
         $instance->initialize();
         sc_configure($instance);
 
@@ -295,7 +295,7 @@ class ProjectServiceContainer extends Container
         $this->services['foo_with_inline'] = $instance = new \Foo();
 
         $a->pub = 'pub';
-        $a->setBaz($this->get('baz'));
+        $a->setBaz(${($_ = isset($this->services['baz']) ? $this->services['baz'] : $this->get('baz')) && false ?: '_'});
 
         $instance->setBar($a);
 
@@ -314,7 +314,7 @@ class ProjectServiceContainer extends Container
     {
         return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function() {
             yield 0 => 'foo';
-            yield 1 => $this->get('foo.baz');
+            yield 1 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
             yield 2 => array('bar' => 'foo is '.'bar'.'', 'foobar' => 'bar');
             yield 3 => true;
             yield 4 => $this;
@@ -332,7 +332,7 @@ class ProjectServiceContainer extends Container
     protected function getLazyContextIgnoreInvalidRefService()
     {
         return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function() {
-            yield 0 => $this->get('foo.baz');
+            yield 0 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
         }));
     }
 
@@ -350,7 +350,7 @@ class ProjectServiceContainer extends Container
 
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
-        $instance->setBar($this->get('foo'));
+        $instance->setBar(${($_ = isset($this->services['foo']) ? $this->services['foo'] : $this->get('foo')) && false ?: '_'});
         $instance->setBar(NULL);
         $instance->setBar(($this->get("foo")->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
 

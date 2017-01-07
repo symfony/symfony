@@ -26,7 +26,7 @@ class ExpressionFunctionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFunctionDoesNotExist()
     {
-        ExpressionFunction::php('fn_does_not_exist');
+        ExpressionFunction::fromPhp('fn_does_not_exist');
     }
 
     /**
@@ -35,7 +35,7 @@ class ExpressionFunctionTest extends \PHPUnit_Framework_TestCase
      */
     public function testFunctionIsNotGlobal()
     {
-        ExpressionFunction::php('Symfony\Component\ExpressionLanguage\Tests\fn_namespaced');
+        ExpressionFunction::fromPhp('Symfony\Component\ExpressionLanguage\Tests\fn_namespaced');
     }
 }
 

@@ -73,7 +73,7 @@ class ExpressionFunction
      * @throws \InvalidArgumentException if given function name does not exist
      * @throws \InvalidArgumentException if given function name is not in global namespace
      */
-    public static function php($name)
+    public static function fromPhp($name)
     {
         if (!function_exists($name)) {
             throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $name));

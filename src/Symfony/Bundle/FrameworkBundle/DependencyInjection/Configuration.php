@@ -12,9 +12,15 @@
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Annotation;
+use Symfony\Bundle\FullStack;
+use Symfony\Component\Asset\Package;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Translation\Translator;
+use Symfony\Component\Validator\Validation;
 
 /**
  * FrameworkExtension configuration structure.
@@ -139,7 +145,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('form')
                     ->info('form configuration')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && class_exists(Form::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->arrayNode('csrf_protection')
                             ->treatFalseLike(array('enabled' => false))
@@ -506,7 +512,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('assets')
                     ->info('assets configuration')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && class_exists(Package::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->fixXmlConfig('base_url')
                     ->children()
                         ->scalarNode('version_strategy')->defaultNull()->end()
@@ -573,7 +579,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('translator')
                     ->info('translator configuration')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && class_exists(Translator::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->fixXmlConfig('fallback')
                     ->fixXmlConfig('path')
                     ->children()
@@ -598,10 +604,10 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('validation')
                     ->info('validation configuration')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && class_exists(Validation::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
                         ->scalarNode('cache')->end()
-                        ->booleanNode('enable_annotations')->{class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->arrayNode('static_method')
                             ->defaultValue(array('loadValidatorMetadata'))
                             ->prototype('scalar')->end()
@@ -642,9 +648,9 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('serializer')
                     ->info('serializer configuration')
-                    ->canBeEnabled()
+                    ->{!class_exists(FullStack::class) && class_exists(Serializer::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                     ->children()
-                        ->booleanNode('enable_annotations')->{class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
+                        ->booleanNode('enable_annotations')->{!class_exists(FullStack::class) && class_exists(Annotation::class) ? 'defaultTrue' : 'defaultFalse'}()->end()
                         ->scalarNode('cache')->end()
                         ->scalarNode('name_converter')->end()
                     ->end()

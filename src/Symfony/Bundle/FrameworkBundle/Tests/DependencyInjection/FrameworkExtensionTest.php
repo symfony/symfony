@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
+use Doctrine\Common\Annotations\Annotation;
+use Symfony\Bundle\FullStack;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -24,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\XmlFileLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
@@ -413,7 +416,9 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(6, $calls);
+        $annotations = !class_exists(FullStack::class) && class_exists(Annotation::class);
+
+        $this->assertCount($annotations ? 7 : 6, $calls);
         $this->assertSame('setConstraintValidatorFactory', $calls[0][0]);
         $this->assertEquals(array(new Reference('validator.validator_factory')), $calls[0][1]);
         $this->assertSame('setTranslator', $calls[1][0]);
@@ -422,10 +427,14 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertSame(array('%validator.translation_domain%'), $calls[2][1]);
         $this->assertSame('addXmlMappings', $calls[3][0]);
         $this->assertSame(array($xmlMappings), $calls[3][1]);
-        $this->assertSame('addMethodMapping', $calls[4][0]);
-        $this->assertSame(array('loadValidatorMetadata'), $calls[4][1]);
-        $this->assertSame('setMetadataCache', $calls[5][0]);
-        $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[5][1]);
+        $i = 3;
+        if ($annotations) {
+            $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
+        }
+        $this->assertSame('addMethodMapping', $calls[++$i][0]);
+        $this->assertSame(array('loadValidatorMetadata'), $calls[$i][1]);
+        $this->assertSame('setMetadataCache', $calls[++$i][0]);
+        $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[$i][1]);
     }
 
     public function testValidationService()
@@ -536,10 +545,16 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $calls = $container->getDefinition('validator.builder')->getMethodCalls();
 
-        $this->assertCount(5, $calls);
+        $annotations = !class_exists(FullStack::class) && class_exists(Annotation::class);
+
+        $this->assertCount($annotations ? 6 : 5, $calls);
         $this->assertSame('addXmlMappings', $calls[3][0]);
-        $this->assertSame('setMetadataCache', $calls[4][0]);
-        $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[4][1]);
+        $i = 3;
+        if ($annotations) {
+            $this->assertSame('enableAnnotationMapping', $calls[++$i][0]);
+        }
+        $this->assertSame('setMetadataCache', $calls[++$i][0]);
+        $this->assertEquals(array(new Reference('validator.mapping.cache.symfony')), $calls[$i][1]);
         // no cache, no annotations, no static methods
     }
 
@@ -572,7 +587,7 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testSerializerDisabled()
     {
         $container = $this->createContainerFromFile('default_config');
-        $this->assertFalse($container->has('serializer'));
+        $this->assertSame(!class_exists(FullStack::class) && class_exists(Serializer::class), $container->has('serializer'));
     }
 
     public function testSerializerEnabled()

@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
+use Symfony\Bundle\FullStack;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
@@ -176,7 +177,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enabled' => false,
             ),
             'form' => array(
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class),
                 'csrf_protection' => array(
                     'enabled' => null, // defaults to csrf_protection.enabled
                     'field_name' => '_token',
@@ -200,14 +201,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
             'translator' => array(
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class),
                 'fallbacks' => array('en'),
                 'logging' => true,
                 'paths' => array(),
             ),
             'validation' => array(
-                'enabled' => false,
-                'enable_annotations' => false,
+                'enabled' => !class_exists(FullStack::class),
+                'enable_annotations' => !class_exists(FullStack::class),
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
                 'strict_email' => false,
@@ -219,8 +220,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'enabled' => true,
             ),
             'serializer' => array(
-                'enabled' => false,
-                'enable_annotations' => false,
+                'enabled' => !class_exists(FullStack::class),
+                'enable_annotations' => !class_exists(FullStack::class),
             ),
             'property_access' => array(
                 'magic_call' => false,
@@ -258,7 +259,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'loaders' => array(),
             ),
             'assets' => array(
-                'enabled' => false,
+                'enabled' => !class_exists(FullStack::class),
                 'version_strategy' => null,
                 'version' => null,
                 'version_format' => '%%s?%%s',

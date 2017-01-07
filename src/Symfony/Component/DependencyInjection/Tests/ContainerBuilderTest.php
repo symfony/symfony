@@ -16,6 +16,7 @@ require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -868,6 +869,63 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('a', (string) $container->getDefinition('b')->getArgument(0));
     }
+
+    public function testClosureProxy()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')
+            ->setProperty('foo', new ClosureProxyArgument('bar', 'c'))
+        ;
+        $container->register('bar', A::class);
+
+        $foo = $container->get('foo');
+
+        $this->assertInstanceOf('Closure', $foo->foo);
+        $this->assertSame(123, call_user_func($foo->foo));
+    }
+
+    public function testClosureProxyContainer()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')
+            ->setProperty('foo', new ClosureProxyArgument('service_container', 'get'))
+        ;
+
+        $foo = $container->get('foo');
+
+        $this->assertInstanceOf('Closure', $foo->foo);
+        $this->assertSame($foo, call_user_func($foo->foo, 'foo'));
+    }
+
+    public function testClosureProxyOnInvalidNull()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')
+            ->setProperty('foo', new ClosureProxyArgument('bar', 'c', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+        ;
+
+        $foo = $container->get('foo');
+
+        $this->assertNull($foo->foo);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @expectedExceptionMessage You have requested a non-existent service "bar".
+     */
+    public function testClosureProxyOnInvalidException()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'stdClass')
+            ->setProperty('foo', new ClosureProxyArgument('bar', 'c'))
+        ;
+
+        $container->get('foo');
+    }
 }
 
 class FooClass
@@ -876,6 +934,10 @@ class FooClass
 
 class A
 {
+    public function c()
+    {
+        return 123;
+    }
 }
 
 class B

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -460,10 +461,28 @@ class YamlFileLoader extends FileLoader
                 if (1 !== count($value)) {
                     throw new InvalidArgumentException('Arguments typed "=iterator" must have no sibling keys.');
                 }
-                if (!is_array($value['=iterator'])) {
+                if (!is_array($value = $value['=iterator'])) {
                     throw new InvalidArgumentException('Arguments typed "=iterator" must be arrays.');
                 }
-                $value = new IteratorArgument(array_map(array($this, 'resolveServices'), $value['=iterator']));
+                $value = new IteratorArgument(array_map(array($this, 'resolveServices'), $value));
+            } elseif (array_key_exists('=closure_proxy', $value)) {
+                if (1 !== count($value)) {
+                    throw new InvalidArgumentException('Arguments typed "=closure_proxy" must have no sibling keys.');
+                }
+                if (!is_array($value = $value['=closure_proxy']) || array(0, 1) !== array_keys($value)) {
+                    throw new InvalidArgumentException('Arguments typed "=closure_proxy" must be arrays of [@service, method].');
+                }
+                if (!is_string($value[0]) || !is_string($value[1]) || 0 !== strpos($value[0], '@') || 0 === strpos($value[0], '@@')) {
+                    throw new InvalidArgumentException('Arguments typed "=closure_proxy" must be arrays of [@service, method].');
+                }
+                if (0 === strpos($value[0], '@?')) {
+                    $value[0] = substr($value[0], 2);
+                    $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+                } else {
+                    $value[0] = substr($value[0], 1);
+                    $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+                }
+                $value = new ClosureProxyArgument($value[0], $value[1], $invalidBehavior);
             } else {
                 $value = array_map(array($this, 'resolveServices'), $value);
             }

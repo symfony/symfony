@@ -46,7 +46,13 @@ class WrappedListener
             $this->name = is_object($listener[0]) ? get_class($listener[0]) : $listener[0];
             $this->pretty = $this->name.'::'.$listener[1];
         } elseif ($listener instanceof \Closure) {
-            $this->pretty = $this->name = 'closure';
+            $r = new \ReflectionFunction($listener);
+            if (preg_match('#^/\*\* @closure-proxy ([^: ]++)::([^: ]++) \*/$#', $r->getDocComment(), $m)) {
+                $this->name = $m[1];
+                $this->pretty = $m[1].'::'.$m[2];
+            } else {
+                $this->pretty = $this->name = 'closure';
+            }
         } elseif (is_string($listener)) {
             $this->pretty = $this->name = $listener;
         } else {

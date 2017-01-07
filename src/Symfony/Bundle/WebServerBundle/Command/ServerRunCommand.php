@@ -27,6 +27,17 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ServerRunCommand extends ServerCommand
 {
+    private $documentRoot;
+    private $environment;
+
+    public function __construct($documentRoot = null, $environment = null)
+    {
+        $this->documentRoot = $documentRoot;
+        $this->environment = $environment;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -71,7 +82,12 @@ EOF
         $io = new SymfonyStyle($input, $output);
 
         if (null === $documentRoot = $input->getOption('docroot')) {
-            $documentRoot = $this->getContainer()->getParameter('kernel.root_dir').'/../web';
+            if (!$this->documentRoot) {
+                $io->error('The document root directory must be either passed as first argument of the constructor or through the "--docroot" input option.');
+
+                return 1;
+            }
+            $documentRoot = $this->documentRoot;
         }
 
         if (!is_dir($documentRoot)) {
@@ -80,7 +96,18 @@ EOF
             return 1;
         }
 
-        $env = $this->getContainer()->getParameter('kernel.environment');
+        if (!$env = $this->environment) {
+            if ($input->hasOption('env') && !$env = $input->getOption('env')) {
+                $io->error('The environment must be either passed as second argument of the constructor or through the "--env" input option.');
+
+                return 1;
+            } else {
+                $io->error('The environment must be passed as second argument of the constructor.');
+
+                return 1;
+            }
+        }
+
         if ('prod' === $env) {
             $io->error('Running this server in production environment is NOT recommended!');
         }

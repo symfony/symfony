@@ -1539,19 +1539,24 @@ EOF;
         }
 
         if ($this->container->hasDefinition($id) && !$this->container->getDefinition($id)->isPublic()) {
-            // The following is PHP 5.5 syntax for what could be written as "(\$this->services['$id'] ?? \$this->{$this->generateMethodName($id)}())" on PHP>=7.0
-
-            return "\${(\$_ = isset(\$this->services['$id']) ? \$this->services['$id'] : \$this->{$this->generateMethodName($id)}()) && false ?: '_'}";
-        }
-        if (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-            return sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
+            $code = sprintf('$this->%s()', $this->generateMethodName($id));
+        } elseif (null !== $reference && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
+            $code = sprintf('$this->get(\'%s\', ContainerInterface::NULL_ON_INVALID_REFERENCE)', $id);
         } else {
             if ($this->container->hasAlias($id)) {
                 $id = (string) $this->container->getAlias($id);
             }
 
-            return sprintf('$this->get(\'%s\')', $id);
+            $code = sprintf('$this->get(\'%s\')', $id);
         }
+
+        if ($this->container->hasDefinition($id) && (!$this->container->getDefinition($id)->isPublic() || $this->container->getDefinition($id)->isShared())) {
+            // The following is PHP 5.5 syntax for what could be written as "(\$this->services['$id'] ?? $code)" on PHP>=7.0
+
+            $code = "\${(\$_ = isset(\$this->services['$id']) ? \$this->services['$id'] : $code) && false ?: '_'}";
+        }
+
+        return $code;
     }
 
     /**

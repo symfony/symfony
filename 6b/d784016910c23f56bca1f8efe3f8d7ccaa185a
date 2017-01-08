@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-08T20:26:06Z
+
+Looks like we need to add some more checks to make sure that the Templating component is not only present, but that the `templating` config in FrameworkBundle is enabled too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-08T20:32:40Z
+
+That's why checking on 'templating' was better. Switched back, tests pass now.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-08T20:37:22Z
+
+Indeed, that's better.

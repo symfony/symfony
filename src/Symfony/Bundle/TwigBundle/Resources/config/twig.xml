@@ -53,6 +53,7 @@
 
         <service id="twig.loader.native_filesystem" class="Twig_Loader_Filesystem" public="false">
             <argument type="collection" />
+            <tag name="twig.loader"/>
         </service>
 
         <service id="twig.loader.chain" class="%twig.loader.chain.class%" public="false"/>

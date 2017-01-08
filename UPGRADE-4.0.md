@@ -42,6 +42,12 @@ DependencyInjection
  * Requesting a private service with the `Container::get()` method is no longer
    supported.
 
+EventDispatcher
+---------------
+
+ * The `ContainerAwareEventDispatcher` class has been removed.
+   Use `EventDispatcher` with closure-proxy injection instead.
+
 ExpressionLanguage
 ----------
 

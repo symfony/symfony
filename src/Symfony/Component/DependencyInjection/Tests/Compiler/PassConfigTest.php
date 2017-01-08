@@ -29,6 +29,8 @@ class PassConfigTest extends \PHPUnit_Framework_TestCase
         $pass2 = $this->getMockBuilder(CompilerPassInterface::class)->getMock();
         $config->addPass($pass2, PassConfig::TYPE_BEFORE_OPTIMIZATION, 30);
 
-        $this->assertSame(array($pass2, $pass1), $config->getBeforeOptimizationPasses());
+        $passes = $config->getBeforeOptimizationPasses();
+        $this->assertSame($pass2, $passes[1]);
+        $this->assertSame($pass1, $passes[2]);
     }
 }

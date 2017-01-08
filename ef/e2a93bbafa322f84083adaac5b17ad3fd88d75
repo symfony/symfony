@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-11-26T10:22:58Z
+
+We could also go with `readFile` / `writeFile` maybe? Where `writeFile` allows some tweaking to append, prepend or set/dump/overwrite/replace.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-26T12:04:42Z
+
+@ro0NL We could and it would make sense imho. Though I'm comfortable with what is proposed here because it's something I actually needed a lot of times, I have concrete use cases for it.
+Feel free to try your approach, I would be 👍  . Thanks for sharing
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T10:35:39Z
+
+The implementation looks very fragile to me: it's not atomic at all; why should it fail when the file doesn't exist?
+I think that this should behave more like fopen+a mode.
+But then why should we need a method to do that when fopen+a mode is really fine?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-12T11:18:53Z
+
+> why should it fail when the file doesn't exist?
+
+You're right, it should not fail by default, but I think it should be opt-in for cases where the content must not be appended if the file doesn't already exist.
+
+> But then why should we need a method to do that when fopen+a mode is really fine?
+
+To ease error handling as `dumpFile()` does, so we could catch a specific exception instead of having to mute an eventual warning and to check the return of `fopen`  in user-land code.
+
+Given the whole `Filesystem` api eases performing such common tasks on the filesystem, I think it's relevant to add this one too, avoiding the need to write this logic yourself and mixing the use of this api with native functions
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-16T09:16:10Z
+
+Removed the exception when the file doesn't exist. Now this behaves like `fopen +a` but writing to the file and throwing exceptions on failure.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-18T12:26:04Z
+
+Travis failure is unrelated
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-18T13:55:15Z
+
+👍
+
+We just need to validate there isn't any downside about using `LOCK_EX` instead of the previous implementation (what were the reasons behind the original implementation).
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T14:00:47Z
+
+:+1:, although I'm wondering if we shouldn't remove LOCK_EX
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-06T16:35:33Z
+
+LOCK_EX removed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-08T12:53:16Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-08T19:58:11Z
+
+Can you add a note in the CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-08T20:08:06Z
+
+CHANGELOG updated

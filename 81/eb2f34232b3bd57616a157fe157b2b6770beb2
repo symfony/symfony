@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-07T12:23:18Z
+
+Here is what is needed to replace the bundle by a component and wire it in the framework https://github.com/symfony/symfony/compare/master...chalasr:webserver-component
+I can submit a PR, just tell me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-07T13:25:09Z
+
+I'm :-0: on this change, but if others thinks it helps, why not.
+
+But I'm :-1: on making it a component and tying it to the framework bundle is exactly what I wanted to avoid in the first place.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-07T13:55:20Z
+
+I saw it like "these commands should live without the framework" while it was "the framework should live without these commands", got it.
+
+I think the first sentence stays good as a "bonus" and this change helps at making it true, decoupling the commands from the framework and from the container (right now they can't be used without both).
+
+---------------------------------------------------------------------------
+
+by mickaelandrieu at 2017-01-07T16:05:55Z
+
+Regarding my previous [comments](https://github.com/symfony/symfony/pull/21039), I'm totaly in favor of this decoupling.
+
+> But I'm 👎 on making it a component and tying it to the framework bundle is exactly what I wanted to avoid in the first place.
+
+And again: why not a component and his bundle ?
+
+> In that case, the commands are not available unless you have the symfony/process component installed.
+
+Also, as the Bundle "require" process component, I don't see how we cant avoid the autoloading of theses commands right now :)

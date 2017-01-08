@@ -77,7 +77,7 @@ class TwigExtension extends Extension
         $envConfiguratorDefinition->replaceArgument(4, $config['number_format']['decimal_point']);
         $envConfiguratorDefinition->replaceArgument(5, $config['number_format']['thousands_separator']);
 
-        $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.filesystem');
+        $twigFilesystemLoaderDefinition = $container->getDefinition('twig.loader.native_filesystem');
 
         // register user-configured paths
         foreach ($config['paths'] as $path => $namespace) {

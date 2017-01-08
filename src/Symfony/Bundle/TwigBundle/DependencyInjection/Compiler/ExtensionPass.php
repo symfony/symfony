@@ -45,7 +45,7 @@ class ExtensionPass implements CompilerPassInterface
         if ($container->has('form.extension')) {
             $container->getDefinition('twig.extension.form')->addTag('twig.extension');
             $reflClass = new \ReflectionClass('Symfony\Bridge\Twig\Extension\FormExtension');
-            $container->getDefinition('twig.loader.filesystem')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
+            $container->getDefinition('twig.loader.native_filesystem')->addMethodCall('addPath', array(dirname(dirname($reflClass->getFileName())).'/Resources/views/Form'));
         }
 
         if ($container->has('fragment.handler')) {
@@ -88,11 +88,13 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.debug')->addTag('twig.extension');
         }
 
-        if (!$container->has('templating')) {
-            $loader = $container->getDefinition('twig.loader.native_filesystem');
-            $loader->addTag('twig.loader');
-            $loader->setMethodCalls($container->getDefinition('twig.loader.filesystem')->getMethodCalls());
+        $twigLoader = $container->getDefinition('twig.loader.native_filesystem');
+        if ($container->has('templating')) {
+            $loader = $container->getDefinition('twig.loader.filesystem');
+            $loader->setMethodCalls($twigLoader->getMethodCalls());
 
+            $twigLoader->clearTag('twig.loader');
+        } else {
             $container->setAlias('twig.loader.filesystem', new Alias('twig.loader.native_filesystem', false));
         }
 

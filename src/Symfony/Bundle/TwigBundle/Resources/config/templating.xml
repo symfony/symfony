@@ -10,8 +10,6 @@
             <tag name="twig.loader"/>
         </service>
 
-        <service id="twig.loader" alias="twig.loader.filesystem" />
-
         <service id="templating.engine.twig" class="%templating.engine.twig.class%" public="false">
             <argument type="service" id="twig" />
             <argument type="service" id="templating.name_parser" />

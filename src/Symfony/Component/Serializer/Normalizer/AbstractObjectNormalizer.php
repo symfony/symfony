@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -269,6 +270,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 if ($this->serializer->supportsDenormalization($data, $class, $format)) {
                     return $this->serializer->denormalize($data, $class, $format, $context);
                 }
+            }
+
+            // JSON only has a Number type corresponding to both int and float PHP types.
+            // PHP's json_encode, JavaScript's JSON.stringify, Go's json.Marshal as well as most other JSON encoders convert
+            // floating-point numbers like 12.0 to 12 (the decimal part is dropped when possible).
+            // PHP's json_decode automatically converts Numbers without a decimal part to integers.
+            // To circumvent this behavior, integers are converted to floats when denormalizing JSON based formats and when
+            // a float is expected.
+            if (Type::BUILTIN_TYPE_FLOAT === $builtinType && is_int($data) && false !== strpos($format, JsonEncoder::FORMAT)) {
+                return (float) $data;
             }
 
             if (call_user_func('is_'.$builtinType, $data)) {

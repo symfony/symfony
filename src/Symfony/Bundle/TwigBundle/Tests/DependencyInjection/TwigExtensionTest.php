@@ -153,7 +153,7 @@ class TwigExtensionTest extends TestCase
         $this->loadFromFile($container, 'extra', $format);
         $this->compileContainer($container);
 
-        $def = $container->getDefinition('twig.loader.filesystem');
+        $def = $container->getDefinition('twig.loader.native_filesystem');
         $paths = array();
         foreach ($def->getMethodCalls() as $call) {
             if ('addPath' === $call[0] && false === strpos($call[1][0], 'Form')) {

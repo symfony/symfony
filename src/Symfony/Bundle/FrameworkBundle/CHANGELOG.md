@@ -4,6 +4,9 @@ CHANGELOG
 3.3.0
 -----
 
+ * Changed default configuration for
+   assets/forms/validation/translation/serialization/csrf from `canBeEnabled()` to
+   `canBeDisabled()` when Flex is used
  * The server:* commands and their associated router files were moved to WebServerBundle
  * Translation related services are not loaded anymore when the `framework.translator` option
    is disabled.

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-15T15:52:01Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-16T20:47:49Z
+
+PR updated to deprecate the ContainerAwareEventDispatcher class.
+To be rebased on top of #20953 before merging.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-17T08:19:25Z
+
+The upgrade files for 3.3 and 4.0 need to be updated too.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-07T14:15:39Z
+
+Can be rebased now
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-07T14:19:26Z
+
+You should probably update `src/Symfony/Bundle/FrameworkBundle/Resources/config/services.xml` as well to remove its usage.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-07T15:59:08Z
+
+Rebased. About services.xml, that'd be a BC break because of the getContainer method that people may use...

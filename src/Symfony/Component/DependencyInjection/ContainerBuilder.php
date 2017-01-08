@@ -862,6 +862,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param string $id
      *
      * @return string
+     *
+     * @internal
      */
     public function getCaseSensitiveId($id)
     {

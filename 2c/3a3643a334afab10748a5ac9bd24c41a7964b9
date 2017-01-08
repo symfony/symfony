@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-08T12:58:56Z
+
+But it still breaks?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-08T13:10:10Z
+
+I can't figure out why, it fixed it on my side https://travis-ci.org/chalasr/symfony/builds/189966453. It's like if the changes made here are not took into account

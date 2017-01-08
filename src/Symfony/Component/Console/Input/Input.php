@@ -142,6 +142,22 @@ abstract class Input implements InputInterface, StreamableInputInterface
     }
 
     /**
+     * @param string $name
+     *
+     * @return bool True if the argument was provided for this input
+     *
+     * @throws InvalidArgumentException When no InputArgument exists in the InputDefinition with this name
+     */
+    public function isArgumentProvided($name)
+    {
+        if (!$this->definition->hasArgument($name)) {
+            throw new InvalidArgumentException(sprintf('The "%s" argument does not exist.', $name));
+        }
+
+        return array_key_exists($name, $this->arguments);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getOptions()
@@ -179,6 +195,22 @@ abstract class Input implements InputInterface, StreamableInputInterface
     public function hasOption($name)
     {
         return $this->definition->hasOption($name);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool True if the option was provided for this input
+     *
+     * @throws InvalidArgumentException When no InputOption exists in the InputDefinition with this name
+     */
+    public function isOptionProvided($name)
+    {
+        if (!$this->definition->hasOption($name)) {
+            throw new InvalidArgumentException(sprintf('The "%s" option does not exist.', $name));
+        }
+
+        return array_key_exists($name, $this->options);
     }
 
     /**

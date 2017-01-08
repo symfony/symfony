@@ -137,4 +137,46 @@ class InputTest extends \PHPUnit_Framework_TestCase
         $input->setStream($stream);
         $this->assertSame($stream, $input->getStream());
     }
+
+    public function testIsArgumentProvided()
+    {
+        $definition = new InputDefinition(array(new InputArgument('name')));
+
+        $input = new ArrayInput(array(), $definition);
+        $this->assertFalse($input->isArgumentProvided('name'));
+
+        $input = new ArrayInput(array('name' => 'foo'), $definition);
+        $this->assertTrue($input->isArgumentProvided('name'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The "name" argument does not exist.
+     */
+    public function testIsArgumentProvidedThrowsOnUndefinedArgument()
+    {
+        $input = new ArrayInput(array(), new InputDefinition());
+        $input->isArgumentProvided('name');
+    }
+
+    public function testIsOptionProvided()
+    {
+        $definition = new InputDefinition(array(new InputOption('bar')));
+
+        $input = new ArrayInput(array(), $definition);
+        $this->assertFalse($input->isOptionProvided('bar'));
+
+        $input = new ArrayInput(array('--bar' => 'foo'), $definition);
+        $this->assertTrue($input->isOptionProvided('bar'));
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The "bar" option does not exist.
+     */
+    public function testIsOptionProvidedThrowsOnUndefinedOption()
+    {
+        $input = new ArrayInput(array(), new InputDefinition());
+        $input->isOptionProvided('bar');
+    }
 }

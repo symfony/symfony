@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by scaytrase at 2017-01-04T09:29:09Z
+
+Not sure if AppVeyor fail is related (https://ci.appveyor.com/project/fabpot/symfony/build/1.0.16476#L492)
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2017-01-04T09:40:05Z
+
+Btw why not add the nightly php builds as allowed-failure travus matrix entry? I think this would expose these failure points a bit earlier
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T13:18:36Z
+
+@scaytrase because nighlty builds create false positive failures when then break. We could add then as "allowed failures", but that would consume a Travis job thus slow down everyone.
+Beside: :+1:
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2017-01-06T13:44:30Z
+
+@nicolas-grekas by slowing down you just mean that we consume one more container per build or making the build being longer?
+
+if second - AFAIK travis marks build green as soon as every mandatory job finishes green.
+
+if first we can make the travis to skip the job if branch is not 2.x or master. Or not a tag. Thus we will check only merged commits or tags only an we will collect at least one run on nigtly build per release
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2017-01-06T14:57:32Z
+
+Travis failed this time:
+
+https://travis-ci.org/symfony/symfony/jobs/189505947#L2114
+
+Fatal error: Call to undefined method PHPUnit_Framework_TestResult::addWarning() in /home/travis/build/symfony/symfony/vendor/symfony/phpunit-bridge/SymfonyTestsListener.php on line 215
+
+Seems unrelated
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-06T18:38:18Z
+
+Why not checking then that the value is not equal to `null`?
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2017-01-06T19:14:43Z
+
+@xabbuh I have the same thoughts on the start. But the `array|null` contract is specified only within the phpdoc annotation, no more, so in a real something other could be passed here, yes, like `\ArrayAccess`?
+
+if we have an `array $cascadedGroups = null` (or modern `?array $cascadedGroups` some days) signature - yes, the null check would be definetely most proper one.
+
+If you sure, that `array|null` signature is guaranteed somewhere else, I can change this.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-06T20:56:23Z
+
+We always rely on the fact that argument types comply with the ones specified in the docblock when we cannot use type hints (for example, we don't have additional checks for scalar types). If you don't respect this contract, you are basically on your own.
+
+---------------------------------------------------------------------------
+
+by scaytrase at 2017-01-07T12:03:01Z
+
+@xabbuh sounds reasonable, updated the check
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-08T09:08:28Z
+
+:+1:
+
+Status: Reviewed

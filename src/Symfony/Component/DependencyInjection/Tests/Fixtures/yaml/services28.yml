@@ -5,6 +5,8 @@ services:
         tags:
             - name: foo
 
+    Acme\Foo: ~
+
     with_defaults:
         class: Foo
 

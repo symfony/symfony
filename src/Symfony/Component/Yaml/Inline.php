@@ -104,7 +104,7 @@ class Inline
                 ++$i;
                 break;
             default:
-                $result = self::parseScalar($value, $flags, null, array('"', "'"), $i, true, $references);
+                $result = self::parseScalar($value, $flags, null, $i, true, $references);
         }
 
         // some comments are allowed at the end
@@ -276,7 +276,6 @@ class Inline
      * @param string $scalar
      * @param int    $flags
      * @param string $delimiters
-     * @param array  $stringDelimiters
      * @param int    &$i
      * @param bool   $evaluate
      * @param array  $references
@@ -287,9 +286,9 @@ class Inline
      *
      * @internal
      */
-    public static function parseScalar($scalar, $flags = 0, $delimiters = null, $stringDelimiters = array('"', "'"), &$i = 0, $evaluate = true, $references = array())
+    public static function parseScalar($scalar, $flags = 0, $delimiters = null, &$i = 0, $evaluate = true, $references = array())
     {
-        if (in_array($scalar[$i], $stringDelimiters)) {
+        if (in_array($scalar[$i], array('"', "'"))) {
             // quoted scalar
             $output = self::parseQuotedScalar($scalar, $i);
 
@@ -399,7 +398,7 @@ class Inline
                     break;
                 default:
                     $isQuoted = in_array($sequence[$i], array('"', "'"));
-                    $value = self::parseScalar($sequence, $flags, array(',', ']'), array('"', "'"), $i, true, $references);
+                    $value = self::parseScalar($sequence, $flags, array(',', ']'), $i, true, $references);
 
                     // the value can be an array if a reference has been resolved to an array var
                     if (is_string($value) && !$isQuoted && false !== strpos($value, ': ')) {
@@ -457,7 +456,7 @@ class Inline
             }
 
             // key
-            $key = self::parseScalar($mapping, $flags, array(':', ' '), array('"', "'"), $i, false);
+            $key = self::parseScalar($mapping, $flags, array(':', ' '), $i, false);
 
             if (false === $i = strpos($mapping, ':', $i)) {
                 break;
@@ -502,7 +501,7 @@ class Inline
                     case ' ':
                         break;
                     default:
-                        $value = self::parseScalar($mapping, $flags, array(',', '}'), array('"', "'"), $i, true, $references);
+                        $value = self::parseScalar($mapping, $flags, array(',', '}'), $i, true, $references);
                         // Spec: Keys MUST be unique; first one wins.
                         // Parser cannot abort this mapping earlier, since lines
                         // are processed sequentially.

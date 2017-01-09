@@ -11,7 +11,11 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests;
 
-use Symfony\Bridge\PhpUnit\Compat\Framework\TestCase;
+if (class_exists('PHPUnit\Framework\Test')) {
+    use PHPUnit\Framework\TestCase;
+} else {
+    use \PHPUnit_Framework_TestCase as TestCase;
+}
 use Symfony\Bridge\PhpUnit\DnsMock;
 
 class DnsMockTest extends TestCase

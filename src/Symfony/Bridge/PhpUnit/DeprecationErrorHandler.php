@@ -11,8 +11,13 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
-use Symfony\Bridge\PhpUnit\Compat\Util\ErrorHandler;
-use Symfony\Bridge\PhpUnit\Compat\Util\Test;
+if (class_exists('PHPUnit\Framework\Test')) {
+    use PHPUnit\Util\ErrorHandler;
+    use PHPUnit\Util\Test;
+} else {
+    use \PHPUnit_Util_ErrorHandler as ErrorHandler;
+    use \PHPUnit_Util_Test as Test;
+}
 
 /**
  * Catch deprecation notices and print a summary report at the end of the test suite.

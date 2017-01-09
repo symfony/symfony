@@ -12,13 +12,22 @@
 namespace Symfony\Bridge\PhpUnit;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use PHPUnit\Framework\Test;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestSuite;
+use Symfony\Bridge\PhpUnit\Compat\Framework\AssertionFailedError;
+use Symfony\Bridge\PhpUnit\Compat\Framework\BaseTestListener;
+use Symfony\Bridge\PhpUnit\Compat\Framework\Warning;
+use Symfony\Bridge\PhpUnit\Compat\Runner\BaseTestRunner;
+use Symfony\Bridge\PhpUnit\Compat\Util\Blacklist;
+use Symfony\Bridge\PhpUnit\Compat\Util\Test as TestUtil;
 
 /**
  * Collects and replays skipped tests.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
+class SymfonyTestsListener extends BaseTestListener
 {
     private static $globallyEnabled = false;
     private $state = -1;
@@ -35,7 +44,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
      */
     public function __construct(array $mockedNamespaces = array())
     {
-        \PHPUnit_Util_Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
+        Blacklist::$blacklistedClassNames['\Symfony\Bridge\PhpUnit\SymfonyTestsListener'] = 1;
 
         $warn = false;
         foreach ($mockedNamespaces as $type => $namespaces) {
@@ -75,8 +84,13 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
-    public function startTestSuite(\PHPUnit_Framework_TestSuite $suite)
+    /**
+     * @param \PHPUnit_Framework_TestSuite | TestSuite $suite
+     */
+    public function startTestSuite($suite)
     {
+        $this->assertIsInstanceOfTestSuite($suite);
+
         $suiteName = $suite->getName();
         $this->testsWithWarnings = array();
 
@@ -103,12 +117,12 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             $testSuites = array($suite);
             for ($i = 0; isset($testSuites[$i]); ++$i) {
                 foreach ($testSuites[$i]->tests() as $test) {
-                    if ($test instanceof \PHPUnit_Framework_TestSuite) {
+                    if ($this->isInstanceOfTestSuite($test)) {
                         if (!class_exists($test->getName(), false)) {
                             $testSuites[] = $test;
                             continue;
                         }
-                        $groups = \PHPUnit_Util_Test::getGroups($test->getName());
+                        $groups = TestUtil::getGroups($test->getName());
                         if (in_array('time-sensitive', $groups, true)) {
                             ClockMock::register($test->getName());
                         }
@@ -121,7 +135,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         } elseif (2 === $this->state) {
             $skipped = array();
             foreach ($suite->tests() as $test) {
-                if (!$test instanceof \PHPUnit_Framework_TestCase
+                if (!$this->isInstanceOfTestCase($test)
                     || isset($this->wasSkipped[$suiteName]['*'])
                     || isset($this->wasSkipped[$suiteName][$test->getName()])) {
                     $skipped[] = $test;
@@ -131,10 +145,17 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
-    public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
+    /**
+     * @param \PHPUnit_Framework_Test | Test $test
+     * @param \Exception $e
+     * @param float $time
+     */
+    public function addSkippedTest($test, \Exception $e, $time)
     {
+        $this->assertIsInstanceOfTest($test);
+
         if (0 < $this->state) {
-            if ($test instanceof \PHPUnit_Framework_TestCase) {
+            if ($this->isInstanceOfTestCase($test)) {
                 $class = get_class($test);
                 $method = $test->getName();
             } else {
@@ -146,10 +167,15 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
-    public function startTest(\PHPUnit_Framework_Test $test)
+    /**
+     * @param \PHPUnit_Framework_Test | Test $test
+     */
+    public function startTest($test)
     {
-        if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
-            $groups = \PHPUnit_Util_Test::getGroups(get_class($test), $test->getName(false));
+        $this->assertIsInstanceOfTest($test);
+
+        if (-2 < $this->state && $this->isInstanceOfTestCase($test)) {
+            $groups = TestUtil::getGroups(get_class($test), $test->getName(false));
 
             if (in_array('time-sensitive', $groups, true)) {
                 ClockMock::register(get_class($test));
@@ -159,14 +185,14 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                 DnsMock::register(get_class($test));
             }
 
-            $annotations = \PHPUnit_Util_Test::parseTestMethodAnnotations(get_class($test), $test->getName(false));
+            $annotations = TestUtil::parseTestMethodAnnotations(get_class($test), $test->getName(false));
 
             if (isset($annotations['class']['expectedDeprecation'])) {
-                $test->getTestResultObject()->addError($test, new \PHPUnit_Framework_AssertionFailedError('`@expectedDeprecation` annotations are not allowed at the class level.'), 0);
+                $test->getTestResultObject()->addError($test, new AssertionFailedError('`@expectedDeprecation` annotations are not allowed at the class level.'), 0);
             }
             if (isset($annotations['method']['expectedDeprecation'])) {
                 if (!in_array('legacy', $groups, true)) {
-                    $test->getTestResultObject()->addError($test, new \PHPUnit_Framework_AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.'), 0);
+                    $test->getTestResultObject()->addError($test, new AssertionFailedError('Only tests with the `@group legacy` annotation can have `@expectedDeprecation`.'), 0);
                 }
                 $this->expectedDeprecations = $annotations['method']['expectedDeprecation'];
                 $this->previousErrorHandler = set_error_handler(array($this, 'handleError'));
@@ -174,27 +200,43 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         }
     }
 
-    public function addWarning(\PHPUnit_Framework_Test $test, \PHPUnit_Framework_Warning $e, $time)
+    /**
+     * @param \PHPUnit_Framework_Test | Test $test
+     * @param \PHPUnit_Framework_Warning | Warning $e
+     * @param $time
+     */
+    public function addWarning($test, $e, $time)
     {
-        if ($test instanceof \PHPUnit_Framework_TestCase) {
+        $this->assertIsInstanceOfTest($test);
+        $this->assertIsInstanceOfWarning($e);
+
+        if ($this->isInstanceOfTestCase($test)) {
             $this->testsWithWarnings[$test->getName()] = true;
         }
     }
 
-    public function endTest(\PHPUnit_Framework_Test $test, $time)
+    /**
+     * @param \PHPUnit_Framework_Test | Test $test
+     * @param float $time
+     */
+    public function endTest($test, $time)
     {
+        $this->assertIsInstanceOfTest($test);
+
         $className = get_class($test);
-        $classGroups = \PHPUnit_Util_Test::getGroups($className);
-        $groups = \PHPUnit_Util_Test::getGroups($className, $test->getName(false));
+        $classGroups = TestUtil::getGroups($className);
+        $groups = TestUtil::getGroups($className, $test->getName(false));
 
         if ($this->expectedDeprecations) {
             restore_error_handler();
 
-            if (!in_array($test->getStatus(), array(\PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED, \PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE, \PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE, \PHPUnit_Runner_BaseTestRunner::STATUS_ERROR), true)) {
+            if (!in_array($test->getStatus(), array(BaseTestRunner::STATUS_SKIPPED, BaseTestRunner::STATUS_INCOMPLETE, BaseTestRunner::STATUS_FAILURE, BaseTestRunner::STATUS_ERROR), true)) {
                 try {
                     $prefix = "@expectedDeprecation:\n";
                     $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", $this->expectedDeprecations)."\n%A", $prefix.'  '.implode("\n  ", $this->gatheredDeprecations)."\n");
                 } catch (\PHPUnit_Framework_AssertionFailedError $e) {
+                    $test->getTestResultObject()->addFailure($test, $e, $time);
+                } catch (\PHPUnit\Framework\AssertionFailedError $e) {
                     $test->getTestResultObject()->addFailure($test, $e, $time);
                 }
             }
@@ -202,7 +244,7 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             $this->expectedDeprecations = $this->gatheredDeprecations = array();
             $this->previousErrorHandler = null;
         }
-        if (-2 < $this->state && $test instanceof \PHPUnit_Framework_TestCase) {
+        if (-2 < $this->state && ($this->isInstanceOfTestCase($test))) {
             if (in_array('time-sensitive', $groups, true)) {
                 ClockMock::withClockMock(false);
             }
@@ -211,19 +253,19 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             }
         }
 
-        if ($test instanceof \PHPUnit_Framework_TestCase && 0 === strpos($test->getName(), 'testLegacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $groups, true)) {
+        if ($this->isInstanceOfTestCase($test) && 0 === strpos($test->getName(), 'testLegacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $groups, true)) {
             $result = $test->getTestResultObject();
 
             if (method_exists($result, 'addWarning')) {
-                $result->addWarning($test, new \PHPUnit_Framework_Warning('Using the "testLegacy" prefix to mark tests as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
+                $result->addWarning($test, new Warning('Using the "testLegacy" prefix to mark tests as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
             }
         }
 
-        if ($test instanceof \PHPUnit_Framework_TestCase && strpos($className, '\Legacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $classGroups, true)) {
+        if ($this->isInstanceOfTestCase($test) && strpos($className, '\Legacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $classGroups, true)) {
             $result = $test->getTestResultObject();
 
             if (method_exists($result, 'addWarning')) {
-                $result->addWarning($test, new \PHPUnit_Framework_Warning('Using the "Legacy" prefix to mark all tests of a class as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
+                $result->addWarning($test, new Warning('Using the "Legacy" prefix to mark all tests of a class as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
             }
         }
     }
@@ -239,5 +281,39 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             $msg = 'Unsilenced deprecation: '.$msg;
         }
         $this->gatheredDeprecations[] = $msg;
+    }
+
+    private function assertIsInstanceOfTest($test)
+    {
+        if (!$test instanceof \PHPUnit_Framework_Test || !$test instanceof Test) {
+            $argType = is_object($test) ? get_class($test) : gettype($test);
+            throw new \InvalidArgumentException('Wrong parameter: expected \PHPUnit_Framework_Test or PHPUnit\Framework\Test, got ' . $argType);
+        }
+    }
+
+    private function assertIsInstanceOfTestSuite($testSuite)
+    {
+        if (!$this->isInstanceOfTestSuite($testSuite)) {
+            $argType = is_object($testSuite) ? get_class($testSuite) : gettype($testSuite);
+            throw new \InvalidArgumentException('Wrong parameter: expected \PHPUnit_Framework_TestSuite or PHPUnit\Framework\TestSuite, got ' . $argType);
+        }
+    }
+
+    private function assertIsInstanceOfWarning($warning)
+    {
+        if (!$warning instanceof \PHPUnit_Framework_Warning || !$warning instanceof Warning) {
+            $argType = is_object($warning) ? get_class($warning) : gettype($warning);
+            throw new \InvalidArgumentException('Wrong parameter: expected \PHPUnit_Framework_Warning or PHPUnit\Framework\Warning, got ' . $argType);
+        }
+    }
+
+    private function isInstanceOfTestSuite($testSuite)
+    {
+        return $testSuite instanceof \PHPUnit_Framework_TestSuite || $testSuite instanceof TestSuite;
+    }
+
+    private function isInstanceOfTestCase($testCase)
+    {
+        return $testCase instanceof \PHPUnit_Framework_TestCase || $testCase instanceof TestCase;
     }
 }

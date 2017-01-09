@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-09T13:06:10Z
+
+Does that really work? I mean: "file created in the system's temporary directory" happens when `tempnam` returns `false`? Isn't the file created in the system's temporary directory returned instead?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-09T13:25:01Z
+
+Before the patch, in dev, I get the notice, and this notice is converted to an exception.
+After the patch I get an exception with a proper error message.
+
+So in both case I have to fix the permission.
+
+Then, If I fix permissions, It works in both case.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-09T13:28:23Z
+
+Ok got it. Your are right. If I add the `@` the result of the function is `/tmp/classes.phpIo9eA9`.
+So the `if false===` is useless.
+
+What you I do? just add the `@`?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-09T13:35:27Z
+
+@lyrixx the goal of ``@`` is to avoid the warning being triggered, so that our own exception is thrown rather than the ErrorException coming from the notice (allowing to have our more actionable error message)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-09T13:35:57Z
+
+and ``if (false ===`` is not useless. It is the part detecting the error
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-09T13:41:35Z
+
+I updated the code.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-09T14:08:19Z
+
+Oups, I forgot PHP 5.4.
+
+I have different implementations:
+```php
+        set_error_handler(function () use ($file) {
+            throw new \RuntimeException(sprintf('Failed to create temporary file in "%s".', dirname($file)));
+        });
+        try {
+            $tmpFile = tempnam(, basename($file));
+        } catch(\RuntimeException $e) {
+            restore_error_handler();
+
+            throw $e;
+        }
+        restore_error_handler();
+```
+
+or something like
+```php
+        $tmpFile = @tempnam(dirname($file), basename($file));
+        if (dirname($file) !== dirname($tmpFile)) {
+            throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $file));
+        }
+```
+
+or
+
+```php
+        $dir = dirname($file);
+        if (is_writable($dir)) {
+            throw new \RuntimeException(sprintf('Failed to write cache in directory "%s".', $dir));
+        }
+```
+
+Which one is the best?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-09T14:12:42Z
+
+Did the 3/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-09T14:45:09Z
+
+:+1:

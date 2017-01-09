@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
@@ -38,11 +37,11 @@ class XmlFileLoader extends FileLoader
      */
     public function load($resource, $type = null)
     {
-        $path = $this->locator->locate($resource);
+        $this->setCurrentResource($resource);
+
+        $path = $this->locate($resource);
 
         $xml = $this->parseFileToDOM($path);
-
-        $this->container->addResource(new FileResource($path));
 
         // anonymous services
         $this->processAnonymousServices($xml, $path);
@@ -95,10 +94,8 @@ class XmlFileLoader extends FileLoader
             return;
         }
 
-        $defaultDirectory = dirname($file);
         foreach ($imports as $import) {
-            $this->setCurrentDir($defaultDirectory);
-            $this->import($import->getAttribute('resource'), null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')), $file);
+            $this->import($import->getAttribute('resource'), null, (bool) XmlUtils::phpize($import->getAttribute('ignore-errors')));
         }
     }
 

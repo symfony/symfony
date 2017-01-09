@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
@@ -27,9 +26,9 @@ class IniFileLoader extends FileLoader
      */
     public function load($resource, $type = null)
     {
-        $path = $this->locator->locate($resource);
+        $this->setCurrentResource($resource);
 
-        $this->container->addResource(new FileResource($path));
+        $path = $this->locate($resource);
 
         // first pass to catch parsing errors
         $result = parse_ini_file($path, true);

@@ -41,7 +41,9 @@ class XmlFileLoader extends FileLoader
      */
     public function load($file, $type = null)
     {
-        $path = $this->locator->locate($file);
+        $this->setCurrentResource($file);
+
+        $path = $this->locate($file);
 
         $xml = $this->loadFile($path);
 
@@ -144,9 +146,8 @@ class XmlFileLoader extends FileLoader
 
         list($defaults, $requirements, $options, $condition) = $this->parseConfigs($node, $path);
 
-        $this->setCurrentDir(dirname($path));
+        $subCollection = $this->import($resource, ('' !== $type ? $type : null));
 
-        $subCollection = $this->import($resource, ('' !== $type ? $type : null), false, $file);
         /* @var $subCollection RouteCollection */
         $subCollection->addPrefix($prefix);
         if (null !== $host) {

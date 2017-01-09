@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
 use Symfony\Component\Config\FileLocatorInterface;
@@ -33,5 +35,14 @@ abstract class FileLoader extends BaseFileLoader
         $this->container = $container;
 
         parent::__construct($locator);
+    }
+
+    public function setCurrentResource($resource)
+    {
+        parent::setCurrentResource($resource);
+
+        $path = $this->locate($resource);
+
+        $this->container->addResource('/' === substr($path, -1) || is_dir($path) ? new DirectoryResource($path) : new FileResource($path));
     }
 }

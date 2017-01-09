@@ -52,12 +52,14 @@ class TwigEngine extends BaseEngine implements EngineInterface
             if ($name instanceof TemplateReference) {
                 try {
                     // try to get the real name of the template where the error occurred
-                    $name = $e->getTemplateName();
-                    $path = (string) $this->locator->locate($this->parser->parse($name));
-                    if (method_exists($e, 'setSourceContext')) {
-                        $e->setSourceContext(new \Twig_Source('', $name, $path));
-                    } else {
-                        $e->setTemplateName($path);
+                    if(method_exists($e,"getTemplateName")) {
+                        $name = $e->getTemplateName();
+                        $path = (string) $this->locator->locate($this->parser->parse($name));
+                        if (method_exists($e, 'setSourceContext')) {
+                            $e->setSourceContext(new \Twig_Source('', $name, $path));
+                        } else {
+                            $e->setTemplateName($path);
+                        }
                     }
                 } catch (\Exception $e2) {
                 }

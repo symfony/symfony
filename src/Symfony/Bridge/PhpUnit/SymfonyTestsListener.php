@@ -19,12 +19,14 @@ if (class_exists('PHPUnit\Framework\Test')) {
     use PHPUnit\Framework\TestSuite;
     use PHPUnit\Util\Blacklist;
     use PHPUnit\Util\Test as TestUtil;
+    use PHPUnit\Framework\Warning;
 } else {
     use \PHPUnit_Framework_AssertionFailedError as AssertionFailedError;
     use \PHPUnit_Framework_BaseTestListener as BaseTestListener;
     use \PHPUnit_Framework_Test as Test;
     use \PHPUnit_Framework_TestCase as TestCase;
     use \PHPUnit_Framework_TestSuite as TestSuite;
+    use \PHPUnit_Framework_Warning as Warning;
     use \PHPUnit_Runner_BaseTestRunner as BaseTestRunner;
     use \PHPUnit_Util_Blacklist as Blacklist;
     use \PHPUnit_Util_Test as TestUtil;
@@ -191,9 +193,9 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function addWarning(\PHPUnit_Framework_Test $test, \PHPUnit_Framework_Warning $e, $time)
+    public function addWarning(Test $test, Warning $e, $time)
     {
-        if ($test instanceof \PHPUnit_Framework_TestCase) {
+        if ($test instanceof TestCase) {
             $this->testsWithWarnings[$test->getName()] = true;
         }
     }
@@ -201,8 +203,8 @@ class SymfonyTestsListener extends BaseTestListener
     public function endTest(Test $test, $time)
     {
         $className = get_class($test);
-        $classGroups = \PHPUnit_Util_Test::getGroups($className);
-        $groups = \PHPUnit_Util_Test::getGroups($className, $test->getName(false));
+        $classGroups = TestUtil::getGroups($className);
+        $groups = TestUtil::getGroups($className, $test->getName(false));
 
         if ($this->expectedDeprecations) {
             restore_error_handler();
@@ -228,19 +230,19 @@ class SymfonyTestsListener extends BaseTestListener
             }
         }
 
-        if ($test instanceof \PHPUnit_Framework_TestCase && 0 === strpos($test->getName(), 'testLegacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $groups, true)) {
+        if ($test instanceof TestCase && 0 === strpos($test->getName(), 'testLegacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $groups, true)) {
             $result = $test->getTestResultObject();
 
             if (method_exists($result, 'addWarning')) {
-                $result->addWarning($test, new \PHPUnit_Framework_Warning('Using the "testLegacy" prefix to mark tests as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
+                $result->addWarning($test, new Warning('Using the "testLegacy" prefix to mark tests as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
             }
         }
 
-        if ($test instanceof \PHPUnit_Framework_TestCase && strpos($className, '\Legacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $classGroups, true)) {
+        if ($test instanceof TestCase && strpos($className, '\Legacy') && !isset($this->testsWithWarnings[$test->getName()]) && !in_array('legacy', $classGroups, true)) {
             $result = $test->getTestResultObject();
 
             if (method_exists($result, 'addWarning')) {
-                $result->addWarning($test, new \PHPUnit_Framework_Warning('Using the "Legacy" prefix to mark all tests of a class as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
+                $result->addWarning($test, new Warning('Using the "Legacy" prefix to mark all tests of a class as legacy is deprecated since version 3.3 and will be removed in 4.0. Use the "@group legacy" notation instead to add the test to the legacy group.'), $time);
             }
         }
     }

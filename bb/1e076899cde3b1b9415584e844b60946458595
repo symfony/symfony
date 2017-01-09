@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-07T11:41:31Z
+
+Wenn cannot do that now as the class was not internal in 3.0. It looks like we didn't document this in the changelog.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-07T11:44:33Z
+
+@xabbuh the class wasn't but [the method was](https://github.com/symfony/symfony/blob/3.0/src/Symfony/Component/Yaml/Inline.php#L226).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-09T13:11:51Z
+
+:+1:

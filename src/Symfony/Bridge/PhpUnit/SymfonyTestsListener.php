@@ -14,18 +14,20 @@ namespace Symfony\Bridge\PhpUnit;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 if (class_exists('PHPUnit\Framework\Test')) {
     use PHPUnit\Framework\AssertionFailedError;
+    use PHPUnit\Framework\Test;
     use PHPUnit\Framework\TestCase;
     use PHPUnit\Framework\TestSuite;
     use PHPUnit\Util\Blacklist;
-    use PHPUnit\Util\Test;
+    use PHPUnit\Util\Test as TestUtil;
 } else {
     use \PHPUnit_Framework_AssertionFailedError as AssertionFailedError;
     use \PHPUnit_Framework_BaseTestListener as BaseTestListener;
+    use \PHPUnit_Framework_Test as Test;
     use \PHPUnit_Framework_TestCase as TestCase;
     use \PHPUnit_Framework_TestSuite as TestSuite;
     use \PHPUnit_Runner_BaseTestRunner as BaseTestRunner;
     use \PHPUnit_Util_Blacklist as Blacklist;
-    use \PHPUnit_Util_Test as Test;
+    use \PHPUnit_Util_Test as TestUtil;
 }
 
 /**
@@ -123,7 +125,7 @@ class SymfonyTestsListener extends BaseTestListener
                             $testSuites[] = $test;
                             continue;
                         }
-                        $groups = Test::getGroups($test->getName());
+                        $groups = TestUtil::getGroups($test->getName());
                         if (in_array('time-sensitive', $groups, true)) {
                             ClockMock::register($test->getName());
                         }
@@ -146,7 +148,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
+    public function addSkippedTest(Test $test, \Exception $e, $time)
     {
         if (0 < $this->state) {
             if ($test instanceof TestCase) {
@@ -161,10 +163,10 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function startTest(\PHPUnit_Framework_Test $test)
+    public function startTest(Test $test)
     {
         if (-2 < $this->state && $test instanceof TestCase) {
-            $groups = Test::getGroups(get_class($test), $test->getName(false));
+            $groups = TestUtil::getGroups(get_class($test), $test->getName(false));
 
             if (in_array('time-sensitive', $groups, true)) {
                 ClockMock::register(get_class($test));
@@ -174,7 +176,7 @@ class SymfonyTestsListener extends BaseTestListener
                 DnsMock::register(get_class($test));
             }
 
-            $annotations = Test::parseTestMethodAnnotations(get_class($test), $test->getName(false));
+            $annotations = TestUtil::parseTestMethodAnnotations(get_class($test), $test->getName(false));
 
             if (isset($annotations['class']['expectedDeprecation'])) {
                 $test->getTestResultObject()->addError($test, new AssertionFailedError('`@expectedDeprecation` annotations are not allowed at the class level.'), 0);
@@ -196,7 +198,7 @@ class SymfonyTestsListener extends BaseTestListener
         }
     }
 
-    public function endTest(\PHPUnit_Framework_Test $test, $time)
+    public function endTest(Test $test, $time)
     {
         $className = get_class($test);
         $classGroups = \PHPUnit_Util_Test::getGroups($className);

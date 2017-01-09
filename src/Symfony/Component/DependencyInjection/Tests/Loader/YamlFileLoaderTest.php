@@ -151,6 +151,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($aliases['another_alias_for_foo']));
         $this->assertEquals('foo', (string) $aliases['another_alias_for_foo']);
         $this->assertFalse($aliases['another_alias_for_foo']->isPublic());
+        $this->assertTrue(isset($aliases['another_third_alias_for_foo']));
+        $this->assertEquals('foo', (string) $aliases['another_third_alias_for_foo']);
+        $this->assertTrue($aliases['another_third_alias_for_foo']->isPublic());
 
         $this->assertEquals(array('decorated', null, 0), $services['decorator_service']->getDecoratedService());
         $this->assertEquals(array('decorated', 'decorated.pif-pouf', 0), $services['decorator_service_with_name']->getDecoratedService());
@@ -361,6 +364,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->getDefinition('with_defaults')->isPublic());
         $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_defaults')->getTags());
         $this->assertTrue($container->getDefinition('with_defaults')->isAutowired());
+
+        $this->assertFalse($container->getAlias('with_defaults_aliased')->isPublic());
+        $this->assertFalse($container->getAlias('with_defaults_aliased_short')->isPublic());
 
         $this->assertArrayNotHasKey('public', $container->getDefinition('no_defaults_child')->getChanges());
         $this->assertArrayNotHasKey('autowire', $container->getDefinition('no_defaults_child')->getChanges());

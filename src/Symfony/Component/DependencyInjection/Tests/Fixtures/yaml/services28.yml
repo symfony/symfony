@@ -34,3 +34,8 @@ services:
         inherit_tags: true
         tags:
             - name: baz
+
+    with_defaults_aliased:
+        alias: with_defaults
+
+    with_defaults_aliased_short: '@with_defaults'

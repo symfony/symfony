@@ -215,7 +215,8 @@ class YamlFileLoader extends FileLoader
     private function parseDefinition($id, $service, $file, array $defaults)
     {
         if (is_string($service) && 0 === strpos($service, '@')) {
-            $this->container->setAlias($id, substr($service, 1));
+            $public = isset($defaults['public']) ? $defaults['public'] : true;
+            $this->container->setAlias($id, new Alias(substr($service, 1), $public));
 
             return;
         }
@@ -231,7 +232,7 @@ class YamlFileLoader extends FileLoader
         static::checkDefinition($id, $service, $file);
 
         if (isset($service['alias'])) {
-            $public = array_key_exists('public', $service) ? (bool) $service['public'] : !empty($defaults['public']);
+            $public = array_key_exists('public', $service) ? (bool) $service['public'] : (isset($defaults['public']) ? $defaults['public'] : true);
             $this->container->setAlias($id, new Alias($service['alias'], $public));
 
             foreach ($service as $key => $value) {

@@ -1,0 +1,92 @@
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-01-06T16:31:41Z
+
+On a dirst glance this still breaks the intention as if you validate Child still the parent constraints are validated as well, right? But as I understand the logic only if you apply Default as group the parent constraints are validate as well, otherwise only the constraints of the specific class are validated which is the onl way to provide full flexibility. The actual issue is that you cannot use Default as group in the GroupSequence.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-06T17:30:28Z
+
+Well, I think that merging symfony/symfony-docs#7249 was a mistake I made. At least, by looking at the rest of the code, it seems to me that validating constraints from the parent class to was intended when validating a sub class. I am not sure if I fully understand your issue. So if you had a test case of which you think it should pass, but that is still failing, I would be happy to look at it.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-01-06T19:24:10Z
+
+Initially when documenting the inheritance I thought validating Child would validate the Parent as well.
+
+When I tested it now again I figured out it is not like that which makes somehow sense as then you would never be able to just validate the child constraints as Default validates both, Parent just the Parent constraints and Child again both. I did extensive tests and sent a mail to Bernhard regarding the original intention but did not get any feedback.
+
+In any case we need to be careful, the current implementation is entirely broken and a BC break which should be reverted. Your fix will still be a BC break for those relying on zhe case wheere you just want to validate the Child constraints. I do not know if that is the case in real wirld apps.
+
+I will try your fix the next days, most likely it will fix the wrong groups issue, but I am concerned regarding the BC break.
+
+I hope you can understand the issue now?
+
+Did you find anything related to the inheritance? Maybe you can reach out to Bernhard?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-07T08:21:05Z
+
+> When I tested it now again I figured out it is not like that which makes somehow sense as then you would never be able to just validate the child constraints as Default validates both, Parent just the Parent constraints and Child again both. I did extensive tests and sent a mail to Bernhard regarding the original intention but did not get any feedback.
+
+But is that really a use case? The problem with this approach is that you then easily could break applications by moving class properties to a base class. Everywhere else in PHP the property would still look like it's part of the object being validated while the validator doesn't agree with this.
+
+IMO, this is not how it should behave. It's different from cascading validation to nested objects because nested object are not really part of the object, but are just associated objects while properties from parent classes are just part of the unit we are looking at (there's noch such difference in OOP when looking at an object from the outside).
+
+> In any case we need to be careful, the current implementation is entirely broken and a BC break which should be reverted.
+
+I agree that this is a BC break. However, I also see the issue it fixes. We just need to be careful not to blindly always add the constraint to the default group.
+
+> Did you find anything related to the inheritance?
+
+Well, the `addImplicitGroupName()` method of the base `Constraint` class which is called here too already behaves this way. Thus, without the change from this PR, the newly added (merged) constraint would have groups whereas it wasn't party of this group in the `$constraintsByGroup` property.
+
+> Maybe you can reach out to Bernhard?
+
+I'll ask him.
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-01-07T14:43:19Z
+
+Okay, I just tested it with the BC Break caused in one of my apps, this would fix it.
+
+@yakobe Have you had the chance to test this? Does this fix your issues?
+
+The other matter is mainly philosophic I guess. When I investigated this I while ago I think
+someone told me or I tried the way how the inheritance is supposed to work. On the one
+hand side I think it makes no sense that if you validate `Child` that `Parent` is not validated,
+but apparently in the past it worked that way.
+
+My personal favor would be that if you validate `Child` that `Parent` is validated as well,
+this is better DX but there is then no way to validate only `Child`. I would accept that
+because I think this seems to unveil bad code design.
+
+It will be a BC break if this was intended previously and we shoudl discuss if we want it
+that way or if this needs to wait until the next major release. Best would be to find out
+Bernhards take on that.
+
+Once decided we should then adjust the docs accordingly.
+
+---------------------------------------------------------------------------
+
+by yakobe at 2017-01-08T10:37:55Z
+
+This works for my use case.
+
+I also do not see a practical use case for only validating Child without Parent. But you guys are right to investigate the impacts. Thanks 👍
+
+---------------------------------------------------------------------------
+
+by peterrehm at 2017-01-10T07:43:58Z
+
+@xabbuh Any news on this?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-10T08:35:02Z
+
+@peterrehm Not yet, let's see what the other @symfony/deciders think about this.

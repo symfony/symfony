@@ -21,6 +21,8 @@ services:
     another_alias_for_foo:
         alias: foo
         public: false
+    another_third_alias_for_foo:
+        alias: foo
     decorator_service:
         decorates: decorated
     decorator_service_with_name:

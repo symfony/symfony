@@ -77,6 +77,7 @@
     </xsd:annotation>
     <xsd:attribute name="resource" type="xsd:string" use="required" />
     <xsd:attribute name="ignore-errors" type="boolean" />
+    <xsd:attribute name="type" type="xsd:string" />
   </xsd:complexType>
 
   <xsd:complexType name="callable">

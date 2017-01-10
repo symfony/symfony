@@ -115,7 +115,17 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services4.yml');
 
         $actual = $container->getParameterBag()->all();
-        $expected = array('foo' => 'bar', 'values' => array(true, false, PHP_INT_MAX), 'bar' => '%foo%', 'escape' => '@escapeme', 'foo_bar' => new Reference('foo_bar'), 'mixedcase' => array('MixedCaseKey' => 'value'), 'imported_from_ini' => true, 'imported_from_xml' => true);
+        $expected = array(
+            'foo' => 'bar',
+            'values' => array(true, false, PHP_INT_MAX),
+            'bar' => '%foo%',
+            'escape' => '@escapeme',
+            'foo_bar' => new Reference('foo_bar'),
+            'mixedcase' => array('MixedCaseKey' => 'value'),
+            'imported_from_ini' => true,
+            'imported_from_xml' => true,
+            'with_wrong_ext' => 'from yaml',
+        );
         $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
         $this->assertTrue($actual['imported_from_ini']);
 
@@ -213,7 +223,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
         $this->assertTrue($loader->supports('foo.yaml'), '->supports() returns true if the resource is loadable');
-        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');
+        $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
+        $this->assertTrue($loader->supports('with_wrong_ext.xml', 'yml'), '->supports() returns true if the resource with forced type is loadable');
+        $this->assertTrue($loader->supports('with_wrong_ext.xml', 'yaml'), '->supports() returns true if the resource with forced type is loadable');
     }
 
     public function testNonArrayTagsThrowsException()

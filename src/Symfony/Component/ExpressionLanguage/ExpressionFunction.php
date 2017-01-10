@@ -64,38 +64,44 @@ class ExpressionFunction
     }
 
     /**
-     * Creates an ExpressionFunction from a global PHP function name.
+     * Creates an ExpressionFunction from a PHP function name.
      *
-     * @param string $name The PHP function name
+     * @param string      $phpFunction        The PHP function name
+     * @param string|null $expressionFunction The expression function name (default: same than the PHP function name)
      *
      * @return self
      *
-     * @throws \InvalidArgumentException if given function name does not exist
-     * @throws \InvalidArgumentException if given function name is not in global namespace
+     * @throws \InvalidArgumentException if given PHP function name does not exist
+     * @throws \InvalidArgumentException if given PHP function name is in namespace
+     *                                   and expression function name is not defined
      */
-    public static function fromPhp($name)
+    public static function fromPhp($phpFunction, $expressionFunction = null)
     {
-        if (!function_exists($name)) {
-            throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $name));
+        if (!function_exists($phpFunction)) {
+            throw new \InvalidArgumentException(sprintf('PHP function "%s" does not exist.', $phpFunction));
         }
 
-        $reflection = new \ReflectionFunction($name);
-        if ($reflection->inNamespace()) {
-            throw new \InvalidArgumentException(sprintf('PHP function "%s" is not in global namespace.', $name));
+        $reflection = new \ReflectionFunction($phpFunction);
+        if ($reflection->inNamespace() && !$expressionFunction) {
+            throw new \InvalidArgumentException(sprintf(
+                'An expression function name must be defined if PHP function "%s" is in namespace.',
+                $phpFunction
+            ));
         }
 
-        $name = $reflection->getShortName();
+        $phpFunction = $reflection->getName();
+        $expressionFunction = $expressionFunction ?: $reflection->getShortName();
 
-        $compiler = function () use ($name) {
-            return sprintf('\%s(%s)', $name, implode(', ', func_get_args()));
+        $compiler = function () use ($phpFunction) {
+            return sprintf('\%s(%s)', $phpFunction, implode(', ', func_get_args()));
         };
 
-        $evaluator = function () use ($name) {
+        $evaluator = function () use ($phpFunction) {
             $args = func_get_args();
 
-            return call_user_func_array($name, array_splice($args, 1));
+            return call_user_func_array($phpFunction, array_splice($args, 1));
         };
 
-        return new self($name, $compiler, $evaluator);
+        return new self($expressionFunction, $compiler, $evaluator);
     }
 }

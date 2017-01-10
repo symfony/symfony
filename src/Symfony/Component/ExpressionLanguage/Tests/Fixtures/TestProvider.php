@@ -29,6 +29,13 @@ class TestProvider implements ExpressionFunctionProviderInterface
             ExpressionFunction::fromPhp('strtoupper'),
 
             ExpressionFunction::fromPhp('\strtolower'),
+
+            ExpressionFunction::fromPhp('Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced', 'fn_namespaced'),
         );
     }
+}
+
+function fn_namespaced()
+{
+    return true;
 }

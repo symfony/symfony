@@ -120,6 +120,8 @@ class ExpressionLanguageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('\strtoupper("foo")', $expressionLanguage->compile('strtoupper("foo")'));
         $this->assertEquals('foo', $expressionLanguage->evaluate('strtolower("FOO")'));
         $this->assertEquals('\strtolower("FOO")', $expressionLanguage->compile('strtolower("FOO")'));
+        $this->assertTrue($expressionLanguage->evaluate('fn_namespaced()'));
+        $this->assertEquals('\Symfony\Component\ExpressionLanguage\Tests\Fixtures\fn_namespaced()', $expressionLanguage->compile('fn_namespaced()'));
     }
 
     /**

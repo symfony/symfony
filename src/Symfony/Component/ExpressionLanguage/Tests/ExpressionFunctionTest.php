@@ -31,9 +31,9 @@ class ExpressionFunctionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage PHP function "Symfony\Component\ExpressionLanguage\Tests\fn_namespaced" is not in global namespace.
+     * @expectedExceptionMessage An expression function name must be defined if PHP function "Symfony\Component\ExpressionLanguage\Tests\fn_namespaced" is in namespace.
      */
-    public function testFunctionIsNotGlobal()
+    public function testFunctionNamespaced()
     {
         ExpressionFunction::fromPhp('Symfony\Component\ExpressionLanguage\Tests\fn_namespaced');
     }

@@ -11,10 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
-if (PHP_VERSION_ID >= 70000) {
-    @trigger_error('The '.__NAMESPACE__.'\ClassCacheCacheWarmer class is deprecated since version 3.3 and will be removed in 4.0.', E_USER_DEPRECATED);
-}
-
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
@@ -31,6 +27,10 @@ class ClassCacheCacheWarmer implements CacheWarmerInterface
 
     public function __construct(array $declaredClasses = null)
     {
+        if (PHP_VERSION_ID >= 70000) {
+            @trigger_error('The '.__CLASS__.' class is deprecated since version 3.3 and will be removed in 4.0.', E_USER_DEPRECATED);
+        }
+
         $this->declaredClasses = $declaredClasses;
     }
 

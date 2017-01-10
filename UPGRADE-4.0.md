@@ -391,6 +391,9 @@ Yaml
 
  * Duplicate mapping keys lead to a `ParseException`.
 
+ * The constructor arguments `$offset`, `$totalNumberOfLines` and
+   `$skippedLineNumbers` of the `Parser` class were removed.
+
 Ldap
 ----
 

@@ -951,6 +951,9 @@ class FrameworkExtension extends Extension
         $definition = $container->findDefinition('validator.email');
         $definition->replaceArgument(0, $config['strict_email']);
 
+        $definition = $container->findDefinition('validator.file');
+        $definition->addMethodCall('setAllowEmpty', array($config['allow_empty_file']));
+
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {
                 throw new \LogicException('"enable_annotations" on the validator cannot be set as Annotations support is disabled.');

@@ -40,6 +40,7 @@ class File extends Constraint
 
     public $binaryFormat;
     public $mimeTypes = array();
+    public $allowEmpty;
     public $notFoundMessage = 'The file could not be found.';
     public $notReadableMessage = 'The file is not readable.';
     public $maxSizeMessage = 'The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.';

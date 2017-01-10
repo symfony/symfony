@@ -212,6 +212,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 'static_method' => array('loadValidatorMetadata'),
                 'translation_domain' => 'validators',
                 'strict_email' => false,
+                'allow_empty_file' => false,
             ),
             'annotations' => array(
                 'cache' => 'php_array',

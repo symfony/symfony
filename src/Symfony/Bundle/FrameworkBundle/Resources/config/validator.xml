@@ -69,5 +69,9 @@
             <argument></argument>
             <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\EmailValidator" />
         </service>
+
+        <service id="validator.file" class="Symfony\Component\Validator\Constraints\FileValidator">
+            <tag name="validator.constraint_validator" alias="Symfony\Component\Validator\Constraints\FileValidator" />
+        </service>
     </services>
 </container>

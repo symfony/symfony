@@ -51,12 +51,13 @@ class FactoryReturnTypePass implements CompilerPassInterface
     private function updateDefinition(ContainerBuilder $container, $id, Definition $definition, array $resolveClassPassChanges, array $previous = array())
     {
         // circular reference
-        if (isset($previous[$id])) {
+        $lcId = strtolower($id);
+        if (isset($previous[$lcId])) {
             return;
         }
 
         $factory = $definition->getFactory();
-        if (null === $factory || (!isset($resolveClassPassChanges[$id]) && null !== $definition->getClass())) {
+        if (null === $factory || (!isset($resolveClassPassChanges[$lcId]) && null !== $definition->getClass())) {
             return;
         }
 
@@ -69,9 +70,9 @@ class FactoryReturnTypePass implements CompilerPassInterface
             }
         } else {
             if ($factory[0] instanceof Reference) {
-                $previous[$id] = true;
+                $previous[$lcId] = true;
                 $factoryDefinition = $container->findDefinition((string) $factory[0]);
-                $this->updateDefinition($container, strtolower($factory[0]), $factoryDefinition, $resolveClassPassChanges, $previous);
+                $this->updateDefinition($container, $factory[0], $factoryDefinition, $resolveClassPassChanges, $previous);
                 $class = $factoryDefinition->getClass();
             } else {
                 $class = $factory[0];
@@ -96,7 +97,7 @@ class FactoryReturnTypePass implements CompilerPassInterface
                 }
             }
 
-            if (null !== $returnType && (!isset($resolveClassPassChanges[$id]) || $returnType !== $resolveClassPassChanges[$id])) {
+            if (null !== $returnType && (!isset($resolveClassPassChanges[$lcId]) || $returnType !== $resolveClassPassChanges[$lcId])) {
                 @trigger_error(sprintf('Relying on its factory\'s return-type to define the class of service "%s" is deprecated since Symfony 3.3 and won\'t work in 4.0. Set the "class" attribute to "%s" on the service definition instead.', $id, $returnType), E_USER_DEPRECATED);
             }
             $definition->setClass($returnType);

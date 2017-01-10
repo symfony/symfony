@@ -104,11 +104,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private $envCounters = array();
 
     /**
-     * @var array a map of case less to case sensitive ids
-     */
-    private $caseSensitiveIds = array();
-
-    /**
      * Sets the track resources flag.
      *
      * If you are not using the loaders and therefore don't want
@@ -372,8 +367,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function set($id, $service)
     {
-        $caseSensitiveId = $id;
-        $id = strtolower($caseSensitiveId);
+        $id = $this->normalizeId($id);
 
         if ($this->isFrozen() && (isset($this->definitions[$id]) && !$this->definitions[$id]->isSynthetic())) {
             // setting a synthetic service on a frozen container is alright
@@ -381,9 +375,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         unset($this->definitions[$id], $this->aliasDefinitions[$id]);
-        if ($id !== $caseSensitiveId) {
-            $this->caseSensitiveIds[$id] = $caseSensitiveId;
-        }
 
         parent::set($id, $service);
     }
@@ -395,7 +386,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeDefinition($id)
     {
-        unset($this->definitions[strtolower($id)]);
+        unset($this->definitions[$this->normalizeId($id)]);
     }
 
     /**
@@ -407,7 +398,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function has($id)
     {
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         return isset($this->definitions[$id]) || isset($this->aliasDefinitions[$id]) || parent::has($id);
     }
@@ -429,7 +420,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get($id, $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
             return $service;
@@ -637,11 +628,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function setAlias($alias, $id)
     {
-        $caseSensitiveAlias = $alias;
-        $alias = strtolower($caseSensitiveAlias);
+        $alias = $this->normalizeId($alias);
 
         if (is_string($id)) {
-            $id = new Alias($id);
+            $id = new Alias($this->normalizeId($id));
         } elseif (!$id instanceof Alias) {
             throw new InvalidArgumentException('$id must be a string, or an Alias object.');
         }
@@ -651,9 +641,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         unset($this->definitions[$alias]);
-        if ($alias !== $caseSensitiveAlias) {
-            $this->caseSensitiveIds[$alias] = $caseSensitiveAlias;
-        }
 
         $this->aliasDefinitions[$alias] = $id;
     }
@@ -665,7 +652,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function removeAlias($alias)
     {
-        unset($this->aliasDefinitions[strtolower($alias)]);
+        unset($this->aliasDefinitions[$this->normalizeId($alias)]);
     }
 
     /**
@@ -677,7 +664,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasAlias($id)
     {
-        return isset($this->aliasDefinitions[strtolower($id)]);
+        return isset($this->aliasDefinitions[$this->normalizeId($id)]);
     }
 
     /**
@@ -701,7 +688,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getAlias($id)
     {
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         if (!isset($this->aliasDefinitions[$id])) {
             throw new InvalidArgumentException(sprintf('The service alias "%s" does not exist.', $id));
@@ -791,13 +778,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             throw new BadMethodCallException('Adding definition to a frozen container is not allowed');
         }
 
-        $caseSensitiveId = $id;
-        $id = strtolower($caseSensitiveId);
+        $id = $this->normalizeId($id);
 
         unset($this->aliasDefinitions[$id]);
-        if ($id !== $caseSensitiveId) {
-            $this->caseSensitiveIds[$id] = $caseSensitiveId;
-        }
 
         return $this->definitions[$id] = $definition;
     }
@@ -811,7 +794,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function hasDefinition($id)
     {
-        return isset($this->definitions[strtolower($id)]);
+        return isset($this->definitions[$this->normalizeId($id)]);
     }
 
     /**
@@ -825,7 +808,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getDefinition($id)
     {
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         if (!isset($this->definitions[$id])) {
             throw new ServiceNotFoundException($id);
@@ -847,29 +830,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function findDefinition($id)
     {
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         while (isset($this->aliasDefinitions[$id])) {
             $id = (string) $this->aliasDefinitions[$id];
         }
 
         return $this->getDefinition($id);
-    }
-
-    /**
-     * Returns the case sensitive id used at registration time.
-     *
-     * @param string $id
-     *
-     * @return string
-     *
-     * @internal
-     */
-    public function getCaseSensitiveId($id)
-    {
-        $id = strtolower($id);
-
-        return isset($this->caseSensitiveIds[$id]) ? $this->caseSensitiveIds[$id] : $id;
     }
 
     /**
@@ -1189,6 +1156,22 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * @internal
+     */
+    public function getNormalizedIds()
+    {
+        $normalizedIds = array();
+
+        foreach ($this->normalizedIds as $k => $v) {
+            if ($v !== (string) $k) {
+                $normalizedIds[$k] = $v;
+            }
+        }
+
+        return $normalizedIds;
+    }
+
+    /**
      * Returns the Service Conditionals.
      *
      * @param mixed $value An array of conditionals to return
@@ -1247,7 +1230,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function shareService(Definition $definition, $service, $id)
     {
         if (null !== $id && $definition->isShared()) {
-            $this->services[strtolower($id)] = $service;
+            $this->services[$this->normalizeId($id)] = $service;
         }
     }
 

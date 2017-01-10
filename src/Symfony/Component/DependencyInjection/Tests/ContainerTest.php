@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -167,7 +168,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $foo = new \stdClass());
         $this->assertSame($foo, $sc->get('foo'), '->get() returns the service for the given id');
-        $this->assertSame($foo, $sc->get('Foo'), '->get() returns the service for the given id, and converts id to lowercase');
         $this->assertSame($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
         $this->assertSame($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
         $this->assertSame($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
@@ -182,6 +182,40 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException', $e, '->get() throws a ServiceNotFoundException exception if the service is empty');
         }
         $this->assertNull($sc->get('', ContainerInterface::NULL_ON_INVALID_REFERENCE), '->get() returns null if the service is empty');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since version 3.3.
+     */
+    public function testGetInsensitivity()
+    {
+        $sc = new ProjectServiceContainer();
+        $sc->set('foo', $foo = new \stdClass());
+        $this->assertSame($foo, $sc->get('Foo'), '->get() returns the service for the given id, and converts id to lowercase');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Non-string service identifiers are deprecated since Symfony 3.3 and won't be supported in 4.0 for service "foo" ("Symfony\Component\DependencyInjection\Alias" given.) Cast it to string beforehand.
+     * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "Foo" instead of "foo" is deprecated since version 3.3.
+     */
+    public function testNonStringNormalizeId()
+    {
+        $sc = new ProjectServiceContainer();
+        $this->assertSame('foo', $sc->normalizeId(new Alias('foo')));
+        $this->assertSame('foo', $sc->normalizeId('Foo'));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Service identifiers will be made case sensitive in Symfony 4.0. Using "foo" instead of "Foo" is deprecated since version 3.3.
+     */
+    public function testNormalizeIdKeepsCase()
+    {
+        $sc = new ProjectServiceContainer();
+        $sc->normalizeId('Foo', true);
+        $this->assertSame('Foo', $sc->normalizeId('foo'));
     }
 
     /**

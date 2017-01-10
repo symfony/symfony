@@ -835,6 +835,7 @@ EOF;
 
 EOF;
 
+        $code .= $this->addNormalizedIds();
         $code .= $this->addMethodMap();
         $code .= $this->addPrivateServices();
         $code .= $this->addAliases();
@@ -870,6 +871,7 @@ EOF;
         }
 
         $code .= "\n        \$this->services = array();\n";
+        $code .= $this->addNormalizedIds();
         $code .= $this->addMethodMap();
         $code .= $this->addAliases();
 
@@ -919,6 +921,26 @@ EOF;
     }
 
 EOF;
+    }
+
+    /**
+     * Adds the normalizedIds property definition.
+     *
+     * @return string
+     */
+    private function addNormalizedIds()
+    {
+        if (!$normalizedIds = $this->container->getNormalizedIds()) {
+            return '';
+        }
+
+        $code = "        \$this->normalizedIds = array(\n";
+        ksort($normalizedIds);
+        foreach ($normalizedIds as $id => $normalizedId) {
+            $code .= '            '.$this->export($id).' => '.$this->export($normalizedId).",\n";
+        }
+
+        return $code."        );\n";
     }
 
     /**

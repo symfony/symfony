@@ -70,6 +70,11 @@ class Container implements ResettableContainerInterface
     protected $aliases = array();
     protected $loading = array();
 
+    /**
+     * @internal
+     */
+    protected $normalizedIds = array();
+
     private $underscoreMap = array('_' => '', '.' => '_', '\\' => '_');
     private $envCache = array();
 
@@ -164,7 +169,7 @@ class Container implements ResettableContainerInterface
      */
     public function set($id, $service)
     {
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         if ('service_container' === $id) {
             throw new InvalidArgumentException('You cannot set service "service_container".');
@@ -215,8 +220,8 @@ class Container implements ResettableContainerInterface
                 return true;
             }
 
-            if (--$i && $id !== $lcId = strtolower($id)) {
-                $id = $lcId;
+            if (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
+                $id = $normalizedId;
                 continue;
             }
 
@@ -254,7 +259,7 @@ class Container implements ResettableContainerInterface
         // Attempt to retrieve the service by checking first aliases then
         // available services. Service IDs are case insensitive, however since
         // this method can be called thousands of times during a request, avoid
-        // calling strtolower() unless necessary.
+        // calling $this->normalizeId($id) unless necessary.
         for ($i = 2;;) {
             if ('service_container' === $id) {
                 return $this;
@@ -273,8 +278,8 @@ class Container implements ResettableContainerInterface
 
             if (isset($this->methodMap[$id])) {
                 $method = $this->methodMap[$id];
-            } elseif (--$i && $id !== $lcId = strtolower($id)) {
-                $id = $lcId;
+            } elseif (--$i && $id !== $normalizedId = $this->normalizeId($id)) {
+                $id = $normalizedId;
                 continue;
             } elseif (!$this->methodMap && !$this instanceof ContainerBuilder && __CLASS__ !== static::class && method_exists($this, $method = 'get'.strtr($id, $this->underscoreMap).'Service')) {
                 // We only check the convention-based factory in a compiled container (i.e. a child class other than a ContainerBuilder,
@@ -329,7 +334,7 @@ class Container implements ResettableContainerInterface
      */
     public function initialized($id)
     {
-        $id = strtolower($id);
+        $id = $this->normalizeId($id);
 
         if ('service_container' === $id) {
             return false;
@@ -424,6 +429,34 @@ class Container implements ResettableContainerInterface
         }
 
         return $this->envCache[$name] = $this->getParameter("env($name)");
+    }
+
+    /**
+     * Returns the case sensitive id used at registration time.
+     *
+     * @param string $id
+     *
+     * @return string
+     *
+     * @internal
+     */
+    public function normalizeId($id)
+    {
+        if (!is_string($id)) {
+            $type = is_object($id) ? get_class($id) : gettype($id);
+            $id = (string) $id;
+            @trigger_error(sprintf('Non-string service identifiers are deprecated since Symfony 3.3 and won\'t be supported in 4.0 for service "%s" ("%s" given.) Cast it to string beforehand.', $id, $type), E_USER_DEPRECATED);
+        }
+        if (isset($this->normalizedIds[$normalizedId = strtolower($id)])) {
+            $normalizedId = $this->normalizedIds[$normalizedId];
+            if ($id !== $normalizedId) {
+                @trigger_error(sprintf('Service identifiers will be made case sensitive in Symfony 4.0. Using "%s" instead of "%s" is deprecated since version 3.3.', $id, $normalizedId), E_USER_DEPRECATED);
+            }
+        } else {
+            $normalizedId = $this->normalizedIds[$normalizedId] = $id;
+        }
+
+        return $normalizedId;
     }
 
     private function __clone()

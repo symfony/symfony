@@ -52,6 +52,9 @@
         <service id="file_locator" class="Symfony\Component\HttpKernel\Config\FileLocator">
             <argument type="service" id="kernel" />
             <argument>%kernel.root_dir%/Resources</argument>
+            <argument type="collection">
+                <argument>%kernel.root_dir%</argument>
+            </argument>
         </service>
 
         <service id="uri_signer" class="Symfony\Component\HttpKernel\UriSigner">

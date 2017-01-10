@@ -162,7 +162,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
                 );
             } elseif (3 === $i) {
                 $this->assertEquals('IS_AUTHENTICATED_ANONYMOUSLY', $attributes[0]);
-                $expression = $container->getDefinition($attributes[1])->getArgument(0);
+                $expression = $container->getDefinition((string) $attributes[1])->getArgument(0);
                 $this->assertEquals("token.getUsername() matches '/^admin/'", $expression);
             }
         }

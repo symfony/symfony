@@ -73,7 +73,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map(function ($ref) { return (string) $ref; }, $arguments['index_0']);
 
-            $configDef = $container->getDefinition($arguments['index_2']);
+            $configDef = $container->getDefinition((string) $arguments['index_2']);
             $configs[] = array_values($configDef->getArguments());
         }
 

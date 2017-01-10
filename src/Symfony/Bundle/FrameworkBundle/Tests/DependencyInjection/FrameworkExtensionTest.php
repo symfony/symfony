@@ -317,26 +317,26 @@ abstract class FrameworkExtensionTest extends TestCase
         $packages = $container->getDefinition('assets.packages');
 
         // default package
-        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
         $this->assertUrlPackage($container, $defaultPackage, array('http://cdn.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
 
         // packages
         $packages = $packages->getArgument(1);
         $this->assertCount(5, $packages);
 
-        $package = $container->getDefinition($packages['images_path']);
+        $package = $container->getDefinition((string) $packages['images_path']);
         $this->assertPathPackage($container, $package, '/foo', 'SomeVersionScheme', '%%s?version=%%s');
 
-        $package = $container->getDefinition($packages['images']);
+        $package = $container->getDefinition((string) $packages['images']);
         $this->assertUrlPackage($container, $package, array('http://images1.example.com', 'http://images2.example.com'), '1.0.0', '%%s?version=%%s');
 
-        $package = $container->getDefinition($packages['foo']);
+        $package = $container->getDefinition((string) $packages['foo']);
         $this->assertPathPackage($container, $package, '', '1.0.0', '%%s-%%s');
 
-        $package = $container->getDefinition($packages['bar']);
+        $package = $container->getDefinition((string) $packages['bar']);
         $this->assertUrlPackage($container, $package, array('https://bar2.example.com'), 'SomeVersionScheme', '%%s?version=%%s');
 
-        $package = $container->getDefinition($packages['bar_version_strategy']);
+        $package = $container->getDefinition((string) $packages['bar_version_strategy']);
         $this->assertEquals('assets.custom_version_strategy', (string) $package->getArgument(1));
     }
 
@@ -346,7 +346,7 @@ abstract class FrameworkExtensionTest extends TestCase
         $packages = $container->getDefinition('assets.packages');
 
         // default package
-        $defaultPackage = $container->getDefinition($packages->getArgument(0));
+        $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
         $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
     }
 

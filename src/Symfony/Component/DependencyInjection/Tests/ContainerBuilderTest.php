@@ -334,6 +334,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($builder->get('baz')->called, '->createService() uses another service as factory');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyCreateServiceFactory()
     {
         $builder = new ContainerBuilder();
@@ -350,6 +353,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('foo' => 'bar', 'bar' => 'foo', $builder->get('bar')), $builder->get('foo1')->arguments, '->createService() passes the arguments to the factory method');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyCreateServiceFactoryService()
     {
         $builder = new ContainerBuilder();

@@ -18,8 +18,6 @@ services:
         calls:
             - [ setBar, [ foo, '@foo', [true, false] ] ]
     alias_for_foo: '@foo'
-    another_third_alias_for_foo:
-        alias: foo
     another_alias_for_foo:
         alias: foo
         public: false
@@ -27,6 +25,8 @@ services:
         class: Request
         synthetic: true
         lazy: true
+    another_third_alias_for_foo:
+        alias: foo
     decorator_service:
         decorates: decorated
     decorator_service_with_name:

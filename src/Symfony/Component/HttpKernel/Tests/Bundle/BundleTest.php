@@ -57,7 +57,7 @@ class BundleTest extends \PHPUnit_Framework_TestCase
     public function testHttpKernelRegisterCommandsIgnoresCommandsThatAreRegisteredAsServices()
     {
         $container = new ContainerBuilder();
-        $container->register('console.command.Symfony_Component_HttpKernel_Tests_Fixtures_ExtensionPresentBundle_Command_FooCommand', 'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand');
+        $container->register('console.command.symfony_component_httpkernel_tests_fixtures_extensionpresentbundle_command_foocommand', 'Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Command\FooCommand');
 
         $application = $this->getMockBuilder('Symfony\Component\Console\Application')->getMock();
         // add() is never called when the found command classes are already registered as services

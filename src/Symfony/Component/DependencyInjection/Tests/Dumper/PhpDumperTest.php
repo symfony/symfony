@@ -272,7 +272,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->set('bar', $bar = new \stdClass());
         $container->setParameter('foo_bar', 'foo_bar');
 
-        $this->assertEquals($bar, $container->get('bar'), '->set() overrides an already defined service');
+        $this->assertSame($bar, $container->get('bar'), '->set() overrides an already defined service');
     }
 
     public function testOverrideServiceWhenUsingADumpedContainerAndServiceIsUsedFromAnotherOne()
@@ -308,7 +308,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services24.php'), $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services24.php', $dumper->dump());
     }
 
     public function testEnvParameter()
@@ -466,8 +466,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Closure_Proxy'));
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services31.php'), $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services31.php', $dumper->dump());
         $res = $container->getResources();
         $this->assertSame(realpath(self::$fixturesPath.'/containers/container31.php'), array_pop($res)->getResource());
     }
@@ -481,8 +480,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Closure_Proxy_Php71'));
-        $this->assertEquals(file_get_contents(self::$fixturesPath.'/php/services32.php'), $dumper->dump());
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services32.php', $dumper->dump());
         $res = $container->getResources();
         $this->assertSame(realpath(self::$fixturesPath.'/containers/container32.php'), array_pop($res)->getResource());
     }

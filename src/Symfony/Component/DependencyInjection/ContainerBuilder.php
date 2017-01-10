@@ -436,7 +436,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (!isset($this->definitions[$id]) && isset($this->aliasDefinitions[$id])) {
-            return $this->get($this->aliasDefinitions[$id], $invalidBehavior);
+            return $this->get((string) $this->aliasDefinitions[$id], $invalidBehavior);
         }
 
         try {
@@ -1240,14 +1240,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Shares a given service in the container.
      *
-     * @param Definition $definition
-     * @param mixed      $service
-     * @param string     $id
+     * @param Definition  $definition
+     * @param mixed       $service
+     * @param string|null $id
      */
     private function shareService(Definition $definition, $service, $id)
     {
-        if ($definition->isShared()) {
-            $this->services[$lowerId = strtolower($id)] = $service;
+        if (null !== $id && $definition->isShared()) {
+            $this->services[strtolower($id)] = $service;
         }
     }
 

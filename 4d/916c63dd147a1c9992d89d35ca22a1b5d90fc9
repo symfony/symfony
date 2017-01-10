@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2016-11-23T22:32:01Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-24T09:11:56Z
+
+This is a new feature IMO, not a bugfix (we never said that ``type: yml`` was intended to trigger the YAML loader, so we cannot consider this behavior as buggy)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-24T09:24:41Z
+
+@stof The PR is already labelled as a feature and is based on the `master` branch. :)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-10T12:01:26Z
+
+👍
+
+Status: reviewed

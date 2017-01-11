@@ -285,7 +285,7 @@ class SymfonyTestsListener extends BaseTestListener
 
     private function assertIsInstanceOfTest($test)
     {
-        if (!$test instanceof \PHPUnit_Framework_Test || !$test instanceof Test) {
+        if (!$this->isInstanceOfTest($test)) {
             $argType = is_object($test) ? get_class($test) : gettype($test);
             throw new \InvalidArgumentException('Wrong parameter: expected \PHPUnit_Framework_Test or PHPUnit\Framework\Test, got ' . $argType);
         }
@@ -301,7 +301,7 @@ class SymfonyTestsListener extends BaseTestListener
 
     private function assertIsInstanceOfWarning($warning)
     {
-        if (!$warning instanceof \PHPUnit_Framework_Warning || !$warning instanceof Warning) {
+        if (!$this->isInstanceOfWarning($warning)) {
             $argType = is_object($warning) ? get_class($warning) : gettype($warning);
             throw new \InvalidArgumentException('Wrong parameter: expected \PHPUnit_Framework_Warning or PHPUnit\Framework\Warning, got ' . $argType);
         }
@@ -309,11 +309,53 @@ class SymfonyTestsListener extends BaseTestListener
 
     private function isInstanceOfTestSuite($testSuite)
     {
-        return $testSuite instanceof \PHPUnit_Framework_TestSuite || $testSuite instanceof TestSuite;
+        if (class_exists(\PHPUnit_Framework_TestSuite::class)) {
+            return $testSuite instanceof \PHPUnit_Framework_TestSuite;
+        }
+
+        if (class_exists(TestSuite::class)) {
+            return $testSuite instanceof TestSuite;
+        }
+        
+        return false;
     }
 
     private function isInstanceOfTestCase($testCase)
     {
-        return $testCase instanceof \PHPUnit_Framework_TestCase || $testCase instanceof TestCase;
+        if (class_exists(\PHPUnit_Framework_TestCase::class)) {
+            return $testCase instanceof \PHPUnit_Framework_TestCase;
+        }
+
+        if (class_exists(TestCase::class)) {
+            return $testCase instanceof TestCase;
+        }
+
+        return false;
+    }
+
+    private function isInstanceOfWarning($warning)
+    {
+        if (class_exists(\PHPUnit_Framework_Warning::class)) {
+            return $warning instanceof \PHPUnit_Framework_Warning;
+        }
+
+        if (class_exists(Warning::class)) {
+            return $warning instanceof Warning;
+        }
+
+        return false;
+    }
+
+    private function isInstanceOfTest($test)
+    {
+        if (class_exists(\PHPUnit_Framework_Test::class)) {
+            return $test instanceof \PHPUnit_Framework_Test;
+        }
+
+        if (class_exists(Test::class)) {
+            return $test instanceof Test;
+        }
+
+        return false;
     }
 }

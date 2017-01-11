@@ -31,8 +31,8 @@ class ResolveClassPass implements CompilerPassInterface
                 continue;
             }
             if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $id)) {
-                $this->changes[$id] = $container->getCaseSensitiveId($id);
-                $definition->setClass($this->changes[$id]);
+                $this->changes[strtolower($id)] = $id;
+                $definition->setClass($id);
             }
         }
     }

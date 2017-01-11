@@ -22,6 +22,10 @@ Debug
 DependencyInjection
 -------------------
 
+ * Service identifiers are now case sensitive.
+
+ * The `Reference` and `Alias` classes do not make service identifiers lowercase anymore.
+
  * Using the `PhpDumper` with an uncompiled `ContainerBuilder` is not supported
    anymore.
 

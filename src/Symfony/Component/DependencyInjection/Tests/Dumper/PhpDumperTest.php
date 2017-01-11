@@ -484,4 +484,13 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $res = $container->getResources();
         $this->assertSame(realpath(self::$fixturesPath.'/containers/container32.php'), array_pop($res)->getResource());
     }
+
+    public function testNormalizedId()
+    {
+        $container = include self::$fixturesPath.'/containers/container33.php';
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services33.php', $dumper->dump());
+    }
 }

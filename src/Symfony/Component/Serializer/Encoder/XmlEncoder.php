@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Encoder;
 
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 /**
  * Encodes XML data.
@@ -78,7 +78,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
     public function decode($data, $format, array $context = array())
     {
         if ('' === trim($data)) {
-            throw new UnexpectedValueException('Invalid XML data, it can not be empty.');
+            throw new NotEncodableValueException('Invalid XML data, it can not be empty.');
         }
 
         $internalErrors = libxml_use_internal_errors(true);
@@ -94,13 +94,13 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
         if ($error = libxml_get_last_error()) {
             libxml_clear_errors();
 
-            throw new UnexpectedValueException($error->message);
+            throw new NotEncodableValueException($error->message);
         }
 
         $rootNode = null;
         foreach ($dom->childNodes as $child) {
             if (XML_DOCUMENT_TYPE_NODE === $child->nodeType) {
-                throw new UnexpectedValueException('Document types are not allowed.');
+                throw new NotEncodableValueException('Document types are not allowed.');
             }
             if (!$rootNode && XML_PI_NODE !== $child->nodeType) {
                 $rootNode = $child;
@@ -380,7 +380,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @return bool
      *
-     * @throws UnexpectedValueException
+     * @throws NotEncodableValueException
      */
     private function buildXml(\DOMNode $parentNode, $data, $xmlRootNodeName = null)
     {
@@ -437,7 +437,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
             return $this->appendNode($parentNode, $data, 'data');
         }
 
-        throw new UnexpectedValueException(sprintf('An unexpected value could not be serialized: %s', var_export($data, true)));
+        throw new NotEncodableValueException(sprintf('An unexpected value could not be serialized: %s', var_export($data, true)));
     }
 
     /**
@@ -485,7 +485,7 @@ class XmlEncoder extends SerializerAwareEncoder implements EncoderInterface, Dec
      *
      * @return bool
      *
-     * @throws UnexpectedValueException
+     * @throws NotEncodableValueException
      */
     private function selectNodeType(\DOMNode $node, $val)
     {

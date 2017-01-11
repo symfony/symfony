@@ -88,14 +88,19 @@ class TwigExtension extends Extension
             }
         }
 
-        // register bundles as Twig namespaces
-        foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
-            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
-                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $name);
+        $bundleHierarchy = $this->getBundleHierarchy($container);
+
+        foreach ($bundleHierarchy as $name => $bundle) {
+            $namespace = $this->normalizeBundleName($name);
+
+            foreach ($bundle['children'] as $child) {
+                foreach ($bundleHierarchy[$child]['paths'] as $path) {
+                    $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
+                }
             }
 
-            if (is_dir($dir = $bundle['path'].'/Resources/views')) {
-                $this->addTwigPath($twigFilesystemLoaderDefinition, $dir, $name);
+            foreach ($bundle['paths'] as $path) {
+                $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
         }
 
@@ -139,13 +144,69 @@ class TwigExtension extends Extension
         ));
     }
 
+    private function getBundleHierarchy(ContainerBuilder $container)
+    {
+        $bundleHierarchy = array();
+
+        foreach ($container->getParameter('kernel.bundles_metadata') as $name => $bundle) {
+            if (!array_key_exists($name, $bundleHierarchy)) {
+                $bundleHierarchy[$name] = array(
+                    'paths' => array(),
+                    'parents' => array(),
+                    'children' => array(),
+                );
+            }
+
+            if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/'.$name.'/views')) {
+                $bundleHierarchy[$name]['paths'][] = $dir;
+            }
+
+            if (is_dir($dir = $bundle['path'].'/Resources/views')) {
+                $bundleHierarchy[$name]['paths'][] = $dir;
+            }
+
+            if (null === $bundle['parent']) {
+                continue;
+            }
+
+            $bundleHierarchy[$name]['parents'][] = $bundle['parent'];
+
+            if (!array_key_exists($bundle['parent'], $bundleHierarchy)) {
+                $bundleHierarchy[$bundle['parent']] = array(
+                    'paths' => array(),
+                    'parents' => array(),
+                    'children' => array(),
+                );
+            }
+
+            $bundleHierarchy[$bundle['parent']]['children'] = array_merge($bundleHierarchy[$name]['children'], array($name), $bundleHierarchy[$bundle['parent']]['children']);
+
+            foreach ($bundleHierarchy[$bundle['parent']]['parents'] as $parent) {
+                $bundleHierarchy[$name]['parents'][] = $parent;
+                $bundleHierarchy[$parent]['children'] = array_merge($bundleHierarchy[$name]['children'], array($name), $bundleHierarchy[$parent]['children']);
+            }
+
+            foreach ($bundleHierarchy[$name]['children'] as $child) {
+                $bundleHierarchy[$child]['parents'] = array_merge($bundleHierarchy[$child]['parents'], $bundleHierarchy[$name]['parents']);
+            }
+        }
+
+        return $bundleHierarchy;
+    }
+
     private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
     {
-        $name = $bundle;
+        $name = $this->normalizeBundleName($bundle);
+        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
+    }
+
+    private function normalizeBundleName($name)
+    {
         if ('Bundle' === substr($name, -6)) {
             $name = substr($name, 0, -6);
         }
-        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
+
+        return $name;
     }
 
     /**

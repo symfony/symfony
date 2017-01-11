@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T07:19:33Z
+
+I think nobody can understand the `invert` part, should we remove it?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-13T08:27:41Z
+
+Good question. I don't know. It can be explained better in a real application by adding a help block describing its purpose.
+However I do think the feature behind makes sense (Maybe "Negative interval" is better?).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T08:31:30Z
+
+At least, we should make the text understandable by default (`invert` does not say anything about what it does). `Negative interval` does not sounds good. It's more about an `Interval in the past`? Even the main `Interval` label is not good enough if you ask me. Let's try to find good names here.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-13T08:36:39Z
+
+I agree. `Interval is in the past` is better.
+About the main `Interval` label, it's only the name of the field in my form.
+
+I know @javiereguiluz is really gifted at suggesting relevant names for such things and expresses good opinions. Maybe he can help 😃
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-13T09:00:51Z
+
+It's tricky to find a good name for this option. In [the Wikipedia page](https://en.wikipedia.org/wiki/ISO_8601) they actually use "negative" (mostly as "negative offset").
+
+Other words that I looked up were: "reverse interval" and "backwards interval". The first one seems to be more popular.
+
+---
+
+I don't like *"Interval is in the past"* because I understand it as follows:
+
+* A *"3-day negative interval"* means *"go back in time 3 days from now"*.
+* A *"3-day interval in the past"* means *"go back or forward 3 days ... and do that at some undefined time in the past"*.
+
+---
+
+So let's ping some English native contributors to help us: @weaverryan @michaelcullum  Thanks!
+
+---------------------------------------------------------------------------
+
+by michaelcullum at 2016-12-13T23:56:06Z
+
+I'd be in agreement with Javier about the interpretation of `3-day negative interval` versus `3-day interval in the past` (the latter meaning that defined interval at some point in the past as opposed to going back by that defined interval).
+
+The main problem here is the word interval as an interval has no direction/is a scalar; therefore an interval is always positive (e.g. in music intervals it's always called an octave, whether it's up an octave or down an octave). It's not the responsibility of the interval to store if it should be negative (inverted) or not, but of when you're putting it relative to something to work something out (e.g. working out a start from an end). Therefore the interval is not negated/reversed, but the interval is being subtracted from a point; it's tricky to find a name because we're basically naming the wrong thing.
+
+That said, backwards interval, negative interval and reverse interval all make sense to me although in my opinion, a negative interval would make the most amount of sense.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-14T18:55:09Z
+
+Many thanks to both of you @javiereguiluz and @michaelcullum. 🙏
+As it seems the "Negative interval" does not look that bad to you, I've changed the default value for this for now.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-16T16:39:41Z
+
+What about "Time interval" and "Subtract interval?"
+
+?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-11T18:55:00Z
+
+> What about "Time interval" and "Subtract interval?"
+
+Thanks @ro0NL :) .
+As a non native english speaker, I still prefer "Negative interval" though, as it seems to be approved.
+
+As there is no new wording propositions that would be appropriate, I think this is ready (Travis failure unrelated. Can be rebased though).

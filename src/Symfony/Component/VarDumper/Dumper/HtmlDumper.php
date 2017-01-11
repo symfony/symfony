@@ -487,19 +487,20 @@ return function (root, x) {
         var searchInput = search.querySelector('.sf-dump-search-input');
         var counter = search.querySelector('.sf-dump-search-count');
         var searchInputTimer = 0;
+        var previousSearchQuery = '';
 
-        addEventListener(searchInput, 'keydown', function (e) {
-            /* Don't intercept escape key in order to not start a search */
-            if (27 === e.keyCode) {
+        addEventListener(searchInput, 'keyup', function (e) {
+            var searchQuery = e.target.value;
+            /* Don't perform anything if the pressed key didn't change the query */
+            if (searchQuery === previousSearchQuery) {
                 return;
             }
-
+            previousSearchQuery = searchQuery;
             clearTimeout(searchInputTimer);
             searchInputTimer = setTimeout(function () {
                 state.reset();
                 collapseAll(root);
                 resetHighlightedNodes(root);
-                var searchQuery = e.target.value;
                 if ('' === searchQuery) {
                     counter.textContent = '0 on 0';
 
@@ -526,17 +527,29 @@ return function (root, x) {
         });
 
         addEventListener(root, 'keydown', function (e) {
-            if (114 === e.keyCode || (isCtrlKey(e) && 70 === e.keyCode)) {
-                /* CTRL + F or CMD + F */
+            var isSearchActive = !/\bsf-dump-search-hidden\b/.test(search.className);
+            if ((114 === e.keyCode && !isSearchActive) || (isCtrlKey(e) && 70 === e.keyCode)) {
+                /* F3 or CMD/CTRL + F */
                 e.preventDefault();
                 search.className = search.className.replace(/\bsf-dump-search-hidden\b/, '');
                 searchInput.focus();
-            } else if (27 === e.keyCode && !/\bsf-dump-search-hidden\b/.test(search.className)) {
-                /* ESC key */
-                search.className += ' sf-dump-search-hidden';
-                e.preventDefault();
-                resetHighlightedNodes(root);
-                searchInput.value = '';
+            } else if (isSearchActive) {
+                if (27 === e.keyCode) {
+                    /* ESC key */
+                    search.className += ' sf-dump-search-hidden';
+                    e.preventDefault();
+                    resetHighlightedNodes(root);
+                    searchInput.value = '';
+                } else if (
+                    (isCtrlKey(e) && 71 === e.keyCode) /* CMD/CTRL + G */
+                    || 13 === e.keyCode /* Enter */
+                    || 114 === e.keyCode /* F3 */
+                ) {
+                    e.preventDefault();
+                    e.shiftKey ? state.previous() : state.next();
+                    collapseAll(root);
+                    showCurrent(state);
+                }
             }
         });
     }

@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by mcfedr at 2016-07-27T10:19:30Z
+
+Maybe worth merging (or reviewing) https://github.com/symfony/symfony/pull/19305 first so that it doesnt conflict.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-09-14T21:49:44Z
+
+Tests do not pass because of the deprecation.
+
+---------------------------------------------------------------------------
+
+by bcremer at 2016-09-15T06:19:34Z
+
+Tests are now all fixed.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-10-22T08:05:41Z
+
+👍 (failure is unrelated)
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-10-22T12:21:34Z
+
+Should we make some hardcoded id's / strings configurable thru required constructor args, as done in #20250? See discussion: https://github.com/symfony/symfony/pull/20250#discussion_r84143705
+
+---------------------------------------------------------------------------
+
+by bcremer at 2017-01-11T07:16:12Z
+
+Is there still anything I can help to get this merged into 3.3?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-11T10:48:38Z
+
+@bcremer You rebase this once again to resolve conflicts, but otherwise this looks ready to me.
+
+ping @symfony/deciders
+
+---------------------------------------------------------------------------
+
+by bcremer at 2017-01-11T12:19:00Z
+
+@xabbuh Rebased onto `master` and targeted to Symfony 3.3.

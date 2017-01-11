@@ -12,7 +12,9 @@
 namespace Symfony\Bundle\FrameworkBundle\Controller;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,8 +31,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -42,153 +42,72 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
  * Supports both autowiring trough setters and accessing services using a container.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Fabien Potencier <fabien@symfony.com>
  */
 trait ControllerTrait
 {
-    /**
-     * @return RouterInterface
-     */
-    protected function getRouter()
+    protected function getRouter(): RouterInterface
     {
-        if (isset($this->container)) {
-            return $this->container->get('router');
-        }
-
-        throw new \LogicException(sprintf('An instance of "%s" must be provided.', RouterInterface::class));
+        throw new \LogicException(sprintf('An instance of "%" must be provided.', RouterInterface::class));
     }
 
-    /**
-     * @return RequestStack
-     */
-    protected function getRequestStack()
+    protected function getRequestStack(): RequestStack
     {
-        if (isset($this->container)) {
-            return $this->container->get('request_stack');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', RequestStack::class));
     }
 
-    /**
-     * @return HttpKernelInterface
-     */
-    protected function getHttpKernel()
+    protected function getHttpKernel(): HttpKernelInterface
     {
-        if (isset($this->container)) {
-            return $this->container->get('http_kernel');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', HttpKernelInterface::class));
     }
 
-    /**
-     * @return SerializerInterface
-     */
-    protected function getSerializer()
+    protected function getSerializer(): SerializerInterface
     {
-        if (isset($this->container) && $this->container->has('serializer')) {
-            return $this->container->get('serializer');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', SerializerInterface::class));
     }
 
     /**
-     * Passing the Symfony session implementation is mandatory because flashes are not part of the interface.
+     * An instance of the Session implementation (and not the interface) is returned because getFlashBag is not part of
+     * the interface.
      *
      * @return Session
      */
-    protected function getSession()
+    protected function getSession(): Session
     {
-        if (isset($this->container) && $this->container->has('session')) {
-            return $this->container->get('session');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', Session::class));
     }
 
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker()
+    protected function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
-        if (isset($this->container) && $this->container->has('security.authorization_checker')) {
-            return $this->container->get('security.authorization_checker');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', AuthorizationCheckerInterface::class));
     }
 
-    /**
-     * @return EngineInterface
-     */
-    protected function getTemplating()
+    protected function getTemplating(): EngineInterface
     {
-        if (isset($this->container) && $this->container->has('templating')) {
-            return $this->container->get('templating');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', EngineInterface::class));
     }
 
-    /**
-     * @return \Twig_Environment
-     */
-    protected function getTwig()
+    protected function getTwig(): \Twig_Environment
     {
-        if (isset($this->container) && $this->container->has('twig')) {
-            return $this->container->get('twig');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', \Twig_Environment::class));
     }
 
-    /**
-     * @return ManagerRegistry
-     */
-    protected function getDoctrine()
+    protected function getDoctrine(): ManagerRegistry
     {
-        if (isset($this->container) && $this->container->has('doctrine')) {
-            return $this->container->get('doctrine');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', ManagerRegistry::class));
     }
 
-    /**
-     * @return FormFactoryInterface
-     */
-    protected function getFormFactory()
+    protected function getFormFactory(): FormFactoryInterface
     {
-        if (isset($this->container)) {
-            return $this->container->get('form.factory');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', FormFactoryInterface::class));
     }
 
-    /**
-     * @return TokenStorageInterface
-     */
-    protected function getTokenStorage()
+    protected function getTokenStorage(): TokenStorageInterface
     {
-        if (isset($this->container) && $this->container->has('security.token_storage')) {
-            return $this->container->get('security.token_storage');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', TokenStorageInterface::class));
     }
 
-    /**
-     * @return CsrfTokenManagerInterface
-     */
-    protected function getCsrfTokenManager()
+    protected function getCsrfTokenManager(): CsrfTokenManagerInterface
     {
-        if (isset($this->container) && $this->container->has('security.csrf.token_manager')) {
-            return $this->container->get('security.csrf.token_manager');
-        }
-
         throw new \LogicException(sprintf('An instance of "%s" must be provided.', CsrfTokenManagerInterface::class));
     }
 
@@ -203,7 +122,7 @@ trait ControllerTrait
      *
      * @see UrlGeneratorInterface
      */
-    protected function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl(string $route, array $parameters = array(), int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         return $this->getRouter()->generate($route, $parameters, $referenceType);
     }
@@ -217,7 +136,7 @@ trait ControllerTrait
      *
      * @return Response A Response instance
      */
-    protected function forward($controller, array $path = array(), array $query = array())
+    protected function forward(string $controller, array $path = array(), array $query = array()): Response
     {
         $request = $this->getRequestStack()->getCurrentRequest();
         $path['_forwarded'] = $request->attributes;
@@ -235,7 +154,7 @@ trait ControllerTrait
      *
      * @return RedirectResponse
      */
-    protected function redirect($url, $status = 302)
+    protected function redirect(string $url, int $status = 302): RedirectResponse
     {
         return new RedirectResponse($url, $status);
     }
@@ -249,7 +168,7 @@ trait ControllerTrait
      *
      * @return RedirectResponse
      */
-    protected function redirectToRoute($route, array $parameters = array(), $status = 302)
+    protected function redirectToRoute(string $route, array $parameters = array(), int $status = 302): RedirectResponse
     {
         return $this->redirect($this->generateUrl($route, $parameters), $status);
     }
@@ -264,7 +183,7 @@ trait ControllerTrait
      *
      * @return JsonResponse
      */
-    protected function json($data, $status = 200, $headers = array(), $context = array())
+    protected function json($data, int $status = 200, array $headers = array(), array $context = array()): JsonResponse
     {
         try {
             $json = $this->getSerializer()->serialize($data, 'json', array_merge(array(
@@ -286,7 +205,7 @@ trait ControllerTrait
      *
      * @return BinaryFileResponse
      */
-    protected function file($file, $fileName = null, $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT)
+    protected function file($file, string $fileName = null, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT): BinaryFileResponse
     {
         $response = new BinaryFileResponse($file);
         $response->setContentDisposition($disposition, $fileName === null ? $response->getFile()->getFilename() : $fileName);
@@ -302,7 +221,7 @@ trait ControllerTrait
      *
      * @throws \LogicException
      */
-    protected function addFlash($type, $message)
+    protected function addFlash(string $type, string $message)
     {
         $this->getSession()->getFlashBag()->add($type, $message);
     }
@@ -317,7 +236,7 @@ trait ControllerTrait
      *
      * @throws \LogicException
      */
-    protected function isGranted($attributes, $object = null)
+    protected function isGranted($attributes, $object = null): bool
     {
         return $this->getAuthorizationChecker()->isGranted($attributes, $object);
     }
@@ -332,7 +251,7 @@ trait ControllerTrait
      *
      * @throws AccessDeniedException
      */
-    protected function denyAccessUnlessGranted($attributes, $object = null, $message = 'Access Denied.')
+    protected function denyAccessUnlessGranted($attributes, $object = null, string $message = 'Access Denied.')
     {
         if (!$this->isGranted($attributes, $object)) {
             $exception = $this->createAccessDeniedException($message);
@@ -350,7 +269,7 @@ trait ControllerTrait
      *
      * @return string The rendered view
      */
-    protected function renderView($view, array $parameters = array())
+    protected function renderView(string $view, array $parameters = array()): string
     {
         try {
             return $this->getTemplating()->render($view, $parameters);
@@ -368,7 +287,7 @@ trait ControllerTrait
      *
      * @return Response A Response instance
      */
-    protected function render($view, array $parameters = array(), Response $response = null)
+    protected function render(string $view, array $parameters = array(), Response $response = null): Response
     {
         try {
             return $this->getTemplating()->renderResponse($view, $parameters, $response);
@@ -390,7 +309,7 @@ trait ControllerTrait
      *
      * @return StreamedResponse A StreamedResponse instance
      */
-    protected function stream($view, array $parameters = array(), StreamedResponse $response = null)
+    protected function stream(string $view, array $parameters = array(), StreamedResponse $response = null): StreamedResponse
     {
         try {
             $templating = $this->getTemplating();
@@ -427,7 +346,7 @@ trait ControllerTrait
      *
      * @return NotFoundHttpException
      */
-    protected function createNotFoundException($message = 'Not Found', \Exception $previous = null)
+    protected function createNotFoundException(string $message = 'Not Found', \Exception $previous = null): NotFoundHttpException
     {
         return new NotFoundHttpException($message, $previous);
     }
@@ -444,7 +363,7 @@ trait ControllerTrait
      *
      * @return AccessDeniedException
      */
-    protected function createAccessDeniedException($message = 'Access Denied.', \Exception $previous = null)
+    protected function createAccessDeniedException(string $message = 'Access Denied.', \Exception $previous = null): AccessDeniedException
     {
         return new AccessDeniedException($message, $previous);
     }
@@ -456,9 +375,9 @@ trait ControllerTrait
      * @param mixed  $data    The initial data for the form
      * @param array  $options Options for the form
      *
-     * @return Form
+     * @return FormInterface
      */
-    protected function createForm($type, $data = null, array $options = array())
+    protected function createForm(string $type, $data = null, array $options = array()): FormInterface
     {
         return $this->getFormFactory()->create($type, $data, $options);
     }
@@ -469,9 +388,9 @@ trait ControllerTrait
      * @param mixed $data    The initial data for the form
      * @param array $options Options for the form
      *
-     * @return FormBuilder
+     * @return FormBuilderInterface
      */
-    protected function createFormBuilder($data = null, array $options = array())
+    protected function createFormBuilder($data = null, array $options = array()): FormBuilderInterface
     {
         return $this->getFormFactory()->createBuilder(FormType::class, $data, $options);
     }
@@ -507,7 +426,7 @@ trait ControllerTrait
      *
      * @return bool
      */
-    protected function isCsrfTokenValid($id, $token)
+    protected function isCsrfTokenValid(string $id, string $token): bool
     {
         return $this->getCsrfTokenManager()->isTokenValid(new CsrfToken($id, $token));
     }

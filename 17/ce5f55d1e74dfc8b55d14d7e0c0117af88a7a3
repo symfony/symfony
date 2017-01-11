@@ -1,0 +1,247 @@
+---------------------------------------------------------------------------
+
+by jakzal at 2016-08-10T08:38:29Z
+
+We'll need a test case for this.
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2016-08-10T09:27:11Z
+
+@jakzal I modified the TwigExtensionTest to include a test case for this situation.
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2016-08-10T09:46:07Z
+
+AppVeyor ran on an outdated commit, might have to be restarted.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-28T17:18:08Z
+
+@wesleylancel Do you think you can finish this one?
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2016-12-28T18:17:28Z
+
+@xabbuh: I wish, as this is something that would be extremely useful for us. But, as pointed out by @ro0NL, bundles can extend infinitely A > B > C > D. My PR currently only checks for one level of extending. Ideally, I would be able to access the bundle map that is part of the kernel, but that's not available at this stage yet. If you could point me towards a possible solution I'd be happy to adjust my code accordingly.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T20:53:36Z
+
+Seeing the related ticket this goes back to 2013. And quite some issues are involved. I've not experienced it myself, but the template problem seems real.
+
+Either way allowing kernel introspection would be _extremely useful_ for everybody. Preferably with an immutable kernel. Practically we can move [this](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Kernel.php#L493) a few lines up. Relying on a synthetic service before compilation.
+
+We also can expose bundles thru parameters, we only need stringish values here. `BundleInterface` only defines name, path and namespace anyway. So passing a stringish bundle map could work, and seems to make sense as we also provide kernel info already. Any further details can be provided with `Bundle::build`.
+
+But mayve @ogizanagi  has more idea's? As i also liked his approach with a contextual builder. Maybe it can be simplified.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-28T21:21:21Z
+
+Unfortunately #19646 was my only attempt to provide a naive feature for sharing some contextual information while the container is building, avoiding the need to rely on pseudo tmp synthetic services. Along with the `BootingKernel` and `BootingBundle` classes, it allowed to solves issues related to this one as a demonstration of the possibilities.
+But despite the implementation is simple, it somehow looks overkilled for the few needs.
+
+As you suggested, maybe exposing a simple representation of the bundle map and bundles informations in a kernel parameter could be the way. But I don't remember all the ins and outs and if it was easily feasible at this point. :/
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-28T21:29:35Z
+
+> But despite the implementation is simple, it somehow looks overkilled for the few needs.
+
+Agree :+1: I feel the same about my own attempts now. Eventually having a builder with context can be done in userland easily. But it doesnt solve it for SF.
+
+If there arent any other insights, i'd say go for `%kernel.bundle_map%` :+1:
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-29T11:38:01Z
+
+>  i'd say go for %kernel.bundle_map%
+
+Not sure it's doable. Putting `Kernel::$bundleMap` in a new kernel parameter would just lead to
+
+>  Unable to dump a service container if a parameter is an object or a resource.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T11:43:52Z
+
+It's a stringish map, that's actually cached :) we're not passing bundle instances around here.
+
+```
+array(
+  'name' => ['parent' => 'name2', 'namespace' => 'NS', 'path' => '/bundles/name' ],
+  'name2' => //
+)
+```
+
+Something like that i guess.
+
+I mean.. this would lead to a nested `<argument>` collection in XML right?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T12:11:58Z
+
+Ie. looking at the issues, im not really sure we need true bundle instances here. Only metadata from bundle introspection. To build things properly.
+
+I truly dont hope we're looking for ways to do this since 2013 :laughing: as it would definitely require the `BootingKernel` idea from @ogizanagi..
+
+---------------------------------------------------------------------------
+
+by chalasr at 2016-12-31T11:41:35Z
+
+See #21113
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-01T19:54:21Z
+
+Nice @chalasr! I've subscribed to the PR and will update this one when it's merged.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-04T20:08:16Z
+
+@wesleylancel #21113 has been merged.
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-04T20:09:46Z
+
+@xabbuh Thanks for the heads up. Looking into rewriting this PR using the new parameter.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-04T20:12:54Z
+
+Is it still needed? @chalasr made the changes in the TwigExtension. What remains to do?
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-04T20:14:56Z
+
+@ogizanagi I don't think that fixes registering extra paths for parent bundles.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-04T20:17:48Z
+
+>  I don't think that fixes registering extra paths for parent bundles.
+
+Indeed, #21113 fixed the case for bundles overriding `getPath()`, handling bundle hierarchy still needs to be fixed
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-04T20:56:40Z
+
+@xabbuh @chalasr Just committed a first attempt using the new parameter. To the contrary of the earlier version this should take multiple levels of nested bundle into account. Feedback welcome.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-04T21:19:32Z
+
+@wesleylancel Looks good to me 👍  Not sure why but it seems you have a conflict
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-04T21:23:12Z
+
+You should probably change the branch target to 2.7 instead of master.
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-04T21:27:14Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-05T08:50:01Z
+
+@xabbuh I think it should be the right way around now :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-05T18:41:11Z
+
+@wesleylancel The calls of `realpath()` need to be removed [here](https://github.com/symfony/symfony/pull/19586/files#diff-00bc5ea153482178966f6617538a8e2eR282) and [here](https://github.com/symfony/symfony/pull/19586/files#diff-00bc5ea153482178966f6617538a8e2eR287) for the appveyor build to pass. Once fixed I would say we're good here
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-05T19:37:48Z
+
+@chalasr Thanks, fixed.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-06T06:42:31Z
+
+Looks good to me.
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-06T09:02:35Z
+
+👍 I checked this with the issues described in FriendsOfSymfony/FOSUserBundle#2376 and FriendsOfSymfony/FOSUserBundle#2378 and I can confirm that this patch fixes them.
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by kmelia at 2017-01-06T09:08:37Z
+
+@xabbuh great news! Could you tell us on which branches this patch will be applied ?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-06T09:11:31Z
+
+@kmelia Once merged, this will be available in the next patch releases of each maintained branch (i.e. from 2.7 to 3.2)  and the current development version (3.3).
+
+---------------------------------------------------------------------------
+
+by kmelia at 2017-01-06T09:30:35Z
+
+@chalasr thanks!
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-06T22:02:35Z
+
+@stof I've added a separate commit so it's easier to see what I've changed (can be squashed later). A hierarchy of bundles is now built first, after that the paths are added to the loader. I'm not sure if I could simplify the code, especially the building of the hierarchy.
+
+I could improve the test by asserting the array per namespace if that helps for readability?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-07T09:08:42Z
+
+I think an easier implementation could be to have two loops. The first would collect path information for bundles we override without actually registering them. The second would then first register the additional paths from child bundles followed by paths the bundle provides itself.
+
+---------------------------------------------------------------------------
+
+by wesleylancel at 2017-01-10T10:57:23Z
+
+@xabbuh: Isn't that what I'm doing now? First the hierarchy is built and then the paths are registered.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-11T15:45:32Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-11T17:46:47Z
+
+👍

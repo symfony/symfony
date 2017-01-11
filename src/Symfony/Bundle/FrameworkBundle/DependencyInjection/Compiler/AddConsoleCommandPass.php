@@ -11,41 +11,17 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+@trigger_error(sprintf('%s is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass instead.', AddConsoleCommandPass::class), E_USER_DEPRECATED);
+
+use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass as BaseAddConsoleCommandPass;
 
 /**
- * AddConsoleCommandPass.
+ * Registers console commands.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0. Use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass instead.
  */
-class AddConsoleCommandPass implements CompilerPassInterface
+class AddConsoleCommandPass extends BaseAddConsoleCommandPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        $commandServices = $container->findTaggedServiceIds('console.command');
-        $serviceIds = array();
-
-        foreach ($commandServices as $id => $tags) {
-            $definition = $container->getDefinition($id);
-
-            if ($definition->isAbstract()) {
-                throw new InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must not be abstract.', $id));
-            }
-
-            $class = $container->getParameterBag()->resolveValue($definition->getClass());
-            if (!is_subclass_of($class, 'Symfony\\Component\\Console\\Command\\Command')) {
-                if (!class_exists($class, false)) {
-                    throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
-                }
-
-                throw new InvalidArgumentException(sprintf('The service "%s" tagged "console.command" must be a subclass of "Symfony\\Component\\Console\\Command\\Command".', $id));
-            }
-            $container->setAlias($serviceId = 'console.command.'.strtolower(str_replace('\\', '_', $class)), $id);
-            $serviceIds[] = $definition->isPublic() ? $id : $serviceId;
-        }
-
-        $container->setParameter('console.command.ids', $serviceIds);
-    }
 }

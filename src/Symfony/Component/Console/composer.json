@@ -21,7 +21,9 @@
         "symfony/debug": "~2.8|~3.0"
     },
     "require-dev": {
+        "symfony/http-kernel": "~2.8|~3.0",
         "symfony/event-dispatcher": "~2.8|~3.0",
+        "symfony/dependency-injection": "~2.8|~3.0",
         "symfony/filesystem": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
         "psr/log": "~1.0"

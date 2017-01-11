@@ -11,6 +11,7 @@ CHANGELOG
  * Translation related services are not loaded anymore when the `framework.translator` option
    is disabled.
  * Added `GlobalVariables::getToken()`
+ * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass`. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
 
 3.2.0
 -----

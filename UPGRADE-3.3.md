@@ -26,7 +26,12 @@ Finder
 ------
 
  * The `ExceptionInterface` has been deprecated and will be removed in 4.0.
+ 
+FrameworkBundle
+---------------
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been deprecated. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ 
 HttpKernel
 -----------
 

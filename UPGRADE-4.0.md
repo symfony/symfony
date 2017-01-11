@@ -150,6 +150,8 @@ FrameworkBundle
  * The `framework.serializer.cache` option and the services
    `serializer.mapping.cache.apc` and `serializer.mapping.cache.doctrine.apc`
    have been removed. APCu should now be automatically used when available.
+   
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been removed. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
 
 SecurityBundle
 --------------

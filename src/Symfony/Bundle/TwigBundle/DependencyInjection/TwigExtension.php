@@ -194,12 +194,6 @@ class TwigExtension extends Extension
         return $bundleHierarchy;
     }
 
-    private function addTwigPath($twigFilesystemLoaderDefinition, $dir, $bundle)
-    {
-        $name = $this->normalizeBundleName($bundle);
-        $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($dir, $name));
-    }
-
     private function normalizeBundleName($name)
     {
         if ('Bundle' === substr($name, -6)) {

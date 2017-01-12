@@ -41,7 +41,7 @@ CHANGELOG
    $twig->addExtension(new FormExtension());
    ```
  * Deprecated the `TwigRendererEngineInterface` interface.
- * added WorkflownExtension (provides `workflow_can` and `workflow_transitions`)
+ * added WorkflowExtension (provides `workflow_can` and `workflow_transitions`)
 
 2.7.0
 -----

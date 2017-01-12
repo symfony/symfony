@@ -15,8 +15,6 @@ use Symfony\Bridge\Twig\Extension\ExpressionExtension;
 
 class ExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    protected $helper;
-
     public function testExpressionCreation()
     {
         $template = "{{ expression('1 == 1') }}";

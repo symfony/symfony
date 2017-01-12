@@ -197,6 +197,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
             'public' => array('show_private' => false),
             'tag1' => array('show_private' => true, 'tag' => 'tag1'),
             'tags' => array('group_by' => 'tags', 'show_private' => true),
+            'arguments' => array('show_private' => false, 'show_arguments' => true),
         );
 
         $data = array();

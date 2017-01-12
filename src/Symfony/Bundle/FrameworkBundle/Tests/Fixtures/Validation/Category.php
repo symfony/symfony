@@ -11,7 +11,7 @@ class Category
     public $id;
 
     /**
-     * @Assert\Type(Category::NAME_PATTERN)
+     * @Assert\Type("string")
      */
     public $name;
 }

@@ -591,15 +591,16 @@ class PhpDumper extends Dumper
      */
     private function addService($id, Definition $definition)
     {
+        if ($definition->isSynthetic()) {
+            return '';
+        }
         $this->definitionVariables = new \SplObjectStorage();
         $this->referenceVariables = array();
         $this->variableCount = 0;
 
         $return = array();
 
-        if ($definition->isSynthetic()) {
-            $return[] = '@throws RuntimeException always since this service is expected to be injected dynamically';
-        } elseif ($class = $definition->getClass()) {
+        if ($class = $definition->getClass()) {
             $class = $this->container->resolveEnvPlaceholders($class);
             $return[] = sprintf('@return %s A %s instance', 0 === strpos($class, '%') ? 'object' : '\\'.ltrim($class, '\\'), ltrim($class, '\\'));
         } elseif ($definition->getFactory()) {
@@ -680,25 +681,21 @@ EOF;
 
         $code .= $isProxyCandidate ? $this->getProxyDumper()->getProxyFactoryCode($definition, $id, $methodName) : '';
 
-        if ($definition->isSynthetic()) {
-            $code .= sprintf("        throw new RuntimeException('You have requested a synthetic service (\"%s\"). The DIC does not know how to construct this service.');\n    }\n", $id);
-        } else {
-            if ($definition->isDeprecated()) {
-                $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
-            }
-
-            $code .=
-                $this->addServiceInclude($id, $definition).
-                $this->addServiceLocalTempVariables($id, $definition).
-                $this->addServiceInlinedDefinitions($id, $definition).
-                $this->addServiceInstance($id, $definition).
-                $this->addServiceInlinedDefinitionsSetup($id, $definition).
-                $this->addServiceProperties($id, $definition).
-                $this->addServiceMethodCalls($id, $definition).
-                $this->addServiceConfigurator($id, $definition).
-                $this->addServiceReturn($id, $definition)
-            ;
+        if ($definition->isDeprecated()) {
+            $code .= sprintf("        @trigger_error(%s, E_USER_DEPRECATED);\n\n", $this->export($definition->getDeprecationMessage($id)));
         }
+
+        $code .=
+            $this->addServiceInclude($id, $definition).
+            $this->addServiceLocalTempVariables($id, $definition).
+            $this->addServiceInlinedDefinitions($id, $definition).
+            $this->addServiceInstance($id, $definition).
+            $this->addServiceInlinedDefinitionsSetup($id, $definition).
+            $this->addServiceProperties($id, $definition).
+            $this->addServiceMethodCalls($id, $definition).
+            $this->addServiceConfigurator($id, $definition).
+            $this->addServiceReturn($id, $definition)
+        ;
 
         $this->definitionVariables = null;
         $this->referenceVariables = null;
@@ -950,7 +947,8 @@ EOF;
      */
     private function addMethodMap()
     {
-        if (!$definitions = $this->container->getDefinitions()) {
+        $definitions = $this->container->getDefinitions();
+        if (!$definitions || !$definitions = array_filter($definitions, function ($def) { return !$def->isSynthetic(); })) {
             return '';
         }
 

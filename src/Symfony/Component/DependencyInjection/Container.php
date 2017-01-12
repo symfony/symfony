@@ -205,10 +205,13 @@ class Container implements ResettableContainerInterface
     public function has($id)
     {
         for ($i = 2;;) {
-            if ('service_container' === $id
-                || isset($this->aliases[$id])
-                || isset($this->services[$id])
-            ) {
+            if ('service_container' === $id) {
+                return true;
+            }
+            if (isset($this->aliases[$id])) {
+                $id = $this->aliases[$id];
+            }
+            if (isset($this->services[$id])) {
                 return true;
             }
 

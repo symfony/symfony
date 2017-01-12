@@ -312,7 +312,10 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
                 $member = clone $member;
 
                 foreach ($member->getConstraints() as $constraint) {
-                    $member->constraintsByGroup[$this->getDefaultGroup()][] = $constraint;
+                    if (in_array($constraint::DEFAULT_GROUP, $constraint->groups, true)) {
+                        $member->constraintsByGroup[$this->getDefaultGroup()][] = $constraint;
+                    }
+
                     $constraint->addImplicitGroupName($this->getDefaultGroup());
                 }
 

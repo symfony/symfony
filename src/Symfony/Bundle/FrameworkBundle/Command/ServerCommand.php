@@ -54,7 +54,9 @@ abstract class ServerCommand extends ContainerAwareCommand
             return true;
         }
 
-        list($hostname, $port) = explode(':', $address);
+        $pos = strrpos($address, ':');
+        $hostname = substr($address, 0, $pos);
+        $port = substr($address, $pos + 1);
 
         $fp = @fsockopen($hostname, $port, $errno, $errstr, 5);
 

@@ -1,0 +1,160 @@
+---------------------------------------------------------------------------
+
+by magnetik at 2017-01-10T13:43:56Z
+
+Thanks for the comments. I'll continue when the discussion about the related bug (#21217) is ended.
+Some input are welcome there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T12:58:29Z
+
+@magnetik ready to update the PR?
+
+---------------------------------------------------------------------------
+
+by magnetik at 2017-01-12T13:04:29Z
+
+I'm willing to update it with the proposed change, but there are some ingoing discussion in #21217 about whether or not this PR is the good solution.
+Could we have your feedback there?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T13:08:16Z
+
+The rational is purely local. The code logic is currently broken, the patch https://github.com/symfony/symfony/pull/21218#discussion_r95388450 fixes the situation by handling TZ as in other places.
+So no need for more considerations on my side, let's move on  :)
+
+---------------------------------------------------------------------------
+
+by magnetik at 2017-01-12T13:25:12Z
+
+Done.
+
+It slightly differ from your diff as I've let the `->setTimezone` in the else.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-01-12T13:33:24Z
+
+@magnetik the setter must be called after the `else` so it's called in both cases.
+
+---------------------------------------------------------------------------
+
+by magnetik at 2017-01-12T13:36:31Z
+
+Well in the `$dateOnly` case the DateTime is directly created with the `outputTimezone` in the construct.
+Is there any point of calling `setTimezone` with the same timezone there?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-01-12T13:55:42Z
+
+Yeah this is what the comment below is talking about ;)
+
+---------------------------------------------------------------------------
+
+by tkleinhakisa at 2017-01-12T14:23:27Z
+
+> The rational is purely local.
+@nicolas-grekas what do you mean ?
+
+As i see the current fix you could still select 2017-01-10 and get back 2017-01-09, which seems very weird
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T14:25:42Z
+
+> 2017-01-10 and get back 2017-01-09
+
+because of TZ config yes - not more weird than TZ themselves - just logical in fact.
+
+---------------------------------------------------------------------------
+
+by tkleinhakisa at 2017-01-12T14:34:02Z
+
+Not logical at all to me ... because there should not be any TZ config at all when working only with dates
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T14:48:55Z
+
+> because there should not be any TZ config at all when working only with dates
+
+then that's a config issue. But when there is one, we must respect it.
+
+---------------------------------------------------------------------------
+
+by tkleinhakisa at 2017-01-12T15:41:49Z
+
+> But when there is one, we must respect it.
+
+When there is a wrong one shouldn't we fix it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T16:50:15Z
+
+@tkleinhakisa config is config, there is no way to tell if a TZ setting is wrong or false
+
+---------------------------------------------------------------------------
+
+by tkleinhakisa at 2017-01-12T17:05:11Z
+
+I'm sorry i don't want to be boring, but it's not about telling if the given TZ is right or wrong (there is no such thing) but it's about removing this setting (or at least deprecate it)
+
+TZ do not make sense when working with dates only, so why do we have these settings ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T17:07:56Z
+
+:+1: again, I messed up with the previous comment :)
+@tkleinhakisa *maybe*, but since we have this setting, we have to honor it.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-12T17:53:17Z
+
+the issue is that removing the timezone setting entirely was already attempted in the past, and it broke things for projects, because PHP still has a time in the object (because there is no Date object but a DateTime one).
+so we cannot simply remove it again (it would cause the same issues)
+
+---------------------------------------------------------------------------
+
+by tkleinhakisa at 2017-01-12T18:03:57Z
+
+From what i've read on this bug tracker, TZ options do not make sense on that field, see #12404 #12380 #12239 #7187
+
+the changes suggested here has the potential to break someone's app in a very isidious way because it won't be a fatal error break that can be easily spotted, it will be a change in the behavior of the app.
+
+@stof From what i've seen in the previous PR's the options were removed without any deprecation first, which should be the way to go so that people using it and relying on it have time to update their app
+
+> it broke things for projects
+
+This PR has the same potential
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-12T18:11:31Z
+
+@tkleinhakisa a deprecation would not have helped much, as the issue was that stopping to take the timezone conversion into account for dates caused issues later when using the DateTime object in ways converting timezones.
+The root issue is that DateTime should not be used to represent a Date alone. It does not represent this. All issues were coming from that. But PHP does not have a Date object.
+
+---------------------------------------------------------------------------
+
+by tkleinhakisa at 2017-01-12T18:20:20Z
+
+Well then maybe the deprecation should not only concern the options but the return type too. If we agree that DateTime is not a good object to represent a date only or time only then shouldn't we move onto something else (a string, a simple Date object or Time Object ?)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T18:24:43Z
+
+Note that I don't see the issue you're talking about : if we have 12hours delta, "the day before" or "the day after" will always be accurate up to 12h. I like to think locally. And locally here, TZ handling is accurate. Changing for something else won't make things more accurate.
+What matters is that forward+reverse transforms is the identity function, which is what this fix ensures.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-12T18:26:04Z
+
+@tkleinhakisa but we first need to have a standard for that, so that other libraries agree on using it (for instance the Doctrine ORM). If the ORM still use DateTime, it would just move the issue to the place where you convert between your Date object and DateTime, which does not solve anything

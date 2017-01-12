@@ -106,7 +106,6 @@ class TwigExtension extends Extension
             foreach ($bundle['paths'] as $path) {
                 $twigFilesystemLoaderDefinition->addMethodCall('addPath', array($path, $namespace));
             }
-            $container->addResource(new FileExistenceResource($dir));
         }
 
         if (is_dir($dir = $container->getParameter('kernel.root_dir').'/Resources/views')) {

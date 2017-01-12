@@ -118,6 +118,9 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->getType('stdClass');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetTypeFromExtension()
     {
         $type = new LegacyFooType();

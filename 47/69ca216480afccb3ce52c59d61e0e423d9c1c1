@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-07T05:44:00Z
+
+The Travis error looks related to your patch.
+
+---------------------------------------------------------------------------
+
+by uwej711 at 2016-12-07T07:24:56Z
+
+Had only PHP 5.5 to test locally ...
+
+---------------------------------------------------------------------------
+
+by uwej711 at 2016-12-07T07:47:48Z
+
+Oh dear, to early in the morning to spot the same two lines further down ...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-31T11:14:41Z
+
+@uwej711 The change itself looks good to me. However, this will only solve the issue mentioned in https://github.com/symfony/symfony/issues/12302#issuecomment-60370044, right?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-12T10:50:55Z
+
+looks good to me. 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T10:59:31Z
+
+:+1:

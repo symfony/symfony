@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\CacheWarmer;
 
+use Doctrine\Common\Annotations\AnnotationException;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -38,8 +39,8 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
 
     /**
      * @param ValidatorBuilderInterface $validatorBuilder
-     * @param string                    $phpArrayFile     The PHP file where metadata are cached.
-     * @param CacheItemPoolInterface    $fallbackPool     The pool where runtime-discovered metadata are cached.
+     * @param string                    $phpArrayFile     The PHP file where metadata are cached
+     * @param CacheItemPoolInterface    $fallbackPool     The pool where runtime-discovered metadata are cached
      */
     public function __construct(ValidatorBuilderInterface $validatorBuilder, $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
@@ -66,9 +67,7 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
         $loaders = $this->validatorBuilder->getLoaders();
         $metadataFactory = new LazyLoadingMetadataFactory(new LoaderChain($loaders), new Psr6Cache($arrayPool));
 
-        $throwingAutoloader = function ($class) { throw new \ReflectionException(sprintf('Class %s does not exist', $class)); };
-        spl_autoload_register($throwingAutoloader);
-
+        spl_autoload_register(array($adapter, 'throwOnRequiredClass'));
         try {
             foreach ($this->extractSupportedLoaders($loaders) as $loader) {
                 foreach ($loader->getMappedClasses() as $mappedClass) {
@@ -78,15 +77,17 @@ class ValidatorCacheWarmer implements CacheWarmerInterface
                         }
                     } catch (\ReflectionException $e) {
                         // ignore failing reflection
+                    } catch (AnnotationException $e) {
+                        // ignore failing annotations
                     }
                 }
             }
         } finally {
-            spl_autoload_unregister($throwingAutoloader);
+            spl_autoload_unregister(array($adapter, 'throwOnRequiredClass'));
         }
 
         $values = $arrayPool->getValues();
-        $adapter->warmUp($values);
+        $adapter->warmUp(array_filter($values));
 
         foreach ($values as $k => $v) {
             $item = $this->fallbackPool->getItem($k);

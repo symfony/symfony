@@ -36,8 +36,8 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
 
     /**
      * @param Reader                 $annotationReader
-     * @param string                 $phpArrayFile     The PHP file where annotations are cached.
-     * @param CacheItemPoolInterface $fallbackPool     The pool where runtime-discovered annotations are cached.
+     * @param string                 $phpArrayFile     The PHP file where annotations are cached
+     * @param CacheItemPoolInterface $fallbackPool     The pool where runtime-discovered annotations are cached
      */
     public function __construct(Reader $annotationReader, $phpArrayFile, CacheItemPoolInterface $fallbackPool)
     {
@@ -67,9 +67,8 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
 
         $arrayPool = new ArrayAdapter(0, false);
         $reader = new CachedReader($this->annotationReader, new DoctrineProvider($arrayPool));
-        $throwingAutoloader = function ($class) { throw new \ReflectionException(sprintf('Class %s does not exist', $class)); };
-        spl_autoload_register($throwingAutoloader);
 
+        spl_autoload_register(array($adapter, 'throwOnRequiredClass'));
         try {
             foreach ($annotatedClasses as $class) {
                 try {
@@ -88,7 +87,7 @@ class AnnotationsCacheWarmer implements CacheWarmerInterface
                 }
             }
         } finally {
-            spl_autoload_unregister($throwingAutoloader);
+            spl_autoload_unregister(array($adapter, 'throwOnRequiredClass'));
         }
 
         $values = $arrayPool->getValues();

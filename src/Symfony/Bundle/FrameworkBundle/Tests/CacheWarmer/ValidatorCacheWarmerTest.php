@@ -51,6 +51,39 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author', $values);
     }
 
+    public function testWarmUpWithAnnotations()
+    {
+        $validatorBuilder = new ValidatorBuilder();
+        $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/categories.yml');
+        $validatorBuilder->enableAnnotationMapping();
+
+        $file = sys_get_temp_dir().'/cache-validator-with-annotations.php';
+        @unlink($file);
+
+        $fallbackPool = new ArrayAdapter();
+
+        $warmer = new ValidatorCacheWarmer($validatorBuilder, $file, $fallbackPool);
+        $warmer->warmUp(dirname($file));
+
+        $this->assertFileExists($file);
+
+        $values = require $file;
+
+        $this->assertInternalType('array', $values);
+        $this->assertCount(1, $values);
+        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category', $values);
+
+        // Simple check to make sure that at least one constraint is actually cached, in this case the "id" property Type.
+        $this->assertContains('"int"', $values['Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category']);
+
+        $values = $fallbackPool->getValues();
+
+        $this->assertInternalType('array', $values);
+        $this->assertCount(2, $values);
+        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Category', $values);
+        $this->assertArrayHasKey('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.SubCategory', $values);
+    }
+
     public function testWarmUpWithoutLoader()
     {
         $validatorBuilder = new ValidatorBuilder();

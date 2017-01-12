@@ -365,4 +365,42 @@ EOF;
             }
         }
     }
+
+    /**
+     * @throws \ReflectionException When $class is not found and is required
+     *
+     * @internal
+     */
+    public static function throwOnRequiredClass($class)
+    {
+        $e = new \ReflectionException(sprintf('Class %s does not exist', $class));
+        $trace = $e->getTrace();
+        $autoloadFrame = array(
+            'function' => 'spl_autoload_call',
+            'args' => array($class),
+        );
+        $i = array_search($autoloadFrame, $trace);
+
+        if (false !== $i++ && isset($trace[$i]['function']) && !isset($trace[$i]['class'])) {
+            switch ($trace[$i]['function']) {
+                case 'get_class_methods':
+                case 'get_class_vars':
+                case 'get_parent_class':
+                case 'is_a':
+                case 'is_subclass_of':
+                case 'class_exists':
+                case 'class_implements':
+                case 'class_parents':
+                case 'trait_exists':
+                case 'defined':
+                case 'interface_exists':
+                case 'method_exists':
+                case 'property_exists':
+                case 'is_callable':
+                    return;
+            }
+        }
+
+        throw $e;
+    }
 }

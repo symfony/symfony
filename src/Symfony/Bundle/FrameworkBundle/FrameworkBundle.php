@@ -80,7 +80,9 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new TemplatingPass());
         $container->addCompilerPass(new AddConstraintValidatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new AddValidatorInitializersPass());
-        $container->addCompilerPass(new AddConsoleCommandPass());
+        if (class_exists(AddConsoleCommandPass::class)) {
+            $container->addCompilerPass(new AddConsoleCommandPass());
+        }
         $container->addCompilerPass(new FormPass());
         $container->addCompilerPass(new TranslatorPass());
         $container->addCompilerPass(new LoggingTranslatorPass());

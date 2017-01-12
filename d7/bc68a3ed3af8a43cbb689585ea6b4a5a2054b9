@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by staabm at 2016-12-30T11:32:40Z
+
+Misses test?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-30T11:49:07Z
+
+In fact, we do not have any tests for the server commands at all. Not sure we should add some (their implementation might become tricky).
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2016-12-30T22:20:54Z
+
+The method that parses the `<ip>:<port>` could be extracted to `Symfony\Component\HttpFoundation\IpUtils` and unit tested.

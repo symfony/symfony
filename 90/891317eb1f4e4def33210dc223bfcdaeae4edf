@@ -1,0 +1,150 @@
+---------------------------------------------------------------------------
+
+by simensen at 2017-01-11T02:32:55Z
+
+One issue I've had with most of the `.env` libraries is that if you create a `.env.dist` you are forced to copy it to `.env` before running the application otherwise it throws something like a `PathException`. What would be the best way to use this such that you don't *have* to have a `.env` defined and only load it if that path exists?
+
+I would be easy enough to use `try`/`catch`, but might not be as elegant. With an application using something like `app.php` vs `app_dev.php`, it is easy to just put the `.env` loader into `app_dev.php` only, but some environments (like Envoyer & Forge) rely on using `.env` for configuration in production. It could be argued this is wrong (and the docs with this PR clearly state that it should *not* be used in production...) but not everyone sees it that way.
+
+All-in-all, looks like a reasonable thing to add and reasons for not using prior art directly (proper bash support) seems legit.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-11T02:43:32Z
+
+@simensen That's an excellent question... for which I have some answers. Basically, you need some env vars to be present. So, for a Symfony app, you might have something like this in your web front controller:
+
+```php
+if (!getenv('APP_ENV')) {
+    (new Dotenv())->load(__DIR__.'/../.env');
+}
+```
+
+That way, you can define real env vars and we fallback automatically to a `.env` file if not present (and there, we do want to enforce it as we do need those env vars).
+
+As you might imagine, this component is a prerequisite for Symfony Flex which automatically copies the `.env.dist` file to a `.env` file that you can then customize (during composer update/install); Flex also automatically adds env vars when adding some specific bundles like Doctrine or Swiftmailer. I still have one question in Symfony Flex: whether we want a `.env` file under the root directory or if we want an `env` file (not that it does not start with a dot) under the config directory for easy discovery (as some/most IDEs do not list dot files). I would prefer the second option but this is "less standard".
+
+---------------------------------------------------------------------------
+
+by dzuelke at 2017-01-11T02:44:20Z
+
+Please no using .dist automatically! If an app needs default values then those can be achieved using the 3.2 functionality for env.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-11T02:46:00Z
+
+@dzuelke What do you mean by "automatically"?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-11T08:47:13Z
+
+I have the feeling that `load()`, `populate()` and `parse()` should be in a different class. I've got 0 experience with `.env` so I can't really comment on when you would use it, but I have the feeling this won't be in a service container anyway.
+
+What about some static helper methods like creating a request if it's in the front controller?
+```
+Dotenv::load(...);
+Dotenv::populate(...);
+Dotenv::parse(...);
+```
+
+The parser itself should not be in the same class as the above 3 methods imo, it feels weird because the class has a state but the same instance can be re-used.
+
+---------------------------------------------------------------------------
+
+by hhamon at 2017-01-11T09:04:32Z
+
+The parser/lexer methods should be moved to a separate DotEnvParser/DotEnvLexer class as @iltar suggests. We can keep the Dotenv class for loading a file and populating the global variables.
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2017-01-11T09:41:58Z
+
+So if I understand Flex correctly, an enhancement would be that the component automatically adds `*.env` to the `.gitignore` file?
+
+Next to that, will the values eventually be sent to the Opcache, or will they be part of the compiled container?
+
+---------------------------------------------------------------------------
+
+by King2500 at 2017-01-11T13:34:07Z
+
+Maybe `DotEnv` would be more clear than `Dotenv` ?
+
+---------------------------------------------------------------------------
+
+by dzuelke at 2017-01-11T14:56:08Z
+
+@fabpot I think I misunderstood @simensen's suggestion as "auto fall back to `.env.dist` if no `.env` present", so nevermind ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-11T18:42:37Z
+
+I don't understand why the lexer/parse should be in another class. The `Dotenv` class is all about parsing a `.env` file already.
+
+---------------------------------------------------------------------------
+
+by josegonzalez at 2017-01-11T21:49:56Z
+
+Any reason why you aren't using an existing library for this? For instance, the [m1/env](https://github.com/m1/env) library is pretty feature complete and should handle everything you don't already implement.
+
+I'd also say for actually *loading* the `.env` file, both [my own library](https://github.com/josegonzalez/php-dotenv) and the one by [vlucas](https://github.com/josegonzalez/php-dotenv) should more than handle any use case symfony users have.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-01-11T21:56:41Z
+
+@josegonzalez the explanation is given in this issue's description. Also, both of the loading libraries you referenced require PHP 7 while Symfony still supports PHP 5.5.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-11T21:57:17Z
+
+All comments addressed.
+
+---------------------------------------------------------------------------
+
+by josegonzalez at 2017-01-11T22:00:55Z
+
+Not speaking on behalf of vlucas, but:
+
+- The `m1/env` library addresses the whole "Implement .env file parsing to bash spec" issue.
+- My library does separate file loading, parsing, and population as you might want.
+- Pretty sure my library handles the user-facing portion in a similar manner as to what you are looking for.
+
+The PHP version is a fair concern. I dropped 5.x support because mocking out php functions - `apache_getenv` - isn't possible until 7.x, though the previous version (2.1.) works just fine and has more or less all the same functionality.
+
+Just curious though, it's obviously your framework so the decision is up to you. Nice to see other frameworks adopting `.env` support! 👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-11T22:03:18Z
+
+@josegonzalez At first, I wanted to use vlucas library, I found many issues, I started to fix them to submit PRs, and then I realized that I removed almost all the code. So, I decided to start from scratch instead.
+
+Never heard of m1/env before, but at first glance it fails my first criteria which is to stick to only what bash can understand (the readme starts with `unlike bash the assignment is pretty relaxed`).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-11T23:52:37Z
+
+failing tests not related
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-12T15:08:19Z
+
+Regarding the main class name, people refer to this concept as `dotenv` (see Google). Naming the class DotEnv would mean that the component name would be `dot-env` which we don't want.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T16:41:10Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-01-12T17:40:36Z
+
+:+1:

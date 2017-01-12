@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-12T17:54:49Z
+
+what about ``workflow_has_marked_place`` ? ``workflow_has_place`` looks like it asks whether the workflow has this place, which is not what the function does
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-12T18:02:13Z
+
+@stof I totally agree with you. I have updated the code.

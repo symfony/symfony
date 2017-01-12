@@ -16,7 +16,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -66,8 +65,7 @@ EOF
         $options = array();
         if ($event = $input->getArgument('event')) {
             if (!$dispatcher->hasListeners($event)) {
-                $errorIo = $output instanceof ConsoleOutputInterface ? new SymfonyStyle($input, $output->getErrorOutput()) : $io;
-                $errorIo->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
+                $io->getErrorStyle()->warning(sprintf('The event "%s" does not have any registered listeners.', $event));
 
                 return;
             }

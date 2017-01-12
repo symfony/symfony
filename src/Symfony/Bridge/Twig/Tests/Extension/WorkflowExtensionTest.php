@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\WorkflowExtension;
+use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\Workflow;
@@ -20,35 +21,26 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        parent::setUp();
-
-        if (!class_exists('Symfony\Component\Workflow\Workflow')) {
+        if (!class_exists(Workflow::class)) {
             $this->markTestSkipped('The Workflow component is needed to run tests for this extension.');
         }
     }
 
-    public function testHasPlace()
+    public function testHasMarkedPlace()
     {
-        $subject = new \stdClass();
+        $definition = new Definition(['ordered', 'waiting_for_payment', 'processed'], []);
+        $workflow = new Workflow($definition);
 
-        $marking = new Marking(array('ordered' => true, 'waiting_for_payment' => true));
-
-        $workflow = $this->getMock(Workflow::class, array(), array(), '', false);
-        $workflow->expects($this->exactly(3))
-             ->method('getMarking')
-             ->with($subject)
-             ->will($this->returnValue($marking));
-
-        $registry = $this->getMock(Registry::class);
-        $registry->expects($this->exactly(3))
-             ->method('get')
-             ->with($subject)
-             ->will($this->returnValue($workflow));
+        $registry = new Registry();
+        $registry->add($workflow, \stdClass::class);
 
         $extension = new WorkflowExtension($registry);
 
-        $this->assertTrue($extension->hasPlace($subject, 'ordered'));
-        $this->assertTrue($extension->hasPlace($subject, 'waiting_for_payment'));
-        $this->assertFalse($extension->hasPlace($subject, 'processed'));
+        $subject = new \stdClass();
+        $subject->marking = array('ordered' => 1, 'waiting_for_payment' => 1);
+
+        $this->assertTrue($extension->hasMarkedPlace($subject, 'ordered'));
+        $this->assertTrue($extension->hasMarkedPlace($subject, 'waiting_for_payment'));
+        $this->assertFalse($extension->hasMarkedPlace($subject, 'processed'));
     }
 }

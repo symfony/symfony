@@ -16,6 +16,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessUtils;
 
 class ProcessHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -84,7 +85,9 @@ EOT;
 
         $errorMessage = 'An error occurred';
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $successOutputProcessDebug = str_replace("'", '"', $successOutputProcessDebug);
+            $args = array('php', '-r', 'echo 42;');
+            $args = array_map(array(ProcessUtils::class, 'escapeArgument'), $args);
+            $successOutputProcessDebug = str_replace("'php' '-r' 'echo 42;'", implode(' ', $args), $successOutputProcessDebug);
         }
 
         return array(

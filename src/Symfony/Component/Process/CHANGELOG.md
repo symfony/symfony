@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * deprecated `!VAR!` expansion inside escaped arguments
+ * deprecated not inheriting environment variables
+ * deprecated configuring `proc_open()` options
+ * deprecated configuring enhanced Windows compatibility
+ * deprecated configuring enhanced sigchild compatibility
+
 2.5.0
 -----
 

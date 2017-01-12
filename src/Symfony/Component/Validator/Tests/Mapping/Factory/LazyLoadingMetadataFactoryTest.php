@@ -150,7 +150,7 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testMetadataCacheWithRuntimeConstraint()
     {
-        $cache = $this->getMock('Symfony\Component\Validator\Mapping\Cache\CacheInterface');
+        $cache = $this->getMockBuilder('Symfony\Component\Validator\Mapping\Cache\CacheInterface')->getMock();
         $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
 
         $cache

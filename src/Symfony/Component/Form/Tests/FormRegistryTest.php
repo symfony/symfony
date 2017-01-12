@@ -159,6 +159,9 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($resolvedType, $this->registry->getType(get_class($type)));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetTypeWithTypeExtensions()
     {
         $type = new LegacyFooType();
@@ -201,6 +204,9 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($resolvedType, $this->registry->getType(get_class($type)));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyGetTypeConnectsParent()
     {
         $parentType = new LegacyFooType();
@@ -286,6 +292,9 @@ class FormRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->registry->hasType('stdClass'));
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyHasTypeAfterLoadingFromExtension()
     {
         $type = new LegacyFooType();

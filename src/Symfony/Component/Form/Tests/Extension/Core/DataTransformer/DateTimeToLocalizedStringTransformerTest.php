@@ -237,6 +237,15 @@ class DateTimeToLocalizedStringTransformerTest extends DateTimeTestCase
         $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('03.02.2010, 04:05'));
     }
 
+    public function testReverseTransformOnlyDateWithDifferentTimezones()
+    {
+        $transformer = new DateTimeToLocalizedStringTransformer('Europe/Berlin', 'Pacific/Tahiti', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
+
+        $dateTime = new \DateTime('2017-01-10 11:00', new \DateTimeZone('Europe/Berlin'));
+
+        $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('2017-01-10'));
+    }
+
     public function testReverseTransformWithDifferentPatterns()
     {
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');

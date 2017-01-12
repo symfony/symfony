@@ -250,7 +250,7 @@ Validator
    ```
    
  * The default value of the strict option of the `Choice` Constraint has been
-   changed to `true` as of 4.0. If you need the the previous behaviour ensure to 
+   changed to `true` as of 4.0. If you need the previous behaviour ensure to 
    set the option to `false`.
 
 Yaml

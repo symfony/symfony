@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-12T10:14:15Z
+
+What about inline service definitions? (ie when `$argument instanceof Definition`?)
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2017-01-12T13:04:39Z
+
+Comments are addressed and PR is green (failures look unrelated)
+
+Ping @dunglas
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-12T15:05:40Z
+
+👍

@@ -27,12 +27,12 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             return array(
-                array('"\"php\" \"-v\""', '"php" "-v"'),
-                array('"foo bar"', 'foo bar'),
-                array('^%"path"^%', '%path%'),
-                array('"<|>\\" \\"\'f"', '<|>" "\'f'),
-                array('""', ''),
-                array('"with\trailingbs\\\\"', 'with\trailingbs\\'),
+                array('^"\^"php\^" \^"-v\^"^"', '"php" "-v"'),
+                array('^"foo bar^"', 'foo bar'),
+                array('^%path^%', '%path%'),
+                array('^"^<^|^>\\^" \\^"\'f^"', '<|>" "\'f'),
+                array('^"^"', ''),
+                array('^"with\trailing bs\\\\^"', 'with\trailing bs\\'),
             );
         }
 
@@ -42,7 +42,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
             array("'%path%'", '%path%'),
             array("'<|>\" \"'\\''f'", '<|>" "\'f'),
             array("''", ''),
-            array("'with\\trailingbs\\'", 'with\trailingbs\\'),
+            array("'with\\trailing bs\\'", 'with\trailing bs\\'),
         );
     }
 }

@@ -17,11 +17,13 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
  * ProcessUtils is a bunch of utility methods.
  *
  * This class contains static methods only and is not meant to be instantiated.
- *
- * @author Martin Hasoň <martin.hason@gmail.com>
  */
 class ProcessUtils
 {
+    const ESC_WINDOWS_ARGV = 1;
+    const ESC_WINDOWS_CMD = 2;
+    const ESC_WINDOWS_ARGV_CMD = 3;
+
     /**
      * This class should not be instantiated.
      */
@@ -32,46 +34,42 @@ class ProcessUtils
     /**
      * Escapes a string to be used as a shell argument.
      *
+     * Provides a more robust method on Windows than escapeshellarg.
+     * See https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/everyone-quotes-command-line-arguments-the-wrong-way/
+     *
      * @param string $argument The argument that will be escaped
+     * @param int    $mode     A bitfield of self::ESC_WINDOWS_* constants to configure escaping context on Windows
      *
      * @return string The escaped argument
      */
-    public static function escapeArgument($argument)
+    public static function escapeArgument($argument, $mode = self::ESC_WINDOWS_ARGV_CMD)
     {
-        //Fix for PHP bug #43784 escapeshellarg removes % from given string
-        //Fix for PHP bug #49446 escapeshellarg doesn't work on Windows
-        //@see https://bugs.php.net/bug.php?id=43784
-        //@see https://bugs.php.net/bug.php?id=49446
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            if ('' === $argument) {
-                return escapeshellarg($argument);
-            }
-
-            $escapedArgument = '';
-            $quote = false;
-            foreach (preg_split('/(")/', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
-                if ('"' === $part) {
-                    $escapedArgument .= '\\"';
-                } elseif (self::isSurroundedBy($part, '%')) {
-                    // Avoid environment variable expansion
-                    $escapedArgument .= '^%"'.substr($part, 1, -1).'"^%';
-                } else {
-                    // escape trailing backslash
-                    if ('\\' === substr($part, -1)) {
-                        $part .= '\\';
-                    }
-                    $quote = true;
-                    $escapedArgument .= $part;
-                }
-            }
-            if ($quote) {
-                $escapedArgument = '"'.$escapedArgument.'"';
-            }
-
-            return $escapedArgument;
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            return escapeshellarg($argument);
+        }
+        if (!(self::ESC_WINDOWS_ARGV_CMD & $mode)) {
+            throw new \InvalidArgumentException(sprintf('The $mode argument of %s must be a non-zero bitfield of self::ESC_WINDOWS_* constants.', __METHOD__));
         }
 
-        return escapeshellarg($argument);
+        if (1 === func_num_args()) {
+            $argument = preg_replace_callback("/!([^!=\n]++)!/", function ($m) {
+                @trigger_error(sprintf('Delayed variables are deprecated since Symfony 3.3 and will be left unresolved in 4.0. Resolve the %s variable before calling ProcessUtil::escapeArgument().', $m[0]), E_USER_DEPRECATED);
+
+                return getenv($m[1]);
+            }, $argument);
+        }
+
+        if ((self::ESC_WINDOWS_ARGV & $mode) && (false !== strpbrk($argument, " \t\n\v\"") || !isset($argument[0]))) {
+            $argument = preg_replace('/(\\\\*+)"/', '$1$1\\"', $argument);
+            $argument = preg_replace('/(\\\\++)$/', '$1$1', $argument);
+            $argument = '"'.$argument.'"';
+        }
+
+        if (self::ESC_WINDOWS_CMD & $mode) {
+            $argument = preg_replace('/[()%!^"<>&|]/', '^$0', $argument);
+        }
+
+        return $argument;
     }
 
     /**
@@ -110,10 +108,5 @@ class ProcessUtils
         }
 
         return $input;
-    }
-
-    private static function isSurroundedBy($arg, $char)
-    {
-        return 2 < strlen($arg) && $char === $arg[0] && $char === $arg[strlen($arg) - 1];
     }
 }

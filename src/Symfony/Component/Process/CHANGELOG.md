@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * disabled delayed expansion on Windows
+ * added second argument to ProcessUtils::escapeArgument() for controlling the escaping context on Windows
+ * deprecated `!VAR!` expansion allowed by ProcessUtils::escapeArgument()
+ * deprecated configuring `proc_open()` options
+ * deprecated configuring enhanced Windows compatibility
+ * deprecated configuring enhanced SIGCHLD compatibility
+
 2.5.0
 -----
 

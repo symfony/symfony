@@ -492,7 +492,9 @@
                     <td>
                         {% if error.trace %}
                             <span class="newline">Caused by:</span>
-                            {{ profiler_dump(error.trace, maxDepth=2) }}
+                            {% for stacked in error.trace %}
+                                {{ profiler_dump(stacked) }}
+                            {% endfor %}
                         {% else %}
                             <em>Unknown.</em>
                         {% endif %}

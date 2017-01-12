@@ -13,6 +13,9 @@ namespace Symfony\Component\Process\Tests;
 
 use Symfony\Component\Process\ProcessUtils;
 
+/**
+ * @group legacy
+ */
 class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
 {
     /**

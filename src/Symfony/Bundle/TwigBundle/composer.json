@@ -24,6 +24,7 @@
         "twig/twig": "~1.28|~2.0"
     },
     "require-dev": {
+        "symfony/console": "~3.3",
         "symfony/stopwatch": "~2.8|~3.0",
         "symfony/dependency-injection": "~2.8|~3.0",
         "symfony/expression-language": "~2.8|~3.0",

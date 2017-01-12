@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-12T14:57:05Z
+
+you need to add the conflict rule too. Otherwise, we could end up in a case where we have framework-bundle 3.3 with console 2.2, where a BC break would happen: existing console commands would not be registered anymore
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-12T14:57:48Z
+
+@stof the conflict is already present: https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/composer.json#L60
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-12T15:07:01Z
+
+(AppVeyor error due to a timeout, Travis should become green after the merge)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-12T15:10:53Z
+
+then 👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-12T18:09:30Z
+
+👍

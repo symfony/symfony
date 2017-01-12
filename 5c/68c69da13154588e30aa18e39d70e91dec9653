@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-11-24T11:07:31Z
+
+Can we cover this with  test?
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2016-11-24T18:16:50Z
+
+With some new insight from my side, we can say that you need to be bound to the LDAP-server (anonymous) before you can do anything with the EntryManager or the Query. This is solved in the Query class with an automatic anonymous bind if the connection is not yet bound, but the EntryManager ignores that.
+
+That means that this PR is not yet complete: we also need some automatic binding in the EntryManager for when the connection is not yet bound. Note that it is uncommon to edit entries with an anonymous bind, so the use case is small.
+
+In conclusion: the current Symfony source it works when you manually bind first, this PR does not fix the problem (yet).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-08T14:18:56Z
+
+ping @csarrazi
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-13T15:15:26Z
+
+should be merged in 3.1, right?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-12-13T15:16:41Z
+
+Regarding @bobvandevijver's comment, I'm against having an auto-bind mechanism. The Ldap and Connection classes should not be aware of the user it is currently bound to, nor should they actually bind to the server without the user explicitly using the `Ldap::bind()` method.
+
+If by "binding" you mean using an anonymous bind, then I agree that we need to run the `Ldap::bind()` method after getting the connection, or throw an exception if the user is not bound.
+
+Another way of solving this problem is simply to throw an exception if the connection object is not initialised, or if the connection is not bound already, which actually would be more secure.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-12-13T15:19:41Z
+
+Wait @fabpot we still have things to discuss. I would actually prefer this to throw an exception instead of trying to connect automatically. Same thing if the connection is not bound.
+
+This will be more secure, especially since I want to prevent any auto-bind or auto-connecting logic from being inserted in the code. In my opinion, the bind or connection should be explicit, and done beforehand.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2016-12-13T21:12:52Z
+
+I agree with @csarrazi, so I will try to update this PR with the exceptions this week.
+
+---------------------------------------------------------------------------
+
+by bobvandevijver at 2016-12-18T16:49:25Z
+
+I've updated the code to throw exceptions when a query or any data-edit is tried without binding the connection first. Also added some test to verify if the exception is thrown when the connection is not bound. I guess it should now have the functionality @csarrazi proposed.
+
+With c87c3fd Travis failed on a single run related to the HttpKernel ([line 3504](https://travis-ci.org/symfony/symfony/jobs/184947386#L3504)), so I expect that same error for the pending one. It is however not related to this PR.
+
+Edit: Indeed, again a fail on the HTTP-kernel ([line 3496](https://travis-ci.org/symfony/symfony/jobs/184957333#L3496) this time).
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-12-19T09:28:00Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T11:13:58Z
+
+:+1:
+
+Status: reviewed

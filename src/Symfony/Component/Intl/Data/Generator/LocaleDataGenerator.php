@@ -57,9 +57,6 @@ class LocaleDataGenerator
         $this->regionDataProvider = $regionDataProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generateData(GeneratorConfig $config)
     {
         $filesystem = new Filesystem();

@@ -44,9 +44,6 @@ class MemcachedAdapter extends AbstractAdapter
         if (\Memcached::SERIALIZER_PHP !== $opt && \Memcached::SERIALIZER_IGBINARY !== $opt) {
             throw new CacheException('MemcachedAdapter: "serializer" option must be "php" or "igbinary".');
         }
-        if (!$client->getOption(\Memcached::OPT_BINARY_PROTOCOL)) {
-            throw new CacheException('MemcachedAdapter: "binary_protocol" option must be enabled.');
-        }
         $this->maxIdLength -= strlen($client->getOption(\Memcached::OPT_PREFIX_KEY));
 
         parent::__construct($namespace, $defaultLifetime);
@@ -67,7 +64,7 @@ class MemcachedAdapter extends AbstractAdapter
      *
      * @return \Memcached
      *
-     * @throws \ErrorEception When invalid options or servers are provided.
+     * @throws \ErrorEception When invalid options or servers are provided
      */
     public static function createConnection($servers, array $options = array())
     {

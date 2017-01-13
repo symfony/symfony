@@ -29,7 +29,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         if (!MemcachedAdapter::isSupported()) {
             self::markTestSkipped('Extension memcached >=2.2.0 required.');
         }
-        self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'));
+        self::$client = AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST'), array('binary_protocol' => false));
         self::$client->get('foo');
         $code = self::$client->getResultCode();
 
@@ -40,7 +40,9 @@ class MemcachedAdapterTest extends AdapterTestCase
 
     public function createCachePool($defaultLifetime = 0)
     {
-        return new MemcachedAdapter(self::$client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
+        $client = $defaultLifetime ? AbstractAdapter::createConnection('memcached://'.getenv('MEMCACHED_HOST')) : self::$client;
+
+        return new MemcachedAdapter($client, str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
     public function testOptions()
@@ -78,15 +80,6 @@ class MemcachedAdapterTest extends AdapterTestCase
             array('serializer', 'zyx'),
             array('distribution', 'zyx'),
         );
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Cache\Exception\CacheException
-     * @expectedExceptionMessage MemcachedAdapter: "binary_protocol" option must be enabled.
-     */
-    public function testBinaryProtocol()
-    {
-        new MemcachedAdapter(MemcachedAdapter::createConnection(array(), array('binary_protocol' => false)));
     }
 
     public function testDefaultOptions()

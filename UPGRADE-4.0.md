@@ -156,6 +156,9 @@ FrameworkBundle
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been removed. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass` class has been
+   removed. Use the `Symfony\Component\Form\DependencyInjection\FormPass` class instead.
+
 SecurityBundle
 --------------
 

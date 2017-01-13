@@ -9,17 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Component\Form\Tests\DependencyInjection;
 
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass;
+use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\AbstractType;
 
 /**
- * @group legacy
- *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class FormPassTest extends \PHPUnit_Framework_TestCase

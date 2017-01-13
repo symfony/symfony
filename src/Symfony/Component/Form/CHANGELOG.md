@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * added `FormPass`
+
 3.2.0
 -----
 

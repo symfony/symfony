@@ -104,7 +104,7 @@ final class CacheItem implements CacheItemInterface
      *
      * @return static
      *
-     * @throws InvalidArgumentException When $tag is not valid.
+     * @throws InvalidArgumentException When $tag is not valid
      */
     public function tag($tags)
     {
@@ -121,7 +121,7 @@ final class CacheItem implements CacheItemInterface
             if (!isset($tag[0])) {
                 throw new InvalidArgumentException('Cache tag length must be greater than zero');
             }
-            if (isset($tag[strcspn($tag, '{}()/\@:')])) {
+            if (false !== strpbrk($tag, '{}()/\@:')) {
                 throw new InvalidArgumentException(sprintf('Cache tag "%s" contains reserved characters {}()/\@:', $tag));
             }
             $this->tags[$tag] = $tag;
@@ -135,7 +135,7 @@ final class CacheItem implements CacheItemInterface
      *
      * @param string $key The key to validate
      *
-     * @throws InvalidArgumentException When $key is not valid.
+     * @throws InvalidArgumentException When $key is not valid
      */
     public static function validateKey($key)
     {
@@ -145,7 +145,7 @@ final class CacheItem implements CacheItemInterface
         if (!isset($key[0])) {
             throw new InvalidArgumentException('Cache key length must be greater than zero');
         }
-        if (isset($key[strcspn($key, '{}()/\@:')])) {
+        if (false !== strpbrk($key, '{}()/\@:')) {
             throw new InvalidArgumentException(sprintf('Cache key "%s" contains reserved characters {}()/\@:', $key));
         }
     }

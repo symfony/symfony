@@ -23,7 +23,7 @@ class UniqueTransitionNameValidator implements DefinitionValidatorInterface
 {
     public function validate(Definition $definition, $name)
     {
-        $places = array_fill_keys($definition->getPlaces(), []);
+        $places = array_fill_keys($definition->getPlaces(), array());
         foreach ($definition->getTransitions() as $transition) {
             foreach ($transition->getFroms() as $from) {
                 if (in_array($transition->getName(), $places[$from])) {

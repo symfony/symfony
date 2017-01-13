@@ -48,7 +48,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     public function testGetMarkingWithImpossiblePlace()
     {
         $subject = new \stdClass();
-        $subject->marking = array('nope' => true);
+        $subject->marking = array('nope' => 1);
         $workflow = new Workflow(new Definition(array(), array()), new MultipleStateMarkingStore());
 
         $workflow->getMarking($subject);
@@ -83,10 +83,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($marking->has('c'));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Workflow\Exception\LogicException
-     * @expectedExceptionMessage Transition "foobar" does not exist for workflow "unnamed".
-     */
     public function testCanWithUnexistingTransition()
     {
         $definition = $this->createComplexWorkflowDefinition();
@@ -94,7 +90,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $subject->marking = null;
         $workflow = new Workflow($definition, new MultipleStateMarkingStore());
 
-        $workflow->can($subject, 'foobar');
+        $this->assertFalse($workflow->can($subject, 'foobar'));
     }
 
     public function testCan()
@@ -136,6 +132,23 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $workflow->apply($subject, 't2');
     }
 
+    public function testCanWithSameNameTransition()
+    {
+        $definition = $this->createWorkflowWithSameNameTransition();
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $this->assertTrue($workflow->can($subject, 'a_to_bc'));
+        $this->assertFalse($workflow->can($subject, 'b_to_c'));
+        $this->assertFalse($workflow->can($subject, 'to_a'));
+
+        $subject->marking = array('b' => 1);
+        $this->assertFalse($workflow->can($subject, 'a_to_bc'));
+        $this->assertTrue($workflow->can($subject, 'b_to_c'));
+        $this->assertTrue($workflow->can($subject, 'to_a'));
+    }
+
     public function testApply()
     {
         $definition = $this->createComplexWorkflowDefinition();
@@ -149,6 +162,59 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($marking->has('a'));
         $this->assertTrue($marking->has('b'));
         $this->assertTrue($marking->has('c'));
+    }
+
+    public function testApplyWithSameNameTransition()
+    {
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $definition = $this->createWorkflowWithSameNameTransition();
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $marking = $workflow->apply($subject, 'a_to_bc');
+
+        $this->assertFalse($marking->has('a'));
+        $this->assertTrue($marking->has('b'));
+        $this->assertTrue($marking->has('c'));
+
+        $marking = $workflow->apply($subject, 'to_a');
+
+        $this->assertTrue($marking->has('a'));
+        $this->assertFalse($marking->has('b'));
+        $this->assertFalse($marking->has('c'));
+
+        $marking = $workflow->apply($subject, 'a_to_bc');
+        $marking = $workflow->apply($subject, 'b_to_c');
+
+        $this->assertFalse($marking->has('a'));
+        $this->assertFalse($marking->has('b'));
+        $this->assertTrue($marking->has('c'));
+
+        $marking = $workflow->apply($subject, 'to_a');
+
+        $this->assertTrue($marking->has('a'));
+        $this->assertFalse($marking->has('b'));
+        $this->assertFalse($marking->has('c'));
+    }
+
+    public function testApplyWithSameNameTransition2()
+    {
+        $subject = new \stdClass();
+        $subject->marking = array('a' => 1, 'b' => 1);
+
+        $places = range('a', 'd');
+        $transitions = array();
+        $transitions[] = new Transition('t', 'a', 'c');
+        $transitions[] = new Transition('t', 'b', 'd');
+        $definition = new Definition($places, $transitions);
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $marking = $workflow->apply($subject, 't');
+
+        $this->assertFalse($marking->has('a'));
+        $this->assertFalse($marking->has('b'));
+        $this->assertTrue($marking->has('c'));
+        $this->assertTrue($marking->has('d'));
     }
 
     public function testApplyWithEventDispatcher()
@@ -198,16 +264,35 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($workflow->getEnabledTransitions($subject));
 
-        $subject->marking = array('d' => true);
+        $subject->marking = array('d' => 1);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(2, $transitions);
         $this->assertSame('t3', $transitions[0]->getName());
         $this->assertSame('t4', $transitions[1]->getName());
 
-        $subject->marking = array('c' => true, 'e' => true);
+        $subject->marking = array('c' => 1, 'e' => 1);
         $transitions = $workflow->getEnabledTransitions($subject);
         $this->assertCount(1, $transitions);
         $this->assertSame('t5', $transitions[0]->getName());
+    }
+
+    public function testGetEnabledTransitionsWithSameNameTransition()
+    {
+        $definition = $this->createWorkflowWithSameNameTransition();
+        $subject = new \stdClass();
+        $subject->marking = null;
+        $workflow = new Workflow($definition, new MultipleStateMarkingStore());
+
+        $transitions = $workflow->getEnabledTransitions($subject);
+        $this->assertCount(1, $transitions);
+        $this->assertSame('a_to_bc', $transitions[0]->getName());
+
+        $subject->marking = array('b' => 1, 'c' => 1);
+        $transitions = $workflow->getEnabledTransitions($subject);
+        $this->assertCount(3, $transitions);
+        $this->assertSame('b_to_c', $transitions[0]->getName());
+        $this->assertSame('to_a', $transitions[1]->getName());
+        $this->assertSame('to_a', $transitions[2]->getName());
     }
 }
 
@@ -223,21 +308,27 @@ class EventDispatcherMock implements \Symfony\Component\EventDispatcher\EventDis
     public function addListener($eventName, $listener, $priority = 0)
     {
     }
+
     public function addSubscriber(\Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber)
     {
     }
+
     public function removeListener($eventName, $listener)
     {
     }
+
     public function removeSubscriber(\Symfony\Component\EventDispatcher\EventSubscriberInterface $subscriber)
     {
     }
+
     public function getListeners($eventName = null)
     {
     }
+
     public function getListenerPriority($eventName, $listener)
     {
     }
+
     public function hasListeners($eventName = null)
     {
     }

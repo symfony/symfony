@@ -49,6 +49,34 @@ trait WorkflowBuilderTrait
         // +---+     +----+     +---+     +----+     +---+
     }
 
+    private function createWorkflowWithSameNameTransition()
+    {
+        $places = range('a', 'c');
+
+        $transitions = array();
+        $transitions[] = new Transition('a_to_bc', 'a', array('b', 'c'));
+        $transitions[] = new Transition('b_to_c', 'b', 'c');
+        $transitions[] = new Transition('to_a', 'b', 'a');
+        $transitions[] = new Transition('to_a', 'c', 'a');
+
+        return new Definition($places, $transitions);
+
+        // The graph looks like:
+        //   +------------------------------------------------------------+
+        //   |                                                            |
+        //   |                                                            |
+        //   |         +----------------------------------------+         |
+        //   v         |                                        v         |
+        // +---+     +---------+     +---+     +--------+     +---+     +------+
+        // | a | --> | a_to_bc | --> | b | --> | b_to_c | --> | c | --> | to_a | -+
+        // +---+     +---------+     +---+     +--------+     +---+     +------+  |
+        //   ^                         |                                  ^       |
+        //   |                         +----------------------------------+       |
+        //   |                                                                    |
+        //   |                                                                    |
+        //   +--------------------------------------------------------------------+
+    }
+
     private function createComplexStateMachineDefinition()
     {
         $places = array('a', 'b', 'c', 'd');

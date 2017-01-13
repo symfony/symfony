@@ -2289,9 +2289,9 @@ class ChoiceTypeTest extends TypeTestCase
     {
         return array(
             'non-multiple, non-expanded' => array(false, false, array(array())),
-            'non-multiple, expanded'     => array(false, true, array(array())),
-            'multiple, non-expanded'     => array(true, false, array(array())),
-            'multiple, expanded'         => array(true, true, array(array())),
+            'non-multiple, expanded' => array(false, true, array(array())),
+            'multiple, non-expanded' => array(true, false, array(array())),
+            'multiple, expanded' => array(true, true, array(array())),
         );
     }
 
@@ -2301,7 +2301,7 @@ class ChoiceTypeTest extends TypeTestCase
     public function testSubmitInvalidNestedValue($multiple, $expanded, $submissionData)
     {
         $form = $this->factory->create('choice', null, array(
-            'choices'  => $this->choices,
+            'choices' => $this->choices,
             'multiple' => $multiple,
             'expanded' => $expanded,
         ));

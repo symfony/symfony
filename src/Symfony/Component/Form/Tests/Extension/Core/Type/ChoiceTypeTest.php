@@ -2284,4 +2284,30 @@ class ChoiceTypeTest extends TypeTestCase
         // In this case the 'choice_label' closure returns null and not the closure from the first choice type.
         $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
     }
+
+    public function invalidNestedValueTestMatrix()
+    {
+        return array(
+            'non-multiple, non-expanded' => array(false, false, array(array())),
+            'non-multiple, expanded'     => array(false, true, array(array())),
+            'multiple, non-expanded'     => array(true, false, array(array())),
+            'multiple, expanded'         => array(true, true, array(array())),
+        );
+    }
+
+    /**
+     * @dataProvider invalidNestedValueTestMatrix
+     */
+    public function testSubmitInvalidNestedValue($multiple, $expanded, $submissionData)
+    {
+        $form = $this->factory->create('choice', null, array(
+            'choices'  => $this->choices,
+            'multiple' => $multiple,
+            'expanded' => $expanded,
+        ));
+
+        $form->submit($submissionData);
+        $this->assertFalse($form->isSynchronized());
+        $this->assertEquals('All elements of submitted array must not be an array.', $form->getTransformationFailure()->getMessage());
+    }
 }

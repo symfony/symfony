@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Symfony\Component\Cache\Exception\CacheException;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */

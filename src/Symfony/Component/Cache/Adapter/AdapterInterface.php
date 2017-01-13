@@ -21,4 +21,17 @@ use Symfony\Component\Cache\CacheItem;
  */
 interface AdapterInterface extends CacheItemPoolInterface
 {
+    /**
+    * {@inheritdoc}
+    *
+    * @return \Symfony\Component\Cache\CacheItem
+    */
+    public function getItem($key);
+
+   /**
+    * {@inheritdoc}
+    *
+    * return \Symfony\Component\Cache\CacheItem[]
+    */
+    public function getItems(array $keys = []);
 }

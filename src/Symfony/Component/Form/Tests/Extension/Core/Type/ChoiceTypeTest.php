@@ -14,9 +14,10 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
+use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\ChoiceSubType;
 
-class ChoiceTypeTest extends \Symfony\Component\Form\Test\TypeTestCase
+class ChoiceTypeTest extends TypeTestCase
 {
     private $choices = array(
         'Bernhard' => 'a',

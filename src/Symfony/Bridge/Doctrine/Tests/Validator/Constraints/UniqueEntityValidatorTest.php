@@ -175,7 +175,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->atPath('property.path.name')
             ->setParameter('{{ value }}', '"Foo"')
-            ->setInvalidValue('Foo')
+            ->setInvalidValue($entity2)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
@@ -200,7 +200,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
         $this->buildViolation('myMessage')
             ->atPath('property.path.bar')
             ->setParameter('{{ value }}', '"Foo"')
-            ->setInvalidValue('Foo')
+            ->setInvalidValue($entity2)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
@@ -419,7 +419,7 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
-            ->setParameter('{{ value }}', $entity1)
+            ->setParameter('{{ value }}', 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity") identified by (id => 1)')
             ->setInvalidValue($entity1)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
@@ -452,12 +452,12 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($associated2, $constraint);
 
-        $expectedValue = 'Object of class "Symfony\Bridge\Doctrine\Tests\Fixtures\AssociationEntity2" identified by "2"';
+        $expectedValue = 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity") identified by (id => 1)';
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.single')
-            ->setParameter('{{ value }}', '"'.$expectedValue.'"')
-            ->setInvalidValue($expectedValue)
+            ->setParameter('{{ value }}', $expectedValue)
+            ->setInvalidValue($entity1)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }
@@ -574,6 +574,11 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $objectOne = new SingleIntIdNoToStringEntity(1, 'foo');
         $objectTwo = new SingleIntIdNoToStringEntity(2, 'bar');
+
+        $this->em->persist($objectOne);
+        $this->em->persist($objectTwo);
+        $this->em->flush();
+
         $entity = new CompositeObjectNoToStringIdEntity($objectOne, $objectTwo);
 
         $this->em->persist($entity);
@@ -583,12 +588,12 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
 
         $this->validator->validate($newEntity, $constraint);
 
-        $expectedValue = 'Object of class "Symfony\Bridge\Doctrine\Tests\Fixtures\CompositeObjectNoToStringIdEntity" identified by "(Object of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity" identified by "1"), (Object of class "Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity" identified by "2")"';
+        $expectedValue = 'object("Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity") identified by (id => 1)';
 
         $this->buildViolation('myMessage')
             ->atPath('property.path.objectOne')
-            ->setParameter('{{ value }}', '"'.$expectedValue.'"')
-            ->setInvalidValue($expectedValue)
+            ->setParameter('{{ value }}', $expectedValue)
+            ->setInvalidValue($objectOne)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->assertRaised();
     }

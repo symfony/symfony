@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__.'/../includes/classes.php';
+require_once __DIR__.'/../includes/foo.php';
 
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;

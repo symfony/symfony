@@ -44,7 +44,7 @@
         "symfony/process": "~2.8|~3.0",
         "symfony/security-core": "~3.2",
         "symfony/security-csrf": "~2.8|~3.0",
-        "symfony/serializer": "~2.8|~3.0",
+        "symfony/serializer": "~3.3",
         "symfony/translation": "~2.8|~3.0",
         "symfony/templating": "~2.8|~3.0",
         "symfony/validator": "~3.2",
@@ -57,7 +57,8 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.0",
-        "symfony/console": "<3.3"
+        "symfony/console": "<3.3",
+        "symfony/serializer": "<3.3"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",

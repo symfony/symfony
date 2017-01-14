@@ -11,40 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\Serializer\DependencyInjection\SerializerPass instead.', SerializerPass::class), E_USER_DEPRECATED);
+
+use Symfony\Component\Serializer\DependencyInjection\SerializerPass as BaseSerializerPass;
 
 /**
  * Adds all services with the tags "serializer.encoder" and "serializer.normalizer" as
  * encoders and normalizers to the Serializer service.
  *
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseSerializerPass} instead.
+ *
  * @author Javier Lopez <f12loalf@gmail.com>
  */
-class SerializerPass implements CompilerPassInterface
+class SerializerPass extends BaseSerializerPass
 {
-    use PriorityTaggedServiceTrait;
-
-    public function process(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('serializer')) {
-            return;
-        }
-
-        // Looks for all the services tagged "serializer.normalizer" and adds them to the Serializer service
-        $normalizers = $this->findAndSortTaggedServices('serializer.normalizer', $container);
-
-        if (empty($normalizers)) {
-            throw new RuntimeException('You must tag at least one service as "serializer.normalizer" to use the Serializer service');
-        }
-        $container->getDefinition('serializer')->replaceArgument(0, $normalizers);
-
-        // Looks for all the services tagged "serializer.encoders" and adds them to the Serializer service
-        $encoders = $this->findAndSortTaggedServices('serializer.encoder', $container);
-        if (empty($encoders)) {
-            throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the Serializer service');
-        }
-        $container->getDefinition('serializer')->replaceArgument(1, $encoders);
-    }
 }

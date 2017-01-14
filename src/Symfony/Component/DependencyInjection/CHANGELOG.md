@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * [EXPERIMENTAL] added prototype services for PSR4-based discovery and registration
  * added `ContainerBuilder::getReflectionClass()` for retrieving and tracking reflection class info
  * deprecated `ContainerBuilder::getClassResource()`, use `ContainerBuilder::getReflectionClass()` or `ContainerBuilder::addObjectResource()` instead
  * added `ContainerBuilder::fileExists()` for checking and tracking file or directory existence

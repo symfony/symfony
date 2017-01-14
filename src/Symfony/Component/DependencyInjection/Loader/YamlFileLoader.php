@@ -36,7 +36,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class YamlFileLoader extends FileLoader
 {
-    private static $keywords = array(
+    private static $serviceKeywords = array(
         'alias' => 'alias',
         'parent' => 'parent',
         'class' => 'class',
@@ -60,6 +60,32 @@ class YamlFileLoader extends FileLoader
         'decoration_priority' => 'decoration_priority',
         'autowire' => 'autowire',
         'autowiring_types' => 'autowiring_types',
+    );
+
+    private static $prototypeKeywords = array(
+        'resource' => 'resource',
+        'parent' => 'parent',
+        'shared' => 'shared',
+        'lazy' => 'lazy',
+        'public' => 'public',
+        'abstract' => 'abstract',
+        'deprecated' => 'deprecated',
+        'factory' => 'factory',
+        'arguments' => 'arguments',
+        'properties' => 'properties',
+        'getters' => 'getters',
+        'configurator' => 'configurator',
+        'calls' => 'calls',
+        'tags' => 'tags',
+        'inherit_tags' => 'inherit_tags',
+        'autowire' => 'autowire',
+    );
+
+    private static $defaultsKeywords = array(
+        'public' => 'public',
+        'tags' => 'tags',
+        'inherit_tags' => 'inherit_tags',
+        'autowire' => 'autowire',
     );
 
     private $yamlParser;
@@ -98,6 +124,7 @@ class YamlFileLoader extends FileLoader
         $this->loadFromExtensions($content);
 
         // services
+        $this->setCurrentDir(dirname($path));
         $this->parseDefinitions($content, $resource);
     }
 
@@ -188,12 +215,11 @@ class YamlFileLoader extends FileLoader
             return array();
         }
 
-        $defaultKeys = array('public', 'tags', 'inherit_tags', 'autowire');
         unset($content['services']['_defaults']);
 
         foreach ($defaults as $key => $default) {
-            if (!in_array($key, $defaultKeys)) {
-                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', $defaultKeys)));
+            if (!isset(self::$defaultsKeywords[$key])) {
+                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', self::$defaultsKeywords)));
             }
         }
         if (!isset($defaults['tags'])) {
@@ -443,7 +469,14 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        $this->container->setDefinition($id, $definition);
+        if (array_key_exists('resource', $service)) {
+            if (!is_string($service['resource'])) {
+                throw new InvalidArgumentException(sprintf('A "resource" attribute must be of type string for service "%s" in %s. Check your YAML syntax.', $id, $file));
+            }
+            $this->registerClasses($definition, $id, $service['resource']);
+        } else {
+            $this->container->setDefinition($id, $definition);
+        }
     }
 
     /**
@@ -660,13 +693,19 @@ class YamlFileLoader extends FileLoader
      */
     private static function checkDefinition($id, array $definition, $file)
     {
+        if ($throw = isset($definition['resource'])) {
+            $keywords = static::$prototypeKeywords;
+        } else {
+            $keywords = static::$serviceKeywords;
+        }
+
         foreach ($definition as $key => $value) {
-            if (!isset(static::$keywords[$key])) {
-                @trigger_error(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s". The YamlFileLoader object will raise an exception instead in Symfony 4.0 when detecting an unsupported service configuration key.', $key, $id, $file, implode('", "', static::$keywords)), E_USER_DEPRECATED);
-                // @deprecated Uncomment the following statement in Symfony 4.0
-                // and also update the corresponding unit test to make it expect
-                // an InvalidArgumentException exception.
-                //throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', static::$keywords)));
+            if (!isset($keywords[$key])) {
+                if ($throw) {
+                    throw new InvalidArgumentException(sprintf('The configuration key "%s" is unsupported for definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', $keywords)));
+                }
+
+                @trigger_error(sprintf('The configuration key "%s" is unsupported for service definition "%s" in "%s". Allowed configuration keys are "%s". The YamlFileLoader object will raise an exception instead in Symfony 4.0 when detecting an unsupported service configuration key.', $key, $id, $file, implode('", "', $keywords)), E_USER_DEPRECATED);
             }
         }
     }

@@ -27,12 +27,14 @@
     "suggest": {
         "symfony/yaml": "",
         "symfony/config": "",
+        "symfony/finder": "For using double-star glob patterns or when GLOB_BRACE portability is required",
         "symfony/expression-language": "For using expressions in service container configuration",
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "conflict": {
-        "symfony/yaml": "<3.3",
-        "symfony/config": "<3.3"
+        "symfony/config": "<3.3",
+        "symfony/finder": "<3.3",
+        "symfony/yaml": "<3.3"
     },
     "provide": {
         "psr/container-implementation": "1.0"

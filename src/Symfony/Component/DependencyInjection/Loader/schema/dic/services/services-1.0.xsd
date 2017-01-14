@@ -54,6 +54,7 @@
     </xsd:annotation>
     <xsd:choice maxOccurs="unbounded">
       <xsd:element name="service" type="service" minOccurs="1" />
+      <xsd:element name="prototype" type="prototype" minOccurs="0" />
       <xsd:element name="defaults" type="defaults" minOccurs="0" maxOccurs="1" />
     </xsd:choice>
   </xsd:complexType>
@@ -132,6 +133,29 @@
     <xsd:attribute name="decorates" type="xsd:string" />
     <xsd:attribute name="decoration-inner-name" type="xsd:string" />
     <xsd:attribute name="decoration-priority" type="xsd:integer" />
+    <xsd:attribute name="autowire" type="boolean" />
+    <xsd:attribute name="inherit-tags" type="boolean" />
+  </xsd:complexType>
+
+  <xsd:complexType name="prototype">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="configurator" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="factory" type="callable" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="deprecated" type="xsd:string" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="getter" type="getter" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:element name="autowire" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="namespace" type="xsd:string" use="required" />
+    <xsd:attribute name="resource" type="xsd:string" use="required" />
+    <xsd:attribute name="shared" type="boolean" />
+    <xsd:attribute name="public" type="boolean" />
+    <xsd:attribute name="lazy" type="boolean" />
+    <xsd:attribute name="abstract" type="boolean" />
+    <xsd:attribute name="parent" type="xsd:string" />
     <xsd:attribute name="autowire" type="boolean" />
     <xsd:attribute name="inherit-tags" type="boolean" />
   </xsd:complexType>

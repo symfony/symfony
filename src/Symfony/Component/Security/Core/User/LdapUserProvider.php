@@ -47,6 +47,10 @@ class LdapUserProvider implements UserProviderInterface
      */
     public function __construct(LdapInterface $ldap, $baseDn, $searchDn = null, $searchPassword = null, array $defaultRoles = array(), $uidKey = 'sAMAccountName', $filter = '({uid_key}={username})', $passwordAttribute = null)
     {
+        if (null === $uidKey) {
+            $uidKey = 'uid';
+        }
+
         $this->ldap = $ldap;
         $this->baseDn = $baseDn;
         $this->searchDn = $searchDn;
@@ -118,7 +122,10 @@ class LdapUserProvider implements UserProviderInterface
      */
     protected function loadUser($username, Entry $entry)
     {
-        $password = $this->getAttributeValue($entry, $this->passwordAttribute);
+        $password = null;
+        if (null !== $this->passwordAttribute) {
+            $password = $this->getAttributeValue($entry, $this->passwordAttribute);
+        }
 
         return new User($username, $password, $this->defaultRoles);
     }
@@ -131,10 +138,6 @@ class LdapUserProvider implements UserProviderInterface
      */
     private function getAttributeValue(Entry $entry, $attribute)
     {
-        if (null === $attribute) {
-            return;
-        }
-
         if (!$entry->hasAttribute($attribute)) {
             throw new InvalidArgumentException(sprintf('Missing attribute "%s" for user "%s".', $attribute, $entry->getDn()));
         }

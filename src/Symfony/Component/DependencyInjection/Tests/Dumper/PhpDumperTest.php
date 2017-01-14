@@ -240,12 +240,13 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
     public function testAliases()
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
+        $container->setParameter('foo_bar', 'foo_bar');
         $container->compile();
         $dumper = new PhpDumper($container);
         eval('?>'.$dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Aliases')));
 
         $container = new \Symfony_DI_PhpDumper_Test_Aliases();
-        $container->set('foo', $foo = new \stdClass());
+        $foo = $container->get('foo');
         $this->assertSame($foo, $container->get('foo'));
         $this->assertSame($foo, $container->get('alias_for_foo'));
         $this->assertSame($foo, $container->get('alias_for_alias'));
@@ -263,6 +264,10 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->has('foo'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Replacing the pre-defined "bar" service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     */
     public function testOverrideServiceWhenUsingADumpedContainer()
     {
         require_once self::$fixturesPath.'/php/services9.php';
@@ -275,6 +280,10 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($bar, $container->get('bar'), '->set() overrides an already defined service');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Replacing the pre-defined "bar" service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     */
     public function testOverrideServiceWhenUsingADumpedContainerAndServiceIsUsedFromAnotherOne()
     {
         require_once self::$fixturesPath.'/php/services9.php';

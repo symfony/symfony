@@ -91,7 +91,7 @@ class ExtensionPass implements CompilerPassInterface
         $twigLoader = $container->getDefinition('twig.loader.native_filesystem');
         if ($container->has('templating')) {
             $loader = $container->getDefinition('twig.loader.filesystem');
-            $loader->setMethodCalls($twigLoader->getMethodCalls());
+            $loader->setMethodCalls(array_merge($twigLoader->getMethodCalls(), $loader->getMethodCalls()));
 
             $twigLoader->clearTag('twig.loader');
         } else {

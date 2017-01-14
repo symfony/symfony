@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -128,7 +130,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
 
         if (is_object($invalidValue) && !method_exists($invalidValue, '__toString')) {
-            $invalidValue = sprintf('Object of class "%s" identified by "%s"', get_class($entity), implode(', ', $class->getIdentifierValues($entity)));
+            $invalidValue = $this->buildInvalidValueString($em, $class, $entity);
         }
 
         $this->context->buildViolation($constraint->message)
@@ -137,5 +139,26 @@ class UniqueEntityValidator extends ConstraintValidator
             ->setInvalidValue($invalidValue)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->addViolation();
+    }
+
+    /**
+     * @param ObjectManager $em
+     * @param ClassMetadata $class
+     * @param object        $entity
+     *
+     * @return string
+     */
+    private function buildInvalidValueString(ObjectManager $em, ClassMetadata $class, $entity)
+    {
+        $identifiers = array_map(function ($identifier) use ($em) {
+            // identifiers can be objects (without any __toString method) if its a composite PK
+            if (is_object($identifier) && !method_exists($identifier, '__toString')) {
+                return sprintf('(%s)', $this->buildInvalidValueString($em, $em->getClassMetadata(get_class($identifier)), $identifier));
+            }
+
+            return $identifier;
+        }, $class->getIdentifierValues($entity));
+
+        return sprintf('Object of class "%s" identified by "%s"', get_class($entity), implode(', ', $identifiers));
     }
 }

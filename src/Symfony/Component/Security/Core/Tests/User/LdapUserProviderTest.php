@@ -119,7 +119,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(
@@ -154,6 +154,48 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Symfony\Component\Security\Core\Exception\InvalidArgumentException
      */
+    public function testLoadUserByUsernameFailsIfEntryHasNoUidKeyAttribute()
+    {
+        $result = $this->getMock(CollectionInterface::class);
+        $query = $this->getMock(QueryInterface::class);
+        $query
+            ->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($result))
+        ;
+        $ldap = $this->getMock(LdapInterface::class);
+        $result
+            ->expects($this->once())
+            ->method('offsetGet')
+            ->with(0)
+            ->will($this->returnValue(new Entry('foo', array())))
+        ;
+        $result
+            ->expects($this->once())
+            ->method('count')
+            ->will($this->returnValue(1))
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('escape')
+            ->will($this->returnValue('foo'))
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('query')
+            ->will($this->returnValue($query))
+        ;
+
+        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, array(), 'sAMAccountName', '({uid_key}={username})');
+        $this->assertInstanceOf(
+            'Symfony\Component\Security\Core\User\User',
+            $provider->loadUserByUsername('foo')
+        );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\InvalidArgumentException
+     */
     public function testLoadUserByUsernameFailsIfEntryHasNoPasswordAttribute()
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
@@ -165,7 +207,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(
@@ -207,7 +249,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(
@@ -249,7 +291,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
         $result
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(
@@ -288,7 +330,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         ;
         $ldap = $this->getMock(LdapInterface::class);
         $result
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
             ->will($this->returnValue(new Entry('foo', array(

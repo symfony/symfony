@@ -255,8 +255,8 @@ class TextDescriptor extends Descriptor
         $tableRows[] = array('Service ID', isset($options['id']) ? $options['id'] : '-');
         $tableRows[] = array('Class', $definition->getClass() ?: '-');
 
-        $tags = $definition->getTags();
-        if (count($tags)) {
+        $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
+        if (!$omitTags && ($tags = $definition->getTags())) {
             $tagInformation = array();
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $tagParameters) {
@@ -325,6 +325,22 @@ class TextDescriptor extends Descriptor
             } else {
                 $tableRows[] = array('Factory Function', $factory);
             }
+        }
+
+        $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
+        $argumentsInformation = array();
+        if ($showArguments && ($arguments = $definition->getArguments())) {
+            foreach ($arguments as $argument) {
+                if ($argument instanceof Reference) {
+                    $argumentsInformation[] = sprintf('Service(%s)', (string) $argument);
+                } elseif ($argument instanceof Definition) {
+                    $argumentsInformation[] = 'Inlined Service';
+                } else {
+                    $argumentsInformation[] = $argument;
+                }
+            }
+
+            $tableRows[] = array('Arguments', implode("\n", $argumentsInformation));
         }
 
         $options['output']->table($tableHeaders, $tableRows);

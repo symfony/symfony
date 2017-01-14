@@ -86,7 +86,7 @@ class JsonDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $this->describeContainerAlias($service, $options, $builder);
         } elseif ($service instanceof Definition) {
-            $this->writeData($this->getContainerDefinitionData($service), $options);
+            $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']), $options);
         } else {
             $this->writeData(get_class($service), $options);
         }
@@ -99,6 +99,7 @@ class JsonDescriptor extends Descriptor
     {
         $serviceIds = isset($options['tag']) && $options['tag'] ? array_keys($builder->findTaggedServiceIds($options['tag'])) : $builder->getServiceIds();
         $showPrivate = isset($options['show_private']) && $options['show_private'];
+        $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
         $showArguments = isset($options['show_arguments']) && $options['show_arguments'];
         $data = array('definitions' => array(), 'aliases' => array(), 'services' => array());
 
@@ -109,7 +110,7 @@ class JsonDescriptor extends Descriptor
                 $data['aliases'][$serviceId] = $this->getContainerAliasData($service);
             } elseif ($service instanceof Definition) {
                 if (($showPrivate || $service->isPublic())) {
-                    $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, false, $showArguments);
+                    $data['definitions'][$serviceId] = $this->getContainerDefinitionData($service, $omitTags, $showArguments);
                 }
             } else {
                 $data['services'][$serviceId] = get_class($service);
@@ -124,7 +125,7 @@ class JsonDescriptor extends Descriptor
      */
     protected function describeContainerDefinition(Definition $definition, array $options = array())
     {
-        $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags']), $options);
+        $this->writeData($this->getContainerDefinitionData($definition, isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments']), $options);
     }
 
     /**
@@ -137,7 +138,7 @@ class JsonDescriptor extends Descriptor
         }
 
         $this->writeData(
-            array($this->getContainerAliasData($alias), $this->getContainerDefinitionData($builder->getDefinition((string) $alias))),
+            array($this->getContainerAliasData($alias), $this->getContainerDefinitionData($builder->getDefinition((string) $alias), isset($options['omit_tags']) && $options['omit_tags'], isset($options['show_arguments']) && $options['show_arguments'])),
             array_merge($options, array('id' => (string) $alias))
         );
     }

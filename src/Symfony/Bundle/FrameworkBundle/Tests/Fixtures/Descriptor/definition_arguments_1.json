@@ -1,0 +1,37 @@
+{
+    "class": "Full\\Qualified\\Class1",
+    "public": true,
+    "synthetic": false,
+    "lazy": true,
+    "shared": true,
+    "abstract": true,
+    "autowire": false,
+    "autowiring_types": [],
+    "arguments": [
+        {
+            "type": "service",
+            "id": "definition2"
+        },
+        "%parameter%",
+        {
+            "class": "inline_service",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autowiring_types": [],
+            "arguments": [
+                "arg1",
+                "arg2"
+            ],
+            "file": null,
+            "tags": []
+        }
+    ],
+    "file": null,
+    "factory_class": "Full\\Qualified\\FactoryClass",
+    "factory_method": "get",
+    "tags": []
+}

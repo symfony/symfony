@@ -19,6 +19,8 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Lukas Kahwe Smith <smith@pooteeweet.org>
+ *
+ * @final since version 3.3.
  */
 class ChainEncoder implements EncoderInterface
 {

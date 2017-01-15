@@ -805,6 +805,8 @@ $bagClass
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
+ *
+ * @final since Symfony 3.3
  */
 class $class extends $baseClass
 {

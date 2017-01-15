@@ -194,6 +194,10 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
                 try {
                     $prefix = "@expectedDeprecation:\n";
                     $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", $this->expectedDeprecations)."\n%A", $prefix.'  '.implode("\n  ", $this->gatheredDeprecations)."\n");
+
+                    if ($missing = array_diff($this->gatheredDeprecations, $this->expectedDeprecations)) {
+                        $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", $missing)."\n%A", $prefix.'  '.implode("\n  ", array())."\n");
+                    }
                 } catch (\PHPUnit_Framework_AssertionFailedError $e) {
                     $test->getTestResultObject()->addFailure($test, $e, $time);
                 }

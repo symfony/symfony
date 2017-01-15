@@ -103,7 +103,7 @@ class MarkdownDescriptor extends Descriptor
             throw new \InvalidArgumentException('An "id" option must be provided.');
         }
 
-        $childOptions = array('id' => $options['id'], 'as_array' => true);
+        $childOptions = array_merge($options, array('id' => $options['id'], 'as_array' => true));
 
         if ($service instanceof Alias) {
             $this->describeContainerAlias($service, $childOptions, $builder);

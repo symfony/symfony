@@ -27,6 +27,7 @@ class DebugClassLoader
     private $classLoader;
     private $isFinder;
     private static $caseCheck;
+    private static $final = array();
     private static $deprecated = array();
     private static $php7Reserved = array('int', 'float', 'bool', 'string', 'true', 'false', 'null');
     private static $darwinCache = array('/' => array('/', array()));
@@ -163,11 +164,21 @@ class DebugClassLoader
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
             }
 
+            if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+                self::$final[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+            }
+
+            $parent = get_parent_class($class);
+            if ($parent && isset(self::$final[$parent])) {
+                @trigger_error(sprintf('The %s class is considered final%s. It may change without further notice as of its next major version. You should not extend it from %s.', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
+            }
+
             if (in_array(strtolower($refl->getShortName()), self::$php7Reserved)) {
                 @trigger_error(sprintf('%s uses a reserved class name (%s) that will break on PHP 7 and higher', $name, $refl->getShortName()), E_USER_DEPRECATED);
             } elseif (preg_match('#\n \* @deprecated (.*?)\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
                 self::$deprecated[$name] = preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]);
             } else {
+                // Don't trigger deprecations for classes in the same vendor
                 if (2 > $len = 1 + (strpos($name, '\\', 1 + strpos($name, '\\')) ?: strpos($name, '_'))) {
                     $len = 0;
                     $ns = '';
@@ -181,7 +192,6 @@ class DebugClassLoader
                             break;
                     }
                 }
-                $parent = get_parent_class($class);
 
                 if (!$parent || strncmp($ns, $parent, $len)) {
                     if ($parent && isset(self::$deprecated[$parent]) && strncmp($ns, $parent, $len)) {

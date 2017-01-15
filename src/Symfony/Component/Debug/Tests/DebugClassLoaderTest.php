@@ -267,6 +267,28 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($xError, $lastError);
     }
+
+    public function testExtendedFinalClass()
+    {
+        set_error_handler(function () { return false; });
+        $e = error_reporting(0);
+        trigger_error('', E_USER_NOTICE);
+
+        class_exists('Test\\'.__NAMESPACE__.'\\ExtendsFinalClass', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $lastError = error_get_last();
+        unset($lastError['file'], $lastError['line']);
+
+        $xError = array(
+            'type' => E_USER_DEPRECATED,
+            'message' => 'The Symfony\Component\Debug\Tests\Fixtures\FinalClass class is considered final since version 3.3. It may change without further notice as of its next major version. You should not extend it from Test\Symfony\Component\Debug\Tests\ExtendsFinalClass.',
+        );
+
+        $this->assertSame($xError, $lastError);
+    }
 }
 
 class ClassLoader
@@ -300,6 +322,8 @@ class ClassLoader
             return $fixtureDir.'notPsr0Bis.php';
         } elseif (__NAMESPACE__.'\Fixtures\DeprecatedInterface' === $class) {
             return $fixtureDir.'DeprecatedInterface.php';
+        } elseif (__NAMESPACE__.'\Fixtures\FinalClass' === $class) {
+            return $fixtureDir.'FinalClass.php';
         } elseif ('Symfony\Bridge\Debug\Tests\Fixtures\ExtendsDeprecatedParent' === $class) {
             eval('namespace Symfony\Bridge\Debug\Tests\Fixtures; class ExtendsDeprecatedParent extends \\'.__NAMESPACE__.'\Fixtures\DeprecatedClass {}');
         } elseif ('Test\\'.__NAMESPACE__.'\DeprecatedParentClass' === $class) {
@@ -310,6 +334,8 @@ class ClassLoader
             eval('namespace Test\\'.__NAMESPACE__.'; class NonDeprecatedInterfaceClass implements \\'.__NAMESPACE__.'\Fixtures\NonDeprecatedInterface {}');
         } elseif ('Test\\'.__NAMESPACE__.'\Float' === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class Float {}');
+        } elseif ('Test\\'.__NAMESPACE__.'\ExtendsFinalClass' === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsFinalClass extends \\'.__NAMESPACE__.'\Fixtures\FinalClass {}');
         }
     }
 }

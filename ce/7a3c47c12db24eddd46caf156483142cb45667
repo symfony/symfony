@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by keradus at 2017-01-12T22:34:13Z
+
+http://symfony.com/doc/current/contributing/code/bc.html#changing-classes
+
+Type of Change    |	Change Allowed
+Make final    |	No
+
+It's only annotation, but when one will remove protected property in 3.4 because he see that annotation he will think it's not a bc breaker. Then, even if this `final by annotation` is not a bc breaker in strict point of view, it makes it risky that one will break a BC in a future thinking his not doing that.
+
+even if class will be deprecated a BC should not be broken.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T23:12:05Z
+
+We need ways to move forward with the code base. What would you suggest to allow this kind of moves? (See #20493 also)
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-13T07:52:25Z
+
+@keradus it doesn't mention anything about generated classes. To be fair, you should probably not be extending generated code in the first place.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-13T08:28:58Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-15T09:28:35Z
+
+> It's only annotation, but when one will remove protected property in 3.4 because he see that annotation he will think it's not a bc breaker. Then, even if this final by annotation is not a bc breaker in strict point of view, it makes it risky that one will break a BC in a future thinking his not doing that.
+
+I do not understand your comment. The class will not be `final` in 3.4. We will only do that in 4.0. But the `@final` annotation will lead to people seeing a deprecation message starting with 3.3 when extending the generated class so they can actually prepare for the break in 4.0.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-15T09:28:44Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-15T13:16:35Z
+
+@xabbuh this comment was done before "since Symfony 3.3" was added; it's true that without this, it would have been too easy to wrongly believe that some class could be changed later on (say 3.4) while it weren't yet possible.

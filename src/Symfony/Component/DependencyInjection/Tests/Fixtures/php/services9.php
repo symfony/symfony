@@ -52,7 +52,6 @@ class ProjectServiceContainer extends Container
             'method_call1' => 'getMethodCall1Service',
             'new_factory' => 'getNewFactoryService',
             'new_factory_service' => 'getNewFactoryServiceService',
-            'request' => 'getRequestService',
             'service_from_static_method' => 'getServiceFromStaticMethodService',
         );
         $this->privates = array(
@@ -384,19 +383,6 @@ class ProjectServiceContainer extends Container
         $instance->foo = 'bar';
 
         return $instance;
-    }
-
-    /**
-     * Gets the 'request' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @throws RuntimeException always since this service is expected to be injected dynamically
-     */
-    protected function getRequestService()
-    {
-        throw new RuntimeException('You have requested a synthetic service ("request"). The DIC does not know how to construct this service.');
     }
 
     /**

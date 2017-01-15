@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\PhpUnit;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use SebastianBergmann\Diff\Differ;
 
 /**
  * Collects and replays skipped tests.
@@ -191,15 +192,11 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
             restore_error_handler();
 
             if (!in_array($test->getStatus(), array(\PHPUnit_Runner_BaseTestRunner::STATUS_SKIPPED, \PHPUnit_Runner_BaseTestRunner::STATUS_INCOMPLETE, \PHPUnit_Runner_BaseTestRunner::STATUS_FAILURE, \PHPUnit_Runner_BaseTestRunner::STATUS_ERROR), true)) {
-                try {
-                    $prefix = "@expectedDeprecation:\n";
-                    $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", $this->expectedDeprecations)."\n%A", $prefix.'  '.implode("\n  ", $this->gatheredDeprecations)."\n");
-
-                    if ($missing = array_diff($this->gatheredDeprecations, $this->expectedDeprecations)) {
-                        $test->assertStringMatchesFormat($prefix.'%A  '.implode("\n%A  ", $missing)."\n%A", $prefix.'  '.implode("\n  ", array())."\n");
-                    }
-                } catch (\PHPUnit_Framework_AssertionFailedError $e) {
-                    $test->getTestResultObject()->addFailure($test, $e, $time);
+                if ($this->gatheredDeprecations !== $this->expectedDeprecations) {
+                    $differ = new Differ("--- Expected\n+++ Actual\n");
+                    $test->getTestResultObject()->addFailure($test, new \PHPUnit_Framework_AssertionFailedError(
+                        "Failed asserting expected deprecations.\n\n".$differ->diff(implode("\n", $this->gatheredDeprecations), implode("\n", $this->expectedDeprecations))
+                    ), $time);
                 }
             }
 

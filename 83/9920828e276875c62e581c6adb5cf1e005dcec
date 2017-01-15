@@ -1,0 +1,206 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-11-12T08:38:39Z
+
+Nice detection trick! The code sample in your PR body should use `!==` instead of `===` though.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-11-12T08:40:35Z
+
+@greg0ire indeed, thanks ! ☺
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-11-13T18:34:08Z
+
+On the same topic, maybe can we make all new classes `final` by default (for implementations of interfaces and Value Objects) and encourage people to use decoration instead of extending.
+It's in the spirit of what we're already doing for properties (`private` by default) and it eases the maintenance a lot. We can always remove the final keyword later when needed (good use case, proxying...).
+
+We already follow this strategy for API Platform and are happy with the result.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-11-13T18:37:26Z
+
+@dunglas :+1:
+BTW same applies for methods: most could be final and extension points would be better identified.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-13T18:49:30Z
+
+@dunglas completely agree, it was discussed in the past, though: #15233.
+
+---------------------------------------------------------------------------
+
+by SoboLAN at 2016-11-15T10:29:39Z
+
+If you mark a lot of classes as final then, even if people will use composition/decoration (or even traits) instead of extending, it will **break unit-tests**.
+
+Per [PHPUnit documentation](https://phpunit.de/manual/current/en/test-doubles.html):
+
+> Please note that final, private and static methods cannot be stubbed or mocked. They are ignored by PHPUnit's test double functionality and retain their original behavior.
+
+Therefore in my tests I won't be able to mock the Symfony objects that I inject in my classes. I know the quote above specifically mentions methods, but it applies to classes as well.
+
+Some of you will say to simply mock the corresponding interface, but the truth is that a loooot of Symfony functionality is not exposed through interfaces.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2016-11-15T10:33:38Z
+
+@SoboLAN : I hit that problem on a project lately, but then there is this saying "don't mock what you don't own". Not mocking what you don't own can have its benefits indeed, for instance, in the case of symfony, you will get deprecation messages and realize that you are misusing the class, which will help you migrate to something forward compatible.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-15T10:36:15Z
+
+@SoboLAN don't mock concrete classes, use the `new` operator.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-11-15T18:09:53Z
+
+@SoboLAN most of the time mocking a third party object is useless (a class not mocked would work fine as well) or the corresponding test is almost a copy-paste of the tested class (test of every calls, etc.).
+From my point of view, mocking is very rarely necessary when there is no abstraction and we should first test classes output. Classes that are very common to extend (and could need to be extended) either implement an interface or are not final.
+
+In the worst case, if someone has a valid use-case about a final class that shouldn't be final, opening an issue and explaining the problem should be enough and it will be solved in the next version.
+
+Same apply for `private` arguments. Unless someone asks for it I don't see why sf's promises should cover stuff that we are not even sure will be used one day.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-11-15T20:24:26Z
+
+As [@stof](https://github.com/symfony/symfony/pull/20493#discussion_r87657820) and [@theofidry](https://github.com/symfony/symfony/pull/20493#discussion_r87657820) said, it looks hard to trigger deprecations when classes don't already have a constructor.
+So I updated the chained encoder/decoder of the serializer component instead as an example. We'll probably not be able to make final classes that don't already have a constructor (that's one more reason to make classes final by default as this may not be doable afterwards).
+
+If we agree to do this, we'll have to list classes that we want to make final. I'm first thinking about `ChainAdapter`, `ChainEncoder`, `Chain...` but they are many other classes that shouldn't be extended.
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-16T08:29:51Z
+
+There is a different way to trigger these warnings: doing it in the DebugClassLoader, as we do for deprecated interfaces being implemented. This way, it does not rely on having a parent constructor being called.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-16T09:02:40Z
+
+:+1: for @stof proposal! DebugClassLoader should look for `@final` annotations and trigger a deprecation. ~~Then trigger an exception in 4.0.~~
+
+---------------------------------------------------------------------------
+
+by stof at 2016-11-16T09:04:49Z
+
+No, DebugClassLoader should not throw an exception in 4.0, as it would prevent adding `@final` in a 4.x version. what will happen in 4.0 is marking classes as final for real wherever needed (and then, PHP itself will trigger the fatal error)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-16T09:06:08Z
+
+> marking classes as final for real
+
+that would not be always desired, esp. to play nice with lazy proxies.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-16T09:15:38Z
+
+> that would not be always desired, esp. to play nice with lazy proxies.
+
+I doubt there is a valid case to make proxy for VOs, classes with interfaces, listeners, commands, controllers, etc. In other words: proxying concrete classes looks like a hack.
+
+---------------------------------------------------------------------------
+
+by theofidry at 2016-11-16T09:17:20Z
+
+@unkind #20392 needs to be solved for 4.0 then
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-11-16T09:18:24Z
+
+> @unkind #20392 needs to be solved first then
+
+Yes, but as far as I see that's not that hard.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-11-16T09:20:16Z
+
+@theofidry not first, there is no blocker, let's move forward. As @unkind noted there are many classes that have no reason to be turned into services/proxies.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-11-16T13:32:42Z
+
+I moved deprecations to the `DebugClassLoader` (thanks @stof for the idea!).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T15:44:23Z
+
+>  if you throw, it means that adding @final somewhere is a BC break, as it forces everyone to update immediately (breaking the dev environment is as bad as breaking the prod one, as your BC would then be valid only for people not using the dev environment to continue working on their project, which means nobody sane).
+
+> And we will never throw an exception here (it would suffer from the same issue for new @final annotations added in a package used alongside symfony/debug 4.x).
+the may is here because the class being wanna-be-final may be turned into a real final class in the next major version of its package (which has nothing to do with the next Symfony major version) if the goal was to move to real final classes. But some package owners may decide to keep them wanna-be-final forever to allow mocking them, so we cannot be sure that the code will break.
+
+got it
+:+1: then
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-06T16:35:27Z
+
+@nicolas-grekas if you did not understand it, the message is not clear enough.
+What about `Extending the class %s in %s is deprecated. This class may be made final and break your code in the next major release.`?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T16:38:22Z
+
+LGTM
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T23:15:14Z
+
+Reading https://github.com/symfony/symfony/pull/21263#issuecomment-272305529, I think we need to add the version where the `@final` has been added in the depreciation message also, and annotations be written as `@final since version 3.3`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T23:23:27Z
+
+The message could be something like:
+`sprintf('The %s class is considered final%s. It may change without further notice as of its next major version. You should not extend it from %s.', $parent, $msgWithFirstUppercaseAndNewlinesAndSpacesAndFinalDotCleanedUp, $class)`
+
+---------------------------------------------------------------------------
+
+by keradus at 2017-01-12T23:27:24Z
+
+If we will treat class with `@final` annotation as final indeed and start playing with protected properties/methods without bumping the MAJOR version then I'm strongly against this move here.
+If we will bump MAJOR version while playing with interface then it's good as not a bc breaker.
+
+I'm totally for putting a deprecation notice, just let the notice not be an excuse to break BC.
+
+Indeed, sth like `@final since 3.3` should prevent devs breaking BC on 3.x line.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-14T20:52:38Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-15T16:04:00Z
+
+@GuilhemN Can you squash your commits please?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-15T16:07:31Z
+
+done @fabpot

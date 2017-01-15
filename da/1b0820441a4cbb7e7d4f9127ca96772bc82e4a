@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-14T17:01:29Z
+
+ping @Cydonia7
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-14T17:30:23Z
+
+To reproduce: `debug:container service-name --show-arguments --format xml|md|json|txt` on the current master
+
+---------------------------------------------------------------------------
+
+by Cydonia7 at 2017-01-14T23:55:06Z
+
+Thank you for fixing this. To be honest, I don't understand this part of the code that well and did not think of testing per-service.
+
+I'm :+1: on this, the tests look good and are passing.

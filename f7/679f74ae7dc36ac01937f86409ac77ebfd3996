@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-12T14:30:03Z
+
+The generated method (and it existence in the method map) has another purpose: it allows ``has()`` to know about the service, and means that ``get('kernel')`` gives you a meaningful message if it is not set yet (same for other synthetic services).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T14:43:09Z
+
+@stof, yes, and my point is that we don't care, because these are erroneous situations anyway. The fact the current behavior prevents meaningful progress largely wins over the small&rare DX+ that it provides.
+For "has", I don't expect anyone to rely on a faulty behavior (userland side) anyway :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-12T19:53:51Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T08:42:51Z
+
+@stof no blocker for you? I'd like to merge to unlock progress in #19668.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-13T08:48:21Z
+
+It makes sense right? Ie. we dont _have_ `kernel` till it's set. `has()` returning true, while `get()` throws is weird..
+
+Imo. the exception is even better now, service not found.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-14T09:22:30Z
+
+What if an alias refers a pre-defined service? I think `has()` needs an update so that `$id` is set first, and continue checks based on the aliased id (basically what `get()` does).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-15T15:01:56Z
+
+@ro0NL updated, was that what you meant?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-15T15:04:07Z
+
+Yep :+1:
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-15T16:23:44Z
+
+:+1:

@@ -120,14 +120,22 @@ class AutowirePass implements CompilerPassInterface
      *
      * @param string           $id
      * @param \ReflectionClass $reflectionClass
-     * @param string[]         $autowiredMethods
+     * @param string[]         $configuredAutowiredMethods
      *
      * @return \ReflectionMethod[]
      */
-    private function getMethodsToAutowire($id, \ReflectionClass $reflectionClass, array $autowiredMethods)
+    private function getMethodsToAutowire($id, \ReflectionClass $reflectionClass, array $configuredAutowiredMethods)
     {
         $found = array();
         $regexList = array();
+
+        // Always try to autowire the constructor
+        if (in_array('__construct', $configuredAutowiredMethods, true)) {
+            $autowiredMethods = $configuredAutowiredMethods;
+        } else {
+            $autowiredMethods = array_merge(array('__construct'), $configuredAutowiredMethods);
+        }
+
         foreach ($autowiredMethods as $pattern) {
             $regexList[] = '/^'.str_replace('\*', '.*', preg_quote($pattern, '/')).'$/i';
         }
@@ -147,7 +155,7 @@ class AutowirePass implements CompilerPassInterface
             }
         }
 
-        if ($notFound = array_diff($autowiredMethods, $found)) {
+        if ($notFound = array_diff($configuredAutowiredMethods, $found)) {
             $compiler = $this->container->getCompiler();
             $compiler->addLogMessage($compiler->getLoggingFormatter()->formatUnusedAutowiringPatterns($this, $id, $notFound));
         }

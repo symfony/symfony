@@ -440,7 +440,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         // manually configure *one* call, to override autowiring
         $container
             ->register('setter_injection', SetterInjection::class)
-            ->setAutowiredMethods(array('__construct', 'set*'))
+            ->setAutowiredMethods(array('set*'))
             ->addMethodCall('setWithCallsConfigured', array('manual_arg1', 'manual_arg2'))
         ;
 
@@ -557,7 +557,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $container->register('c1', CollisionA::class);
         $container->register('c2', CollisionB::class);
         $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollision::class);
-        $aDefinition->setAutowiredMethods(array('__construct', 'set*'));
+        $aDefinition->setAutowiredMethods(array('set*'));
 
         $pass = new AutowirePass();
         $pass->process($container);

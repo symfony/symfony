@@ -82,11 +82,8 @@ class ExpressionFunction
         }
 
         $reflection = new \ReflectionFunction($phpFunction);
-        if ($reflection->inNamespace() && !$expressionFunction) {
-            throw new \InvalidArgumentException(sprintf(
-                'An expression function name must be defined if PHP function "%s" is in namespace.',
-                $phpFunction
-            ));
+        if (!$expressionFunction && $reflection->inNamespace()) {
+            throw new \InvalidArgumentException(sprintf('An expression function name must be defined if PHP function "%s" is in namespace.', $phpFunction));
         }
 
         $phpFunction = $reflection->getName();

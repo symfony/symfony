@@ -30,7 +30,8 @@
         "phpdocumentor/reflection-docblock": "~3.0"
     },
     "conflict": {
-        "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4"
+        "symfony/property-access": ">=3.0,<3.0.4|>=2.8,<2.8.4",
+        "symfony/property-info": "<3.1"
     },
     "suggest": {
         "psr/cache-implementation": "For using the metadata cache.",

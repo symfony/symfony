@@ -31,7 +31,7 @@ class WorkflowValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\Workflow\Exception\InvalidDefinitionException
-     * expectedExceptionMessage All transitions for a place must have an unique name. Multiple transitions named "t1" where found for place "a" in workflow "foo".
+     * @expectedExceptionMessage All transitions for a place must have an unique name. Multiple transitions named "t1" where found for place "a" in workflow "foo".
      */
     public function testWorkflowWithInvalidNames()
     {

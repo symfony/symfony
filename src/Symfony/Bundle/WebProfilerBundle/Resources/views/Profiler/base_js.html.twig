@@ -118,10 +118,14 @@
                             rows.insertBefore(row, rows.firstChild);
 
                             var methodCell = document.createElement('td');
-                            if (request.error) {
+                            if (request.loading) {
+                                methodCell.innerHTML = '<span class="sf-toolbar-status sf-toolbar-status-loading">'+request.method+'</span>';
+                            } else if (request.error) {
                                 methodCell.className = 'sf-ajax-request-error';
+                                methodCell.innerHTML = '<span class="sf-toolbar-status sf-toolbar-status-red">'+request.method+'</span>';
+                            } else {
+                                methodCell.innerHTML = '<span class="sf-toolbar-status sf-toolbar-status-green">'+request.method+'</span>';
                             }
-                            methodCell.textContent = request.method;
                             row.appendChild(methodCell);
 
                             var pathCell = document.createElement('td');

@@ -229,6 +229,10 @@ class YamlFileLoader extends FileLoader
             return;
         }
 
+        if (is_array($service) && array_values($service) === $service) {
+            $service = array('arguments' => $service);
+        }
+
         if (null === $service) {
             $service = array();
         }

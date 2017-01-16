@@ -12,6 +12,8 @@
 namespace Symfony\Bridge\Doctrine\Validator\Constraints;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -127,15 +129,41 @@ class UniqueEntityValidator extends ConstraintValidator
         $errorPath = null !== $constraint->errorPath ? $constraint->errorPath : $fields[0];
         $invalidValue = isset($criteria[$errorPath]) ? $criteria[$errorPath] : $criteria[$fields[0]];
 
-        if (is_object($invalidValue) && !method_exists($invalidValue, '__toString')) {
-            $invalidValue = sprintf('Object of class "%s" identified by "%s"', get_class($entity), implode(', ', $class->getIdentifierValues($entity)));
-        }
-
         $this->context->buildViolation($constraint->message)
             ->atPath($errorPath)
-            ->setParameter('{{ value }}', $this->formatValue($invalidValue, static::OBJECT_TO_STRING | static::PRETTY_DATE))
+            ->setParameter('{{ value }}', $this->formatWithIdentifiers($em, $class, $invalidValue))
             ->setInvalidValue($invalidValue)
             ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->addViolation();
+    }
+
+    private function formatWithIdentifiers(ObjectManager $em, ClassMetadata $class, $value)
+    {
+        if (!is_object($value) || $value instanceof \DateTimeInterface) {
+            return $this->formatValue($value, self::PRETTY_DATE);
+        }
+
+        // non unique value is a composite PK
+        if ($class->getName() !== $idClass = get_class($value)) {
+            $identifiers = $em->getClassMetadata($idClass)->getIdentifierValues($value);
+        } else {
+            $identifiers = $class->getIdentifierValues($value);
+        }
+
+        if (!$identifiers) {
+            return sprintf('object("%s")', $idClass);
+        }
+
+        array_walk($identifiers, function (&$id, $field) {
+            if (!is_object($id) || $id instanceof \DateTimeInterface) {
+                $idAsString = $this->formatValue($id, self::PRETTY_DATE);
+            } else {
+                $idAsString = sprintf('object("%s")', get_class($id));
+            }
+
+            $id = sprintf('%s => %s', $field, $idAsString);
+        });
+
+        return sprintf('object("%s") identified by (%s)', $idClass, implode(', ', $identifiers));
     }
 }

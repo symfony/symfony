@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-16T16:19:09Z
+
+Looks like a slippery slope here :)
+
+What if my config is:
+
+```php
+services:
+    Foo\Bar: { autowire: ['setLogger'] }
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-16T16:24:29Z
+
+The constructor will be autowired if it exists. If it's not wanted, it's weird to use `autowire` instead of a `call`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T16:53:48Z
+
+I agree with @dunglas: autowiring has to wire the constructor - and optionally the setters.
+Having to state:
+```yaml
+services:
+    Foo\Bar: { autowire: ['__construct', 'setLogger'] }
+```
+
+looks like unneeded boilerplate to me, that people will forget most of the time. There is always a constructor to wire. We don't need to handle the case for one wanting to autowire the setters but wire manually the contructor, because by doing so, one already went out of autowire-land.

@@ -109,7 +109,7 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
     protected function determineTargetUrl(Request $request)
     {
         if ($this->options['always_use_default_target_path']) {
-            return $this->options['default_target_path'];
+            return $this->httpUtils->generateUri($request, $this->options['default_target_path']);
         }
 
         if ($targetUrl = ParameterBagUtils::getRequestParameterValue($request, $this->options['target_path_parameter'])) {
@@ -126,6 +126,6 @@ class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandle
             return $targetUrl;
         }
 
-        return $this->options['default_target_path'];
+        return $this->httpUtils->generateUri($request, $this->options['default_target_path']);
     }
 }

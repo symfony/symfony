@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-01-14T12:06:19Z
+
+@HeahDude as you added this code (https://github.com/symfony/symfony/commit/40c0c52465bd9e8fed49edaad1de954d6547be08) what do you think about this?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-01-16T13:19:47Z
+
+I've discussed this PR with @dmaicher in https://github.com/dmaicher/symfony/issues/1, which is now merged.
+
+This looks good to me.
+
+ping __@symfony/deciders__
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T13:23:08Z
+
+Failure looks related to me (not the messages about getMock, but the one about CompositeObjectNoToStringIdEntity) - maybe a composer.json update needed somewhere?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-01-16T13:38:40Z
+
+@nicolas-grekas I've opened https://github.com/dmaicher/symfony/pull/2 which seems to have fixed the tests, waiting for @dmaicher to merge it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T13:43:39Z
+
+@dmaicher can you please squash the history? We can't merge (nor don't want to :) ) merge PRs with merges inside.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T13:44:44Z
+
+(maybe keep just two commits, one for you and one for @HeahDude with rebase -i ?)
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-01-16T13:45:01Z
+
+@nicolas-grekas sure :wink: Let's wait for the build and hope its fixed
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-01-16T13:51:12Z
+
+Green 🎉
+
+---------------------------------------------------------------------------
+
+by dmaicher at 2017-01-16T14:02:08Z
+
+Done :wink:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-16T16:24:50Z
+
+I've not checked, but don't we have the same issue in 2.7 and 2.8?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-01-16T16:30:11Z
+
+@fabpot This fix is related to a feature introduced in 3.1 https://github.com/symfony/symfony/pull/15279, and not enough fixed by https://github.com/symfony/symfony/pull/19227 (missing composite identifiers handling, provided here).

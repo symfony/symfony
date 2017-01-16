@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 use Symfony\Component\Workflow\Validator\StateMachineValidator;
-use Symfony\Component\Workflow\Validator\UniqueTransitionNameValidator;
 use Symfony\Component\Workflow\Validator\WorkflowValidator;
 
 /**
@@ -41,7 +40,6 @@ class ValidateWorkflowsPass implements CompilerPassInterface
                 }
 
                 $this->createValidator($tag)->validate($definition, $tag['name']);
-                (new UniqueTransitionNameValidator())->validate($definition, $tag['name']);
             }
         }
     }

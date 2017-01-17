@@ -373,6 +373,18 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
+        $autowiredCalls = array_filter($definition->getAutowiredCalls(), function ($method) {
+            return $method !== '__construct';
+        });
+        if ($autowiredCalls) {
+            $serviceXML->appendChild($autowiredMethodsXML = $dom->createElement('autowired-calls'));
+            foreach ($autowiredCalls as $autowiredMethod) {
+                $autowiredMethodXML = $dom->createElement('autowired-call');
+                $autowiredMethodXML->appendChild(new \DOMText($autowiredMethod));
+                $autowiredMethodsXML->appendChild($autowiredMethodXML);
+            }
+        }
+
         $calls = $definition->getMethodCalls();
         if (count($calls) > 0) {
             $serviceXML->appendChild($callsXML = $dom->createElement('calls'));

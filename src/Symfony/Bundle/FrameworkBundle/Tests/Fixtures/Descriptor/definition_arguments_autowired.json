@@ -1,0 +1,12 @@
+{
+    "class": "AutowiredService",
+    "public": true,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": true,
+    "arguments": [],
+    "file": null,
+    "tags": []
+}

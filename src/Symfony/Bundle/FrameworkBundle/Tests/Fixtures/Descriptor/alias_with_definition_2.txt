@@ -17,7 +17,7 @@
   Lazy              no                               
   Shared            yes                              
   Abstract          no                               
-  Autowired         no                               
+  Autowire          no                               
   Required File     /path/to/file                    
   Factory Service   factory.service                  
   Factory Method    get                              

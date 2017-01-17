@@ -12,6 +12,31 @@
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
             "tags": []
+        },
+        "definition_autowired": {
+            "class": "AutowiredService",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": true,
+            "file": null,
+            "tags": []
+        },
+        "definition_autowired_with_methods": {
+            "class": "AutowiredService",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": [
+                "set*",
+                "addFoo"
+            ],
+            "file": null,
+            "tags": []
         }
     },
     "aliases": {

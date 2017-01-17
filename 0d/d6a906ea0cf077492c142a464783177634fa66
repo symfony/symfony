@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by quentinus95 at 2017-01-14T14:59:19Z
+
+@csarrazi I have recreated a new PR and deleted the old one because I merged the whole master branch in it inadvertently (I forgot it was based on 3.1)
+
+I have removed the `null` check in `getAttributeValue` method and set a default value for `$uidKey` if `null` given. I also set the password to `null` if the password attribute is `null`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-15T13:12:00Z
+
+Which branch is this fix for? There's a mismatch between the description and the selected base branch (no need to change because we can while merging.)
+
+---------------------------------------------------------------------------
+
+by quentinus95 at 2017-01-15T13:49:17Z
+
+This fix is for the 3.1 branch, sorry!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T13:18:28Z
+
+ping @csarrazi (3.1 is EOLed in two weeks)
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-01-16T18:59:32Z
+
+👍 , as I said in the previous PR. I would merge it against 3.1, as we still support it (even though EOL is in 2 weeks).
+
+---------------------------------------------------------------------------
+
+by quentinus95 at 2017-01-16T19:55:12Z
+
+Should I care about the failure on AppVeyor as it does not seems related to the changes of this PR ?

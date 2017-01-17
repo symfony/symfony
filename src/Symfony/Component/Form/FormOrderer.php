@@ -20,39 +20,20 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
  */
 class FormOrderer
 {
-    /**
-     * @var array
-     */
     private $weights;
-
-    /**
-     * @var array
-     */
     private $deferred;
-
-    /**
-     * @var int
-     */
     private $firstWeight;
-
-    /**
-     * @var int
-     */
     private $currentWeight;
-
-    /**
-     * @var int
-     */
     private $lastWeight;
 
     /**
      * Orders the form.
      *
-     * @param FormInterface $form The form.
+     * @param FormInterface $form
      *
-     * @return array The ordered form child names.
+     * @return array The ordered form child names
      *
-     * @throws \Symfony\Component\Form\Exception\InvalidConfigurationException If a position is not valid.
+     * @throws InvalidConfigurationException If a position is not valid
      */
     public function order(FormInterface $form)
     {
@@ -76,9 +57,9 @@ class FormOrderer
     }
 
     /**
-     * Process the form using the current weight in order to maintain the default order.
+     * Process the form using the current weight in order to maintain the default order
      *
-     * @param FormInterface $form The form.
+     * @param FormInterface $form
      */
     private function processEmptyPosition(FormInterface $form)
     {
@@ -87,10 +68,10 @@ class FormOrderer
 
     /**
      * Process the form using the current first/last weight in order to put your form at the
-     * first/last position according to the default order.
+     * first/last position according to the default order
      *
-     * @param FormInterface $form     The form.
-     * @param string        $position The position.
+     * @param FormInterface $form
+     * @param string        $position
      */
     private function processStringPosition(FormInterface $form, $position)
     {
@@ -102,12 +83,11 @@ class FormOrderer
     }
 
     /**
-     * Processes an array position (before/after).
+     * Process the form using the weight of the "before" or "after" form
+     * If the "before" or "after" form has not been processed yet, we defer it for the next forms
      *
-     * FIXME
-     *
-     * @param FormInterface $form     The form.
-     * @param array         $position The position.
+     * @param FormInterface $form
+     * @param array         $position
      */
     private function processArrayPosition(FormInterface $form, array $position)
     {
@@ -122,9 +102,9 @@ class FormOrderer
 
     /**
      * Process the form using the current first weight in order to put
-     * your form at the first position according to the default order.
+     * your form at the first position according to the default order
      *
-     * @param FormInterface $form The form.
+     * @param FormInterface $form
      */
     private function processFirst(FormInterface $form)
     {
@@ -133,9 +113,9 @@ class FormOrderer
 
     /**
      * Processes the form using the current last weight in order to put
-     * your form at the last position according to the default order.
+     * your form at the last position according to the default order
      *
-     * @param FormInterface $form The form.
+     * @param FormInterface $form
      */
     private function processLast(FormInterface $form)
     {
@@ -143,11 +123,11 @@ class FormOrderer
     }
 
     /**
-     * Process the form using the weight of the "before" form.
-     * If the "before" form has not been processed yet, we defer it for the next forms.
+     * Process the form using the weight of the "before" form
+     * If the "before" form has not been processed yet, we defer it for the next forms
      *
-     * @param FormInterface $form   The form.
-     * @param string        $before The before form name.
+     * @param FormInterface $form
+     * @param string        $before
      */
     private function processBefore(FormInterface $form, $before)
     {
@@ -159,11 +139,11 @@ class FormOrderer
     }
 
     /**
-     * Process the form using the weight of the "after" form.
-     * If the "after" form has not been processed yet, we defer it for the next forms.
+     * Process the form using the weight of the "after" form
+     * If the "after" form has not been processed yet, we defer it for the next forms
      *
-     * @param FormInterface $form  The form.
-     * @param string        $after The after form name.
+     * @param FormInterface $form
+     * @param string        $after
      */
     private function processAfter(FormInterface $form, $after)
     {
@@ -175,12 +155,12 @@ class FormOrderer
     }
 
     /**
-     * Process the form using the given weight.
+     * Process the form using the given weight
      *
-     * This method also updates the orderer state accordingly.
+     * This method also updates the orderer state accordingly
      *
-     * @param FormInterface $form   The form.
-     * @param int           $weight The weight.
+     * @param FormInterface $form
+     * @param int           $weight
      */
     private function processWeight(FormInterface $form, $weight)
     {
@@ -202,13 +182,13 @@ class FormOrderer
 
     /**
      * Finishes the form weight processing by trying to process deferred forms
-     * which refers to the current processed form.
+     * which refers to the current processed form
      *
-     * @param FormInterface $form     The form.
-     * @param int           $weight   The weight.
-     * @param string        $position The position (null|before|after).
+     * @param FormInterface $form
+     * @param int           $weight
+     * @param string        $position
      *
-     * @return int The new weight.
+     * @return int The new weight
      */
     private function finishWeight(FormInterface $form, $weight, $position = null)
     {
@@ -235,13 +215,13 @@ class FormOrderer
 
     /**
      * Processes a deferred form by checking if it is valid and
-     * if it does not become a circular or symmetric ordering.
+     * if it does not become a circular or symmetric ordering
      *
-     * @param FormInterface $form     The form.
-     * @param string        $deferred The deferred form name.
-     * @param string        $position The position (before|after).
+     * @param FormInterface $form
+     * @param string        $deferred
+     * @param string        $position
      *
-     * @throws InvalidConfigurationException If the deferred form does not exist.
+     * @throws InvalidConfigurationException If the deferred form does not exist
      */
     private function processDeferred(FormInterface $form, $deferred, $position)
     {
@@ -258,13 +238,13 @@ class FormOrderer
     }
 
     /**
-     * Detects circular deferred forms for after/before position such as A => B => C => A.
+     * Detects circular deferred forms for after/before position such as A => B => C => A
      *
-     * @param string $name     The form name.
-     * @param string $position The position (before|after)
-     * @param array  $stack    The circular stack.
+     * @param string $name
+     * @param string $position
+     * @param array  $stack
      *
-     * @throws InvalidConfigurationException If there is a circular before/after deferred.
+     * @throws InvalidConfigurationException If there is a circular before/after deferred
      */
     private function detectCircularDeferred($name, $position, array $stack = array())
     {
@@ -288,13 +268,13 @@ class FormOrderer
     }
 
     /**
-     * Detects symmetric before/after deferred such as A after B and B after A.
+     * Detects symmetric before/after deferred such as A after B and B after A
      *
-     * @param string $name     The form name.
-     * @param string $deferred The deferred form name.
-     * @param string $position The position (before|after).
+     * @param string $name
+     * @param string $deferred
+     * @param string $position
      *
-     * @throws InvalidConfigurationException If there is a symetric before/after deferred.
+     * @throws InvalidConfigurationException If there is a symetric before/after deferred
      */
     private function detectedSymmetricDeferred($name, $deferred, $position)
     {
@@ -310,7 +290,7 @@ class FormOrderer
     }
 
     /**
-     * Resets the orderer.
+     * Resets the orderer
      */
     private function reset()
     {

@@ -851,15 +851,15 @@ class FormConfigBuilder implements FormConfigBuilderInterface, OrderedFormConfig
     public function setPosition($position)
     {
         if ($this->locked) {
-            throw new BadMethodCallException('The config builder cannot be modified anymore.');
+            throw new BadMethodCallException('FormConfigBuilder methods cannot be accessed anymore once the builder is turned into a FormConfigInterface instance.');
         }
 
         if (is_string($position) && ($position !== 'first') && ($position !== 'last')) {
-            throw new InvalidConfigurationException('If you use position as string, you can only use "first" & "last".');
+            throw new InvalidConfigurationException('When using position as a string, the only supported values are "first" and "last".');
         }
 
         if (is_array($position) && !isset($position['before']) && !isset($position['after'])) {
-            throw new InvalidConfigurationException('If you use position as array, you must at least define the "before" or "after" option.');
+            throw new InvalidConfigurationException('When using position as an array, the "before" or "after" option must be defined.');
         }
 
         $this->position = $position;

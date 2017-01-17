@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -38,6 +39,22 @@ abstract class FileLoader extends BaseFileLoader
         $this->container = $container;
 
         parent::__construct($locator);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function import($resource, $type = null, $ignoreErrors = false, $sourceResource = null)
+    {
+        try {
+            foreach ($this->glob($resource, false) as $path => $info) {
+                parent::import($path, $type, $ignoreErrors, $sourceResource);
+            }
+        } catch (FileLocatorFileNotFoundException $e) {
+            if (!$ignoreErrors) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -73,7 +90,7 @@ abstract class FileLoader extends BaseFileLoader
         $extRegexp = defined('HHVM_VERSION') ? '/\\.(?:php|hh)$/' : '/\\.php$/';
 
         foreach ($this->glob($resource, true, $prefixLen) as $path => $info) {
-            if (!preg_match($extRegexp, $path, $m) || !$info->isFile() || !$info->isReadable()) {
+            if (!preg_match($extRegexp, $path, $m) || !$info->isReadable()) {
                 continue;
             }
             $class = $namespace.ltrim(str_replace('/', '\\', substr($path, $prefixLen, -strlen($m[0]))), '\\');
@@ -95,6 +112,11 @@ abstract class FileLoader extends BaseFileLoader
     private function glob($resource, $recursive, &$prefixLen = null)
     {
         if (strlen($resource) === $i = strcspn($resource, '*?{[')) {
+            if (!$recursive) {
+                yield $resource => new \SplFileInfo($resource);
+
+                return;
+            }
             $resourcePrefix = $resource;
             $resource = '';
         } elseif (0 === $i) {
@@ -117,9 +139,11 @@ abstract class FileLoader extends BaseFileLoader
                 if ($recursive && is_dir($path)) {
                     $flags = \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS;
                     foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, $flags)) as $path => $info) {
-                        yield $path => $info;
+                        if ($info->isFile()) {
+                            yield $path => $info;
+                        }
                     }
-                } else {
+                } elseif (is_file($path)) {
                     yield $path => new \SplFileInfo($path);
                 }
             }
@@ -138,7 +162,7 @@ abstract class FileLoader extends BaseFileLoader
         }
 
         foreach ($finder->followLinks()->in($resourcePrefix) as $path => $info) {
-            if (preg_match($regex, substr($path, $prefixLen))) {
+            if (preg_match($regex, substr($path, $prefixLen)) && $info->isFile()) {
                 yield $path => $info;
             }
         }

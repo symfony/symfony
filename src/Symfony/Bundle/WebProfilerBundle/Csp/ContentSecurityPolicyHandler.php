@@ -135,7 +135,8 @@ class ContentSecurityPolicyHandler
                     if (isset($headers[$header]['default-src'])) {
                         $headers[$header][$type] = $headers[$header]['default-src'];
                     } else {
-                        $headers[$header][$type] = array();
+                        // If there is no script-src/style-src and no default-src, no additional rules required.
+                        continue;
                     }
                 }
                 $ruleIsSet = true;

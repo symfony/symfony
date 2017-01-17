@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
@@ -25,83 +23,39 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ResolveDefinitionTemplatesPass implements CompilerPassInterface
+class ResolveDefinitionTemplatesPass extends AbstractRecursivePass implements CompilerPassInterface
 {
-    private $compiler;
-    private $formatter;
-    private $currentId;
-
-    /**
-     * Process the ContainerBuilder to replace ChildDefinition instances with their real Definition instances.
-     *
-     * @param ContainerBuilder $container
-     */
-    public function process(ContainerBuilder $container)
+    protected function processValue($value, $isRoot = false)
     {
-        $this->compiler = $container->getCompiler();
-        $this->formatter = $this->compiler->getLoggingFormatter();
-
-        $container->setDefinitions($this->resolveArguments($container, $container->getDefinitions(), true));
-    }
-
-    /**
-     * Resolves definition decorator arguments.
-     *
-     * @param ContainerBuilder $container The ContainerBuilder
-     * @param array            $arguments An array of arguments
-     * @param bool             $isRoot    If we are processing the root definitions or not
-     *
-     * @return array
-     */
-    private function resolveArguments(ContainerBuilder $container, array $arguments, $isRoot = false)
-    {
-        foreach ($arguments as $k => $argument) {
+        if (!$value instanceof Definition) {
+            return parent::processValue($value, $isRoot);
+        }
+        if ($isRoot) {
+            // yes, we are specifically fetching the definition from the
+            // container to ensure we are not operating on stale data
+            $value = $this->container->getDefinition($this->currentId);
+        }
+        if ($value instanceof ChildDefinition) {
+            $value = $this->resolveDefinition($value);
             if ($isRoot) {
-                // yes, we are specifically fetching the definition from the
-                // container to ensure we are not operating on stale data
-                $arguments[$k] = $argument = $container->getDefinition($k);
-                $this->currentId = $k;
-            }
-            if (is_array($argument)) {
-                $arguments[$k] = $this->resolveArguments($container, $argument);
-            } elseif ($argument instanceof ArgumentInterface) {
-                $argument->setValues($this->resolveArguments($container, $argument->getValues()));
-            } elseif ($argument instanceof Definition) {
-                if ($argument instanceof ChildDefinition) {
-                    $arguments[$k] = $argument = $this->resolveDefinition($container, $argument);
-                    if ($isRoot) {
-                        $container->setDefinition($k, $argument);
-                    }
-                }
-                $argument->setArguments($this->resolveArguments($container, $argument->getArguments()));
-                $argument->setMethodCalls($this->resolveArguments($container, $argument->getMethodCalls()));
-                $argument->setProperties($this->resolveArguments($container, $argument->getProperties()));
-
-                $configurator = $this->resolveArguments($container, array($argument->getConfigurator()));
-                $argument->setConfigurator($configurator[0]);
-
-                $factory = $this->resolveArguments($container, array($argument->getFactory()));
-                $argument->setFactory($factory[0]);
+                $this->container->setDefinition($this->currentId, $value);
             }
         }
 
-        return $arguments;
+        return parent::processValue($value, $isRoot);
     }
 
     /**
      * Resolves the definition.
      *
-     * @param ContainerBuilder $container  The ContainerBuilder
-     * @param ChildDefinition  $definition
-     *
      * @return Definition
      *
-     * @throws \RuntimeException When the definition is invalid
+     * @throws RuntimeException When the definition is invalid
      */
-    private function resolveDefinition(ContainerBuilder $container, ChildDefinition $definition)
+    private function resolveDefinition(ChildDefinition $definition)
     {
         try {
-            return $this->doResolveDefinition($container, $definition);
+            return $this->doResolveDefinition($definition);
         } catch (ExceptionInterface $e) {
             $r = new \ReflectionProperty($e, 'message');
             $r->setAccessible(true);
@@ -111,22 +65,23 @@ class ResolveDefinitionTemplatesPass implements CompilerPassInterface
         }
     }
 
-    private function doResolveDefinition(ContainerBuilder $container, ChildDefinition $definition)
+    private function doResolveDefinition(ChildDefinition $definition)
     {
-        if (!$container->has($parent = $definition->getParent())) {
+        if (!$this->container->has($parent = $definition->getParent())) {
             throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));
         }
 
-        $parentDef = $container->findDefinition($parent);
+        $parentDef = $this->container->findDefinition($parent);
         if ($parentDef instanceof ChildDefinition) {
             $id = $this->currentId;
             $this->currentId = $parent;
-            $parentDef = $this->resolveDefinition($container, $parentDef);
-            $container->setDefinition($parent, $parentDef);
+            $parentDef = $this->resolveDefinition($parentDef);
+            $this->container->setDefinition($parent, $parentDef);
             $this->currentId = $id;
         }
 
-        $this->compiler->addLogMessage($this->formatter->formatResolveInheritance($this, $this->currentId, $parent));
+        $compiler = $this->container->getCompiler();
+        $compiler->addLogMessage($compiler->getLoggingFormatter()->formatResolveInheritance($this, $this->currentId, $parent));
         $def = new Definition();
 
         // merge in parent definition

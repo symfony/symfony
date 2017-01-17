@@ -287,18 +287,16 @@ class TextDescriptor extends Descriptor
         }
         $tableRows[] = array('Abstract', $definition->isAbstract() ? 'yes' : 'no');
 
-        if (method_exists($definition, 'isAutowired')) {
-            $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
+        $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
 
-            $autowiringTypes = $definition->getAutowiringTypes();
-            if (count($autowiringTypes)) {
-                $autowiringTypesInformation = implode(', ', $autowiringTypes);
-            } else {
-                $autowiringTypesInformation = '-';
-            }
-
-            $tableRows[] = array('Autowiring Types', $autowiringTypesInformation);
+        $autowiringTypes = $definition->getAutowiringTypes();
+        if (count($autowiringTypes)) {
+            $autowiringTypesInformation = implode(', ', $autowiringTypes);
+        } else {
+            $autowiringTypesInformation = '-';
         }
+
+        $tableRows[] = array('Autowiring Types', $autowiringTypesInformation);
 
         if ($definition->getFile()) {
             $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');

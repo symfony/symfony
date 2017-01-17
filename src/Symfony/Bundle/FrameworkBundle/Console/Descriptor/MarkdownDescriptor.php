@@ -185,9 +185,7 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Lazy: '.($definition->isLazy() ? 'yes' : 'no')
         ;
 
-        if (method_exists($definition, 'isShared')) {
-            $output .= "\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no');
-        }
+        $output .= "\n".'- Shared: '.($definition->isShared() ? 'yes' : 'no');
 
         if (method_exists($definition, 'isSynchronized')) {
             $output .= "\n".'- Synchronized: '.($definition->isSynchronized(false) ? 'yes' : 'no');
@@ -195,12 +193,10 @@ class MarkdownDescriptor extends Descriptor
 
         $output .= "\n".'- Abstract: '.($definition->isAbstract() ? 'yes' : 'no');
 
-        if (method_exists($definition, 'isAutowired')) {
-            $output .= "\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no');
+        $output .= "\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no');
 
-            foreach ($definition->getAutowiringTypes() as $autowiringType) {
-                $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
-            }
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
         }
 
         if ($definition->getFile()) {

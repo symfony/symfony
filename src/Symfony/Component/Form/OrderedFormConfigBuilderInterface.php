@@ -42,11 +42,11 @@ interface OrderedFormConfigBuilderInterface extends OrderedFormConfigInterface
      * You can combine the `after` & `before` options together or with `first` and/or `last` to achieve
      * more complex use cases.
      *
-     * @param null|string|array $position The form position.
+     * @param null|string|array $position the form position
      *
-     * @throws \Symfony\Component\Form\Exception\InvalidConfigurationException If the position is not valid.
+     * @throws \Symfony\Component\Form\Exception\InvalidConfigurationException if the position is not valid
      *
-     * @return self The configuration object.
+     * @return self the configuration object
      */
     public function setPosition($position);
 }

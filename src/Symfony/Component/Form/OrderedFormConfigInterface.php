@@ -21,7 +21,7 @@ interface OrderedFormConfigInterface
      *
      * @see FormConfigBuilderInterface::setPosition
      *
-     * @return null|string|array The position.
+     * @return null|string|array the position
      */
     public function getPosition();
 }

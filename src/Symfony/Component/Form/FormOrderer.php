@@ -57,7 +57,7 @@ class FormOrderer
     }
 
     /**
-     * Process the form using the current weight in order to maintain the default order
+     * Process the form using the current weight in order to maintain the default order.
      *
      * @param FormInterface $form
      */
@@ -68,7 +68,7 @@ class FormOrderer
 
     /**
      * Process the form using the current first/last weight in order to put your form at the
-     * first/last position according to the default order
+     * first/last position according to the default order.
      *
      * @param FormInterface $form
      * @param string        $position
@@ -84,7 +84,7 @@ class FormOrderer
 
     /**
      * Process the form using the weight of the "before" or "after" form
-     * If the "before" or "after" form has not been processed yet, we defer it for the next forms
+     * If the "before" or "after" form has not been processed yet, we defer it for the next forms.
      *
      * @param FormInterface $form
      * @param array         $position
@@ -102,7 +102,7 @@ class FormOrderer
 
     /**
      * Process the form using the current first weight in order to put
-     * your form at the first position according to the default order
+     * your form at the first position according to the default order.
      *
      * @param FormInterface $form
      */
@@ -113,7 +113,7 @@ class FormOrderer
 
     /**
      * Processes the form using the current last weight in order to put
-     * your form at the last position according to the default order
+     * your form at the last position according to the default order.
      *
      * @param FormInterface $form
      */
@@ -124,7 +124,7 @@ class FormOrderer
 
     /**
      * Process the form using the weight of the "before" form
-     * If the "before" form has not been processed yet, we defer it for the next forms
+     * If the "before" form has not been processed yet, we defer it for the next forms.
      *
      * @param FormInterface $form
      * @param string        $before
@@ -140,7 +140,7 @@ class FormOrderer
 
     /**
      * Process the form using the weight of the "after" form
-     * If the "after" form has not been processed yet, we defer it for the next forms
+     * If the "after" form has not been processed yet, we defer it for the next forms.
      *
      * @param FormInterface $form
      * @param string        $after
@@ -155,7 +155,7 @@ class FormOrderer
     }
 
     /**
-     * Process the form using the given weight
+     * Process the form using the given weight.
      *
      * This method also updates the orderer state accordingly
      *
@@ -182,7 +182,7 @@ class FormOrderer
 
     /**
      * Finishes the form weight processing by trying to process deferred forms
-     * which refers to the current processed form
+     * which refers to the current processed form.
      *
      * @param FormInterface $form
      * @param int           $weight
@@ -215,7 +215,7 @@ class FormOrderer
 
     /**
      * Processes a deferred form by checking if it is valid and
-     * if it does not become a circular or symmetric ordering
+     * if it does not become a circular or symmetric ordering.
      *
      * @param FormInterface $form
      * @param string        $deferred
@@ -238,7 +238,7 @@ class FormOrderer
     }
 
     /**
-     * Detects circular deferred forms for after/before position such as A => B => C => A
+     * Detects circular deferred forms for after/before position such as A => B => C => A.
      *
      * @param string $name
      * @param string $position
@@ -268,7 +268,7 @@ class FormOrderer
     }
 
     /**
-     * Detects symmetric before/after deferred such as A after B and B after A
+     * Detects symmetric before/after deferred such as A after B and B after A.
      *
      * @param string $name
      * @param string $deferred
@@ -290,7 +290,7 @@ class FormOrderer
     }
 
     /**
-     * Resets the orderer
+     * Resets the orderer.
      */
     private function reset()
     {

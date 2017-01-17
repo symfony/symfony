@@ -211,7 +211,6 @@ class FormOrdererTest extends FormIntegrationTestCase
                     'ban',
                     'biz' => array('before' => 'nan'),
                     'boz' => array('before' => 'biz', array('after' => 'pop')),
-
                 ),
                 array('foo', 'bar', 'baz', 'bat', 'ban', 'pop', 'boz', 'biz', 'nan'),
             ),

@@ -108,9 +108,20 @@ class PdoAdapter extends AbstractAdapter
         $conn = $this->getConnection();
 
         if ($conn instanceof Connection) {
+            $types = array(
+                'mysql' => 'binary',
+                'sqlite' => 'text',
+                'pgsql' => 'string',
+                'oci' => 'string',
+                'sqlsrv' => 'string',
+            );
+            if (!isset($types[$this->driver])) {
+                throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver));
+            }
+
             $schema = new Schema();
             $table = $schema->createTable($this->table);
-            $table->addColumn($this->idCol, 'blob', array('length' => 255));
+            $table->addColumn($this->idCol, $types[$this->driver], array('length' => 255));
             $table->addColumn($this->dataCol, 'blob', array('length' => 16777215));
             $table->addColumn($this->lifetimeCol, 'integer', array('unsigned' => true, 'notnull' => false));
             $table->addColumn($this->timeCol, 'integer', array('unsigned' => true, 'foo' => 'bar'));

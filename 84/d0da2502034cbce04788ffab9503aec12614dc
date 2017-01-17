@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-17T09:05:05Z
+
+> A bug I did find, but not fix, is the fact that that 'unsafe-inline' is ignored in at least Firefox and Chrome due to the fact there is also a nonce-element in the rule.
+
+This is **not** a bug. ``unsafe-inline`` combined with nonces is about supporting both CSP 1 and CSP 2 together
+
+---------------------------------------------------------------------------
+
+by arjenm at 2017-01-17T09:06:50Z
+
+Ok, it doesn't really matter for my PR anyway, so I scratched that. Thanks for correcting me :)
+
+---------------------------------------------------------------------------
+
+by romainneutron at 2017-01-17T13:09:24Z
+
+LGTM 👍

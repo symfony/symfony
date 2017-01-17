@@ -164,7 +164,9 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
             $status = $this->handleRouteRequirements($pathinfo, $name, $route);
 
             if (self::ROUTE_MATCH === $status[0]) {
-                return $status[1];
+                $attributes = array_replace($matches, $hostMatches, (array) $status[1]);
+
+                return $this->mergeDefaults($attributes, $route->getDefaults());
             }
 
             if (self::REQUIREMENT_MISMATCH === $status[0]) {

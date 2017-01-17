@@ -348,7 +348,7 @@ class ControllerTest extends TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @expectedException \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     public function testdenyAccessUnlessGranted()
     {
@@ -450,7 +450,7 @@ class ControllerTest extends TestCase
     {
         $controller = new TestController();
 
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Exception\AccessDeniedException', $controller->createAccessDeniedException());
+        $this->assertInstanceOf('Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException', $controller->createAccessDeniedException());
     }
 
     public function testIsCsrfTokenValid()

@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by akeeman at 2016-12-11T19:21:41Z
+
+It would be nice if this could be added to the next 3.2.n release...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-19T08:25:38Z
+
+But this could indeed break applications or bundles where an event listener analyses or modifies the request formats.
+
+---------------------------------------------------------------------------
+
+by akeeman at 2016-12-19T09:50:59Z
+
+ Indeed. Though this is only the case when these criteria are met:
+* application configures custom framework.request.formats
+* application has an event listener on kernel.request that processes the format
+* given that event listener, this one may not consider the custom registered formats.
+
+In my opinion, a bug is exploited if that is the case. It's a weird feature to be able to register custom formats, but to not be able to use them in a stage where it makes perfect sense to do so.
+
+Of course Symfony should be stable and changing this could break thinks. And keeping that in mind is important too. Therefore I'm glad @xabbuh expresses his concerns, though I do wonder what your opinion is about merging this PR. Do you think it's still possible to merge it into 3.2.n as I proposed? Or rather wait to 3.3.0, so it's available in May? Or don't you feel like this is a good plan at all?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-19T09:53:00Z
+
+We could at least mitigate that issue a bit by changing the listener's priority to 1.
+
+@symfony/deciders What do you think?
+
+---------------------------------------------------------------------------
+
+by akeeman at 2016-12-19T10:10:34Z
+
+A priority of 1 would indeed work. I used 255 as it is the highest value for the [usually used range](http://symfony.com/doc/current/event_dispatcher.html), and, as you noticed, I think it should run quite early as it doesn't have dependencies, can be dependent of it (after all, that's what it's for), and is an optional and quite fast operation.
+
+For many people (or at least me) who want to use this feature during the kernel.request event, increasing it to 1 for now would work. Maybe it's an idea to set it to 1 for 3.2.n and to 255 for ^3.3.0? Let me know your thoughts!
+
+---------------------------------------------------------------------------
+
+by akeeman at 2017-01-18T08:23:23Z
+
+Can someone give some input here? I think it would be nice if we can continue working on this :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-18T15:09:53Z
+
+ping @symfony/deciders :)
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-18T15:17:33Z
+
+Looks reasonable to me.
+
+---------------------------------------------------------------------------
+
+by akeeman at 2017-01-18T17:27:00Z
+
+Any chance you guys will accept an additional pr with a priority of 255 instead of 1 targeted milestone 4.0 or something? It's more logical that it has this value after all if bc breaks are accepted...
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-18T17:31:17Z
+
+Can you also update the test?

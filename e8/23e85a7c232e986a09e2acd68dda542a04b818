@@ -1,0 +1,215 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-27T15:33:53Z
+
+@Nyholm thanks for this PR. Don't worry about the logo because the SensioLabs designer will take care of that. And same thing about the design, don't worry because we can iterate it later. Let's focus on the contents and the information provided. Thanks!
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-27T15:34:38Z
+
+That is great. Then Im done with this PR =)
+
+("Done" = "Waiting for community feedback")
+
+---------------------------------------------------------------------------
+
+by Koc at 2016-12-27T15:35:41Z
+
+It would be very useful collect this information also from production env and analyze it later. Can anybody idea how to make it possible without enabling whole profiler?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-27T15:37:16Z
+
+>It would be very useful collect this information also from production env and analyze it later. Can anybody idea how to make it possible without enabling whole profiler?
+
+With the current implementation you should only load `cache_debug.xml` and then make sure to store the data from the collector somewhere on `kernel.terminate`
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-28T19:41:02Z
+
+![screen shot 2016-12-28 at 20 39 35](https://cloud.githubusercontent.com/assets/1275206/21530003/ef2a6fec-cd3d-11e6-8f7d-de6228e9fde8.png)
+![screen shot 2016-12-28 at 20 39 25](https://cloud.githubusercontent.com/assets/1275206/21530004/ef2add56-cd3d-11e6-8ee8-6653707774ef.png)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-28T19:55:03Z
+
+Just by looking at the screenshot I was not able to easily recognise what "ratio" refers to. Does it mean hits/reads?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-28T20:01:40Z
+
+Sorry about that. Yes, the ratio is the hits/reads ratio. See new screenshot:
+
+<img width="1094" alt="screen shot 2016-12-28 at 20 59 03" src="https://cloud.githubusercontent.com/assets/1275206/21530377/b1f830de-cd40-11e6-931e-1381c2b33ec3.png">
+
+------
+
+FYI: I created a [separate PR](https://github.com/symfony/symfony/issues/21082) with the adapters. I added some tests and fixed some bugs in it. I will rebase this PR when/if #21082 gets merged.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-28T20:26:26Z
+
+I think I would change the label from "ratio" to "hits/reads" then.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-28T20:28:47Z
+
+And what about providing aggregated data across all pools?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-28T20:41:09Z
+
+I will.
+
+> And what about providing aggregated data across all pools?
+
+That is only in the toolbar atm.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T10:50:33Z
+
+Nice :)
+
+What about a tab per pool? That should organize things right?
+
+The table with calls looks rather technical, so maybe we can improve that UX-wise.
+
+- Try to keep simple `key | value | time` headers (only save calls seem to have extra metadata)
+- Differ with colors between gets, deletes or saves (an in-row label or so)
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-29T11:11:51Z
+
+Thank you @ro0NL. I agree with your comments that this could be improved and I really like your suggestions. I think this is "good enough" and I will let other PRs improve this. Does it sound reasonable?
+
+I've rebased this PR on master.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-29T11:23:47Z
+
+> Does it sound reasonable?
+
+Totally :) just aiming to get this shipped as pretty as possible with the first tag release :)
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-29T12:10:46Z
+
+The deps-low test is failing because Framework bundle fetches symfony/cache 3.2 (not dev-master).
+
+Im not sure how to fix that or if I should fix that.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-29T14:16:36Z
+
+@Nyholm the designer of SensioLabs has just send me icon for the cache. It uses the same conceptualization as yours (because it's great) but it tweaks the design a bit to match the style of the other icons:
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#AAA" d="M2.26 6.09l9.06-4.67a1.49 1.49 0 0 1 1.37 0l9.06 4.67a1.49 1.49 0 0 1 0 2.65l-9.06 4.67a1.49 1.49 0 0 1-1.37 0L2.26 8.74a1.49 1.49 0 0 1 0-2.65zM20.55 11L12 15.39 3.45 11a1.36 1.36 0 0 0-1.25 2.42l9.17 4.73a1.36 1.36 0 0 0 1.25 0l9.17-4.73A1.36 1.36 0 0 0 20.55 11zm0 4.47L12 19.86l-8.55-4.41a1.36 1.36 0 0 0-1.25 2.42l9.17 4.73a1.36 1.36 0 0 0 1.25 0l9.17-4.73a1.36 1.36 0 0 0-1.25-2.42z"/></svg>
+```
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-29T14:56:49Z
+
+I've updated the logos:
+
+Before:
+![screen shot 2016-12-29 at 15 52 43](https://cloud.githubusercontent.com/assets/1275206/21546467/39aad970-cddf-11e6-9f10-e8bfeb0c2e2d.png)
+
+After:
+![screen shot 2016-12-29 at 15 52 33](https://cloud.githubusercontent.com/assets/1275206/21546460/34aaac2a-cddf-11e6-8a8b-11707b22f8b4.png)
+
+FYI, It was @mablae that created the original logo for PHP-cache. Thank you.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-29T15:34:26Z
+
+@Nyholm You can change the version constraint for `symfony/cache` to `~3.3`.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2016-12-29T15:48:42Z
+
+Thank you @xabbuh It worked.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-02T17:40:35Z
+
+> > And what about providing aggregated data across all pools?
+>
+> That is only in the toolbar atm.
+
+That's unfortunate, as it means that the main info displayed in the toolbar is not available anymore when looking at details.
+Btw, I made the same comment earlier about that (and you said it was done while it is not
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-03T09:44:47Z
+
+Ping @stof
+
+![screen shot 2017-01-03 at 10 46 53](https://cloud.githubusercontent.com/assets/1275206/21604183/00ac4822-d1a2-11e6-836b-1040f51ccd45.png)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-03T09:48:14Z
+
+@Nyholm Any reason not to aggregate missed and deletes? I would also change the order to be consistent with how it is for the cache pools.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-03T09:52:40Z
+
+I updated the order and added deletes. Thank you for the quick feedback.
+![screen shot 2017-01-03 at 10 52 16](https://cloud.githubusercontent.com/assets/1275206/21604307/bded3112-d1a2-11e6-9e4c-8b5595ed124a.png)
+
+---------------------------------------------------------------------------
+
+by rvanlaak at 2017-01-03T12:26:35Z
+
+We chain a `apcu` pool with a `filesystem` pool, which means we have three pools in the profiler overview. It would be nice (for a future PR) to think about some chain-specific aggregates, or maybe allow to disable profiler data collection per pool?
+
+From DX perspective it also would be great to have some kind of (javascript?) filtering in the panel, as that would allow you to instantly see the behavior path of a specific cache item.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-12T13:07:08Z
+
+Is there anything else I can do to help getting this PR merged?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-12T15:58:03Z
+
+@Nyholm If you can rebase on current master, I can merge it :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-12T16:00:36Z
+
+:+1: from me
+we should open an issue with the remaining ideas to not forget about them
+for this next issue : about the compiler pass, ideally, we could keep track of removed private pools so that the panel show them eg grayed.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-14T09:19:00Z
+
+Thank you. The PR is rebased and tests are all green.

@@ -51,6 +51,10 @@ class Dummy extends ParentDummy
      */
     public $B;
 
+    public static function getStatic()
+    {
+    }
+
     /**
      * A.
      *

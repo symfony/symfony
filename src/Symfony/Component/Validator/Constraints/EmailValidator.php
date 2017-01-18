@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Egulias\EmailValidator\EmailValidator as StrictEmailValidator;
 use Egulias\EmailValidator\Validation\EmailValidation;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Symfony\Component\Validator\Constraint;
@@ -23,14 +24,17 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EmailValidator extends ConstraintValidator
 {
-    /**
-     * @var bool
-     */
-    private $isStrict;
+    private $strict;
+    private $strictValidator;
 
-    public function __construct($strict = false)
+    /**
+     * @param bool                      $strict
+     * @param StrictEmailValidator|null $strictValidator
+     */
+    public function __construct($strict = false, StrictEmailValidator $strictValidator = null)
     {
-        $this->isStrict = $strict;
+        $this->strict = $strict;
+        $this->strictValidator = $strictValidator;
     }
 
     /**
@@ -51,17 +55,10 @@ class EmailValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+        $strict = null === $constraint->strict ? $this->strict : $constraint->strict;
 
-        if (null === $constraint->strict) {
-            $constraint->strict = $this->isStrict;
-        }
-
-        if ($constraint->strict) {
-            if (!class_exists('\Egulias\EmailValidator\EmailValidator')) {
-                throw new RuntimeException('Strict email validation requires egulias/email-validator ~1.2|~2.0');
-            }
-
-            $strictValidator = new \Egulias\EmailValidator\EmailValidator();
+        if ($strict) {
+            $strictValidator = $this->createStrictValidator();
 
             if (interface_exists(EmailValidation::class) && !$strictValidator->isValid($value, new NoRFCWarningsValidation())) {
                 $this->context->buildViolation($constraint->message)
@@ -131,5 +128,18 @@ class EmailValidator extends ConstraintValidator
     private function checkHost($host)
     {
         return $this->checkMX($host) || (checkdnsrr($host, 'A') || checkdnsrr($host, 'AAAA'));
+    }
+
+    private function createStrictValidator()
+    {
+        if (null !== $this->strictValidator) {
+            // @FIXME should be factorized, ie. like below
+            return $this->strictValidator;
+        }
+        if (!class_exists(StrictEmailValidator::class)) {
+            throw new RuntimeException('Strict email validation requires egulias/email-validator ~1.2|~2.0');
+        }
+
+        return new StrictEmailValidator();
     }
 }

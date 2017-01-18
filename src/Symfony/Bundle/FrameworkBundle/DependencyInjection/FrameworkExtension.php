@@ -950,7 +950,12 @@ class FrameworkExtension extends Extension
         }
 
         $definition = $container->findDefinition('validator.email');
-        $definition->replaceArgument(0, $config['strict_email']);
+        if (is_string($config['strict_email'])) {
+            $definition->replaceArgument(0, true);
+            $definition->replaceArgument(1, new Reference($config['strict_email']));
+        } else {
+            $definition->replaceArgument(0, (bool) $config['strict_email']);
+        }
 
         if (array_key_exists('enable_annotations', $config) && $config['enable_annotations']) {
             if (!$this->annotationsConfigEnabled) {

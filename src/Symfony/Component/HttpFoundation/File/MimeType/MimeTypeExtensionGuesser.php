@@ -744,6 +744,7 @@ class MimeTypeExtensionGuesser implements ExtensionGuesserInterface
         'text/vnd.sun.j2me.app-descriptor' => 'jad',
         'text/vnd.wap.wml' => 'wml',
         'text/vnd.wap.wmlscript' => 'wmls',
+        'text/vtt' => 'vtt',
         'text/x-asm' => 's',
         'text/x-c' => 'c',
         'text/x-fortran' => 'f',

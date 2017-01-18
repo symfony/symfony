@@ -17,6 +17,8 @@ use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 
 class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
 {
@@ -220,6 +222,33 @@ class InlineServiceDefinitionsPassTest extends \PHPUnit_Framework_TestCase
 
         $calls = $container->getDefinition('foo')->getMethodCalls();
         $this->assertSame($ref, $calls[0][1][0]);
+    }
+
+    public function testProcessDoesNotSetLazyArgumentValuesAfterInlining()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('inline')
+            ->setShared(false)
+        ;
+        $container
+            ->register('closure-proxy')
+            ->setArguments(array(new ClosureProxyArgument('inline', 'method')))
+        ;
+        $container
+            ->register('iterator')
+            ->setArguments(array(new IteratorArgument(array(new Reference('inline')))))
+        ;
+
+        $this->process($container);
+
+        $values = $container->getDefinition('closure-proxy')->getArgument(0)->getValues();
+        $this->assertInstanceOf(Reference::class, $values[0]);
+        $this->assertSame('inline', (string) $values[0]);
+
+        $values = $container->getDefinition('iterator')->getArgument(0)->getValues();
+        $this->assertInstanceOf(Reference::class, $values[0]);
+        $this->assertSame('inline', (string) $values[0]);
     }
 
     protected function process(ContainerBuilder $container)

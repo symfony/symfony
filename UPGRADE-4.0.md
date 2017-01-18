@@ -392,6 +392,6 @@ Yaml
  * Duplicate mapping keys lead to a `ParseException`.
 
 Ldap
---------------
+----
  
   * The `RenameEntryInterface` has been deprecated, and merged with `EntryManagerInterface`

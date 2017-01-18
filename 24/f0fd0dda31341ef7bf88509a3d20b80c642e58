@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by MamWayne at 2017-01-13T20:30:52Z
+
+Well done ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-14T16:42:46Z
+
+@Nyholm I added a new test case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-14T17:09:26Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-15T16:28:27Z
+
+This is not strictly a bug fix. I understand that the current behavior is not the "right"/"expected" one, but I don't think this qualifies as something for 3.2. I would recommend to merge it in 3.3 instead.
+
+@lyrixx Can you add a note in the component CHANGELOG about this change?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-16T09:54:28Z
+
+IMHO, it should go on 3.2 because it will be impossible for 3.2 users to have the correct behavior, and then when they will upgrade to 3.3, the behavior will be different than what they know.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-16T10:00:31Z
+
+Please note that there are not new visible interface, so it's a pure behavioral change

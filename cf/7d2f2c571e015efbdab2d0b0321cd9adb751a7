@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by fruitwasp at 2016-11-03T09:03:35Z
+
+@csarrazi
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2016-11-08T08:32:07Z
+
+In short, 👍 on the intent of the PR, 👎 on the actual implementation, which should not reflect the implementation details.
+
+---------------------------------------------------------------------------
+
+by xunto at 2016-12-16T23:50:44Z
+
+@csarrazi we need to track objects' changes anyway because now if you have only read access to some properties, you won't be able to change properties you have access to by changing entry object and persisting it.
+
+As example;
+```
+        $records = $ldap->query()->execute();
+        $record = $records[0];
+        $record->setAttribute("uid", ['data']);
+        $ldap->getEntryManager()->update($record);
+```
+Won't work even if you have write access to uid property because it tries to update all properties this object have.
+
+I used this workaround:
+```
+        $records = $ldap->query()->execute();
+        $record = new Entry($records[0]->getDn());
+        $record->setAttribute("uid", ['data']);
+        $ldap->getEntryManager()->update($record);
+```
+
+It's not place for bug reports but it's connected to the topic :)
+
+---------------------------------------------------------------------------
+
+by fruitwasp at 2017-01-10T11:18:09Z
+
+@csarrazi I have implemented the `rename` functionality as you suggested. About flagging the Entry as dirty, I think that's one worth to discuss in another pull request.
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-01-11T15:07:32Z
+
+@fruitwasp you're welcome! :+1:
+
+---------------------------------------------------------------------------
+
+by fruitwasp at 2017-01-13T12:37:32Z
+
+@csarrazi @xabbuh fixed conflicts with the master branch, implemented the `RenameEntryInterface` and rebased. Ready for merge?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-13T12:46:28Z
+
+@fruitwasp I am not very familiar with LDAP, but my BC concerns have been addressed.

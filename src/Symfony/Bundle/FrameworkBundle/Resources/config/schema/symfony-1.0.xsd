@@ -232,13 +232,14 @@
     <xsd:complexType name="workflow">
         <xsd:sequence>
             <xsd:element name="marking-store" type="marking_store" />
-            <xsd:element name="support" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+            <xsd:element name="support" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="place" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
             <xsd:element name="transition" type="transition" minOccurs="1" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="type" type="workflow_type" />
         <xsd:attribute name="initial-place" type="xsd:string" />
+        <xsd:attribute name="support-strategy" type="xsd:string" />
     </xsd:complexType>
 
     <xsd:complexType name="marking_store">

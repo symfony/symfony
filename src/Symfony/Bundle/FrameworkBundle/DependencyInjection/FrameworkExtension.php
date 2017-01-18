@@ -476,7 +476,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition(sprintf('%s.definition', $workflowId), $definitionDefinition);
 
             // Add workflow to Registry
-            if (isset($workflow['supports'])) {
+            if ($workflow['supports']) {
                 foreach ($workflow['supports'] as $supportedClassName) {
                     $strategyDefinition = new Definition(ClassInstanceSupportStrategy::class, array($supportedClassName));
                     $strategyDefinition->setPublic(false);

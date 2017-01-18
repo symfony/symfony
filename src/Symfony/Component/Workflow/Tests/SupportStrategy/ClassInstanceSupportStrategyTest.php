@@ -11,17 +11,17 @@ class ClassInstanceSupportStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $strategy = new ClassInstanceSupportStrategy('Symfony\Component\Workflow\Tests\SupportStrategy\Subject1');
 
-        $this->assertTrue($strategy->supports($this->getWorkflow(), new Subject1()));
+        $this->assertTrue($strategy->supports($this->createWorkflow(), new Subject1()));
     }
 
     public function testSupportsIfNotClassInstance()
     {
         $strategy = new ClassInstanceSupportStrategy('Symfony\Component\Workflow\Tests\SupportStrategy\Subject2');
 
-        $this->assertFalse($strategy->supports($this->getWorkflow(), new Subject1()));
+        $this->assertFalse($strategy->supports($this->createWorkflow(), new Subject1()));
     }
 
-    private function getWorkflow()
+    private function createWorkflow()
     {
         return $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()

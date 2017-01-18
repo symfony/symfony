@@ -168,7 +168,6 @@ abstract class FrameworkExtensionTest extends TestCase
         $this->assertCount(9, $stateMachineDefinition->getArgument(1));
         $this->assertSame('start', $stateMachineDefinition->getArgument(2));
 
-
         $serviceMarkingStoreWorkflowDefinition = $container->getDefinition('workflow.service_marking_store_workflow');
         /** @var Reference $markingStoreRef */
         $markingStoreRef = $serviceMarkingStoreWorkflowDefinition->getArgument(1);
@@ -187,6 +186,24 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testWorkflowCannotHaveBothTypeAndService()
     {
         $this->createContainerFromFile('workflow_with_type_and_service');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "supports" and "support_strategy" cannot be used together.
+     */
+    public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()
+    {
+        $this->createContainerFromFile('workflow_with_support_and_support_strategy');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "supports" or "support_strategy" should be configured.
+     */
+    public function testWorkflowShouldHaveOneOfSupportsAndSupportStrategy()
+    {
+        $this->createContainerFromFile('workflow_without_support_and_support_strategy');
     }
 
     /**

@@ -295,7 +295,9 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('support_strategy')
                                 ->cannotBeEmpty()
                             ->end()
-                            ->scalarNode('initial_place')->defaultNull()->end()
+                            ->scalarNode('initial_place')
+                                ->defaultNull()
+                            ->end()
                             ->arrayNode('places')
                                 ->isRequired()
                                 ->requiresAtLeastOneElement()
@@ -356,8 +358,16 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->validate()
-                            ->ifTrue(function ($v) { return isset($v['supports']) && isset($v['support_strategy']); })
+                            ->ifTrue(function ($v) {
+                                return $v['supports'] && isset($v['support_strategy']);
+                            })
                             ->thenInvalid('"supports" and "support_strategy" cannot be used together.')
+                        ->end()
+                        ->validate()
+                            ->ifTrue(function ($v) {
+                                return !$v['supports'] && !isset($v['support_strategy']);
+                            })
+                            ->thenInvalid('"supports" or "support_strategy" should be configured.')
                         ->end()
                     ->end()
                 ->end()

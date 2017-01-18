@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-13T13:26:16Z
+
+**Note**: It should be merge in 3.2 and not master.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-01-14T10:01:42Z
+
+What about moving it to `WorkflowValidator`? The `StateMachineValidator` already enforces this right?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-14T10:59:16Z
+
+Thank you @ro0NL. You are correct. The StateMachineValidator has this test already but it is missing in the WorkflowValidator.
+
+I will merge this test to the Workflow validator.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-15T16:30:59Z
+
+Looks like a new feature to me, not a bug fix. I think it should be merged in 3.3 instead.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-16T08:06:31Z
+
+> Looks like a new feature to me, not a bug fix.
+
+This PR makes sure the Definition is not invalid. That is why I marked it as a "bugfix". But one could argue that all PRs to the Validator as bugfixes... Anyhow.
+
+Since this check exist for the [StateMachineValidator](https://github.com/symfony/symfony/blob/v3.2.2/src/Symfony/Component/Workflow/Validator/StateMachineValidator.php#L37-L43), I've updated the PR to include this check in the Workflow validator only.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T08:15:33Z
+
+Generally : any new visible interface => feature.
+Now that this just tweaks an edge case behavior only, it may much likely qualify as bug fix :)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-16T09:20:19Z
+
+For me it's a bug fix too, because if the definition is not valid, the workflow will not work correctly.

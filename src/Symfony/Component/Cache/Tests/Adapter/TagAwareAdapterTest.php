@@ -97,4 +97,21 @@ class TagAwareAdapterTest extends AdapterTestCase
 
         $this->assertTrue($pool->getItem('k')->isHit());
     }
+
+    public function testTagItemExpiry()
+    {
+        $pool = $this->createCachePool(10);
+
+        $item = $pool->getItem('foo');
+        $item->tag(array('baz'));
+        $item->expiresAfter(100);
+
+        $pool->save($item);
+        $pool->invalidateTags(array('baz'));
+        $this->assertFalse($pool->getItem('foo')->isHit());
+
+        sleep(20);
+
+        $this->assertFalse($pool->getItem('foo')->isHit());
+    }
 }

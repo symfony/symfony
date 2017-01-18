@@ -72,6 +72,8 @@ class ReflectionExtractorTest extends \PHPUnit_Framework_TestCase
             array('e', null),
             array('f', array(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')))),
             array('donotexist', null),
+            array('staticGetter', null),
+            array('staticSetter', null),
         );
     }
 

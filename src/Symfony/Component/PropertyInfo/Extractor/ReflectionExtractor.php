@@ -68,6 +68,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+            if ($reflectionMethod->isStatic()) {
+                continue;
+            }
+
             $propertyName = $this->getPropertyName($reflectionMethod->name);
             if (!$propertyName || isset($properties[$propertyName])) {
                 continue;

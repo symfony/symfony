@@ -59,3 +59,9 @@ TwigBridge
 
  * The `TwigRendererEngine::setEnvironment()` method has been deprecated and will be removed
    in 4.0. Pass the Twig Environment as second argument of the constructor instead.
+
+Workflow
+--------
+
+ * Deprecated class name support in `WorkflowRegistry::add()` as second parameter.
+   Wrap the class name in an instance of ClassInstanceSupportStrategy instead.

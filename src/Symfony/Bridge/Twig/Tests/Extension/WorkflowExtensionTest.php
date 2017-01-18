@@ -15,6 +15,7 @@ use Symfony\Bridge\Twig\Extension\WorkflowExtension;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
@@ -37,7 +38,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $workflow = new Workflow($definition);
 
         $registry = new Registry();
-        $registry->add($workflow, \stdClass::class);
+        $registry->add($workflow, new ClassInstanceSupportStrategy(\stdClass::class));
 
         $this->extension = new WorkflowExtension($registry);
     }

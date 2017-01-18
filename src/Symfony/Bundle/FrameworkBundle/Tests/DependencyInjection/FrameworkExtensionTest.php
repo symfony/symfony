@@ -173,6 +173,10 @@ abstract class FrameworkExtensionTest extends TestCase
         $markingStoreRef = $serviceMarkingStoreWorkflowDefinition->getArgument(1);
         $this->assertInstanceOf(Reference::class, $markingStoreRef);
         $this->assertEquals('workflow_service', (string) $markingStoreRef);
+
+        $this->assertTrue($container->hasDefinition('workflow.registry', 'Workflow registry is registered as a service'));
+        $registryDefinition = $container->getDefinition('workflow.registry');
+        $this->assertGreaterThan(0, count($registryDefinition->getMethodCalls()));
     }
 
     /**
@@ -182,6 +186,24 @@ abstract class FrameworkExtensionTest extends TestCase
     public function testWorkflowCannotHaveBothTypeAndService()
     {
         $this->createContainerFromFile('workflow_with_type_and_service');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "supports" and "support_strategy" cannot be used together.
+     */
+    public function testWorkflowCannotHaveBothSupportsAndSupportStrategy()
+    {
+        $this->createContainerFromFile('workflow_with_support_and_support_strategy');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage "supports" or "support_strategy" should be configured.
+     */
+    public function testWorkflowShouldHaveOneOfSupportsAndSupportStrategy()
+    {
+        $this->createContainerFromFile('workflow_without_support_and_support_strategy');
     }
 
     /**

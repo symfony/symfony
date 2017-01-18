@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
+/**
+ * @runTestsInSeparateProcesses
+ */
 class StaticMethodLoaderTest extends \PHPUnit_Framework_TestCase
 {
     private $errorLevel;

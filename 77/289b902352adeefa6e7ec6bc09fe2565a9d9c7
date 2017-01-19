@@ -1,0 +1,191 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T13:24:42Z
+
+There is no BC break nor deprecation here, please remove the corresponding labels, my bad sorry.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-18T15:12:46Z
+
+How come it injects `null` instead of the `Request`? In theory the Request resolver should inject it as the default value one is triggered way later
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T15:20:47Z
+
+Not sure but I believe the current implementation makes the Request resolver is just skipped so the default value wins. It can be reproduced with a fresh SE, changing the provided `DefaultController::indexAction(Request $request)` to `DefaultController::indexAction(Request $request = null);`
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-18T15:23:33Z
+
+But that would mean that this code is not hit properly: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Controller/ArgumentResolver/RequestValueResolver.php#L30-L38
+
+Can you confirm this? Because this code is responsible for setting the request if it's supported and should work with the original setup (in theory).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T15:58:16Z
+
+@iltar I can confirm this since using `indexAction(Request $request = null)` and adding a `dump($request);die;` immediately before this line https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Controller/ArgumentResolver/RequestValueResolver.php#L30, the dump is never reached.
+
+But right now I'm not able to say what exactly is wrong with the current implem, the patch made here avoids the only doubts I have about the origin of the issue (one being `continue 2;`) while covering all other cases that are working well originally, I was hoping you can say me more :/
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-18T18:58:38Z
+
+I'll try to reproduce it tomorrow. Maybe it's a sequence issue, because in theory this is only not called when something else already supports it and the `continue 2;` is hit. So if something else hits this first, there is probably another issue at hand.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T19:43:45Z
+
+>  Maybe it's a sequence issue
+
+Right! I looked deeper into and fact is that the RequestAttributeValueResolver is the culprit.
+I updated this PR to give it a lower priority than the `RequestValueResolver`/`SecurityUserValueResolver`, but maybe there's something wrong in the request argument one that should be fixed instead.
+Waiting for your feedback.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-18T19:48:46Z
+
+@chalasr is there a specific reason that this line is returning true? https://github.com/symfony/symfony/blob/master/src/Symfony/Component/HttpKernel/Controller/ArgumentResolver/RequestAttributeValueResolver.php#L30
+
+Perhaps the `'request'` key is created for some reason? Not sure why a null `'request'` key would return true in a has here. Regarding your fix, if having the request in the attribute bag but as null is correct (which I kinda doubt), make sure the request attribute resolver is still called before the `RequestValueResolver`, due to the parameter converters
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T20:04:01Z
+
+> make sure the request attribute resolver is still called before the RequestValueResolver, due to the parameter converters
+
+Did not considered that :/ then the current fix is not good, it just gives a lower priority to the request attribute resolver so it is called after the request/user resolver.
+
+> Perhaps the "request" key is created for some reason?
+
+Right again! A `request` (variable name) key is put in the attribute bag with `null` as value. Same problem for the `SecurityUserValueResolver` given a `user` attribute with `null` as value exists, the `RequestAttributeValueResolver` takes precedence of course...
+
+Not sure what's the proper way to fix this :/ Any idea @iltar?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-18T20:08:57Z
+
+I think we have to check why the attributes are created but empty, perhaps this is done for the parameter converters? An additional check could be to check if it `has()` the key and it's not empty
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T20:18:07Z
+
+>  perhaps this is done for the parameter converters?
+
+Not sure but there're good chances. Note that these attributes stay null at the end (from the controller itself) since I do not have any param converter explicitly configured
+
+> make sure the request attribute resolver is still called before the RequestValueResolver, due to the parameter converters
+
+Could you please develop?
+How calling the request/user resolvers before the request attribute one would be a problem for param converters? I mean if one sets up an argument value resolver for a given argument, then he should not rely on a param converter to populate it, should he?
+
+> An additional check could be to check if it has() the key and it's not empty
+
+If you mean adding an additional check inside `RequestAttributeValueResolver::supports()` I think it could help indeed,  I'd say a strict `null !== $attribute` though
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-18T20:23:50Z
+
+The ~~PC~~ attribute resolver should be called first because that's how the behavior was before the argument value resolvers were introduced. if attributes.foo existed, 'foo' should be inserted first rather than trigger the PCs (when passing in templates for example).
+
+_edit: Not PC but attribute resolver should be called first_
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T20:35:38Z
+
+I updated this for reverting the previous changes and only adding the additional `null !== $attribute` check instead, it fixes the issue.
+It would be great if you could have a look at it and confirm it won't cause any issue with PCs.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T21:21:11Z
+
+Added a test for.
+@iltar Thank you for the time spent
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-19T09:46:58Z
+
+@iltar @xabbuh In fact the problem occurs only when using the `@Route` annotation, the routing AnnotationClassLoader merges the signature arguments (the ones with default null) to the route defaults. Since it is the only one to do so and I can't find a good reason for that, I removed this behavior and all works as expected.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-19T09:53:24Z
+
+Are the other changes still required to fix the bug? I'm afraid they might cause a behavioral change as there's been done some tweaking regarding nullables
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-19T09:54:25Z
+
+@iltar My bad, I forgot to revert it. The diff is clean now
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-19T10:01:28Z
+
+Nice! :+1:
+
+So just for the confirmation, this behavior is only present with annotations?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-19T10:02:32Z
+
+Yes, it is only present for annotations, which make this bug exists only when using them.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-19T15:49:02Z
+
+The code you removed was introduced in 84adcb1c3e1 by @lyrixx. See #5904 for the associated PR.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-19T15:55:56Z
+
+@fabpot I found it and was about to add a comment for clarifying this patch after discussed it with @iltar and @xabbuh on slack.
+
+The code removed here seems unnecessary, arguments with default values properly keep their default value even after removing it, same on 3.0.
+Actually, it seems that this code sets attributes that are not needed, and it prevents the ArgumentResolver from resolving these arguments (since they have an equivalent request attribute which takes precedence), and this only occurs when using annotations.
+
+@lyrixx Could you please confirm that this code is no more needed and that removing it in 2.7 would not break anything? The bug fixed here exists on 2.7 as well, before that argument value resolvers were introduced.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-19T15:59:53Z
+
+If the tests added back then by @lyrixx still work after the removal, I would say that this is safe to do on 2.7 instead of 3.1. Any drawbacks?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-19T16:07:19Z
+
+Changed the target to 2.7. Tests seem green, let's see the build.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-19T16:17:15Z
+
+> Could you please confirm that this code is no more needed and that removing it in 2.7 would not break anything? The bug fixed here exists on 2.7 as well, before that argument value resolvers were introduced.
+
+Actually I don't know. The best way to know it is to test in a real project I guess.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-19T16:49:59Z
+
+Ok thanks, tried out on 2.7 and it works as expected (for the record: [screenshot on a fresh 2.7](http://image.prntscr.com/image/fe79f5e2efc642fbaaccb2ae4c2a3136.png)).

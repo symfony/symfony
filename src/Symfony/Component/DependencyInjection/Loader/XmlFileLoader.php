@@ -126,8 +126,9 @@ class XmlFileLoader extends FileLoader
         }
 
         $defaults = $this->getServiceDefaults($xml, $file);
+        $instanceof = $xpath->query('//container:services/container:instanceof/container:service') ?: null;
         foreach ($services as $service) {
-            if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
+            if (null !== $definition = $this->parseDefinition($service, $file, $defaults, $instanceof)) {
                 $this->container->setDefinition((string) $service->getAttribute('id'), $definition);
             }
         }
@@ -182,14 +183,16 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses an individual Definition.
      *
-     * @param \DOMElement $service
-     * @param string      $file
-     * @param array       $defaults
+     * @param \DOMElement       $service
+     * @param string            $file
+     * @param array             $defaults
+     * @param \DOMNodeList|null $instanceof
      *
      * @return Definition|null
      */
-    private function parseDefinition(\DOMElement $service, $file, array $defaults = array())
+    private function parseDefinition(\DOMElement $service, $file, array $defaults = array(), \DOMNodeList $instanceof = null)
     {
+        $id = (string) $service->getAttribute('id');
         if ($alias = $service->getAttribute('alias')) {
             $this->validateAlias($service, $file);
 
@@ -199,11 +202,48 @@ class XmlFileLoader extends FileLoader
             } elseif (isset($defaults['public'])) {
                 $public = $defaults['public'];
             }
-            $this->container->setAlias((string) $service->getAttribute('id'), new Alias($alias, $public));
+            $this->container->setAlias($id, new Alias($alias, $public));
 
             return;
         }
 
+        $definition = $this->getDefinition($service, $file, $defaults);
+        if (null === $instanceof) {
+            return $definition;
+        }
+
+        $className = $definition->getClass() ?: $id;
+        $parentId = $definition instanceof ChildDefinition ? $definition->getParent() : null;
+        foreach ($instanceof as $s) {
+            $type = (string) $s->getAttribute('id');
+            if (!is_a($className, $type, true)) {
+                continue;
+            }
+
+            if ($parentId) {
+                $s->setAttribute('parent', $parentId);
+            }
+            // TODO: move the ID generation or maybe the whole block in the parent class
+            $parentId = md5("$file.$type.$id");
+            $parentDefinition = $this->getDefinition($s, $file);
+            $parentDefinition->setAbstract(true);
+            if ($parentDefinition instanceof ChildDefinition) {
+                $definition->setInheritTags(true);
+            }
+            $this->container->setDefinition($parentId, $parentDefinition);
+        }
+
+        if (null !== $parentId) {
+            $service->setAttribute('parent', $parentId);
+            $definition = $this->getDefinition($service, $file, $defaults);
+            $definition->setInheritTags(true);
+        }
+
+        return $definition;
+    }
+
+    private function getDefinition(\DOMElement $service, $file, array $defaults = array())
+    {
         if ($parent = $service->getAttribute('parent')) {
             $definition = new ChildDefinition($parent);
 

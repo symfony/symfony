@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -405,6 +406,26 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
     }
 
+    public function testInstanceof()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services32.yml');
+
+        $parentDefinition = $container->getDefinition('ab31379cf807a57ab10c13685f0ee619');
+        $this->assertNotInstanceOf(ChildDefinition::class, $parentDefinition);
+        $this->assertTrue($parentDefinition->isAutowired());
+        $this->assertTrue($parentDefinition->isLazy());
+        $this->assertEquals(array('foo' => array(array()), 'bar' => array(array())), $parentDefinition->getTags());
+
+        $container->compile();
+
+        $definition = $container->getDefinition(Foo::class);
+        $this->assertTrue($definition->isAutowired());
+        $this->assertTrue($definition->isLazy());
+        $this->assertEquals(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The value of the "decorates" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").
@@ -414,4 +435,12 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_decorates.yml');
     }
+}
+
+interface FooInterface
+{
+}
+
+class Foo implements FooInterface
+{
 }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -658,4 +659,32 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults_child')->getAutowiredMethods());
         $this->assertSame(array(), $container->getDefinition('with_defaults_child')->getAutowiredMethods());
     }
+
+    public function testInstanceof()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath . '/xml'));
+        $loader->load('services32.xml');
+
+        $parentDefinition = $container->getDefinition('97c529c8fec609499e1a920f6f064edb');
+        $this->assertNotInstanceOf(ChildDefinition::class, $parentDefinition);
+        $this->assertTrue($parentDefinition->isAutowired());
+        $this->assertTrue($parentDefinition->isLazy());
+        $this->assertEquals(array('foo' => array(array()), 'bar' => array(array())), $parentDefinition->getTags());
+
+        $container->compile();
+
+        $definition = $container->getDefinition(Bar::class);
+        $this->assertTrue($definition->isAutowired());
+        $this->assertTrue($definition->isLazy());
+        $this->assertEquals(array('foo' => array(array()), 'bar' => array(array())), $definition->getTags());
+    }
+}
+
+interface BarInterface
+{
+}
+
+class Bar implements BarInterface
+{
 }

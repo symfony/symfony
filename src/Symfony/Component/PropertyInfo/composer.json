@@ -23,19 +23,23 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9"
+        "php": ">=5.5.9",
+        "symfony/inflector": "~3.1"
     },
     "require-dev": {
-        "symfony/serializer": "~2.8|~3.0",
-        "phpdocumentor/reflection": "^1.0.7",
+        "symfony/serializer": "~2.8||~3.0",
+        "symfony/cache": "~3.1",
+        "phpdocumentor/reflection-docblock": "^3.0",
         "doctrine/annotations": "~1.0"
     },
     "conflict": {
-        "phpdocumentor/reflection": "<1.0.7"
+        "phpdocumentor/reflection-docblock": "<3.0",
+        "phpdocumentor/type-resolver": "<0.2.0"
     },
     "suggest": {
+        "psr/cache-implementation": "To cache results",
         "symfony/doctrine-bridge": "To use Doctrine metadata",
-        "phpdocumentor/reflection": "To use the PHPDoc",
+        "phpdocumentor/reflection-docblock": "To use the PHPDoc",
         "symfony/serializer": "To use Serializer metadata"
     },
     "autoload": {
@@ -47,7 +51,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

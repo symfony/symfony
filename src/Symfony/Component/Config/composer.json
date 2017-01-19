@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/filesystem": "~2.8|~3.0"
+        "symfony/filesystem": "~2.8||~3.0"
     },
     "suggest": {
         "symfony/yaml": "To use the yaml reference dumper"

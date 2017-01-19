@@ -18,7 +18,8 @@
     "require": {
         "php": ">=5.5.9",
         "doctrine/common": "~2.4",
-        "twig/twig": "~1.23|~2.0",
+        "twig/twig": "~1.28||~2.0",
+        "psr/cache": "~1.0",
         "psr/log": "~1.0",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
@@ -29,6 +30,7 @@
     "replace": {
         "symfony/asset": "self.version",
         "symfony/browser-kit": "self.version",
+        "symfony/cache": "self.version",
         "symfony/class-loader": "self.version",
         "symfony/config": "self.version",
         "symfony/console": "self.version",
@@ -38,6 +40,7 @@
         "symfony/debug-bundle": "self.version",
         "symfony/doctrine-bridge": "self.version",
         "symfony/dom-crawler": "self.version",
+        "symfony/dotenv": "self.version",
         "symfony/event-dispatcher": "self.version",
         "symfony/expression-language": "self.version",
         "symfony/filesystem": "self.version",
@@ -46,6 +49,7 @@
         "symfony/framework-bundle": "self.version",
         "symfony/http-foundation": "self.version",
         "symfony/http-kernel": "self.version",
+        "symfony/inflector": "self.version",
         "symfony/intl": "self.version",
         "symfony/ldap": "self.version",
         "symfony/monolog-bridge": "self.version",
@@ -70,22 +74,32 @@
         "symfony/validator": "self.version",
         "symfony/var-dumper": "self.version",
         "symfony/web-profiler-bundle": "self.version",
+        "symfony/web-server-bundle": "self.version",
+        "symfony/workflow": "self.version",
         "symfony/yaml": "self.version"
     },
     "require-dev": {
+        "cache/integration-tests": "dev-master",
+        "doctrine/cache": "~1.6",
         "doctrine/data-fixtures": "1.0.*",
         "doctrine/dbal": "~2.4",
         "doctrine/orm": "~2.4,>=2.4.5",
         "doctrine/doctrine-bundle": "~1.4",
         "monolog/monolog": "~1.11",
-        "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
-        "egulias/email-validator": "~1.2,>=1.2.1",
+        "ocramius/proxy-manager": "~0.4||~1.0||~2.0",
+        "predis/predis": "~1.0",
+        "egulias/email-validator": "~1.2,>=1.2.8||~2.0",
+        "symfony/phpunit-bridge": "~3.2",
         "symfony/polyfill-apcu": "~1.1",
-        "symfony/security-acl": "~2.8|~3.0",
-        "phpdocumentor/reflection": "^1.0.7"
+        "symfony/security-acl": "~2.8||~3.0",
+        "phpdocumentor/reflection-docblock": "^3.0"
     },
     "conflict": {
-        "phpdocumentor/reflection": "<1.0.7"
+        "phpdocumentor/reflection-docblock": "<3.0",
+        "phpdocumentor/type-resolver": "<0.2.0"
+    },
+    "provide": {
+        "psr/cache-implementation": "1.0"
     },
     "autoload": {
         "psr-4": {
@@ -104,15 +118,10 @@
             "**/Tests/"
         ]
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Symfony\\Bridge\\PhpUnit\\": "src/Symfony/Bridge/PhpUnit/"
-        }
-    },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

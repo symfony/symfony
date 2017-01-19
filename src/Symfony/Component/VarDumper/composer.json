@@ -20,7 +20,7 @@
         "symfony/polyfill-mbstring": "~1.0"
     },
     "require-dev": {
-        "twig/twig": "~1.20|~2.0"
+        "twig/twig": "~1.20||~2.0"
     },
     "suggest": {
         "ext-symfony_debug": ""

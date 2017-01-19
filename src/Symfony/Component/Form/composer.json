@@ -17,20 +17,21 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/event-dispatcher": "~2.8|~3.0",
-        "symfony/intl": "~2.8|~3.0",
-        "symfony/options-resolver": "~2.8|~3.0",
+        "symfony/event-dispatcher": "~2.8||~3.0",
+        "symfony/intl": "~2.8||~3.0",
+        "symfony/options-resolver": "~2.8||~3.0",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/property-access": "~2.8|~3.0"
+        "symfony/property-access": "~2.8||~3.0"
     },
     "require-dev": {
         "doctrine/collections": "~1.0",
-        "symfony/validator": "~2.8|~3.0",
-        "symfony/dependency-injection": "~2.8|~3.0",
-        "symfony/http-foundation": "~2.8|~3.0",
-        "symfony/http-kernel": "~2.8|~3.0",
-        "symfony/security-csrf": "~2.8|~3.0",
-        "symfony/translation": "~2.8|~3.0"
+        "symfony/validator": "~2.8||~3.0",
+        "symfony/dependency-injection": "~2.8||~3.0",
+        "symfony/http-foundation": "~2.8||~3.0",
+        "symfony/http-kernel": "~2.8||~3.0",
+        "symfony/security-csrf": "~2.8||~3.0",
+        "symfony/translation": "~2.8||~3.0",
+        "symfony/var-dumper": "~3.2"
     },
     "conflict": {
         "symfony/doctrine-bridge": "<2.7",
@@ -52,7 +53,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

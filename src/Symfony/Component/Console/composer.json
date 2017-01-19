@@ -17,15 +17,20 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/polyfill-mbstring": "~1.0"
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/debug": "~2.8||~3.0"
     },
     "require-dev": {
-        "symfony/event-dispatcher": "~2.8|~3.0",
-        "symfony/process": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8||~3.0",
+        "symfony/event-dispatcher": "~2.8||~3.0",
+        "symfony/dependency-injection": "~2.8||~3.0",
+        "symfony/filesystem": "~2.8||~3.0",
+        "symfony/process": "~2.8||~3.0",
         "psr/log": "~1.0"
     },
     "suggest": {
         "symfony/event-dispatcher": "",
+        "symfony/filesystem": "",
         "symfony/process": "",
         "psr/log": "For using the console logger"
     },
@@ -38,7 +43,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

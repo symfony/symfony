@@ -20,7 +20,7 @@
         "symfony/polyfill-mbstring": "~1.1"
     },
     "require-dev": {
-        "symfony/expression-language": "~2.8|~3.0"
+        "symfony/expression-language": "~2.8||~3.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HttpFoundation\\": "" },

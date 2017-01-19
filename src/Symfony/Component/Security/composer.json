@@ -17,13 +17,13 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "symfony/event-dispatcher": "~2.8|~3.0",
-        "symfony/http-foundation": "~2.8|~3.0",
-        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/event-dispatcher": "~2.8||~3.0",
+        "symfony/http-foundation": "~2.8||~3.0",
+        "symfony/http-kernel": "~2.8||~3.0",
         "symfony/polyfill-php56": "~1.0",
         "symfony/polyfill-php70": "~1.0",
         "symfony/polyfill-util": "~1.0",
-        "symfony/property-access": "~2.8|~3.0"
+        "symfony/property-access": "~2.8||~3.0"
     },
     "replace": {
         "symfony/security-core": "self.version",
@@ -32,12 +32,12 @@
         "symfony/security-http": "self.version"
     },
     "require-dev": {
-        "symfony/finder": "~2.8|~3.0",
+        "symfony/finder": "~2.8||~3.0",
         "symfony/polyfill-intl-icu": "~1.0",
-        "symfony/routing": "~2.8|~3.0",
-        "symfony/validator": "~2.8|~3.0",
-        "symfony/expression-language": "~2.8|~3.0",
-        "symfony/ldap": "~2.8|~3.0",
+        "symfony/routing": "~2.8||~3.0",
+        "symfony/validator": "~2.8||~3.0",
+        "symfony/expression-language": "~2.8||~3.0",
+        "symfony/ldap": "~3.1",
         "psr/log": "~1.0"
     },
     "suggest": {
@@ -56,7 +56,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

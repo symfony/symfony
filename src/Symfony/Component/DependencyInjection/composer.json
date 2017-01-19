@@ -19,15 +19,18 @@
         "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/yaml": "~2.8.7|~3.0.7|~3.1.1|~3.2",
-        "symfony/config": "~2.8|~3.0",
-        "symfony/expression-language": "~2.8|~3.0"
+        "symfony/yaml": "~3.2",
+        "symfony/config": "~2.8||~3.0",
+        "symfony/expression-language": "~2.8||~3.0"
     },
     "suggest": {
         "symfony/yaml": "",
         "symfony/config": "",
         "symfony/expression-language": "For using expressions in service container configuration",
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
+    },
+    "conflict": {
+        "symfony/yaml": "<3.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },
@@ -38,7 +41,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

@@ -28,7 +28,7 @@
         "symfony/polyfill-intl-icu": "~1.0"
     },
     "require-dev": {
-        "symfony/filesystem": "~2.8|~3.0"
+        "symfony/filesystem": "~2.8||~3.0"
     },
     "suggest": {
         "ext-intl": "to use the component with locales other than \"en\""

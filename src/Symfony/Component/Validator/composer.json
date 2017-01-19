@@ -18,19 +18,21 @@
     "require": {
         "php": ">=5.5.9",
         "symfony/polyfill-mbstring": "~1.0",
-        "symfony/translation": "~2.8|~3.0"
+        "symfony/translation": "~2.8||~3.0"
     },
     "require-dev": {
-        "symfony/http-foundation": "~2.8|~3.0",
-        "symfony/intl": "~2.8|~3.0",
-        "symfony/yaml": "~2.8|~3.0",
-        "symfony/config": "~2.8|~3.0",
-        "symfony/expression-language": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8||~3.0",
+        "symfony/intl": "~2.8||~3.0",
+        "symfony/yaml": "~2.8||~3.0",
+        "symfony/config": "~2.8||~3.0",
+        "symfony/expression-language": "~2.8||~3.0",
+        "symfony/cache": "~3.1",
         "doctrine/annotations": "~1.0",
         "doctrine/cache": "~1.0",
-        "egulias/email-validator": "~1.2,>=1.2.1"
+        "egulias/email-validator": "~1.2,>=1.2.8||~2.0"
     },
     "suggest": {
+        "psr/cache-implementation": "For using the metadata cache.",
         "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
         "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
         "symfony/http-foundation": "",
@@ -50,7 +52,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "3.3-dev"
         }
     }
 }

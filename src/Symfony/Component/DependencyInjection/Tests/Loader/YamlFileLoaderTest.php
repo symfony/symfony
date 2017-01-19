@@ -408,4 +408,14 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('bad_decorates.yml');
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Parameter "tags" must be an array for service "Foo\Bar" in services31_invalid_tags.yml. Check your YAML syntax.
+     */
+    public function testInvalidTagsWithDefaults()
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services31_invalid_tags.yml');
+    }
 }

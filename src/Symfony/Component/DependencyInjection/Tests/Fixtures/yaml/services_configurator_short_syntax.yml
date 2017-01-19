@@ -1,5 +1,4 @@
 services:
-
     foo_bar:
         class: FooBarClass
         configurator: foo_bar_configurator:configure

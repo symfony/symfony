@@ -332,6 +332,9 @@ class YamlFileLoader extends FileLoader
         }
 
         $tags = isset($service['tags']) ? $service['tags'] : array();
+        if (!is_array($tags)) {
+            throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+        }
 
         if (!isset($defaults['tags'])) {
             // no-op
@@ -343,34 +346,28 @@ class YamlFileLoader extends FileLoader
             $tags = array_merge($tags, $defaults['tags']);
         }
 
-        if (null !== $tags) {
-            if (!is_array($tags)) {
-                throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
+        foreach ($tags as $tag) {
+            if (!is_array($tag)) {
+                $tag = array('name' => $tag);
             }
 
-            foreach ($tags as $tag) {
-                if (!is_array($tag)) {
-                    $tag = array('name' => $tag);
-                }
-
-                if (!isset($tag['name'])) {
-                    throw new InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key for service "%s" in %s.', $id, $file));
-                }
-                $name = $tag['name'];
-                unset($tag['name']);
-
-                if (!is_string($name) || '' === $name) {
-                    throw new InvalidArgumentException(sprintf('The tag name for service "%s" in %s must be a non-empty string.', $id, $file));
-                }
-
-                foreach ($tag as $attribute => $value) {
-                    if (!is_scalar($value) && null !== $value) {
-                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in %s. Check your YAML syntax.', $id, $name, $attribute, $file));
-                    }
-                }
-
-                $definition->addTag($name, $tag);
+            if (!isset($tag['name'])) {
+                throw new InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key for service "%s" in %s.', $id, $file));
             }
+            $name = $tag['name'];
+            unset($tag['name']);
+
+            if (!is_string($name) || '' === $name) {
+                throw new InvalidArgumentException(sprintf('The tag name for service "%s" in %s must be a non-empty string.', $id, $file));
+            }
+
+            foreach ($tag as $attribute => $value) {
+                if (!is_scalar($value) && null !== $value) {
+                    throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s", attribute "%s" in %s. Check your YAML syntax.', $id, $name, $attribute, $file));
+                }
+            }
+
+            $definition->addTag($name, $tag);
         }
 
         if (isset($service['decorates'])) {

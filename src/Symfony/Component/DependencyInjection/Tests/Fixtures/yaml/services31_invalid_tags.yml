@@ -1,0 +1,7 @@
+services:
+    _defaults:
+        tags: ['foo']
+
+    Foo\Bar:
+        tags: invalid
+        inherit_tags: true

@@ -2308,6 +2308,6 @@ class ChoiceTypeTest extends TypeTestCase
 
         $form->submit($submissionData);
         $this->assertFalse($form->isSynchronized());
-        $this->assertEquals('All elements of submitted array must not be an array.', $form->getTransformationFailure()->getMessage());
+        $this->assertEquals('All choices submitted must be NULL or strings.', $form->getTransformationFailure()->getMessage());
     }
 }

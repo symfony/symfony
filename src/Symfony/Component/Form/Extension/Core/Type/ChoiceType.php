@@ -65,22 +65,6 @@ class ChoiceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // To avoid some problem against treating of array (e.g. Array to string conversion),
-        // we have to first ensure the all elements of submitted data ain't an array.
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            $data = $event->getData();
-
-            if (!is_array($data)) {
-                return;
-            }
-
-            foreach ($data as $v) {
-                if (is_array($v)) {
-                    throw new TransformationFailedException('All elements of submitted array must not be an array.');
-                }
-            }
-        }, 256);
-
         if ($options['expanded']) {
             $builder->setDataMapper($options['multiple'] ? new CheckboxListMapper() : new RadioListMapper());
 
@@ -176,6 +160,22 @@ class ChoiceType extends AbstractType
             // transformation is merged back into the original collection
             $builder->addEventSubscriber(new MergeCollectionListener(true, true));
         }
+
+        // To avoid some problem against treating of array (e.g. Array to string conversion),
+        // we have to first ensure the all elements of submitted data ain't an array.
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+
+            if (!is_array($data)) {
+                return;
+            }
+
+            foreach ($data as $v) {
+                if (null !== $v && !is_string($v)) {
+                    throw new TransformationFailedException('All choices submitted must be NULL or strings.');
+                }
+            }
+        }, 256);
     }
 
     /**

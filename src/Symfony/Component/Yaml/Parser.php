@@ -32,18 +32,8 @@ class Parser
     private $skippedLineNumbers = array();
     private $locallySkippedLineNumbers = array();
 
-    /**
-     * Constructor.
-     *
-     * @param int      $offset             The offset of YAML document (used for line numbers in error messages)
-     * @param int|null $totalNumberOfLines The overall number of lines being parsed
-     * @param int[]    $skippedLineNumbers Number of comment lines that have been skipped by the parser
-     */
-    public function __construct($offset = 0, $totalNumberOfLines = null, array $skippedLineNumbers = array())
+    public function __construct()
     {
-        $this->offset = $offset;
-        $this->totalNumberOfLines = $totalNumberOfLines;
-        $this->skippedLineNumbers = $skippedLineNumbers;
     }
 
     /**
@@ -384,7 +374,11 @@ class Parser
             $skippedLineNumbers[] = $lineNumber;
         }
 
-        $parser = new self($offset, $this->totalNumberOfLines, $skippedLineNumbers);
+        $parser = new self();
+        $parser->offset = $offset;
+        $parser->totalNumberOfLines = $this->totalNumberOfLines;
+        $parser->skippedLineNumbers = $skippedLineNumbers;
+
         $parser->refs = &$this->refs;
 
         return $parser->parse($yaml, $flags);

@@ -157,57 +157,73 @@ class YamlFileLoader extends FileLoader
         if (!is_array($content['services'])) {
             throw new InvalidArgumentException(sprintf('The "services" key should contain an array in %s. Check your YAML syntax.', $file));
         }
-        if (isset($content['services']['_defaults'])) {
-            if (!is_array($defaults = $content['services']['_defaults'])) {
-                throw new InvalidArgumentException(sprintf('Service defaults must be an array, "%s" given in "%s".', gettype($defaults), $file));
-            }
-            if (isset($defaults['alias']) || isset($defaults['class']) || isset($defaults['factory'])) {
-                @trigger_error('Giving a service the "_defaults" name is deprecated since Symfony 3.3 and will be forbidden in 4.0. Rename your service.', E_USER_DEPRECATED);
-                $defaults = array();
-            } else {
-                $defaultKeys = array('public', 'tags', 'inherit_tags', 'autowire');
-                unset($content['services']['_defaults']);
 
-                foreach ($defaults as $key => $default) {
-                    if (!in_array($key, $defaultKeys)) {
-                        throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', $defaultKeys)));
-                    }
-                }
-                if (isset($defaults['tags'])) {
-                    if (!is_array($tags = $defaults['tags'])) {
-                        throw new InvalidArgumentException(sprintf('Parameter "tags" in "_defaults" must be an array in %s. Check your YAML syntax.', $file));
-                    }
-
-                    foreach ($tags as $tag) {
-                        if (!is_array($tag)) {
-                            $tag = array('name' => $tag);
-                        }
-
-                        if (!isset($tag['name'])) {
-                            throw new InvalidArgumentException(sprintf('A "tags" entry in "_defaults" is missing a "name" key in %s.', $file));
-                        }
-                        $name = $tag['name'];
-                        unset($tag['name']);
-
-                        if (!is_string($name) || '' === $name) {
-                            throw new InvalidArgumentException(sprintf('The tag name in "_defaults" must be a non-empty string in %s.', $file));
-                        }
-
-                        foreach ($tag as $attribute => $value) {
-                            if (!is_scalar($value) && null !== $value) {
-                                throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in %s. Check your YAML syntax.', $name, $attribute, $file));
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            $defaults = array();
-        }
-
+        $defaults = $this->parseDefaults($content, $file);
         foreach ($content['services'] as $id => $service) {
             $this->parseDefinition($id, $service, $file, $defaults);
         }
+    }
+
+    /**
+     * @param array  $content
+     * @param string $file
+     *
+     * @return array
+     *
+     * @throws InvalidArgumentException
+     */
+    private function parseDefaults(array &$content, $file)
+    {
+        if (!isset($content['services']['_defaults'])) {
+            return $content;
+        }
+        if (!is_array($defaults = $content['services']['_defaults'])) {
+            throw new InvalidArgumentException(sprintf('Service defaults must be an array, "%s" given in "%s".', gettype($defaults), $file));
+        }
+        if (isset($defaults['alias']) || isset($defaults['class']) || isset($defaults['factory'])) {
+            @trigger_error('Giving a service the "_defaults" name is deprecated since Symfony 3.3 and will be forbidden in 4.0. Rename your service.', E_USER_DEPRECATED);
+
+            return $content;
+        }
+
+        $defaultKeys = array('public', 'tags', 'inherit_tags', 'autowire');
+        unset($content['services']['_defaults']);
+
+        foreach ($defaults as $key => $default) {
+            if (!in_array($key, $defaultKeys)) {
+                throw new InvalidArgumentException(sprintf('The configuration key "%s" cannot be used to define a default value in "%s". Allowed keys are "%s".', $key, $file, implode('", "', $defaultKeys)));
+            }
+        }
+        if (!isset($defaults['tags'])) {
+            return $defaults;
+        }
+        if (!is_array($tags = $defaults['tags'])) {
+            throw new InvalidArgumentException(sprintf('Parameter "tags" in "_defaults" must be an array in %s. Check your YAML syntax.', $file));
+        }
+
+        foreach ($tags as $tag) {
+            if (!is_array($tag)) {
+                $tag = array('name' => $tag);
+            }
+
+            if (!isset($tag['name'])) {
+                throw new InvalidArgumentException(sprintf('A "tags" entry in "_defaults" is missing a "name" key in %s.', $file));
+            }
+            $name = $tag['name'];
+            unset($tag['name']);
+
+            if (!is_string($name) || '' === $name) {
+                throw new InvalidArgumentException(sprintf('The tag name in "_defaults" must be a non-empty string in %s.', $file));
+            }
+
+            foreach ($tag as $attribute => $value) {
+                if (!is_scalar($value) && null !== $value) {
+                    throw new InvalidArgumentException(sprintf('Tag "%s", attribute "%s" in "_defaults" must be of a scalar-type in %s. Check your YAML syntax.', $name, $attribute, $file));
+                }
+            }
+        }
+
+        return $defaults;
     }
 
     /**

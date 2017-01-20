@@ -96,22 +96,29 @@ class Client extends BaseClient
     {
         $kernel = str_replace("'", "\\'", serialize($this->kernel));
         $request = str_replace("'", "\\'", serialize($request));
-
-        $r = new \ReflectionClass('\\Symfony\\Component\\ClassLoader\\ClassLoader');
-        $requirePath = str_replace("'", "\\'", $r->getFileName());
-        $symfonyPath = str_replace("'", "\\'", dirname(dirname(dirname(__DIR__))));
         $errorReporting = error_reporting();
+
+        $requires = '';
+        foreach (get_declared_classes() as $class) {
+            if (0 === strpos($class, 'ComposerAutoloaderInit')) {
+                $r = new \ReflectionClass($class);
+                $file = dirname(dirname($r->getFileName())).'/autoload.php';
+                if (file_exists($file)) {
+                    $requires .= "require_once '".str_replace("'", "\\'", $file)."';\n";
+                }
+            }
+        }
+
+        if (!$requires) {
+            throw new \RuntimeException('Composer autoloader not found.');
+        }
 
         $code = <<<EOF
 <?php
 
 error_reporting($errorReporting);
 
-require_once '$requirePath';
-
-\$loader = new Symfony\Component\ClassLoader\ClassLoader();
-\$loader->addPrefix('Symfony', '$symfonyPath');
-\$loader->register();
+$requires
 
 \$kernel = unserialize('$kernel');
 \$request = unserialize('$request');

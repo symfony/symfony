@@ -13,6 +13,9 @@ namespace Symfony\Component\ClassLoader\Tests;
 
 use Symfony\Component\ClassLoader\ClassMapGenerator;
 
+/**
+ * @group legacy
+ */
 class ClassMapGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**

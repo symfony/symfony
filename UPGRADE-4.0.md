@@ -4,8 +4,7 @@ UPGRADE FROM 3.x to 4.0
 ClassLoader
 -----------
 
- * The ApcClassLoader, WinCacheClassLoader and XcacheClassLoader classes have been removed
-   in favor of the `--apcu-autoloader` option introduced in composer 1.3
+ * The component has been removed. Use Composer instead.
 
 Console
 -------

@@ -13,6 +13,9 @@ namespace Symfony\Component\ClassLoader\Tests;
 
 use Symfony\Component\ClassLoader\ClassLoader;
 
+/**
+ * @group legacy
+ */
 class ClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetPrefixes()

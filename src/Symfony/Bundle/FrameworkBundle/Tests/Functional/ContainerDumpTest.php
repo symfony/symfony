@@ -29,4 +29,14 @@ class ContainerDumpTest extends WebTestCase
 
         $this->assertTrue($client->getContainer()->has('serializer'));
     }
+
+    /**
+     * @see https://github.com/symfony/symfony/issues/21339
+     */
+    public function testContainerCompilationErrorDueCachePoolClearerPassBug()
+    {
+        $client = $this->createClient(array('test_case' => 'ContainerDumpCacheAnnotationsBug', 'root_config' => 'config.yml', 'debug' => true));
+
+        $this->assertTrue($client->getContainer()->has('serializer'));
+    }
 }

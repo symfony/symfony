@@ -125,8 +125,9 @@ class XmlFileLoader extends FileLoader
             return;
         }
 
+        $defaults = $this->getServiceDefaults($xml, $file);
         foreach ($services as $service) {
-            if (null !== $definition = $this->parseDefinition($service, $file, $this->getServiceDefaults($xml, $file))) {
+            if (null !== $definition = $this->parseDefinition($service, $file, $defaults)) {
                 $this->container->setDefinition((string) $service->getAttribute('id'), $definition);
             }
         }

@@ -11,12 +11,17 @@
 
 namespace Symfony\Bridge\PhpUnit\TextUI;
 
+if (class_exists('PHPUnit\Framework\Test')) {
+    use PHPUnit\TextUI\TestRunner as PHPUnitTestRunner;
+} else {
+    use \PHPUnit_TextUI_TestRunner as PHPUnitTestRunner;
+}
 use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
 
 /**
  * {@inheritdoc}
  */
-class TestRunner extends \PHPUnit_TextUI_TestRunner
+class TestRunner extends PHPUnitTestRunner
 {
     /**
      * {@inheritdoc}

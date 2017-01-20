@@ -11,10 +11,16 @@
 
 namespace Symfony\Bridge\PhpUnit\TextUI;
 
+if (class_exists('PHPUnit\Framework\Test')) {
+    use PHPUnit\TextUI\Command as PHPUnitCommand;
+} else {
+    use \PHPUnit_TextUI_Command as PHPUnitCommand;
+}
+
 /**
  * {@inheritdoc}
  */
-class Command extends \PHPUnit_TextUI_Command
+class Command extends PHPUnitCommand
 {
     /**
      * {@inheritdoc}

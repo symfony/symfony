@@ -11,9 +11,14 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests;
 
+if (class_exists('PHPUnit\Framework\Test')) {
+    use PHPUnit\Framework\TestCase;
+} else {
+    use \PHPUnit_Framework_TestCase as TestCase;
+}
 use Symfony\Bridge\PhpUnit\DnsMock;
 
-class DnsMockTest extends \PHPUnit_Framework_TestCase
+class DnsMockTest extends TestCase
 {
     protected function tearDown()
     {

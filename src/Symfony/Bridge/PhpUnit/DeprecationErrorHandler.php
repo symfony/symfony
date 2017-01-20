@@ -11,6 +11,14 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
+if (class_exists('PHPUnit\Framework\Test')) {
+    use PHPUnit\Util\ErrorHandler;
+    use PHPUnit\Util\Test;
+} else {
+    use \PHPUnit_Util_ErrorHandler as ErrorHandler;
+    use \PHPUnit_Util_Test as Test;
+}
+
 /**
  * Catch deprecation notices and print a summary report at the end of the test suite.
  *
@@ -70,14 +78,14 @@ class DeprecationErrorHandler
         $deprecationHandler = function ($type, $msg, $file, $line, $context) use (&$deprecations, $getMode) {
             $mode = $getMode();
             if ((E_USER_DEPRECATED !== $type && E_DEPRECATED !== $type) || DeprecationErrorHandler::MODE_DISABLED === $mode) {
-                return \PHPUnit_Util_ErrorHandler::handleError($type, $msg, $file, $line, $context);
+                return ErrorHandler::handleError($type, $msg, $file, $line, $context);
             }
 
             $trace = debug_backtrace(true);
             $group = 'other';
 
             $i = count($trace);
-            while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_')))) {
+            while (1 < $i && (!isset($trace[--$i]['class']) || ('ReflectionMethod' === $trace[$i]['class'] || 0 === strpos($trace[$i]['class'], 'PHPUnit_') || 0 === strpos($trace[$i]['class'], 'PHPUnit\\')))) {
                 // No-op
             }
 
@@ -91,7 +99,7 @@ class DeprecationErrorHandler
                     || 0 === strpos($method, 'provideLegacy')
                     || 0 === strpos($method, 'getLegacy')
                     || strpos($class, '\Legacy')
-                    || in_array('legacy', \PHPUnit_Util_Test::getGroups($class, $method), true)
+                    || in_array('legacy', Test::getGroups($class, $method), true)
                 ) {
                     $group = 'legacy';
                 } else {
@@ -128,7 +136,7 @@ class DeprecationErrorHandler
 
         if (null !== $oldErrorHandler) {
             restore_error_handler();
-            if (array('PHPUnit_Util_ErrorHandler', 'handleError') === $oldErrorHandler) {
+            if (array('PHPUnit_Util_ErrorHandler', 'handleError') === $oldErrorHandler || array('PHPUnit\Util\ErrorHandler', 'handleError') === $oldErrorHandler) {
                 restore_error_handler();
                 self::register($mode);
             }

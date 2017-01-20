@@ -154,6 +154,10 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidChoiceSplEnum()
     {
+        if (!class_exists('\SplEnum')) {
+            $this->markTestSkipped('SplEnum is not installed on this system.');
+        }
+
         $constraint = new Choice(array('enum' => new class extends \SplEnum {
             const __default = 'foo';
             const FOO = 'foo';

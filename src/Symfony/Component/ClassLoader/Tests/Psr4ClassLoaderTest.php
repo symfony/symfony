@@ -13,6 +13,9 @@ namespace Symfony\Component\ClassLoader\Tests;
 
 use Symfony\Component\ClassLoader\Psr4ClassLoader;
 
+/**
+ * @group legacy
+ */
 class Psr4ClassLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**

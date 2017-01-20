@@ -11,12 +11,16 @@
 
 namespace Symfony\Component\ClassLoader;
 
+@trigger_error('The '.__NAMESPACE__.'\Psr4ClassLoader class is deprecated since version 3.3 and will be removed in 4.0. Use Composer instead.', E_USER_DEPRECATED);
+
 /**
  * A PSR-4 compatible class loader.
  *
  * See http://www.php-fig.org/psr/psr-4/
  *
  * @author Alexander M. Turek <me@derrabus.de>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0.
  */
 class Psr4ClassLoader
 {

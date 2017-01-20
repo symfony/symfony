@@ -66,14 +66,16 @@ final class CacheItem implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function expiresAt($expiration)
+    public function expiresAt($expiration = null)
     {
-        if (null === $expiration) {
+        if (0 === func_num_args()) {
+            $this->expiry = null;
+        } elseif (null === $expiration) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($expiration instanceof \DateTimeInterface) {
             $this->expiry = (int) $expiration->format('U');
         } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface or be null, "%s" given', is_object($expiration) ? get_class($expiration) : gettype($expiration)));
+            throw new InvalidArgumentException(sprintf('Expiration date must implement DateTimeInterface, be null, be false, be omitted, "%s" given', is_object($expiration) ? get_class($expiration) : gettype($expiration)));
         }
 
         return $this;
@@ -82,16 +84,18 @@ final class CacheItem implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function expiresAfter($time)
+    public function expiresAfter($time = null)
     {
-        if (null === $time) {
+        if (0 === func_num_args()) {
+            $this->expiry = null;
+        } elseif (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
             $this->expiry = (int) \DateTime::createFromFormat('U', time())->add($time)->format('U');
         } elseif (is_int($time)) {
             $this->expiry = $time + time();
         } else {
-            throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval or null, "%s" given', is_object($time) ? get_class($time) : gettype($time)));
+            throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval, null, false or omitted, "%s" given', is_object($time) ? get_class($time) : gettype($time)));
         }
 
         return $this;

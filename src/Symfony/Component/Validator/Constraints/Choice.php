@@ -33,6 +33,7 @@ class Choice extends Constraint
 
     public $choices;
     public $callback;
+    public $enum;
     public $multiple = false;
     public $strict = false;
     public $min;

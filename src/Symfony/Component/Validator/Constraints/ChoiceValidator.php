@@ -54,6 +54,9 @@ class ChoiceValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException('The Choice constraint expects a valid callback');
             }
             $choices = call_user_func($choices);
+        } elseif ($constraint->enum) {
+            $enum = new \ReflectionClass($constraint->enum);
+            $choices = $enum->getConstants();
         } else {
             $choices = $constraint->choices;
         }

@@ -90,7 +90,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
         }
         $this->charsetConverter = 'fallback';
         $supported = true;
-        set_error_handler(function () use (&$supported) {$supported = false;});
+        set_error_handler(function () use (&$supported) { $supported = false; });
 
         if (function_exists('mb_encoding_aliases') && mb_encoding_aliases($charset)) {
             $this->charset = $charset;
@@ -193,7 +193,7 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
         }
         if ('iconv' === $this->charsetConverter) {
             $valid = true;
-            set_error_handler(function () use (&$valid) {$valid = false;});
+            set_error_handler(function () use (&$valid) { $valid = false; });
             $c = iconv($this->charset, 'UTF-8', $s);
             restore_error_handler();
             if ($valid) {

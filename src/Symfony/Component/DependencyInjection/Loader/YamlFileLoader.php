@@ -331,14 +331,9 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        if (isset($service['tags'])) {
-            $tags = $service['tags'];
-
-            if (!is_array($tags)) {
-                throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
-            }
-        } else {
-            $tags = array();
+        $tags = isset($service['tags']) ? $service['tags'] : array();
+        if (!is_array($tags)) {
+            throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s. Check your YAML syntax.', $id, $file));
         }
 
         if (!isset($defaults['tags'])) {

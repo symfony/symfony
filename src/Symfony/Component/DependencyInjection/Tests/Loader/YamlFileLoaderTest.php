@@ -411,7 +411,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Parameter "tags" must be an array for service "Foo\Bar" in services29_invalid_tags.yml. Check your YAML syntax.
+     * @expectedExceptionMessage Parameter "tags" must be an array for service "Foo\Bar" in services31_invalid_tags.yml. Check your YAML syntax.
      */
     public function testInvalidTagsWithDefaults()
     {

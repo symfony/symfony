@@ -54,6 +54,6 @@ class JsonEncodeTest extends \PHPUnit_Framework_TestCase
      */
     public function testEncodeWithError()
     {
-        $this->encode->encode("\xB1\x31",  JsonEncoder::FORMAT);
+        $this->encode->encode("\xB1\x31", JsonEncoder::FORMAT);
     }
 }

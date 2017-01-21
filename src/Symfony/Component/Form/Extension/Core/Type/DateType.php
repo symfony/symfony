@@ -221,7 +221,7 @@ class DateType extends AbstractType
                     array('year' => $default, 'month' => $default, 'day' => $default),
                     $choiceTranslationDomain
                 );
-            };
+            }
 
             return array(
                 'year' => $choiceTranslationDomain,

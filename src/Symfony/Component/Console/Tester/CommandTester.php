@@ -155,7 +155,7 @@ class CommandTester
     {
         $stream = fopen('php://memory', 'r+', false);
 
-        fputs($stream, implode(PHP_EOL, $inputs));
+        fwrite($stream, implode(PHP_EOL, $inputs));
         rewind($stream);
 
         return $stream;

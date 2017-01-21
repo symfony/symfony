@@ -16,7 +16,7 @@ use Symfony\Bridge\PhpUnit\SymfonyTestsListener;
 /**
  * {@inheritdoc}
  */
-class TestRunner extends \PHPUnit_TextUI_TestRunner
+class TestRunner extends \Symfony\Bridge\PhpUnit\Compat\TextUI\TestRunner
 {
     /**
      * {@inheritdoc}

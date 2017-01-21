@@ -64,3 +64,10 @@ Workflow
 
  * Deprecated class name support in `WorkflowRegistry::add()` as second parameter.
    Wrap the class name in an instance of ClassInstanceSupportStrategy instead.
+
+Yaml
+----
+
+ * The constructor arguments `$offset`, `$totalNumberOfLines` and
+   `$skippedLineNumbers` of the `Parser` class are deprecated and will be
+   removed in 4.0

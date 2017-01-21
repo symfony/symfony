@@ -55,7 +55,7 @@ class WindowsPipes extends AbstractPipes
             $tmpDir = sys_get_temp_dir();
             $lastError = 'unknown reason';
             set_error_handler(function ($type, $msg) use (&$lastError) { $lastError = $msg; });
-            for ($i = 0;; ++$i) {
+            for ($i = 0; ; ++$i) {
                 foreach ($pipes as $pipe => $name) {
                     $file = sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
                     if (file_exists($file) && !unlink($file)) {

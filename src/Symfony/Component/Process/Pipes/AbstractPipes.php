@@ -109,7 +109,7 @@ abstract class AbstractPipes implements PipesInterface
             }
 
             if ($input) {
-                for (;;) {
+                for (; ;) {
                     $data = fread($input, self::CHUNK_SIZE);
                     if (!isset($data[0])) {
                         break;

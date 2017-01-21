@@ -176,7 +176,7 @@ class DebugClassLoaderTest extends \PHPUnit_Framework_TestCase
     {
         set_error_handler(function () { return false; });
         $e = error_reporting(0);
-        trigger_error('', E_USER_DEPRECATED);
+        @trigger_error('', E_USER_DEPRECATED);
 
         class_exists('Test\\'.__NAMESPACE__.'\\'.$class, true);
 

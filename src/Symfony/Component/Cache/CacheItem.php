@@ -68,9 +68,7 @@ final class CacheItem implements CacheItemInterface
      */
     public function expiresAt($expiration)
     {
-        if (0 === $expiration) {
-            $this->expiry = null;
-        } elseif (null === $expiration) {
+        if (null === $expiration) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($expiration instanceof \DateTimeInterface) {
             $this->expiry = (int) $expiration->format('U');
@@ -86,9 +84,7 @@ final class CacheItem implements CacheItemInterface
      */
     public function expiresAfter($time)
     {
-        if (0 === $time) {
-            $this->expiry = null;
-        } elseif (null === $time) {
+        if (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
             $this->expiry = (int) \DateTime::createFromFormat('U', time())->add($time)->format('U');
@@ -98,6 +94,18 @@ final class CacheItem implements CacheItemInterface
             throw new InvalidArgumentException(sprintf('Expiration date must be an integer, a DateInterval, null, false or omitted, "%s" given', is_object($time) ? get_class($time) : gettype($time)));
         }
 
+        return $this;
+    }
+    
+    /**
+     * Remove the expiry time.
+     *
+     * @return static
+     */
+    public function clearExpiry()
+    {
+        $this->expiry = null;
+        
         return $this;
     }
 

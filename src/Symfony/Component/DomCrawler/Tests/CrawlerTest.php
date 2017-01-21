@@ -30,14 +30,14 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
     public function testGetUri()
     {
         $uri = 'http://symfony.com';
-        $crawler = new Crawler(null,  $uri);
+        $crawler = new Crawler(null, $uri);
         $this->assertEquals($uri, $crawler->getUri());
     }
 
     public function testGetBaseHref()
     {
         $baseHref = 'http://symfony.com';
-        $crawler = new Crawler(null,  null, $baseHref);
+        $crawler = new Crawler(null, null, $baseHref);
         $this->assertEquals($baseHref, $crawler->getBaseHref());
     }
 

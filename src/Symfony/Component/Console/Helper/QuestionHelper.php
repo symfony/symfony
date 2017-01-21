@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\RepeatedQuestion;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
@@ -39,7 +40,7 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output   An OutputInterface instance
      * @param Question        $question The question to ask
      *
-     * @return string The user answer
+     * @return mixed A string, the default answer or an array for {@link RepeatedQuestion}
      *
      * @throws RuntimeException If there is no data to read in the input stream
      */
@@ -50,7 +51,20 @@ class QuestionHelper extends Helper
         }
 
         if (!$input->isInteractive()) {
-            return $question->getDefault();
+            if (!$question instanceof RepeatedQuestion) {
+                return $question->getDefault();
+            }
+
+            $responses = array();
+            $generator = $question->getGenerator();
+            // Will throw an exception if already used
+            $generator->rewind();
+            while ($generator->valid()) {
+                $generator->send($question->getDefault());
+                $responses[] = $question->getDefault();
+            }
+
+            return $responses;
         }
 
         if ($input instanceof StreamableInputInterface && $stream = $input->getStream()) {
@@ -122,7 +136,7 @@ class QuestionHelper extends Helper
      * @param OutputInterface $output
      * @param Question        $question
      *
-     * @return bool|mixed|null|string
+     * @return mixed
      *
      * @throws \Exception
      * @throws \RuntimeException
@@ -130,6 +144,25 @@ class QuestionHelper extends Helper
     private function doAsk(OutputInterface $output, Question $question)
     {
         $this->writePrompt($output, $question);
+
+        if (!$question instanceof RepeatedQuestion) {
+            return $this->getResponse($output, $question);
+        }
+
+        $responses = array();
+        $generator = $question->getGenerator();
+        // Will throw an exception if already used
+        $generator->rewind();
+        while ($generator->valid()) {
+            $generator->send($responses[] = $this->getResponse($output, $question));
+        }
+
+        return $responses;
+    }
+
+    private function getResponse(OutputInterface $output, Question $question)
+    {
+        $this->prependResponse($output, $question);
 
         $inputStream = $this->inputStream ?: STDIN;
         $autocomplete = $question->getAutocompleterValues();
@@ -164,6 +197,13 @@ class QuestionHelper extends Helper
         }
 
         return $ret;
+    }
+
+    /**
+     * Prepends the user response.
+     */
+    protected function prependResponse(OutputInterface $output, Question $question)
+    {
     }
 
     /**

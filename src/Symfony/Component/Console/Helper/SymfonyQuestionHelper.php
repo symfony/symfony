@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\RepeatedQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 
@@ -32,6 +33,12 @@ class SymfonyQuestionHelper extends QuestionHelper
      */
     public function ask(InputInterface $input, OutputInterface $output, Question $question)
     {
+        // The RepeatedQuestion should be stoppable
+        // by sending an empty value
+        if ($question instanceof RepeatedQuestion) {
+            return parent::ask($input, $output, $question);
+        }
+
         $validator = $question->getValidator();
         $question->setValidator(function ($value) use ($validator) {
             if (null !== $validator) {
@@ -58,7 +65,8 @@ class SymfonyQuestionHelper extends QuestionHelper
         $default = $question->getDefault();
 
         switch (true) {
-            case null === $default:
+            // RepeatedQuestion is managed in prependResponse
+            case null === $default || $question instanceof RepeatedQuestion:
                 $text = sprintf(' <info>%s</info>:', $text);
 
                 break;
@@ -90,16 +98,25 @@ class SymfonyQuestionHelper extends QuestionHelper
                 $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, OutputFormatter::escape($default));
         }
 
-        $output->writeln($text);
+        $output->writeLn($text);
 
         if ($question instanceof ChoiceQuestion) {
             $width = max(array_map('strlen', array_keys($question->getChoices())));
 
             foreach ($question->getChoices() as $key => $value) {
-                $output->writeln(sprintf("  [<comment>%-${width}s</comment>] %s", $key, $value));
+                $output->writeLn(sprintf("  [<comment>%-${width}s</comment>] %s", $key, $value));
             }
         }
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function prependResponse(OutputInterface $output, Question $question)
+    {
+        if ($question instanceof RepeatedQuestion && null !== $question->getDefault()) {
+            $output->write(sprintf(' [<comment>%s</comment>]', $question->getDefault()));
+        }
         $output->write(' > ');
     }
 

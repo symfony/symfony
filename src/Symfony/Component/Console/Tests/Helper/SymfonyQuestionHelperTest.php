@@ -8,12 +8,34 @@ use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\RepeatedQuestion;
 
 /**
  * @group tty
  */
 class SymfonyQuestionHelperTest extends AbstractQuestionHelperTest
 {
+    public function testAskRepeatedQuestion()
+    {
+        $questionHelper = new SymfonyQuestionHelper();
+        $question = new RepeatedQuestion('What are your hobbies?', call_user_func(function () {
+            $defaults = array('Badminton', 'Basket', 'Football');
+            do {
+                if (count($defaults)) {
+                    $answer = (yield array_shift($defaults));
+                } else {
+                    $answer = yield;
+                }
+            } while (null !== $answer);
+        }));
+
+        $inputStream = $this->getInputStream("\nSwimming\n\nClimbing\n\n");
+        $this->assertEquals(array('Badminton', 'Swimming', 'Football', 'Climbing', null), $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream), $output = $this->createOutputInterface(), $question));
+
+        $this->assertOutputContains(' What are your hobbies?:', $output);
+        $this->assertOutputContains(' [Badminton] >  [Basket] >  [Football] >  >  > ', $output);
+    }
+
     public function testAskChoice()
     {
         $questionHelper = new SymfonyQuestionHelper();

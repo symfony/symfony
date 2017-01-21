@@ -288,7 +288,7 @@ class SymfonyStyle extends OutputStyle
     /**
      * @param Question $question
      *
-     * @return string
+     * @return mixed see {@link SymfonyQuestionHelper::ask()}
      */
     public function askQuestion(Question $question)
     {

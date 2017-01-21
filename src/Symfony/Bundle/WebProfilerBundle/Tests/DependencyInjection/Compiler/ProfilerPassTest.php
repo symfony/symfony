@@ -9,14 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
+namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection\Compiler;
 
+use Symfony\Bundle\WebProfilerBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 
-/**
- * @group legacy
- */
 class ProfilerPassTest extends \PHPUnit_Framework_TestCase
 {
     private $profilerDefinition;

@@ -50,6 +50,7 @@
         "symfony/validator": "~3.2",
         "symfony/yaml": "~3.2",
         "symfony/property-info": "~2.8|~3.0",
+        "symfony/web-profiler-bundle": "~3.3",
         "doctrine/annotations": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0",
         "twig/twig": "~1.26|~2.0"
@@ -57,7 +58,8 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
         "phpdocumentor/type-resolver": "<0.2.0",
-        "symfony/console": "<3.3"
+        "symfony/console": "<3.3",
+        "symfony/web-profiler-bundle": "<3.3"
     },
     "suggest": {
         "ext-apcu": "For best performance of the system caches",

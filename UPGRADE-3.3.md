@@ -34,6 +34,9 @@ FrameworkBundle
 ---------------
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been deprecated. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass` class has been deprecated and will be removed in 4.0, use the
+   `Symfony\Bundle\WebProfilerBundle\DependencyInjection\Compiler\ProfilerPass` class instead.
 
 HttpKernel
 -----------

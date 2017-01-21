@@ -15,7 +15,6 @@ class RegisterMappingsPassTest extends \PHPUnit_Framework_TestCase
     public function testNoDriverParmeterException()
     {
         $container = $this->createBuilder(array(
-
         ));
         $this->process($container, array(
             'manager.param.one',

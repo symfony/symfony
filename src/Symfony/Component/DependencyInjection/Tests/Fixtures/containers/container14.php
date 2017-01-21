@@ -4,7 +4,7 @@ namespace Container14;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-/*
+/**
  * This file is included in Tests\Dumper\GraphvizDumperTest::testDumpWithFrozenCustomClassContainer
  * and Tests\Dumper\XmlDumperTest::testCompiledContainerCanBeDumped.
  */

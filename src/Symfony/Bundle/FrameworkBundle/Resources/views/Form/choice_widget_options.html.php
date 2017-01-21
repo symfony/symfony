@@ -1,6 +1,6 @@
 <?php use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 
-$translatorHelper = $view['translator']; // outside of the loop for performance reasons!?>
+$translatorHelper = $view['translator']; // outside of the loop for performance reasons! ?>
 <?php $formHelper = $view['form']; ?>
 <?php foreach ($choices as $group_label => $choice): ?>
     <?php if (is_array($choice) || $choice instanceof ChoiceGroupView): ?>

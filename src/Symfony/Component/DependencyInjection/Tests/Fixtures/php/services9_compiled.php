@@ -253,8 +253,8 @@ class ProjectServiceContainer extends Container
         $this->services['method_call1'] = $instance = new \Bar\FooClass();
 
         $instance->setBar($this->get('foo'));
-        $instance->setBar(null);
-        $instance->setBar(($this->get('foo')->foo().(($this->hasParameter('foo')) ? ($this->getParameter('foo')) : ('default'))));
+        $instance->setBar(NULL);
+        $instance->setBar(($this->get("foo")->foo() . (($this->hasParameter("foo")) ? ($this->getParameter("foo")) : ("default"))));
 
         return $instance;
     }

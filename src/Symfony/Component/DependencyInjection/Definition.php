@@ -158,7 +158,7 @@ class Definition
     }
 
     /**
-     * Gets the service that this service is decorating.
+     * Gets the service that decorates this service.
      *
      * @return null|array An array composed of the decorated service id and the new id for it, null if no service is decorated
      */

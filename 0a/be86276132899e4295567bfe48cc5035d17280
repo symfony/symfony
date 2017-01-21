@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-19T21:34:09Z
+
+Can you rebase to get rid of the merge commit?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-19T21:41:26Z
+
+Sure, sorry.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-20T06:58:22Z
+
+FYI, I have updated the "Deprecations?" row of the PR description to match the actual changes.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-20T08:28:06Z
+
+:+1: after the changes proposed by @xabbuh
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-20T18:19:17Z
+
+@xabbuh I fixed your comments.

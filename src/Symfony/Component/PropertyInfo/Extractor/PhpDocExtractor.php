@@ -256,6 +256,9 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
             try {
                 $reflectionMethod = new \ReflectionMethod($class, $methodName);
+                if ($reflectionMethod->isStatic()) {
+                    continue;
+                }
 
                 if (
                     (self::ACCESSOR === $type && 0 === $reflectionMethod->getNumberOfRequiredParameters()) ||

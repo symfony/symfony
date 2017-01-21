@@ -369,11 +369,11 @@ class MainConfiguration implements ConfigurationInterface
 
         $providerNodeBuilder
             ->validate()
-                ->ifTrue(function ($v) {return count($v) > 1;})
+                ->ifTrue(function ($v) { return count($v) > 1; })
                 ->thenInvalid('You cannot set multiple provider types for the same provider')
             ->end()
             ->validate()
-                ->ifTrue(function ($v) {return count($v) === 0;})
+                ->ifTrue(function ($v) { return count($v) === 0; })
                 ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;

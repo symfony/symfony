@@ -288,7 +288,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     {
         $html = '';
 
-        $dumper = new HtmlDumper(function ($line) use (&$html) {$html .= $line;}, $this->charset);
+        $dumper = new HtmlDumper(function ($line) use (&$html) { $html .= $line; }, $this->charset);
         $dumper->setDumpHeader('');
         $dumper->setDumpBoundaries('', '');
 

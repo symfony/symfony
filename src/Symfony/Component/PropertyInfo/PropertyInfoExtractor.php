@@ -44,7 +44,7 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface
      * @param PropertyDescriptionExtractorInterface[] $descriptionExtractors
      * @param PropertyAccessExtractorInterface[]      $accessExtractors
      */
-    public function __construct(array $listExtractors = array(), array $typeExtractors = array(),  array $descriptionExtractors = array(), array $accessExtractors = array())
+    public function __construct(array $listExtractors = array(), array $typeExtractors = array(), array $descriptionExtractors = array(), array $accessExtractors = array())
     {
         $this->listExtractors = $listExtractors;
         $this->typeExtractors = $typeExtractors;

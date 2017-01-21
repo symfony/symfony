@@ -4,8 +4,7 @@ Public services
 Definitions
 -----------
 
-definition_1
-~~~~~~~~~~~~
+### definition_1
 
 - Class: `Full\Qualified\Class1`
 - Public: yes
@@ -21,14 +20,12 @@ definition_1
 Aliases
 -------
 
-alias_1
-~~~~~~~
+### alias_1
 
 - Service: `service_1`
 - Public: yes
 
-alias_2
-~~~~~~~
+### alias_2
 
 - Service: `service_2`
 - Public: no

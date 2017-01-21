@@ -230,7 +230,7 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
+        $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
     /**
@@ -241,7 +241,7 @@ class MarkdownDescriptor extends Descriptor
         $output = '- Service: `'.$alias.'`'
             ."\n".'- Public: '.($alias->isPublic() ? 'yes' : 'no');
 
-        $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
+        $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
     /**

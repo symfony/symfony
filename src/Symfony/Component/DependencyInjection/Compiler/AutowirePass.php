@@ -331,9 +331,26 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
      *
      * @throws RuntimeException
      */
-    private function createAutowiredDefinition(\ReflectionClass $typeHint)
+    private function createAutowiredDefinition(\ReflectionClass $typeHint, Definition $decorator = null)
     {
         if (isset($this->ambiguousServiceTypes[$typeHint->name])) {
+            // Only two alternatives, check if it is a decorator/inner couple to use the decorator
+            if (2 === count($this->ambiguousServiceTypes[$typeHint->name])) {
+                foreach ($this->ambiguousServiceTypes[$typeHint->name] as $ambiguousId) {
+                    $definition = $this->container->getDefinition($ambiguousId);
+                    if ($decoratorId = $definition->getDecorator()) {
+                        $decoratorDefinition = $this->container->getDefinition($decoratorId);
+
+                        // The decorator may expect the inner to be injected
+                        $this->types[$typeHint->name] = $ambiguousId;
+                        $this->currentId = $decoratorId;
+                        unset($this->ambiguousServiceTypes[$typeHint->name]);
+
+                        return $this->createAutowiredDefinition(new \ReflectionClass($decoratorDefinition->getClass()), $decoratorDefinition);
+                    }
+                }
+            }
+
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
             $matchingServices = implode(', ', $this->ambiguousServiceTypes[$typeHint->name]);
 
@@ -352,7 +369,9 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
         $argumentDefinition->setPublic(false);
         $argumentDefinition->setAutowired(true);
 
-        $this->populateAvailableType($argumentId, $argumentDefinition);
+        if (null === $decorator) {
+            $this->populateAvailableType($argumentId, $argumentDefinition);
+        }
 
         try {
             $this->processValue($argumentDefinition, true);
@@ -361,6 +380,15 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
             $message = sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $this->currentId, $classOrInterface);
             throw new RuntimeException($message, 0, $e);
+        }
+
+        if (null !== $decorator) {
+            $this->populateAvailableType($argumentId, $argumentDefinition);
+
+            // Avoid ambiguous types between original definition and autowired one
+            if (isset($this->ambiguousServiceTypes[$typeHint->name])) {
+                unset($this->ambiguousServiceTypes[$typeHint->name]);
+            }
         }
 
         return new Reference($argumentId);

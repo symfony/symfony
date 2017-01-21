@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
+use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
@@ -254,6 +255,31 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $this->assertEquals('foo', $container->getDefinition('bar')->getArgument(0));
+    }
+
+    public function testDecorated()
+    {
+        $container = new ContainerBuilder();
+        $container->register('decorated', Decorated::class);
+
+        $container
+            ->register('decorator', Decorator::class)
+            ->setDecoratedService('decorated')
+            ->setArguments(array(new Reference('decorator.inner')))
+        ;
+
+        $decoratorPass = new DecoratorServicePass();
+        $decoratorPass->process($container);
+
+        $container->autowire('autowired_1', DecoratorDependent::class);
+        $container->autowire('autowired_2', DecoratorDependent::class);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame('autowired.'.Decorator::class, (string) $container->getDefinition('autowired_1')->getArgument(0));
+        $this->assertSame('autowired.'.Decorator::class, (string) $container->getDefinition('autowired_2')->getArgument(0));
+        $this->assertSame('decorator.inner', (string) $container->getDefinition('autowired.'.Decorator::class)->getArgument(0));
     }
 
     public function testOptionalParameter()
@@ -834,5 +860,23 @@ class SetterInjectionCollision
         // The CollisionInterface cannot be autowired - there are multiple
 
         // should throw an exception
+    }
+}
+
+class Decorated implements DInterface
+{
+}
+
+class Decorator implements DInterface
+{
+    public function __construct(DInterface $inner)
+    {
+    }
+}
+
+class DecoratorDependent
+{
+    public function __construct(DInterface $service)
+    {
     }
 }

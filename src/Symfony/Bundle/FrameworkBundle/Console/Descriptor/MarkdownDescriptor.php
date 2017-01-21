@@ -235,7 +235,7 @@ class MarkdownDescriptor extends Descriptor
             }
         }
 
-        $this->write(isset($options['id']) ? sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output) : $output);
+        $this->write(isset($options['id']) ? sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 
     /**
@@ -250,7 +250,7 @@ class MarkdownDescriptor extends Descriptor
             return $this->write($output);
         }
 
-        $this->write(sprintf("%s\n%s\n\n%s\n", $options['id'], str_repeat('~', strlen($options['id'])), $output));
+        $this->write(sprintf("### %s\n\n%s\n", $options['id'], $output));
 
         if (!$builder) {
             return;

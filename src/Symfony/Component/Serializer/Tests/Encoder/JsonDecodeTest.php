@@ -61,7 +61,7 @@ class JsonDecodeTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecodeWithException($value)
     {
-        $this->decode->decode($value,  JsonEncoder::FORMAT);
+        $this->decode->decode($value, JsonEncoder::FORMAT);
     }
 
     public function decodeProviderException()

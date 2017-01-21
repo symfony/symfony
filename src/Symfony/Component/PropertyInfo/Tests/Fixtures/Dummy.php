@@ -51,6 +51,21 @@ class Dummy extends ParentDummy
      */
     public $B;
 
+    public static function getStatic()
+    {
+    }
+
+    /**
+     * @return string
+     */
+    public static function staticGetter()
+    {
+    }
+
+    public static function staticSetter(\DateTime $d)
+    {
+    }
+
     /**
      * A.
      *

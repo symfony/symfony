@@ -213,7 +213,7 @@ class TimeType extends AbstractType
                     array('hour' => $default, 'minute' => $default, 'second' => $default),
                     $choiceTranslationDomain
                 );
-            };
+            }
 
             return array(
                 'hour' => $choiceTranslationDomain,

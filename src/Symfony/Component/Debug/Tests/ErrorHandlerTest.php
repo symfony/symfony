@@ -417,6 +417,25 @@ class ErrorHandlerTest extends \PHPUnit_Framework_TestCase
         $handler->setLoggers(array(E_DEPRECATED => array($mockLogger, LogLevel::WARNING)));
     }
 
+    public function testSettingLoggerWhenExceptionIsBuffered()
+    {
+        $bootLogger = new BufferingLogger();
+        $handler = new ErrorHandler($bootLogger);
+
+        $exception = new \Exception('Foo message');
+
+        $mockLogger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $mockLogger->expects($this->once())
+            ->method('log')
+            ->with(LogLevel::CRITICAL, 'Uncaught Exception: Foo message', array('exception' => $exception));
+
+        $handler->setExceptionHandler(function () use ($handler, $mockLogger) {
+            $handler->setDefaultLogger($mockLogger);
+        });
+
+        $handler->handleException($exception);
+    }
+
     public function testHandleFatalError()
     {
         try {

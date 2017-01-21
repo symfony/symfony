@@ -33,7 +33,7 @@ class DumpExtensionTest extends \PHPUnit_Framework_TestCase
 
         $dumped = null;
         $exception = null;
-        $prevDumper = VarDumper::setHandler(function ($var) use (&$dumped) {$dumped = $var;});
+        $prevDumper = VarDumper::setHandler(function ($var) use (&$dumped) { $dumped = $var; });
 
         try {
             $this->assertEquals($expectedOutput, $twig->render('template'));

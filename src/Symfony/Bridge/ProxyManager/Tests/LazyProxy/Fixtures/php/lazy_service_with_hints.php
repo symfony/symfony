@@ -120,9 +120,6 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
         unset($this->valueHolder5157dd96e88c0->$name);
     }
 
-    /**
-     *
-     */
     public function __clone()
     {
         $this->initializer5157dd96e8924 && $this->initializer5157dd96e8924->__invoke($this->valueHolder5157dd96e88c0, $this, '__clone', array());
@@ -130,9 +127,6 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
         $this->valueHolder5157dd96e88c0 = clone $this->valueHolder5157dd96e88c0;
     }
 
-    /**
-     *
-     */
     public function __sleep()
     {
         $this->initializer5157dd96e8924 && $this->initializer5157dd96e8924->__invoke($this->valueHolder5157dd96e88c0, $this, '__sleep', array());
@@ -140,9 +134,6 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
         return array('valueHolder5157dd96e88c0');
     }
 
-    /**
-     *
-     */
     public function __wakeup()
     {
     }
@@ -166,7 +157,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
     /**
      * {@inheritdoc}
      */
-    public function initializeProxy() : bool
+    public function initializeProxy(): bool
     {
         return $this->initializer5157dd96e8924 && $this->initializer5157dd96e8924->__invoke($this->valueHolder5157dd96e88c0, $this, 'initializeProxy', array());
     }
@@ -174,7 +165,7 @@ class stdClass_c1d194250ee2e2b7d2eab8b8212368a8 extends \stdClass implements \Pr
     /**
      * {@inheritdoc}
      */
-    public function isProxyInitialized() : bool
+    public function isProxyInitialized(): bool
     {
         return null !== $this->valueHolder5157dd96e88c0;
     }

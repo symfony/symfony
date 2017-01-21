@@ -21,7 +21,7 @@ use Symfony\Component\Yaml\Exception\DumpException;
  */
 class Inline
 {
-    const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\']*(?:\'\'[^\']*)*)\')';
+    const REGEX_QUOTED_STRING = '(?:"([^"\\\\]*+(?:\\\\.[^"\\\\]*+)*+)"|\'([^\']*+(?:\'\'[^\']*+)*+)\')';
 
     private static $exceptionOnInvalidType = false;
     private static $objectSupport = false;

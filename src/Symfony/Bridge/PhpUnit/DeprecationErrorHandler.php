@@ -140,7 +140,7 @@ class DeprecationErrorHandler
                     return "\x1B[{$color}m{$str}\x1B[0m";
                 };
             } else {
-                $colorize = function ($str) {return $str;};
+                $colorize = function ($str) { return $str; };
             }
             register_shutdown_function(function () use ($getMode, &$deprecations, $deprecationHandler, $colorize) {
                 $mode = $getMode();
@@ -151,7 +151,7 @@ class DeprecationErrorHandler
                 restore_error_handler();
 
                 if (DeprecationErrorHandler::MODE_WEAK === $mode) {
-                    $colorize = function ($str) {return $str;};
+                    $colorize = function ($str) { return $str; };
                 }
                 if ($currErrorHandler !== $deprecationHandler) {
                     echo "\n", $colorize('THE ERROR HANDLER HAS CHANGED!', true), "\n";

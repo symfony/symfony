@@ -1281,7 +1281,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $i = 0;
         $input = new InputStream();
-        $input->onEmpty(function () use (&$i) {++$i;});
+        $input->onEmpty(function () use (&$i) { ++$i; });
 
         $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo 123; echo fread(STDIN, 1); echo 456;'));
         $process->setInput($input);

@@ -4,8 +4,7 @@ Public and private services with tag `tag1`
 Definitions
 -----------
 
-definition_2
-~~~~~~~~~~~~
+### definition_2
 
 - Class: `Full\Qualified\Class2`
 - Public: no

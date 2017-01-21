@@ -42,9 +42,6 @@ abstract class AbstractDataGenerator
         $this->dirName = $dirName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generateData(GeneratorConfig $config)
     {
         $filesystem = new Filesystem();

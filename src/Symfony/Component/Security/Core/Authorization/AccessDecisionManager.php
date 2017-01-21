@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authorization;
 
+use Symfony\Component\Security\Core\Authorization\Voter\Report\VoteReportBuilderInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Report\VoteReportInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -26,22 +28,43 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     const STRATEGY_CONSENSUS = 'consensus';
     const STRATEGY_UNANIMOUS = 'unanimous';
 
+    /**
+     * @var VoterInterface[]
+     */
     private $voters;
+
+    /**
+     * @var string
+     */
     private $strategy;
+
+    /**
+     * @var bool
+     */
     private $allowIfAllAbstainDecisions;
+
+    /**
+     * @var bool
+     */
     private $allowIfEqualGrantedDeniedDecisions;
+
+    /**
+     * @var VoteReportBuilderInterface
+     */
+    private $reportBuilder;
 
     /**
      * Constructor.
      *
-     * @param VoterInterface[] $voters                             An array of VoterInterface instances
-     * @param string           $strategy                           The vote strategy
-     * @param bool             $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
-     * @param bool             $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
+     * @param VoterInterface[]           $voters                             An array of VoterInterface instances
+     * @param VoteReportBuilderInterface $reportBuilder                      A vote report builder instance
+     * @param string                     $strategy                           The vote strategy
+     * @param bool                       $allowIfAllAbstainDecisions         Whether to grant access if all voters abstained or not
+     * @param bool                       $allowIfEqualGrantedDeniedDecisions Whether to grant access if result are equals
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $voters = array(), $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
+    public function __construct(array $voters = array(), VoteReportBuilderInterface $reportBuilder, $strategy = self::STRATEGY_AFFIRMATIVE, $allowIfAllAbstainDecisions = false, $allowIfEqualGrantedDeniedDecisions = true)
     {
         $strategyMethod = 'decide'.ucfirst($strategy);
         if (!is_callable(array($this, $strategyMethod))) {
@@ -52,6 +75,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $this->strategy = $strategyMethod;
         $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
         $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
+        $this->reportBuilder = $reportBuilder;
     }
 
     /**
@@ -82,7 +106,8 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
     {
         $deny = 0;
         foreach ($this->voters as $voter) {
-            $result = $voter->vote($token, $object, $attributes);
+            $result = $this->voteWith($voter, $token, $object, $attributes);
+
             switch ($result) {
                 case VoterInterface::ACCESS_GRANTED:
                     return true;
@@ -123,7 +148,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $grant = 0;
         $deny = 0;
         foreach ($this->voters as $voter) {
-            $result = $voter->vote($token, $object, $attributes);
+            $result = $this->voteWith($voter, $token, $object, $attributes);
 
             switch ($result) {
                 case VoterInterface::ACCESS_GRANTED:
@@ -164,7 +189,7 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         $grant = 0;
         foreach ($attributes as $attribute) {
             foreach ($this->voters as $voter) {
-                $result = $voter->vote($token, $object, array($attribute));
+                $result = $this->voteWith($voter, $token, $object, array($attribute));
 
                 switch ($result) {
                     case VoterInterface::ACCESS_GRANTED:
@@ -187,5 +212,33 @@ class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         return $this->allowIfAllAbstainDecisions;
+    }
+
+    /**
+     * @param VoterInterface $voter
+     * @param TokenInterface $token
+     * @param mixed          $subject
+     * @param array          $attributes
+     *
+     * @return int
+     */
+    private function voteWith(VoterInterface $voter, TokenInterface $token, $subject, array $attributes)
+    {
+        $result = $voter->vote($token, $subject, $attributes);
+        if (!$result instanceof VoteReportInterface) {
+            return $result;
+        }
+
+        $finalResult = $result->getResult();
+
+        while ($result !== null) {
+            if ($result->getMessage() !== null) {
+                $this->reportBuilder->addReport($voter, $result, $subject, $token);
+            }
+
+            $result = $result->getPrevious();
+        }
+
+        return $finalResult;
     }
 }

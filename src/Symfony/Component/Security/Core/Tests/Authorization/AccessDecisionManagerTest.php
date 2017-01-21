@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\Result\VoterResult;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +22,7 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetUnsupportedStrategy()
     {
-        new AccessDecisionManager(array($this->getVoter(VoterInterface::ACCESS_GRANTED)), 'fooBar');
+        new AccessDecisionManager(array($this->getVoter(VoterInterface::ACCESS_GRANTED)), $this->getVoteReportBuilder(), 'fooBar');
     }
 
     /**
@@ -30,7 +31,7 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
     public function testStrategies($strategy, $voters, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions, $expected)
     {
         $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
-        $manager = new AccessDecisionManager($voters, $strategy, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions);
+        $manager = new AccessDecisionManager($voters, $this->getVoteReportBuilder(), $strategy, $allowIfAllAbstainDecisions, $allowIfEqualGrantedDeniedDecisions);
 
         $this->assertSame($expected, $manager->decide($token, array('ROLE_FOO')));
     }
@@ -40,7 +41,7 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testStrategiesWith2Roles($token, $strategy, $voter, $expected)
     {
-        $manager = new AccessDecisionManager(array($voter), $strategy);
+        $manager = new AccessDecisionManager(array($voter), $this->getVoteReportBuilder(), $strategy);
 
         $this->assertSame($expected, $manager->decide($token, array('ROLE_FOO', 'ROLE_BAR')));
     }
@@ -69,8 +70,8 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $voter->expects($this->any())
               ->method('vote')
               ->will($this->returnValueMap(array(
-                  array($token, null, array('ROLE_FOO'), $vote1),
-                  array($token, null, array('ROLE_BAR'), $vote2),
+                  array($token, null, array('ROLE_FOO'), new VoterResult($vote1)),
+                  array($token, null, array('ROLE_BAR'), new VoterResult($vote2)),
               )))
         ;
 
@@ -133,8 +134,15 @@ class AccessDecisionManagerTest extends \PHPUnit_Framework_TestCase
         $voter = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\VoterInterface')->getMock();
         $voter->expects($this->any())
               ->method('vote')
-              ->will($this->returnValue($vote));
+              ->will($this->returnValue(new VoterResult($vote)));
 
         return $voter;
+    }
+
+    protected function getVoteReportBuilder()
+    {
+        $contextFactory = $this->getMockBuilder('Symfony\Component\Security\Core\Authorization\Voter\Report\VoteReportBuilderInterface')->getMock();
+
+        return $contextFactory;
     }
 }

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Security\Core\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Result\VoterResult;
+use Symfony\Component\Security\Core\Authorization\Voter\Result\VoterResultInterface;
 
 /**
  * Voter is an abstract default implementation of a voter.
@@ -28,6 +30,7 @@ abstract class Voter implements VoterInterface
     {
         // abstain vote by default in case none of the attributes are supported
         $vote = self::ACCESS_ABSTAIN;
+        $resultChain = null;
 
         foreach ($attributes as $attribute) {
             if (!$this->supports($attribute, $subject)) {
@@ -37,13 +40,20 @@ abstract class Voter implements VoterInterface
             // as soon as at least one attribute is supported, default is to deny access
             $vote = self::ACCESS_DENIED;
 
-            if ($this->voteOnAttribute($attribute, $subject, $token)) {
+            $result = $this->voteOnAttribute($attribute, $subject, $token);
+            if (!$result instanceof VoterResultInterface) {
+                $result = new VoterResult($result, $attribute);
+            }
+
+            $resultChain = $resultChain ? $result->setPrevious($resultChain) : $result;
+
+            if ($resultChain->getResult()) {
                 // grant access as soon as at least one attribute returns a positive response
-                return self::ACCESS_GRANTED;
+                return (new VoterResult(self::ACCESS_GRANTED))->setPrevious($resultChain);
             }
         }
 
-        return $vote;
+        return (new VoterResult($vote))->setPrevious($resultChain);
     }
 
     /**
@@ -64,7 +74,7 @@ abstract class Voter implements VoterInterface
      * @param mixed          $subject
      * @param TokenInterface $token
      *
-     * @return bool
+     * @return bool|VoterResultInterface
      */
     abstract protected function voteOnAttribute($attribute, $subject, TokenInterface $token);
 }

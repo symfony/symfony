@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-21T10:36:56Z
+
+While you're there, I spotted a typo in https://github.com/symfony/symfony/blob/2.7/src/Symfony/Component/DependencyInjection/Definition.php#L161, it should be ` Gets the service that this service is decorating`. Maybe could you fix it btw?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-21T16:33:59Z
+
+@chalasr done, thanks

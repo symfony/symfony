@@ -1,0 +1,68 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-20T08:38:05Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-20T09:00:43Z
+
+:+1:
+
+@jakzal @iltar @wouterj Can you review the Polish and Dutch translations?
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-20T09:11:28Z
+
+Current:
+```
+Er is geen tijdelijke map geconfigureerd in php.ini, of de geconfigureerde map
+bestaat niet.
+```
+
+Proposal:
+```
+Er is geen tijdelijke folder geconfigureerd in php.ini, of de geconfigureerde folder
+bestaat niet.
+```
+
+Not 100% sure about the original text. It's not wrong, but it feels a bit like google translate.
+
+---------------------------------------------------------------------------
+
+by Breuls at 2017-01-20T10:20:33Z
+
+@iltar 'folder' isn't actually a Dutch word, so it seems odd to change 'map' to 'folder'.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-20T11:24:43Z
+
+After a small discussion on slack in `#dutch`, we came up with this:
+> Er is geen tijdelijke map geconfigureerd in de php.ini, of de gespecifiëerde map bestaat niet.
+
+---------------------------------------------------------------------------
+
+by Breuls at 2017-01-20T11:45:18Z
+
+Allright, that's fine. I'll make it "gespecificeerde" though, as "gespecifiëerde" also doesn't exist. ;)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-20T14:46:06Z
+
+@Breuls What about @jakzal suggestion for the Polish version?
+
+---------------------------------------------------------------------------
+
+by Breuls at 2017-01-21T08:50:35Z
+
+@fabpot Sorry, missed that. I didn't write the original proposal, but I've updated it now.
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-01-21T09:30:07Z
+
+:+1:

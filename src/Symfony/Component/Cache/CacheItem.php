@@ -66,9 +66,9 @@ final class CacheItem implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function expiresAt($expiration = null)
+    public function expiresAt($expiration)
     {
-        if (0 === func_num_args()) {
+        if (0 === $expiration) {
             $this->expiry = null;
         } elseif (null === $expiration) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;
@@ -84,9 +84,9 @@ final class CacheItem implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function expiresAfter($time = null)
+    public function expiresAfter($time)
     {
-        if (0 === func_num_args()) {
+        if (0 === $time) {
             $this->expiry = null;
         } elseif (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? time() + $this->defaultLifetime : null;

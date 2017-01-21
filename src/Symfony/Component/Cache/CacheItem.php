@@ -105,7 +105,7 @@ final class CacheItem implements CacheItemInterface
     public function clearExpiry()
     {
         $this->expiry = null;
-        
+
         return $this;
     }
 

@@ -40,6 +40,13 @@ abstract class FrameworkExtensionTest extends TestCase
 
     abstract protected function loadFromFile(ContainerBuilder $container, $file);
 
+    public function testTranslationEnabledWhenTemplatingEngineIsSetToPHP()
+    {
+        $container = $this->createContainerFromFile('templating_enabled_php');
+
+        $this->assertTrue($container->has('translator'));
+    }
+
     public function testFormCsrfProtection()
     {
         $container = $this->createContainerFromFile('full');

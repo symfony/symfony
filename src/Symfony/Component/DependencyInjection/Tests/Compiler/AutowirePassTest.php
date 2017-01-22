@@ -35,6 +35,20 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $container->getDefinition('bar')->getArgument(0));
     }
 
+    public function testProcessVariadic()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', __NAMESPACE__.'\Foo');
+        $definition = $container->register('fooVariadic', __NAMESPACE__.'\FooVariadic');
+        $definition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertCount(1, $container->getDefinition('fooVariadic')->getArguments());
+        $this->assertEquals('foo', (string) $container->getDefinition('fooVariadic')->getArgument(0));
+    }
+
     public function testProcessAutowireParent()
     {
         $container = new ContainerBuilder();
@@ -651,6 +665,17 @@ class IdenticalClassResource extends ClassForResource
 class ClassChangedConstructorArgs extends ClassForResource
 {
     public function __construct($foo, Bar $bar, $baz)
+    {
+    }
+}
+
+class FooVariadic
+{
+    public function __construct(Foo $foo)
+    {
+    }
+
+    public function bar(...$arguments)
     {
     }
 }

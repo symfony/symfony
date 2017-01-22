@@ -341,7 +341,7 @@ class AutowirePass implements CompilerPassInterface
             $methodArgumentsMetadata[] = array(
                 'class' => $class,
                 'isOptional' => $parameter->isOptional(),
-                'defaultValue' => $parameter->isOptional() ? $parameter->getDefaultValue() : null,
+                'defaultValue' => ($parameter->isOptional() && !$parameter->isVariadic()) ? $parameter->getDefaultValue() : null,
             );
         }
 

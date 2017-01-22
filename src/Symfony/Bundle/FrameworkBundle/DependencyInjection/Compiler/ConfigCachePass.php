@@ -11,28 +11,18 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\DependencyInjection\ConfigCachePass as BaseConfigCachePass;
+
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Component\Config\DependencyInjection\ConfigCachePass instead.', ConfigCachePass::class), E_USER_DEPRECATED);
 
 /**
  * Adds services tagged config_cache.resource_checker to the config_cache_factory service, ordering them by priority.
  *
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseConfigCachePass} instead.
+ *
  * @author Matthias Pigulla <mp@webfactory.de>
  * @author Benjamin Klotz <bk@webfactory.de>
  */
-class ConfigCachePass implements CompilerPassInterface
+class ConfigCachePass extends BaseConfigCachePass
 {
-    use PriorityTaggedServiceTrait;
-
-    public function process(ContainerBuilder $container)
-    {
-        $resourceCheckers = $this->findAndSortTaggedServices('config_cache.resource_checker', $container);
-
-        if (empty($resourceCheckers)) {
-            return;
-        }
-
-        $container->getDefinition('config_cache_factory')->replaceArgument(0, $resourceCheckers);
-    }
 }

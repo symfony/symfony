@@ -17,6 +17,8 @@ CHANGELOG
  * Deprecated `FormPass`, use `Symfony\Component\Form\DependencyInjection\FormPass` instead
  * Deprecated `SessionListener`
  * Deprecated `TestSessionListener`
+ * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass`. 
+   Use `Symfony\Component\Console\DependencyInjection\ConfigCachePass` instead.
 
 3.2.0
 -----

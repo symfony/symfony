@@ -79,6 +79,11 @@ FrameworkBundle
    deprecated and will be removed in 4.0. Use the `Symfony\Component\HttpKernel\EventListener\TestSessionListener`
    class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass` class has been
+   deprecated and will be removed in 4.0. Use `Symfony\Component\Config\DependencyInjection\ConfigCachePass`
+   class instead.
+
+
 HttpKernel
 -----------
 

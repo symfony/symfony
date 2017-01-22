@@ -20,7 +20,11 @@
         "symfony/filesystem": "~2.8|~3.0"
     },
     "require-dev": {
-        "symfony/yaml": "~3.0"
+        "symfony/yaml": "~3.0",
+        "symfony/dependency-injection": "~3.2"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<3.2"
     },
     "suggest": {
         "symfony/yaml": "To use the yaml reference dumper"

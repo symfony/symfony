@@ -195,6 +195,10 @@ FrameworkBundle
    removed. Use the `Symfony\Component\HttpKernel\EventListener\TestSessionListener`
    class instead.
 
+ * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConfigCachePass` class has been removed.
+   Use `Symfony\Component\Config\DependencyInjection\ConfigCachePass` class instead.
+
+
 HttpFoundation
 ---------------
 

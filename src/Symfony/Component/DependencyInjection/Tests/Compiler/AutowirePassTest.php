@@ -42,7 +42,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
     public function testProcessVariadic()
     {
         $container = new ContainerBuilder();
-        $container->register('foo', __NAMESPACE__.'\Foo');
+        $container->register('foo', Foo::class);
         $definition = $container->register('fooVariadic', FooVariadic::class);
         $definition->setAutowired(true);
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -35,11 +36,14 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', (string) $container->getDefinition('bar')->getArgument(0));
     }
 
+    /**
+     * @requires PHP 5.6
+     */
     public function testProcessVariadic()
     {
         $container = new ContainerBuilder();
         $container->register('foo', __NAMESPACE__.'\Foo');
-        $definition = $container->register('fooVariadic', __NAMESPACE__.'\FooVariadic');
+        $definition = $container->register('fooVariadic', FooVariadic::class);
         $definition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -665,17 +669,6 @@ class IdenticalClassResource extends ClassForResource
 class ClassChangedConstructorArgs extends ClassForResource
 {
     public function __construct($foo, Bar $bar, $baz)
-    {
-    }
-}
-
-class FooVariadic
-{
-    public function __construct(Foo $foo)
-    {
-    }
-
-    public function bar(...$arguments)
     {
     }
 }

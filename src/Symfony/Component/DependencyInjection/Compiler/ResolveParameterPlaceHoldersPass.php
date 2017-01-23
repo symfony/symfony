@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 
 /**
@@ -19,52 +20,50 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ResolveParameterPlaceHoldersPass implements CompilerPassInterface
+class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass implements CompilerPassInterface
 {
+    private $bag;
+
     /**
-     * Processes the ContainerBuilder to resolve parameter placeholders.
-     *
-     * @param ContainerBuilder $container
+     * {@inheritdoc}
      *
      * @throws ParameterNotFoundException
      */
     public function process(ContainerBuilder $container)
     {
-        $parameterBag = $container->getParameterBag();
+        $this->bag = $container->getParameterBag();
 
-        foreach ($container->getDefinitions() as $id => $definition) {
-            try {
-                $definition->setClass($parameterBag->resolveValue($definition->getClass()));
-                $definition->setFile($parameterBag->resolveValue($definition->getFile()));
-                $definition->setArguments($parameterBag->resolveValue($definition->getArguments()));
+        try {
+            parent::process($container);
 
-                $factory = $definition->getFactory();
-
-                if (is_array($factory) && isset($factory[0])) {
-                    $factory[0] = $parameterBag->resolveValue($factory[0]);
-                    $definition->setFactory($factory);
-                }
-
-                $calls = array();
-                foreach ($definition->getMethodCalls() as $name => $arguments) {
-                    $calls[$parameterBag->resolveValue($name)] = $parameterBag->resolveValue($arguments);
-                }
-                $definition->setMethodCalls($calls);
-
-                $definition->setProperties($parameterBag->resolveValue($definition->getProperties()));
-            } catch (ParameterNotFoundException $e) {
-                $e->setSourceId($id);
-
-                throw $e;
+            $aliases = array();
+            foreach ($container->getAliases() as $name => $target) {
+                $this->currentId = $name;
+                $aliases[$this->bag->resolveValue($name)] = $this->bag->resolveValue($target);
             }
+            $container->setAliases($aliases);
+        } catch (ParameterNotFoundException $e) {
+            $e->setSourceId($this->currentId);
+
+            throw $e;
         }
 
-        $aliases = array();
-        foreach ($container->getAliases() as $name => $target) {
-            $aliases[$parameterBag->resolveValue($name)] = $parameterBag->resolveValue($target);
-        }
-        $container->setAliases($aliases);
+        $this->bag->resolve();
+        $this->bag = null;
+    }
 
-        $parameterBag->resolve();
+    protected function processValue($value, $isRoot = false)
+    {
+        if (is_string($value)) {
+            return $this->bag->resolveValue($value);
+        }
+        if ($value instanceof Definition) {
+            $value->setClass($this->bag->resolveValue($value->getClass()));
+            $value->setFile($this->bag->resolveValue($value->getFile()));
+            $value->setProperties($this->bag->resolveValue($value->getProperties()));
+            $value->setMethodCalls($this->bag->resolveValue($value->getMethodCalls()));
+        }
+
+        return parent::processValue($value, $isRoot);
     }
 }

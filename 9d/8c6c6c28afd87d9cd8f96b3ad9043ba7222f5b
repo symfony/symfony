@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-11-30T10:11:29Z
+
+@Seldaek @nicolas-grekas @dragoonis @Nyholm it may be worth starting the work on a shared testsuite for simple-cache too (similar to the one existing for PSR-6)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-09T10:30:44Z
+
+Status: needs review
+PR updated to fit simple-cache v0.3. The PSR-6 to PSR-16 is now called `Symfony\Component\Cache\Simple\Psr6Cache`, which opens a new namespace to provide native e.g. `Simple\ApcuCache` implementations. WDYT?
+The PSR-16 to PSR-6 bridge is named `Symfony\Component\Cache\Adapter\SimpleCacheAdapter` (following existing convention).
+Code is tested by the PSR-6 test suite, with both bridges wired together.
+This means coverage is full for `SimpleCacheAdapter` and partial for `Psr6Cache`, until we work on a shared PSR-16 test suite with @Nyholm.
+
+I'd propose to merge this PR without waiting for more tests nor for more progress from the fig. This would unlock some other things I'd like to do on top of this one, but deserve another PR.
+If the fig does not deliver on time for 3.3, then it will still be easy to revert before tagging.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-03T17:15:41Z
+
+@Nyholm @nicolas-grekas have you made any progress on the shared PSR-16 testsuite ?
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-03T17:29:10Z
+
+Yes. I do. Expect it to be done at the very latest this weekend.
+
+---------------------------------------------------------------------------
+
+by dragoonis at 2017-01-03T17:30:06Z
+
+Looking forward to seeing it :)
+
+On Tue, Jan 3, 2017 at 5:29 PM, Tobias Nyholm <notifications@github.com>
+wrote:
+
+> Yes. I do. Expect it to be done at the very latest this weekend.
+>
+> —
+> You are receiving this because you were mentioned.
+> Reply to this email directly, view it on GitHub
+> <https://github.com/symfony/symfony/pull/20694#issuecomment-270171134>,
+> or mute the thread
+> <https://github.com/notifications/unsubscribe-auth/AAI7kVEVrbPN_eQ9W57oTP6Ns9H8VjKcks5rOoV3gaJpZM4LAAFV>
+> .
+>
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-04T18:49:10Z
+
+Test PR is here: https://github.com/php-cache/integration-tests/pull/66
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-04T21:42:41Z
+
+PR updated to PSR-16 1.0, with a full refacto of the component.
+All existing PSR-6 adapters now have a native PSR-16 counterpart, for full performance in all cases.
+
+- 3 commits that shouldn't be squashed because they will help future merges (by allowing git to detect renames correctly)
+- the implementation of all adapters has been moved to internal traits
+- PSR-6 & PSR-16 adapters have their own namespace, yet share their implem via the traits
+
+The diff is huge, yet there is little room for mistakes, since on the interface topic, things are settled by the PSRs, and on the implem level, we're using the exact same code that already works, with minor adjustments. And everything is well tested.
+
+The PSR-16 adapters are tested via the PSR-6 test suite, waiting for php-cache/integration-tests#66 to be finished so we can use it soon.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-04T21:47:14Z
+
+To help reviews, you should open only the first and the 3d commit. The 2nd one is generating noise when viewing the full diff by holding the renames.
+
+---------------------------------------------------------------------------
+
+by Nyholm at 2017-01-05T11:01:38Z
+
+I've merged the integration tests and released a new version.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-05T17:53:01Z
+
+php-cache/integration-tests v0.14.0 integrated, tests green.
+PR is ready
+[some tests could be enhanced](https://github.com/php-cache/integration-tests/pull/66#issuecomment-270673995), but this should not be a blocker
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T11:11:24Z
+
+Status: needs review
+test suite fixed and updated, all green

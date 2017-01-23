@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-20T08:40:50Z
+
+👍 I like this proposal a lot ... my only minor fear is that we may be introducing too many different ways/shortcuts to configure things.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-20T08:58:59Z
+
+I understand your fear, but to advocate even more this one, I find this way very intuitive as it echoes a php object instantiation:
+
+```yml
+App\Serializer\FooNormalizer: ['@baz', 'foo', '%qux%']
+```
+```php
+new \App\Serializer\FooNormalizer(new Baz(), 'foo', 'qux_value')
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-23T10:36:39Z
+
+👍

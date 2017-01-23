@@ -1,0 +1,172 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2016-06-17T12:37:26Z
+
+Supporting files and directories in the same list would be a better developer experience:
+
+``` yaml
+#config.yml
+framework:
+  validation:
+    mapping:
+      - "path/to/file/validation.yml"
+      - "path/to/file/validation.xml"
+      - "path/to/another/directory"
+```
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-06-17T13:25:08Z
+
+Check out how the translation does it, would be nice if it's got a similar configuration implementation.
+
+---------------------------------------------------------------------------
+
+by davewwww at 2016-06-17T14:28:14Z
+
+if you guys prefer to combine files and dirs, then I can do that.
+
+---------------------------------------------------------------------------
+
+by iltar at 2016-06-17T19:41:30Z
+
+https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/Configuration.php#L454
+https://github.com/symfony/symfony/blob/master/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L704
+
+At the translator part it called `path(s)`, but I think it only loads from a root dir. Why not let the validation behave the same?
+
+---------------------------------------------------------------------------
+
+by davewwww at 2016-06-22T09:24:55Z
+
+Is there anything I can do to finish this ticket?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2016-06-23T16:33:50Z
+
+@iltar the translations are meant to be put in a folder as there are at least two versions of the same file but the validation files can be in the root of a config folder so imo we should support files and dirs.
+
+@davewwww isn't it possible to merge the two config options under `paths` ?
+
+---------------------------------------------------------------------------
+
+by davewwww at 2016-06-30T13:02:27Z
+
+i've merged the two "files" and "dirs" options to a single "paths" option.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-07-04T11:09:37Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by davewwww at 2016-07-06T08:36:00Z
+
+@xabbuh can I do anything else?
+
+---------------------------------------------------------------------------
+
+by lunetics at 2016-11-19T00:55:42Z
+
+This sounds like a good solution when not using bundles at all. Anything against merging that?
+
+---------------------------------------------------------------------------
+
+by davewwww at 2016-11-28T12:02:59Z
+
+@xabbuh: I would like to move on here, what can I do next?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-10T21:00:38Z
+
+Can you add a note about this new feature in the CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by davewwww at 2017-01-11T18:57:59Z
+
+of course, on which version?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-12T00:13:24Z
+
+Can you rebase on current master?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-12T20:43:34Z
+
+👍 (when rebased). I left some (optional) minor comments.
+
+---------------------------------------------------------------------------
+
+by davewwww at 2017-01-13T15:44:24Z
+
+rebased and added the suggestion from dunglas
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-15T08:18:31Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-20T15:42:57Z
+
+Tests do not pass on Windows
+
+---------------------------------------------------------------------------
+
+by davewwww at 2017-01-20T16:11:55Z
+
+Yes, because
+TestBundle\Resources\config\validation.xml
+is not:
+TestBundle/Resources/config/validation.xml
+
+```php
+$this->assertStringEndsWith('TestBundle/Resources/config/validation.xml', $xmlMappings[1]);
+```
+appears the error because of my changes?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-20T16:15:00Z
+
+@davewwww Apparently, yes
+
+---------------------------------------------------------------------------
+
+by davewwww at 2017-01-20T16:28:25Z
+
+The problem is solved when I remove the realpath()
+
+```php
+if (is_file($file = $dirname.'/Resources/config/validation.xml')) {
+   $files['xml'][] = realpath($file);
+ }
+```
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-22T18:41:58Z
+
+@davewwww  This now looks good to me. But before I can merge, can you squash your commit or at least rebase on current master (to get rid of the merge commit which prevents me to merge this PR cleanly).
+
+Also, can you submit a PR to update the Symfony docs? Between, can you also change the description of this PR to reflect the latest version of this PR?
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by davewwww at 2017-01-23T14:56:43Z
+
+spuashed, pr updated and doc pr submitted

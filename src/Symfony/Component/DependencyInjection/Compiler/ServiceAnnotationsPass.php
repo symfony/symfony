@@ -146,12 +146,13 @@ class ServiceAnnotationsPass implements CompilerPassInterface
 
     /**
      * @param \ReflectionMethod $method
+     *
      * @return Annotations\Argument[]
      */
     private function getArgumentAnnotationsForMethod(\ReflectionMethod $method)
     {
         $annotations = $this->reader->getMethodAnnotations($method);
-        $argAnnotations = [];
+        $argAnnotations = array();
         foreach ($annotations as $annotation) {
             if ($annotation instanceof Annotations\Argument) {
                 $argAnnotations[] = $annotation;
@@ -166,16 +167,17 @@ class ServiceAnnotationsPass implements CompilerPassInterface
      * of the argument and the value is its index.
      *
      * @param \ReflectionMethod $method
+     *
      * @return array
      */
     private function getMethodArguments(\ReflectionMethod $method)
     {
-        $arguments = [];
+        $arguments = array();
         $i = 0;
         foreach ($method->getParameters() as $parameter) {
             $arguments[$parameter->getName()] = $i;
 
-            $i++;
+            ++$i;
         }
 
         return $arguments;

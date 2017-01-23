@@ -101,9 +101,9 @@ class ServiceAnnotationsPass implements CompilerPassInterface
 
             $onInvalid = $arg->getOnInvalid();
             $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
-            if ('ignore' == $onInvalid) {
+            if ('ignore' === $onInvalid) {
                 $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
-            } elseif ('null' == $onInvalid) {
+            } elseif ('null' === $onInvalid) {
                 $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
             }
 

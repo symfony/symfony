@@ -89,6 +89,11 @@ class Argument
 
     public function setOnInvalid($onInvalid)
     {
+        $validOptions = array('exception', 'ignore', 'null');
+        if (!in_array($onInvalid, $validOptions, true)) {
+            throw new \InvalidArgumentException(sprintf('Invalid onInvalid property "%s" set on annotation "%s. Expected on of: %s', $onInvalid, get_class($this), implode(', ', $validOptions)));
+        };
+
         $this->onInvalid = $onInvalid;
     }
 

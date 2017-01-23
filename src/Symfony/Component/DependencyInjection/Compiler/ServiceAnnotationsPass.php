@@ -35,7 +35,7 @@ class ServiceAnnotationsPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (class_exists(AnnotationReader::class)) {
+        if (!class_exists(AnnotationReader::class)) {
             return;
         }
 

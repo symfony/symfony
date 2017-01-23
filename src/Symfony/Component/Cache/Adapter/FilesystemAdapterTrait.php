@@ -79,6 +79,25 @@ trait FilesystemAdapterTrait
         return $ok;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function doIncrement($id, $step)
+    {
+        if (!$lock = @fopen($this->getFile($id, true), 'cb')) {
+            return false;
+        }
+        if (!flock($lock, LOCK_EX)) {
+            return false;
+        }
+        $result = parent::doIncrement($id, $step);
+
+        flock($lock, LOCK_UN);
+        fclose($lock);
+
+        return $result;
+    }
+
     private function write($file, $data, $expiresAt = null)
     {
         if (false === @file_put_contents($this->tmp, $data)) {

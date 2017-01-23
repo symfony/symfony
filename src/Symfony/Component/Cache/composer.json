@@ -16,12 +16,14 @@
         }
     ],
     "provide": {
-        "psr/cache-implementation": "1.0"
+        "psr/cache-implementation": "1.0",
+        "psr/simple-cache-implementation": "1.0"
     },
     "require": {
         "php": ">=5.5.9",
         "psr/cache": "~1.0",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "psr/simple-cache": "^0.2"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

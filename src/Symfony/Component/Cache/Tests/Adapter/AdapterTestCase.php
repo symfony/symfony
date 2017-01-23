@@ -12,6 +12,7 @@
 namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
+use Psr\SimpleCache\CounterInterface;
 
 abstract class AdapterTestCase extends CachePoolTest
 {
@@ -66,6 +67,26 @@ abstract class AdapterTestCase extends CachePoolTest
         foreach ($cache->getItems(array('foo')) as $item) {
         }
         $this->assertFalse($item->isHit());
+    }
+
+    public function testCounterInterface()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+        $cache = $this->createCachePool();
+
+        if (!$cache instanceof CounterInterface) {
+            $this->markTestSkipped(get_class($cache).' does not implement Psr\SimpleCache\CounterInterface');
+        }
+
+        $this->assertSame(1, $cache->increment('foo'));
+        $this->assertSame(5, $cache->increment('foo', 4));
+        $this->assertSame(3, $cache->increment('foo', -2));
+
+        $this->assertSame(2, $cache->decrement('foo'));
+        $this->assertSame(-4, $cache->decrement('bar', 4));
+        $this->assertSame(-2, $cache->decrement('bar', -2));
     }
 }
 

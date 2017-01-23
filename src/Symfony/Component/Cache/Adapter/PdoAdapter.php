@@ -347,6 +347,19 @@ class PdoAdapter extends AbstractAdapter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function doIncrement($id, $step)
+    {
+        $conn = $this->getConnection();
+        $conn->beginTransaction();
+        $result = parent::doIncrement($id, $step);
+        $conn->commit();
+
+        return $result;
+    }
+
+    /**
      * @return \PDO|Connection
      */
     private function getConnection()

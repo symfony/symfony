@@ -104,4 +104,12 @@ class ApcuAdapter extends AbstractAdapter
 
         throw $e;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doIncrement($id, $step)
+    {
+        return apcu_inc($id, $step);
+    }
 }

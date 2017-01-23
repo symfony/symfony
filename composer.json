@@ -21,6 +21,7 @@
         "twig/twig": "~1.28|~2.0",
         "psr/cache": "~1.0",
         "psr/log": "~1.0",
+        "psr/simple-cache": "^0.2",
         "symfony/polyfill-intl-icu": "~1.0",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/polyfill-php56": "~1.0",
@@ -99,7 +100,8 @@
         "phpdocumentor/type-resolver": "<0.2.0"
     },
     "provide": {
-        "psr/cache-implementation": "1.0"
+        "psr/cache-implementation": "1.0",
+        "psr/simple-cache-implementation": "1.0"
     },
     "autoload": {
         "psr-4": {

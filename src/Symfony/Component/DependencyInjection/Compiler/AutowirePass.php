@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Util\ServiceTypeHelper;
 
 /**
  * Guesses constructor arguments of services definitions and try to instantiate services if necessary.
@@ -29,18 +30,20 @@ class AutowirePass implements CompilerPassInterface
      */
     private $container;
     private $reflectionClasses = array();
-    private $definedTypes = array();
     private $types;
-    private $ambiguousServiceTypes = array();
+    private $typeHelper;
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $throwingAutoloader = function ($class) { throw new \ReflectionException(sprintf('Class %s does not exist', $class)); };
+        $throwingAutoloader = function ($class) {
+            throw new \ReflectionException(sprintf('Class %s does not exist', $class));
+        };
         spl_autoload_register($throwingAutoloader);
 
+        $this->typeHelper = new ServiceTypeHelper($container);
         try {
             $this->container = $container;
             foreach ($container->getDefinitions() as $id => $definition) {
@@ -52,11 +55,10 @@ class AutowirePass implements CompilerPassInterface
             spl_autoload_unregister($throwingAutoloader);
 
             // Free memory and remove circular reference to container
+            $this->typeHelper = null;
             $this->container = null;
             $this->reflectionClasses = array();
-            $this->definedTypes = array();
             $this->types = null;
-            $this->ambiguousServiceTypes = array();
         }
     }
 
@@ -201,12 +203,8 @@ class AutowirePass implements CompilerPassInterface
                     continue;
                 }
 
-                if (null === $this->types) {
-                    $this->populateAvailableTypes();
-                }
-
-                if (isset($this->types[$typeHint->name])) {
-                    $value = new Reference($this->types[$typeHint->name]);
+                if (null !== ($injectedService = $this->getOfType($typeHint->name, $id))) {
+                    $value = new Reference($injectedService);
                     $addMethodCall = true;
                 } else {
                     try {
@@ -255,13 +253,34 @@ class AutowirePass implements CompilerPassInterface
         }
     }
 
+    private function getOfType($type, $serviceId)
+    {
+        if (null === $this->types) {
+            $this->populateAvailableTypes();
+        }
+
+        if (isset($this->types[$type])) {
+            return $this->types[$type];
+        }
+
+        $services = $this->typeHelper->getOfType($type);
+        if (1 === count($services)) {
+            return $services[0];
+        }
+        if (1 < count($services)) {
+            $classOrInterface = class_exists($type) ? 'class' : 'interface';
+            $matchingServices = implode(', ', $services);
+
+            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $type, $serviceId, $classOrInterface, $matchingServices), 1);
+        }
+    }
+
     /**
      * Populates the list of available types.
      */
     private function populateAvailableTypes()
     {
         $this->types = array();
-
         foreach ($this->container->getDefinitions() as $id => $definition) {
             $this->populateAvailableType($id, $definition);
         }
@@ -281,57 +300,8 @@ class AutowirePass implements CompilerPassInterface
         }
 
         foreach ($definition->getAutowiringTypes() as $type) {
-            $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
         }
-
-        if (!$reflectionClass = $this->getReflectionClass($id, $definition)) {
-            return;
-        }
-
-        foreach ($reflectionClass->getInterfaces() as $reflectionInterface) {
-            $this->set($reflectionInterface->name, $id);
-        }
-
-        do {
-            $this->set($reflectionClass->name, $id);
-        } while ($reflectionClass = $reflectionClass->getParentClass());
-    }
-
-    /**
-     * Associates a type and a service id if applicable.
-     *
-     * @param string $type
-     * @param string $id
-     */
-    private function set($type, $id)
-    {
-        if (isset($this->definedTypes[$type])) {
-            return;
-        }
-
-        // is this already a type/class that is known to match multiple services?
-        if (isset($this->ambiguousServiceTypes[$type])) {
-            $this->addServiceToAmbiguousType($id, $type);
-
-            return;
-        }
-
-        // check to make sure the type doesn't match multiple services
-        if (isset($this->types[$type])) {
-            if ($this->types[$type] === $id) {
-                return;
-            }
-
-            // keep an array of all services matching this type
-            $this->addServiceToAmbiguousType($id, $type);
-
-            unset($this->types[$type]);
-
-            return;
-        }
-
-        $this->types[$type] = $id;
     }
 
     /**
@@ -346,13 +316,6 @@ class AutowirePass implements CompilerPassInterface
      */
     private function createAutowiredDefinition(\ReflectionClass $typeHint, $id)
     {
-        if (isset($this->ambiguousServiceTypes[$typeHint->name])) {
-            $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
-            $matchingServices = implode(', ', $this->ambiguousServiceTypes[$typeHint->name]);
-
-            throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". Multiple services exist for this %s (%s).', $typeHint->name, $id, $classOrInterface, $matchingServices), 1);
-        }
-
         if (!$typeHint->isInstantiable()) {
             $classOrInterface = $typeHint->isInterface() ? 'interface' : 'class';
             throw new RuntimeException(sprintf('Unable to autowire argument of type "%s" for the service "%s". No services were found matching this %s and it cannot be auto-registered.', $typeHint->name, $id, $classOrInterface));
@@ -363,7 +326,7 @@ class AutowirePass implements CompilerPassInterface
         $argumentDefinition = $this->container->register($argumentId, $typeHint->name);
         $argumentDefinition->setPublic(false);
 
-        $this->populateAvailableType($argumentId, $argumentDefinition);
+        $this->typeHelper->reset();
 
         try {
             $this->completeDefinition($argumentId, $argumentDefinition, array('__construct'));
@@ -404,17 +367,6 @@ class AutowirePass implements CompilerPassInterface
         }
 
         return $this->reflectionClasses[$id] = $reflector;
-    }
-
-    private function addServiceToAmbiguousType($id, $type)
-    {
-        // keep an array of all services matching this type
-        if (!isset($this->ambiguousServiceTypes[$type])) {
-            $this->ambiguousServiceTypes[$type] = array(
-                $this->types[$type],
-            );
-        }
-        $this->ambiguousServiceTypes[$type][] = $id;
     }
 
     private static function getResourceMetadataForMethod(\ReflectionMethod $method)

@@ -1,0 +1,78 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-01-15T15:46:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-17T11:45:33Z
+
+What about adding an entry to the changelog?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-17T14:01:49Z
+
+Changelog updated
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T07:54:53Z
+
+@xabbuh The listener is private now
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T08:48:45Z
+
+The event-dispatcher does not allow private listeners before 3.3... Can we let it public, or shall I update the framework's event-dispatcher requirement to `~3.3`?
+Edit: Reverted to public, it's not worth it IMHO.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-18T11:35:42Z
+
+Why not updating the version and make use of the new features?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T11:42:20Z
+
+@xabbuh To be honest, I'm often asking myself when is it better to update the requirement and I'm never sure. Isn't it too bad to forbid using the FrameworkBundle with older versions than 3.3 just to avoid one more built-in listener being public? When do we consider that it's legit to increase the required version of a component?
+
+Anyway I made the change, thanks
+
+Edit: Got it. It is acceptable to have a conflict for a component in a bundle (here framework), but should be avoided as possible for component-to-component dependencies.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-18T16:09:46Z
+
+@chalasr I think most people upgrade all Symfony components from one version to the next, especially as many just use symfony/symfony, which does not provide any flexibility. Having broader constraints help with compatibility with other libs using Symfony though.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-18T16:15:22Z
+
+Makes sense, thank you for the hint @fabpot
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-18T17:33:57Z
+
+👍
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-23T07:11:34Z
+
+ping @fabpot
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-23T22:02:37Z
+
+Build failure is unrelated.

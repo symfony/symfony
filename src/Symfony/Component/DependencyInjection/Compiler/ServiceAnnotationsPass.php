@@ -173,11 +173,8 @@ class ServiceAnnotationsPass implements CompilerPassInterface
     private function getMethodArguments(\ReflectionMethod $method)
     {
         $arguments = array();
-        $i = 0;
-        foreach ($method->getParameters() as $parameter) {
+        foreach ($method->getParameters() as $i => $parameter) {
             $arguments[$parameter->getName()] = $i;
-
-            ++$i;
         }
 
         return $arguments;

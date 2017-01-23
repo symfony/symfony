@@ -11,48 +11,17 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+@trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use Symfony\Bundle\WebProfilerBundle\DependencyInjection\Compiler\ProfilerPass instead.', ProfilerPass::class), E_USER_DEPRECATED);
+
+use Symfony\Bundle\WebProfilerBundle\DependencyInjection\Compiler\ProfilerPass as BaseProfilerPass;
 
 /**
  * Adds tagged data_collector services to profiler service.
  *
+ * @deprecated since version 3.3, to be removed in 4.0. Use {@link BaseProfilerPass} instead.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ProfilerPass implements CompilerPassInterface
+class ProfilerPass extends BaseProfilerPass
 {
-    public function process(ContainerBuilder $container)
-    {
-        if (false === $container->hasDefinition('profiler')) {
-            return;
-        }
-
-        $definition = $container->getDefinition('profiler');
-
-        $collectors = new \SplPriorityQueue();
-        $order = PHP_INT_MAX;
-        foreach ($container->findTaggedServiceIds('data_collector') as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $template = null;
-
-            if (isset($attributes[0]['template'])) {
-                if (!isset($attributes[0]['id'])) {
-                    throw new InvalidArgumentException(sprintf('Data collector service "%s" must have an id attribute in order to specify a template', $id));
-                }
-                $template = array($attributes[0]['id'], $attributes[0]['template']);
-            }
-
-            $collectors->insert(array($id, $template), array($priority, --$order));
-        }
-
-        $templates = array();
-        foreach ($collectors as $collector) {
-            $definition->addMethodCall('add', array(new Reference($collector[0])));
-            $templates[$collector[0]] = $collector[1];
-        }
-
-        $container->setParameter('data_collector.templates', $templates);
-    }
 }

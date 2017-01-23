@@ -1,11 +1,9 @@
-alias_1
-~~~~~~~
+### alias_1
 
 - Service: `service_1`
 - Public: yes
 
-service_1
-~~~~~~~~~
+### service_1
 
 - Class: `Full\Qualified\Class1`
 - Public: yes

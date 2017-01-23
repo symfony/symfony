@@ -176,12 +176,19 @@
     <xsd:complexType name="validation">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="static-method" type="xsd:string" />
+            <xsd:element name="mapping" type="validation_mapping" />
         </xsd:choice>
 
         <xsd:attribute name="enabled" type="xsd:boolean" />
         <xsd:attribute name="cache" type="xsd:string" />
         <xsd:attribute name="enable-annotations" type="xsd:boolean" />
         <xsd:attribute name="static-method" type="xsd:boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="validation_mapping">
+        <xsd:sequence>
+            <xsd:element name="path" type="xsd:string" minOccurs="1" maxOccurs="unbounded" />
+        </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="annotations">

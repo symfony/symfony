@@ -32,10 +32,10 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertEquals('getItem', $call->name);
-        $this->assertEquals('k', $call->argument);
-        $this->assertEquals(0, $call->hits);
-        $this->assertEquals(1, $call->misses);
+        $this->assertSame('getItem', $call->name);
+        $this->assertSame('k', $call->argument);
+        $this->assertSame(0, $call->hits);
+        $this->assertSame(1, $call->misses);
         $this->assertNull($call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
@@ -51,8 +51,8 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(3, $calls);
 
         $call = $calls[2];
-        $this->assertEquals(1, $call->hits);
-        $this->assertEquals(0, $call->misses);
+        $this->assertSame(1, $call->hits);
+        $this->assertSame(0, $call->misses);
     }
 
     public function testGetItemsMiss()
@@ -66,9 +66,9 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertEquals('getItems', $call->name);
-        $this->assertEquals($arg, $call->argument);
-        $this->assertEquals(2, $call->misses);
+        $this->assertSame('getItems', $call->name);
+        $this->assertSame($arg, $call->argument);
+        $this->assertSame(2, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
@@ -81,8 +81,8 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertEquals('hasItem', $call->name);
-        $this->assertEquals('k', $call->argument);
+        $this->assertSame('hasItem', $call->name);
+        $this->assertSame('k', $call->argument);
         $this->assertFalse($call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
@@ -98,8 +98,8 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(3, $calls);
 
         $call = $calls[2];
-        $this->assertEquals('hasItem', $call->name);
-        $this->assertEquals('k', $call->argument);
+        $this->assertSame('hasItem', $call->name);
+        $this->assertSame('k', $call->argument);
         $this->assertTrue($call->result);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
@@ -113,10 +113,10 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertEquals('deleteItem', $call->name);
-        $this->assertEquals('k', $call->argument);
-        $this->assertEquals(0, $call->hits);
-        $this->assertEquals(0, $call->misses);
+        $this->assertSame('deleteItem', $call->name);
+        $this->assertSame('k', $call->argument);
+        $this->assertSame(0, $call->hits);
+        $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
@@ -130,10 +130,10 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertEquals('deleteItems', $call->name);
-        $this->assertEquals($arg, $call->argument);
-        $this->assertEquals(0, $call->hits);
-        $this->assertEquals(0, $call->misses);
+        $this->assertSame('deleteItems', $call->name);
+        $this->assertSame($arg, $call->argument);
+        $this->assertSame(0, $call->hits);
+        $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
@@ -147,10 +147,10 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(2, $calls);
 
         $call = $calls[1];
-        $this->assertEquals('save', $call->name);
-        $this->assertEquals($item, $call->argument);
-        $this->assertEquals(0, $call->hits);
-        $this->assertEquals(0, $call->misses);
+        $this->assertSame('save', $call->name);
+        $this->assertSame($item, $call->argument);
+        $this->assertSame(0, $call->hits);
+        $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
@@ -164,10 +164,10 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(2, $calls);
 
         $call = $calls[1];
-        $this->assertEquals('saveDeferred', $call->name);
-        $this->assertEquals($item, $call->argument);
-        $this->assertEquals(0, $call->hits);
-        $this->assertEquals(0, $call->misses);
+        $this->assertSame('saveDeferred', $call->name);
+        $this->assertSame($item, $call->argument);
+        $this->assertSame(0, $call->hits);
+        $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }
@@ -180,10 +180,10 @@ class TraceableAdapterTest extends AdapterTestCase
         $this->assertCount(1, $calls);
 
         $call = $calls[0];
-        $this->assertEquals('commit', $call->name);
+        $this->assertSame('commit', $call->name);
         $this->assertNull(null, $call->argument);
-        $this->assertEquals(0, $call->hits);
-        $this->assertEquals(0, $call->misses);
+        $this->assertSame(0, $call->hits);
+        $this->assertSame(0, $call->misses);
         $this->assertNotEmpty($call->start);
         $this->assertNotEmpty($call->end);
     }

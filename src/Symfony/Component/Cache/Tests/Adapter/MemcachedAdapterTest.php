@@ -22,7 +22,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
     );
 
-    private static $client;
+    protected static $client;
 
     public static function setupBeforeClass()
     {

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
  *
  * @internal
  */
-trait FilesystemAdapterTrait
+trait FilesystemCommonTrait
 {
     private $directory;
     private $tmp;

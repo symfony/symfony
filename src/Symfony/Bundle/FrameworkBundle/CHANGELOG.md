@@ -12,6 +12,7 @@ CHANGELOG
    is disabled.
  * Added `GlobalVariables::getToken()`
  * Deprecated `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass`. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ * Added configurable paths for validation files 
 
 3.2.0
 -----

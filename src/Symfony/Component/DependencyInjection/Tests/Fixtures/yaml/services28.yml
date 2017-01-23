@@ -39,3 +39,5 @@ services:
         alias: with_defaults
 
     with_defaults_aliased_short: '@with_defaults'
+
+    with_shortcut_args: [foo]

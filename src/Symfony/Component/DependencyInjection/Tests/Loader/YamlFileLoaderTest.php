@@ -153,6 +153,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('factory', $services['new_factory1']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array(new Reference('baz'), 'getClass'), $services['new_factory2']->getFactory(), '->load() parses the factory tag');
         $this->assertEquals(array('BazClass', 'getInstance'), $services['new_factory3']->getFactory(), '->load() parses the factory tag');
+        $this->assertEquals(array('foo', new Reference('baz')), $services['with_shortcut_args']->getArguments(), '->load() parses short service definition');
 
         $aliases = $container->getAliases();
         $this->assertTrue(isset($aliases['alias_for_foo']), '->load() parses aliases');
@@ -382,6 +383,10 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayNotHasKey('public', $container->getDefinition('no_defaults_child')->getChanges());
         $this->assertArrayNotHasKey('autowire', $container->getDefinition('no_defaults_child')->getChanges());
+
+        $this->assertFalse($container->getDefinition('with_shortcut_args')->isPublic());
+        $this->assertSame(array('foo' => array(array())), $container->getDefinition('with_shortcut_args')->getTags());
+        $this->assertTrue($container->getDefinition('with_shortcut_args')->isAutowired());
 
         $container->compile();
 

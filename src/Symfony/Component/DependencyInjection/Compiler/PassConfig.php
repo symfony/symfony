@@ -53,6 +53,7 @@ class PassConfig
             new ResolveFactoryClassPass(),
             new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),
+            new ResolveNamedArgumentsPass(),
             new AutowirePass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),

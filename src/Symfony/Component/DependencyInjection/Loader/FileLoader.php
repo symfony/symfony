@@ -46,6 +46,6 @@ abstract class FileLoader extends BaseFileLoader
      */
     protected function generateInstanceofDefinitionId($id, $type, $file)
     {
-        return sprintf("%s_%s_%s", $id, $type, hash('sha256', $file));
+        return sprintf('%s_%s_%s', $id, $type, hash('sha256', $file));
     }
 }

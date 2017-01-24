@@ -663,7 +663,7 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
     public function testInstanceof()
     {
         $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath . '/xml'));
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services32.xml');
 
         $definitions = $container->getDefinitions();

@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-23T16:44:48Z
+
+We could still deprecate this feature in 3.3 as it's inconsistent with other loaders, properly defining attributes is always better IMHO.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-23T16:50:21Z
+
+Can you add a test-case with the `(Request $request = null)` and a test with a controller like this (via `WebTestCase`) to prevent regressions?
+
+What to do about the feature regarding defaults?
+ - it should be kept as is
+ - it should be removed
+ - it should be added to the other loaders as well
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-23T17:02:55Z
+
+> What to do about the feature regarding defaults?
+
+IMHO it should be removed, at least not kept as is, switching between two config formats for routing should not break an app.
+
+> Can you add a test-case with the (Request $request = null) and a test with a controller like this (via WebTestCase) to prevent regressions?
+
+Sure!
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-23T17:12:04Z
+
+> IMHO it should be removed, at least not kept as is, switching between two config formats for routing should not break an app.
+
+Removing it makes sense, but it must be done using a deprecation first (so deprecated in 3.3 and removed in 4.0)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-23T20:21:45Z
+
+Functional test added. Hope the fix is good, it was not that easy 😄
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-23T20:23:06Z
+
+Not sure we should deprecate the feature, I think it's a nice one.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-23T20:26:57Z
+
+I can understand. I'll look at adding it to other formats on 3.3 if you agree
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-24T12:30:11Z
+
+Build failure is normal (high deps only).

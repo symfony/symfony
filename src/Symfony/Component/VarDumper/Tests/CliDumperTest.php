@@ -316,7 +316,7 @@ stream resource {@{$ref}
           %sTemplate.php:%d: """
             try {\\n
                 \$this->display(\$context);\\n
-            } catch (Exception \$e) {\\n
+            } catch (%s \$e) {\\n
             """
         }
       }

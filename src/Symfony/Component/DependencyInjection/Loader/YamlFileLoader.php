@@ -159,8 +159,16 @@ class YamlFileLoader extends FileLoader
         }
 
         $defaults = $this->parseDefaults($content, $file);
+
+        if ($this->isUnderscoredParamValid($content, '_instanceof', $file)) {
+            $instanceof = $content['services']['_instanceof'];
+            unset($content['services']['_instanceof']);
+        } else {
+            $instanceof = array();
+        }
+
         foreach ($content['services'] as $id => $service) {
-            $this->parseDefinition($id, $service, $file, $defaults);
+            $this->parseDefinition($id, $service, $file, $defaults, $instanceof);
         }
     }
 
@@ -174,20 +182,13 @@ class YamlFileLoader extends FileLoader
      */
     private function parseDefaults(array &$content, $file)
     {
-        if (!isset($content['services']['_defaults'])) {
-            return $content;
-        }
-        if (!is_array($defaults = $content['services']['_defaults'])) {
-            throw new InvalidArgumentException(sprintf('Service defaults must be an array, "%s" given in "%s".', gettype($defaults), $file));
-        }
-        if (isset($defaults['alias']) || isset($defaults['class']) || isset($defaults['factory'])) {
-            @trigger_error('Giving a service the "_defaults" name is deprecated since Symfony 3.3 and will be forbidden in 4.0. Rename your service.', E_USER_DEPRECATED);
-
-            return $content;
+        if (!$this->isUnderscoredParamValid($content, '_defaults', $file)) {
+            return array();
         }
 
-        $defaultKeys = array('public', 'tags', 'inherit_tags', 'autowire');
+        $defaults = $content['services']['_defaults'];
         unset($content['services']['_defaults']);
+        $defaultKeys = array('public', 'tags', 'inherit_tags', 'autowire');
 
         foreach ($defaults as $key => $default) {
             if (!in_array($key, $defaultKeys)) {
@@ -226,6 +227,25 @@ class YamlFileLoader extends FileLoader
         return $defaults;
     }
 
+    private function isUnderscoredParamValid($content, $name, $file)
+    {
+        if (!isset($content['services'][$name])) {
+            return false;
+        }
+
+        if (!is_array($underscoreParam = $content['services'][$name])) {
+            throw new InvalidArgumentException(sprintf('Service "%s" key must be an array, "%s" given in "%s".', $name, gettype($underscoreParam), $file));
+        }
+
+        if (isset($underscoreParam['alias']) || isset($underscoreParam['class']) || isset($underscoreParam['factory'])) {
+            @trigger_error(sprintf('Giving a service the "%s" name is deprecated since Symfony 3.3 and will be forbidden in 4.0. Rename your service.', $name), E_USER_DEPRECATED);
+
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Parses a definition.
      *
@@ -233,10 +253,11 @@ class YamlFileLoader extends FileLoader
      * @param array|string $service
      * @param string       $file
      * @param array        $defaults
+     * @param array        $instanceof
      *
      * @throws InvalidArgumentException When tags are invalid
      */
-    private function parseDefinition($id, $service, $file, array $defaults)
+    private function parseDefinition($id, $service, $file, array $defaults, array $instanceof)
     {
         if (is_string($service) && 0 === strpos($service, '@')) {
             $public = isset($defaults['public']) ? $defaults['public'] : true;
@@ -253,12 +274,6 @@ class YamlFileLoader extends FileLoader
             $service = array();
         }
 
-        if (!is_array($service)) {
-            throw new InvalidArgumentException(sprintf('A service definition must be an array or a string starting with "@" but %s found for service "%s" in %s. Check your YAML syntax.', gettype($service), $id, $file));
-        }
-
-        static::checkDefinition($id, $service, $file);
-
         if (isset($service['alias'])) {
             $public = array_key_exists('public', $service) ? (bool) $service['public'] : (isset($defaults['public']) ? $defaults['public'] : true);
             $this->container->setAlias($id, new Alias($service['alias'], $public));
@@ -271,6 +286,43 @@ class YamlFileLoader extends FileLoader
 
             return;
         }
+
+        $definition = $this->getDefinition($id, $service, $file, $defaults);
+        $className = $definition->getClass() ?: $id;
+        $parentId = $definition instanceof ChildDefinition ? $definition->getParent() : null;
+        foreach ($instanceof as $type => $value) {
+            if (!is_a($className, $type, true)) {
+                continue;
+            }
+
+            if ($parentId) {
+                $value['parent'] = $parentId;
+            }
+            $parentId = $this->generateInstanceofDefinitionId($id, $type, $file);
+            $parentDefinition = $this->getDefinition($parentId, $value, $file, array());
+            $parentDefinition->setAbstract(true);
+            if ($parentDefinition instanceof ChildDefinition) {
+                $definition->setInheritTags(true);
+            }
+            $this->container->setDefinition($parentId, $parentDefinition);
+        }
+
+        if (null !== $parentId) {
+            $service['parent'] = $parentId;
+            $definition = $this->getDefinition($id, $service, $file, $defaults);
+            $definition->setInheritTags(true);
+        }
+
+        $this->container->setDefinition($id, $definition);
+    }
+
+    private function getDefinition($id, $service, $file, array $defaults)
+    {
+        if (!is_array($service)) {
+            throw new InvalidArgumentException(sprintf('A service definition must be an array or a string starting with "@" but %s found for service "%s" in %s. Check your YAML syntax.', gettype($service), $id, $file));
+        }
+
+        static::checkDefinition($id, $service, $file);
 
         if (isset($service['parent'])) {
             $definition = new ChildDefinition($service['parent']);
@@ -430,7 +482,7 @@ class YamlFileLoader extends FileLoader
             }
         }
 
-        $this->container->setDefinition($id, $definition);
+        return $definition;
     }
 
     /**

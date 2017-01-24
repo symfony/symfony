@@ -175,7 +175,7 @@ class YamlFileLoader extends FileLoader
     private function parseDefaults(array &$content, $file)
     {
         if (!isset($content['services']['_defaults'])) {
-            return $content;
+            return array();
         }
         if (!is_array($defaults = $content['services']['_defaults'])) {
             throw new InvalidArgumentException(sprintf('Service defaults must be an array, "%s" given in "%s".', gettype($defaults), $file));
@@ -183,7 +183,7 @@ class YamlFileLoader extends FileLoader
         if (isset($defaults['alias']) || isset($defaults['class']) || isset($defaults['factory'])) {
             @trigger_error('Giving a service the "_defaults" name is deprecated since Symfony 3.3 and will be forbidden in 4.0. Rename your service.', E_USER_DEPRECATED);
 
-            return $content;
+            return array();
         }
 
         $defaultKeys = array('public', 'tags', 'inherit_tags', 'autowire');

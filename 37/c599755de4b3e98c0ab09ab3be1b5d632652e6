@@ -1,0 +1,294 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-15T18:57:26Z
+
+(Travis and fabbot failures unrelated)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-16T07:02:36Z
+
+Couldn't we support this in the YAML Format too by specifying an array with only one element (same for the PHP loader)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-16T07:10:59Z
+
+Or null `~` first element?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-16T08:42:50Z
+
+Looks like a good trade-off to me and can be handled directly in the `Definition::setFactory()` method.
+Anything against supporting both? (i.e `factory: [~, 'create']` and `factory: ['create']`)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-16T12:16:58Z
+
+PR updated to support this directly in the `Definition` class and allowing it from the `YamlFileLoader`.
+
+Exceptions messages would need to be enhanced, but it's hard to be really succinct.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T11:15:25Z
+
+Rethinking about this one, shouldn't this logic be handled by PhpDumper instead?
+Definition should have as low logic as possible. But PhpDumper is the right place to *interpret* what a definition *means*. Don't you think?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-18T11:30:50Z
+
+@nicolas-grekas : I can give a look, but the idea was to be able to warn the user with as much context as possible if something is missing, and limit things done in his back (if the definition class is altered somewhere, the end user might not expect the factory class to change magically).
+
+```yml
+services:
+    my_factory:
+        class: Bar\Baz
+        factory: [~, 'create']
+```
+
+Is only syntax sugar to avoid typing `Bar\Baz` twice in the definition. Not a magical thing allowing to guess the factory class according to the final `Definition` class if the class has been modified elsewhere, in a compiler pass for instance. Considering this, maybe I shouldn't have changed any logic in the `Definition` class, but only added it to dedicated loaders.
+
+Now, if we really want to support something like:
+
+```yml
+services:
+    my_factory:
+        factory: [~, 'create']
+```
+
+where the class can be provided later, indeed `PhpDumper` looks like the good candidate.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T11:49:09Z
+
+> be able to warn the user with as much context as possible if something is missing
+
+the PhpDumper has full context to do so
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-18T11:50:29Z
+
+I'll rework this PR then.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-18T12:05:23Z
+
+This makes the feature a compilation artifact.. not sure if that makes sense.
+
+Im fine with mutating the `Definition` with sensible defaults in runtime as well... perhaps a private `ContainerBuilder::finalizeDefinition($id, Def $def)` will do?
+
+- set class from id
+- set factory from class
+- etc.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-18T18:34:49Z
+
+Updated.
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-19T14:27:04Z
+
+@ogizanagi I know that fabbot.io fail is not related with your changes, but could you fix it in this PR?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-19T14:30:00Z
+
+@yceruto Those changes should be ignored ;) (see https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/2413).
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-19T14:34:36Z
+
+It should not be resolved in the PhpDumper (as this forces to reimplement the same logic in ContainerBuilder when not using a dumped container). It should be resolved in a compiler pass.
+
+The PhpDumper should contain logic about the dumped container, but it should not contain generic resolution logic, as this logic would always need to be duplicated in ``ContainerBuilder::createService``
+
+---------------------------------------------------------------------------
+
+by stof at 2016-12-19T14:35:28Z
+
+> Im fine with mutating the Definition with sensible defaults in runtime as well... perhaps a private ContainerBuilder::finalizeDefinition($id, Def $def) will do?
+
+a compiler pass is a better fit for that than adding a new responsibility in ContainerBuilder IMO.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-19T14:51:39Z
+
+@stof i believe #20264 tried an approach using a pass.. which lead to issues we have no scope on the original id.
+
+I guess in this case a pass would work.. but.. yeah, imo. we should resolve default `Definition` properties in a single place.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2016-12-20T19:03:20Z
+
+Updated in order to use a compiler pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-30T17:04:50Z
+
+There is a competition between this PR and #20264: both try to define the class when it's missing based on different rules. But if we're not careful, those rules can collide and we can have priority issues, with one implem taking over the other one.
+I think this PR should be enhanced up to replace #20264.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-01T14:39:35Z
+
+Hum, I completely messed up with my previous comment, you can forget about it :)
+Why do we need to patch the xml & yaml loader at all? I'd expect the compiler pass to deal with the logic completely. Did I miss something?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-01T16:05:39Z
+
+> Why do we need to patch the xml & yaml loader at all?
+
+Just in order to be able to use those formats without getting an exception thrown by the loaders because factory class is missing.
+The compiler pass does all the job.
+
+(Happy new year 🎉 🎈🍾🥂😃)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-01T16:38:14Z
+
+The compiler pass is missing recursivity handing into arguments, etc. Note that I'd be really fine with considering that PhpDumper + ContainerBuilder::createService have this responsibility of interpreting such state correctly as I proposed previously...
+PhpDumper & ContainerBuilder already have many in common and the logic we're talking about doesn't look that divergent from what they already share.
+
+(Happy new year ! :) )
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-04T08:20:39Z
+
+As I don't have a strong opinion on the Compiler pass vs. PhpDumper + ContainerBuilder, I can update both commits and we can choose then...but that would help me not doing everything twice if someone else has a stronger opinion on this.
+
+Isn't a complete Definition better, for instance when using the `debug:container` command?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-06T13:41:34Z
+
+@ogizanagi can you please amend the first commit so that it gets in what's fixed by the 2nd one (ie everything but the compiler pass).
+
+We miss a test + implementation for ContainerBuilder.
+
+@stof please confirm you'd be ok with only the first commit. Personally, I am. A recursive compiler pass vs 4 lines in the PhpDumper + 4 lines in ContainerBuilder, I prefer the 4x2 lines.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-07T12:01:30Z
+
+@nicolas-grekas : amended + added implementation for the ContainerBuilder + test.
+
+Despite it's the most straightforward solution, we should be aware that it'll still allow an "incomplete" Definition. Thus, the following:
+
+```yml
+
+foo:
+    class: Foo
+    factory: [~, create]
+```
+
+along with the `bin/console debug:container foo` command, for instance, will output:
+
+```txt
+Information for Service "foo"
+=============================
+
+ ------------------ --------
+  Option             Value
+ ------------------ --------
+  Service ID         foo
+  Class              Foo
+  Tags               -
+  Public             yes
+  Synthetic          no
+  Lazy               no
+  Shared             yes
+  Abstract           no
+  Autowired          no
+  Autowiring Types   -
+  Factory Class
+  Factory Method     create
+ ------------------ --------
+```
+
+(i.e no factory class, unless we adjust the command or opt for the pass)
+
+**EDIT:** I've added the required changes in descriptors regarding this in the first commit. Let me know.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-12T17:50:57Z
+
+@stof : Anything to declare? 😄
+
+Otherwise I'll remove the last commit about the compiler pass implementation.
+
+Thank you.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-16T17:00:14Z
+
+@ogizanagi would you mind updating the compiler pass ti make it able to handle nested inline definitions?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-16T17:32:12Z
+
+@nicolas-grekas : I was going to remove the second commit and go forward. Did you change your mind, or should we simply wait for more opinions on this?
+
+BTW, regarding the PHPDumper + ContainerBuilder implementation, now that dumping a non-compiled container is deprecated and #21133 is merged, [this test](https://github.com/ogizanagi/symfony/blob/6af17f32753eef0f76bceaaf54be7221cb2f5a70/src/Symfony/Component/DependencyInjection/Tests/Dumper/PhpDumperTest.php#L214-L226) is failing when adding `$container->compile()`, because:
+
+1. #21133 uses the service id if class is not set in the definition, even for a service id like `bar`. If we want to avoid a `class_exists` call to support generated classes, I wonder if we shouldn't at least enforce a leading `\` in case someone wants to register a service named after a class in the global namespace?
+2. The `CheckDefinitionValidityPass` anyway checks a definition has a class, even for definition with a factory. So maybe this test should be marked as legacy, or should be removed along with related code?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-23T21:13:39Z
+
+@ogizanagi can you rebase and take advantage of AbstractRecursivePass now that #21327 is merged?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-23T22:44:13Z
+
+Tests are failing, but that's not related AFAIK.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-23T22:56:42Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-23T22:58:55Z
+
+@ogizanagi Can you add a note in the component CHANGELOG?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-23T23:02:19Z
+
+Sure. Done :)

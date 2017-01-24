@@ -257,7 +257,13 @@
                                 : '<span class="label status-error same-width">DENIED</span>'
                             }}
                         </td>
-                        <td>{{ decision.attributes|length == 1 ? decision.attributes|first : profiler_dump(decision.attributes) }}</td>
+                        <td>
+                            {% if decision.attributes|length == 1 %}
+                                {{ decision.attributes|first }}
+                            {% else %}
+                                {{ profiler_dump(decision.attributes) }}
+                            {% endif %}
+                        </td>
                         <td>{{ profiler_dump(decision.object) }}</td>
                     </tr>
                 {% endfor %}

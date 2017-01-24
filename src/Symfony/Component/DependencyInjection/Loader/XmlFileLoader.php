@@ -223,8 +223,7 @@ class XmlFileLoader extends FileLoader
             if ($parentId) {
                 $s->setAttribute('parent', $parentId);
             }
-            // TODO: move the ID generation or maybe the whole block in the parent class
-            $parentId = md5("$file.$type.$id");
+            $parentId = $this->generateInstanceofDefinitionId($id, $type, $file);
             $parentDefinition = $this->getDefinition($s, $file);
             $parentDefinition->setAbstract(true);
             if ($parentDefinition instanceof ChildDefinition) {

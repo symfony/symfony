@@ -34,4 +34,18 @@ abstract class FileLoader extends BaseFileLoader
 
         parent::__construct($locator);
     }
+
+    /**
+     * Generates the ID of an "instanceof" definition.
+     *
+     * @param string $id
+     * @param string $type
+     * @param string $file
+     *
+     * @return string
+     */
+    protected function generateInstanceofDefinitionId($id, $type, $file)
+    {
+        return sprintf("%s_%s_%s", $id, $type, hash('sha256', $file));
+    }
 }

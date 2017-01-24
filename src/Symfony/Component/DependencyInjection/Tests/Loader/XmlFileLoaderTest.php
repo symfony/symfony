@@ -666,7 +666,8 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath . '/xml'));
         $loader->load('services32.xml');
 
-        $parentDefinition = $container->getDefinition('97c529c8fec609499e1a920f6f064edb');
+        $definitions = $container->getDefinitions();
+        $parentDefinition = array_shift($definitions);
         $this->assertNotInstanceOf(ChildDefinition::class, $parentDefinition);
         $this->assertTrue($parentDefinition->isAutowired());
         $this->assertTrue($parentDefinition->isLazy());

@@ -412,7 +412,8 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
         $loader->load('services32.yml');
 
-        $parentDefinition = $container->getDefinition('ab31379cf807a57ab10c13685f0ee619');
+        $definitions = $container->getDefinitions();
+        $parentDefinition = array_shift($definitions);
         $this->assertNotInstanceOf(ChildDefinition::class, $parentDefinition);
         $this->assertTrue($parentDefinition->isAutowired());
         $this->assertTrue($parentDefinition->isLazy());

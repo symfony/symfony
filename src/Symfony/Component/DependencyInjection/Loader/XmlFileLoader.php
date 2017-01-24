@@ -221,6 +221,7 @@ class XmlFileLoader extends FileLoader
             }
 
             if ($parentId) {
+                $s = clone $s;
                 $s->setAttribute('parent', $parentId);
             }
             $parentId = $this->generateInstanceofDefinitionId($id, $type, $file);

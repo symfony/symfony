@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-23T21:40:16Z
+
+Is it possible to some tests? Because I fear we can get regressions on this one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-24T08:18:20Z
+
+Test added. Without the patch, the test suite fails with many `Constructing service "cache.annotations" from a parent definition is not supported at build time.`

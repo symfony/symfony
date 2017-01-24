@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Psr\Http\Message\UploadedFileInterface;
 use Symfony\Component\HttpFoundation\File\File as FileObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -49,10 +50,18 @@ class FileValidator extends ConstraintValidator
             return;
         }
 
-        if ($value instanceof UploadedFile && !$value->isValid()) {
-            switch ($value->getError()) {
+        $error = null;
+        if (
+            ($value instanceof UploadedFile && !$value->isValid())
+            || ($value instanceof UploadedFileInterface && UPLOAD_ERR_OK !== $value->getError())
+        ) {
+            $error = $value->getError();
+        }
+
+        if (null !== $error) {
+            switch ($error) {
                 case UPLOAD_ERR_INI_SIZE:
-                    $iniLimitSize = UploadedFile::getMaxFilesize();
+                    $iniLimitSize = self::getMaxFilesize();
                     if ($constraint->maxSize && $constraint->maxSize < $iniLimitSize) {
                         $limitInBytes = $constraint->maxSize;
                         $binaryFormat = $constraint->binaryFormat;
@@ -152,16 +161,22 @@ class FileValidator extends ConstraintValidator
                 default:
                     if ($this->context instanceof ExecutionContextInterface) {
                         $this->context->buildViolation($constraint->uploadErrorMessage)
-                            ->setCode($value->getError())
+                            ->setCode($error)
                             ->addViolation();
                     } else {
                         $this->buildViolation($constraint->uploadErrorMessage)
-                            ->setCode($value->getError())
+                            ->setCode($error)
                             ->addViolation();
                     }
 
                     return;
             }
+        }
+
+        if ($value instanceof UploadedFileInterface) {
+            // PSR-7 UploadedFileInterface does not represent a file
+            // in the filesystem.
+            return;
         }
 
         if (!is_scalar($value) && !$value instanceof FileObject && !(is_object($value) && method_exists($value, '__toString'))) {
@@ -288,6 +303,33 @@ class FileValidator extends ConstraintValidator
     private static function moreDecimalsThan($double, $numberOfDecimals)
     {
         return strlen((string) $double) > strlen(round($double, $numberOfDecimals));
+    }
+
+    private static function getMaxFilesize()
+    {
+        $iniMax = strtolower(ini_get('upload_max_filesize'));
+
+        if ('' === $iniMax) {
+            return PHP_INT_MAX;
+        }
+
+        $max = ltrim($iniMax, '+');
+        if (0 === strpos($max, '0x')) {
+            $max = intval($max, 16);
+        } elseif (0 === strpos($max, '0')) {
+            $max = intval($max, 8);
+        } else {
+            $max = (int) $max;
+        }
+
+        switch (substr($iniMax, -1)) {
+            case 't': $max *= 1024;
+            case 'g': $max *= 1024;
+            case 'm': $max *= 1024;
+            case 'k': $max *= 1024;
+        }
+
+        return $max;
     }
 
     /**

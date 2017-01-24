@@ -6,6 +6,11 @@ ClassLoader
 
  * The component is deprecated and will be removed in 4.0. Use Composer instead.
 
+Debug
+-----
+
+ * The `ContextErrorException` class is deprecated. `\ErrorException` will be used instead in 4.0.
+
 DependencyInjection
 -------------------
 

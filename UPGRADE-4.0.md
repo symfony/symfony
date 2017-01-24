@@ -15,6 +15,9 @@ Console
 Debug
 -----
 
+
+ * The `ContextErrorException` class has been removed. Use `\ErrorException` instead.
+
  * `FlattenException::getTrace()` now returns additional type descriptions
    `integer` and `float`.
 

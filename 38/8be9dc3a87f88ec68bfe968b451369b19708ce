@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-17T15:00:41Z
+
+> Currently skipped tests in components depending on ICU data:
+
+is this table built before or after your change ?
+
+---------------------------------------------------------------------------
+
+by jakzal at 2017-01-17T15:20:29Z
+
+@stof after my change. Here's the current 2.7:
+
+|            | 4.8.1.1 | 54.1 | 55.1 | 57.1 |
+|---|---|--|--|--|
+| Intl       | 488     | 488  | 7    | 488    |
+| Locale     | 0       | 0    | 0    | 0    |
+| Translation| 0       | 0    | 0    | 0    |
+| Validator  | 69      | 69   | 69   | 0    |
+| Form       | 75      | 75 + 1 error + 5 failures   | 75   | 1 + 3 errors + 3 failures  |
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-24T14:17:58Z
+
+:+1:

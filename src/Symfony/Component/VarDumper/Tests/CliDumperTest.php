@@ -289,7 +289,7 @@ stream resource {@{$ref}
       %sTemplate.php:%d: {
         : try {
         :     \$this->display(\$context);
-        : } catch (Exception \$e) {
+        : } catch (%s \$e) {
       }
       %sCliDumperTest.php:{$line}: {
         :         }

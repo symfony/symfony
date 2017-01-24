@@ -58,5 +58,8 @@
     <service id="new_factory3" class="FooBarClass">
       <factory class="BazClass" method="getInstance" />
     </service>
+    <service id="new_factory4" class="BazClass">
+      <factory method="getInstance" />
+    </service>
   </services>
 </container>

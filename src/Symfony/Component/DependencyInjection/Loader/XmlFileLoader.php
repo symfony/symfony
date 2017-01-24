@@ -257,7 +257,7 @@ class XmlFileLoader extends FileLoader
                 } elseif ($childService = $factory->getAttribute('service')) {
                     $class = new Reference($childService, ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, false);
                 } else {
-                    $class = $factory->getAttribute('class');
+                    $class = $factory->hasAttribute('class') ? $factory->getAttribute('class') : null;
                 }
 
                 $definition->setFactory(array($class, $factory->getAttribute('method')));

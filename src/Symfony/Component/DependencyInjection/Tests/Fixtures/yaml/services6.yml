@@ -39,4 +39,5 @@ services:
     new_factory1: { class: FooBarClass, factory: factory}
     new_factory2: { class: FooBarClass, factory: ['@baz', getClass]}
     new_factory3: { class: FooBarClass, factory: [BazClass, getInstance]}
+    new_factory4: { class: BazClass, factory: [~, getInstance]}
     with_shortcut_args: [foo, '@baz']

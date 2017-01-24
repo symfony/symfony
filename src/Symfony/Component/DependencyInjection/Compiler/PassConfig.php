@@ -50,6 +50,7 @@ class PassConfig
             new ResolveDefinitionTemplatesPass(),
             new DecoratorServicePass(),
             new ResolveParameterPlaceHoldersPass(),
+            new ResolveFactoryClassPass(),
             new FactoryReturnTypePass($resolveClassPass),
             new CheckDefinitionValidityPass(),
             new ResolveReferencesToAliasesPass(),

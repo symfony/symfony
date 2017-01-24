@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
 {
     private $manager;
-    private $strategy;
+    private $defaultStrategy;
     private $voters = array();
     private $decisionLog = array();
 
@@ -33,10 +33,10 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
         $this->manager = $manager;
 
         if ($this->manager instanceof AccessDecisionManager) {
-            // The strategy is stored in a private property of the decorated service
-            $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'strategy');
+            // The default strategy is stored in a private property of the decorated service
+            $reflection = new \ReflectionProperty(AccessDecisionManager::class, 'defaultStrategy');
             $reflection->setAccessible(true);
-            $this->strategy = $reflection->getValue($manager);
+            $this->defaultStrategy = $reflection->getValue($manager);
         }
     }
 
@@ -47,10 +47,16 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     {
         $result = $this->manager->decide($token, $attributes, $object);
 
+        $strategy = 'unknown';
+        if ($this->manager instanceof AccessDecisionManager) {
+            $strategy = $this->manager->getStrategy($token, $attributes, $object);
+        }
+
         $this->decisionLog[] = array(
             'attributes' => $attributes,
             'object' => $object,
             'result' => $result,
+            'strategy' => $strategy,
         );
 
         return $result;
@@ -72,12 +78,9 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     /**
      * @return string
      */
-    public function getStrategy()
+    public function getDefaultStrategy()
     {
-        // The $strategy property is misleading because it stores the name of its
-        // method (e.g. 'decideAffirmative') instead of the original strategy name
-        // (e.g. 'affirmative')
-        return null === $this->strategy ? '-' : strtolower(substr($this->strategy, 6));
+        return null === $this->defaultStrategy ? 'unknown' : $this->defaultStrategy;
     }
 
     /**

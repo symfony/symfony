@@ -127,14 +127,14 @@ class SecurityDataCollector extends DataCollector
                 return $decision;
             }, $this->accessDecisionManager->getDecisionLog());
 
-            $this->data['voter_strategy'] = $this->accessDecisionManager->getStrategy();
+            $this->data['voter_default_strategy'] = $this->accessDecisionManager->getDefaultStrategy();
 
             foreach ($this->accessDecisionManager->getVoters() as $voter) {
                 $this->data['voters'][] = get_class($voter);
             }
         } else {
             $this->data['access_decision_log'] = array();
-            $this->data['voter_strategy'] = 'unknown';
+            $this->data['voter_default_strategy'] = 'unknown';
             $this->data['voters'] = array();
         }
 
@@ -263,13 +263,13 @@ class SecurityDataCollector extends DataCollector
     }
 
     /**
-     * Returns the strategy configured for the security voters.
+     * Returns the default strategy configured for the security voters.
      *
      * @return string
      */
-    public function getVoterStrategy()
+    public function getVoterDefaultStrategy()
     {
-        return $this->data['voter_strategy'];
+        return $this->data['voter_default_strategy'];
     }
 
     /**

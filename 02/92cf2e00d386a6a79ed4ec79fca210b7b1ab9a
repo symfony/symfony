@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-24T10:31:47Z
+
+is there still a case where we will provide a context to the exception ? If no, we should deprecate ContextErrorException (which is here only to add the context)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-24T10:38:59Z
+
+Done in #21388

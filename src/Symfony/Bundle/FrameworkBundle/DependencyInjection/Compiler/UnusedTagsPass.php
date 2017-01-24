@@ -53,8 +53,6 @@ class UnusedTagsPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $compiler = $container->getCompiler();
-        $formatter = $compiler->getLoggingFormatter();
         $tags = array_unique(array_merge($container->findTags(), $this->whitelist));
 
         foreach ($container->findUnusedTags() as $tag) {
@@ -81,7 +79,7 @@ class UnusedTagsPass implements CompilerPassInterface
                 $message .= sprintf(' Did you mean "%s"?', implode('", "', $candidates));
             }
 
-            $compiler->addLogMessage($formatter->format($this, $message));
+            $container->log($this, $message);
         }
     }
 }

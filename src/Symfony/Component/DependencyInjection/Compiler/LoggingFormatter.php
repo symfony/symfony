@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+@trigger_error('The '.__NAMESPACE__.'\LoggingFormatter class is deprecated since version 3.3 and will be removed in 4.0. Use the ContainerBuilder::log() method instead.', E_USER_DEPRECATED);
+
 /**
  * Used to format logging messages during the compilation.
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ *
+ * @deprecated since version 3.3, to be removed in 4.0. Use the ContainerBuilder::log() method instead.
  */
 class LoggingFormatter
 {

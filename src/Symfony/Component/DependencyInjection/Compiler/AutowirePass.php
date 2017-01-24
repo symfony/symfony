@@ -24,9 +24,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AutowirePass extends AbstractRecursivePass implements CompilerPassInterface
 {
-    /**
-     * @var ContainerBuilder
-     */
     private $reflectionClasses = array();
     private $definedTypes = array();
     private $types;

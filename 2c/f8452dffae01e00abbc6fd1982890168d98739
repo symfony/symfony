@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-24T09:29:26Z
+
+Note that 3.1 is not affected, because ``profiler_dump`` is not safe there
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-24T09:50:51Z
+
+Okay, I have to admit, I would not have guessed this was even possible :laughing:

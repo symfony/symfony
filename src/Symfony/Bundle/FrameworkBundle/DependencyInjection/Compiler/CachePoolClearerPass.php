@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -37,23 +36,6 @@ final class CachePoolClearerPass implements CompilerPassInterface
                 if (array_key_exists('clearer', $attr)) {
                     break;
                 }
-            }
-        }
-
-        if (!$container->has('cache.annotations')) {
-            return;
-        }
-        $factory = array(AbstractAdapter::class, 'createSystemCache');
-        $annotationsPool = $container->getDefinition('cache.annotations');
-        if ($factory !== $annotationsPool->getFactory() || 4 !== count($annotationsPool->getArguments())) {
-            return;
-        }
-        if ($container->has('monolog.logger.cache')) {
-            $annotationsPool->addArgument(new Reference('monolog.logger.cache'));
-        } elseif ($container->has('cache.system')) {
-            $systemPool = $container->getDefinition('cache.system');
-            if ($factory === $systemPool->getFactory() && 5 <= count($systemArgs = $systemPool->getArguments())) {
-                $annotationsPool->addArgument($systemArgs[4]);
             }
         }
     }

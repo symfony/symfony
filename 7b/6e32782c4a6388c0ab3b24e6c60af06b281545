@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-20T06:52:36Z
+
+Didn't any tests fail without these changes?
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-20T07:16:40Z
+
+No because it still returns an array behaving like an empty one (because keys of `$content` are usually service ids or class names and don't have any signifiant meaning as a service definition).
+
+It's why it's very unlikely to introduce bugs, but it still needs to be fixed IMO.

@@ -373,7 +373,7 @@ class ErrorHandler
         $scope = $this->scopedErrors & $type;
 
         if (4 < $numArgs = func_num_args()) {
-            $context = $scope ? func_get_arg(4) : array();
+            $context = $scope ? (func_get_arg(4) ?: array()) : array();
             $backtrace = 5 < $numArgs ? func_get_arg(5) : null; // defined on HHVM
         } else {
             $context = array();

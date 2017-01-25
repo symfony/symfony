@@ -219,9 +219,7 @@ class JsonDescriptor extends Descriptor
             'lazy' => $definition->isLazy(),
         );
 
-        if (method_exists($definition, 'isShared')) {
-            $data['shared'] = $definition->isShared();
-        }
+        $data['shared'] = $definition->isShared();
 
         if (method_exists($definition, 'isSynchronized')) {
             $data['synchronized'] = $definition->isSynchronized(false);
@@ -229,13 +227,11 @@ class JsonDescriptor extends Descriptor
 
         $data['abstract'] = $definition->isAbstract();
 
-        if (method_exists($definition, 'isAutowired')) {
-            $data['autowire'] = $definition->isAutowired();
+        $data['autowire'] = $definition->isAutowired();
 
-            $data['autowiring_types'] = array();
-            foreach ($definition->getAutowiringTypes() as $autowiringType) {
-                $data['autowiring_types'][] = $autowiringType;
-            }
+        $data['autowiring_types'] = array();
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $data['autowiring_types'][] = $autowiringType;
         }
 
         $data['file'] = $definition->getFile();

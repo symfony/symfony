@@ -61,10 +61,6 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
     {
         $metadata = array();
 
-        if ($constructor = $reflectionClass->getConstructor()) {
-            $metadata['__construct'] = self::getResourceMetadataForMethod($constructor);
-        }
-
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             if (!$reflectionMethod->isStatic()) {
                 $metadata[$reflectionMethod->name] = self::getResourceMetadataForMethod($reflectionMethod);
@@ -91,15 +87,27 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
             $this->container->addResource(static::createResourceForClass($reflectionClass));
         }
 
-        $methodsCalled = array();
-        foreach ($value->getMethodCalls() as $methodCall) {
-            $methodsCalled[strtolower($methodCall[0])] = true;
+        $autowiredMethods = $this->getMethodsToAutowire($reflectionClass, $autowiredMethods);
+        $methodCalls = $value->getMethodCalls();
+
+        if ($constructor = $reflectionClass->getConstructor()) {
+            array_unshift($methodCalls, array($constructor->name, $value->getArguments()));
+        } elseif ($value->getArguments()) {
+            throw new RuntimeException(sprintf('Cannot autowire service "%s": class %s has no constructor but arguments are defined.', $this->currentId, $reflectionClass->name, $method));
         }
 
-        foreach ($this->getMethodsToAutowire($reflectionClass, $autowiredMethods) as $reflectionMethod) {
-            if (!isset($methodsCalled[strtolower($reflectionMethod->name)])) {
-                $this->autowireMethod($value, $reflectionMethod);
+        $methodCalls = $this->autowireMethodCalls($reflectionClass, $methodCalls, $autowiredMethods);
+
+        if ($constructor) {
+            list(, $arguments) = array_shift($methodCalls);
+
+            if ($arguments !== $value->getArguments()) {
+                $value->setArguments($arguments);
             }
+        }
+
+        if ($methodCalls !== $value->getMethodCalls()) {
+            $value->setMethodCalls($methodCalls);
         }
 
         return parent::processValue($value, $isRoot);
@@ -109,21 +117,15 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
      * Gets the list of methods to autowire.
      *
      * @param \ReflectionClass $reflectionClass
-     * @param string[]         $configuredAutowiredMethods
+     * @param string[]         $autowiredMethods
      *
      * @return \ReflectionMethod[]
      */
-    private function getMethodsToAutowire(\ReflectionClass $reflectionClass, array $configuredAutowiredMethods)
+    private function getMethodsToAutowire(\ReflectionClass $reflectionClass, array $autowiredMethods)
     {
         $found = array();
         $regexList = array();
-
-        // Always try to autowire the constructor
-        if (in_array('__construct', $configuredAutowiredMethods, true)) {
-            $autowiredMethods = $configuredAutowiredMethods;
-        } else {
-            $autowiredMethods = array_merge(array('__construct'), $configuredAutowiredMethods);
-        }
+        $methodsToAutowire = array();
 
         foreach ($autowiredMethods as $pattern) {
             $regexList[] = '/^'.str_replace('\*', '.*', preg_quote($pattern, '/')).'$/i';
@@ -137,36 +139,82 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
             foreach ($regexList as $k => $regex) {
                 if (preg_match($regex, $reflectionMethod->name)) {
                     $found[] = $autowiredMethods[$k];
-                    yield $reflectionMethod;
-
+                    $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
                     continue 2;
                 }
             }
+
+            if ($reflectionMethod->isConstructor()) {
+                $methodsToAutowire[strtolower($reflectionMethod->name)] = $reflectionMethod;
+            }
         }
 
-        if ($notFound = array_diff($configuredAutowiredMethods, $found)) {
+        if ($notFound = array_diff($autowiredMethods, $found)) {
             $compiler = $this->container->getCompiler();
             $compiler->addLogMessage($compiler->getLoggingFormatter()->formatUnusedAutowiringPatterns($this, $this->currentId, $notFound));
         }
+
+        return $methodsToAutowire;
+    }
+
+    /**
+     * @param \ReflectionClass    $reflectionClass
+     * @param array               $methodCalls
+     * @param \ReflectionMethod[] $autowiredMethods
+     *
+     * @return array
+     */
+    private function autowireMethodCalls(\ReflectionClass $reflectionClass, array $methodCalls, array $autowiredMethods)
+    {
+        $parameterBag = $this->container->getParameterBag();
+
+        foreach ($methodCalls as $i => $call) {
+            list($method, $arguments) = $call;
+            $method = $parameterBag->resolveValue($method);
+
+            if (isset($autowiredMethods[$lcMethod = strtolower($method)])) {
+                $reflectionMethod = $autowiredMethods[$lcMethod];
+                unset($autowiredMethods[$lcMethod]);
+            } else {
+                if (!$reflectionClass->hasMethod($method)) {
+                    throw new RuntimeException(sprintf('Cannot autowire service "%s": method %s::%s() does not exist.', $this->currentId, $reflectionClass->name, $method));
+                }
+                $reflectionMethod = $reflectionClass->getMethod($method);
+                if (!$reflectionMethod->isPublic()) {
+                    throw new RuntimeException(sprintf('Cannot autowire service "%s": method %s::%s() must be public.', $this->currentId, $reflectionClass->name, $method));
+                }
+            }
+
+            $arguments = $this->autowireMethod($reflectionMethod, $arguments, true);
+
+            if ($arguments !== $call[1]) {
+                $methodCalls[$i][1] = $arguments;
+            }
+        }
+
+        foreach ($autowiredMethods as $reflectionMethod) {
+            if ($arguments = $this->autowireMethod($reflectionMethod, array(), false)) {
+                $methodCalls[] = array($reflectionMethod->name, $arguments);
+            }
+        }
+
+        return $methodCalls;
     }
 
     /**
      * Autowires the constructor or a setter.
      *
-     * @param Definition        $definition
      * @param \ReflectionMethod $reflectionMethod
+     * @param array             $arguments
+     * @param bool              $mustAutowire
+     *
+     * @return array The autowired arguments
      *
      * @throws RuntimeException
      */
-    private function autowireMethod(Definition $definition, \ReflectionMethod $reflectionMethod)
+    private function autowireMethod(\ReflectionMethod $reflectionMethod, array $arguments, $mustAutowire)
     {
-        if ($isConstructor = $reflectionMethod->isConstructor()) {
-            $arguments = $definition->getArguments();
-        } else {
-            $arguments = array();
-        }
-
-        $addMethodCall = false; // Whether the method should be added to the definition as a call or as arguments
+        $didAutowire = false; // Whether any arguments have been autowired or not
         foreach ($reflectionMethod->getParameters() as $index => $parameter) {
             if (array_key_exists($index, $arguments) && '' !== $arguments[$index]) {
                 continue;
@@ -176,11 +224,11 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
                 if (!$typeHint = $parameter->getClass()) {
                     // no default value? Then fail
                     if (!$parameter->isOptional()) {
-                        if ($isConstructor) {
-                            throw new RuntimeException(sprintf('Unable to autowire argument index %d ($%s) for the service "%s". If this is an object, give it a type-hint. Otherwise, specify this argument\'s value explicitly.', $index, $parameter->name, $this->currentId));
+                        if ($mustAutowire) {
+                            throw new RuntimeException(sprintf('Cannot autowire service "%s": argument $%s of method %s::%s() must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $reflectionMethod->class, $reflectionMethod->name));
                         }
 
-                        return;
+                        return array();
                     }
 
                     // specifically pass the default value
@@ -195,23 +243,23 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
 
                 if (isset($this->types[$typeHint->name])) {
                     $value = new Reference($this->types[$typeHint->name]);
-                    $addMethodCall = true;
+                    $didAutowire = true;
                 } else {
                     try {
                         $value = $this->createAutowiredDefinition($typeHint);
-                        $addMethodCall = true;
+                        $didAutowire = true;
                     } catch (RuntimeException $e) {
                         if ($parameter->allowsNull()) {
                             $value = null;
                         } elseif ($parameter->isDefaultValueAvailable()) {
                             $value = $parameter->getDefaultValue();
                         } else {
-                            // The exception code is set to 1 if the exception must be thrown even if it's a setter
-                            if (1 === $e->getCode() || $isConstructor) {
+                            // The exception code is set to 1 if the exception must be thrown even if it's an optional setter
+                            if (1 === $e->getCode() || $mustAutowire) {
                                 throw $e;
                             }
 
-                            return;
+                            return array();
                         }
                     }
                 }
@@ -219,11 +267,11 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
                 // Typehint against a non-existing class
 
                 if (!$parameter->isDefaultValueAvailable()) {
-                    if ($isConstructor) {
-                        throw new RuntimeException(sprintf('Cannot autowire argument %s for %s because the type-hinted class does not exist (%s).', $index + 1, $definition->getClass(), $e->getMessage()), 0, $e);
+                    if ($mustAutowire) {
+                        throw new RuntimeException(sprintf('Cannot autowire argument $%s of method %s::%s() for service "%s": %s.', $parameter->name, $reflectionMethod->class, $reflectionMethod->name, $this->currentId, $e->getMessage()), 0, $e);
                     }
 
-                    return;
+                    return array();
                 }
 
                 $value = $parameter->getDefaultValue();
@@ -232,15 +280,15 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
             $arguments[$index] = $value;
         }
 
+        if (!$mustAutowire && !$didAutowire) {
+            return array();
+        }
+
         // it's possible index 1 was set, then index 0, then 2, etc
         // make sure that we re-order so they're injected as expected
         ksort($arguments);
 
-        if ($isConstructor) {
-            $definition->setArguments($arguments);
-        } elseif ($addMethodCall) {
-            $definition->addMethodCall($reflectionMethod->name, $arguments);
-        }
+        return $arguments;
     }
 
     /**

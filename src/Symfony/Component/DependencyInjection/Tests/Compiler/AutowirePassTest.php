@@ -289,7 +289,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot autowire argument 2 for Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument because the type-hinted class does not exist (Class Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass does not exist).
+     * @expectedExceptionMessage Cannot autowire argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadTypeHintedArgument::__construct() for service "a": Class Symfony\Component\DependencyInjection\Tests\Compiler\NotARealClass does not exist.
      */
     public function testClassNotFoundThrowsException()
     {
@@ -304,7 +304,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Cannot autowire argument 2 for Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument because the type-hinted class does not exist (Class Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass does not exist).
+     * @expectedExceptionMessage Cannot autowire argument $r of method Symfony\Component\DependencyInjection\Tests\Compiler\BadParentTypeHintedArgument::__construct() for service "a": Class Symfony\Component\DependencyInjection\Tests\Compiler\OptionalServiceClass does not exist.
      */
     public function testParentClassNotFoundThrowsException()
     {
@@ -363,7 +363,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument index 1 ($foo) for the service "arg_no_type_hint". If this is an object, give it a type-hint. Otherwise, specify this argument's value explicitly.
+     * @expectedExceptionMessage Cannot autowire service "arg_no_type_hint": argument $foo of method Symfony\Component\DependencyInjection\Tests\Compiler\MultipleArguments::__construct() must have a type-hint or be given a value explicitly.
      */
     public function testScalarArgsCannotBeAutowired()
     {
@@ -382,7 +382,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
-     * @expectedExceptionMessage Unable to autowire argument index 1 ($foo) for the service "not_really_optional_scalar". If this is an object, give it a type-hint. Otherwise, specify this argument's value explicitly.
+     * @expectedExceptionMessage Cannot autowire service "not_really_optional_scalar": argument $foo of method Symfony\Component\DependencyInjection\Tests\Compiler\MultipleArgumentsOptionalScalarNotReallyOptional::__construct() must have a type-hint or be given a value explicitly.
      */
     public function testOptionalScalarNotReallyOptionalThrowException()
     {
@@ -592,6 +592,22 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $pass->process($container);
 
         $this->assertEquals(array(AutowirePass::class.': Autowiring\'s patterns "not", "exist*" for service "foo" don\'t match any method.'), $container->getCompiler()->getLog());
+    }
+
+    public function testPartialMethodCalls()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', A::class);
+        $container->register('foo', Foo::class);
+        $definition = $container->register('bar', SetterInjection::class);
+        $definition->setAutowired(true);
+        $definition->addMethodCall('setDependencies', array(new Reference('foo')));
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertEquals(array(array('setDependencies', array(new Reference('foo'), new Reference('a')))), $container->getDefinition('bar')->getMethodCalls());
     }
 }
 

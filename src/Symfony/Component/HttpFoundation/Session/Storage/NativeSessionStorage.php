@@ -223,7 +223,29 @@ class NativeSessionStorage implements SessionStorageInterface
      */
     public function save()
     {
-        session_write_close();
+        try {
+            session_write_close();
+        } catch (\ErrorException $e) {
+            // The default PHP error message is not very helpful, as it does not give any information on the curently
+            // used save handler.
+            // Therefore, we catch this exception and throw a new exception is a proper exception message
+            $handler = $this->getSaveHandler();
+            if ($handler instanceof SessionHandlerProxy) {
+                $handler = $handler->getHandler();
+            }
+
+            throw new \ErrorException(
+                sprintf(
+                    'session_write_close(): Failed to write session data with %s handler',
+                    get_class($handler)
+                ),
+                $e->getCode(),
+                $e->getSeverity(),
+                $e->getFile(),
+                $e->getLine(),
+                $e
+            );
+        }
 
         if (!$this->saveHandler->isWrapper() && !$this->saveHandler->isSessionHandlerInterface()) {
             // This condition matches only PHP 5.3 with internal save handlers

@@ -518,6 +518,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getCreateResourceTests
+     * @group legacy
      */
     public function testCreateResourceForClass($className, $isEqual)
     {

@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * added `ReflectionClassResource` class
+ * added second `$exists` constructor argument to `ClassExistenceResource`
+ * made `ClassExistenceResource` work with interfaces and traits
+
 3.0.0
 -----
 

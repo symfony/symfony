@@ -51,4 +51,24 @@ EOF
 
         $this->assertTrue($res->isFresh(time()));
     }
+
+    public function testExistsKo()
+    {
+        spl_autoload_register($autoloader = function ($class) use (&$loadedClass) { $loadedClass = $class; });
+
+        try {
+            $res = new ClassExistenceResource('MissingFooClass');
+            $this->assertTrue($res->isFresh(0));
+
+            $this->assertSame('MissingFooClass', $loadedClass);
+
+            $loadedClass = 123;
+
+            $res = new ClassExistenceResource('MissingFooClass', ClassExistenceResource::EXISTS_KO);
+
+            $this->assertSame(123, $loadedClass);
+        } finally {
+            spl_autoload_unregister($autoloader);
+        }
+    }
 }

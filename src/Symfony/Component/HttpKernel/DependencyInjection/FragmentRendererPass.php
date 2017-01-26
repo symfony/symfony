@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 
 /**
  * Adds services tagged kernel.fragment_renderer as HTTP content rendering strategies.
@@ -53,14 +54,12 @@ class FragmentRendererPass implements CompilerPassInterface
             }
 
             $class = $container->getParameterBag()->resolveValue($def->getClass());
-            $interface = 'Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface';
 
-            if (!is_subclass_of($class, $interface)) {
-                if (!class_exists($class, false)) {
-                    throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
-                }
-
-                throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
+            if (!$r = $container->getReflectionClass($class)) {
+                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $class, $id));
+            }
+            if (!$r->isSubclassOf(FragmentRendererInterface::class)) {
+                throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, FragmentRendererInterface::class));
             }
 
             foreach ($tags as $tag) {

@@ -23,7 +23,7 @@
     "require-dev": {
         "symfony/http-kernel": "~2.8|~3.0",
         "symfony/event-dispatcher": "~2.8|~3.0",
-        "symfony/dependency-injection": "~2.8|~3.0",
+        "symfony/dependency-injection": "~3.3",
         "symfony/filesystem": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
         "psr/log": "~1.0"
@@ -33,6 +33,9 @@
         "symfony/filesystem": "",
         "symfony/process": "",
         "psr/log": "For using the console logger"
+    },
+    "conflict": {
+        "symfony/dependency-injection": "<3.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Console\\": "" },

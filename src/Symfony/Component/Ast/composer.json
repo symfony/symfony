@@ -1,0 +1,34 @@
+{
+    "name": "symfony/ast",
+    "type": "library",
+    "description": "Symfony AST Component",
+    "keywords": ["symfony", "ast"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joel Wurtz",
+            "email": "joel.wurtz@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "nikic/php-parser": "~2.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Ast\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.2-dev"
+        }
+    }
+}

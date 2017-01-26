@@ -93,7 +93,8 @@
         "symfony/phpunit-bridge": "~3.2",
         "symfony/polyfill-apcu": "~1.1",
         "symfony/security-acl": "~2.8|~3.0",
-        "phpdocumentor/reflection-docblock": "^3.0"
+        "phpdocumentor/reflection-docblock": "^3.0",
+        "nikic/PHP-Parser": "~2.0"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",

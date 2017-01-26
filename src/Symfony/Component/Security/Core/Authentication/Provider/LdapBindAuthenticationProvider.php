@@ -93,9 +93,7 @@ class LdapBindAuthenticationProvider extends UserAuthenticationProvider
 
             if ($this->queryString) {
                 $query = str_replace('{username}', $username, $this->queryString);
-
-                $query = $this->ldap->query($this->dnString, $query);
-                $result = $query->execute();
+                $result = $this->ldap->query($this->dnString, $query)->execute();
                 if (1 !== $result->count()) {
                     throw new BadCredentialsException('The presented username is invalid.');
                 }

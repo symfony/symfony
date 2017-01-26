@@ -11,8 +11,10 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Registers the Twig exception listener if Twig is registered as a templating engine.
@@ -28,7 +30,7 @@ class ExceptionListenerPass implements CompilerPassInterface
         }
 
         // register the exception controller only if Twig is enabled and required dependencies do exist
-        if (!class_exists('Symfony\Component\Debug\Exception\FlattenException') || !interface_exists('Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
+        if (!$container->classExists(FlattenException::class) || !$container->classExists(EventSubscriberInterface::class)) {
             $container->removeDefinition('twig.exception_listener');
         } elseif ($container->hasParameter('templating.engines')) {
             $engines = $container->getParameter('templating.engines');

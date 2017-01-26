@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
@@ -102,6 +104,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var int[] a map of env vars to their resolution counter
      */
     private $envCounters = array();
+
+    /**
+     * @var \ReflectionClass[]
+     */
+    private $classReflectors = array();
 
     /**
      * Sets the track resources flag.
@@ -276,6 +283,37 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } while ($class = $class->getParentClass());
 
         return $this;
+    }
+
+    /**
+     * Checks whether the requested class, interface or trait exists and registers the result for resource tracking.
+     *
+     * @param string $class
+     *
+     * @return bool
+     *
+     * @final
+     */
+    public function classExists($class)
+    {
+        if (isset($this->classReflectors[$class])) {
+            return (bool) $this->classReflectors[$class];
+        }
+        $exists = class_exists($class) || interface_exists($class, false) || trait_exists($class, false);
+
+        if ($this->trackResources) {
+            if (!$exists) {
+                $this->addResource(new ClassExistenceResource($class));
+                $this->classReflectors[$class] = false;
+            } else {
+                $class = $this->classReflectors[$class] = new \ReflectionClass($class);
+                if (!$class->isInternal() && false !== ($file = $class->getFileName()) && file_exists($file)) {
+                    $this->addResource(new FileExistenceResource($file));
+                }
+            }
+        }
+
+        return $exists;
     }
 
     /**
@@ -983,7 +1021,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if ('service_container' === $id = (string) $reference) {
                 $class = parent::class;
             } elseif (!$this->hasDefinition($id) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-                return null;
+                return;
             } else {
                 $class = $parameterBag->resolveValue($this->findDefinition($id)->getClass());
             }

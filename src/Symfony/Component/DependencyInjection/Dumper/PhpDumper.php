@@ -265,7 +265,7 @@ class PhpDumper extends Dumper
             array($this->getProxyDumper(), 'isProxyCandidate')
         );
         $code = '';
-        $strip = '' === $this->docStar && method_exists('Symfony\Component\HttpKernel\Kernel', 'stripComments');
+        $strip = '' === $this->docStar;
 
         foreach ($definitions as $definition) {
             $proxyCode = "\n".$this->getProxyDumper()->getProxyCode($definition);
@@ -1672,7 +1672,7 @@ EOF;
     private function getExpressionLanguage()
     {
         if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            if (!$this->container->classExists(Expression::class)) {
                 throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $providers = $this->container->getExpressionLanguageProviders();

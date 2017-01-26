@@ -11,8 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
+use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Reader;
+use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Component\Asset\Package;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Alias;
@@ -26,16 +29,21 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\DataUriNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
+use Symfony\Component\Templating\PhpEngine;
+use Symfony\Component\Translation\Translator;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\SupportStrategy\ClassInstanceSupportStrategy;
 use Symfony\Component\Yaml\Yaml;
@@ -85,8 +93,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('fragment_renderer.xml');
 
-        $container->addResource(new ClassExistenceResource(Application::class));
-        if (class_exists(Application::class)) {
+        if ($container->classExists(Application::class)) {
             $loader->load('console.xml');
         }
 
@@ -105,16 +112,18 @@ class FrameworkExtension extends Extension
         // default in the Form and Validator component). If disabled, an identity
         // translator will be used and everything will still work as expected.
         if ($this->isConfigEnabled($container, $config['translator']) || $this->isConfigEnabled($container, $config['form']) || $this->isConfigEnabled($container, $config['validation'])) {
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['translator'])) {
-                throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
-            }
+            if (!$container->classExists(Translator::class)) {
+                if ($this->isConfigEnabled($container, $config['translator'])) {
+                    throw new LogicException('Translation support cannot be enabled as the Translation component is not installed.');
+                }
 
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['form'])) {
-                throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
-            }
+                if ($this->isConfigEnabled($container, $config['form'])) {
+                    throw new LogicException('Form support cannot be enabled as the Translation component is not installed.');
+                }
 
-            if (!class_exists('Symfony\Component\Translation\Translator') && $this->isConfigEnabled($container, $config['validation'])) {
-                throw new LogicException('Validation support cannot be enabled as the Translation component is not installed.');
+                if ($this->isConfigEnabled($container, $config['validation'])) {
+                    throw new LogicException('Validation support cannot be enabled as the Translation component is not installed.');
+                }
             }
 
             $loader->load('identity_translator.xml');
@@ -163,7 +172,7 @@ class FrameworkExtension extends Extension
             $this->registerFormConfiguration($config, $container, $loader);
             $config['validation']['enabled'] = true;
 
-            if (!class_exists('Symfony\Component\Validator\Validation')) {
+            if (!$container->classExists(Validation::class)) {
                 throw new LogicException('The Validator component is required to use the Form component.');
             }
         }
@@ -171,7 +180,7 @@ class FrameworkExtension extends Extension
         $this->registerSecurityCsrfConfiguration($config['csrf_protection'], $container, $loader);
 
         if ($this->isConfigEnabled($container, $config['assets'])) {
-            if (!class_exists('Symfony\Component\Asset\Package')) {
+            if (!$container->classExists(Package::class)) {
                 throw new LogicException('Asset support cannot be enabled as the Asset component is not installed.');
             }
 
@@ -179,7 +188,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->isConfigEnabled($container, $config['templating'])) {
-            if (!class_exists('Symfony\Component\Templating\PhpEngine')) {
+            if (!$container->classExists(PhpEngine::class)) {
                 throw new LogicException('Templating support cannot be enabled as the Templating component is not installed.');
             }
 
@@ -525,7 +534,7 @@ class FrameworkExtension extends Extension
         $definition->replaceArgument(4, $debug);
         $definition->replaceArgument(6, $debug);
 
-        if ($debug && class_exists(DebugProcessor::class)) {
+        if ($debug && $container->classExists(DebugProcessor::class)) {
             $definition = new Definition(DebugProcessor::class);
             $definition->setPublic(false);
             $container->setDefinition('debug.log_processor', $definition);
@@ -860,18 +869,18 @@ class FrameworkExtension extends Extension
 
         // Discover translation directories
         $dirs = array();
-        if (class_exists('Symfony\Component\Validator\Validation')) {
-            $r = new \ReflectionClass('Symfony\Component\Validator\Validation');
+        if ($container->classExists(Validation::class)) {
+            $r = new \ReflectionClass(Validation::class);
 
             $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
-        if (class_exists('Symfony\Component\Form\Form')) {
-            $r = new \ReflectionClass('Symfony\Component\Form\Form');
+        if ($container->classExists(Form::class)) {
+            $r = new \ReflectionClass(Form::class);
 
             $dirs[] = dirname($r->getFileName()).'/Resources/translations';
         }
-        if (class_exists('Symfony\Component\Security\Core\Exception\AuthenticationException')) {
-            $r = new \ReflectionClass('Symfony\Component\Security\Core\Exception\AuthenticationException');
+        if ($container->classExists(AuthenticationException::class)) {
+            $r = new \ReflectionClass(AuthenticationException::class);
 
             $dirs[] = dirname(dirname($r->getFileName())).'/Resources/translations';
         }
@@ -944,7 +953,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Symfony\Component\Validator\Validation')) {
+        if (!$container->classExists(Validation::class)) {
             throw new LogicException('Validation support cannot be enabled as the Validator component is not installed.');
         }
 
@@ -999,8 +1008,8 @@ class FrameworkExtension extends Extension
 
     private function getValidatorMappingFiles(ContainerBuilder $container, array &$files)
     {
-        if (interface_exists('Symfony\Component\Form\FormInterface')) {
-            $reflClass = new \ReflectionClass('Symfony\Component\Form\FormInterface');
+        if ($container->classExists(FormInterface::class)) {
+            $reflClass = new \ReflectionClass(FormInterface::class);
             $files['xml'][] = $file = dirname($reflClass->getFileName()).'/Resources/config/validation.xml';
             $container->addResource(new FileResource($file));
         }
@@ -1057,7 +1066,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Doctrine\Common\Annotations\Annotation')) {
+        if (!$container->classExists(Annotation::class)) {
             throw new LogicException('Annotations cannot be enabled as the Doctrine Annotation library is not installed.');
         }
 
@@ -1129,7 +1138,7 @@ class FrameworkExtension extends Extension
             return;
         }
 
-        if (!class_exists('Symfony\Component\Security\Csrf\CsrfToken')) {
+        if (!$container->classExists('Symfony\Component\Security\Csrf\CsrfToken')) {
             throw new LogicException('CSRF support cannot be enabled as the Security CSRF component is not installed.');
         }
 
@@ -1150,34 +1159,34 @@ class FrameworkExtension extends Extension
      */
     private function registerSerializerConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
     {
-        if (class_exists('Symfony\Component\Serializer\Normalizer\DataUriNormalizer')) {
+        if ($container->classExists(DataUriNormalizer::class)) {
             // Run after serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.data_uri', DataUriNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -920));
         }
 
-        if (class_exists('Symfony\Component\Serializer\Normalizer\DateTimeNormalizer')) {
+        if ($container->classExists(DateTimeNormalizer::class)) {
             // Run before serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.datetime', DateTimeNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -910));
         }
 
-        if (class_exists('Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer')) {
+        if ($container->classExists(JsonSerializableNormalizer::class)) {
             // Run before serializer.normalizer.object
             $definition = $container->register('serializer.normalizer.json_serializable', JsonSerializableNormalizer::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.normalizer', array('priority' => -900));
         }
 
-        if (class_exists(YamlEncoder::class) && defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
+        if ($container->classExists(YamlEncoder::class) && defined('Symfony\Component\Yaml\Yaml::DUMP_OBJECT')) {
             $definition = $container->register('serializer.encoder.yaml', YamlEncoder::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.encoder');
         }
 
-        if (class_exists(CsvEncoder::class)) {
+        if ($container->classExists(CsvEncoder::class)) {
             $definition = $container->register('serializer.encoder.csv', CsvEncoder::class);
             $definition->setPublic(false);
             $definition->addTag('serializer.encoder');
@@ -1252,7 +1261,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('serializer.mapping.class_metadata_factory')->replaceArgument(
                 1, new Reference($config['cache'])
             );
-        } elseif (!$container->getParameter('kernel.debug') && class_exists(CacheClassMetadataFactory::class)) {
+        } elseif (!$container->getParameter('kernel.debug') && $container->classExists(CacheClassMetadataFactory::class)) {
             $cacheMetadataFactory = new Definition(
                 CacheClassMetadataFactory::class,
                 array(
@@ -1282,7 +1291,7 @@ class FrameworkExtension extends Extension
     {
         $loader->load('property_info.xml');
 
-        if (interface_exists('phpDocumentor\Reflection\DocBlockFactoryInterface')) {
+        if ($container->classExists(DocBlockFactoryInterface::class)) {
             $definition = $container->register('property_info.php_doc_extractor', 'Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor');
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
@@ -1324,7 +1333,7 @@ class FrameworkExtension extends Extension
             $container->setDefinition($name, $definition);
         }
 
-        if (method_exists(PropertyAccessor::class, 'createCache')) {
+        if ($container->classExists(PropertyAccessor::class) && method_exists(PropertyAccessor::class, 'createCache')) {
             $propertyAccessDefinition = $container->register('cache.property_access', AdapterInterface::class);
             $propertyAccessDefinition->setPublic(false);
             $propertyAccessDefinition->setFactory(array(PropertyAccessor::class, 'createCache'));

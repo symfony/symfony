@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * made `ClassExistenceResource` to work with interfaces and traits
+
 3.0.0
 -----
 

@@ -16,7 +16,10 @@ use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Templating\EngineInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * TwigExtension.
@@ -37,15 +40,15 @@ class TwigExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.xml');
 
-        if (class_exists('Symfony\Component\Form\Form')) {
+        if ($container->classExists(Form::class)) {
             $loader->load('form.xml');
         }
 
-        if (interface_exists('Symfony\Component\Templating\EngineInterface')) {
+        if ($container->classExists(EngineInterface::class)) {
             $loader->load('templating.xml');
         }
 
-        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
+        if (!$container->classExists(TranslatorInterface::class)) {
             $container->removeDefinition('twig.translation.extractor');
         }
 

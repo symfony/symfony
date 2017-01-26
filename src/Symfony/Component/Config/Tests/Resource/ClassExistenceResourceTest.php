@@ -36,7 +36,7 @@ class ClassExistenceResourceTest extends \PHPUnit_Framework_TestCase
         eval(<<<EOF
 namespace Symfony\Component\Config\Tests\Fixtures;
 
-class BarClass
+interface BarClass
 {
 }
 EOF
@@ -50,5 +50,6 @@ EOF
         $res = new ClassExistenceResource('Symfony\Component\Config\Tests\Resource\ClassExistenceResourceTest');
 
         $this->assertTrue($res->isFresh(time()));
+        $this->assertTrue(class_exists('Symfony\Component\Config\Tests\Resource\ClassExistenceResourceTest', false));
     }
 }

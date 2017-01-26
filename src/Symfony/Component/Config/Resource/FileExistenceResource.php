@@ -33,7 +33,6 @@ class FileExistenceResource implements SelfCheckingResourceInterface, \Serializa
     public function __construct($resource)
     {
         $this->resource = (string) $resource;
-        $this->exists = file_exists($resource);
     }
 
     /**
@@ -57,6 +56,10 @@ class FileExistenceResource implements SelfCheckingResourceInterface, \Serializa
      */
     public function isFresh($timestamp)
     {
+        if (null === $this->exists) {
+            $this->exists = file_exists($this->resource);
+        }
+
         return file_exists($this->resource) === $this->exists;
     }
 
@@ -65,6 +68,10 @@ class FileExistenceResource implements SelfCheckingResourceInterface, \Serializa
      */
     public function serialize()
     {
+        if (null === $this->exists) {
+            $this->exists = file_exists($this->resource);
+        }
+
         return serialize(array($this->resource, $this->exists));
     }
 

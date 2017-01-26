@@ -11,13 +11,15 @@
 
 namespace Symfony\Bundle\TwigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Yaml\Parser as YamlParser;
 
 /**
@@ -27,22 +29,23 @@ class ExtensionPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!class_exists('Symfony\Component\Asset\Packages')) {
+        if (!$container->classExists(Packages::class)) {
             $container->removeDefinition('twig.extension.assets');
         }
 
-        if (!class_exists('Symfony\Component\ExpressionLanguage\Expression')) {
+        if (!$container->classExists(ExpressionLanguage::class)) {
             $container->removeDefinition('twig.extension.expression');
         }
 
-        if (!interface_exists('Symfony\Component\Routing\Generator\UrlGeneratorInterface')) {
+        if (!$container->classExists(UrlGeneratorInterface::class)) {
             $container->removeDefinition('twig.extension.routing');
         }
-        if (!interface_exists('Symfony\Component\Translation\TranslatorInterface')) {
+
+        if (!$container->classExists(TranslatorInterface::class)) {
             $container->removeDefinition('twig.extension.trans');
         }
 
-        if (!class_exists('Symfony\Component\Yaml\Yaml')) {
+        if (!$container->classExists(YamlParser::class)) {
             $container->removeDefinition('twig.extension.yaml');
         }
 
@@ -101,18 +104,15 @@ class ExtensionPass implements CompilerPassInterface
             $container->getDefinition('twig.extension.assets')->addTag('twig.extension');
         }
 
-        $container->addResource(new ClassExistenceResource(YamlParser::class));
-        if (class_exists(YamlParser::class)) {
+        if ($container->hasDefinition('twig.extension.yaml')) {
             $container->getDefinition('twig.extension.yaml')->addTag('twig.extension');
         }
 
-        $container->addResource(new ClassExistenceResource(Stopwatch::class));
-        if (class_exists(Stopwatch::class)) {
+        if ($container->classExists(Stopwatch::class)) {
             $container->getDefinition('twig.extension.debug.stopwatch')->addTag('twig.extension');
         }
 
-        $container->addResource(new ClassExistenceResource(ExpressionLanguage::class));
-        if (class_exists(ExpressionLanguage::class)) {
+        if ($container->hasDefinition('twig.extension.expression')) {
             $container->getDefinition('twig.extension.expression')->addTag('twig.extension');
         }
     }

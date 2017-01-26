@@ -30,7 +30,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     public function __construct($resource)
     {
         $this->resource = $resource;
-        $this->exists = class_exists($resource);
+        $this->exists = class_exists($resource) || interface_exists($resource, false) || trait_exists($resource, false);
     }
 
     /**
@@ -54,7 +54,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
      */
     public function isFresh($timestamp)
     {
-        return class_exists($this->resource) === $this->exists;
+        return (class_exists($this->resource) || interface_exists($this->resource, false) || trait_exists($this->resource, false)) === $this->exists;
     }
 
     /**

@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 /**
@@ -70,7 +72,7 @@ class SecurityExtension extends Extension
             $loader->load('security_debug.xml');
         }
 
-        if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+        if (!$container->classExists(Expression::class)) {
             $container->removeDefinition('security.expression_language');
             $container->removeDefinition('security.access.expression_voter');
         }
@@ -121,7 +123,7 @@ class SecurityExtension extends Extension
 
     private function aclLoad($config, ContainerBuilder $container)
     {
-        if (!interface_exists('Symfony\Component\Security\Acl\Model\AclInterface')) {
+        if (!$container->classExists(AclInterface::class)) {
             throw new \LogicException('You must install symfony/security-acl in order to use the ACL functionality.');
         }
 
@@ -643,7 +645,7 @@ class SecurityExtension extends Extension
             ->register($id, 'Symfony\Component\ExpressionLanguage\SerializedParsedExpression')
             ->setPublic(false)
             ->addArgument($expression)
-            ->addArgument(serialize($this->getExpressionLanguage()->parse($expression, array('token', 'user', 'object', 'roles', 'request', 'trust_resolver'))->getNodes()))
+            ->addArgument(serialize($this->getExpressionLanguage($container)->parse($expression, array('token', 'user', 'object', 'roles', 'request', 'trust_resolver'))->getNodes()))
         ;
 
         return $this->expressions[$id] = new Reference($id);
@@ -708,10 +710,10 @@ class SecurityExtension extends Extension
         return new MainConfiguration($this->factories, $this->userProviderFactories);
     }
 
-    private function getExpressionLanguage()
+    private function getExpressionLanguage($container)
     {
         if (null === $this->expressionLanguage) {
-            if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
+            if (!$container->hasDefinition('security.expression_language')) {
                 throw new \RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage();

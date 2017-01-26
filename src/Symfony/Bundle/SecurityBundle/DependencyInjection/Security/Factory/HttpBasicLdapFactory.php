@@ -28,7 +28,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
     {
         $provider = 'security.authentication.provider.ldap_bind.'.$id;
-        $container
+        $definition = $container
             ->setDefinition($provider, new ChildDefinition('security.authentication.provider.ldap_bind'))
             ->replaceArgument(0, new Reference($userProvider))
             ->replaceArgument(1, new Reference('security.user_checker.'.$id))
@@ -39,6 +39,11 @@ class HttpBasicLdapFactory extends HttpBasicFactory
 
         // entry point
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
+
+
+        if (!empty($config['query_string'])) {
+            $definition->addMethodCall('setQueryString', array($config['query_string']));
+        }
 
         // listener
         $listenerId = 'security.authentication.listener.basic.'.$id;
@@ -57,6 +62,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
             ->children()
                 ->scalarNode('service')->defaultValue('ldap')->end()
                 ->scalarNode('dn_string')->defaultValue('{username}')->end()
+                ->scalarNode('query_string')->end()
             ->end()
         ;
     }

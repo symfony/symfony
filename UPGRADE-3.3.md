@@ -39,6 +39,11 @@ FrameworkBundle
 ---------------
 
  * The `Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConsoleCommandPass` has been deprecated. Use `Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass` instead.
+ 
+HttpFoundation
+--------------
+
+ * The `PdoSessionHandler` option `db_lifetime_col` has been deprecated.
 
 HttpKernel
 -----------

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -65,6 +66,9 @@ class FactoryReturnTypePass implements CompilerPassInterface
         if (is_string($factory)) {
             try {
                 $m = new \ReflectionFunction($factory);
+                if (false !== $m->getFileName() && file_exists($m->getFileName())) {
+                    $container->addResource(new FileResource($m->getFileName()));
+                }
             } catch (\ReflectionException $e) {
                 return;
             }

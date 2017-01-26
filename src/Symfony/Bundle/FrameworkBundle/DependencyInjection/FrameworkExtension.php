@@ -28,7 +28,6 @@ use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -85,7 +84,6 @@ class FrameworkExtension extends Extension
 
         $loader->load('fragment_renderer.xml');
 
-        $container->addResource(new ClassExistenceResource(Application::class));
         if (class_exists(Application::class)) {
             $loader->load('console.xml');
         }

@@ -1007,7 +1007,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if ('service_container' === $id = (string) $reference) {
                 $class = parent::class;
             } elseif (!$this->hasDefinition($id) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $reference->getInvalidBehavior()) {
-                return null;
+                return;
             } else {
                 $class = $parameterBag->resolveValue($this->findDefinition($id)->getClass());
             }

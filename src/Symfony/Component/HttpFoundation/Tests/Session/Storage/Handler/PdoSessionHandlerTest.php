@@ -146,7 +146,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
         $stream = $this->createStream($content);
 
         $pdo->prepareResult->expects($this->once())->method('fetchAll')
-            ->will($this->returnValue(array(array($stream, 42, time()))));
+            ->will($this->returnValue(array(array($stream, 42 + time()))));
 
         $storage = new PdoSessionHandler($pdo);
         $result = $storage->read('foo');
@@ -174,7 +174,7 @@ class PdoSessionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $selectStmt->expects($this->atLeast(2))->method('fetchAll')
             ->will($this->returnCallback(function () use (&$exception, $stream) {
-                return $exception ? array(array($stream, 42, time())) : array();
+                return $exception ? array(array($stream, 42 + time())) : array();
             }));
 
         $insertStmt->expects($this->once())->method('execute')

@@ -30,7 +30,7 @@ class TableCell
     );
 
     /**
-     * @param string|int|float $value
+     * @param string $value
      * @param array  $options
      */
     public function __construct($value = '', array $options = array())

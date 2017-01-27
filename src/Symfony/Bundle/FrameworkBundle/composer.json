@@ -27,7 +27,7 @@
         "symfony/http-kernel": "~2.8.16",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~2.3|~3.0.0",
-        "symfony/routing": "~2.8|~3.0.0",
+        "symfony/routing": "~2.8.17",
         "symfony/security-core": "~2.6.13|~2.7.9|~2.8|~3.0.0",
         "symfony/security-csrf": "~2.6|~3.0.0",
         "symfony/stopwatch": "~2.3|~3.0.0",
@@ -50,7 +50,8 @@
         "symfony/yaml": "~2.0,>=2.0.5|~3.0.0",
         "symfony/property-info": "~2.8|~3.0.0",
         "phpdocumentor/reflection": "^1.0.7",
-        "twig/twig": "~1.23|~2.0"
+        "twig/twig": "~1.23|~2.0",
+        "sensio/framework-extra-bundle": "^3.0.2"
     },
     "suggest": {
         "symfony/console": "For using the console commands",

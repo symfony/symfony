@@ -85,11 +85,13 @@ class UniqueEntityValidator extends ConstraintValidator
                 throw new ConstraintDefinitionException(sprintf('The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.', $fieldName));
             }
 
-            $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
+            $fieldValue = $class->reflFields[$fieldName]->getValue($entity);
 
-            if ($constraint->ignoreNull && null === $criteria[$fieldName]) {
-                return;
+            if ($constraint->ignoreNull && null === $fieldValue) {
+                continue;
             }
+
+            $criteria[$fieldName] = $fieldValue;
 
             if (null !== $criteria[$fieldName] && $class->hasAssociation($fieldName)) {
                 /* Ensure the Proxy is initialized before using reflection to
@@ -98,6 +100,12 @@ class UniqueEntityValidator extends ConstraintValidator
                  */
                 $em->initializeObject($criteria[$fieldName]);
             }
+        }
+
+        // skip validation if there are no criteria (this can happen when the
+        // "ignoreNull" option is enabled and fields to be checked are null
+        if (empty($criteria)) {
+            return;
         }
 
         $repository = $em->getRepository(get_class($entity));

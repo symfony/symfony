@@ -90,7 +90,8 @@
         "phpdocumentor/reflection": "^1.0.7"
     },
     "conflict": {
-        "phpdocumentor/reflection": "<1.0.7"
+        "phpdocumentor/reflection": "<1.0.7",
+        "sensio/framework-extra-bundle": "^3.0.2"
     },
     "autoload": {
         "psr-4": {

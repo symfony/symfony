@@ -247,6 +247,23 @@ class UniqueEntityValidatorTest extends AbstractConstraintValidatorTest
             ->assertRaised();
     }
 
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
+     */
+    public function testAllConfiguredFieldsAreCheckedOfBeingMappedByDoctrineWithIgnoreNullEnabled()
+    {
+        $constraint = new UniqueEntity(array(
+            'message' => 'myMessage',
+            'fields' => array('name', 'name2'),
+            'em' => self::EM_NAME,
+            'ignoreNull' => true,
+        ));
+
+        $entity1 = new SingleIntIdEntity(1, null);
+
+        $this->validator->validate($entity1, $constraint);
+    }
+
     public function testValidateUniquenessWithValidCustomErrorPath()
     {
         $constraint = new UniqueEntity(array(

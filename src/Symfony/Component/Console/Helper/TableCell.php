@@ -30,12 +30,12 @@ class TableCell
     );
 
     /**
-     * @param string $value
+     * @param string|int|float $value
      * @param array  $options
      */
     public function __construct($value = '', array $options = array())
     {
-        $this->value = $value;
+        $this->value = (string) $value;
 
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {
@@ -52,7 +52,7 @@ class TableCell
      */
     public function __toString()
     {
-        return (string) $this->value;
+        return $this->value;
     }
 
     /**

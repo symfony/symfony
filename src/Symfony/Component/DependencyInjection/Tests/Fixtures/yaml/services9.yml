@@ -52,8 +52,6 @@ services:
 
     baz:
         class: Baz
-        calls:
-            - [setFoo, ['@foo_with_inline']]
 
     request:
         class: Request

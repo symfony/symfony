@@ -113,4 +113,30 @@ class IntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->hasDefinition('b'));
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     */
+    public function testCircularReferencesCausedByMethodCallsAreDetectedDuringCompilation()
+    {
+        $container = new ContainerBuilder();
+        $container->setResourceTracking(false);
+
+        $container
+            ->register('foobar', '\stdClass')
+            ->addArgument(new Reference('foo'))
+        ;
+
+        $container
+            ->register('foo', '\stdClass')
+            ->addArgument(new Reference('bar'))
+        ;
+
+        $container
+            ->register('foo', '\stdClass')
+            ->addMethodCall('addFoobar', array(new Reference('foobar')))
+        ;
+
+        $container->compile();
+    }
 }

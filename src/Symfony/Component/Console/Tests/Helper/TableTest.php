@@ -518,7 +518,7 @@ TABLE;
     {
         $table = new Table($output = $this->getOutputStream());
 
-        $table->setRows([[new TableCell(12345)]]);
+        $table->setRows(array(array(new TableCell(12345))));
         $table->render();
 
         $expected =

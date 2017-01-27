@@ -86,6 +86,7 @@ install:
     - export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
     - if [[ ! $skip && $deps ]]; then export SYMFONY_DEPRECATIONS_HELPER=weak; fi
     - if [[ ! $skip && $deps ]]; then mv composer.json.phpunit composer.json; fi
+    - if [[ ! $skip ]]; then composer global require "hirak/prestissimo:^0.3"; fi
     - if [[ ! $skip ]]; then composer update; fi
     - if [[ ! $skip ]]; then ./phpunit install; fi
     - if [[ ! $skip && ! $PHP = hhvm* ]]; then php -i; else hhvm --php -r 'print_r($_SERVER);print_r(ini_get_all());'; fi

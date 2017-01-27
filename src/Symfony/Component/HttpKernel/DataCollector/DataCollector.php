@@ -66,21 +66,19 @@ abstract class DataCollector implements DataCollectorInterface, \Serializable
      */
     protected function cloneVar($var)
     {
-        if (null === $this->cloner) {
-            if (class_exists(ClassStub::class)) {
-                $this->cloner = new VarCloner();
-                $this->cloner->setMaxItems(250);
-                $this->cloner->addCasters(array(
-                    Stub::class => function (Stub $v, array $a, Stub $s, $isNested) {
-                        return $isNested ? $a : StubCaster::castStub($v, $a, $s, true);
-                    },
-                ));
-            } else {
-                @trigger_error(sprintf('Using the %s() method without the VarDumper component is deprecated since version 3.2 and won\'t be supported in 4.0. Install symfony/var-dumper version 3.2 or above.', __METHOD__), E_USER_DEPRECATED);
-                $this->cloner = false;
-            }
+        if (class_exists(ClassStub::class)) {
+            $this->cloner = new VarCloner();
+            $this->cloner->setMaxItems(250);
+            $this->cloner->addCasters(array(
+                Stub::class => function (Stub $v, array $a, Stub $s, $isNested) {
+                    return $isNested ? $a : StubCaster::castStub($v, $a, $s, true);
+                },
+            ));
+        } else {
+            @trigger_error(sprintf('Using the %s() method without the VarDumper component is deprecated since version 3.2 and won\'t be supported in 4.0. Install symfony/var-dumper version 3.2 or above.', __METHOD__), E_USER_DEPRECATED);
         }
-        if (false === $this->cloner) {
+
+        if (null === $this->cloner) {
             if (null === $this->valueExporter) {
                 $this->valueExporter = new ValueExporter();
             }

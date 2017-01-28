@@ -85,7 +85,7 @@ class XliffFileDumper extends FileDumper
         foreach ($messages->all($domain) as $source => $target) {
             $translation = $dom->createElement('trans-unit');
 
-            $translation->setAttribute('id', md5($source));
+            $translation->setAttribute('id', sha1($domain . '::' . $source));
             $translation->setAttribute('resname', $source);
 
             $s = $translation->appendChild($dom->createElement('source'));
@@ -145,7 +145,7 @@ class XliffFileDumper extends FileDumper
 
         foreach ($messages->all($domain) as $source => $target) {
             $translation = $dom->createElement('unit');
-            $translation->setAttribute('id', md5($source));
+            $translation->setAttribute('id', sha1($domain . '::' . $source));
 
             $segment = $translation->appendChild($dom->createElement('segment'));
 

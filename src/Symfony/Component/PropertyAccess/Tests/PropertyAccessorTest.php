@@ -566,4 +566,15 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $propertyAccessor->setValue($obj, 'publicGetSetter', 'baz');
         $this->assertEquals('baz', $propertyAccessor->getValue($obj, 'publicGetSetter'));
     }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Expected argument of type "Countable", "string" given
+     */
+    public function testThrowTypeErrorWithInterface()
+    {
+        $object = new TypeHinted();
+
+        $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
+    }
 }

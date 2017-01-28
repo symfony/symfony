@@ -352,12 +352,10 @@ class ErrorHandler
     /**
      * Handles errors by filtering then logging them according to the configured bit fields.
      *
-     * @param int    $type      One of the E_* constants
+     * @param int    $type    One of the E_* constants
      * @param string $message
      * @param string $file
      * @param int    $line
-     * @param array  $context
-     * @param array  $backtrace
      *
      * @return bool Returns false when no handling happens so that the PHP engine can handle the error itself
      *
@@ -365,7 +363,7 @@ class ErrorHandler
      *
      * @internal
      */
-    public function handleError($type, $message, $file, $line, array $context, array $backtrace = null)
+    public function handleError($type, $message, $file, $line)
     {
         // Level is the current error reporting level to manage silent error.
         // Strong errors are not authorized to be silenced.
@@ -377,9 +375,20 @@ class ErrorHandler
         if (!$type || (!$log && !$throw)) {
             return $type && $log;
         }
+        $scope = $this->scopedErrors & $type;
 
-        if (isset($context['GLOBALS']) && ($this->scopedErrors & $type)) {
-            unset($context['GLOBALS']);
+        if (4 < $numArgs = func_num_args()) {
+            $context = $scope ? (func_get_arg(4) ?: array()) : array();
+            $backtrace = 5 < $numArgs ? func_get_arg(5) : null; // defined on HHVM
+        } else {
+            $context = array();
+            $backtrace = null;
+        }
+
+        if (isset($context['GLOBALS']) && $scope) {
+            $e = $context;                  // Whatever the signature of the method,
+            unset($e['GLOBALS'], $context); // $context is always a reference in 5.3
+            $context = $e;
         }
 
         if (null !== $backtrace && $type & E_ERROR) {
@@ -399,7 +408,7 @@ class ErrorHandler
         } elseif (!$throw && !($type & $level)) {
             $errorAsException = new SilencedErrorContext($type, $file, $line);
         } else {
-            if ($this->scopedErrors & $type) {
+            if ($scope) {
                 $errorAsException = new ContextErrorException($logMessage, 0, $type, $file, $line, $context);
             } else {
                 $errorAsException = new \ErrorException($logMessage, 0, $type, $file, $line);

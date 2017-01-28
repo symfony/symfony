@@ -494,6 +494,22 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->hasDefinition('bar'));
     }
+
+    public function testEmptyStringIsKept()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', __NAMESPACE__.'\A');
+        $container->register('lille', __NAMESPACE__.'\Lille');
+        $container->register('foo', __NAMESPACE__.'\MultipleArgumentsOptionalScalar')
+            ->setAutowired(true)
+            ->setArguments(array('', ''));
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertEquals(array(new Reference('a'), '', new Reference('lille')), $container->getDefinition('foo')->getArguments());
+    }
 }
 
 class Foo

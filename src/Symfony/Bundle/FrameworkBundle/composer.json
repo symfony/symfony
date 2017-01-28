@@ -27,7 +27,9 @@
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~2.8|~3.0",
         "symfony/finder": "~2.8|~3.0",
-        "symfony/routing": "~3.0",
+        "symfony/routing": "~3.1.10|~3.2.3",
+        "symfony/security-core": "~2.8|~3.0",
+        "symfony/security-csrf": "~2.8|~3.0",
         "symfony/stopwatch": "~2.8|~3.0",
         "doctrine/cache": "~1.0"
     },
@@ -52,7 +54,8 @@
         "symfony/property-info": "~2.8|~3.0",
         "doctrine/annotations": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0",
-        "twig/twig": "~1.26|~2.0"
+        "twig/twig": "~1.26|~2.0",
+        "sensio/framework-extra-bundle": "^3.0.2"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",

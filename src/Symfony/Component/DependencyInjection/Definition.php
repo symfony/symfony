@@ -198,6 +198,10 @@ class Definition
      */
     public function replaceArgument($index, $argument)
     {
+        if (0 === count($this->arguments)) {
+            throw new OutOfBoundsException('Cannot replace arguments if none have been configured yet.');
+        }
+
         if ($index < 0 || $index > count($this->arguments) - 1) {
             throw new OutOfBoundsException(sprintf('The index "%d" is not in the range [0, %d].', $index, count($this->arguments) - 1));
         }

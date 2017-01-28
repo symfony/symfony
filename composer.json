@@ -87,11 +87,11 @@
         "ocramius/proxy-manager": "~0.4|~1.0|~2.0",
         "symfony/phpunit-bridge": "~3.2",
         "egulias/email-validator": "~1.2,>=1.2.1",
-        "phpdocumentor/reflection": "^1.0.7"
+        "phpdocumentor/reflection": "^1.0.7",
+        "sensio/framework-extra-bundle": "^3.0.2"
     },
     "conflict": {
         "phpdocumentor/reflection": "<1.0.7",
-        "sensio/framework-extra-bundle": "^3.0.2"
     },
     "autoload": {
         "psr-4": {

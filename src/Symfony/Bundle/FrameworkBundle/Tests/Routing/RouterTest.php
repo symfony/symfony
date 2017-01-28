@@ -12,11 +12,29 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
+    private static $cachePath;
+
+    public static function setUpBeforeClass()
+    {
+        $fs = new Filesystem();
+        static::$cachePath = sys_get_temp_dir().'/'.uniqid('sf2_router_app_cache', true);
+        $fs->mkdir(static::$cachePath);
+        $fs->touch(static::$cachePath.'/appContainer.php');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        $fs = new Filesystem();
+        $fs->remove(static::$cachePath);
+    }
+
     public function testGenerateWithServiceParam()
     {
         $routes = new RouteCollection();
@@ -207,6 +225,23 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         return array(array(null), array(false), array(true), array(new \stdClass()), array(array('foo', 'bar')), array(array(array())));
     }
 
+    public function testGetRouteCollectionAddsContainerClassAsResource()
+    {
+        $routeCollection = $this->getMockBuilder('Symfony\Component\Routing\RouteCollection')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $containerClassPath = static::$cachePath.'/appContainer.php';
+        $routeCollection->method('getIterator')->willReturn(new \ArrayIterator(array()));
+        $routeCollection->expects($this->once())->method('addResource')->with(new FileResource($containerClassPath));
+
+        $sc = $this->getServiceContainer($routeCollection);
+
+        $router = new Router($sc, 'foo');
+
+        $router->getRouteCollection();
+    }
+
     /**
      * @param RouteCollection $routes
      *
@@ -223,6 +258,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         ;
 
         $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(array('get'))->getMock();
+        $sc->setParameter('kernel.cache_dir', static::$cachePath);
+        $sc->setParameter('kernel.container_class', 'appContainer');
 
         $sc
             ->expects($this->once())

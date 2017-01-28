@@ -94,7 +94,7 @@
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
-        "phpdocumentor/type-resolver": "<0.2.0",
+        "phpdocumentor/type-resolver": "<0.2.0"
     },
     "provide": {
         "psr/cache-implementation": "1.0"

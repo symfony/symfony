@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Exception\RuntimeException;
  *
  * @final since version 3.3.
  */
-class ChainEncoder implements EncoderInterface/*, ContextAwareEncoderInterface*/
+class ChainEncoder implements EncoderInterface g/*, ContextAwareEncoderInterface*/
 {
     protected $encoders = array();
     protected $encoderByFormat = array();

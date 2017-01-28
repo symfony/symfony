@@ -7,6 +7,23 @@ in 3.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v3.1.0...v3.1.1
 
+* 3.1.10 (2017-01-28)
+
+ * bug #21431 [DoctrineBridge] always check for all fields to be mapped (xabbuh)
+ * bug #21360 [PropertyAccess] Handle interfaces in the invalid argument exception (fancyweb)
+ * bug #21403 [DI] Fix defaults overriding empty strings in AutowirePass (nicolas-grekas)
+ * bug #21401 [Debug] Workaround "null" $context (nicolas-grekas)
+ * bug #21372 [DependencyInjection] Fixed variadic method parameter in autowired classes (brainexe)
+ * bug #21333 [HttpKernel] Fix ArgumentValueResolver for arguments default null (chalasr)
+ * bug #20871 [HttpKernel] Give higher priority to adding request formats (akeeman)
+ * bug #21332 [PropertyInfo] Don't try to access a property thru a static method (dunglas)
+ * bug #21331 [PropertyInfo] Exclude static methods form properties guessing (dunglas)
+ * bug #21291 [Ldap] Ldap username case fix (quentinus95)
+ * bug #21288 [Doctrine Bridge] fix UniqueEntityValidator for composite object primary keys (dmaicher, HeahDude)
+ * bug #21285 [TwigBundle] do not lose already set method calls (xabbuh)
+ * bug #21279 #20411 fix Yaml parsing for very long quoted strings (RichardBradley)
+ * bug #21269 [Cache] Using strpbrk() instead of strcspn() is faster (nicolas-grekas)
+
 * 3.1.9 (2017-01-12)
 
  * bug #21218 [Form] DateTimeToLocalizedStringTransformer does not use timezone when using date only (magnetik)

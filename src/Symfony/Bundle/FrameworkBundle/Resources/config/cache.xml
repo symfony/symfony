@@ -22,13 +22,8 @@
             <tag name="cache.pool" />
         </service>
 
-        <service id="cache.annotations" class="Symfony\Component\Cache\Adapter\AdapterInterface" public="false">
-            <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache" />
-            <tag name="cache.pool" clearer="cache.default_clearer" />
-            <argument /> <!-- namespace -->
-            <argument>0</argument> <!-- default lifetime -->
-            <argument /> <!-- version -->
-            <argument>%kernel.cache_dir%/pools</argument>
+        <service id="cache.annotations" parent="cache.system" public="false">
+            <tag name="cache.pool" />
         </service>
 
         <service id="cache.adapter.system" class="Symfony\Component\Cache\Adapter\AdapterInterface" abstract="true">

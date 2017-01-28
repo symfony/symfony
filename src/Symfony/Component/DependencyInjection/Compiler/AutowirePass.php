@@ -231,8 +231,10 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
                         return array();
                     }
 
-                    // specifically pass the default value
-                    $arguments[$index] = $parameter->getDefaultValue();
+                    if (!array_key_exists($index, $arguments)) {
+                        // specifically pass the default value
+                        $arguments[$index] = $parameter->getDefaultValue();
+                    }
 
                     continue;
                 }

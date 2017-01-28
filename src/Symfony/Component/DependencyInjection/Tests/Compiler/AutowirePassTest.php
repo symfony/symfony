@@ -603,11 +603,22 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $definition = $container->register('bar', SetterInjection::class);
         $definition->setAutowired(true);
         $definition->addMethodCall('setDependencies', array(new Reference('foo')));
+    }
+
+    public function testEmptyStringIsKept()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', __NAMESPACE__.'\A');
+        $container->register('lille', __NAMESPACE__.'\Lille');
+        $container->register('foo', __NAMESPACE__.'\MultipleArgumentsOptionalScalar')
+            ->setAutowired(true)
+            ->setArguments(array('', ''));
 
         $pass = new AutowirePass();
         $pass->process($container);
 
-        $this->assertEquals(array(array('setDependencies', array(new Reference('foo'), new Reference('a')))), $container->getDefinition('bar')->getMethodCalls());
+        $this->assertEquals(array(new Reference('a'), '', new Reference('lille')), $container->getDefinition('foo')->getArguments());
     }
 }
 

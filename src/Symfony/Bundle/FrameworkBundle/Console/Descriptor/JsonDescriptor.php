@@ -217,28 +217,17 @@ class JsonDescriptor extends Descriptor
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
+            'shared' => $definition->isShared(),
+            'synchronized' => $definition->isSynchronized(false),
+            'abstract' => $definition->isAbstract(),
+            'autowire' => $definition->isAutowired(),
+            'autowiring_types' => array(),
+            'file' => $definition->getFile(),
         );
 
-        if (method_exists($definition, 'isShared')) {
-            $data['shared'] = $definition->isShared();
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $data['autowiring_types'][] = $autowiringType;
         }
-
-        if (method_exists($definition, 'isSynchronized')) {
-            $data['synchronized'] = $definition->isSynchronized(false);
-        }
-
-        $data['abstract'] = $definition->isAbstract();
-
-        if (method_exists($definition, 'isAutowired')) {
-            $data['autowire'] = $definition->isAutowired();
-
-            $data['autowiring_types'] = array();
-            foreach ($definition->getAutowiringTypes() as $autowiringType) {
-                $data['autowiring_types'][] = $autowiringType;
-            }
-        }
-
-        $data['file'] = $definition->getFile();
 
         if ($definition->getFactoryClass(false)) {
             $data['factory_class'] = $definition->getFactoryClass(false);
@@ -269,11 +258,9 @@ class JsonDescriptor extends Descriptor
 
         if (!$omitTags) {
             $data['tags'] = array();
-            if (count($definition->getTags())) {
-                foreach ($definition->getTags() as $tagName => $tagData) {
-                    foreach ($tagData as $parameters) {
-                        $data['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
-                    }
+            foreach ($definition->getTags() as $tagName => $tagData) {
+                foreach ($tagData as $parameters) {
+                    $data['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
                 }
             }
         }

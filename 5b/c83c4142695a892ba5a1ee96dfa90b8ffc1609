@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-19T09:26:21Z
+
+Status: Reviewed
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-19T09:34:50Z
+
+Removed some useless counts.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-24T12:46:31Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-24T15:55:19Z
+
+Does it mean that @stof comments were wrong or fixed but Github does not show that? Sorry, I haven't re-read the PR.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-24T16:05:13Z
+
+@fabpot yes but we need to be very careful when merging to other branches (I can do the merge if you want).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-24T16:06:24Z
+
+@dunglas Ok, I Iet you merge this one and then merge to other branches, that will be much easier.

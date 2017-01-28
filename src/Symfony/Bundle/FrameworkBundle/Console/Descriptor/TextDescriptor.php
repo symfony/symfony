@@ -290,23 +290,12 @@ class TextDescriptor extends Descriptor
         $tableRows[] = array('Public', $definition->isPublic() ? 'yes' : 'no');
         $tableRows[] = array('Synthetic', $definition->isSynthetic() ? 'yes' : 'no');
         $tableRows[] = array('Lazy', $definition->isLazy() ? 'yes' : 'no');
-        if (method_exists($definition, 'isShared')) {
-            $tableRows[] = array('Shared', $definition->isShared() ? 'yes' : 'no');
-        }
+        $tableRows[] = array('Shared', $definition->isShared() ? 'yes' : 'no');
         $tableRows[] = array('Abstract', $definition->isAbstract() ? 'yes' : 'no');
+        $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
 
-        if (method_exists($definition, 'isAutowired')) {
-            $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
-
-            $autowiringTypes = $definition->getAutowiringTypes();
-            if (count($autowiringTypes)) {
-                $autowiringTypesInformation = implode(', ', $autowiringTypes);
-            } else {
-                $autowiringTypesInformation = '-';
-            }
-
-            $tableRows[] = array('Autowiring Types', $autowiringTypesInformation);
-        }
+        $autowiringTypes = $definition->getAutowiringTypes();
+        $tableRows[] = array('Autowiring Types', $autowiringTypes ? implode(', ', $autowiringTypes) : '-');
 
         if ($definition->getFile()) {
             $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');

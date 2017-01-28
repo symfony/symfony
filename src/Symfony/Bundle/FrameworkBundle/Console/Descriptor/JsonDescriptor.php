@@ -217,21 +217,14 @@ class JsonDescriptor extends Descriptor
             'public' => $definition->isPublic(),
             'synthetic' => $definition->isSynthetic(),
             'lazy' => $definition->isLazy(),
+            'shared' => $definition->isShared(),
+            'abstract' => $definition->isAbstract(),
+            'autowire' => $definition->isAutowired(),
+            'autowiring_types' => array(),
         );
 
-        if (method_exists($definition, 'isShared')) {
-            $data['shared'] = $definition->isShared();
-        }
-
-        $data['abstract'] = $definition->isAbstract();
-
-        if (method_exists($definition, 'isAutowired')) {
-            $data['autowire'] = $definition->isAutowired();
-
-            $data['autowiring_types'] = array();
-            foreach ($definition->getAutowiringTypes() as $autowiringType) {
-                $data['autowiring_types'][] = $autowiringType;
-            }
+        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+            $data['autowiring_types'][] = $autowiringType;
         }
 
         if ($showArguments) {
@@ -278,11 +271,9 @@ class JsonDescriptor extends Descriptor
 
         if (!$omitTags) {
             $data['tags'] = array();
-            if (count($definition->getTags())) {
-                foreach ($definition->getTags() as $tagName => $tagData) {
-                    foreach ($tagData as $parameters) {
-                        $data['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
-                    }
+            foreach ($definition->getTags() as $tagName => $tagData) {
+                foreach ($tagData as $parameters) {
+                    $data['tags'][] = array('name' => $tagName, 'parameters' => $parameters);
                 }
             }
         }

@@ -187,7 +187,7 @@ class XmlDescriptor extends Descriptor
             $methodXML->appendChild(new \DOMText($method));
         }
 
-        if (count($route->getDefaults())) {
+        if ($route->getDefaults()) {
             $routeXML->appendChild($defaultsXML = $dom->createElement('defaults'));
             foreach ($route->getDefaults() as $attribute => $value) {
                 $defaultsXML->appendChild($defaultXML = $dom->createElement('default'));
@@ -196,16 +196,18 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        if (count($route->getRequirements())) {
+        $originRequirements = $requirements = $route->getRequirements();
+        unset($requirements['_scheme'], $requirements['_method']);
+        if ($requirements) {
             $routeXML->appendChild($requirementsXML = $dom->createElement('requirements'));
-            foreach ($route->getRequirements() as $attribute => $pattern) {
+            foreach ($originRequirements as $attribute => $pattern) {
                 $requirementsXML->appendChild($requirementXML = $dom->createElement('requirement'));
                 $requirementXML->setAttribute('key', $attribute);
                 $requirementXML->appendChild(new \DOMText($pattern));
             }
         }
 
-        if (count($route->getOptions())) {
+        if ($route->getOptions()) {
             $routeXML->appendChild($optionsXML = $dom->createElement('options'));
             foreach ($route->getOptions() as $name => $value) {
                 $optionsXML->appendChild($optionXML = $dom->createElement('option'));
@@ -349,15 +351,9 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
-        if (method_exists($definition, 'isShared')) {
-            $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
-        }
+        $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
         $serviceXML->setAttribute('abstract', $definition->isAbstract() ? 'true' : 'false');
-
-        if (method_exists($definition, 'isAutowired')) {
-            $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
-        }
-
+        $serviceXML->setAttribute('autowired', $definition->isAutowired() ? 'true' : 'false');
         $serviceXML->setAttribute('file', $definition->getFile());
 
         $calls = $definition->getMethodCalls();
@@ -370,9 +366,7 @@ class XmlDescriptor extends Descriptor
         }
 
         if (!$omitTags) {
-            $tags = $definition->getTags();
-
-            if (count($tags) > 0) {
+            if ($tags = $definition->getTags()) {
                 $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
                 foreach ($tags as $tagName => $tagData) {
                     foreach ($tagData as $parameters) {

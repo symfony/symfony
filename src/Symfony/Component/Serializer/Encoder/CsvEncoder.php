@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class CsvEncoder implements ContextAwareEncoderInterface, ContextAwareDecoderInterface
+class CsvEncoder implements EncoderInterface, DecoderInterface
 {
     const FORMAT = 'csv';
 
@@ -90,7 +90,7 @@ class CsvEncoder implements ContextAwareEncoderInterface, ContextAwareDecoderInt
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format, array $context = array())
+    public function supportsEncoding($format)
     {
         return self::FORMAT === $format;
     }
@@ -156,7 +156,7 @@ class CsvEncoder implements ContextAwareEncoderInterface, ContextAwareDecoderInt
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format, array $context = array())
+    public function supportsDecoding($format)
     {
         return self::FORMAT === $format;
     }

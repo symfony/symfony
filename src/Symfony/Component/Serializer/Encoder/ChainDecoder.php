@@ -45,7 +45,19 @@ class ChainDecoder implements DecoderInterface /*, ContextAwareDecoderInterface*
      */
     public function supportsDecoding($format/*, array $context = array()*/)
     {
-        $context = func_num_args() > 1 ? func_get_arg(1) : array();
+        if (func_num_args() > 1) {
+            $context = func_get_arg(1);
+        } else {
+            if (__CLASS__ !== get_class($this)) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
+                    @trigger_error(sprintf('Method %s() will have a second `$context = array()` argument in version 4.0. Not defining it is deprecated since 3.3.', get_class($this), __FUNCTION__), E_USER_DEPRECATED);
+                }
+            }
+
+            $context = array();
+        }
+
         try {
             $this->getDecoder($format, $context);
         } catch (RuntimeException $e) {

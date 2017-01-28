@@ -1,0 +1,112 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-25T14:07:07Z
+
+ping @csarrazi
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-01-25T19:43:48Z
+
+@csarrazi pushed (and fixed the duplicate code)
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-01-25T20:40:41Z
+
+added some tests
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-01-25T20:45:02Z
+
+I will test it tomorrow again when I have direct access to the LDAP server of the project where I am implementing this to confirm the tests are sufficient and the code is indeed working.
+
+---------------------------------------------------------------------------
+
+by nietonfir at 2017-01-25T22:40:20Z
+
+Just tested  (both the original PR and the updated one - against current [stable@3.2.2](https://github.com/symfony/symfony-standard/commit/d68e2e0819e1443d53f0a1a10655c21e03e43ba0)) against an OpenLDAP directory configured with a meta backend serving as a proxy for two different OpenLDAP instances  (thus two different DNs - see #16823), works like a charm.
+
+Your changes can also be applied directly to `HttpBasicLdapFactory`:
+```diff
+diff --git a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/HttpBasicLdapFactory.php b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/HttpBasicLdapFactory.php
+index 961af71..4665c07 100644
+--- a/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/HttpBasicLdapFactory.php
++++ b/src/Symfony/Bundle/SecurityBundle/DependencyInjection/Security/Factory/HttpBasicLdapFactory.php
+@@ -28,7 +28,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
+     public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
+     {
+         $provider = 'security.authentication.provider.ldap_bind.'.$id;
+-        $container
++        $definition = $container
+             ->setDefinition($provider, new ChildDefinition('security.authentication.provider.ldap_bind'))
+             ->replaceArgument(0, new Reference($userProvider))
+             ->replaceArgument(1, new Reference('security.user_checker.'.$id))
+@@ -40,6 +40,11 @@ class HttpBasicLdapFactory extends HttpBasicFactory
+         // entry point
+         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPoint);
+
++
++        if (!empty($config['query_string'])) {
++            $definition->addMethodCall('setQueryString', array($config['query_string']));
++        }
++
+         // listener
+         $listenerId = 'security.authentication.listener.basic.'.$id;
+         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.basic'));
+@@ -57,6 +62,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
+             ->children()
+                 ->scalarNode('service')->defaultValue('ldap')->end()
+                 ->scalarNode('dn_string')->defaultValue('{username}')->end()
++                ->scalarNode('query_string')->end()
+             ->end()
+         ;
+     }
+```
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-01-26T07:09:43Z
+
+@nietonfir can you send a PR to this PR to apply the above changes?
+
+---------------------------------------------------------------------------
+
+by nietonfir at 2017-01-26T11:05:22Z
+
+@lsmith77 created a PR to your branch. Hope that's what you meant… ;-)
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-01-26T14:30:01Z
+
+thx
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-01-26T22:08:54Z
+
+added support for HTTP basic as well and linked a doc PR.
+
+will do final testing on my end tomorrow.
+
+@csarrazi are the unit tests sufficient or do we also need some functional tests?
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-01-26T23:50:07Z
+
+I don't think we need functional tests for this one. Functional tests are limited to the Ldap component's integration with OpenLDAP. The component was not updated here, so no functional tests are needed. Unit tests are sufficient here.
+
+---------------------------------------------------------------------------
+
+by lsmith77 at 2017-01-27T12:25:43Z
+
+@csarrazi ok fixed your comments and tested it against the production LDAP server. all is well to merge from my side
+
+---------------------------------------------------------------------------
+
+by csarrazi at 2017-01-27T17:53:09Z
+
+:+1:

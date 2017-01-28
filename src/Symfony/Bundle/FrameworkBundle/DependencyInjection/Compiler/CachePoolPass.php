@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -77,7 +78,20 @@ class CachePoolPass implements CompilerPassInterface
             }
 
             if (null !== $clearer) {
-                $clearer->addMethodCall('addPool', array(new Reference($id)));
+                if (Kernel::VERSION_ID < 30300) {
+                    $clearer->addMethodCall('addPool', array(new Reference($id)));
+                } else {
+                    $arguments = $clearer->getArguments();
+
+                    if (empty($arguments)) {
+                        $pools = array($id => new Reference($id));
+                        $clearer->addArgument($pools);
+                    } else {
+                        $pools = $arguments[0];
+                        $pools[$id] = new Reference($id);
+                        $clearer->replaceArgument(0, $pools);
+                    }
+                }
             }
         }
     }

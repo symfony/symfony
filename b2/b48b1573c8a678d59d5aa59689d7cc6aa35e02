@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-17T07:41:14Z
+
+Did you make sure that the missing parts just aren't things that were not deprecated in 2.7, but were only deprecated in 2.8?
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2017-01-17T08:57:15Z
+
+Should't that be the same? Also, a big missing part was the one about the Form deprecations, that I'm sure are from before 2.8.
+
+Anyway, I'll double check that...
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2017-01-17T09:19:35Z
+
+Ok I've rechecked everything.
+
+I've changed the base branch to 2.8, and leaved only the changes that where really missing: the Monolog Bridge
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-24T12:50:14Z
+
+:+1:

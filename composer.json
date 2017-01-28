@@ -93,7 +93,8 @@
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",
-        "phpdocumentor/type-resolver": "<0.2.0"
+        "phpdocumentor/type-resolver": "<0.2.0",
+        "sensio/framework-extra-bundle": "^3.0.2"
     },
     "provide": {
         "psr/cache-implementation": "1.0"

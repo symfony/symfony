@@ -554,4 +554,15 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('baz', $this->propertyAccessor->getValue($object, 'publicAccessor[value2]'));
         $this->assertSame(array('value1' => 'foo', 'value2' => 'baz'), $object->getPublicAccessor());
     }
+
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Expected argument of type "Countable", "string" given
+     */
+    public function testThrowTypeErrorWithInterface()
+    {
+        $object = new TypeHinted();
+
+        $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
+    }
 }

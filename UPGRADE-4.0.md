@@ -164,6 +164,8 @@ SecurityBundle
 
  * The `FirewallContext::getContext()` method has been removed, use the `getListeners()` method instead.
 
+ * The `FirewallMap::$map` and `$container` properties have been removed.
+
 HttpFoundation
 ---------------
 

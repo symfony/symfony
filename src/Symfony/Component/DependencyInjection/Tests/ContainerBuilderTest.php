@@ -422,6 +422,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $lazyContext = $builder->get('lazy_context');
         $this->assertInstanceOf(RewindableGenerator::class, $lazyContext->lazyValues);
+        $this->assertCount(1, $lazyContext->lazyValues);
 
         $i = 0;
         foreach ($lazyContext->lazyValues as $k => $v) {

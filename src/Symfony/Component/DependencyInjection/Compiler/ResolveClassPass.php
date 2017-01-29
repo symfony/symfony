@@ -30,7 +30,7 @@ class ResolveClassPass implements CompilerPassInterface
             if ($definition instanceof ChildDefinition || $definition->isSynthetic() || null !== $definition->getClass()) {
                 continue;
             }
-            if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+$/', $id)) {
+            if (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)++$/', $id)) {
                 $this->changes[strtolower($id)] = $id;
                 $definition->setClass($id);
             }

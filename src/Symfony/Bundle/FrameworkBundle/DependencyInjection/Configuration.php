@@ -18,6 +18,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Lock\Lock;
+use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Validation;
@@ -129,6 +131,7 @@ class Configuration implements ConfigurationInterface
         $this->addCacheSection($rootNode);
         $this->addPhpErrorsSection($rootNode);
         $this->addWebLinkSection($rootNode);
+        $this->addLockSection($rootNode);
 
         return $treeBuilder;
     }
@@ -868,6 +871,49 @@ class Configuration implements ConfigurationInterface
                             ->info('Throw PHP errors as \ErrorException instances.')
                             ->defaultValue($this->debug)
                             ->treatNullLike($this->debug)
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addLockSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('lock')
+                    ->info('Lock configuration')
+                    ->{!class_exists(FullStack::class) && class_exists(Lock::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->beforeNormalization()
+                        ->ifString()->then(function ($v) { return array('enabled' => true, 'resources' => $v); })
+                    ->end()
+                    ->beforeNormalization()
+                        ->ifTrue(function ($v) { return is_array($v) && !isset($v['resources']); })
+                        ->then(function ($v) {
+                            $e = $v['enabled'];
+                            unset($v['enabled']);
+
+                            return array('enabled' => $e, 'resources' => $v);
+                        })
+                    ->end()
+                    ->addDefaultsIfNotSet()
+                    ->fixXmlConfig('resource')
+                    ->children()
+                        ->arrayNode('resources')
+                            ->requiresAtLeastOneElement()
+                            ->defaultValue(array('default' => array(class_exists(SemaphoreStore::class) && SemaphoreStore::isSupported() ? 'semaphore' : 'flock')))
+                            ->beforeNormalization()
+                                ->ifString()->then(function ($v) { return array('default' => $v); })
+                            ->end()
+                            ->beforeNormalization()
+                                ->ifTrue(function ($v) { return is_array($v) && array_keys($v) === range(0, count($v) - 1); })
+                                ->then(function ($v) { return array('default' => $v); })
+                            ->end()
+                            ->prototype('array')
+                                ->beforeNormalization()->ifString()->then(function ($v) { return array($v); })->end()
+                                ->prototype('scalar')->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

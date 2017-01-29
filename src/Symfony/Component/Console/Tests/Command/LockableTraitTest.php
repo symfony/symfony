@@ -44,7 +44,7 @@ class LockableTraitTest extends TestCase
         if (SemaphoreStore::isSupported(false)) {
             $store = new SemaphoreStore();
         } else {
-            $store = new FlockStore(sys_get_temp_dir());
+            $store = new FlockStore();
         }
 
         $lock = (new Factory($store))->createLock($command->getName());

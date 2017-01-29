@@ -54,6 +54,7 @@
         "symfony/workflow": "~3.3|~4.0",
         "symfony/yaml": "~3.2|~4.0",
         "symfony/property-info": "~3.3|~4.0",
+        "symfony/lock": "~3.4|~4.0",
         "symfony/web-link": "~3.3|~4.0",
         "doctrine/annotations": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0|^4.0",

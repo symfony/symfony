@@ -40,4 +40,4 @@ services:
 
     with_defaults_aliased_short: '@with_defaults'
 
-    with_shortcut_args: [foo]
+    Acme\WithShortCutArgs: [foo]

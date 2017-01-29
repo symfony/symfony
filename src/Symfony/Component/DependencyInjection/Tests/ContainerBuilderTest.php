@@ -932,14 +932,24 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $unknown = $container->register('unknown_class');
-        $class = $container->register(\stdClass::class);
+        $unknown = $container->register('Acme\UnknownClass');
         $autoloadClass = $container->register(CaseSensitiveClass::class);
         $container->compile();
 
-        $this->assertSame('unknown_class', $unknown->getClass());
-        $this->assertEquals(\stdClass::class, $class->getClass());
+        $this->assertSame('Acme\UnknownClass', $unknown->getClass());
         $this->assertEquals(CaseSensitiveClass::class, $autoloadClass->getClass());
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The definition for "DateTime" has no class.
+     */
+    public function testNoClassFromGlobalNamespaceClassId()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = $container->register(\DateTime::class);
+        $container->compile();
     }
 
     /**

@@ -298,6 +298,10 @@ class FrameworkExtension extends Extension
             $this->registerPropertyInfoConfiguration($config['property_info'], $container, $loader);
         }
 
+        if ($this->isConfigEnabled($container, $config['lock'])) {
+            $this->registerLockConfiguration($config['lock'], $container, $loader);
+        }
+
         if ($this->isConfigEnabled($container, $config['web_link'])) {
             if (!class_exists(HttpHeaderSerializer::class)) {
                 throw new LogicException('WebLink support cannot be enabled as the WebLink component is not installed.');
@@ -1669,6 +1673,86 @@ class FrameworkExtension extends Extension
             $definition->setPrivate(true);
             $definition->addTag('property_info.description_extractor', array('priority' => -1000));
             $definition->addTag('property_info.type_extractor', array('priority' => -1001));
+        }
+    }
+
+    /**
+     * Loads lock configuration.
+     *
+     * @param array            $config
+     * @param ContainerBuilder $container
+     * @param XmlFileLoader    $loader
+     */
+    private function registerLockConfiguration(array $config, ContainerBuilder $container, XmlFileLoader $loader)
+    {
+        $loader->load('lock.xml');
+
+        $container->getDefinition('lock.store.flock')->replaceArgument(0, sys_get_temp_dir());
+
+        // configure connectable stores
+        foreach (array('redis', 'memcached') as $store) {
+            if ($this->isConfigEnabled($container, $config[$store]) && count($config[$store]['hosts']) > 0) {
+                /** @var Reference[] $hostsDefinitions */
+                $hostsDefinitions = array();
+                foreach ($config[$store]['hosts'] as $host) {
+                    $definition = new ChildDefinition('lock.store.'.$store.'.abstract');
+
+                    // generate a service connection for the host
+                    $container->resolveEnvPlaceholders($host, null, $usedEnvs);
+                    if ($usedEnvs || preg_match('#^[a-z]++://#', $host)) {
+                        $dsn = $host;
+
+                        if (!$container->hasDefinition($host = 'lock.connection.'.$store.'.'.md5($dsn))) {
+                            $connectionDefinition = new Definition(\stdClass::class);
+                            $connectionDefinition->setPublic(false);
+                            $connectionDefinition->setFactory(array($container->getDefinition($definition->getParent())->getClass(), 'createConnection'));
+                            $connectionDefinition->setArguments(array($dsn));
+                            $container->setDefinition($host, $connectionDefinition);
+                        }
+                    }
+
+                    $definition->replaceArgument(0, new Reference($host));
+                    $container->setDefinition($name = 'lock.store.'.$store.'.'.md5($host), $definition);
+
+                    $hostsDefinitions[] = new Reference($name);
+                }
+
+                if (count($hostsDefinitions) > 1) {
+                    $definition = new ChildDefinition('lock.store.combined.abstract');
+                    $definition->replaceArgument(0, $hostsDefinitions);
+                    $container->setDefinition('lock.store.'.$store, $definition);
+                } else {
+                    $container->setAlias('lock.store.'.$store, new Alias((string) $hostsDefinitions[0]));
+                }
+            }
+        }
+
+        // wrap non blocking store with retry mechanism
+        foreach (array('redis', 'memcached') as $store) {
+            if ($container->has($name = 'lock.store.'.$store)) {
+                $container->register($name.'.retry', 'Symfony\\Component\\Lock\\Store\\RetryTillSaveStore')
+                    ->setDecoratedService($name)
+                    ->addArgument(new Reference($name.'.retry.inner'))
+                    ->setPublic(false)
+                ;
+            }
+        }
+
+        // generate factory for activated stores
+        $hasAlias = false;
+        // Order of stores matters: First enabled will be used in the default "lock.factory"
+        foreach (array('redis', 'memcached', 'semaphore', 'flock') as $store) {
+            if ($this->isConfigEnabled($container, $config[$store]) && $container->has('lock.store.'.$store)) {
+                $definition = new ChildDefinition('lock.factory.abstract');
+                $definition->replaceArgument(0, new Reference('lock.store.'.$store));
+                $definition->setPublic(true);
+                $container->setDefinition('lock.factory.'.$store, $definition);
+
+                if (!$hasAlias) {
+                    $container->setAlias('lock.factory', new Alias('lock.factory.'.$store));
+                    $hasAlias = true;
+                }
+            }
         }
     }
 

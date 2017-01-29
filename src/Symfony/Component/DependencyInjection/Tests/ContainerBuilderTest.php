@@ -550,6 +550,33 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         unset($_ENV['DUMMY_ENV_VAR']);
     }
 
+    public function testCompileWithResolveEnv()
+    {
+        $_ENV['DUMMY_ENV_VAR'] = 'du%%y';
+
+        $container = new ContainerBuilder();
+        $container->setParameter('env(FOO)', 'Foo');
+        $container->setParameter('bar', '%% %env(DUMMY_ENV_VAR)%');
+        $container->setParameter('foo', '%env(FOO)%');
+        $container->compile(true);
+
+        $this->assertSame('% du%%y', $container->getParameter('bar'));
+        $this->assertSame('Foo', $container->getParameter('foo'));
+
+        unset($_ENV['DUMMY_ENV_VAR']);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\EnvNotFoundException
+     * @expectedExceptionMessage Environment variable not found: "FOO".
+     */
+    public function testCompileWithResolveMissingEnv()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('foo', '%env(FOO)%');
+        $container->compile(true);
+    }
+
     /**
      * @expectedException \LogicException
      */

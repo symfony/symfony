@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -62,11 +63,13 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
             $authenticatorReferences[] = new Reference($authenticatorId);
         }
 
+        $authenticators = new IteratorArgument($authenticatorReferences);
+
         // configure the GuardAuthenticationFactory to have the dynamic constructor arguments
         $providerId = 'security.authentication.provider.guard.'.$id;
         $container
             ->setDefinition($providerId, new ChildDefinition('security.authentication.provider.guard'))
-            ->replaceArgument(0, $authenticatorReferences)
+            ->replaceArgument(0, $authenticators)
             ->replaceArgument(1, new Reference($userProvider))
             ->replaceArgument(2, $id)
             ->replaceArgument(3, new Reference('security.user_checker.'.$id))
@@ -76,7 +79,7 @@ class GuardAuthenticationFactory implements SecurityFactoryInterface
         $listenerId = 'security.authentication.listener.guard.'.$id;
         $listener = $container->setDefinition($listenerId, new ChildDefinition('security.authentication.listener.guard'));
         $listener->replaceArgument(2, $id);
-        $listener->replaceArgument(3, $authenticatorReferences);
+        $listener->replaceArgument(3, $authenticators);
 
         // determine the entryPointId to use
         $entryPointId = $this->determineEntryPoint($defaultEntryPoint, $config);

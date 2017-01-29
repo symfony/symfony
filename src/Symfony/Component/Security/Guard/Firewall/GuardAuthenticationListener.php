@@ -39,13 +39,13 @@ class GuardAuthenticationListener implements ListenerInterface
     private $rememberMeServices;
 
     /**
-     * @param GuardAuthenticatorHandler      $guardHandler          The Guard handler
-     * @param AuthenticationManagerInterface $authenticationManager An AuthenticationManagerInterface instance
-     * @param string                         $providerKey           The provider (i.e. firewall) key
-     * @param GuardAuthenticatorInterface[]  $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
-     * @param LoggerInterface                $logger                A LoggerInterface instance
+     * @param GuardAuthenticatorHandler              $guardHandler          The Guard handler
+     * @param AuthenticationManagerInterface         $authenticationManager An AuthenticationManagerInterface instance
+     * @param string                                 $providerKey           The provider (i.e. firewall) key
+     * @param iterable|GuardAuthenticatorInterface[] $guardAuthenticators   The authenticators, with keys that match what's passed to GuardAuthenticationProvider
+     * @param LoggerInterface                        $logger                A LoggerInterface instance
      */
-    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, array $guardAuthenticators, LoggerInterface $logger = null)
+    public function __construct(GuardAuthenticatorHandler $guardHandler, AuthenticationManagerInterface $authenticationManager, $providerKey, $guardAuthenticators, LoggerInterface $logger = null)
     {
         if (empty($providerKey)) {
             throw new \InvalidArgumentException('$providerKey must not be empty.');
@@ -66,7 +66,13 @@ class GuardAuthenticationListener implements ListenerInterface
     public function handle(GetResponseEvent $event)
     {
         if (null !== $this->logger) {
-            $this->logger->debug('Checking for guard authentication credentials.', array('firewall_key' => $this->providerKey, 'authenticators' => count($this->guardAuthenticators)));
+            $context = array('firewall_key' => $this->providerKey);
+
+            if ($this->guardAuthenticators instanceof \Countable || is_array($this->guardAuthenticators)) {
+                $context['authenticators'] = count($this->guardAuthenticators);
+            }
+
+            $this->logger->debug('Checking for guard authentication credentials.', $context);
         }
 
         foreach ($this->guardAuthenticators as $key => $guardAuthenticator) {

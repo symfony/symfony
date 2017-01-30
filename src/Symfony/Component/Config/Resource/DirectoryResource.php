@@ -68,7 +68,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
             return false;
         }
 
-        if ($timestamp <= filemtime($this->resource)) {
+        if ($timestamp < filemtime($this->resource)) {
             return false;
         }
 
@@ -85,7 +85,7 @@ class DirectoryResource implements ResourceInterface, \Serializable
             }
 
             // early return if a file's mtime exceeds the passed timestamp
-            if ($timestamp <= $file->getMTime()) {
+            if ($timestamp < $file->getMTime()) {
                 return false;
             }
         }

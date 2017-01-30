@@ -145,11 +145,12 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
                 continue;
             }
 
-            if (0 !== strpos($k, 'index_')) {
+            if (0 === strpos($k, 'index_')) {
+                $index = (int) substr($k, strlen('index_'));
+            } elseif (0 !== strpos($k, '$')) {
                 throw new RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
             }
 
-            $index = (int) substr($k, strlen('index_'));
             $def->replaceArgument($index, $v);
         }
 

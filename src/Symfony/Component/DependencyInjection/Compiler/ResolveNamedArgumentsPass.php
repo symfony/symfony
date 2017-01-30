@@ -43,9 +43,14 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
             list($method, $arguments) = $call;
             $method = $parameterBag->resolveValue($method);
             $parameters = null;
+            $resolvedArguments = array();
 
             foreach ($arguments as $key => $argument) {
                 if (is_int($key) || '' === $key || '$' !== $key[0]) {
+                    if (!is_int($key)) {
+                        @trigger_error(sprintf('Using key "%s" for defining arguments of method "%s" for service "%s" is deprecated since Symfony 3.3 and will throw an exception in 4.0. Use no keys or $named arguments instead.', $key, $method, $this->currentId), E_USER_DEPRECATED);
+                    }
+                    $resolvedArguments[] = $argument;
                     continue;
                 }
 
@@ -53,8 +58,7 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
 
                 foreach ($parameters as $j => $p) {
                     if ($key === '$'.$p->name) {
-                        unset($arguments[$key]);
-                        $arguments[$j] = $argument;
+                        $resolvedArguments[$j] = $argument;
 
                         continue 2;
                     }
@@ -63,9 +67,9 @@ class ResolveNamedArgumentsPass extends AbstractRecursivePass
                 throw new InvalidArgumentException(sprintf('Unable to resolve service "%s": method "%s::%s" has no argument named "%s". Check your service definition.', $this->currentId, $class, $method, $key));
             }
 
-            if ($arguments !== $call[1]) {
-                ksort($arguments);
-                $calls[$i][1] = $arguments;
+            if ($resolvedArguments !== $call[1]) {
+                ksort($resolvedArguments);
+                $calls[$i][1] = $resolvedArguments;
             }
         }
 

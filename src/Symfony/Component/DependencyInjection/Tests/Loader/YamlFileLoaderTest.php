@@ -405,6 +405,15 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
     }
 
+    public function testGetter()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services31.yml');
+
+        $this->assertEquals(array('getbar' => array('bar' => new Reference('bar'))), $container->getDefinition('foo')->getOverriddenGetters());
+    }
+
     /**
      * @expectedException \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @expectedExceptionMessage The value of the "decorates" option for the "bar" service must be the id of the service without the "@" prefix (replace "@foo" with "foo").

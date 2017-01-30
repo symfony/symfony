@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -309,6 +310,66 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services24.php', $dumper->dump());
+    }
+
+    public function testDumpOverridenGetters()
+    {
+        $container = include self::$fixturesPath.'/containers/container29.php';
+        $container->compile();
+        $container->getDefinition('foo')
+            ->setOverriddenGetter('getInvalid', array(new Reference('bar', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)));
+        $dumper = new PhpDumper($container);
+
+        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Overriden_Getters'));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services29.php', $dump);
+        $res = $container->getResources();
+        $this->assertSame(realpath(self::$fixturesPath.'/containers/container29.php'), array_pop($res)->getResource());
+
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Test_Overriden_Getters();
+
+        $foo = $container->get('foo');
+
+        $this->assertSame('public', $foo->getPublic());
+        $this->assertSame('protected', $foo->getGetProtected());
+        $this->assertSame($foo, $foo->getSelf());
+        $this->assertSame(456, $foo->getInvalid());
+
+        $baz = $container->get('baz');
+        $r = new \ReflectionMethod($baz, 'getBaz');
+        $r->setAccessible(true);
+
+        $this->assertTrue($r->isProtected());
+        $this->assertSame('baz', $r->invoke($baz));
+    }
+
+    /**
+     * @dataProvider provideBadOverridenGetters
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     */
+    public function testBadOverridenGetters($expectedMessage, $getter, $id = 'foo')
+    {
+        $container = include self::$fixturesPath.'/containers/container30.php';
+        $container->getDefinition($id)->setOverriddenGetter($getter, 123);
+
+        $container->compile();
+        $dumper = new PhpDumper($container);
+
+        $this->setExpectedException(RuntimeException::class, $expectedMessage);
+        $dumper->dump();
+    }
+
+    public function provideBadOverridenGetters()
+    {
+        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getnotfound" does not exist.', 'getNotFound');
+        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getPrivate" must be public or protected.', 'getPrivate');
+        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getStatic" cannot be static.', 'getStatic');
+        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getFinal" cannot be marked as final.', 'getFinal');
+        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getRef" cannot return by reference.', 'getRef');
+        yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getParam" cannot have any arguments.', 'getParam');
+        yield array('Unable to configure getter injection for service "bar": class "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Bar" cannot be marked as final.', 'getParam', 'bar');
+        yield array('Cannot dump definition for service "baz": factories and overridden getters are incompatible with each other.', 'getParam', 'baz');
     }
 
     public function testEnvParameter()

@@ -80,8 +80,7 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass implements Co
             $this->currentId = $id;
         }
 
-        $compiler = $this->container->getCompiler();
-        $compiler->addLogMessage($compiler->getLoggingFormatter()->formatResolveInheritance($this, $this->currentId, $parent));
+        $this->container->log($this, sprintf('Resolving inheritance for "%s" (parent: %s).', $this->currentId, $parent));
         $def = new Definition();
 
         // merge in parent definition

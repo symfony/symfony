@@ -150,8 +150,7 @@ class AutowirePass extends AbstractRecursivePass implements CompilerPassInterfac
         }
 
         if ($notFound = array_diff($autowiredMethods, $found)) {
-            $compiler = $this->container->getCompiler();
-            $compiler->addLogMessage($compiler->getLoggingFormatter()->formatUnusedAutowiringPatterns($this, $this->currentId, $notFound));
+            $this->container->log($this, sprintf('Autowiring\'s patterns "%s" for service "%s" don\'t match any method.', implode('", "', $notFound), $this->currentId));
         }
 
         return $methodsToAutowire;

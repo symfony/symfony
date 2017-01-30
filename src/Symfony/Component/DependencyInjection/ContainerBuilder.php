@@ -1172,6 +1172,14 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     }
 
     /**
+     * @final
+     */
+    public function log(CompilerPassInterface $pass, $message)
+    {
+        $this->getCompiler()->log($pass, $message);
+    }
+
+    /**
      * Returns the Service Conditionals.
      *
      * @param mixed $value An array of conditionals to return

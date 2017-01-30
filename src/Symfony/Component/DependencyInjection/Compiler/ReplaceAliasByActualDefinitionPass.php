@@ -82,8 +82,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass implement
             // Perform the replacement
             $newId = $this->replacements[$referenceId];
             $value = new Reference($newId, $value->getInvalidBehavior());
-            $compiler = $this->container->getCompiler();
-            $compiler->addLogMessage($compiler->getLoggingFormatter()->formatUpdateReference($this, $this->currentId, $referenceId, $newId));
+            $this->container->log($this, sprintf('Changed reference of service "%s" previously pointing to "%s" to "%s".', $this->currentId, $referenceId, $newId));
         }
 
         return parent::processValue($value, $isRoot);

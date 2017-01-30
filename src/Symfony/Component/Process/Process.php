@@ -58,7 +58,7 @@ class Process implements \IteratorAggregate
     private $lastOutputTime;
     private $timeout;
     private $idleTimeout;
-    private $options;
+    private $options = array('suppress_errors' => true);
     private $exitcode;
     private $fallbackStatus = array();
     private $processInformation;
@@ -145,7 +145,7 @@ class Process implements \IteratorAggregate
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array())
+    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = null)
     {
         if (!function_exists('proc_open')) {
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
@@ -171,7 +171,10 @@ class Process implements \IteratorAggregate
         $this->pty = false;
         $this->enhanceWindowsCompatibility = true;
         $this->enhanceSigchildCompatibility = '\\' !== DIRECTORY_SEPARATOR && $this->isSigchildEnabled();
-        $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
+        if (null !== $options) {
+            @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since version 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
+            $this->options = $options + $this->options;
+        }
     }
 
     public function __destruct()
@@ -274,24 +277,23 @@ class Process implements \IteratorAggregate
             if ('\\' === DIRECTORY_SEPARATOR && !empty($this->options['bypass_shell']) && !$this->enhanceWindowsCompatibility) {
                 throw new LogicException('The "bypass_shell" option must be false to inherit environment variables while enhanced Windows compatibility is off');
             }
+            $escape = '\\' === DIRECTORY_SEPARATOR ? function ($v) { return ProcessUtils::escapeArgument($v, ProcessUtils::ESC_WINDOWS_CMD); } : 'escapeshellarg';
             $env = '\\' === DIRECTORY_SEPARATOR ? '(SET %s)&&' : 'export %s;';
             foreach ($this->env as $k => $v) {
-                $envline .= sprintf($env, ProcessUtils::escapeArgument("$k=$v"));
+                $envline .= sprintf($env, $escape("$k=$v"));
             }
             $env = null;
         } else {
             $env = $this->env;
         }
         if ('\\' === DIRECTORY_SEPARATOR && $this->enhanceWindowsCompatibility) {
-            $commandline = 'cmd /V:ON /E:ON /D /C "('.$envline.$commandline.')';
+            $commandline = 'cmd /V:OFF /E:ON /D /C "('.$envline.$commandline.')';
             foreach ($this->processPipes->getFiles() as $offset => $filename) {
-                $commandline .= ' '.$offset.'>'.ProcessUtils::escapeArgument($filename);
+                $commandline .= ' '.$offset.'>'.ProcessUtils::escapeArgument($filename, ProcessUtils::ESC_WINDOWS_CMD);
             }
             $commandline .= '"';
 
-            if (!isset($this->options['bypass_shell'])) {
-                $this->options['bypass_shell'] = true;
-            }
+            $this->options['bypass_shell'] = true;
         } elseif (!$this->useFileHandles && $this->enhanceSigchildCompatibility && $this->isSigchildEnabled()) {
             // last exit code is output on the fourth pipe and caught to work around --enable-sigchild
             $descriptors[3] = array('pipe', 'w');
@@ -1148,9 +1150,13 @@ class Process implements \IteratorAggregate
      * Gets the options for proc_open.
      *
      * @return array The current options
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function getOptions()
     {
+        @trigger_error(sprintf('The %s method is deprecated since version 3.3 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->options;
     }
 
@@ -1160,9 +1166,13 @@ class Process implements \IteratorAggregate
      * @param array $options The new options
      *
      * @return self The current Process instance
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function setOptions(array $options)
     {
+        @trigger_error(sprintf('The %s method is deprecated since version 3.3 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
         $this->options = $options;
 
         return $this;
@@ -1174,9 +1184,13 @@ class Process implements \IteratorAggregate
      * This is true by default.
      *
      * @return bool
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function getEnhanceWindowsCompatibility()
     {
+        @trigger_error(sprintf('The %s method is deprecated since version 3.3 and will be removed in 4.0. Enhanced Windows compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->enhanceWindowsCompatibility;
     }
 
@@ -1186,9 +1200,13 @@ class Process implements \IteratorAggregate
      * @param bool $enhance
      *
      * @return self The current Process instance
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function setEnhanceWindowsCompatibility($enhance)
     {
+        @trigger_error(sprintf('The %s method is deprecated since version 3.3 and will be removed in 4.0. Enhanced Windows compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+
         $this->enhanceWindowsCompatibility = (bool) $enhance;
 
         return $this;
@@ -1198,9 +1216,13 @@ class Process implements \IteratorAggregate
      * Returns whether sigchild compatibility mode is activated or not.
      *
      * @return bool
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function getEnhanceSigchildCompatibility()
     {
+        @trigger_error(sprintf('The %s method is deprecated since version 3.3 and will be removed in 4.0. SIGCHLD compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+
         return $this->enhanceSigchildCompatibility;
     }
 
@@ -1214,9 +1236,13 @@ class Process implements \IteratorAggregate
      * @param bool $enhance
      *
      * @return self The current Process instance
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function setEnhanceSigchildCompatibility($enhance)
     {
+        @trigger_error(sprintf('The %s method is deprecated since version 3.3 and will be removed in 4.0. SIGCHLD compatibility will always be enabled.', __METHOD__), E_USER_DEPRECATED);
+
         $this->enhanceSigchildCompatibility = (bool) $enhance;
 
         return $this;

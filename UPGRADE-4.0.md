@@ -206,6 +206,15 @@ HttpKernel
  * The `Psr6CacheClearer::addPool()` method has been removed. Pass an array of pools indexed
    by name to the constructor instead.
 
+Process
+-------
+
+ * Delayed expansion on Windows has been disabled, you now must resolve
+   `!VAR!` variables before calling `ProcessUtils::escapeArgument()`.
+
+ * Configuring `proc_open()` options, Windows compatibility and SIGCHLD
+   compatibility is not possible anymore - they are always enabled.
+
 Security
 --------
 

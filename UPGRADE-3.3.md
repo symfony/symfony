@@ -46,6 +46,17 @@ HttpKernel
  * The `Psr6CacheClearer::addPool()` method has been deprecated. Pass an array of pools indexed
    by name to the constructor instead.
 
+Process
+-------
+
+ * Delayed expansion on Windows has been disabled.
+
+ * `!VAR!` expansion allowed by ProcessUtils::escapeArgument() is deprecated.
+   You should resolve these variables before calling `ProcessUtils::escapeArgument()`.
+
+ * Configuring `proc_open()` options, Windows compatibility and SIGCHLD
+   compatibility is deprecated - they will be always enabled in 4.0.
+
 Security
 --------
 

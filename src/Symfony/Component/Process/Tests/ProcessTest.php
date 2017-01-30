@@ -1427,9 +1427,9 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      *
      * @return Process
      */
-    private function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array())
+    private function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60)
     {
-        $process = new Process($commandline, $cwd, $env, $input, $timeout, $options);
+        $process = new Process($commandline, $cwd, $env, $input, $timeout);
 
         if (false !== $enhance = getenv('ENHANCE_SIGCHLD')) {
             try {

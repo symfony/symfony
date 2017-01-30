@@ -15,6 +15,7 @@ require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -680,6 +681,25 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($a, $b), $resources, '->getResources() returns an array of resources read for the current configuration');
         $this->assertSame($container, $container->setResources(array()));
         $this->assertEquals(array(), $container->getResources());
+    }
+
+    public function testFileExists()
+    {
+        $container = new ContainerBuilder();
+        $a = new FileResource(__DIR__.'/Fixtures/xml/services1.xml');
+        $b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml');
+        $c = new DirectoryResource($dir = dirname($b));
+
+        $this->assertTrue($container->fileExists((string) $a) && $container->fileExists((string) $b) && $container->fileExists($dir));
+
+        $resources = array();
+        foreach ($container->getResources() as $resource) {
+            if (false === strpos($resource, '.php')) {
+                $resources[] = $resource;
+            }
+        }
+
+        $this->assertEquals(array($a, $b, $c), $resources, '->getResources() returns an array of resources read for the current configuration');
     }
 
     public function testExtension()

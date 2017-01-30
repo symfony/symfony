@@ -25,6 +25,8 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
@@ -1319,6 +1321,42 @@ EOF;
         }
 
         return $services;
+    }
+
+    /**
+     * Checks whether the requested file or directory exists and registers the result for resource tracking.
+     *
+     * @param string      $path          The file or directory path for which to check the existence
+     * @param bool|string $trackContents Whether to track contents of the given resource. If a string is passed,
+     *                                   it will be used as pattern for tracking contents of the requested directory
+     *
+     * @return bool
+     *
+     * @final
+     */
+    public function fileExists($path, $trackContents = true)
+    {
+        $exists = file_exists($path);
+
+        if (!$this->trackResources) {
+            return $exists;
+        }
+
+        if (!$exists) {
+            $this->addResource(new FileExistenceResource($path));
+
+            return $exists;
+        }
+
+        if ($trackContents) {
+            if (is_file($path)) {
+                $this->addResource(new FileResource($path));
+            } else {
+                $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
+            }
+        }
+
+        return $exists;
     }
 
     /**

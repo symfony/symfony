@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-24T12:39:42Z
+
+Not sure it should go on master to me. To reviewers: please advise your pov :)
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-24T18:07:31Z
+
+@nicolas-grekas do you think it should go in 2.8? It is fine for me either way.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-30T19:58:17Z
+
+Looks like a bug fix to me.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-30T20:08:10Z
+
+@dunglas's comment on the issue is interesting; it was done for performance reasons. This change makes sense but can we check that performance is still ok?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-30T20:14:02Z
+
+@fabpot that's why there is a cache layer, i don't think it's relevant.

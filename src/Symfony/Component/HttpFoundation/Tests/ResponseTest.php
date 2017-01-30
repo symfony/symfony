@@ -843,25 +843,6 @@ class ResponseTest extends ResponseTestCase
         }
     }
 
-    public function testNoDeprecationsAreTriggered()
-    {
-        new DefaultResponse();
-        $this->getMockBuilder(Response::class)->getMock();
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Extending Symfony\Component\HttpFoundation\Response::getDate() in Symfony\Component\HttpFoundation\Tests\ExtendedResponse is deprecated %s.
-     * @expectedDeprecation Extending Symfony\Component\HttpFoundation\Response::setLastModified() in Symfony\Component\HttpFoundation\Tests\ExtendedResponse is deprecated %s.
-     */
-    public function testDeprecations()
-    {
-        new ExtendedResponse();
-
-        // Deprecations should not be triggered twice
-        new ExtendedResponse();
-    }
-
     public function validContentProvider()
     {
         return array(

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-01-30T14:07:08Z
+
+This looks weird to me. The issue says to ignore the cookie, not to ignore only its date
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-30T14:10:44Z
+
+Not sure what you mean. The issue description contains this quote from the RFC:
+
+> If the attribute-value failed to parse as a cookie date, ignore the cookie-av.
+
+Maybe I misinterpret that part, but IIUC `cookie-av` means cookie argument value, but the entire cookie.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-30T14:24:11Z
+
+ah sorry, I misread it
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-30T15:07:38Z
+
+@javiereguiluz I don't think so. Let me quote myself from https://github.com/symfony/symfony/issues/15656#issuecomment-276069832:
+
+> Actually, after thinking of this again I do not think that we need to change the constructor. It is documented that the expected value must be a string containing the expires timestamp.
+
+The constructor will be used by some code that already had to parse the `Set-Cookie` header. So this part should be responsible to deal with invalid values instead of magically treating them as anything else.

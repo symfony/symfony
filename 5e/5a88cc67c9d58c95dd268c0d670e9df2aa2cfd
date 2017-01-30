@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by stof at 2016-12-27T10:52:27Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-27T11:11:40Z
+
+My concerns are here: https://github.com/symfony/symfony/pull/20938#discussion_r92873633
+So if you considered them but still think this should be the way to go, I'm OK.
+(which means I'm +0 :) )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-30T14:49:49Z
+
+:+1:
+if bundles need to support SF 2 & 4 and are bothered about this "strict" attribute, they can very well have two different xml files.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-30T14:56:24Z
+
+if they need to support both 2.x and 4.x, they cannot rely on the ``strict=false`` feature anyway (as it is always string in Symfony 3+), and so they can omit the attribute even in 2.x (as the default behavior of 2.x is the one we kept).
+
+👍 about this.

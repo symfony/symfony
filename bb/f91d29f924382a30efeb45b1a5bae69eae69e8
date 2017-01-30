@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-24T20:51:44Z
+
+It would be great to have a profiler panel that displays the contents of the var/cache/dev/appDevDebugProjectContainerCompiler.log file btw!
+Would someone like to give it a try?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-25T12:45:56Z
+
+The panel showing the container logs is a good idea though
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T18:34:37Z
+
+"logRemoveService" removed

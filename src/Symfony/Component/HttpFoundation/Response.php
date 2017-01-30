@@ -626,12 +626,13 @@ class Response
     /**
      * Sets the Date header.
      *
-     * @param \DateTime $date A \DateTime instance
+     * @param \DateTimeInterface $date A \DateTimeInterface instance
      *
      * @return $this
      */
-    public function setDate(\DateTime $date)
+    public function setDate(\DateTimeInterface $date)
     {
+        $date = \DateTime::createFromFormat(\DateTime::ISO8601, $date->format(\DateTime::ISO8601));
         $date->setTimezone(new \DateTimeZone('UTC'));
         $this->headers->set('Date', $date->format('D, d M Y H:i:s').' GMT');
 
@@ -686,16 +687,16 @@ class Response
      *
      * Passing null as value will remove the header.
      *
-     * @param \DateTime|null $date A \DateTime instance or null to remove the header
+     * @param \DateTimeInterface|null $date A \DateTimeInterface instance or null to remove the header
      *
      * @return $this
      */
-    public function setExpires(\DateTime $date = null)
+    public function setExpires(\DateTimeInterface $date = null)
     {
         if (null === $date) {
             $this->headers->remove('Expires');
         } else {
-            $date = clone $date;
+            $date = \DateTime::createFromFormat(\DateTime::ISO8601, $date->format(\DateTime::ISO8601));
             $date->setTimezone(new \DateTimeZone('UTC'));
             $this->headers->set('Expires', $date->format('D, d M Y H:i:s').' GMT');
         }
@@ -826,16 +827,16 @@ class Response
      *
      * Passing null as value will remove the header.
      *
-     * @param \DateTime|null $date A \DateTime instance or null to remove the header
+     * @param \DateTimeInterface|null $date A \DateTimeInterface instance or null to remove the header
      *
      * @return $this
      */
-    public function setLastModified(\DateTime $date = null)
+    public function setLastModified(\DateTimeInterface $date = null)
     {
         if (null === $date) {
             $this->headers->remove('Last-Modified');
         } else {
-            $date = clone $date;
+            $date = \DateTime::createFromFormat(\DateTime::ISO8601, $date->format(\DateTime::ISO8601));
             $date->setTimezone(new \DateTimeZone('UTC'));
             $this->headers->set('Last-Modified', $date->format('D, d M Y H:i:s').' GMT');
         }

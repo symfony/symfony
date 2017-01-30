@@ -1,0 +1,438 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-17T15:42:58Z
+
+@nicolas-grekas thanks for this PR and for your other proposals to improve the DI component.
+
+Given that this kind of concepts are a bit abstract, it'd be nice if you displayed a very simple before/after comparison code sample showing the benefits. Thanks!
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-17T22:50:52Z
+
+@nicolas-grekas im curious.. why would one choose getter overriding over setter/constructor injection?
+
+It's really cool.. but it allows to bypass traditional service definitions like;
+
+```yml
+dep:
+   class: ...
+   lazy: true
+
+service:
+  class: Service
+  arguments: ['@dep']
+```
+
+with
+
+```yml
+service:
+  class: Service
+  getters:
+     getDep: '@dep'
+```
+
+and creating classes like
+
+```php
+class Service {
+   public function getDep() {} // stub
+}
+```
+
+edit: i see the benfit for being lazy though :/
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T08:50:50Z
+
+> edit: i see the benfit for being lazy though :/
+
+then you have your answer :) see the linked issue for more.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-18T10:31:55Z
+
+Figured it out. But still.. why make the service a proxy, when we already can proxy the dependency itself (`lazy: true`).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T10:35:05Z
+
+As said in the linked issue `lazy: true` has no effect when ocramius/proxy-manager is not installed.
+Which means it's a userland only feature, we can't rely on it in the core.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-18T10:45:00Z
+
+Ok.. if that's the case i'd favor a core implementation of `lazy: true`. Personally i have no problems with a package less or more.
+
+I think i'd stick with lazy dependencies, opposed to lazy services. It feels weird to do a different approach only to save on a package...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T10:56:32Z
+
+I was just answering to your question, but there are more arguments. Please read the linked issue.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-18T13:20:13Z
+
+Implementation is ready, generated code looks good.
+Note that the anonymous proxy classes need a property or two, whose name shouldn't collide with any existing properties in the service class.
+I chose a `1337 5|*34|<` strategy, naming those: `private $c0nt41n3r` and `private $g3ttErV4lu35;`.
+We could have a randomly generated suffix instead. WDYT?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-18T13:35:48Z
+
+Random would be more safe right? I'd go for that :)
+
+---------------------------------------------------------------------------
+
+by jean-pasqualini at 2016-12-19T08:20:14Z
+
+@nicolas-grekas
+
+What would be the list of things to do to bring the support of this functionality on PHP 5.6.X ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-19T09:15:32Z
+
+@jean-pasqualini: we'd need to replace the anonymous inline classes by real classes, dumped in the same file as the container, just after it (as done for lazy-proxies right now by the addProxyClasses method). There is no major blocker I guess, just more time to spend, so maybe later, maybe by someone else than me :)
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2016-12-23T14:31:05Z
+
+That means that classes written take advantage of that will be completely dependent on Symfony's container right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-23T15:26:50Z
+
+@mnapoli how that? I'd say absolutely not. This is still DI, which means decoupling on the contrary. If you want to wire such a getter without any DIC, just use a plain PHP class, eg an anonymous one to do it inline.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-12-24T14:46:13Z
+
+> @mnapoli how that? I'd say absolutely not.
+
+I have some thoughts why I think this is magic and why it looks coupled with a container. But take into account that we can interpret differently what "magic" means.
+
+First, if you try find usages in your IDE, you'd probably find no inherited classes (who indexes compiled stuff?).
+
+Second, you can have not-working code in your getter, e.g.
+```php
+class Foo
+{
+    public function bar()
+    {
+        $this->getLogger()->warning('Magic people, voodoo people');
+    }
+
+    protected function getLogger(): Logger
+    {
+    }
+}
+```
+But it works. I can also change this method somehow, I'd see no effect at all. Magic!
+
+Third, what's difference of getter-injection with protected-field-injection:
+```php
+class Foo
+{
+    protected $logger;
+
+    public function bar()
+    {
+        $this->logger->warning('Magic people, voodoo people');
+    }
+}
+```
+?
+I'd say it is almost same feature. You can use the same argument here: since this property is `protected`, you always can replace it with inheritance:
+```php
+final FooWithLoggerWithoutSymfonyContainer extends Foo
+{
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+}
+```
+But ask someone: does the code above with `protected` field look like a magic? I'd say yes. This is not sane and usual way to inject dependencies. You'd never do this unless it is dictated by some low-level infrastructure thing like container.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2016-12-24T15:17:23Z
+
+@nicolas-grekas Thanks for your answer, maybe I'm missing something. I'll take the example given by @unkind:
+
+```php
+class Foo
+{
+    public function bar()
+    {
+        $this->getLogger()->warning('Magic people, voodoo people');
+    }
+
+    protected function getLogger(): Logger
+    {
+    }
+}
+```
+
+If I don't use Symfony's container, that code will fail:
+
+```php
+(new Foo)->bar();
+```
+
+right? Or is that not what you have in mind?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-24T16:41:08Z
+
+But this code is broken, so I don't know why we should care about that. You could have the same argument with setter injection, saying that if the setter is not called, some broken implementation would break by expecting it to be called. This doesn't mean there is any coupling with any DIC. If you intend to force an overriden getter, you could make it abstract. But again, that's just plain OOP, nothing Symfony specific here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2016-12-26T10:44:24Z
+
+Actually, we might even argue that regarding "brokenness", getter injection is slightly "better" than setter injection as it allows to define a default:
+
+```php
+class Foo
+{
+    public function bar()
+    {
+        $this->getLogger()->warning('Magic people, voodoo people');
+    }
+
+    protected function getLogger(): Logger
+    {
+        return NullLogger();
+    }
+}
+```
+
+Of course, that does not work for more complex dependencies, this just illustrates that getter and setter injections are quire similar in their pros and cons.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-12-26T10:45:25Z
+
+> But this code is broken, so I don't know why we should care about that.
+
+One has no motivation to "fix" this code. It works because container "fixes" it. Moreover, one can add such "invalid" method on purpose: to make sure this method is overridden.
+
+---------------------------------------------------------------------------
+
+by unkind at 2016-12-26T10:53:48Z
+
+> getter injection is slightly "better" than setter injection as it allows to define a default
+
+Even if I'm not big fan of setter injection, you are able to define default in constructor:
+
+```php
+final class Foo
+{
+    private $logger;
+
+    public function __construct()
+    {
+        $this->logger = new NullLogger();
+    }
+
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    public function bar()
+    {
+        $this->logger->warning('Magic people, voodoo people');
+    }
+}
+```
+
+However, I prefer to define logger as an non-optional dependency:
+
+```php
+final class Foo
+{
+    private $logger;
+
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    public function bar()
+    {
+        $this->logger->warning('Magic people, voodoo people');
+    }
+}
+
+$logger = new Foo(new NullLogger());
+```
+
+---
+
+I don't think it's a good idea to say that getter injection is OK by comparing it with setter injection. Setter injection is a bad idea too, but it is already widespread (sadly).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-26T16:13:08Z
+
+Tests added, PR is ready.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-26T16:31:28Z
+
+Is there any reason to limit this to _getters_ only? Does it concern DI semantics?
+
+Technically it already supports _methods_ right? Im comparing `setAutowiredMethods` (read: `setInjectedMethods`) and `setOverriddenGetters` (vs. `setOverriddenMethods`) here...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-26T16:36:08Z
+
+"getters" are unconditional mappings from a method name to a return value.
+Anything else (eg that takes a parameter, even an optional one), is not unconditional anymore, thus can't be mapped to a single return value.
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2016-12-26T16:48:34Z
+
+`setOverridenGetterMethods`?
+
+But `setOverridenGetters` is also fine :+1:
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-27T11:45:49Z
+
+About the name, it works for any function, not especially getters.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2016-12-27T11:51:38Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-29T18:11:38Z
+
+Doc PR created: symfony/symfony-docs#7300
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2016-12-29T19:00:54Z
+
+This getter injection seems like a "valid enough" idea to me: i.e. it would certainly be useful to some people. So, I'm +1 for the idea in general. Is it a good idea that we should really *push*? I'm not so sure... but like a lot of things, we could start using & teaching this (teaching is one thing I'm a bit concerned about), and then determine if this is a great feature we should teach people pretty early, or if it should be left as an "advanced" feature for advanced users to find (we should default to the latter - your docs PR is perfect in that case).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-29T20:05:21Z
+
+Thanks for the review @weaverryan, suggestions accepted!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2016-12-30T07:48:12Z
+
+Sorry for being late, but I'd like to say that looking at the proposed configuration of this feature, I consider it too verbose.
+
+```php
+abstract class NewsletterManager
+{
+    protected function getLogger(): LoggerInterface
+    {
+        return new NullLogger();
+    }
+
+    // ...
+}
+```
+
+```yaml
+services:
+    # ...
+    app.newsletter_manager:
+        class: AppBundle\Mail\NewsletterManager
+        getters:
+            getLogger: '@logger'
+            # ...
+```
+
+If we want this to be "RAD", I think we should make this work as the JMSDiExtraBundle:
+
+**Alternative 1**
+
+```php
+abstract class NewsletterManager
+{
+    /** @Inject('logger') */
+    private $logger;
+
+    // ...
+}
+```
+
+**Alternative 2**
+
+```php
+abstract class NewsletterManager
+{
+    /** @Inject('logger') */
+    protected function getLogger(): LoggerInterface
+    {
+        return new NullLogger();
+    }
+
+    // ...
+}
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2016-12-30T08:00:51Z
+
+@javiereguiluz that's a nice proposal that basically describes an alternative configuration system for DI, that is not related to getter injection but to any kind of injection. To me, the config shipped in this PR is consistent with how config can be defined today. If you want to pursue this idea, I invite you to open an RFC.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-05T10:30:14Z
+
+Now green on PHP 5!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-09T19:35:20Z
+
+@symfony/deciders Is there anything preventing the merge of this one? Merging it will unlock #21031 and #18193.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-10T14:49:33Z
+
+@stof comments addressed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-27T10:06:49Z
+
+PR updated with `@experimental` mentions, as explained in http://symfony.com/blog/experimental-features
+Ready to merge :)

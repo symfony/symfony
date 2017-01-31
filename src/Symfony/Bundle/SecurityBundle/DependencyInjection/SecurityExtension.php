@@ -15,6 +15,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\SecurityF
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -255,7 +256,7 @@ class SecurityExtension extends Extension
 
             $map[$contextId] = $matcher;
         }
-        $mapDef->replaceArgument(1, $map);
+        $mapDef->replaceArgument(1, new IteratorArgument($map));
 
         // add authentication providers to authentication manager
         $authenticationProviders = array_map(function ($id) {

@@ -105,7 +105,7 @@
 
         <service id="security.firewall.map" class="Symfony\Bundle\SecurityBundle\Security\FirewallMap" public="false">
             <argument type="service" id="service_container" />
-            <argument type="collection" />
+            <argument />
         </service>
 
         <service id="security.firewall.context" class="Symfony\Bundle\SecurityBundle\Security\FirewallContext" abstract="true">

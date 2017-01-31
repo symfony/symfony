@@ -68,7 +68,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $listeners = array();
         $configs = array();
-        foreach (array_keys($arguments[1]) as $contextId) {
+        foreach (array_keys($arguments[1]->getValues()) as $contextId) {
             $contextDef = $container->getDefinition($contextId);
             $arguments = $contextDef->getArguments();
             $listeners[] = array_map(function ($ref) { return (string) $ref; }, $arguments['index_0']);
@@ -180,7 +180,7 @@ abstract class CompleteConfigurationTest extends \PHPUnit_Framework_TestCase
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
         $matchers = array();
 
-        foreach ($arguments[1] as $reference) {
+        foreach ($arguments[1]->getValues() as $reference) {
             if ($reference instanceof Reference) {
                 $definition = $container->getDefinition((string) $reference);
                 $matchers[] = $definition->getArguments();

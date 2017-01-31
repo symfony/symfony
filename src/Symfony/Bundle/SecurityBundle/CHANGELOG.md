@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.3.0
+-----
+
+ * Deprecated the `FirewallMap::$map` and `$container` properties.
+
 3.2.0
 -----
 

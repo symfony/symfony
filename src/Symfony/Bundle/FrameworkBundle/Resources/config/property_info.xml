@@ -15,7 +15,7 @@
         <!-- Extractor -->
         <service id="property_info.reflection_extractor" class="Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor" public="false">
             <tag name="property_info.list_extractor" priority="-1000" />
-            <tag name="property_info.type_extractor" priority="-1000" />
+            <tag name="property_info.type_extractor" priority="-1002" />
             <tag name="property_info.access_extractor" priority="-1000" />
         </service>
     </services>

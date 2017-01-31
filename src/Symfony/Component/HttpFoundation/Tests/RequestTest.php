@@ -2050,6 +2050,36 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             array('CONNECT', false),
         );
     }
+
+    /**
+     * @dataProvider originalProtocolVersionProvider
+     */
+    public function testOriginalProtocolVersion($serverProtocol, $trustedProxy, $via, $expected)
+    {
+        if ($trustedProxy) {
+            Request::setTrustedProxies(array('1.1.1.1'));
+        }
+
+        $request = new Request();
+        $request->server->set('SERVER_PROTOCOL', $serverProtocol);
+        $request->server->set('REMOTE_ADDR', '1.1.1.1');
+        $request->headers->set('Via', $via);
+
+        $this->assertSame($expected, $request->getOriginalProtocolVersion());
+    }
+
+    public function originalProtocolVersionProvider()
+    {
+        return array(
+            'untrusted without via' => array('HTTP/2.0', false, '', 'HTTP/2.0'),
+            'untrusted with via' => array('HTTP/2.0', false, '1.0 fred, 1.1 nowhere.com (Apache/1.1)', 'HTTP/2.0'),
+            'trusted without via' => array('HTTP/2.0', true, '', 'HTTP/2.0'),
+            'trusted with via' => array('HTTP/2.0', true, '1.0 fred, 1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'),
+            'trusted with via and protocol name' => array('HTTP/2.0', true, 'HTTP/1.0 fred, HTTP/1.1 nowhere.com (Apache/1.1)', 'HTTP/1.0'),
+            'trusted with broken via' => array('HTTP/2.0', true, 'foo', 'HTTP/2.0'),
+            'trusted with partially-broken via' => array('HTTP/2.0', true, '1.0 fred, foo', 'HTTP/1.0'),
+        );
+    }
 }
 
 class RequestContentProxy extends Request

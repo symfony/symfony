@@ -1383,14 +1383,11 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('456', $p2->getOutput());
     }
 
-    public function testInheritEnvEnabled()
+    public function testEnvIsInherited()
     {
         $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo serialize($_SERVER);'), null, array('BAR' => 'BAZ'));
 
         putenv('FOO=BAR');
-
-        $this->assertSame($process, $process->inheritEnvironmentVariables(1));
-        $this->assertTrue($process->areEnvironmentVariablesInherited());
 
         $process->run();
 
@@ -1400,12 +1397,16 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $env);
     }
 
+    /**
+     * @group legacy
+     */
     public function testInheritEnvDisabled()
     {
         $process = $this->getProcess(self::$phpBin.' -r '.escapeshellarg('echo serialize($_SERVER);'), null, array('BAR' => 'BAZ'));
 
         putenv('FOO=BAR');
 
+        $this->assertSame($process, $process->inheritEnvironmentVariables(false));
         $this->assertFalse($process->areEnvironmentVariablesInherited());
 
         $process->run();
@@ -1427,9 +1428,10 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
      *
      * @return Process
      */
-    private function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array())
+    private function getProcess($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60)
     {
-        $process = new Process($commandline, $cwd, $env, $input, $timeout, $options);
+        $process = new Process($commandline, $cwd, $env, $input, $timeout);
+        $process->inheritEnvironmentVariables();
 
         if (false !== $enhance = getenv('ENHANCE_SIGCHLD')) {
             try {

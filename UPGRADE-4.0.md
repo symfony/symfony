@@ -203,6 +203,15 @@ HttpKernel
  * The `Psr6CacheClearer::addPool()` method has been removed. Pass an array of pools indexed
    by name to the constructor instead.
 
+Process
+-------
+
+ * Environment variables are always inherited in sub-processes.
+
+ * Configuring `proc_open()` options has been removed.
+
+ * Configuring Windows and sigchild compatibility is not possible anymore - they are always enabled.
+
 Security
 --------
 

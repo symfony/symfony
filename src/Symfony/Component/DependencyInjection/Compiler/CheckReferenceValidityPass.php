@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class CheckReferenceValidityPass extends AbstractRecursivePass implements CompilerPassInterface
+class CheckReferenceValidityPass extends AbstractRecursivePass
 {
     protected function processValue($value, $isRoot = false)
     {

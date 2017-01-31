@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AutowirePass extends AbstractRecursivePass implements CompilerPassInterface
+class AutowirePass extends AbstractRecursivePass
 {
     private $reflectionClasses = array();
     private $definedTypes = array();

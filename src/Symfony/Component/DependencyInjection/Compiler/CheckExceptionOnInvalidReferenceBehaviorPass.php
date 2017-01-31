@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass implements CompilerPassInterface
+class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
 {
     protected function processValue($value, $isRoot = false)
     {

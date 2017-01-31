@@ -264,7 +264,7 @@ class SecurityExtension extends Extension
         }, array_values(array_unique($authenticationProviders)));
         $container
             ->getDefinition('security.authentication.manager')
-            ->replaceArgument(0, $authenticationProviders)
+            ->replaceArgument(0, new IteratorArgument($authenticationProviders))
         ;
     }
 

@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass implements CompilerPassInterface
+class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
 {
     private $replacements;
 

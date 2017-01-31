@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass implements CompilerPassInterface
+class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
 {
     private $bag;
 

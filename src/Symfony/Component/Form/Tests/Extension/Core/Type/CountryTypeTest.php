@@ -50,4 +50,12 @@ class CountryTypeTest extends TestCase
             }
         }
     }
+
+    public function testSubmitNull()
+    {
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType');
+        $form->submit(null);
+
+        $this->assertNull($form->getData());
+    }
 }

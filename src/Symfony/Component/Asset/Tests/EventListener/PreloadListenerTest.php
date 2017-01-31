@@ -29,7 +29,7 @@ class PreloadListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new PreloadListener($manager);
         $response = new Response();
 
-        $event = $this->createMock(FilterResponseEvent::class);
+        $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getResponse')->willReturn($response);
 
         $listener->onKernelResponse($event);

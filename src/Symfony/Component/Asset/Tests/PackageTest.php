@@ -55,7 +55,7 @@ class PackageTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAndPreloadUrl()
     {
-        $preloadManager = $this->createMock(PreloadManagerInterface::class);
+        $preloadManager = $this->getMockBuilder(PreloadManagerInterface::class)->getMock();
         $preloadManager
             ->expects($this->exactly(2))
             ->method('addResource')

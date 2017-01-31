@@ -15,6 +15,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
+use Symfony\Component\Asset\EventListener\PreloadListener;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineAdapter;
@@ -363,8 +364,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $package = $container->getDefinition((string) $packages['bar_version_strategy']);
         $this->assertEquals('assets.custom_version_strategy', (string) $package->getArgument(1));
-
-        $this->assertTrue($container->hasDefinition('asset.preload_listener'));
     }
 
     public function testAssetsDefaultVersionStrategyAsService()
@@ -375,6 +374,16 @@ abstract class FrameworkExtensionTest extends TestCase
         // default package
         $defaultPackage = $container->getDefinition((string) $packages->getArgument(0));
         $this->assertEquals('assets.custom_version_strategy', (string) $defaultPackage->getArgument(1));
+    }
+
+    public function testAssetHasPreloadListener()
+    {
+        if (!class_exists(PreloadListener::class)) {
+            $this->markTestSkipped('Requires asset 3.3 or superior.');
+        }
+
+        $container = $this->createContainerFromFile('assets');
+        $this->assertTrue($container->hasDefinition('asset.preload_listener'));
     }
 
     public function testTranslator()

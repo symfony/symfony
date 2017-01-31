@@ -58,7 +58,7 @@ class PackagesTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAndPreloadUrl()
     {
-        $preloadManager = $this->createMock(PreloadManagerInterface::class);
+        $preloadManager = $this->getMockBuilder(PreloadManagerInterface::class)->getMock();
         $preloadManager
             ->expects($this->exactly(2))
             ->method('addResource')
@@ -100,7 +100,7 @@ class PackagesTest extends \PHPUnit_Framework_TestCase
      */
     public function testDoesNotSupportPreloading()
     {
-        $packages = new Packages($this->createMock(PackageInterface::class));
+        $packages = new Packages($this->getMockBuilder(PackageInterface::class)->getMock());
         $packages->getAndPreloadUrl('/foo');
     }
 }

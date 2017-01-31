@@ -1907,3 +1907,9 @@ UPGRADE FROM 2.x to 3.0
    ```php
    $request->query->get('foo')['bar'];
    ```
+### Monolog Bridge
+
+ * `Symfony\Bridge\Monolog\Logger::emerg()` was removed. Use `emergency()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::crit()` was removed. Use `critical()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::err()` was removed. Use `error()` which is PSR-3 compatible.
+ * `Symfony\Bridge\Monolog\Logger::warn()` was removed. Use `warning()` which is PSR-3 compatible.

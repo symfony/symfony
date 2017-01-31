@@ -24,7 +24,31 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text/plain', $response->headers->get('Content-Type'));
     }
 
-    public function testPrepareWith11Protocol()
+    /**
+     * @dataProvider protocolVersionProvider
+     */
+    public function testPrepareSetsVersion($serverProtocol, $expectedVersion)
+    {
+        $response = new StreamedResponse(function () { echo 'foo'; });
+        $request = Request::create('/');
+        $request->server->set('SERVER_PROTOCOL', $serverProtocol);
+
+        $response->prepare($request);
+
+        $this->assertEquals($expectedVersion, $response->getProtocolVersion());
+    }
+
+    public function protocolVersionProvider()
+    {
+        return array(
+            '1.0' => array('HTTP/1.0', '1.0'),
+            '1.1' => array('HTTP/1.1', '1.1'),
+            '2.0' => array('HTTP/2.0', '2.0'),
+            'broken' => array('foo', '1.0'),
+        );
+    }
+
+    public function testPrepareTransferEncodingWith11Protocol()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
         $request = Request::create('/');
@@ -32,11 +56,10 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
         $response->prepare($request);
 
-        $this->assertEquals('1.1', $response->getProtocolVersion());
         $this->assertNotEquals('chunked', $response->headers->get('Transfer-Encoding'), 'Apache assumes responses with a Transfer-Encoding header set to chunked to already be encoded.');
     }
 
-    public function testPrepareWith10Protocol()
+    public function testPrepareTransferEncodingWith10Protocol()
     {
         $response = new StreamedResponse(function () { echo 'foo'; });
         $request = Request::create('/');
@@ -44,7 +67,6 @@ class StreamedResponseTest extends \PHPUnit_Framework_TestCase
 
         $response->prepare($request);
 
-        $this->assertEquals('1.0', $response->getProtocolVersion());
         $this->assertNull($response->headers->get('Transfer-Encoding'));
     }
 

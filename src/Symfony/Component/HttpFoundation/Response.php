@@ -347,8 +347,9 @@ class Response
         }
 
         // Fix protocol
-        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
-            $this->setProtocolVersion('1.1');
+        preg_match('~^HTTP/([1-9]\.[0-9])$~', $request->server->get('SERVER_PROTOCOL'), $versionMatches);
+        if ($versionMatches) {
+            $this->setProtocolVersion($versionMatches[1]);
         }
 
         // Check if we need to send extra expire info headers
@@ -464,7 +465,7 @@ class Response
     }
 
     /**
-     * Sets the HTTP protocol version (1.0 or 1.1).
+     * Sets the HTTP protocol version.
      *
      * @param string $version The HTTP protocol version
      *

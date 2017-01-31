@@ -544,6 +544,29 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->headers->has('Content-Length'));
     }
 
+    /**
+     * @dataProvider protocolVersionProvider
+     */
+    public function testPrepareSetsVersion($serverProtocol, $expected)
+    {
+        $request = Request::create('/', 'GET');
+        $request->server->set('SERVER_PROTOCOL', $serverProtocol);
+
+        $response = new Response('foo');
+        $response->prepare($request);
+        $this->assertEquals($expected, $response->getProtocolVersion());
+    }
+
+    public function protocolVersionProvider()
+    {
+        return array(
+            '1.0' => array('HTTP/1.0', '1.0'),
+            '1.1' => array('HTTP/1.1', '1.1'),
+            '2.0' => array('HTTP/2.0', '2.0'),
+            'broken' => array('foo', '1.0'),
+        );
+    }
+
     public function testPrepareSetsPragmaOnHttp10Only()
     {
         $request = Request::create('/', 'GET');

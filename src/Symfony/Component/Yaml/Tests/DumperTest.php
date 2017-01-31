@@ -258,10 +258,10 @@ EOF;
         $this->assertEquals('[]', $dump);
 
         $dump = $this->dumper->dump(new \ArrayObject(), 0, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_OBJECT_AS_MAP);
-        $this->assertEquals('[]', $dump);
+        $this->assertEquals('{  }', $dump);
 
         $dump = $this->dumper->dump(new \stdClass(), 0, 0, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_OBJECT_AS_MAP);
-        $this->assertEquals('[]', $dump);
+        $this->assertEquals('{  }', $dump);
     }
 
     /**

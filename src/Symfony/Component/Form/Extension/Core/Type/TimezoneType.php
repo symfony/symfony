@@ -72,6 +72,7 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
     public function loadChoicesForValues(array $values, $value = null)
     {
         // Optimize
+        $values = array_filter($values);
         if (empty($values)) {
             return array();
         }
@@ -90,6 +91,7 @@ class TimezoneType extends AbstractType implements ChoiceLoaderInterface
     public function loadValuesForChoices(array $choices, $value = null)
     {
         // Optimize
+        $choices = array_filter($choices);
         if (empty($choices)) {
             return array();
         }

@@ -13,6 +13,8 @@ namespace Symfony\Component\Asset;
 
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Context\NullContext;
+use Symfony\Component\Asset\Exception\LogicException;
+use Symfony\Component\Asset\Preload\PreloadManagerInterface;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**
@@ -20,16 +22,19 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Package implements PackageInterface
+class Package implements PreloadedPackageInterface
 {
     private $versionStrategy;
     private $context;
+    private $preloadManager;
 
-    public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
+    public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null, PreloadManagerInterface $preloadManager = null)
     {
         $this->versionStrategy = $versionStrategy;
         $this->context = $context ?: new NullContext();
+        $this->preloadManager = $preloadManager;
     }
 
     /**
@@ -50,6 +55,21 @@ class Package implements PackageInterface
         }
 
         return $this->versionStrategy->applyVersion($path);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAndPreloadUrl($path, $as = '')
+    {
+        if (null === $this->preloadManager) {
+            throw new LogicException('There is no preload manager, configure one first.');
+        }
+
+        $url = $this->getUrl($path);
+        $this->preloadManager->addResource($url, $as);
+
+        return $url;
     }
 
     /**

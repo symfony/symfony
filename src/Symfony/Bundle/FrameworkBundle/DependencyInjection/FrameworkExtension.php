@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
+use Symfony\Component\Asset\EventListener\PreloadListener;
+use Symfony\Component\Asset\Preload\HttpFoundationPreloadManager;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Alias;
@@ -764,6 +766,18 @@ class FrameworkExtension extends Extension
             $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
         }
 
+        if (class_exists(HttpFoundationPreloadManager::class)) {
+            $preloadManagerDefinition = $container->register('assets.preload_manager', HttpFoundationPreloadManager::class);
+            $preloadManagerDefinition->setPublic(false);
+
+            $preloadListener = $container->register('asset.preload_listener', PreloadListener::class);
+            $preloadListener->addArgument(new Reference('assets.preload_manager'));
+            $preloadListener->addTag('kernel.event_listener', array(
+                'event'  => 'kernel.response',
+                'method' => 'onKernelResponse'
+            ));
+        }
+
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
         $container->setDefinition('assets._default_package', $defaultPackage);
 
@@ -797,23 +811,19 @@ class FrameworkExtension extends Extension
             throw new \LogicException('An asset package cannot have base URLs and base paths.');
         }
 
-        if (!$baseUrls) {
-            $package = new ChildDefinition('assets.path_package');
+        $package = new ChildDefinition($baseUrls ? 'assets.url_package' : 'assets.path_package');
 
-            return $package
-                ->setPublic(false)
-                ->replaceArgument(0, $basePath)
-                ->replaceArgument(1, $version)
-            ;
-        }
-
-        $package = new ChildDefinition('assets.url_package');
-
-        return $package
+        $package
             ->setPublic(false)
-            ->replaceArgument(0, $baseUrls)
+            ->replaceArgument(0, $baseUrls ?: $basePath)
             ->replaceArgument(1, $version)
         ;
+
+        if (class_exists(HttpFoundationPreloadManager::class)) {
+            $package->addArgument(new Reference('assets.preload_manager'));
+        }
+
+        return $package;
     }
 
     private function createVersion(ContainerBuilder $container, $version, $format, $name)

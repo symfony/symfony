@@ -34,6 +34,7 @@ class AssetExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
+            new \Twig_SimpleFunction('preloaded_asset', array($this, 'getAndPreloadAssetUrl')),
             new \Twig_SimpleFunction('asset_version', array($this, 'getAssetVersion')),
         );
     }
@@ -52,6 +53,23 @@ class AssetExtension extends \Twig_Extension
     public function getAssetUrl($path, $packageName = null)
     {
         return $this->packages->getUrl($path, $packageName);
+    }
+
+    /**
+     * Returns the public url/path of an asset and preloads it.
+     *
+     * If the package used to generate the path is an instance of
+     * UrlPackage, you will always get a URL and not a path.
+     *
+     * @param string $path        A public path
+     * @param string $as          A valid destination according to https://fetch.spec.whatwg.org/#concept-request-destination
+     * @param string $packageName The name of the asset package to use
+     *
+     * @return string The public path of the asset
+     */
+    public function getAndPreloadAssetUrl($path, $as = '', $packageName)
+    {
+        return $this->packages->getAndPreloadUrl($path, $as, $packageName);
     }
 
     /**

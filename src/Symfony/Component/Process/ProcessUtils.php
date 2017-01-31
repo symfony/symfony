@@ -17,8 +17,6 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
  * ProcessUtils is a bunch of utility methods.
  *
  * This class contains static methods only and is not meant to be instantiated.
- *
- * @author Martin Hasoň <martin.hason@gmail.com>
  */
 class ProcessUtils
 {
@@ -38,40 +36,30 @@ class ProcessUtils
      */
     public static function escapeArgument($argument)
     {
-        //Fix for PHP bug #43784 escapeshellarg removes % from given string
-        //Fix for PHP bug #49446 escapeshellarg doesn't work on Windows
-        //@see https://bugs.php.net/bug.php?id=43784
-        //@see https://bugs.php.net/bug.php?id=49446
-        if ('\\' === DIRECTORY_SEPARATOR) {
-            if ('' === $argument) {
-                return escapeshellarg($argument);
-            }
-
-            $escapedArgument = '';
-            $quote = false;
-            foreach (preg_split('/(")/', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
-                if ('"' === $part) {
-                    $escapedArgument .= '\\"';
-                } elseif (self::isSurroundedBy($part, '%')) {
-                    // Avoid environment variable expansion
-                    $escapedArgument .= '^%"'.substr($part, 1, -1).'"^%';
-                } else {
-                    // escape trailing backslash
-                    if ('\\' === substr($part, -1)) {
-                        $part .= '\\';
-                    }
-                    $quote = true;
-                    $escapedArgument .= $part;
-                }
-            }
-            if ($quote) {
-                $escapedArgument = '"'.$escapedArgument.'"';
-            }
-
-            return $escapedArgument;
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            return escapeshellarg($argument);
         }
+        $argument = preg_replace_callback("/!([^!=\n]++)!/", function ($m) {
+            if (false !== $v = getenv($m[1])) {
+                @trigger_error(sprintf('Delayed variables are deprecated since Symfony 3.3 and will be left unresolved in 4.0. Resolve the %s variable before calling ProcessUtils::escapeArgument().', $m[0]), E_USER_DEPRECATED);
 
-        return escapeshellarg($argument);
+                return $v;
+            }
+
+            return $m[0];
+        }, $argument);
+        if ('' === $argument) {
+            return '""';
+        }
+        if (false !== strpos($argument, "\0")) {
+            $argument = str_replace("\0", '?', $argument);
+        }
+        if (!preg_match('/[()%!^"<>&|\s]/', $argument)) {
+            return $argument;
+        }
+        $argument = preg_replace('/(\\\\+)$/', '$1$1', $argument);
+
+        return '"'.str_replace(array('"', '^', '%', '!', "\n"), array('""', '"^^"', '"^%"', '"^!"', '!LF!'), $argument).'"';
     }
 
     /**

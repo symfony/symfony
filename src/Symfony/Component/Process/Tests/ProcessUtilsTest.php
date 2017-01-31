@@ -27,12 +27,13 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
     {
         if ('\\' === DIRECTORY_SEPARATOR) {
             return array(
-                array('"\"php\" \"-v\""', '"php" "-v"'),
+                array('"""php"" ""-v"""', '"php" "-v"'),
                 array('"foo bar"', 'foo bar'),
-                array('^%"path"^%', '%path%'),
-                array('"<|>\\" \\"\'f"', '<|>" "\'f'),
+                array('""^%"path"^%""', '%path%'),
+                array('"<|>"" ""\'f"', '<|>" "\'f'),
                 array('""', ''),
-                array('"with\trailingbs\\\\"', 'with\trailingbs\\'),
+                array('with\trailingbs\\', 'with\trailingbs\\'),
+                array('"with\trailing bs\\\\"', 'with\trailing bs\\'),
             );
         }
 

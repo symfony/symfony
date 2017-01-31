@@ -33,7 +33,7 @@ class PhpProcess extends Process
      * @param int         $timeout The timeout in seconds
      * @param array       $options An array of options for proc_open
      */
-    public function __construct($script, $cwd = null, array $env = null, $timeout = 60, array $options = array())
+    public function __construct($script, $cwd = null, array $env = null, $timeout = 60, array $options = null)
     {
         $executableFinder = new PhpExecutableFinder();
         if (false === $php = $executableFinder->find()) {
@@ -51,6 +51,9 @@ class PhpProcess extends Process
             // see https://github.com/symfony/symfony/issues/5030 about prepending
             // command with exec
             $php = 'exec '.$php;
+        }
+        if (null !== $options) {
+            @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since version 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
         }
 
         parent::__construct($php, $cwd, $env, $script, $timeout, $options);

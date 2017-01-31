@@ -15,6 +15,29 @@ use Symfony\Component\Process\ProcessBuilder;
 
 class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @group legacy
+     * @expectedDeprecation Delayed variables are deprecated since Symfony 3.3 and will be left unresolved in 4.0. Resolve the !FOO! variable before calling ProcessUtils::escapeArgument().
+     */
+    public function testDelayedVars()
+    {
+        if ('\\' !== DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test is for Windows platform only');
+        }
+        putenv('FOO=BAR');
+
+        $proc = ProcessBuilder::create()
+            ->add('echo')
+            ->add('!FOO!')
+            ->getProcess();
+
+        $proc->run();
+        $this->assertSame('BAR', trim($proc->getOutput()));
+    }
+
+    /**
+     * @group legacy
+     */
     public function testInheritEnvironmentVars()
     {
         $proc = ProcessBuilder::create()
@@ -22,6 +45,13 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->getProcess();
 
         $this->assertTrue($proc->areEnvironmentVariablesInherited());
+
+        $proc = ProcessBuilder::create()
+            ->add('foo')
+            ->inheritEnvironmentVariables(false)
+            ->getProcess();
+
+        $this->assertFalse($proc->areEnvironmentVariablesInherited());
     }
 
     public function testAddEnvironmentVariables()
@@ -35,12 +65,10 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->add('command')
             ->setEnv('foo', 'bar2')
             ->addEnvironmentVariables($env)
-            ->inheritEnvironmentVariables(false)
             ->getProcess()
         ;
 
         $this->assertSame($env, $proc->getEnv());
-        $this->assertFalse($proc->areEnvironmentVariablesInherited());
     }
 
     /**
@@ -82,14 +110,14 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $proc = $pb->setArguments(array('-v'))->getProcess();
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php" "-v"', $proc->getCommandLine());
+            $this->assertEquals('/usr/bin/php -v', $proc->getCommandLine());
         } else {
             $this->assertEquals("'/usr/bin/php' '-v'", $proc->getCommandLine());
         }
 
         $proc = $pb->setArguments(array('-i'))->getProcess();
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php" "-i"', $proc->getCommandLine());
+            $this->assertEquals('/usr/bin/php -i', $proc->getCommandLine());
         } else {
             $this->assertEquals("'/usr/bin/php' '-i'", $proc->getCommandLine());
         }
@@ -102,14 +130,14 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $proc = $pb->setArguments(array('-v'))->getProcess();
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php" "composer.phar" "-v"', $proc->getCommandLine());
+            $this->assertEquals('/usr/bin/php composer.phar -v', $proc->getCommandLine());
         } else {
             $this->assertEquals("'/usr/bin/php' 'composer.phar' '-v'", $proc->getCommandLine());
         }
 
         $proc = $pb->setArguments(array('-i'))->getProcess();
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php" "composer.phar" "-i"', $proc->getCommandLine());
+            $this->assertEquals('/usr/bin/php composer.phar -i', $proc->getCommandLine());
         } else {
             $this->assertEquals("'/usr/bin/php' 'composer.phar' '-i'", $proc->getCommandLine());
         }
@@ -121,7 +149,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $proc = $pb->getProcess();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertSame('^%"path"^% "foo \\" bar" "%baz%baz"', $proc->getCommandLine());
+            $this->assertSame('""^%"path"^%"" "foo "" bar" ""^%"baz"^%"baz"', $proc->getCommandLine());
         } else {
             $this->assertSame("'%path%' 'foo \" bar' '%baz%baz'", $proc->getCommandLine());
         }
@@ -134,7 +162,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $proc = $pb->getProcess();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertSame('^%"prefix"^% "arg"', $proc->getCommandLine());
+            $this->assertSame('""^%"prefix"^%"" arg', $proc->getCommandLine());
         } else {
             $this->assertSame("'%prefix%' 'arg'", $proc->getCommandLine());
         }
@@ -155,7 +183,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->getProcess();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php"', $process->getCommandLine());
+            $this->assertEquals('/usr/bin/php', $process->getCommandLine());
         } else {
             $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
         }
@@ -167,7 +195,7 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->getProcess();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php"', $process->getCommandLine());
+            $this->assertEquals('/usr/bin/php', $process->getCommandLine());
         } else {
             $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
         }

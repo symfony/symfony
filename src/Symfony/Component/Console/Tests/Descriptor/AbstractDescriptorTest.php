@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Descriptor;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Descriptor\Descriptor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -57,6 +58,13 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         $this->assertDescription($expectedDescription, $application);
     }
 
+    /** @expectedException \InvalidArgumentException */
+    public function testDescribeInvalid()
+    {
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+        $this->getDescriptor()->describe($output, new \stdClass(), array('raw_output' => true));
+    }
+
     public function getDescribeInputArgumentTestData()
     {
         return $this->getDescriptionTestData(ObjectsProvider::getInputArguments());
@@ -82,6 +90,7 @@ abstract class AbstractDescriptorTest extends \PHPUnit_Framework_TestCase
         return $this->getDescriptionTestData(ObjectsProvider::getApplications());
     }
 
+    /** @return Descriptor */
     abstract protected function getDescriptor();
 
     abstract protected function getFormat();

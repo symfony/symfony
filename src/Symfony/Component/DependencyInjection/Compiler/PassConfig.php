@@ -60,6 +60,7 @@ class PassConfig
             new AnalyzeServiceReferencesPass(true),
             new CheckCircularReferencesPass(),
             new CheckReferenceValidityPass(),
+            new CheckArgumentsValidityPass(),
         ));
 
         $this->removingPasses = array(array(

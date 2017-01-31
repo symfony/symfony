@@ -252,7 +252,7 @@ class Inline
     private static function dumpArray($value, $flags)
     {
         // array
-        if ($value && !self::isHash($value)) {
+        if (($value || Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE & $flags) && !self::isHash($value)) {
             $output = array();
             foreach ($value as $val) {
                 $output[] = self::dump($val, $flags);

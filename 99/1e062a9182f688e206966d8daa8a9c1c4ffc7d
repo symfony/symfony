@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T19:08:55Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-30T16:22:55Z
+
+Instead of closing it, what about documenting the change in the CHANGELOG/UPGRADE files and target 4.0?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T16:33:37Z
+
+Let's do that. Target and CHANGELOG/UPGRADE files updated, this should be removed from the 3.3  milestone
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-30T16:34:41Z
+
+Changed the milestone to 4.0.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-30T16:42:35Z
+
+But we *can* create a smooth upgrade path: let's deprecate `$map`.
+See #20769 for inspiration.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T17:13:27Z
+
+@nicolas-grekas Updated, thank you.
+
+@fabpot Is it ok for you?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-30T17:21:16Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T18:50:07Z
+
+Milestone should be changed, again :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-31T08:27:05Z
+
+@nicolas-grekas deprecated using `$container` and addressed your comments.

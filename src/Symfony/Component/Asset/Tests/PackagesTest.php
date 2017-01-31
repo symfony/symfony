@@ -12,7 +12,9 @@
 namespace Symfony\Component\Asset\Tests;
 
 use Symfony\Component\Asset\Package;
+use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\Asset\Preload\PreloadManagerInterface;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class PackagesTest extends \PHPUnit_Framework_TestCase
@@ -54,6 +56,27 @@ class PackagesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo?a', $packages->getUrl('/foo', 'a'));
     }
 
+    public function testGetAndPreloadUrl()
+    {
+        $preloadManager = $this->createMock(PreloadManagerInterface::class);
+        $preloadManager
+            ->expects($this->exactly(2))
+            ->method('addResource')
+            ->withConsecutive(
+                array($this->equalTo('/foo?default'), $this->equalTo(''), $this->equalTo(false)),
+                array($this->equalTo('/foo?a'), $this->equalTo('script'), $this->equalTo(true))
+            )
+        ;
+
+        $packages = new Packages(
+            new Package(new StaticVersionStrategy('default'), null, $preloadManager),
+            array('a' => new Package(new StaticVersionStrategy('a'), null, $preloadManager))
+        );
+
+        $this->assertEquals('/foo?default', $packages->getAndPreloadUrl('/foo'));
+        $this->assertEquals('/foo?a', $packages->getAndPreloadUrl('/foo', 'script', true, 'a'));
+    }
+
     /**
      * @expectedException \Symfony\Component\Asset\Exception\LogicException
      */
@@ -70,5 +93,14 @@ class PackagesTest extends \PHPUnit_Framework_TestCase
     {
         $packages = new Packages();
         $packages->getPackage('a');
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Asset\Exception\InvalidArgumentException
+     */
+    public function testDoesNotSupportPreloading()
+    {
+        $packages = new Packages($this->createMock(PackageInterface::class));
+        $packages->getAndPreloadUrl('/foo');
     }
 }

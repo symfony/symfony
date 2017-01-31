@@ -60,14 +60,14 @@ class Package implements PreloadedPackageInterface
     /**
      * {@inheritdoc}
      */
-    public function getAndPreloadUrl($path, $as = '')
+    public function getAndPreloadUrl($path, $as = '', $nopush = false)
     {
         if (null === $this->preloadManager) {
             throw new LogicException('There is no preload manager, configure one first.');
         }
 
         $url = $this->getUrl($path);
-        $this->preloadManager->addResource($url, $as);
+        $this->preloadManager->addResource($url, $as, $nopush);
 
         return $url;
     }

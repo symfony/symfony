@@ -10,6 +10,8 @@
  */
 
 namespace Symfony\Component\Asset\Preload;
+
+use Symfony\Component\Asset\Exception\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -24,9 +26,9 @@ class HttpFoundationPreloadManager implements PreloadManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function addResource($uri, $as)
+    public function addResource($uri, $as = '', $nopush = false)
     {
-        $this->resources[$uri] = $as;
+        $this->resources[$uri] = array('as' => $as, 'nopush' => $nopush);
     }
 
     /**
@@ -42,6 +44,20 @@ class HttpFoundationPreloadManager implements PreloadManagerInterface
      */
     public function setResources(array $resources)
     {
+        foreach ($resources as $key => $options) {
+            if (!is_string($key)) {
+                throw new InvalidArgumentException('The key must be a path to an asset, "%s" given.', $key);
+            }
+
+            if (!isset($options['as']) || !is_string($options['as'])) {
+                throw new InvalidArgumentException('The "as" option is mandatory and must be a string.');
+            }
+
+            if (!isset($options['nopush']) || !is_bool($options['nopush'])) {
+                throw new InvalidArgumentException('The "nopush" option is mandatory and must be a bool.');
+            }
+        }
+
         $this->resources = $resources;
     }
 
@@ -57,8 +73,17 @@ class HttpFoundationPreloadManager implements PreloadManagerInterface
         }
 
         $parts = array();
-        foreach ($this->resources as $uri => $as) {
-            $parts[] = "<$uri>; rel=preload; as=$as";
+        foreach ($this->resources as $uri => $options) {
+            $part = "<$uri>; rel=preload";
+            if ('' !== $options['as']) {
+                $part .= "; as={$options['as']}";
+            }
+
+            if ($options['nopush']) {
+                $part .= '; nopush';
+            }
+
+            $parts[] = $part;
         }
 
         $response->headers->set('Link', implode(',', $parts));

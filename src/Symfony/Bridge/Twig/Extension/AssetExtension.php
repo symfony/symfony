@@ -61,15 +61,16 @@ class AssetExtension extends \Twig_Extension
      * If the package used to generate the path is an instance of
      * UrlPackage, you will always get a URL and not a path.
      *
-     * @param string $path        A public path
-     * @param string $as          A valid destination according to https://fetch.spec.whatwg.org/#concept-request-destination
-     * @param string $packageName The name of the asset package to use
+     * @param string      $path        A public path
+     * @param string      $as          A valid destination according to https://fetch.spec.whatwg.org/#concept-request-destination
+     * @param bool        $nopush      If this asset should not be pushed over HTTP/2
+     * @param string|null $packageName The name of the asset package to use
      *
      * @return string The public path of the asset
      */
-    public function getAndPreloadAssetUrl($path, $as = '', $packageName)
+    public function getAndPreloadAssetUrl($path, $as = '', $nopush = false, $packageName = null)
     {
-        return $this->packages->getAndPreloadUrl($path, $as, $packageName);
+        return $this->packages->getAndPreloadUrl($path, $as, $nopush, $packageName);
     }
 
     /**

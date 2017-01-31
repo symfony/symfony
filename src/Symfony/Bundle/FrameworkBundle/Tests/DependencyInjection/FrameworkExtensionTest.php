@@ -363,6 +363,8 @@ abstract class FrameworkExtensionTest extends TestCase
 
         $package = $container->getDefinition((string) $packages['bar_version_strategy']);
         $this->assertEquals('assets.custom_version_strategy', (string) $package->getArgument(1));
+
+        $this->assertTrue($container->hasDefinition('asset.preload_listener'));
     }
 
     public function testAssetsDefaultVersionStrategyAsService()

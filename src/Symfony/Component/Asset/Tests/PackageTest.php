@@ -12,6 +12,7 @@
 namespace Symfony\Component\Asset\Tests;
 
 use Symfony\Component\Asset\Package;
+use Symfony\Component\Asset\Preload\PreloadManagerInterface;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 
@@ -50,5 +51,22 @@ class PackageTest extends \PHPUnit_Framework_TestCase
     {
         $package = new Package(new StaticVersionStrategy('v1'));
         $this->assertEquals('v1', $package->getVersion('/foo'));
+    }
+
+    public function testGetAndPreloadUrl()
+    {
+        $preloadManager = $this->createMock(PreloadManagerInterface::class);
+        $preloadManager
+            ->expects($this->exactly(2))
+            ->method('addResource')
+            ->withConsecutive(
+                array($this->equalTo('/foo'), $this->equalTo(''), $this->equalTo(false)),
+                array($this->equalTo('/bar'), $this->equalTo('script'), $this->equalTo(true))
+            )
+        ;
+
+        $package = new Package(new EmptyVersionStrategy(), null, $preloadManager);
+        $this->assertEquals('/foo', $package->getAndPreloadUrl('/foo'));
+        $this->assertEquals('/bar', $package->getAndPreloadUrl('/bar', 'script', true));
     }
 }

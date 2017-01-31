@@ -773,8 +773,8 @@ class FrameworkExtension extends Extension
             $preloadListener = $container->register('asset.preload_listener', PreloadListener::class);
             $preloadListener->addArgument(new Reference('assets.preload_manager'));
             $preloadListener->addTag('kernel.event_listener', array(
-                'event'  => 'kernel.response',
-                'method' => 'onKernelResponse'
+                'event' => 'kernel.response',
+                'method' => 'onKernelResponse',
             ));
         }
 

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Asset\Preload;
 
-use Symfony\Component\Asset\Exception\InvalidArgumentException;
-
 /**
  * Manages preload HTTP headers.
  *

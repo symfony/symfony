@@ -32,10 +32,12 @@ class PreloadListener implements EventSubscriberInterface
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        $event->getResponse()->headers->set('Link', $this->preloadManager->getLinkValue());
+        if ($value = $this->preloadManager->getLinkValue()) {
+            $event->getResponse()->headers->set('Link', $value);
 
-        // Free memory
-        $this->preloadManager->setResources(array());
+            // Free memory
+            $this->preloadManager->setResources(array());
+        }
     }
 
     /**

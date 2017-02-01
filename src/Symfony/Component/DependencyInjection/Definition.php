@@ -37,6 +37,7 @@ class Definition
     private $abstract = false;
     private $lazy = false;
     private $decoratedService;
+    private $decorator;
     private $autowiredMethods = array();
     private $autowiringTypes = array();
 
@@ -114,6 +115,18 @@ class Definition
     public function getDecoratedService()
     {
         return $this->decoratedService;
+    }
+
+    public function setDecorator($id)
+    {
+        $this->decorator = $id;
+
+        return $this;
+    }
+
+    public function getDecorator()
+    {
+        return $this->decorator;
     }
 
     /**

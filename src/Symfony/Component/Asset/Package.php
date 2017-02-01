@@ -13,8 +13,6 @@ namespace Symfony\Component\Asset;
 
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Context\NullContext;
-use Symfony\Component\Asset\Exception\LogicException;
-use Symfony\Component\Asset\Preload\PreloadManagerInterface;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 /**

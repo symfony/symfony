@@ -12,9 +12,7 @@
 namespace Symfony\Component\Asset\Tests;
 
 use Symfony\Component\Asset\Package;
-use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\Preload\PreloadManagerInterface;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class PackagesTest extends \PHPUnit_Framework_TestCase

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Asset\Preload;
 
-use Symfony\Component\HttpFoundation\Response;
-
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

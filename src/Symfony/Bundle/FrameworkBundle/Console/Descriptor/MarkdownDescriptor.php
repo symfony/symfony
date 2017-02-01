@@ -185,8 +185,8 @@ class MarkdownDescriptor extends Descriptor
             ."\n".'- Autowired: '.($definition->isAutowired() ? 'yes' : 'no')
         ;
 
-        foreach ($definition->getAutowiringTypes() as $autowiringType) {
-            $output .= "\n" . '- Autowiring Type: `' . $autowiringType . '`';
+        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
+            $output .= "\n".'- Autowiring Type: `'.$autowiringType.'`';
         }
 
         if (isset($options['show_arguments']) && $options['show_arguments']) {

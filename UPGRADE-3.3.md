@@ -14,6 +14,23 @@ Debug
 DependencyInjection
 -------------------
 
+ * Autowiring-types have been deprecated, use aliases instead.
+
+   Before:
+
+   ```xml
+   <service id="annotations.reader" class="Doctrine\Common\Annotations\AnnotationReader" public="false">
+       <autowiring-type>Doctrine\Common\Annotations\Reader</autowiring-type>
+   </service>
+   ```
+
+   After:
+
+   ```xml
+   <service id="annotations.reader" class="Doctrine\Common\Annotations\AnnotationReader" public="false" />
+   <service id="Doctrine\Common\Annotations\Reader" alias="annotations.reader" public="false" />
+   ```
+
  * The `Reference` and `Alias` classes do not make service identifiers lowercase anymore.
 
  * Case insensitivity of service identifiers is deprecated and will be removed in 4.0.

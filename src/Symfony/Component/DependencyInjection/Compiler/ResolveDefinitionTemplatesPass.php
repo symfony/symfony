@@ -90,7 +90,9 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setOverriddenGetters($parentDef->getOverriddenGetters());
         $def->setProperties($parentDef->getProperties());
-        $def->setAutowiringTypes($parentDef->getAutowiringTypes());
+        if ($parentDef->getAutowiringTypes(false)) {
+            $def->setAutowiringTypes($parentDef->getAutowiringTypes(false));
+        }
         if ($parentDef->isDeprecated()) {
             $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
         }
@@ -167,7 +169,7 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         }
 
         // merge autowiring types
-        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
             $def->addAutowiringType($autowiringType);
         }
 

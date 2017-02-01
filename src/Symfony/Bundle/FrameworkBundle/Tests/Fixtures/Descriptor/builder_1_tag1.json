@@ -34,8 +34,7 @@
             "calls": [
                 "setMailer"
             ],
-            "autowire": false,
-            "autowiring_types": []
+            "autowire": false
         }
     },
     "aliases": [

@@ -313,6 +313,9 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($def->isAutowired());
     }
 
+    /**
+     * @group legacy
+     */
     public function testTypes()
     {
         $def = new Definition('stdClass');

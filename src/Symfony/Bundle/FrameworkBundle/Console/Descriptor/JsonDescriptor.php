@@ -220,10 +220,9 @@ class JsonDescriptor extends Descriptor
             'shared' => $definition->isShared(),
             'abstract' => $definition->isAbstract(),
             'autowire' => $definition->isAutowired(),
-            'autowiring_types' => array(),
         );
 
-        foreach ($definition->getAutowiringTypes() as $autowiringType) {
+        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
             $data['autowiring_types'][] = $autowiringType;
         }
 

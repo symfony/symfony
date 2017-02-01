@@ -554,6 +554,9 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('configureBar', $barConfigurator[1]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testType()
     {
         $container = new ContainerBuilder();

@@ -322,6 +322,9 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->getDefinition('decorated_deprecated_parent')->isDeprecated());
     }
 
+    /**
+     * @group legacy
+     */
     public function testProcessMergeAutowiringTypes()
     {
         $container = new ContainerBuilder();

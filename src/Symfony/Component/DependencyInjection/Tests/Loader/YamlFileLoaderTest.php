@@ -325,6 +325,9 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('bad_types2.yml');
     }
 
+    /**
+     * @group legacy
+     */
     public function testTypes()
     {
         $container = new ContainerBuilder();

@@ -245,6 +245,13 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
+            if ($this->container->has($typeName) && !$this->container->findDefinition($typeName)->isAbstract()) {
+                $arguments[$index] = new Reference($typeName);
+                $didAutowire = true;
+
+                continue;
+            }
+
             if (null === $this->types) {
                 $this->populateAvailableTypes();
             }
@@ -332,7 +339,7 @@ class AutowirePass extends AbstractRecursivePass
             return;
         }
 
-        foreach ($definition->getAutowiringTypes() as $type) {
+        foreach ($definition->getAutowiringTypes(false) as $type) {
             $this->definedTypes[$type] = true;
             $this->types[$type] = $id;
         }

@@ -1096,8 +1096,8 @@ class FrameworkExtension extends Extension
                 ->getDefinition('annotations.cached_reader')
                 ->replaceArgument(1, new Reference($cacheService))
                 ->replaceArgument(2, $config['debug'])
-                ->addAutowiringType(Reader::class)
             ;
+            $container->setAlias(Reader::class, new Alias('annotations.cached_reader', false));
         } else {
             $container->removeDefinition('annotations.cached_reader');
         }

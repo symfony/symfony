@@ -679,9 +679,13 @@ class Definition
      * @param string[] $types
      *
      * @return $this
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function setAutowiringTypes(array $types)
     {
+        @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', E_USER_DEPRECATED);
+
         $this->autowiringTypes = array();
 
         foreach ($types as $type) {
@@ -750,9 +754,15 @@ class Definition
      * Gets autowiring types that will default to this definition.
      *
      * @return string[]
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
-    public function getAutowiringTypes()
+    public function getAutowiringTypes(/*$triggerDeprecation = true*/)
     {
+        if (1 > func_num_args() || func_get_arg(0)) {
+            @trigger_error('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead.', E_USER_DEPRECATED);
+        }
+
         return array_keys($this->autowiringTypes);
     }
 
@@ -762,9 +772,13 @@ class Definition
      * @param string $type
      *
      * @return $this
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function addAutowiringType($type)
     {
+        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
+
         $this->autowiringTypes[$type] = true;
 
         return $this;
@@ -776,9 +790,13 @@ class Definition
      * @param string $type
      *
      * @return $this
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function removeAutowiringType($type)
     {
+        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
+
         unset($this->autowiringTypes[$type]);
 
         return $this;
@@ -790,9 +808,13 @@ class Definition
      * @param string $type
      *
      * @return bool
+     *
+     * @deprecated since version 3.3, to be removed in 4.0.
      */
     public function hasAutowiringType($type)
     {
+        @trigger_error(sprintf('Autowiring-types are deprecated since Symfony 3.3 and will be removed in 4.0. Use aliases instead for "%s".', $type), E_USER_DEPRECATED);
+
         return isset($this->autowiringTypes[$type]);
     }
 }

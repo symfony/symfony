@@ -11,6 +11,5 @@
     "tags": [
 
     ],
-    "autowire": false,
-    "autowiring_types": []
+    "autowire": false
 }

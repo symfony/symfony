@@ -15,6 +15,9 @@ use Symfony\Component\Process\ProcessBuilder;
 
 class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @group legacy
+     */
     public function testInheritEnvironmentVars()
     {
         $proc = ProcessBuilder::create()
@@ -22,6 +25,13 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->getProcess();
 
         $this->assertTrue($proc->areEnvironmentVariablesInherited());
+
+        $proc = ProcessBuilder::create()
+            ->add('foo')
+            ->inheritEnvironmentVariables(false)
+            ->getProcess();
+
+        $this->assertFalse($proc->areEnvironmentVariablesInherited());
     }
 
     public function testAddEnvironmentVariables()
@@ -35,12 +45,10 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->add('command')
             ->setEnv('foo', 'bar2')
             ->addEnvironmentVariables($env)
-            ->inheritEnvironmentVariables(false)
             ->getProcess()
         ;
 
         $this->assertSame($env, $proc->getEnv());
-        $this->assertFalse($proc->areEnvironmentVariablesInherited());
     }
 
     /**

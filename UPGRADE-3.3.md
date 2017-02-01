@@ -63,6 +63,15 @@ HttpKernel
  * The `Psr6CacheClearer::addPool()` method has been deprecated. Pass an array of pools indexed
    by name to the constructor instead.
 
+Process
+-------
+
+ * Not inheriting environment variables is deprecated.
+
+ * Configuring `proc_open()` options is deprecated.
+
+ * Configuring Windows and sigchild compatibility is deprecated - they will be always enabled in 4.0.
+
 Security
 --------
 

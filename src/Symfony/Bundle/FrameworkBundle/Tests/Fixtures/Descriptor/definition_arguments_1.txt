@@ -1,19 +1,22 @@
- ---------------- ----------------------------- 
- [32m Option         [39m [32m Value                       [39m 
- ---------------- ----------------------------- 
-  Service ID       -                            
-  Class            Full\Qualified\Class1        
-  Tags             -                            
-  Public           yes                          
-  Synthetic        no                           
-  Lazy             yes                          
-  Shared           yes                          
-  Abstract         yes                          
-  Autowired        no                           
-  Factory Class    Full\Qualified\FactoryClass  
-  Factory Method   get                          
-  Arguments        Service(definition2)         
-                   %parameter%                  
-                   Inlined Service              
- ---------------- ----------------------------- 
+ ---------------- ------------------------------------------- 
+ [32m Option         [39m [32m Value                                     [39m 
+ ---------------- ------------------------------------------- 
+  Service ID       -                                          
+  Class            Full\Qualified\Class1                      
+  Tags             -                                          
+  Public           yes                                        
+  Synthetic        no                                         
+  Lazy             yes                                        
+  Shared           yes                                        
+  Abstract         yes                                        
+  Autowired        no                                         
+  Factory Class    Full\Qualified\FactoryClass                
+  Factory Method   get                                        
+  Arguments        Service(definition2)                       
+                   %parameter%                                
+                   Inlined Service                            
+                   Array                                      
+                   Iterator                                   
+                   ClosureProxy(Service(definition1)::get())  
+ ---------------- ------------------------------------------- 
 

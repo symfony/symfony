@@ -14,6 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -325,8 +327,13 @@ class TextDescriptor extends Descriptor
                     $argumentsInformation[] = sprintf('Service(%s)', (string) $argument);
                 } elseif ($argument instanceof Definition) {
                     $argumentsInformation[] = 'Inlined Service';
+                } elseif ($argument instanceof IteratorArgument) {
+                    $argumentsInformation[] = 'Iterator';
+                } elseif ($argument instanceof ClosureProxyArgument) {
+                    list($reference, $method) = $argument->getValues();
+                    $argumentsInformation[] = sprintf('ClosureProxy(Service(%s)::%s())', $reference, $method);
                 } else {
-                    $argumentsInformation[] = $argument;
+                    $argumentsInformation[] = is_array($argument) ? 'Array' : $argument;
                 }
             }
 

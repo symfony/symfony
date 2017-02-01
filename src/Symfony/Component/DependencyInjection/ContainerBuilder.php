@@ -202,7 +202,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function getResources()
     {
-        return array_unique($this->resources);
+        return array_values($this->resources);
     }
 
     /**
@@ -218,7 +218,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $this;
         }
 
-        $this->resources[] = $resource;
+        $this->resources[(string) $resource] = $resource;
 
         return $this;
     }

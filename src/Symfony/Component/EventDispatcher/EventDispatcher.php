@@ -127,7 +127,21 @@ class EventDispatcher implements EventDispatcherInterface
     public function addSubscriber(EventSubscriberInterface $subscriber)
     {
         foreach ($subscriber->getSubscribedEvents() as $eventName => $params) {
-            if (is_string($params)) {
+            if (is_int($eventName) && is_string($params)) {
+                $method = 'on'.preg_replace_callback(array(
+                        '/(?<=\b)[a-z]/i',
+                        '/[^a-z0-9]/i',
+                    ), function ($matches) { return strtoupper($matches[0]); }, $params);
+                $method = preg_replace('/[^a-z0-9]/i', '', $method);
+                $this->addListener($params, array($subscriber, $method));
+            } elseif (is_int($params)) {
+                $method = 'on'.preg_replace_callback(array(
+                        '/(?<=\b)[a-z]/i',
+                        '/[^a-z0-9]/i',
+                    ), function ($matches) { return strtoupper($matches[0]); }, $eventName);
+                $method = preg_replace('/[^a-z0-9]/i', '', $method);
+                $this->addListener($eventName, array($subscriber, $method), $params);
+            } elseif (is_string($params)) {
                 $this->addListener($eventName, array($subscriber, $params));
             } elseif (is_string($params[0])) {
                 $this->addListener($eventName, array($subscriber, $params[0]), isset($params[1]) ? $params[1] : 0);

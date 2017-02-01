@@ -163,7 +163,21 @@ class ContainerAwareEventDispatcher extends EventDispatcher
         @trigger_error(sprintf('The %s class is deprecated since version 3.3 and will be removed in 4.0. Use EventDispatcher with closure-proxy injection instead.', __CLASS__), E_USER_DEPRECATED);
 
         foreach ($class::getSubscribedEvents() as $eventName => $params) {
-            if (is_string($params)) {
+            if (is_int($eventName) && is_string($params)) {
+                $method = 'on'.preg_replace_callback(array(
+                        '/(?<=\b)[a-z]/i',
+                        '/[^a-z0-9]/i',
+                    ), function ($matches) { return strtoupper($matches[0]); }, $params);
+                $method = preg_replace('/[^a-z0-9]/i', '', $method);
+                $this->listenerIds[$params][] = array($serviceId, $method, 0);
+            } elseif (is_int($params)) {
+                $method = 'on'.preg_replace_callback(array(
+                        '/(?<=\b)[a-z]/i',
+                        '/[^a-z0-9]/i',
+                    ), function ($matches) { return strtoupper($matches[0]); }, $eventName);
+                $method = preg_replace('/[^a-z0-9]/i', '', $method);
+                $this->listenerIds[$eventName][] = array($serviceId, $method, $params);
+            } elseif (is_string($params)) {
                 $this->listenerIds[$eventName][] = array($serviceId, $params, 0);
             } elseif (is_string($params[0])) {
                 $this->listenerIds[$eventName][] = array($serviceId, $params[0], isset($params[1]) ? $params[1] : 0);

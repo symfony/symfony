@@ -71,11 +71,7 @@ class ProcessUtils
 
             return $escapedArgument;
         }
-        // Avoid the disapeareance of non-ascii parameters when LC_CTYPE is not set as UTF-8
-        if (preg_match('/[^\x20-\x7f]/', $argument) && strpos("UTF-8", setlocale(LC_CTYPE, "0")) === false) {
-            throw new InvalidArgumentException("argument cannot contains non-ascii characters if the locale LC_CTYPE is not set as UTF-8");
-        }
-        return escapeshellarg($argument);
+        return "'" . str_replace("'", "'\\''", $argument) . "'";
     }
 
     /**

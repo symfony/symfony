@@ -14,11 +14,12 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\ChoiceSubType;
 
-class ChoiceTypeTest extends TypeTestCase
+class ChoiceTypeTest extends BaseTypeTest
 {
+    const TESTED_TYPE = 'choice';
+
     private $choices = array(
         'Bernhard' => 'a',
         'Fabien' => 'b',
@@ -98,7 +99,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testChoicesOptionExpectsArrayOrTraversable()
     {
-        $this->factory->create('choice', null, array(
+        $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => new \stdClass(),
         ));
     }
@@ -108,7 +109,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testChoiceListOptionExpectsChoiceListInterface()
     {
-        $this->factory->create('choice', null, array(
+        $this->factory->create(static::TESTED_TYPE, null, array(
             'choice_list' => array('foo' => 'foo'),
         ));
     }
@@ -118,19 +119,21 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testChoiceLoaderOptionExpectsChoiceLoaderInterface()
     {
-        $this->factory->create('choice', null, array(
+        $this->factory->create(static::TESTED_TYPE, null, array(
             'choice_loader' => new \stdClass(),
         ));
     }
 
     public function testChoiceListAndChoicesCanBeEmpty()
     {
-        $this->factory->create('choice');
+        $this->factory->create(static::TESTED_TYPE, null, array(
+            'choices_as_values' => true,
+        ));
     }
 
     public function testExpandedChoicesOptionsTurnIntoChildren()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
             'choices' => $this->choices,
             'choices_as_values' => true,
@@ -144,7 +147,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testExpandedFlippedChoicesOptionsTurnIntoChildren()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
             'choices' => array_flip($this->choices),
         ));
@@ -154,7 +157,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testChoiceListWithScalarValues()
     {
-        $view = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->scalarChoices,
             'choices_as_values' => true,
         ))->createView();
@@ -169,7 +172,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testChoiceListWithScalarValuesAndFalseAsPreSetData()
     {
-        $view = $this->factory->create('choice', false, array(
+        $view = $this->factory->create(static::TESTED_TYPE, false, array(
             'choices' => $this->scalarChoices,
             'choices_as_values' => true,
         ))->createView();
@@ -179,7 +182,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testExpandedChoiceListWithScalarValues()
     {
-        $view = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->scalarChoices,
             'choices_as_values' => true,
             'expanded' => true,
@@ -192,7 +195,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testExpandedChoiceListWithBooleanAndNullValues()
     {
-        $view = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->booleanChoicesWithNull,
             'choices_as_values' => true,
             'expanded' => true,
@@ -205,7 +208,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testExpandedChoiceListWithScalarValuesAndFalseAsPreSetData()
     {
-        $view = $this->factory->create('choice', false, array(
+        $view = $this->factory->create(static::TESTED_TYPE, false, array(
             'choices' => $this->scalarChoices,
             'choices_as_values' => true,
             'expanded' => true,
@@ -219,7 +222,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testExpandedChoiceListWithBooleanAndNullValuesAndFalseAsPreSetData()
     {
-        $view = $this->factory->create('choice', false, array(
+        $view = $this->factory->create(static::TESTED_TYPE, false, array(
             'choices' => $this->booleanChoicesWithNull,
             'choices_as_values' => true,
             'expanded' => true,
@@ -232,7 +235,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderPresentOnNonRequiredExpandedSingleChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -246,7 +249,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderNotPresentIfRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -260,7 +263,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderNotPresentIfMultiple()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'required' => false,
@@ -274,7 +277,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderNotPresentIfEmptyChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -291,7 +294,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderWithBooleanChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'required' => false,
@@ -301,9 +304,8 @@ class ChoiceTypeTest extends TypeTestCase
             ),
             'placeholder' => 'Select an option',
             'choices_as_values' => true,
-        ));
-
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertSame('', $view->vars['value'], 'Value should be empty');
         $this->assertSame('1', $view->vars['choices'][0]->value);
@@ -313,7 +315,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderWithBooleanChoicesWithFalseAsPreSetData()
     {
-        $form = $this->factory->create('choice', false, array(
+        $view = $this->factory->create(static::TESTED_TYPE, false, array(
             'multiple' => false,
             'expanded' => false,
             'required' => false,
@@ -323,9 +325,8 @@ class ChoiceTypeTest extends TypeTestCase
             ),
             'placeholder' => 'Select an option',
             'choices_as_values' => true,
-        ));
-
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertSame('0', $view->vars['value'], 'Value should be "0"');
         $this->assertSame('1', $view->vars['choices'][0]->value);
@@ -335,7 +336,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderWithExpandedBooleanChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -360,7 +361,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderWithExpandedBooleanChoicesAndWithFalseAsPreSetData()
     {
-        $form = $this->factory->create('choice', false, array(
+        $form = $this->factory->create(static::TESTED_TYPE, false, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -385,7 +386,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testExpandedChoicesOptionsAreFlattened()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
             'choices' => $this->groupedChoices,
             'choices_as_values' => true,
@@ -408,7 +409,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testExpandedChoicesFlippedOptionsAreFlattened()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
             'choices' => $this->groupedChoicesFlipped,
         ));
@@ -433,7 +434,7 @@ class ChoiceTypeTest extends TypeTestCase
         $obj4 = (object) array('id' => 4, 'name' => 'Jon');
         $obj5 = (object) array('id' => 5, 'name' => 'Roman');
 
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
             'choices' => array(
                 'Symfony' => array($obj1, $obj2, $obj3),
@@ -453,7 +454,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testExpandedCheckboxesAreNeverRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'required' => true,
@@ -468,7 +469,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testExpandedRadiosAreRequiredIfChoiceChildIsRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -483,7 +484,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testExpandedRadiosAreNotRequiredIfChoiceChildIsNotRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -498,7 +499,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleNonExpanded()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->choices,
@@ -514,7 +515,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleNonExpandedInvalidChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->choices,
@@ -530,7 +531,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleNonExpandedNull()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->choices,
@@ -547,9 +548,9 @@ class ChoiceTypeTest extends TypeTestCase
     // In edge cases (for example, when choices are loaded dynamically by a
     // loader), the choices may be empty. Make sure to behave the same as when
     // choices are available.
-    public function testSubmitSingleNonExpandedNullNoChoices()
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => array(),
@@ -559,13 +560,14 @@ class ChoiceTypeTest extends TypeTestCase
         $form->submit(null);
 
         $this->assertNull($form->getData());
+        $this->assertNull($form->getNormData());
         $this->assertSame('', $form->getViewData());
         $this->assertTrue($form->isSynchronized());
     }
 
     public function testSubmitSingleNonExpandedEmpty()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->choices,
@@ -581,7 +583,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleNonExpandedEmptyExplicitEmptyChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => array(
@@ -605,7 +607,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitSingleNonExpandedEmptyNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => array(),
@@ -621,7 +623,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleNonExpandedFalse()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->choices,
@@ -640,7 +642,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitSingleNonExpandedFalseNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => array(),
@@ -656,7 +658,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleNonExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->objectChoices,
@@ -675,7 +677,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleChoiceWithEmptyData()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => array('test'),
@@ -690,7 +692,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleChoiceWithEmptyData()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => array('test'),
@@ -705,7 +707,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleChoiceExpandedWithEmptyData()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'choices' => array('test'),
@@ -720,7 +722,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleChoiceExpandedWithEmptyData()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => array('test'),
@@ -738,7 +740,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testLegacyNullChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => null,
@@ -753,7 +755,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testLegacySubmitSingleNonExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choice_list' => new ObjectChoiceList(
@@ -777,7 +779,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleNonExpanded()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -793,7 +795,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleNonExpandedEmpty()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -812,7 +814,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitMultipleNonExpandedEmptyNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => array(),
@@ -828,7 +830,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleNonExpandedInvalidScalarChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -844,7 +846,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleNonExpandedInvalidArrayChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
@@ -860,7 +862,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleNonExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->objectChoices,
@@ -881,7 +883,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testLegacySubmitMultipleNonExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choice_list' => new ObjectChoiceList(
@@ -904,7 +906,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -933,7 +935,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedRequiredInvalidChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -962,7 +964,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedNonRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -993,7 +995,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedNonRequiredInvalidChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -1022,7 +1024,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedRequiredNull()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -1054,7 +1056,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitSingleExpandedRequiredNullNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -1072,7 +1074,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedRequiredEmpty()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -1104,7 +1106,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitSingleExpandedRequiredEmptyNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -1122,7 +1124,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedRequiredFalse()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -1154,7 +1156,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitSingleExpandedRequiredFalseNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => true,
@@ -1172,7 +1174,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedNonRequiredNull()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -1206,7 +1208,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitSingleExpandedNonRequiredNullNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -1224,7 +1226,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedNonRequiredEmpty()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -1258,7 +1260,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitSingleExpandedNonRequiredEmptyNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -1276,7 +1278,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedNonRequiredFalse()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -1310,7 +1312,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitSingleExpandedNonRequiredFalseNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'required' => false,
@@ -1328,7 +1330,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedWithEmptyChild()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'choices' => array(
@@ -1351,7 +1353,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitSingleExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $this->objectChoices,
@@ -1382,7 +1384,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testLegacySubmitSingleExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'choice_list' => new ObjectChoiceList(
@@ -1418,7 +1420,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testSubmitSingleExpandedNumericChoicesFlipped()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => true,
             'choices' => $this->numericChoicesFlipped,
@@ -1443,7 +1445,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleExpanded()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -1471,7 +1473,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleExpandedInvalidScalarChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -1499,7 +1501,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleExpandedInvalidArrayChoice()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -1527,7 +1529,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleExpandedEmpty()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->choices,
@@ -1556,7 +1558,7 @@ class ChoiceTypeTest extends TypeTestCase
     // choices are available.
     public function testSubmitMultipleExpandedEmptyNoChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => array(),
@@ -1571,7 +1573,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleExpandedWithEmptyChild()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => array(
@@ -1597,7 +1599,7 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSubmitMultipleExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->objectChoices,
@@ -1628,7 +1630,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testLegacySubmitMultipleExpandedObjectChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choice_list' => new ObjectChoiceList(
@@ -1664,7 +1666,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testSubmitMultipleExpandedNumericChoices()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => true,
             'choices' => $this->numericChoicesFlipped,
@@ -1689,16 +1691,17 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testSingleSelectedObjectChoices()
     {
-        $form = $this->factory->create('choice', $this->objectChoices[3], array(
+        $view = $this->factory->create(static::TESTED_TYPE, $this->objectChoices[3], array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->objectChoices,
             'choices_as_values' => true,
             'choice_label' => 'name',
             'choice_value' => 'id',
-        ));
+        ))
+            ->createView();
 
-        $view = $form->createView();
+        /** @var callable $selectedChecker */
         $selectedChecker = $view->vars['is_selected'];
 
         $this->assertTrue($selectedChecker($view->vars['choices'][3]->value, $view->vars['value']));
@@ -1707,16 +1710,17 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testMultipleSelectedObjectChoices()
     {
-        $form = $this->factory->create('choice', array($this->objectChoices[3]), array(
+        $view = $this->factory->create(static::TESTED_TYPE, array($this->objectChoices[3]), array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->objectChoices,
             'choices_as_values' => true,
             'choice_label' => 'name',
             'choice_value' => 'id',
-        ));
+        ))
+            ->createView();
 
-        $view = $form->createView();
+        /** @var callable $selectedChecker */
         $selectedChecker = $view->vars['is_selected'];
 
         $this->assertTrue($selectedChecker($view->vars['choices'][3]->value, $view->vars['value']));
@@ -1731,7 +1735,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testSetDataSingleNonExpandedAcceptsBoolean()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'expanded' => false,
             'choices' => $this->numericChoicesFlipped,
@@ -1749,7 +1753,7 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testSetDataMultipleNonExpandedAcceptsBoolean()
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->numericChoicesFlipped,
@@ -1764,82 +1768,82 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPassRequiredToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertTrue($view->vars['required']);
     }
 
     public function testPassNonRequiredToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'required' => false,
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertFalse($view->vars['required']);
     }
 
     public function testPassMultipleToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => true,
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertTrue($view->vars['multiple']);
     }
 
     public function testPassExpandedToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'expanded' => true,
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertTrue($view->vars['expanded']);
     }
 
     public function testPassChoiceTranslationDomainToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertNull($view->vars['choice_translation_domain']);
     }
 
     public function testChoiceTranslationDomainWithTrueValueToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
             'choices_as_values' => true,
             'choice_translation_domain' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertNull($view->vars['choice_translation_domain']);
     }
 
     public function testDefaultChoiceTranslationDomainIsSameAsTranslationDomainToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
             'choices_as_values' => true,
             'translation_domain' => 'foo',
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertEquals('foo', $view->vars['choice_translation_domain']);
     }
@@ -1847,10 +1851,12 @@ class ChoiceTypeTest extends TypeTestCase
     public function testInheritChoiceTranslationDomainFromParent()
     {
         $view = $this->factory
-            ->createNamedBuilder('parent', 'form', null, array(
+            ->createNamedBuilder('parent', FormTypeTest::TESTED_TYPE, null, array(
                 'translation_domain' => 'domain',
             ))
-            ->add('child', 'choice')
+            ->add('child', static::TESTED_TYPE, array(
+                'choices_as_values' => true,
+            ))
             ->getForm()
             ->createView();
 
@@ -1859,26 +1865,26 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPlaceholderIsNullByDefaultIfRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'required' => true,
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertNull($view->vars['placeholder']);
     }
 
     public function testPlaceholderIsEmptyStringByDefaultIfNotRequired()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => false,
             'required' => false,
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertSame('', $view->vars['placeholder']);
     }
@@ -1888,15 +1894,15 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testPassPlaceholderToView($multiple, $expanded, $required, $placeholder, $viewValue)
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => $multiple,
             'expanded' => $expanded,
             'required' => $required,
             'placeholder' => $placeholder,
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertSame($viewValue, $view->vars['placeholder']);
         $this->assertFalse($view->vars['placeholder_in_choices']);
@@ -1908,15 +1914,15 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testPassEmptyValueBC($multiple, $expanded, $required, $placeholder, $viewValue)
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => $multiple,
             'expanded' => $expanded,
             'required' => $required,
             'empty_value' => $placeholder,
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertSame($viewValue, $view->vars['placeholder']);
         $this->assertFalse($view->vars['placeholder_in_choices']);
@@ -1929,15 +1935,15 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testDontPassPlaceholderIfContainedInChoices($multiple, $expanded, $required, $placeholder, $viewValue)
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => $multiple,
             'expanded' => $expanded,
             'required' => $required,
             'placeholder' => $placeholder,
             'choices' => array('Empty' => '', 'A' => 'a'),
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertNull($view->vars['placeholder']);
         $this->assertTrue($view->vars['placeholder_in_choices']);
@@ -1993,15 +1999,15 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testPlaceholderOptionWithEmptyValueOption($multiple, $expanded, $required, $placeholder, $emptyValue, $viewValue)
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'multiple' => $multiple,
             'expanded' => $expanded,
             'required' => $required,
             'placeholder' => $placeholder,
             'empty_value' => $emptyValue,
             'choices' => $this->choices,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertSame($viewValue, $view->vars['placeholder']);
         $this->assertFalse($view->vars['placeholder_in_choices']);
@@ -2115,11 +2121,11 @@ class ChoiceTypeTest extends TypeTestCase
     public function testPassChoicesToView()
     {
         $choices = array('A' => 'a', 'B' => 'b', 'C' => 'c', 'D' => 'd');
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertEquals(array(
             new ChoiceView('a', 'a', 'A'),
@@ -2132,12 +2138,12 @@ class ChoiceTypeTest extends TypeTestCase
     public function testPassPreferredChoicesToView()
     {
         $choices = array('A' => 'a', 'B' => 'b', 'C' => 'c', 'D' => 'd');
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $choices,
             'choices_as_values' => true,
             'preferred_choices' => array('b', 'd'),
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertEquals(array(
             0 => new ChoiceView('a', 'a', 'A'),
@@ -2151,12 +2157,12 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testPassHierarchicalChoicesToView()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->groupedChoices,
             'choices_as_values' => true,
             'preferred_choices' => array('b', 'd'),
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertEquals(array(
             'Symfony' => new ChoiceGroupView('Symfony', array(
@@ -2183,13 +2189,13 @@ class ChoiceTypeTest extends TypeTestCase
         $obj2 = (object) array('value' => 'b', 'label' => 'B');
         $obj3 = (object) array('value' => 'c', 'label' => 'C');
         $obj4 = (object) array('value' => 'd', 'label' => 'D');
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => array($obj1, $obj2, $obj3, $obj4),
             'choices_as_values' => true,
             'choice_label' => 'label',
             'choice_value' => 'value',
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertEquals(array(
             new ChoiceView($obj1, 'a', 'A'),
@@ -2204,10 +2210,10 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testDuplicateChoiceLabels()
     {
-        $form = $this->factory->create('choice', null, array(
+        $view = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => array('a' => 'A', 'b' => 'B', 'c' => 'A'),
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertEquals(array(
             new ChoiceView('a', 'a', 'A'),
@@ -2218,13 +2224,13 @@ class ChoiceTypeTest extends TypeTestCase
 
     public function testAdjustFullNameForMultipleNonExpanded()
     {
-        $form = $this->factory->createNamed('name', 'choice', null, array(
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'multiple' => true,
             'expanded' => false,
             'choices' => $this->choices,
             'choices_as_values' => true,
-        ));
-        $view = $form->createView();
+        ))
+            ->createView();
 
         $this->assertSame('name[]', $view->vars['full_name']);
     }
@@ -2232,7 +2238,7 @@ class ChoiceTypeTest extends TypeTestCase
     // https://github.com/symfony/symfony/issues/3298
     public function testInitializeWithEmptyChoices()
     {
-        $this->factory->createNamed('name', 'choice', null, array(
+        $this->factory->createNamed('name', static::TESTED_TYPE, null, array(
             'choices' => array(),
             'choices_as_values' => true,
         ));
@@ -2245,7 +2251,7 @@ class ChoiceTypeTest extends TypeTestCase
         $obj3 = (object) array('value' => 'c', 'label' => 'C');
         $obj4 = (object) array('value' => 'd', 'label' => 'D');
 
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => array($obj1, $obj2, $obj3, $obj4),
             'choices_as_values' => true,
             'choice_label' => 'label',
@@ -2256,7 +2262,7 @@ class ChoiceTypeTest extends TypeTestCase
         ));
 
         // Trigger data initialization
-        $form->getViewData();
+        $this->assertSame('c', $form->getViewData());
     }
 
     /**
@@ -2269,11 +2275,12 @@ class ChoiceTypeTest extends TypeTestCase
     public function testCustomChoiceTypeDoesNotInheritChoiceLabels()
     {
         $builder = $this->factory->createBuilder();
-        $builder->add('choice', 'choice', array(
+        $builder->add('choice', static::TESTED_TYPE, array(
                 'choices' => array(
                     '1' => '1',
                     '2' => '2',
                 ),
+                'choices_as_values' => true,
             )
         );
         $builder->add('subChoice', new ChoiceSubType());
@@ -2290,10 +2297,11 @@ class ChoiceTypeTest extends TypeTestCase
      */
     public function testSubmitInvalidNestedValue($multiple, $expanded, $submissionData)
     {
-        $form = $this->factory->create('choice', null, array(
+        $form = $this->factory->create(static::TESTED_TYPE, null, array(
             'choices' => $this->choices,
             'multiple' => $multiple,
             'expanded' => $expanded,
+            'choices_as_values' => true,
         ));
 
         $form->submit($submissionData);

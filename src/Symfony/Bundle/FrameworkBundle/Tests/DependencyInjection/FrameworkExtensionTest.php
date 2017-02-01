@@ -378,10 +378,6 @@ abstract class FrameworkExtensionTest extends TestCase
 
     public function testAssetHasPreloadListener()
     {
-        if (!class_exists(PreloadListener::class)) {
-            $this->markTestSkipped('Requires asset 3.3 or superior.');
-        }
-
         $container = $this->createContainerFromFile('assets');
         $this->assertTrue($container->hasDefinition('asset.preload_listener'));
     }

@@ -26,7 +26,7 @@ class AssetExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new AssetExtension(new Packages(), $preloadManager);
 
         $this->assertEquals('/foo.css', $extension->preload('/foo.css', 'style', true));
-        $this->assertEquals(array('/foo.css' => array('as' => 'style', 'nopush' => true)), $preloadManager->getResources());
+        $this->assertEquals('</foo.css>; rel=preload; as=style; nopush', $preloadManager->buildLinkValue());
     }
 
     /**

@@ -30,23 +30,14 @@ interface PreloadManagerInterface
     public function addResource($uri, $as = '', $nopush = false);
 
     /**
-     * Gets the list of resources to preload.
-     *
-     * @return array
+     * Clears the list of resources.
      */
-    public function getResources();
+    public function clear();
 
     /**
-     * Replaces the list of resources.
-     *
-     * @param array $resources
-     */
-    public function setResources(array $resources);
-
-    /**
-     * Gets the value of the preload Link HTTP header.
+     * Builds the value of the preload Link HTTP header.
      *
      * @return string|null
      */
-    public function getLinkValue();
+    public function buildLinkValue();
 }

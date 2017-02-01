@@ -33,37 +33,15 @@ class PreloadManager implements PreloadManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getResources()
+    public function clear()
     {
-        return $this->resources;
+        $this->resources = array();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setResources(array $resources)
-    {
-        foreach ($resources as $key => $options) {
-            if (!is_string($key)) {
-                throw new InvalidArgumentException('The key must be a path to an asset, "%s" given.', $key);
-            }
-
-            if (!isset($options['as']) || !is_string($options['as'])) {
-                throw new InvalidArgumentException('The "as" option is mandatory and must be a string.');
-            }
-
-            if (!isset($options['nopush']) || !is_bool($options['nopush'])) {
-                throw new InvalidArgumentException('The "nopush" option is mandatory and must be a bool.');
-            }
-        }
-
-        $this->resources = $resources;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLinkValue()
+    public function buildLinkValue()
     {
         if (!$this->resources) {
             return null;
@@ -71,16 +49,10 @@ class PreloadManager implements PreloadManagerInterface
 
         $parts = array();
         foreach ($this->resources as $uri => $options) {
-            $part = "<$uri>; rel=preload";
-            if ('' !== $options['as']) {
-                $part .= "; as={$options['as']}";
-            }
+            $as = '' === $options['as'] ? '' : sprintf('; as=%s', $options['as']);
+            $nopush = $options['nopush'] ? '; nopush' : '';
 
-            if ($options['nopush']) {
-                $part .= '; nopush';
-            }
-
-            $parts[] = $part;
+            $parts[] = sprintf('<%s>; rel=preload%s%s', $uri, $as, $nopush);
         }
 
         return implode(',', $parts);

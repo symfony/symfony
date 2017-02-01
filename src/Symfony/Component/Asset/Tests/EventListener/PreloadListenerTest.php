@@ -32,13 +32,14 @@ class PreloadListenerTest extends \PHPUnit_Framework_TestCase
         $response = new Response();
 
         $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
+        $event->method('isMasterRequest')->willReturn(true);
         $event->method('getResponse')->willReturn($response);
 
         $subscriber->onKernelResponse($event);
 
         $this->assertInstanceOf(EventSubscriberInterface::class, $subscriber);
         $this->assertEquals('</foo>; rel=preload', $response->headers->get('Link'));
-        $this->assertEmpty($manager->getResources());
+        $this->assertNull($manager->buildLinkValue());
     }
 
     public function testSubscribedEvents()

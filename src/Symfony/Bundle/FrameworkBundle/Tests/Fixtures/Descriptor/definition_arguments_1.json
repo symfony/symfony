@@ -6,7 +6,6 @@
     "shared": true,
     "abstract": true,
     "autowire": false,
-    "autowiring_types": [],
     "arguments": [
         {
             "type": "service",
@@ -21,7 +20,6 @@
             "shared": true,
             "abstract": false,
             "autowire": false,
-            "autowiring_types": [],
             "arguments": [
                 "arg1",
                 "arg2"

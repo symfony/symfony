@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * deprecated autowiring-types, use aliases instead
  * [EXPERIMENTAL] added support for getter-injection
  * added support for omitting the factory class name in a service definition if the definition class is set
  * deprecated case insensitivity of service identifiers

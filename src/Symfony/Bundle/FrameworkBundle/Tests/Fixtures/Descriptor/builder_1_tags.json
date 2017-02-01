@@ -13,8 +13,7 @@
             ],
             "factory_service": "factory.service",
             "factory_method": "get",
-            "autowire": false,
-            "autowiring_types": []
+            "autowire": false
         }
     ],
     "tag2": [
@@ -31,8 +30,7 @@
             ],
             "factory_service": "factory.service",
             "factory_method": "get",
-            "autowire": false,
-            "autowiring_types": []
+            "autowire": false
         }
     ]
 }

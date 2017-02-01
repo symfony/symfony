@@ -201,7 +201,7 @@ class XmlDumper extends Dumper
             $service->setAttribute('autowire', 'true');
         }
 
-        foreach ($definition->getAutowiringTypes() as $autowiringTypeValue) {
+        foreach ($definition->getAutowiringTypes(false) as $autowiringTypeValue) {
             $autowiringType = $this->document->createElement('autowiring-type');
             $autowiringType->appendChild($this->document->createTextNode($autowiringTypeValue));
 

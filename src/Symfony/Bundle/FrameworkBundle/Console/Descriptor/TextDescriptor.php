@@ -294,8 +294,9 @@ class TextDescriptor extends Descriptor
         $tableRows[] = array('Abstract', $definition->isAbstract() ? 'yes' : 'no');
         $tableRows[] = array('Autowired', $definition->isAutowired() ? 'yes' : 'no');
 
-        $autowiringTypes = $definition->getAutowiringTypes();
-        $tableRows[] = array('Autowiring Types', $autowiringTypes ? implode(', ', $autowiringTypes) : '-');
+        if ($autowiringTypes = $definition->getAutowiringTypes(false)) {
+            $tableRows[] = array('Autowiring Types', implode(', ', $autowiringTypes));
+        }
 
         if ($definition->getFile()) {
             $tableRows[] = array('Required File', $definition->getFile() ? $definition->getFile() : '-');

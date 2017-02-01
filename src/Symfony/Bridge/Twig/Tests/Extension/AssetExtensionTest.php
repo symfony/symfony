@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\Asset\Preload\HttpFoundationPreloadManager;
+use Symfony\Component\Asset\Preload\PreloadManager;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -22,7 +22,7 @@ class AssetExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetAndPreloadAssetUrl()
     {
-        $preloadManager = new HttpFoundationPreloadManager();
+        $preloadManager = new PreloadManager();
         $extension = new AssetExtension(new Packages(), $preloadManager);
 
         $this->assertEquals('/foo.css', $extension->preload('/foo.css', 'style', true));

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Asset\Tests\EventListener;
 
 use Symfony\Component\Asset\EventListener\PreloadListener;
-use Symfony\Component\Asset\Preload\HttpFoundationPreloadManager;
+use Symfony\Component\Asset\Preload\PreloadManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -25,7 +25,7 @@ class PreloadListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testOnKernelResponse()
     {
-        $manager = new HttpFoundationPreloadManager();
+        $manager = new PreloadManager();
         $manager->addResource('/foo');
 
         $subscriber = new PreloadListener($manager);

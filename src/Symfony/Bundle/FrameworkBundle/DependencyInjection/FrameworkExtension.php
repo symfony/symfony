@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Component\Asset\EventListener\PreloadListener;
-use Symfony\Component\Asset\Preload\HttpFoundationPreloadManager;
+use Symfony\Component\Asset\Preload\PreloadManager;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Alias;
@@ -766,8 +766,8 @@ class FrameworkExtension extends Extension
             $defaultVersion = $this->createVersion($container, $config['version'], $config['version_format'], '_default');
         }
 
-        if (class_exists(HttpFoundationPreloadManager::class)) {
-            $preloadManagerDefinition = $container->register('assets.preload_manager', HttpFoundationPreloadManager::class);
+        if (class_exists(PreloadManager::class)) {
+            $preloadManagerDefinition = $container->register('assets.preload_manager', PreloadManager::class);
             $preloadManagerDefinition->setPublic(false);
 
             $preloadListener = $container->register('asset.preload_listener', PreloadListener::class);

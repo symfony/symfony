@@ -12,14 +12,13 @@
 namespace Symfony\Component\Asset\Preload;
 
 use Symfony\Component\Asset\Exception\InvalidArgumentException;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Preload manager for the HttpFoundation component.
+ * Manages preload HTTP headers.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class HttpFoundationPreloadManager implements PreloadManagerInterface
+class PreloadManager implements PreloadManagerInterface
 {
     private $resources = array();
 
@@ -62,14 +61,12 @@ class HttpFoundationPreloadManager implements PreloadManagerInterface
     }
 
     /**
-     * Sets preload Link HTTP header.
-     *
-     * @param Response $response
+     * {@inheritdoc}
      */
-    public function setLinkHeader(Response $response)
+    public function getLinkValue()
     {
         if (!$this->resources) {
-            return;
+            return null;
         }
 
         $parts = array();
@@ -86,6 +83,6 @@ class HttpFoundationPreloadManager implements PreloadManagerInterface
             $parts[] = $part;
         }
 
-        $response->headers->set('Link', implode(',', $parts));
+        return implode(',', $parts);
     }
 }

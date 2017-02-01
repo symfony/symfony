@@ -16,11 +16,11 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class HttpFoundationPreloadManagerTest extends \PHPUnit_Framework_TestCase
+class PreloadManagerTest extends \PHPUnit_Framework_TestCase
 {
     public function testManageResources()
     {
-        $manager = new HttpFoundationPreloadManager();
+        $manager = new PreloadManager();
         $this->assertInstanceOf(PreloadManagerInterface::class, $manager);
 
         $manager->setResources(array('/foo/bar.js' => array('as' => 'script', 'nopush' => false)));
@@ -33,10 +33,7 @@ class HttpFoundationPreloadManagerTest extends \PHPUnit_Framework_TestCase
                 '/foo/bat.png' => array('as' => 'image', 'nopush' => true),
         ), $manager->getResources());
 
-        $response = new Response();
-        $manager->setLinkHeader($response);
-
-        $this->assertEquals('</foo/bar.js>; rel=preload; as=script,</foo/baz.css>; rel=preload,</foo/bat.png>; rel=preload; as=image; nopush', $response->headers->get('Link'));
+        $this->assertEquals('</foo/bar.js>; rel=preload; as=script,</foo/baz.css>; rel=preload,</foo/bat.png>; rel=preload; as=image; nopush', $manager->getLinkValue());
     }
 
     /**
@@ -45,7 +42,7 @@ class HttpFoundationPreloadManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidResources($resources)
     {
-        $manager = new HttpFoundationPreloadManager();
+        $manager = new PreloadManager();
         $manager->setResources($resources);
     }
 

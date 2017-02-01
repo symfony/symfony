@@ -42,4 +42,11 @@ interface PreloadManagerInterface
      * @param array $resources
      */
     public function setResources(array $resources);
+
+    /**
+     * Gets the value of the preload Link HTTP header.
+     *
+     * @return string|null
+     */
+    public function getLinkValue();
 }

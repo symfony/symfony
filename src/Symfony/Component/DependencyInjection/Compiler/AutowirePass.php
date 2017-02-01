@@ -219,54 +219,69 @@ class AutowirePass extends AbstractRecursivePass
                 continue;
             }
 
+            if (method_exists($parameter, 'getType')) {
+                if ($typeName = $parameter->getType()) {
+                    $typeName = $typeName->isBuiltin() ? null : ($typeName instanceof \ReflectionNamedType ? $typeName->getName() : $typeName->__toString());
+                }
+            } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $parameter, $typeName)) {
+                $typeName = 'callable' === $typeName[1] || 'array' === $typeName[1] ? null : $typeName[1];
+            }
+
+            if (!$typeName) {
+                // no default value? Then fail
+                if (!$parameter->isOptional()) {
+                    if ($mustAutowire) {
+                        throw new RuntimeException(sprintf('Cannot autowire service "%s": argument $%s of method %s::%s() must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $reflectionMethod->class, $reflectionMethod->name));
+                    }
+
+                    return array();
+                }
+
+                if (!array_key_exists($index, $arguments)) {
+                    // specifically pass the default value
+                    $arguments[$index] = $parameter->getDefaultValue();
+                }
+
+                continue;
+            }
+
+            if (null === $this->types) {
+                $this->populateAvailableTypes();
+            }
+
+            if (isset($this->types[$typeName])) {
+                $arguments[$index] = new Reference($this->types[$typeName]);
+                $didAutowire = true;
+
+                continue;
+            }
+
             try {
-                if (!$typeHint = $parameter->getClass()) {
-                    // no default value? Then fail
-                    if (!$parameter->isOptional()) {
-                        if ($mustAutowire) {
-                            throw new RuntimeException(sprintf('Cannot autowire service "%s": argument $%s of method %s::%s() must have a type-hint or be given a value explicitly.', $this->currentId, $parameter->name, $reflectionMethod->class, $reflectionMethod->name));
+                $typeHint = new \ReflectionClass($typeName);
+            } catch (\ReflectionException $e) {
+                // Typehint against a non-existing class
+                $typeHint = false;
+            }
+
+            if ($typeHint) {
+                try {
+                    $value = $this->createAutowiredDefinition($typeHint);
+                    $didAutowire = true;
+                } catch (RuntimeException $e) {
+                    if ($parameter->allowsNull()) {
+                        $value = null;
+                    } elseif ($parameter->isDefaultValueAvailable()) {
+                        $value = $parameter->getDefaultValue();
+                    } else {
+                        // The exception code is set to 1 if the exception must be thrown even if it's an optional setter
+                        if (1 === $e->getCode() || $mustAutowire) {
+                            throw $e;
                         }
 
                         return array();
                     }
-
-                    if (!array_key_exists($index, $arguments)) {
-                        // specifically pass the default value
-                        $arguments[$index] = $parameter->getDefaultValue();
-                    }
-
-                    continue;
                 }
-
-                if (null === $this->types) {
-                    $this->populateAvailableTypes();
-                }
-
-                if (isset($this->types[$typeHint->name])) {
-                    $value = new Reference($this->types[$typeHint->name]);
-                    $didAutowire = true;
-                } else {
-                    try {
-                        $value = $this->createAutowiredDefinition($typeHint);
-                        $didAutowire = true;
-                    } catch (RuntimeException $e) {
-                        if ($parameter->allowsNull()) {
-                            $value = null;
-                        } elseif ($parameter->isDefaultValueAvailable()) {
-                            $value = $parameter->getDefaultValue();
-                        } else {
-                            // The exception code is set to 1 if the exception must be thrown even if it's an optional setter
-                            if (1 === $e->getCode() || $mustAutowire) {
-                                throw $e;
-                            }
-
-                            return array();
-                        }
-                    }
-                }
-            } catch (\ReflectionException $e) {
-                // Typehint against a non-existing class
-
+            } else {
                 if (!$parameter->isDefaultValueAvailable()) {
                     if ($mustAutowire) {
                         throw new RuntimeException(sprintf('Cannot autowire argument $%s of method %s::%s() for service "%s": %s.', $parameter->name, $reflectionMethod->class, $reflectionMethod->name, $this->currentId, $e->getMessage()), 0, $e);

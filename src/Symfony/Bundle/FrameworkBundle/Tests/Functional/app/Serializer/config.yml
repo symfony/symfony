@@ -1,0 +1,6 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    serializer: { enabled: true }
+    property_info: { enabled: true }

@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-01T15:46:56Z
+
+@nicolas-grekas Haha... I really like this simplification... but I don't understand how it works! :) Is there some significance to the service id matching the autowired interface? Otherwise... I would still expect that if I had 10 services for an interface (e.g. LoggerInterface)... that now it would simply appear that I would have *11* services for that interface. Clearly, I'm missing something ;)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T15:50:06Z
+
+It is very simple: if there is a service named "Foo\BarInterface", then that's the one, when looking to wire a "Foo\BarInterface" type hint.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-01T16:07:47Z
+
+this is a very elegant solution to the problem, allowing to use third-party services to autowire a type (as your alias can point to any service), and forbidding to explicitly configure the same autowired type twice for different services (as service ids are unique).
+
+So 👍 for me.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-01T17:03:29Z
+
+Far simpler 👍
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-01T17:04:55Z
+
+Great! :+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-01T18:04:10Z
+
+Ha, I missed the change to `AutowirePass`. Of course, it makes sense! We'll need a docs issue so we can update things.
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T18:43:50Z
+
+@stof comments addressed, thanks
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-01T18:47:35Z
+
+btw, my comment about using private aliases for this is also true for the documentation when writing it
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-01T20:02:34Z
+
+Docs issue created - I added a note on there about your (Stof) "private aliases" comment.

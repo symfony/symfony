@@ -113,28 +113,4 @@ class Packages
     {
         return $this->getPackage($packageName)->getUrl($path);
     }
-
-    /**
-     * Returns the public path and preloads it.
-     *
-     * Absolute paths (i.e. http://...) are returned unmodified.
-     *
-     * @param string $path        A public path
-     * @param string $as          A valid destination according to https://fetch.spec.whatwg.org/#concept-request-destination
-     * @param bool   $nopush      If this asset should not be pushed over HTTP/2
-     * @param string $packageName The name of the asset package to use
-     *
-     * @return string A public path which takes into account the base path and URL path
-     *
-     * @throws InvalidArgumentException If the requested package doesn't support preloading
-     */
-    public function getAndPreloadUrl($path, $as = '', $nopush = false, $packageName = null)
-    {
-        $package = $this->getPackage($packageName);
-        if (!$package instanceof PreloadedPackageInterface) {
-            throw new InvalidArgumentException(sprintf('The "%s" package doesn\'t support preloading.', $packageName ?: 'default'));
-        }
-
-        return $package->getAndPreloadUrl($path, $as, $nopush);
-    }
 }

@@ -56,27 +56,6 @@ class PackagesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/foo?a', $packages->getUrl('/foo', 'a'));
     }
 
-    public function testGetAndPreloadUrl()
-    {
-        $preloadManager = $this->getMockBuilder(PreloadManagerInterface::class)->getMock();
-        $preloadManager
-            ->expects($this->exactly(2))
-            ->method('addResource')
-            ->withConsecutive(
-                array($this->equalTo('/foo?default'), $this->equalTo(''), $this->equalTo(false)),
-                array($this->equalTo('/foo?a'), $this->equalTo('script'), $this->equalTo(true))
-            )
-        ;
-
-        $packages = new Packages(
-            new Package(new StaticVersionStrategy('default'), null, $preloadManager),
-            array('a' => new Package(new StaticVersionStrategy('a'), null, $preloadManager))
-        );
-
-        $this->assertEquals('/foo?default', $packages->getAndPreloadUrl('/foo'));
-        $this->assertEquals('/foo?a', $packages->getAndPreloadUrl('/foo', 'script', true, 'a'));
-    }
-
     /**
      * @expectedException \Symfony\Component\Asset\Exception\LogicException
      */
@@ -93,14 +72,5 @@ class PackagesTest extends \PHPUnit_Framework_TestCase
     {
         $packages = new Packages();
         $packages->getPackage('a');
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Asset\Exception\InvalidArgumentException
-     */
-    public function testDoesNotSupportPreloading()
-    {
-        $packages = new Packages($this->getMockBuilder(PackageInterface::class)->getMock());
-        $packages->getAndPreloadUrl('/foo');
     }
 }

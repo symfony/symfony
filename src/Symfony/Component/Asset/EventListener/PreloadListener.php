@@ -12,14 +12,16 @@
 namespace Symfony\Component\Asset\EventListener;
 
 use Symfony\Component\Asset\Preload\HttpFoundationPreloadManager;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Adds preload's Link HTTP headers to the response.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class PreloadListener
+class PreloadListener implements EventSubscriberInterface
 {
     private $preloadManager;
 
@@ -31,5 +33,16 @@ class PreloadListener
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $this->preloadManager->setLinkHeader($event->getResponse());
+
+        // Free memory
+        $this->preloadManager->setResources(array());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(KernelEvents::RESPONSE => 'onKernelResponse');
     }
 }

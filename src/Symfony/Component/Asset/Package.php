@@ -22,19 +22,16 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  *
  * @author Kris Wallsmith <kris@symfony.com>
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class Package implements PreloadedPackageInterface
+class Package implements PackageInterface
 {
     private $versionStrategy;
     private $context;
-    private $preloadManager;
 
-    public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null, PreloadManagerInterface $preloadManager = null)
+    public function __construct(VersionStrategyInterface $versionStrategy, ContextInterface $context = null)
     {
         $this->versionStrategy = $versionStrategy;
         $this->context = $context ?: new NullContext();
-        $this->preloadManager = $preloadManager;
     }
 
     /**
@@ -55,21 +52,6 @@ class Package implements PreloadedPackageInterface
         }
 
         return $this->versionStrategy->applyVersion($path);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAndPreloadUrl($path, $as = '', $nopush = false)
-    {
-        if (null === $this->preloadManager) {
-            throw new LogicException('There is no preload manager, configure one first.');
-        }
-
-        $url = $this->getUrl($path);
-        $this->preloadManager->addResource($url, $as, $nopush);
-
-        return $url;
     }
 
     /**

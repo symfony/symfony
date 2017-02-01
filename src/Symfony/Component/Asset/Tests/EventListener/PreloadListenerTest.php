@@ -13,8 +13,10 @@ namespace Symfony\Component\Asset\Tests\EventListener;
 
 use Symfony\Component\Asset\EventListener\PreloadListener;
 use Symfony\Component\Asset\Preload\HttpFoundationPreloadManager;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -26,13 +28,21 @@ class PreloadListenerTest extends \PHPUnit_Framework_TestCase
         $manager = new HttpFoundationPreloadManager();
         $manager->addResource('/foo');
 
-        $listener = new PreloadListener($manager);
+        $subscriber = new PreloadListener($manager);
         $response = new Response();
 
         $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('getResponse')->willReturn($response);
 
-        $listener->onKernelResponse($event);
+        $subscriber->onKernelResponse($event);
+
+        $this->assertInstanceOf(EventSubscriberInterface::class, $subscriber);
         $this->assertEquals('</foo>; rel=preload', $response->headers->get('Link'));
+        $this->assertEmpty($manager->getResources());
+    }
+
+    public function testSubscribedEvents()
+    {
+        $this->assertEquals(array(KernelEvents::RESPONSE => 'onKernelResponse'), PreloadListener::getSubscribedEvents());
     }
 }

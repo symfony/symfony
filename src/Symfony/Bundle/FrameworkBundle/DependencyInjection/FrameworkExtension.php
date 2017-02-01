@@ -772,10 +772,7 @@ class FrameworkExtension extends Extension
 
             $preloadListener = $container->register('asset.preload_listener', PreloadListener::class);
             $preloadListener->addArgument(new Reference('assets.preload_manager'));
-            $preloadListener->addTag('kernel.event_listener', array(
-                'event' => 'kernel.response',
-                'method' => 'onKernelResponse',
-            ));
+            $preloadListener->addTag('kernel.event_subscriber');
         }
 
         $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
@@ -818,10 +815,6 @@ class FrameworkExtension extends Extension
             ->replaceArgument(0, $baseUrls ?: $basePath)
             ->replaceArgument(1, $version)
         ;
-
-        if (class_exists(HttpFoundationPreloadManager::class)) {
-            $package->addArgument(new Reference('assets.preload_manager'));
-        }
 
         return $package;
     }

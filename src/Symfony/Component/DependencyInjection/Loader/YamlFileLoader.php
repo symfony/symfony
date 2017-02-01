@@ -182,7 +182,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('Service defaults must be an array, "%s" given in "%s".', gettype($defaults), $file));
         }
         if (isset($defaults['alias']) || isset($defaults['class']) || isset($defaults['factory'])) {
-            @trigger_error('Giving a service the "_defaults" name is deprecated since Symfony 3.3 and will be forbidden in 4.0. Rename your service.', E_USER_DEPRECATED);
+            // @deprecated code path, to be removed in 4.0
 
             return array();
         }
@@ -239,6 +239,9 @@ class YamlFileLoader extends FileLoader
      */
     private function parseDefinition($id, $service, $file, array $defaults)
     {
+        if (preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
+            @trigger_error(sprintf('Service names that start with an underscore are deprecated since Symfony 3.3 and will be reserved in 4.0. Rename the "%s" service or define it in XML instead.', $id), E_USER_DEPRECATED);
+        }
         if (is_string($service) && 0 === strpos($service, '@')) {
             $public = isset($defaults['public']) ? $defaults['public'] : true;
             $this->container->setAlias($id, new Alias(substr($service, 1), $public));

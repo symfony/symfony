@@ -11,9 +11,7 @@
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": [
-
-            ]
+            "tags": []
         },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
@@ -42,9 +40,7 @@
                 },
                 {
                     "name": "tag2",
-                    "parameters": [
-
-                    ]
+                    "parameters": []
                 }
             ]
         }

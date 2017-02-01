@@ -11,9 +11,7 @@
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": [
-
-            ]
+            "tags": []
         }
     },
     "aliases": {

@@ -27,17 +27,11 @@
                 },
                 {
                     "name": "tag2",
-                    "parameters": [
-
-                    ]
+                    "parameters": []
                 }
             ]
         }
     },
-    "aliases": [
-
-    ],
-    "services": [
-
-    ]
+    "aliases": [],
+    "services": []
 }

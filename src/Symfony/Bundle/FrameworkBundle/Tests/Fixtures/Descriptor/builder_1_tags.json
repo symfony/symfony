@@ -9,11 +9,11 @@
             "shared": true,
             "synchronized": false,
             "abstract": false,
+            "autowire": false,
+            "autowiring_types": [],
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
-            "factory_method": "get",
-            "autowire": false,
-            "autowiring_types": []
+            "factory_method": "get"
         }
     ],
     "tag2": [
@@ -26,11 +26,11 @@
             "shared": true,
             "synchronized": false,
             "abstract": false,
+            "autowire": false,
+            "autowiring_types": [],
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
-            "factory_method": "get",
-            "autowire": false,
-            "autowiring_types": []
+            "factory_method": "get"
         }
     ]
 }

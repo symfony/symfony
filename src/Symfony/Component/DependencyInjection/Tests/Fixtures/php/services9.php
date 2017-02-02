@@ -314,13 +314,13 @@ class ProjectServiceContainer extends Container
      */
     protected function getLazyContextService()
     {
-        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function() {
+        return $this->services['lazy_context'] = new \LazyContext(new RewindableGenerator(function () {
             yield 0 => 'foo';
             yield 1 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
             yield 2 => array($this->getParameter('foo') => 'foo is '.$this->getParameter('foo').'', 'foobar' => $this->getParameter('foo'));
             yield 3 => true;
             yield 4 => $this;
-        }));
+        }, 5));
     }
 
     /**
@@ -333,11 +333,13 @@ class ProjectServiceContainer extends Container
      */
     protected function getLazyContextIgnoreInvalidRefService()
     {
-        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function() {
+        return $this->services['lazy_context_ignore_invalid_ref'] = new \LazyContext(new RewindableGenerator(function () {
             yield 0 => ${($_ = isset($this->services['foo.baz']) ? $this->services['foo.baz'] : $this->get('foo.baz')) && false ?: '_'};
             if ($this->has('invalid')) {
                 yield 1 => $this->get('invalid', ContainerInterface::NULL_ON_INVALID_REFERENCE);
             }
+        }, function () {
+            return 1 + (int) ($this->has('invalid'));
         }));
     }
 

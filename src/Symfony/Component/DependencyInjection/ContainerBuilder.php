@@ -1002,6 +1002,19 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
 
                     yield $k => $this->resolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($v)));
                 }
+            }, function () use ($value) {
+                $count = 0;
+                foreach ($value->getValues() as $v) {
+                    foreach (self::getServiceConditionals($v) as $s) {
+                        if (!$this->has($s)) {
+                            continue 2;
+                        }
+                    }
+
+                    ++$count;
+                }
+
+                return $count;
             });
         } elseif ($value instanceof ClosureProxyArgument) {
             $parameterBag = $this->getParameterBag();

@@ -1362,8 +1362,28 @@ EOF;
      */
     private function wrapServiceConditionals($value, $code, &$isUnconditional = null, $containerRef = '$this')
     {
-        if ($isUnconditional = !$services = ContainerBuilder::getServiceConditionals($value)) {
+        if ($isUnconditional = !$condition = $this->getServiceConditionals($value, $containerRef)) {
             return $code;
+        }
+
+        // re-indent the wrapped code
+        $code = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $code)));
+
+        return sprintf("        if (%s) {\n%s        }\n", $condition, $code);
+    }
+
+    /**
+     * Get the conditions to execute for conditional services.
+     *
+     * @param string $value
+     * @param string $containerRef
+     *
+     * @return null|string
+     */
+    private function getServiceConditionals($value, $containerRef = '$this')
+    {
+        if (!$services = ContainerBuilder::getServiceConditionals($value)) {
+            return null;
         }
 
         $conditions = array();
@@ -1371,10 +1391,7 @@ EOF;
             $conditions[] = sprintf("%s->has('%s')", $containerRef, $service);
         }
 
-        // re-indent the wrapped code
-        $code = implode("\n", array_map(function ($line) { return $line ? '    '.$line : $line; }, explode("\n", $code)));
-
-        return sprintf("        if (%s) {\n%s        }\n", implode(' && ', $conditions), $code);
+        return implode(' && ', $conditions);
     }
 
     /**
@@ -1524,9 +1541,14 @@ EOF;
 
             return sprintf('array(%s)', implode(', ', $code));
         } elseif ($value instanceof IteratorArgument) {
+            $countCode = array();
+            $countCode[] = 'function () {';
+            $operands = array(0);
+
             $code = array();
-            $code[] = 'new RewindableGenerator(function() {';
+            $code[] = 'new RewindableGenerator(function () {';
             foreach ($value->getValues() as $k => $v) {
+                ($c = $this->getServiceConditionals($v)) ? $operands[] = "(int) ($c)" : ++$operands[0];
                 $v = $this->wrapServiceConditionals($v, sprintf("        yield %s => %s;\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate)));
                 foreach (explode("\n", $v) as $v) {
                     if ($v) {
@@ -1534,7 +1556,11 @@ EOF;
                     }
                 }
             }
-            $code[] = '        })';
+
+            $countCode[] = sprintf('            return %s;', implode(' + ', $operands));
+            $countCode[] = '        }';
+
+            $code[] = sprintf('        }, %s)', count($operands) > 1 ? implode("\n", $countCode) : $operands[0]);
 
             return implode("\n", $code);
         } elseif ($value instanceof Definition) {

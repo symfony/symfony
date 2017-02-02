@@ -12,9 +12,7 @@
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": [
-
-            ],
+            "tags": [],
             "autowire": false,
             "autowiring_types": []
         },
@@ -46,9 +44,7 @@
                 },
                 {
                     "name": "tag2",
-                    "parameters": [
-
-                    ]
+                    "parameters": []
                 }
             ],
             "autowire": false,

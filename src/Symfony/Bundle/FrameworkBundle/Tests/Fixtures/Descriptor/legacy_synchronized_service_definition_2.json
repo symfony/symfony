@@ -26,9 +26,7 @@
     },
     {
       "name": "tag2",
-      "parameters": [
-
-      ]
+      "parameters": []
     }
   ],
   "autowire": false,

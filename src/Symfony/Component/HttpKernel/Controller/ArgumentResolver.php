@@ -29,11 +29,11 @@ final class ArgumentResolver implements ArgumentResolverInterface
     private $argumentMetadataFactory;
 
     /**
-     * @var ArgumentValueResolverInterface[]
+     * @var iterable|ArgumentValueResolverInterface[]
      */
     private $argumentValueResolvers;
 
-    public function __construct(ArgumentMetadataFactoryInterface $argumentMetadataFactory = null, array $argumentValueResolvers = array())
+    public function __construct(ArgumentMetadataFactoryInterface $argumentMetadataFactory = null, $argumentValueResolvers = array())
     {
         $this->argumentMetadataFactory = $argumentMetadataFactory ?: new ArgumentMetadataFactory();
         $this->argumentValueResolvers = $argumentValueResolvers ?: self::getDefaultArgumentValueResolvers();

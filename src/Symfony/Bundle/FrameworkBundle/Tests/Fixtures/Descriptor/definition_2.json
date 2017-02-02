@@ -24,9 +24,7 @@
         },
         {
             "name": "tag2",
-            "parameters": [
-
-            ]
+            "parameters": []
         }
     ],
     "calls": [

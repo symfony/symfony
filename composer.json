@@ -117,6 +117,9 @@
             "**/Tests/"
         ]
     },
+    "autoload-dev": {
+        "files": [ "src/Symfony/Component/VarDumper/Resources/functions/dump.php" ]
+    },
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

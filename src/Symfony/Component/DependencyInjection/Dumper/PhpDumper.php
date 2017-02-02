@@ -64,7 +64,6 @@ class PhpDumper extends Dumper
     private $docStar;
     private $serviceIdToMethodNameMap;
     private $usedMethodNames;
-    private $classResources = array();
     private $baseClass;
     private $getterProxies = array();
     private $useInstantiateProxy;
@@ -127,7 +126,6 @@ class PhpDumper extends Dumper
         $this->salt = substr(strtr(base64_encode(md5($options['namespace'].'\\'.$options['class'].'+'.$options['base_class'], true)), '+/', '__'), 0, -2);
         $this->getterProxies = array();
         $this->useInstantiateProxy = false;
-        $this->classResources = array();
         $this->initializeMethodNamesMap($options['base_class']);
         $this->baseClass = $options['base_class'];
 
@@ -176,16 +174,6 @@ class PhpDumper extends Dumper
         ;
         $this->targetDirRegex = null;
         $this->getterProxies = array();
-
-        foreach ($this->classResources as $r) {
-            $this->container->addClassResource($r);
-        }
-        $this->classResources = array();
-
-        foreach ($this->classResources as $r) {
-            $this->container->addClassResource($r);
-        }
-        $this->classResources = array();
 
         $unusedEnvs = array();
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -508,10 +496,7 @@ class PhpDumper extends Dumper
 
     private function addServiceOverriddenGetters($id, Definition $definition)
     {
-        if (!isset($this->classResources[$class = $definition->getClass()])) {
-            $this->classResources[$class] = new \ReflectionClass($class);
-        }
-        $class = $this->classResources[$class];
+        $class = $this->container->getReflectionClass($definition->getClass());
         if ($class->isFinal()) {
             throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": class "%s" cannot be marked as final.', $id, $class->name));
         }
@@ -864,7 +849,7 @@ EOF;
             $getterProxy = sprintf("%s implements \\%s\n{\n    private \$container%s;\n    private \$getters%3\$s;\n%s}\n", $class, GetterProxyInterface::class, $this->salt, $this->addServiceOverriddenGetters($id, $definition));
             $class = 'SymfonyProxy_'.md5($getterProxy);
             $this->getterProxies[$class] = $getterProxy;
-            $constructor = $this->classResources[$definition->getClass()]->getConstructor();
+            $constructor = $this->container->getReflectionClass($definition->getClass())->getConstructor();
 
             if ($constructor && $constructor->isFinal()) {
                 $this->useInstantiateProxy = true;
@@ -1633,10 +1618,7 @@ EOF;
             if (!method_exists($class, $method)) {
                 throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" does not exist.', $reference, $class, $method));
             }
-            if (!isset($this->classResources[$class])) {
-                $this->classResources[$class] = new \ReflectionClass($class);
-            }
-            $r = $this->classResources[$class]->getMethod($method);
+            $r = $this->container->getReflectionClass($class)->getMethod($method);
             if (!$r->isPublic()) {
                 throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" must be public.', $reference, $class, $method));
             }
@@ -1757,12 +1739,10 @@ EOF;
         $this->serviceIdToMethodNameMap = array();
         $this->usedMethodNames = array();
 
-        try {
-            $reflectionClass = new \ReflectionClass($class);
+        if ($reflectionClass = $this->container->getReflectionClass($class)) {
             foreach ($reflectionClass->getMethods() as $method) {
                 $this->usedMethodNames[strtolower($method->getName())] = true;
             }
-        } catch (\ReflectionException $e) {
         }
     }
 

@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AutowirePass extends AbstractRecursivePass
 {
-    private $reflectionClasses = array();
     private $definedTypes = array();
     private $types;
     private $ambiguousServiceTypes = array();
@@ -34,16 +33,10 @@ class AutowirePass extends AbstractRecursivePass
      */
     public function process(ContainerBuilder $container)
     {
-        $throwingAutoloader = function ($class) { throw new \ReflectionException(sprintf('Class %s does not exist', $class)); };
-        spl_autoload_register($throwingAutoloader);
-
         try {
             parent::process($container);
         } finally {
-            spl_autoload_unregister($throwingAutoloader);
-
             // Free memory and remove circular reference to container
-            $this->reflectionClasses = array();
             $this->definedTypes = array();
             $this->types = null;
             $this->ambiguousServiceTypes = array();
@@ -56,9 +49,13 @@ class AutowirePass extends AbstractRecursivePass
      * @param \ReflectionClass $reflectionClass
      *
      * @return AutowireServiceResource
+     *
+     * @deprecated since version 3.3, to be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.
      */
     public static function createResourceForClass(\ReflectionClass $reflectionClass)
     {
+        @trigger_error('The '.__METHOD__.'() method is deprecated since version 3.3 and will be removed in 4.0. Use ContainerBuilder::getReflectionClass() instead.', E_USER_DEPRECATED);
+
         $metadata = array();
 
         foreach ($reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
@@ -79,12 +76,8 @@ class AutowirePass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
 
-        if (!$reflectionClass = $this->getReflectionClass($isRoot ? $this->currentId : null, $value)) {
+        if (!$reflectionClass = $this->container->getReflectionClass($value->getClass())) {
             return parent::processValue($value, $isRoot);
-        }
-
-        if ($this->container->isTrackingResources()) {
-            $this->container->addResource(static::createResourceForClass($reflectionClass));
         }
 
         $autowiredMethods = $this->getMethodsToAutowire($reflectionClass, $autowiredMethods);
@@ -257,20 +250,9 @@ class AutowirePass extends AbstractRecursivePass
             }
 
             if (isset($this->types[$typeName])) {
-                $arguments[$index] = new Reference($this->types[$typeName]);
+                $value = new Reference($this->types[$typeName]);
                 $didAutowire = true;
-
-                continue;
-            }
-
-            try {
-                $typeHint = new \ReflectionClass($typeName);
-            } catch (\ReflectionException $e) {
-                // Typehint against a non-existing class
-                $typeHint = false;
-            }
-
-            if ($typeHint) {
+            } elseif ($typeHint = $this->container->getReflectionClass($typeName, true)) {
                 try {
                     $value = $this->createAutowiredDefinition($typeHint);
                     $didAutowire = true;
@@ -289,9 +271,11 @@ class AutowirePass extends AbstractRecursivePass
                     }
                 }
             } else {
+                // Typehint against a non-existing class
+
                 if (!$parameter->isDefaultValueAvailable()) {
                     if ($mustAutowire) {
-                        throw new RuntimeException(sprintf('Cannot autowire argument $%s of method %s::%s() for service "%s": %s.', $parameter->name, $reflectionMethod->class, $reflectionMethod->name, $this->currentId, $e->getMessage()), 0, $e);
+                        throw new RuntimeException(sprintf('Cannot autowire argument $%s of method %s::%s() for service "%s": Class %s does not exist.', $parameter->name, $reflectionMethod->class, $reflectionMethod->name, $this->currentId, $typeName));
                     }
 
                     return array();
@@ -344,7 +328,7 @@ class AutowirePass extends AbstractRecursivePass
             $this->types[$type] = $id;
         }
 
-        if (!$reflectionClass = $this->getReflectionClass($id, $definition)) {
+        if (!$reflectionClass = $this->container->getReflectionClass($definition->getClass(), true)) {
             return;
         }
 
@@ -437,40 +421,6 @@ class AutowirePass extends AbstractRecursivePass
         return new Reference($argumentId);
     }
 
-    /**
-     * Retrieves the reflection class associated with the given service.
-     *
-     * @param string|null $id
-     * @param Definition  $definition
-     *
-     * @return \ReflectionClass|false
-     */
-    private function getReflectionClass($id, Definition $definition)
-    {
-        if (null !== $id && isset($this->reflectionClasses[$id])) {
-            return $this->reflectionClasses[$id];
-        }
-
-        // Cannot use reflection if the class isn't set
-        if (!$class = $definition->getClass()) {
-            return false;
-        }
-
-        $class = $this->container->getParameterBag()->resolveValue($class);
-
-        try {
-            $reflector = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
-            $reflector = false;
-        }
-
-        if (null !== $id) {
-            $this->reflectionClasses[$id] = $reflector;
-        }
-
-        return $reflector;
-    }
-
     private function addServiceToAmbiguousType($id, $type)
     {
         // keep an array of all services matching this type
@@ -482,6 +432,9 @@ class AutowirePass extends AbstractRecursivePass
         $this->ambiguousServiceTypes[$type][] = $id;
     }
 
+    /**
+     * @deprecated since version 3.3, to be removed in 4.0.
+     */
     private static function getResourceMetadataForMethod(\ReflectionMethod $method)
     {
         $methodArgumentsMetadata = array();

@@ -323,7 +323,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Overriden_Getters'));
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services29.php', $dump);
         $res = $container->getResources();
-        $this->assertSame(realpath(self::$fixturesPath.'/containers/container29.php'), array_pop($res)->getResource());
+        $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container29\Foo', (string) array_pop($res));
 
         eval('?>'.$dump);
 
@@ -550,7 +550,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services31.php', $dumper->dump());
         $res = $container->getResources();
-        $this->assertSame(realpath(self::$fixturesPath.'/containers/container31.php'), array_pop($res)->getResource());
+        $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container31\Foo', (string) array_pop($res));
     }
 
     /**
@@ -564,7 +564,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertStringEqualsFile(self::$fixturesPath.'/php/services32.php', $dumper->dump());
         $res = $container->getResources();
-        $this->assertSame(realpath(self::$fixturesPath.'/containers/container32.php'), array_pop($res)->getResource());
+        $this->assertSame('reflection.Symfony\Component\DependencyInjection\Tests\Fixtures\Container32\Foo', (string) array_pop($res));
     }
 
     public function testNormalizedId()

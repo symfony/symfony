@@ -103,6 +103,7 @@ class RegisterListenersPass implements CompilerPassInterface
 
                 throw new InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
             }
+            $container->addObjectResource($class);
 
             $r = new \ReflectionClass($class);
             $extractingDispatcher->addSubscriber($r->newInstanceWithoutConstructor());

@@ -25,9 +25,11 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
@@ -246,14 +248,39 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     /**
      * Adds the object class hierarchy as resources.
      *
-     * @param object $object An object instance
+     * @param object|string $object An object instance or class name
      *
      * @return $this
      */
     public function addObjectResource($object)
     {
         if ($this->trackResources) {
-            $this->addClassResource(new \ReflectionClass($object));
+            if (is_object($object)) {
+                $object = get_class($object);
+            }
+            if (!isset($this->classReflectors[$object])) {
+                $this->classReflectors[$object] = new \ReflectionClass($object);
+            }
+            $class = $this->classReflectors[$object];
+
+            foreach ($class->getInterfaceNames() as $name) {
+                if (null === $interface = &$this->classReflectors[$name]) {
+                    $interface = new \ReflectionClass($name);
+                }
+                $file = $interface->getFileName();
+                if (false !== $file && file_exists($file)) {
+                    $this->addResource(new FileResource($file));
+                }
+            }
+            do {
+                $file = $class->getFileName();
+                if (false !== $file && file_exists($file)) {
+                    $this->addResource(new FileResource($file));
+                }
+                foreach ($class->getTraitNames() as $name) {
+                    $this->addObjectResource($name);
+                }
+            } while ($class = $class->getParentClass());
         }
 
         return $this;
@@ -265,20 +292,93 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @param \ReflectionClass $class
      *
      * @return $this
+     *
+     * @deprecated since version 3.3, to be removed in 4.0. Use addObjectResource() or getReflectionClass() instead.
      */
     public function addClassResource(\ReflectionClass $class)
     {
-        if (!$this->trackResources) {
-            return $this;
+        @trigger_error('The '.__METHOD__.'() method is deprecated since version 3.3 and will be removed in 4.0. Use the addObjectResource() or the getReflectionClass() method instead.', E_USER_DEPRECATED);
+
+        return $this->addObjectResource($class->name);
+    }
+
+    /**
+     * Retrieves the requested reflection class and registers it for resource tracking.
+     *
+     * @param string $class
+     * @param bool   $koWithThrowingAutoloader Whether autoload should be protected against bad parents or not
+     *
+     * @return \ReflectionClass|null
+     *
+     * @final
+     */
+    public function getReflectionClass($class, $koWithThrowingAutoloader = false)
+    {
+        if (!$class = $this->getParameterBag()->resolveValue($class)) {
+            return;
+        }
+        $resource = null;
+
+        try {
+            if (isset($this->classReflectors[$class])) {
+                $classReflector = $this->classReflectors[$class];
+            } elseif ($koWithThrowingAutoloader) {
+                $resource = new ClassExistenceResource($class, ClassExistenceResource::EXISTS_KO_WITH_THROWING_AUTOLOADER);
+
+                $classReflector = $resource->isFresh(0) ? false : new \ReflectionClass($class);
+            } else {
+                $classReflector = new \ReflectionClass($class);
+            }
+        } catch (\ReflectionException $e) {
+            $classReflector = false;
         }
 
-        do {
-            if (is_file($class->getFileName())) {
-                $this->addResource(new FileResource($class->getFileName()));
+        if ($this->trackResources) {
+            if (!$classReflector) {
+                $this->addResource($resource ?: new ClassExistenceResource($class, ClassExistenceResource::EXISTS_KO));
+            } elseif (!$classReflector->isInternal()) {
+                $this->addResource(new ReflectionClassResource($classReflector));
             }
-        } while ($class = $class->getParentClass());
+            $this->classReflectors[$class] = $classReflector;
+        }
 
-        return $this;
+        return $classReflector ?: null;
+    }
+
+    /**
+     * Checks whether the requested file or directory exists and registers the result for resource tracking.
+     *
+     * @param string      $path          The file or directory path for which to check the existence
+     * @param bool|string $trackContents Whether to track contents of the given resource. If a string is passed,
+     *                                   it will be used as pattern for tracking contents of the requested directory
+     *
+     * @return bool
+     *
+     * @final
+     */
+    public function fileExists($path, $trackContents = true)
+    {
+        $exists = file_exists($path);
+
+        if (!$this->trackResources) {
+            return $exists;
+        }
+
+        if (!$exists) {
+            $this->addResource(new FileExistenceResource($path));
+
+            return $exists;
+        }
+
+        if ($trackContents) {
+            if (is_file($path)) {
+                $this->addResource(new FileResource($path));
+            } else {
+                $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
+            }
+        }
+
+        return $exists;
     }
 
     /**
@@ -574,8 +674,8 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if (!$definition->isPublic()) {
                 $this->privates[$id] = true;
             }
-            if ($this->trackResources && $definition->isLazy() && ($class = $definition->getClass()) && class_exists($class)) {
-                $this->addClassResource(new \ReflectionClass($class));
+            if ($this->trackResources && $definition->isLazy()) {
+                $this->getReflectionClass($definition->getClass());
             }
         }
 
@@ -1334,42 +1434,6 @@ EOF;
         }
 
         return $services;
-    }
-
-    /**
-     * Checks whether the requested file or directory exists and registers the result for resource tracking.
-     *
-     * @param string      $path          The file or directory path for which to check the existence
-     * @param bool|string $trackContents Whether to track contents of the given resource. If a string is passed,
-     *                                   it will be used as pattern for tracking contents of the requested directory
-     *
-     * @return bool
-     *
-     * @final
-     */
-    public function fileExists($path, $trackContents = true)
-    {
-        $exists = file_exists($path);
-
-        if (!$this->trackResources) {
-            return $exists;
-        }
-
-        if (!$exists) {
-            $this->addResource(new FileExistenceResource($path));
-
-            return $exists;
-        }
-
-        if ($trackContents) {
-            if (is_file($path)) {
-                $this->addResource(new FileResource($path));
-            } else {
-                $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
-            }
-        }
-
-        return $exists;
     }
 
     /**

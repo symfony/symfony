@@ -54,6 +54,11 @@ class LoggingTranslatorPassTest extends \PHPUnit_Framework_TestCase
             ->method('getParameterBag')
             ->will($this->returnValue($parameterBag));
 
+        $container->expects($this->once())
+            ->method('getReflectionClass')
+            ->with('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+            ->will($this->returnValue(new \ReflectionClass('Symfony\Bundle\FrameworkBundle\Translation\Translator')));
+
         $pass = new LoggingTranslatorPass();
         $pass->process($container);
     }

@@ -21,16 +21,27 @@ namespace Symfony\Component\Config\Resource;
  */
 class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializable
 {
+    const EXISTS_OK = 1;
+    const EXISTS_KO = 0;
+    const EXISTS_KO_WITH_THROWING_AUTOLOADER = -1;
+
     private $resource;
-    private $exists;
+    private $existsStatus;
+
+    private static $checkingLevel = 0;
+    private static $throwingAutoloader;
+    private static $existsCache = array();
 
     /**
-     * @param string $resource The fully-qualified class name
+     * @param string   $resource     The fully-qualified class name
+     * @param int|null $existsStatus One of the self::EXISTS_* const if the existency check has already been done
      */
-    public function __construct($resource)
+    public function __construct($resource, $existsStatus = null)
     {
         $this->resource = $resource;
-        $this->exists = class_exists($resource);
+        if (null !== $existsStatus) {
+            $this->existsStatus = (int) $existsStatus;
+        }
     }
 
     /**
@@ -54,7 +65,35 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
      */
     public function isFresh($timestamp)
     {
-        return class_exists($this->resource) === $this->exists;
+        if (null !== $exists = &self::$existsCache[$this->resource]) {
+            $exists = $exists || class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
+        } elseif (self::EXISTS_KO_WITH_THROWING_AUTOLOADER === $this->existsStatus) {
+            if (null === self::$throwingAutoloader) {
+                $signalingException = new \ReflectionException();
+                self::$throwingAutoloader = function () use ($signalingException) { throw $signalingException; };
+            }
+            if (!self::$checkingLevel++) {
+                spl_autoload_register(self::$throwingAutoloader);
+            }
+
+            try {
+                $exists = class_exists($this->resource) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
+            } catch (\ReflectionException $e) {
+                $exists = false;
+            } finally {
+                if (!--self::$checkingLevel) {
+                    spl_autoload_unregister(self::$throwingAutoloader);
+                }
+            }
+        } else {
+            $exists = class_exists($this->resource) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
+        }
+
+        if (null === $this->existsStatus) {
+            $this->existsStatus = $exists ? self::EXISTS_OK : self::EXISTS_KO;
+        }
+
+        return self::EXISTS_OK === $this->existsStatus xor !$exists;
     }
 
     /**
@@ -62,7 +101,11 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
      */
     public function serialize()
     {
-        return serialize(array($this->resource, $this->exists));
+        if (null === $this->existsStatus) {
+            $this->isFresh(0);
+        }
+
+        return serialize(array($this->resource, $this->existsStatus));
     }
 
     /**
@@ -70,6 +113,6 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
      */
     public function unserialize($serialized)
     {
-        list($this->resource, $this->exists) = unserialize($serialized);
+        list($this->resource, $this->existsStatus) = unserialize($serialized);
     }
 }

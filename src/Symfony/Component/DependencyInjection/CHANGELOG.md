@@ -4,6 +4,8 @@ CHANGELOG
 3.3.0
 -----
 
+ * added `ContainerBuilder::getReflectionClass()` for retrieving and tracking reflection class info
+ * deprecated `ContainerBuilder::getClassResource()`, use `ContainerBuilder::getReflectionClass()` or `ContainerBuilder::addObjectResource()` instead
  * added `ContainerBuilder::fileExists()` for checking and tracking file or directory existence
  * deprecated autowiring-types, use aliases instead
  * [EXPERIMENTAL] added support for getter-injection

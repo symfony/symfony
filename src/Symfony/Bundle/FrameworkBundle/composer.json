@@ -22,7 +22,7 @@
         "symfony/dependency-injection": "~3.3",
         "symfony/config": "~3.3",
         "symfony/event-dispatcher": "~3.3",
-        "symfony/http-foundation": "~3.1",
+        "symfony/http-foundation": "~3.3",
         "symfony/http-kernel": "~3.3",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/filesystem": "~2.8|~3.0",

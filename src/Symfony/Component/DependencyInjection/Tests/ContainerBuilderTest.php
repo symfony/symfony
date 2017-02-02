@@ -623,6 +623,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
     }
 
+    /**
+     * @group legacy
+     */
     public function testAddClassResource()
     {
         $container = new ContainerBuilder();
@@ -646,6 +649,32 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(realpath(__DIR__.'/Fixtures/includes/classes.php'), realpath($resource->getResource()));
     }
 
+    public function testGetReflectionClass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->setResourceTracking(false);
+        $r1 = $container->getReflectionClass('BarClass');
+
+        $this->assertEmpty($container->getResources(), 'No resources get registered without resource tracking');
+
+        $container->setResourceTracking(true);
+        $r2 = $container->getReflectionClass('BarClass');
+        $r3 = $container->getReflectionClass('BarClass');
+
+        $this->assertNull($container->getReflectionClass('BarMissingClass'));
+
+        $this->assertEquals($r1, $r2);
+        $this->assertSame($r2, $r3);
+
+        $resources = $container->getResources();
+
+        $this->assertCount(2, $resources, '2 resources were registered');
+
+        $this->assertSame('reflection.BarClass', (string) $resources[0]);
+        $this->assertSame('BarMissingClass', (string) end($resources));
+    }
+
     public function testCompilesClassDefinitionsOfLazyServices()
     {
         $container = new ContainerBuilder();
@@ -657,11 +686,10 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $container->compile();
 
-        $classesPath = realpath(__DIR__.'/Fixtures/includes/classes.php');
         $matchingResources = array_filter(
             $container->getResources(),
-            function (ResourceInterface $resource) use ($classesPath) {
-                return $resource instanceof FileResource && $classesPath === realpath($resource->getResource());
+            function (ResourceInterface $resource) {
+                return 'reflection.BarClass' === (string) $resource;
             }
         );
 
@@ -900,16 +928,13 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $container->compile();
 
-        $class = new \BazClass();
-        $reflectionClass = new \ReflectionClass($class);
-
         $r = new \ReflectionProperty($container, 'resources');
         $r->setAccessible(true);
         $resources = $r->getValue($container);
 
         $classInList = false;
         foreach ($resources as $resource) {
-            if ($resource->getResource() === $reflectionClass->getFileName()) {
+            if ('reflection.BazClass' === (string) $resource) {
                 $classInList = true;
                 break;
             }

@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-29T19:36:05Z
+
+I would not add the `$count` member and always rely on `iterator_count($g())` instead, do I miss the point?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-29T19:41:33Z
+
+@chalasr: calling `iterator_count` would miss the purpose of the lazy collection: instantiate items on need. If we only need to get the number of items in the collection, we do already know that, and don't want to trigger the collection items instantiation.
+
+For instance, in #21450, calling `iterator_count($this->guardAuthenticators)` right before iterating over it would defeat the purpose of your PR.  `iterator_count` will execute the whole generator to get the number of items in there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T20:08:13Z
+
+Wait, we can't! There maybe be conditional "yield", when `IGNORE_ON_INVALID_REFERENCE` is used!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T20:08:46Z
+
+Let's close and tweak the error message instead sorry for the bad suggestion.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-29T20:10:21Z
+
+> There maybe be conditional "yield", when IGNORE_ON_INVALID_REFERENCE is used!
+
+@nicolas-grekas : But this case can be properly handled, right? See https://github.com/ogizanagi/symfony/blob/3dfcbe10ac3aab14922b92afb0818d35cfa8ba8c/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/services9.php#L344
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T20:25:44Z
+
+That's wise :)
+Then I suggest turning $count into int|closure : int when known before hand, closure when conditionals. And compute the count lazily.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-30T08:20:50Z
+
+Ready to review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T09:07:39Z
+
+LGTM 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-31T07:39:38Z
+
+:+1:
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-31T09:49:33Z
+
+👍

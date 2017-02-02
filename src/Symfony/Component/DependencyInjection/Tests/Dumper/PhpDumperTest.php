@@ -344,6 +344,27 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('baz', $r->invoke($baz));
     }
 
+    public function testDumpOverridenGettersWithConstructor()
+    {
+        $container = include self::$fixturesPath.'/containers/container_dump_overriden_getters_with_constructor.php';
+        $container->compile();
+        $container->getDefinition('foo')
+            ->setOverriddenGetter('getInvalid', array(new Reference('bar', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)));
+        $dumper = new PhpDumper($container);
+
+        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Overriden_Getters_With_Constructor'));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_dump_overriden_getters_with_constructor.php', $dump);
+        $resources = array_map('strval', $container->getResources());
+        $this->assertContains(realpath(self::$fixturesPath.'/containers/container_dump_overriden_getters_with_constructor.php'), $resources);
+
+        $baz = $container->get('baz');
+        $r = new \ReflectionMethod($baz, 'getBaz');
+        $r->setAccessible(true);
+
+        $this->assertTrue($r->isProtected());
+        $this->assertSame('baz', $r->invoke($baz));
+    }
+
     /**
      * @dataProvider provideBadOverridenGetters
      * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException

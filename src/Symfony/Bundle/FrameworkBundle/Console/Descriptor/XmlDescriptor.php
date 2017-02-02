@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -427,6 +429,17 @@ class XmlDescriptor extends Descriptor
                 $argumentXML->setAttribute('id', (string) $argument);
             } elseif ($argument instanceof Definition) {
                 $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, true)->childNodes->item(0), true));
+            } elseif ($argument instanceof IteratorArgument) {
+                $argumentXML->setAttribute('type', 'iterator');
+
+                foreach ($this->getArgumentNodes($argument->getValues(), $dom) as $childArgumentXML) {
+                    $argumentXML->appendChild($childArgumentXML);
+                }
+            } elseif ($argument instanceof ClosureProxyArgument) {
+                list($reference, $method) = $argument->getValues();
+                $argumentXML->setAttribute('type', 'closure-proxy');
+                $argumentXML->setAttribute('id', (string) $reference);
+                $argumentXML->setAttribute('method', $method);
             } elseif (is_array($argument)) {
                 $argumentXML->setAttribute('type', 'collection');
 

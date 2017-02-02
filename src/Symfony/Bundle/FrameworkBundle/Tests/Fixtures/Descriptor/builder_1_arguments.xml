@@ -12,6 +12,18 @@
         <argument>arg2</argument>
       </definition>
     </argument>
+    <argument type="collection">
+      <argument>foo</argument>
+      <argument type="service" id="definition2"/>
+      <argument>
+        <definition class="inline_service" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" file=""/>
+      </argument>
+    </argument>
+    <argument type="iterator">
+      <argument type="service" id="definition_1"/>
+      <argument type="service" id="definition_2"/>
+    </argument>
+    <argument type="closure-proxy" id="definition1" method="get"/>
   </definition>
   <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerBuilder"/>
 </container>

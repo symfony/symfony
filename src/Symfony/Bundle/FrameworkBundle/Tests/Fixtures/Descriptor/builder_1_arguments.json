@@ -34,7 +34,43 @@
                     ],
                     "file": null,
                     "tags": []
-                }
+                },
+                [
+                    "foo",
+                    {
+                        "type": "service",
+                        "id": "definition2"
+                    },
+                    {
+                        "class": "inline_service",
+                        "public": true,
+                        "synthetic": false,
+                        "lazy": false,
+                        "shared": true,
+                        "abstract": false,
+                        "autowire": false,
+                        "arguments": [],
+                        "file": null,
+                        "tags": []
+                    }
+                ],
+                [
+                    {
+                        "type": "service",
+                        "id": "definition_1"
+                    },
+                    {
+                        "type": "service",
+                        "id": "definition_2"
+                    }
+                ],
+                [
+                    {
+                        "type": "service",
+                        "id": "definition1"
+                    },
+                    "get"
+                ]
             ]
         }
     },

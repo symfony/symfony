@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -32,6 +33,6 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('argument_resolver');
         $argumentResolvers = $this->findAndSortTaggedServices('controller.argument_value_resolver', $container);
-        $definition->replaceArgument(1, $argumentResolvers);
+        $definition->replaceArgument(1, new IteratorArgument($argumentResolvers));
     }
 }

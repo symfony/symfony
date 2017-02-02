@@ -28,8 +28,8 @@ class WebServerConfig
             throw new \InvalidArgumentException(sprintf('The document root directory "%s" does not exist.', $documentRoot));
         }
 
-        if (null === $file = $this->guessFrontController($documentRoot, $env)) {
-            throw new \InvalidArgumentException(sprintf('Unable to guess the front controller under "%s".', $documentRoot));
+        if (null === $file = $this->findFrontController($documentRoot, $env)) {
+            throw new \InvalidArgumentException(sprintf('Unable to find the front controller under "%s" (none of these files exist: %s).', $documentRoot, implode(', ', $this->getFrontControllerFileNames($env))));
         }
 
         putenv('APP_FRONT_CONTROLLER='.$file);
@@ -87,19 +87,20 @@ class WebServerConfig
         return $this->hostname.':'.$this->port;
     }
 
-    private function guessFrontController($documentRoot, $env)
+    private function findFrontController($documentRoot, $env)
     {
-        foreach (array('app', 'index') as $prefix) {
-            $file = sprintf('%s_%s.php', $prefix, $env);
-            if (file_exists($documentRoot.'/'.$file)) {
-                return $file;
-            }
+        $fileNames = $this->getFrontControllerFileNames($env);
 
-            $file = sprintf('%s.php', $prefix);
-            if (file_exists($documentRoot.'/'.$file)) {
-                return $file;
+        foreach ($fileNames as $fileName) {
+            if (file_exists($documentRoot.'/'.$fileName)) {
+                return $fileName;
             }
         }
+    }
+
+    private function getFrontControllerFileNames($env)
+    {
+        return array('app_'.$env.'.php', 'app.php', 'index_'.$env.'.php', 'index.php');
     }
 
     private function findBestPort()

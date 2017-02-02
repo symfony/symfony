@@ -27,7 +27,7 @@ class DirectoryLoader extends FileLoader
     {
         $file = rtrim($file, '/');
         $path = $this->locator->locate($file);
-        $this->container->addResource(new DirectoryResource($path));
+        $this->container->fileExists($path, false);
 
         foreach (scandir($path) as $dir) {
             if ('.' !== $dir[0]) {

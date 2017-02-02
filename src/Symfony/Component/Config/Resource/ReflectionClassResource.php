@@ -19,12 +19,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
     private $files = array();
     private $className;
     private $classReflector;
+    private $excludedVendors = array();
     private $hash;
 
-    public function __construct(\ReflectionClass $classReflector)
+    public function __construct(\ReflectionClass $classReflector, $excludedVendors = array())
     {
         $this->className = $classReflector->name;
         $this->classReflector = $classReflector;
+        $this->excludedVendors = $excludedVendors;
     }
 
     public function isFresh($timestamp)
@@ -75,7 +77,15 @@ class ReflectionClassResource implements SelfCheckingResourceInterface, \Seriali
         do {
             $file = $class->getFileName();
             if (false !== $file && file_exists($file)) {
-                $this->files[$file] = null;
+                foreach ($this->excludedVendors as $vendor) {
+                    if (0 === strpos($file, $vendor) && false !== strpbrk(substr($file, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+                        $file = false;
+                        break;
+                    }
+                }
+                if ($file) {
+                    $this->files[$file] = null;
+                }
             }
             foreach ($class->getTraits() as $v) {
                 $this->loadFiles($v);

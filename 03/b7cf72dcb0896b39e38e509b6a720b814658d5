@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-26T15:33:15Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-28T10:36:15Z
+
+`addObjectResource` and `ReflectionClassResource` now track mtimes of parents, traits and interfaces.
+
+Hash computation, file and class existence is now done lazily - ie after the resources are deduplicated.
+
+And to prevent checking the hash again when it was found valid in a previous run, files are "touched" when needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-30T23:17:25Z
+
+Rebased
+ping @stof :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T18:36:17Z
+
+@stof comments addressed

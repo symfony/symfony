@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T15:27:24Z
+
+what about doing escaping ourselves instead?
+`return "'".str_replace(array('\\', "'"), array('\\\\', "\\'"), $argument)."'";`
+can you try it? does it work?
+if yes, can you pelase update your PR and add a test case?
+
+---------------------------------------------------------------------------
+
+by GuillaumeVerdon at 2017-02-01T21:29:03Z
+
+I edited the current test case and the logic for Linux, as I don't know how the function is working on windows I didn't patch it.
+
+ProcessUtilsTest.php is passing on my environment
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T21:36:19Z
+
+:+1: (to be merged on 2.7, Windows is unaffected)

@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-25T18:02:57Z
+
+According to https://github.com/symfony/symfony/pull/20189#issuecomment-263077473, it seems the `DirectoryExistenceResource` implementation should allow to detect new files in the directory. Not only check if the dir exists (which already worked with the `FileExistenceResource` but here you ensure it's a dir).
+
+---------------------------------------------------------------------------
+
+by stof at 2017-01-25T18:05:34Z
+
+@ogizanagi no. If you need to detect the addition of new files inside a directory, you must use DirectoryResource. This is exactly what it does.
+
+And IIRC, we used FileExistenceResource to account for cases checking for directory existence in the past (the only case where it would fail is if you replace a file with a directory with the same name, but this is weird)
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-25T18:12:01Z
+
+@stof : You're right. Thanks for the head up. I misinterpreted @fabpot comment and didn't even realized I was talking about the existing `DirectoryResource` implementation... -.-'
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-25T18:26:45Z
+
+> And IIRC, we used FileExistenceResource to account for cases checking for directory existence in the past (the only case where it would fail is if you replace a file with a directory with the same name, but this is weird)
+
+@stof Sure, FileExistenceResource would work except for the edge case you mentioned. IMHO the distinction is not bad to have, but I'll revert if you think it's not worth it.
+
+Btw, I updated the places you're talking about for make them use `DirectoryExistenceResource` instead.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-25T20:54:51Z
+
+Comments addressed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T15:16:46Z
+
+Note that this PR might be superseded by #21452
+So maybe better to submit a PR on my fork if you see anything missing there?
+Or keep here only the parts that are not already covered in #21452?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-29T15:21:01Z
+
+> Or keep here only the parts that are not already covered in #21452?
+
+Let's do it this way if you're ok, I think both deserve their own line in the changelog.
+I'll revert all about class/interface existence made here.
+Thanks for the heads up.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T18:52:22Z
+
+In fact, in the spirit of #21452, I think we should add a "fileExists" method on the container.
+
+Its signature would be: `public function fileExists($path, $trackContents = true)`
+
+and `$trackContents` should be a `bool|string`: `bool` for enabling/disabling content tracking, and `string` to feed the `$pattern` argument of `DirectoryResource`.
+
+Would you like to give this a try in this PR? I think all your local fixes would never happen with such a method. WDYT?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-29T18:55:18Z
+
+Sounds good 👍  I tell you when I'm done
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T10:43:06Z
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T11:02:03Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-30T12:49:36Z
+
+@nicolas-grekas Updated TwigExtension and DoctrineValidationPass, other places do not seem relevant (either they are about `RouteCollection::addResource()`  or do not look for the resource existence).
+
+Status: needs review

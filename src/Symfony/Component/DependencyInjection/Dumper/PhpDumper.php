@@ -525,9 +525,9 @@ class PhpDumper extends Dumper
             }
             if (!$r->isFinal()) {
                 if (0 < $r->getNumberOfParameters()) {
-                    $getters = implode('($container'.$this->salt.', ', explode('(', $this->generateSignature($r), 2));
+                    $getters = implode('__construct($container'.$this->salt.', ', explode('(', $this->generateSignature($r), 2));
                 } else {
-                    $getters = '($container'.$this->salt.')';
+                    $getters = '__construct($container'.$this->salt.')';
                 }
                 $getters = sprintf("\n    public function %s\n    {\n        \$this->container%3\$s = \$container%3\$s;\n        parent::%s;\n    }\n", $getters, $this->generateCall($r), $this->salt);
             } else {

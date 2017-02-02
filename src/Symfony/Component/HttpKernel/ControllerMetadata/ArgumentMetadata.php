@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpKernel\ControllerMetadata;
  *
  * @author Iltar van der Berg <kjarli@gmail.com>
  */
-class ArgumentMetadata
+class ArgumentMetadata implements \Serializable
 {
     private $name;
     private $type;
@@ -111,5 +111,21 @@ class ArgumentMetadata
         }
 
         return $this->defaultValue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize(array($this->name, $this->type, $this->isVariadic, $this->hasDefaultValue, $this->defaultValue));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list($this->name, $this->type, $this->isVariadic, $this->hasDefaultValue, $this->defaultValue) = unserialize($serialized);
     }
 }

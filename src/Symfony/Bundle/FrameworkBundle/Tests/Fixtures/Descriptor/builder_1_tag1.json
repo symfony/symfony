@@ -26,9 +26,7 @@
                 },
                 {
                     "name": "tag2",
-                    "parameters": [
-
-                    ]
+                    "parameters": []
                 }
             ],
             "calls": [
@@ -37,10 +35,6 @@
             "autowire": false
         }
     },
-    "aliases": [
-
-    ],
-    "services": [
-
-    ]
+    "aliases": [],
+    "services": []
 }

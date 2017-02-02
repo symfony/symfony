@@ -10,9 +10,7 @@
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": [
-
-            ],
+            "tags": [],
             "autowire": false
         },
         "definition_2": {
@@ -41,9 +39,7 @@
                 },
                 {
                     "name": "tag2",
-                    "parameters": [
-
-                    ]
+                    "parameters": []
                 }
             ],
             "calls": [

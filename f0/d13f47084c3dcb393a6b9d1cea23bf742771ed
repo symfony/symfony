@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-27T08:22:36Z
+
+Taking it strictly the current behaviour is not wing as the `TableCell` constructor documents that it expects a string. In the other hand does this change not do any harm. So +0 from me on the proposed change.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-01-27T08:42:57Z
+
+Looks like a feature to me, it is the expected behavior on 2.7.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-29T19:59:01Z
+
+:+1: on 2.7, minor tweak to me
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-30T02:49:37Z
+
+I would only cast for ints then.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-03T19:18:41Z
+
+@jaydiablo Can you make the change @fabpot asked for? :)
+
+---------------------------------------------------------------------------
+
+by jaydiablo at 2017-02-03T20:15:25Z
+
+Sure, what about other numeric values that aren't ints?  Like a float.
+
+Should we wrap the cast in something like:
+
+```php
+if (is_numeric($value) && !is_string($value)) {
+```
+
+?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-03T20:22:32Z
+
+My point was that I don't want to have a cast to a string for objects for instance.

@@ -7,14 +7,14 @@
             "lazy": false,
             "shared": true,
             "abstract": false,
+            "autowire": false,
+            "autowiring_types": [],
             "file": "\/path\/to\/file",
-            "calls": [
-                "setMailer"
-            ],
             "factory_service": "factory.service",
             "factory_method": "get",
-            "autowire": false,
-            "autowiring_types": []
+            "calls": [
+                "setMailer"
+            ]
         }
     ],
     "tag2": [
@@ -25,14 +25,14 @@
             "lazy": false,
             "shared": true,
             "abstract": false,
+            "autowire": false,
+            "autowiring_types": [],
             "file": "\/path\/to\/file",
-            "calls": [
-                "setMailer"
-            ],
             "factory_service": "factory.service",
             "factory_method": "get",
-            "autowire": false,
-            "autowiring_types": []
+            "calls": [
+                "setMailer"
+            ]
         }
     ]
 }

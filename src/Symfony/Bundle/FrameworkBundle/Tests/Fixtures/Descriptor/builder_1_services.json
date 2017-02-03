@@ -9,12 +9,12 @@
             "shared": true,
             "synchronized": false,
             "abstract": true,
+            "autowire": false,
+            "autowiring_types": [],
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": [],
-            "autowire": false,
-            "autowiring_types": []
+            "tags": []
         },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
@@ -25,6 +25,8 @@
             "shared": true,
             "synchronized": false,
             "abstract": false,
+            "autowire": false,
+            "autowiring_types": [],
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
@@ -46,9 +48,7 @@
                     "name": "tag2",
                     "parameters": []
                 }
-            ],
-            "autowire": false,
-            "autowiring_types": []
+            ]
         }
     },
     "aliases": {

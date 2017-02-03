@@ -47,11 +47,32 @@ interface StyleInterface
     public function text($message);
 
     /**
+     * Formats an info result bar.
+     *
+     * @param string|array $message
+     */
+    public function info($message);
+
+    /**
+     * Formats an info result line.
+     *
+     * @param string|array $message
+     */
+    public function infoLine($message);
+
+    /**
      * Formats a success result bar.
      *
      * @param string|array $message
      */
     public function success($message);
+
+    /**
+     * Formats a success result line.
+     *
+     * @param string|array $message
+     */
+    public function successLine($message);
 
     /**
      * Formats an error result bar.
@@ -61,11 +82,25 @@ interface StyleInterface
     public function error($message);
 
     /**
+     * Formats an error result line.
+     *
+     * @param string|array $message
+     */
+    public function errorLine($message);
+
+    /**
      * Formats an warning result bar.
      *
      * @param string|array $message
      */
     public function warning($message);
+
+    /**
+     * Formats an warning result line.
+     *
+     * @param string|array $message
+     */
+    public function warningLine($message);
 
     /**
      * Formats a note admonition.
@@ -80,6 +115,13 @@ interface StyleInterface
      * @param string|array $message
      */
     public function caution($message);
+
+    /**
+     * Formats a caution admonition line.
+     *
+     * @param string|array $message
+     */
+    public function cautionLine($message);
 
     /**
      * Formats a table.

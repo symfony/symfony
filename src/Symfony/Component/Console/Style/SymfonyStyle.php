@@ -151,6 +151,14 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
+    public function successLine($message)
+    {
+        $this->block($message, 'OK', 'fg=green', ' ');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function error($message)
     {
         $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true);
@@ -159,9 +167,25 @@ class SymfonyStyle extends OutputStyle
     /**
      * {@inheritdoc}
      */
+    public function errorLine($message)
+    {
+        $this->block($message, 'ERROR', 'fg=red', ' ');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function warning($message)
     {
         $this->block($message, 'WARNING', 'fg=white;bg=red', ' ', true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function warningLine($message)
+    {
+        $this->block($message, 'WARNING', 'fg=red', ' ');
     }
 
     /**
@@ -178,6 +202,27 @@ class SymfonyStyle extends OutputStyle
     public function caution($message)
     {
         $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function cautionLine($message)
+    {
+        $this->block($message, 'CAUTION', 'fg=red', ' ! ');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function info($message)
+    {
+        $this->block($message, 'INFO', 'fg=white;bg=blue', ' ', true);
+    }
+
+    public function infoLine($message)
+    {
+        $this->block($message, 'INFO', 'fg=blue', ' ');
     }
 
     /**

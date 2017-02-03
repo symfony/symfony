@@ -103,6 +103,26 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         $def->setLazy($parentDef->isLazy());
         $def->setAutowiredCalls($parentDef->getAutowiredCalls());
 
+        self::mergeDefinition($def, $definition);
+
+        // merge autowiring types
+        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
+            $def->addAutowiringType($autowiringType);
+        }
+
+        // these attributes are always taken from the child
+        $def->setAbstract($definition->isAbstract());
+        $def->setShared($definition->isShared());
+        $def->setTags($definition->getTags());
+
+        return $def;
+    }
+
+    /**
+     * @internal
+     */
+    public static function mergeDefinition(Definition $def, ChildDefinition $definition)
+    {
         // overwrite with values specified in the decorator
         $changes = $definition->getChanges();
         if (isset($changes['class'])) {
@@ -168,26 +188,5 @@ class ResolveDefinitionTemplatesPass extends AbstractRecursivePass
         foreach ($definition->getOverriddenGetters() as $k => $v) {
             $def->setOverriddenGetter($k, $v);
         }
-
-        // merge autowiring types
-        foreach ($definition->getAutowiringTypes(false) as $autowiringType) {
-            $def->addAutowiringType($autowiringType);
-        }
-
-        // these attributes are always taken from the child
-        $def->setAbstract($definition->isAbstract());
-        $def->setShared($definition->isShared());
-        $def->setTags($definition->getTags());
-
-        // append parent tags when inheriting is enabled
-        if ($definition->getInheritTags()) {
-            foreach ($parentDef->getTags() as $k => $v) {
-                foreach ($v as $v) {
-                    $def->addTag($k, $v);
-                }
-            }
-        }
-
-        return $def;
     }
 }

@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-03T10:35:43Z
+
+should we add LoggerInterface also? or do we consider it should be done on monolog bundle?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-03T11:04:33Z
+
+> do we consider it should be done on monolog bundle?
+
+Not sure but I would say yes so each bundle is responsible for supporting autowiring for its services

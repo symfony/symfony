@@ -17,6 +17,9 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Generator\Dumper\PhpGeneratorDumper;
 use Symfony\Component\Routing\RequestContext;
 
+/**
+ * @runTestsInSeparateProcesses
+ */
 class PhpGeneratorDumperTest extends \PHPUnit_Framework_TestCase
 {
     /**

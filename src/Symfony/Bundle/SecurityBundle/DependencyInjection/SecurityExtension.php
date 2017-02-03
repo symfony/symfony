@@ -113,7 +113,6 @@ class SecurityExtension extends Extension
                 'Symfony\Component\Security\Core\Authorization\AuthorizationChecker',
                 'Symfony\Component\Security\Core\Authorization\Voter\VoterInterface',
                 'Symfony\Bundle\SecurityBundle\Security\FirewallConfig',
-                'Symfony\Bundle\SecurityBundle\Security\FirewallMap',
                 'Symfony\Bundle\SecurityBundle\Security\FirewallContext',
                 'Symfony\Component\HttpFoundation\RequestMatcher',
             ));

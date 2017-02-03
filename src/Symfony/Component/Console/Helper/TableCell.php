@@ -35,7 +35,11 @@ class TableCell
      */
     public function __construct($value = '', array $options = array())
     {
-        $this->value = (string) $value;
+        if (is_numeric($value) && !is_string($value)) {
+            $value = (string) $value;
+        }
+
+        $this->value = $value;
 
         // check option names
         if ($diff = array_diff(array_keys($options), array_keys($this->options))) {

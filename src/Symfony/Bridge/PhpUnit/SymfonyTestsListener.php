@@ -82,7 +82,6 @@ class SymfonyTestsListener extends \PHPUnit_Framework_BaseTestListener
         $this->testsWithWarnings = array();
 
         if (-1 === $this->state) {
-            echo "Testing $suiteName\n";
             $this->state = 0;
 
             if (!class_exists('Doctrine\Common\Annotations\AnnotationRegistry', false) && class_exists('Doctrine\Common\Annotations\AnnotationRegistry')) {

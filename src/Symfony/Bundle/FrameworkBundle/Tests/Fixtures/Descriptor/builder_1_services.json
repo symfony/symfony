@@ -7,11 +7,11 @@
             "lazy": true,
             "shared": true,
             "abstract": true,
+            "autowire": false,
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": [],
-            "autowire": false
+            "tags": []
         },
         "definition_2": {
             "class": "Full\\Qualified\\Class2",
@@ -20,9 +20,13 @@
             "lazy": false,
             "shared": true,
             "abstract": false,
+            "autowire": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
+            "calls": [
+                "setMailer"
+            ],
             "tags": [
                 {
                     "name": "tag1",
@@ -41,11 +45,7 @@
                     "name": "tag2",
                     "parameters": []
                 }
-            ],
-            "calls": [
-                "setMailer"
-            ],
-            "autowire": false
+            ]
         }
     },
     "aliases": {

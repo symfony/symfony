@@ -7,11 +7,11 @@
             "lazy": true,
             "shared": true,
             "abstract": true,
+            "autowire": false,
             "file": null,
             "factory_class": "Full\\Qualified\\FactoryClass",
             "factory_method": "get",
-            "tags": [],
-            "autowire": false
+            "tags": []
         }
     },
     "aliases": {

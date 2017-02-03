@@ -7,9 +7,13 @@
             "lazy": false,
             "shared": true,
             "abstract": false,
+            "autowire": false,
             "file": "\/path\/to\/file",
             "factory_service": "factory.service",
             "factory_method": "get",
+            "calls": [
+                "setMailer"
+            ],
             "tags": [
                 {
                     "name": "tag1",
@@ -28,11 +32,7 @@
                     "name": "tag2",
                     "parameters": []
                 }
-            ],
-            "calls": [
-                "setMailer"
-            ],
-            "autowire": false
+            ]
         }
     },
     "aliases": [],

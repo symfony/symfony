@@ -40,7 +40,7 @@
         "symfony/css-selector": "~2.8|~3.0",
         "symfony/dom-crawler": "~2.8|~3.0",
         "symfony/polyfill-intl-icu": "~1.0",
-        "symfony/security": "~3.3",
+        "symfony/security": "~2.8|~3.0",
         "symfony/form": "~2.8.16|~3.1.9|^3.2.2",
         "symfony/expression-language": "~2.8|~3.0",
         "symfony/process": "~2.8|~3.0",
@@ -55,8 +55,7 @@
         "doctrine/annotations": "~1.0",
         "phpdocumentor/reflection-docblock": "^3.0",
         "twig/twig": "~1.26|~2.0",
-        "sensio/framework-extra-bundle": "^3.0.2",
-        "symfony/security-bundle": "~3.3"
+        "sensio/framework-extra-bundle": "^3.0.2"
     },
     "conflict": {
         "phpdocumentor/reflection-docblock": "<3.0",

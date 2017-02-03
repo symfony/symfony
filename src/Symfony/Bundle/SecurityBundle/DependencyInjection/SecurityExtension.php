@@ -69,6 +69,11 @@ class SecurityExtension extends Extension
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $loader->load('security_debug.xml');
+
+            if ($container->hasDefinition('security.access.decision_manager') && $container->hasDefinition('debug.security.access.decision_manager')) {
+                $container->getDefinition('security.access.decision_manager')->setAutowiringTypes(array());
+                $container->getDefinition('debug.security.access.decision_manager')->setAutowiringTypes(array('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface'));
+            }
         }
 
         if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {

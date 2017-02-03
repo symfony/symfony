@@ -29,7 +29,7 @@ class PreloadListenerTest extends \PHPUnit_Framework_TestCase
         $manager->addResource('/foo');
 
         $subscriber = new PreloadListener($manager);
-        $response = new Response();
+        $response = new Response('', 200, array('Link' => '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"'));
 
         $event = $this->getMockBuilder(FilterResponseEvent::class)->disableOriginalConstructor()->getMock();
         $event->method('isMasterRequest')->willReturn(true);
@@ -38,7 +38,13 @@ class PreloadListenerTest extends \PHPUnit_Framework_TestCase
         $subscriber->onKernelResponse($event);
 
         $this->assertInstanceOf(EventSubscriberInterface::class, $subscriber);
-        $this->assertEquals('</foo>; rel=preload', $response->headers->get('Link'));
+
+        $expected = array(
+            '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"',
+            '</foo>; rel=preload',
+        );
+
+        $this->assertEquals($expected, $response->headers->get('Link', null, false));
         $this->assertNull($manager->buildLinkValue());
     }
 

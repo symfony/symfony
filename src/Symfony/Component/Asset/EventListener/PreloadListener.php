@@ -12,6 +12,7 @@
 namespace Symfony\Component\Asset\EventListener;
 
 use Symfony\Component\Asset\Preload\PreloadManager;
+use Symfony\Component\Asset\Preload\PreloadManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -25,7 +26,7 @@ class PreloadListener implements EventSubscriberInterface
 {
     private $preloadManager;
 
-    public function __construct(PreloadManager $preloadManager)
+    public function __construct(PreloadManagerInterface $preloadManager)
     {
         $this->preloadManager = $preloadManager;
     }
@@ -37,7 +38,7 @@ class PreloadListener implements EventSubscriberInterface
         }
 
         if ($value = $this->preloadManager->buildLinkValue()) {
-            $event->getResponse()->headers->set('Link', $value);
+            $event->getResponse()->headers->set('Link', $value, false);
 
             // Free memory
             $this->preloadManager->clear();

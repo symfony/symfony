@@ -129,16 +129,17 @@ class Process
     /**
      * Constructor.
      *
-     * @param string         $commandline The command line to run
-     * @param string|null    $cwd         The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env         The environment variables or null to use the same environment as the current PHP process
-     * @param string|null    $input       The input
-     * @param int|float|null $timeout     The timeout in seconds or null to disable
-     * @param array          $options     An array of options for proc_open
+     * @param string         $commandline                 The command line to run
+     * @param string|null    $cwd                         The working directory or null to use the working dir of the current PHP process
+     * @param array|null     $env                         The environment variables or null to use the same environment as the current PHP process
+     * @param string|null    $input                       The input
+     * @param int|float|null $timeout                     The timeout in seconds or null to disable
+     * @param array          $options                     An array of options for proc_open
+     * @param bool           $enhanceWindowsCompatibility Enhance windows compatibility
      *
      * @throws RuntimeException When proc_open is not installed
      */
-    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array())
+    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 60, array $options = array(), $enhanceWindowsCompatibility = true)
     {
         if (!function_exists('proc_open')) {
             throw new RuntimeException('The Process class relies on proc_open, which is not available on your PHP installation.');
@@ -162,7 +163,7 @@ class Process
         $this->setTimeout($timeout);
         $this->useFileHandles = '\\' === DIRECTORY_SEPARATOR;
         $this->pty = false;
-        $this->enhanceWindowsCompatibility = true;
+        $this->enhanceWindowsCompatibility = $enhanceWindowsCompatibility;
         $this->enhanceSigchildCompatibility = '\\' !== DIRECTORY_SEPARATOR && $this->isSigchildEnabled();
         $this->options = array_replace(array('suppress_errors' => true, 'binary_pipes' => true), $options);
     }

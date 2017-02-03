@@ -14,8 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\CachedReader;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
-use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Templating\EngineInterface as ComponentEngineInterface;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
@@ -64,21 +62,6 @@ class AutowiringTypesTest extends WebTestCase
 
         $autowiredServices = $container->get('test.autowiring_types.autowired_services');
         $this->assertInstanceOf(TraceableEventDispatcher::class, $autowiredServices->getDispatcher(), 'The debug.event_dispatcher service should be injected if the debug is enabled');
-    }
-
-    public function testAccessDecisionManagerAutowiring()
-    {
-        static::bootKernel(array('debug' => false));
-        $container = static::$kernel->getContainer();
-
-        $autowiredServices = $container->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(AccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The security.access.decision_manager service should be injected in debug mode');
-
-        static::bootKernel(array('debug' => true));
-        $container = static::$kernel->getContainer();
-
-        $autowiredServices = $container->get('test.autowiring_types.autowired_services');
-        $this->assertInstanceOf(TraceableAccessDecisionManager::class, $autowiredServices->getAccessDecisionManager(), 'The debug.security.access.decision_manager service should be injected in non-debug mode');
     }
 
     public function testCacheAutowiring()

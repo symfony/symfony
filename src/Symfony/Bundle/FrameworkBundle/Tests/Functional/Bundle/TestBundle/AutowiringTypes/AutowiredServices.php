@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Auto
 use Doctrine\Common\Annotations\Reader;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as FrameworkBundleEngineInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -24,16 +23,14 @@ class AutowiredServices
     private $frameworkBundleEngine;
     private $engine;
     private $dispatcher;
-    private $accessDecisionManager;
     private $cachePool;
 
-    public function __construct(Reader $annotationReader = null, FrameworkBundleEngineInterface $frameworkBundleEngine, EngineInterface $engine, EventDispatcherInterface $dispatcher, AccessDecisionManagerInterface $accessDecisionManager, CacheItemPoolInterface $cachePool)
+    public function __construct(Reader $annotationReader = null, FrameworkBundleEngineInterface $frameworkBundleEngine, EngineInterface $engine, EventDispatcherInterface $dispatcher, CacheItemPoolInterface $cachePool)
     {
         $this->annotationReader = $annotationReader;
         $this->frameworkBundleEngine = $frameworkBundleEngine;
         $this->engine = $engine;
         $this->dispatcher = $dispatcher;
-        $this->accessDecisionManager = $accessDecisionManager;
         $this->cachePool = $cachePool;
     }
 
@@ -55,11 +52,6 @@ class AutowiredServices
     public function getDispatcher()
     {
         return $this->dispatcher;
-    }
-
-    public function getAccessDecisionManager()
-    {
-        return $this->accessDecisionManager;
     }
 
     public function getCachePool()

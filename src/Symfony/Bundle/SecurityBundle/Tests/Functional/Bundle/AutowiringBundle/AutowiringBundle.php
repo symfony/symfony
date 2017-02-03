@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+namespace Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AutowiringBundle;
 
-return array(
-    new FrameworkBundle(),
-    new TestBundle(),
-);
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class AutowiringBundle extends Bundle
+{
+}

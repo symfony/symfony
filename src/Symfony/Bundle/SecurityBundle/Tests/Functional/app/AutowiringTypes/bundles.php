@@ -9,10 +9,8 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-
 return array(
-    new FrameworkBundle(),
-    new TestBundle(),
+    new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+    new Symfony\Bundle\SecurityBundle\SecurityBundle(),
+    new Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\AutowiringBundle\AutowiringBundle(),
 );

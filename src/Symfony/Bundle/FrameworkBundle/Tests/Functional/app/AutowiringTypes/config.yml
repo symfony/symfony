@@ -8,3 +8,10 @@ services:
 framework:
     templating:
         engines: ['php']
+security:
+    providers:
+        dummy:
+            memory: ~
+    firewalls:
+        dummy:
+            security: false

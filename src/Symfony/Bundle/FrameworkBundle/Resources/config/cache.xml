@@ -105,6 +105,7 @@
 
         <service id="cache.global_clearer" parent="cache.default_clearer" />
         <service id="cache.app_clearer" alias="cache.default_clearer" />
+        <service id="Psr\Cache\CacheItemPoolInterface" alias="cache.app" public="false" />
 
     </services>
 </container>

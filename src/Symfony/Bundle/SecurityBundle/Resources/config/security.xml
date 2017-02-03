@@ -67,6 +67,7 @@
         <service id="security.access.decision_manager" class="Symfony\Component\Security\Core\Authorization\AccessDecisionManager" public="false">
             <argument type="collection" />
         </service>
+        <service id="Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface" alias="security.access.decision_manager" public="false" />
 
         <service id="security.role_hierarchy" class="Symfony\Component\Security\Core\Role\RoleHierarchy" public="false">
             <argument>%security.role_hierarchy.roles%</argument>

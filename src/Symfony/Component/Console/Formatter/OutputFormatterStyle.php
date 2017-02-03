@@ -21,25 +21,25 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 class OutputFormatterStyle implements OutputFormatterStyleInterface
 {
     private static $availableForegroundColors = array(
-        'black' => array('set' => 30, 'unset' => 39),
+        'white' => array('set' => 30, 'unset' => 39),
         'red' => array('set' => 31, 'unset' => 39),
         'green' => array('set' => 32, 'unset' => 39),
         'yellow' => array('set' => 33, 'unset' => 39),
         'blue' => array('set' => 34, 'unset' => 39),
         'magenta' => array('set' => 35, 'unset' => 39),
         'cyan' => array('set' => 36, 'unset' => 39),
-        'white' => array('set' => 37, 'unset' => 39),
+        'black' => array('set' => 37, 'unset' => 39),
         'default' => array('set' => 39, 'unset' => 39),
     );
     private static $availableBackgroundColors = array(
-        'black' => array('set' => 40, 'unset' => 49),
+        'white' => array('set' => 40, 'unset' => 49),
         'red' => array('set' => 41, 'unset' => 49),
         'green' => array('set' => 42, 'unset' => 49),
         'yellow' => array('set' => 43, 'unset' => 49),
         'blue' => array('set' => 44, 'unset' => 49),
         'magenta' => array('set' => 45, 'unset' => 49),
         'cyan' => array('set' => 46, 'unset' => 49),
-        'white' => array('set' => 47, 'unset' => 49),
+        'black' => array('set' => 47, 'unset' => 49),
         'default' => array('set' => 49, 'unset' => 49),
     );
     private static $availableOptions = array(

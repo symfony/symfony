@@ -283,6 +283,21 @@ class YamlFileLoader extends FileLoader
         return $defaults;
     }
 
+    private function isUnderscoredParamValid($content, $name, $file)
+    {
+        if (!isset($content['services'][$name])) {
+            return false;
+        }
+
+        if (!is_array($underscoreParam = $content['services'][$name])) {
+            throw new InvalidArgumentException(sprintf('Service "%s" key must be an array, "%s" given in "%s".', $name, gettype($underscoreParam), $file));
+        }
+
+        // @deprecated condition, to be removed in 4.0
+
+        return !isset($underscoreParam['alias']) && !isset($underscoreParam['class']) && !isset($underscoreParam['factory']);
+    }
+
     /**
      * @param array $service
      *

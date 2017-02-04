@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-27T18:09:07Z
+
+But what is the expected value for the omitted parts of the date?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-27T22:08:44Z
+
+@HeahDude I've tested your changes and it looks wrong for `'format' => 'MM/yyyy'` and `'widget' => 'choice'`. It display two *choice* inputs (Month and Year) correctly, but on submit shows:
+
+    This value is not valid.
+
+I think we need pass the right date fields to `DateTimeToArrayTransformer` (3rd param) when some field was ignored in format option (e.g. For `'format' => 'MM/yyyy'` should we pass `array('year', 'month')` only), otherwise it expects the three date fields always.
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-27T23:16:20Z
+
+@yceruto AFAIK `format` option is meant to be used with the `single_text` widget since it is used to format the one field text only. This is also documented this way http://symfony.com/doc/current/reference/forms/types/date.html#format.
+
+EDIT
+Ok but then we don't have the proper exception, I'm gonna move this throwing in the `if/else` below to keep both checks, thanks!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-28T02:49:14Z
+
+> Ok but then we don't have the proper exception, I'm gonna move this throwing in the if/else below to keep both checks.
+
+Do you plan to implement this one to all available widget here? It would be great to have custom/partial format for `choice` widget too ;)
+
+The `format` option (later `$pattern`) affects both widgets, and the `choice` widget wasn't ready to accept custom/partial format. That's why this seems more as a new feature rather than a bug (IMHO).
+
+---------------------------------------------------------------------------
+
+by yceruto at 2016-12-28T14:19:49Z
+
+If something helps you: https://github.com/yceruto/symfony/commit/5e0d86cc517a4632516d4786a98816d1b59034e5 it is my quick proof to enable this feature on whole type. WDYT?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-31T14:39:27Z
+
+I've updated the PR to fix the bug when using the `single_text` widget only, because IMHO it should only work as is, the only thing preventing it is a wrong configuration exception preventing to build the form.
+
+If we want to handle this for other widgets that would imply a new way to configure the type so yeah I agree this is a new feature, @yceruto feel free to open a PR then :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2016-12-31T14:52:50Z
+
+@HeahDude I do not understand why the pattern should not contain all the subpatterns when the `single_text` widget is used. What is so different compared to other widgets?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2016-12-31T15:46:36Z
+
+>why the pattern should not contain all there subpatterns when the single_text widget is used
+
+Because in this case the `pattern` get from [here](https://github.com/symfony/symfony/tree/2.7/src/Symfony/Component/Form/Extension/Core/Type/DateType.php#L48) is simply used to format the date thanks to the [transformer](https://github.com/symfony/symfony/tree/2.7/src/Symfony/Component/Form/Extension/Core/Type/DateType.php#L65).
+
+For other widgets each part has to be extracted from it (ref https://github.com/symfony/symfony/tree/2.7/src/Symfony/Component/Form/Extension/Core/Type/DateType.php#L90 and https://github.com/symfony/symfony/tree/2.7/src/Symfony/Component/Form/Extension/Core/Type/DateType.php#L277).
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-01T23:16:31Z
+
+@HeahDude But then the stricter test is only needed when the `widget` option is `choice`, right?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-01-02T10:58:29Z
+
+@xabbuh No it looks like it's not, the `text` widget also uses the `DateTimeToArrayTransformer` which fails to transform the submitted value on missing parts.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-01-03T17:43:51Z
+
+@HeahDude Can you show me where this is done?
+
+---------------------------------------------------------------------------
+
+by HeahDude at 2017-01-03T17:46:44Z
+
+@xabbuh  https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Form/Extension/Core/DataTransformer/DateTimeToArrayTransformer.php#L140
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-03T14:20:31Z
+
+👍
+
+Status: Reviewed

@@ -367,7 +367,7 @@ class DateTypeTest extends TestCase
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @expectedExceptionMessage The "format" option should contain the letters "y", "M" or "d". Its current value is "wrong".
      */
-    public function testThrowExceptionIfFormatDoesNotContainYearMonthOrDay()
+    public function testThrowExceptionIfFormatMissesYearMonthAndDayWithSingleTextWidget()
     {
         $this->factory->create('date', null, array(
             'widget' => 'single_text',

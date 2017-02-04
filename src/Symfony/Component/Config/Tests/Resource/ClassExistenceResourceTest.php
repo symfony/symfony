@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Resource;
 
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
 
 class ClassExistenceResourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -70,5 +71,12 @@ EOF
         } finally {
             spl_autoload_unregister($autoloader);
         }
+    }
+
+    public function testConditionalClass()
+    {
+        $res = new ClassExistenceResource(ConditionalClass::class, ClassExistenceResource::EXISTS_KO_WITH_THROWING_AUTOLOADER);
+
+        $this->assertFalse($res->isFresh(0));
     }
 }

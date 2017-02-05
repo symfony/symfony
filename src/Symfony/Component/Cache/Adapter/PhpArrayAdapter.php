@@ -373,15 +373,15 @@ EOF;
      */
     public static function throwOnRequiredClass($class)
     {
-        $e = new \ReflectionException(sprintf('Class %s does not exist', $class));
+        $e = new \ReflectionException("Class $class does not exist");
         $trace = $e->getTrace();
         $autoloadFrame = array(
             'function' => 'spl_autoload_call',
             'args' => array($class),
         );
-        $i = array_search($autoloadFrame, $trace);
+        $i = 1 + array_search($autoloadFrame, $trace, true);
 
-        if (false !== $i++ && isset($trace[$i]['function']) && !isset($trace[$i]['class'])) {
+        if (isset($trace[$i]['function']) && !isset($trace[$i]['class'])) {
             switch ($trace[$i]['function']) {
                 case 'get_class_methods':
                 case 'get_class_vars':

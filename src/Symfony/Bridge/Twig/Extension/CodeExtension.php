@@ -138,7 +138,7 @@ class CodeExtension extends \Twig_Extension
             $code = @highlight_file($file, true);
             // remove main code/span tags
             $code = preg_replace('#^<code.*?>\s*<span.*?>(.*)</span>\s*</code>#s', '\\1', $code);
-            $content = preg_split('#<br />#', $code);
+            $content = explode('<br />', $code);
 
             $lines = array();
             for ($i = max($line - 3, 1), $max = min($line + 3, count($content)); $i <= $max; ++$i) {

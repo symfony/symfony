@@ -62,9 +62,7 @@ class HttpKernelExtensionTest extends \PHPUnit_Framework_TestCase
 
         $context->expects($this->any())->method('getCurrentRequest')->will($this->returnValue(Request::create('/')));
 
-        $renderer = new FragmentHandler(array($strategy), false, $context);
-
-        return $renderer;
+        return new FragmentHandler(array($strategy), false, $context);
     }
 
     protected function renderTemplate(FragmentHandler $renderer, $template = '{{ render("foo") }}')

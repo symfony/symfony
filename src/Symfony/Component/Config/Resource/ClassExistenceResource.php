@@ -28,8 +28,7 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     private $resource;
     private $existsStatus;
 
-    private static $checkingLevel = 0;
-    private static $throwingAutoloader;
+    private static $autoloadLevel = 0;
     private static $existsCache = array();
 
     /**
@@ -68,12 +67,8 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
         if (null !== $exists = &self::$existsCache[$this->resource]) {
             $exists = $exists || class_exists($this->resource, false) || interface_exists($this->resource, false) || trait_exists($this->resource, false);
         } elseif (self::EXISTS_KO_WITH_THROWING_AUTOLOADER === $this->existsStatus) {
-            if (null === self::$throwingAutoloader) {
-                $signalingException = new \ReflectionException();
-                self::$throwingAutoloader = function () use ($signalingException) { throw $signalingException; };
-            }
-            if (!self::$checkingLevel++) {
-                spl_autoload_register(self::$throwingAutoloader);
+            if (!self::$autoloadLevel++) {
+                spl_autoload_register('Symfony\Component\Config\Resource\ClassExistenceResource::throwOnRequiredClass');
             }
 
             try {
@@ -81,8 +76,8 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
             } catch (\ReflectionException $e) {
                 $exists = false;
             } finally {
-                if (!--self::$checkingLevel) {
-                    spl_autoload_unregister(self::$throwingAutoloader);
+                if (!--self::$autoloadLevel) {
+                    spl_autoload_unregister('Symfony\Component\Config\Resource\ClassExistenceResource::throwOnRequiredClass');
                 }
             }
         } else {
@@ -114,5 +109,41 @@ class ClassExistenceResource implements SelfCheckingResourceInterface, \Serializ
     public function unserialize($serialized)
     {
         list($this->resource, $this->existsStatus) = unserialize($serialized);
+    }
+
+    /**
+     * @throws \ReflectionException When $class is not found and is required
+     */
+    private static function throwOnRequiredClass($class)
+    {
+        $e = new \ReflectionException("Class $class does not exist");
+        $trace = $e->getTrace();
+        $autoloadFrame = array(
+            'function' => 'spl_autoload_call',
+            'args' => array($class),
+        );
+        $i = 1 + array_search($autoloadFrame, $trace, true);
+
+        if (isset($trace[$i]['function']) && !isset($trace[$i]['class'])) {
+            switch ($trace[$i]['function']) {
+                case 'get_class_methods':
+                case 'get_class_vars':
+                case 'get_parent_class':
+                case 'is_a':
+                case 'is_subclass_of':
+                case 'class_exists':
+                case 'class_implements':
+                case 'class_parents':
+                case 'trait_exists':
+                case 'defined':
+                case 'interface_exists':
+                case 'method_exists':
+                case 'property_exists':
+                case 'is_callable':
+                    return;
+            }
+        }
+
+        throw $e;
     }
 }

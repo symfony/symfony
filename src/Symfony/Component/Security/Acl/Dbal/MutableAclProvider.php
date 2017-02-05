@@ -662,6 +662,7 @@ QUERY;
     protected function getDeleteSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
         $select = $this->getSelectSecurityIdentityIdSql($sid);
+
         return preg_replace('/^SELECT id FROM/', 'DELETE FROM', $select);
     }
 

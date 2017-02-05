@@ -1,3 +1,5 @@
+[![Build Status - master branch](https://travis-ci.org/symfony/symfony.png?branch=master)](https://travis-ci.org/symfony/symfony)
+
 README
 ======
 

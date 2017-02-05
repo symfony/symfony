@@ -128,4 +128,16 @@ class ResourceCheckerConfigCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('FOOBAR', file_get_contents($cache->getPath()));
     }
+
+    public function testCacheIsNotFreshIfNotExistsMetaFile()
+    {
+        $checker = $this->getMockBuilder('\Symfony\Component\Config\ResourceCheckerInterface')->getMock();
+        $cache = new ResourceCheckerConfigCache($this->cacheFile, array($checker));
+        $cache->write('foo', array(new FileResource(__FILE__)));
+
+        $metaFile = "{$this->cacheFile}.meta";
+        unlink($metaFile);
+
+        $this->assertFalse($cache->isFresh());
+    }
 }

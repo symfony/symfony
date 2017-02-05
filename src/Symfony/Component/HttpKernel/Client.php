@@ -48,26 +48,6 @@ class Client extends BaseClient
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return Request|null A Request instance
-     */
-    public function getRequest()
-    {
-        return parent::getRequest();
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return Response|null A Response instance
-     */
-    public function getResponse()
-    {
-        return parent::getResponse();
-    }
-
-    /**
      * Makes a request.
      *
      * @param Request $request A Request instance

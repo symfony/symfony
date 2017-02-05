@@ -33,6 +33,7 @@ class ValueExporter
 
         if (is_object($value)) {
             if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+                // note: \DateTime::ISO8601 is not ISO8601 compatible; \DateTime::ATOM IS ISO8601 compatible
                 return sprintf('Object(%s) - %s', get_class($value), $value->format(\DateTime::ISO8601));
             }
 

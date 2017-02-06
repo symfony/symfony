@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -506,7 +507,7 @@ class YamlFileLoader extends FileLoader
         }
 
         try {
-            $configuration = $this->yamlParser->parse(file_get_contents($file), Yaml::PARSE_CONSTANT);
+            $configuration = $this->yamlParser->parse(file_get_contents($file), Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS);
         } catch (ParseException $e) {
             throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML.', $file), 0, $e);
         }
@@ -557,42 +558,42 @@ class YamlFileLoader extends FileLoader
     /**
      * Resolves services.
      *
-     * @param string|array $value
+     * @param mixed $value
      *
-     * @return array|string|Reference
+     * @return array|string|Reference|ArgumentInterface
      */
     private function resolveServices($value)
     {
-        if (is_array($value)) {
-            if (array_key_exists('=iterator', $value)) {
-                if (1 !== count($value)) {
-                    throw new InvalidArgumentException('Arguments typed "=iterator" must have no sibling keys.');
+        if ($value instanceof TaggedValue) {
+            $argument = $value->getValue();
+            if ('iterator' === $value->getTag()) {
+                if (!is_array($argument)) {
+                    throw new InvalidArgumentException('"!iterator" tag only accepts sequences.');
                 }
-                if (!is_array($value = $value['=iterator'])) {
-                    throw new InvalidArgumentException('Arguments typed "=iterator" must be arrays.');
+
+                return new IteratorArgument(array_map(array($this, 'resolveServices'), $argument));
+            }
+            if ('closure_proxy' === $value->getTag()) {
+                if (!is_array($argument) || array(0, 1) !== array_keys($argument) || !is_string($argument[0]) || !is_string($argument[1]) || 0 !== strpos($argument[0], '@') || 0 === strpos($argument[0], '@@')) {
+                    throw new InvalidArgumentException('"!closure_proxy" tagged values must be arrays of [@service, method].');
                 }
-                $value = new IteratorArgument(array_map(array($this, 'resolveServices'), $value));
-            } elseif (array_key_exists('=closure_proxy', $value)) {
-                if (1 !== count($value)) {
-                    throw new InvalidArgumentException('Arguments typed "=closure_proxy" must have no sibling keys.');
-                }
-                if (!is_array($value = $value['=closure_proxy']) || array(0, 1) !== array_keys($value)) {
-                    throw new InvalidArgumentException('Arguments typed "=closure_proxy" must be arrays of [@service, method].');
-                }
-                if (!is_string($value[0]) || !is_string($value[1]) || 0 !== strpos($value[0], '@') || 0 === strpos($value[0], '@@')) {
-                    throw new InvalidArgumentException('Arguments typed "=closure_proxy" must be arrays of [@service, method].');
-                }
-                if (0 === strpos($value[0], '@?')) {
-                    $value[0] = substr($value[0], 2);
+
+                if (0 === strpos($argument[0], '@?')) {
+                    $argument[0] = substr($argument[0], 2);
                     $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
                 } else {
-                    $value[0] = substr($value[0], 1);
+                    $argument[0] = substr($argument[0], 1);
                     $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
                 }
-                $value = new ClosureProxyArgument($value[0], $value[1], $invalidBehavior);
-            } else {
-                $value = array_map(array($this, 'resolveServices'), $value);
+
+                return new ClosureProxyArgument($argument[0], $argument[1], $invalidBehavior);
             }
+
+            throw new InvalidArgumentException(sprintf('Unsupported tag "!%s".', $value->getTag()));
+        }
+
+        if (is_array($value)) {
+            $value = array_map(array($this, 'resolveServices'), $value);
         } elseif (is_string($value) && 0 === strpos($value, '@=')) {
             return new Expression(substr($value, 2));
         } elseif (is_string($value) && 0 === strpos($value, '@')) {

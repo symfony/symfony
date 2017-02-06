@@ -19,7 +19,7 @@
         "php": ">=5.5.9"
     },
     "require-dev": {
-        "symfony/yaml": "~3.2",
+        "symfony/yaml": "~3.3",
         "symfony/config": "~3.3",
         "symfony/expression-language": "~2.8|~3.0"
     },
@@ -30,8 +30,8 @@
         "symfony/proxy-manager-bridge": "Generate service proxies to lazy load them"
     },
     "conflict": {
-        "symfony/config": "<3.3",
-        "symfony/yaml": "<3.2"
+        "symfony/yaml": "<3.3",
+        "symfony/config": "<3.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },

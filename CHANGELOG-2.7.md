@@ -7,6 +7,22 @@ in 2.7 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v2.7.0...v2.7.1
 
+* 2.7.24 (2017-02-06)
+
+ * bug #21063 [Form] Fixed DateType format option for single text widget (HeahDude)
+ * bug #21430 Casting TableCell value to string. (jaydiablo)
+ * bug #21359 [FrameworkBundle] fixed custom domain for translations in php templates (robinlehrmann)
+ * bug #21485 [Process] Non ASCII characters disappearing during the escapeshellarg (GuillaumeVerdon)
+ * bug #21462 [BrowserKit] ignore invalid cookies expires date format (xabbuh)
+ * bug #21438 [Console] Fix TableCell issues with decoration (ogizanagi)
+ * bug #21431 [DoctrineBridge] always check for all fields to be mapped (xabbuh)
+ * bug #21360 [PropertyAccess] Handle interfaces in the invalid argument exception (fancyweb)
+ * bug #21401 [Debug] Workaround "null" $context (nicolas-grekas)
+ * bug #21333 [HttpKernel] Fix ArgumentValueResolver for arguments default null (chalasr)
+ * bug #20871 [HttpKernel] Give higher priority to adding request formats (akeeman)
+ * bug #21285 [TwigBundle] do not lose already set method calls (xabbuh)
+ * bug #21279 #20411 fix Yaml parsing for very long quoted strings (RichardBradley)
+
 * 2.7.23 (2017-01-12)
 
  * bug #21218 [Form] DateTimeToLocalizedStringTransformer does not use timezone when using date only (magnetik)

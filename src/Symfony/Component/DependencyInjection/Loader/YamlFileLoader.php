@@ -14,13 +14,13 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
@@ -615,6 +615,19 @@ class YamlFileLoader extends FileLoader
                 }
 
                 return new IteratorArgument(array_map(array($this, 'resolveServices'), $argument));
+            }
+            if ('service_locator' === $value->getTag()) {
+                if (!is_array($argument)) {
+                    throw new InvalidArgumentException('"!service_locator" tag only accepts mappings.');
+                }
+
+                foreach ($argument as $v) {
+                    if (!is_string($v) || 0 !== strpos($v[0], '@') || 0 === strpos($v[0], '@@')) {
+                        throw new InvalidArgumentException('"!service_locator" tagged values must be {key: @service} mappings.');
+                    }
+                }
+
+                return new ServiceLocatorArgument(array_map(array($this, 'resolveServices'), $argument));
             }
             if ('closure_proxy' === $value->getTag()) {
                 if (!is_array($argument) || array(0, 1) !== array_keys($argument) || !is_string($argument[0]) || !is_string($argument[1]) || 0 !== strpos($argument[0], '@') || 0 === strpos($argument[0], '@@')) {

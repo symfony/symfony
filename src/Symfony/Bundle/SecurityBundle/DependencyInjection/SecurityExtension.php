@@ -16,6 +16,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\User
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -239,7 +240,7 @@ class SecurityExtension extends Extension
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
-        $map = $authenticationProviders = array();
+        $map = $authenticationProviders = $contextRefs = array();
         foreach ($firewalls as $name => $firewall) {
             $configId = 'security.firewall.map.config.'.$name;
 
@@ -253,8 +254,10 @@ class SecurityExtension extends Extension
                 ->replaceArgument(2, new Reference($configId))
             ;
 
+            $contextRefs[$contextId] = new Reference($contextId);
             $map[$contextId] = $matcher;
         }
+        $mapDef->replaceArgument(0, new ServiceLocatorArgument($contextRefs));
         $mapDef->replaceArgument(1, new IteratorArgument($map));
 
         // add authentication providers to authentication manager

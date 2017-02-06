@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,6 +34,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -435,6 +437,24 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         // The second argument should have been ignored.
         $this->assertEquals(1, $i);
+    }
+
+    public function testCreateServiceWithServiceLocatorArgument()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'stdClass');
+        $builder
+            ->register('lazy_context', 'LazyContext')
+            ->setArguments(array(new ServiceLocatorArgument(array('bar' => new Reference('bar'), 'invalid' => new Reference('invalid', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))))
+        ;
+
+        $lazyContext = $builder->get('lazy_context');
+        $locator = $lazyContext->lazyValues;
+
+        $this->assertInstanceOf(ServiceLocator::class, $locator);
+        $this->assertInstanceOf('stdClass', $locator->get('bar'));
+        $this->assertNull($locator->get('invalid'));
+        $this->assertSame($locator->get('bar'), $locator('bar'), '->get() should be used when invoking ServiceLocator');
     }
 
     /**

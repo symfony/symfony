@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 
 use Symfony\Component\DependencyInjection\Argument\ClosureProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -897,6 +898,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 $bagClass
 
 /*{$this->docStar}
@@ -1536,6 +1538,14 @@ EOF;
             }
 
             return sprintf('array(%s)', implode(', ', $code));
+        } elseif ($value instanceof ServiceLocatorArgument) {
+            $code = "\n";
+            foreach ($value->getValues() as $k => $v) {
+                $code .= sprintf("            %s => function () { return %s; },\n", $this->dumpValue($k, $interpolate), $this->dumpValue($v, $interpolate));
+            }
+            $code .= '        ';
+
+            return sprintf('new ServiceLocator(array(%s))', $code);
         } elseif ($value instanceof IteratorArgument) {
             $countCode = array();
             $countCode[] = 'function () {';

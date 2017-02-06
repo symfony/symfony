@@ -17,11 +17,13 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Variable;
 use Symfony\Component\ExpressionLanguage\Expression;
 
@@ -501,6 +503,35 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
 
         $dumper->setProxyDumper(new DummyProxyDumper());
         $dumper->dump();
+    }
+
+    public function testServiceLocatorArgumentProvideServiceLocator()
+    {
+        require_once self::$fixturesPath.'/includes/classes.php';
+
+        $container = new ContainerBuilder();
+        $container->register('lazy_referenced', 'stdClass');
+        $container
+            ->register('lazy_context', 'LazyContext')
+            ->setArguments(array(new ServiceLocatorArgument(array('lazy1' => new Reference('lazy_referenced'), 'lazy2' => new Reference('lazy_referenced'), 'container' => new Reference('service_container')))))
+        ;
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(array('class' => 'Symfony_DI_PhpDumper_Test_Locator_Argument_Provide_Service_Locator'));
+        $this->assertStringEqualsFile(self::$fixturesPath.'/php/services_locator_argument.php', $dump);
+
+        require_once self::$fixturesPath.'/php/services_locator_argument.php';
+
+        $container = new \Symfony_DI_PhpDumper_Test_Locator_Argument_Provide_Service_Locator();
+        $lazyContext = $container->get('lazy_context');
+
+        $this->assertInstanceOf(ServiceLocator::class, $lazyContext->lazyValues);
+        $this->assertSame($container, $lazyContext->lazyValues->get('container'));
+        $this->assertInstanceOf('stdClass', $lazy1 = $lazyContext->lazyValues->get('lazy1'));
+        $this->assertInstanceOf('stdClass', $lazy2 = $lazyContext->lazyValues->get('lazy2'));
+        $this->assertSame($lazy1, $lazy2);
+        $this->assertFalse($lazyContext->lazyValues->has('lazy_referenced'), '->has() returns false for the original service id, only the key can be used');
     }
 
     public function testLazyArgumentProvideGenerator()

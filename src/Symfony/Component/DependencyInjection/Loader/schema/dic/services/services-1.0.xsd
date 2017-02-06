@@ -246,6 +246,7 @@
       <xsd:enumeration value="string" />
       <xsd:enumeration value="constant" />
       <xsd:enumeration value="iterator" />
+      <xsd:enumeration value="service-locator" />
       <xsd:enumeration value="closure-proxy" />
     </xsd:restriction>
   </xsd:simpleType>

@@ -1,0 +1,7 @@
+services:
+    foo:
+        class: Foo
+        autowire: true
+        tails:
+            method1: { 1: 'bar', 2: '@bar' }
+

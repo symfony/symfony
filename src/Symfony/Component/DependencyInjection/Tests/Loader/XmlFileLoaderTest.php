@@ -591,6 +591,15 @@ class XmlFileLoaderTest extends TestCase
         $this->assertTrue($container->getDefinition('bar')->isAutowired());
     }
 
+    public function testTails()
+    {
+        $container = new ContainerBuilder();
+        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
+        $loader->load('services_tails.xml');
+
+        $this->assertEquals(array('method1' => array(1 => 'bar', 2 => new Reference('bar'))), $container->getDefinition('foo')->getOverridenTails());
+    }
+
     public function testGetter()
     {
         $container = new ContainerBuilder();

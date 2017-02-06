@@ -20,21 +20,28 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class InheritanceProxyHelper
 {
-    public static function getGetterReflector(\ReflectionClass $class, $name, $id)
+    public static function getReflector(\ReflectionClass $class, $name, $id, $msg = 'tail')
     {
         if (!$class->hasMethod($name)) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" does not exist.', $id, $class->name, $name));
+            throw new RuntimeException(sprintf('Unable to configure %s injection for service "%s": method "%s::%s" does not exist.', $msg, $id, $class->name, $name));
         }
         $r = $class->getMethod($name);
         if ($r->isPrivate()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" must be public or protected.', $id, $class->name, $r->name));
+            throw new RuntimeException(sprintf('Unable to configure %s injection for service "%s": method "%s::%s" must be public or protected.', $msg, $id, $class->name, $r->name));
         }
         if ($r->isStatic()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot be static.', $id, $class->name, $r->name));
+            throw new RuntimeException(sprintf('Unable to configure %s injection for service "%s": method "%s::%s" cannot be static.', $msg, $id, $class->name, $r->name));
         }
         if ($r->isFinal()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot be marked as final.', $id, $class->name, $r->name));
+            throw new RuntimeException(sprintf('Unable to configure %s injection for service "%s": method "%s::%s" cannot be marked as final.', $msg, $id, $class->name, $r->name));
         }
+
+        return $r;
+    }
+
+    public static function getGetterReflector(\ReflectionClass $class, $name, $id)
+    {
+        $r = self::getReflector($class, $name, $id, 'getter');
         if ($r->returnsReference()) {
             throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot return by reference.', $id, $class->name, $r->name));
         }
@@ -48,7 +55,7 @@ class InheritanceProxyHelper
     /**
      * @return string The signature of the passed function, return type and function/method name included if any
      */
-    public static function getSignature(\ReflectionFunctionAbstract $r, &$call = null)
+    public static function getSignature(\ReflectionFunctionAbstract $r, &$call = null, array $tailArgs = array())
     {
         $signature = array();
         $call = array();
@@ -71,8 +78,8 @@ class InheritanceProxyHelper
             }
 
             try {
-                $k .= ' = '.self::export($p->getDefaultValue());
-                if ($type && $p->allowsNull() && null === $p->getDefaultValue()) {
+                $k .= ' = '.(array_key_exists($i, $tailArgs) ? 'null' : self::export($p->getDefaultValue()));
+                if ($type && $p->allowsNull() && (array_key_exists($i, $tailArgs) || null === $p->getDefaultValue())) {
                     $k = substr($k, 1);
                 }
             } catch (\ReflectionException $e) {
@@ -136,6 +143,36 @@ class InheritanceProxyHelper
         if ($parent = $r->getDeclaringClass()->getParentClass()) {
             return $prefix.$parent->name;
         }
+    }
+
+    public static function getTailArgs(\ReflectionMethod $r, $defaultArgs, $id)
+    {
+        if (!$defaultArgs) {
+            return array();
+        }
+        $params = $r->getParameters();
+        $numParams = count($params);
+        for ($i = 0; $i < $numParams; ++$i) {
+            if (array_key_exists($i, $defaultArgs)) {
+                break;
+            }
+        }
+        $tailArgs = array();
+        for (; $i < $numParams; ++$i) {
+            if (method_exists($params[$i], 'isVariadic') && $params[$i]->isVariadic()) {
+                break;
+            }
+            if (!array_key_exists($i, $defaultArgs) && !$params[$i]->isDefaultValueAvailable()) {
+                throw new RuntimeException(sprintf('Unable to configure service "%s": tail of method "%s::%s()" misses a value for argument %d ($%s).', $id, $r->class, $r->name, 1 + $i, $params[$i]->name));
+            }
+            $tailArgs[$i] = array($params[$i], $defaultArgs[$i]);
+            unset($defaultArgs[$i]);
+        }
+        if ($defaultArgs) {
+            throw new RuntimeException(sprintf('Unable to configure service "%s": tail of method "%s::%s()" has extra arguments "%s".', $id, $r->class, $r->name, implode('", "', array_keys($defaultArgs))));
+        }
+
+        return $tailArgs;
     }
 
     private static function export($value)

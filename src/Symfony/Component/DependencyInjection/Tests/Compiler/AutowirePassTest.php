@@ -700,6 +700,17 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
+    public function testOverridenTailCalls()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('a', A::class);
+        $container->register('foo', Foo::class);
+        $definition = $container->register('bar', SetterInjection::class);
+        $definition->setAutowired(true);
+        $definition->addMethodCall('setDependencies', array(new Reference('foo')));
+    }
+
     public function provideAutodiscoveredAutowiringOrder()
     {
         return array(
@@ -707,10 +718,40 @@ class AutowirePassTest extends TestCase
             array('CannotBeAutowiredReverseOrder'),
         );
     }
+
+    public function testTail()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', FooController::class)
+            ->setAutowired(true)
+            ->setOverridenTail('fooAction', array(2 => ''))
+            ->setOverridenTail('barAction', array(1 => 123));
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $expected = array(
+            'baraction' => array(1 => 123, 2 => new Reference('autowired.'.Foo::class)),
+            'fooaction' => array(2 => new Reference('autowired.'.Foo::class)),
+        );
+        $this->assertEquals($expected, $container->getDefinition('foo')->getOverridenTails());
+    }
 }
 
 class Foo
 {
+}
+
+class FooController
+{
+    public function fooAction($a, $b, Foo $foo)
+    {
+    }
+
+    public function barAction($a, $b, Foo $foo)
+    {
+    }
 }
 
 class Bar

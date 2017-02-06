@@ -52,6 +52,7 @@ class YamlFileLoader extends FileLoader
         'arguments' => 'arguments',
         'properties' => 'properties',
         'getters' => 'getters',
+        'tails' => 'tails',
         'configurator' => 'configurator',
         'calls' => 'calls',
         'tags' => 'tags',
@@ -429,6 +430,10 @@ class YamlFileLoader extends FileLoader
 
         if (isset($service['getters'])) {
             $definition->setOverriddenGetters($this->resolveServices($service['getters']));
+        }
+
+        if (isset($service['tails'])) {
+            $definition->setOverridenTails($this->resolveServices($service['tails']));
         }
 
         if (isset($service['calls'])) {

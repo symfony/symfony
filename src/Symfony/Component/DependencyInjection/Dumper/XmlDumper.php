@@ -173,6 +173,10 @@ class XmlDumper extends Dumper
             $this->convertParameters($parameters, 'getter', $service, 'name');
         }
 
+        if ($parameters = $definition->getOverridenTails()) {
+            $this->convertParameters($parameters, 'tail', $service, 'name');
+        }
+
         $this->addMethodCalls($definition->getMethodCalls(), $service);
 
         if ($callable = $definition->getFactory()) {

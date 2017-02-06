@@ -84,7 +84,14 @@ class GraphvizDumper extends Dumper
             foreach ($definition->getOverriddenGetters() as $name => $value) {
                 $this->edges[$id] = array_merge(
                     $this->edges[$id],
-                    $this->findEdges($id, $value, false, $name.'()')
+                    $this->findEdges($id, $value, false, $name.'()', true)
+                );
+            }
+
+            foreach ($definition->getOverridenTails() as $name => $value) {
+                $this->edges[$id] = array_merge(
+                    $this->edges[$id],
+                    $this->findEdges($id, $value, false, $name.'()', true)
                 );
             }
         }

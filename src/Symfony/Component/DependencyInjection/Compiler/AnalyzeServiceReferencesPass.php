@@ -111,6 +111,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass implements Repe
             $this->processValue($value->getProperties());
             $this->lazy = true;
             $this->processValue($value->getOverriddenGetters());
+            $this->processValue($value->getOverridenTails());
             $this->lazy = false;
             $this->processValue($value->getMethodCalls());
             $this->processValue($value->getConfigurator());

@@ -31,6 +31,7 @@ class Definition
     private $calls = array();
     private $getters = array();
     private $instanceof = array();
+    private $tails = array();
     private $configurator;
     private $tags = array();
     private $public = true;
@@ -388,6 +389,49 @@ class Definition
     public function getInstanceofConditionals()
     {
         return $this->instanceof;
+    }
+
+    /**
+     * Sets the default values of tail arguments in a method.
+     *
+     * @return $this
+     *
+     * @experimental in version 3.3
+     */
+    public function setOverridenTail($name, array $defaultArgs)
+    {
+        if (!$name) {
+            throw new InvalidArgumentException(sprintf('Tail method name cannot be empty.'));
+        }
+        $this->tails[strtolower($name)] = $defaultArgs;
+
+        return $this;
+    }
+
+    /**
+     * Sets the default values of tail arguments in a list of methods.
+     *
+     * @return $this
+     *
+     * @experimental in version 3.3
+     */
+    public function setOverridenTails(array $tails)
+    {
+        $this->tails = array_change_key_case($tails, CASE_LOWER);
+
+        return $this;
+    }
+
+    /**
+     * Gets the default values of tail arguments for configured methods.
+     *
+     * @return array
+     *
+     * @experimental in version 3.3
+     */
+    public function getOverridenTails()
+    {
+        return $this->tails;
     }
 
     /**

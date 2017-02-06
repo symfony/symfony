@@ -4,6 +4,7 @@ CHANGELOG
 3.3.0
 -----
 
+ * [EXPERIMENTAL] added support for tail-injection for methods + autowiring
  * [EXPERIMENTAL] added "TypedReference" and "ServiceClosureArgument" for creating service-locator services
  * [EXPERIMENTAL] added "instanceof" section for local interface-defined configs
  * added "service-locator" argument for lazy loading a set of identified values and services

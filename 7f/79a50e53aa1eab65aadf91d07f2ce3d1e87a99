@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-22T09:16:50Z
+
+@core23 can you look at @chalasr's comment please?
+
+---------------------------------------------------------------------------
+
+by core23 at 2017-01-22T10:27:30Z
+
+I'm a little bit busy right now. Hope I can have a look at this next weekend.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-02T09:18:41Z
+
+status: needs work
+
+---------------------------------------------------------------------------
+
+by core23 at 2017-02-03T17:02:52Z
+
+Fixed :)
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-03T17:07:41Z
+
+Looks good to me 👍
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-06T12:01:29Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-06T16:36:41Z
+
+Rereading the discussion at https://github.com/symfony/symfony/pull/21292#discussion_r99077383 I think it would indeed be simpler to use the `on-invalid` attribute and drop the compiler pass.
+
+---------------------------------------------------------------------------
+
+by core23 at 2017-02-06T16:37:42Z
+
+Fixed that

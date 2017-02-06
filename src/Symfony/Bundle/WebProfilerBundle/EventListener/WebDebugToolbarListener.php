@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
+use Symfony\Component\HttpFoundation\HtmlResponseInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
@@ -116,21 +117,16 @@ class WebDebugToolbarListener implements EventSubscriberInterface
      */
     protected function injectToolbar(Response $response, Request $request, array $nonces)
     {
+        if ($response instanceof HtmlResponseInterface) {
+            $response->appendToBody($this->getToolbarJs($response, $request, $nonces));
+            return;
+        }
+        
         $content = $response->getContent();
         $pos = strripos($content, '</body>');
 
         if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
-                '@WebProfiler/Profiler/toolbar_js.html.twig',
-                array(
-                    'position' => $this->position,
-                    'excluded_ajax_paths' => $this->excludedAjaxPaths,
-                    'token' => $response->headers->get('X-Debug-Token'),
-                    'request' => $request,
-                    'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
-                    'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
-                )
-            ))."\n";
+            $toolbar = "\n".str_replace("\n", '', $this->getToolbarJs($response, $request, $nonces))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
             $response->setContent($content);
         }
@@ -140,6 +136,21 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::RESPONSE => array('onKernelResponse', -128),
+        );
+    }
+    
+    private function getToolbarJs(Response $response, Request $request, array $nonces)
+    {
+        return $this->twig->render(
+            '@WebProfiler/Profiler/toolbar_js.html.twig',
+            array(
+                'position' => $this->position,
+                'excluded_ajax_paths' => $this->excludedAjaxPaths,
+                'token' => $response->headers->get('X-Debug-Token'),
+                'request' => $request,
+                'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
+                'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
+            )
         );
     }
 }

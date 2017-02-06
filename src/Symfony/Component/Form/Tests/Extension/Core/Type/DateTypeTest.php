@@ -79,7 +79,7 @@ class DateTypeTest extends TestCase
 
     public function testSubmitFromSingleTextDateTimeWithCustomFormat()
     {
-        $form = $this->factory->create('date', null, array(
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',
             'widget' => 'single_text',
@@ -379,7 +379,7 @@ class DateTypeTest extends TestCase
      */
     public function testThrowExceptionIfFormatMissesYearMonthAndDayWithSingleTextWidget()
     {
-        $this->factory->create('date', null, array(
+        $this->factory->create('Symfony\Component\Form\Extension\Core\Type\DateType', null, array(
             'widget' => 'single_text',
             'format' => 'wrong',
         ));

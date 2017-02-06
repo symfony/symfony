@@ -982,8 +982,15 @@ class Parser
             return;
         }
 
+        $tag = substr($matches['tag'], 1);
+
+        // Built-in tags
+        if ($tag && '!' === $tag[0]) {
+            throw new ParseException(sprintf('The built-in tag "!%s" is not implemented.', $tag));
+        }
+
         if (Yaml::PARSE_CUSTOM_TAGS & $flags) {
-            return substr($matches['tag'], 1);
+            return $tag;
         }
 
         throw new ParseException(sprintf('Tags support is not enabled. You must use the flag `Yaml::PARSE_CUSTOM_TAGS` to use "%s".', $matches['tag']));

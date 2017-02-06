@@ -1510,27 +1510,27 @@ EOF;
     {
         return array(
             'sequences' => array(
-                array(new TaggedValue('foo', array('yaml')), new TaggedValue('!quz', array('bar'))),
+                array(new TaggedValue('foo', array('yaml')), new TaggedValue('quz', array('bar'))),
                 <<<YAML
 - !foo
     - yaml
-- !!quz [bar]
+- !quz [bar]
 YAML
             ),
             'mappings' => array(
-                new TaggedValue('foo', array('foo' => new TaggedValue('!quz', array('bar')), 'quz' => new TaggedValue('foo', array('quz' => 'bar')))),
+                new TaggedValue('foo', array('foo' => new TaggedValue('quz', array('bar')), 'quz' => new TaggedValue('foo', array('quz' => 'bar')))),
                 <<<YAML
 !foo
-foo: !!quz [bar]
+foo: !quz [bar]
 quz: !foo
    quz: bar
 YAML
             ),
             'inline' => array(
-                array(new TaggedValue('foo', array('foo', 'bar')), new TaggedValue('!quz', array('foo' => 'bar', 'quz' => new TaggedValue('bar', array('one' => 'bar'))))),
+                array(new TaggedValue('foo', array('foo', 'bar')), new TaggedValue('quz', array('foo' => 'bar', 'quz' => new TaggedValue('bar', array('one' => 'bar'))))),
                 <<<YAML
 - !foo [foo, bar]
-- !!quz {foo: bar, quz: !bar {one: bar}}
+- !quz {foo: bar, quz: !bar {one: bar}}
 YAML
             ),
         );
@@ -1552,6 +1552,15 @@ YAML
     public function testUnsupportedTagWithScalar()
     {
         $this->assertEquals('!iterator foo', $this->parser->parse('!iterator foo'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Yaml\Exception\ParseException
+     * @expectedExceptionMessage The built-in tag "!!foo" is not implemented.
+     */
+    public function testExceptionWhenUsingUnsuportedBuiltInTags()
+    {
+        $this->parser->parse('!!foo');
     }
 }
 

@@ -714,6 +714,11 @@ class Inline
             return;
         }
 
+        // Built-in tags
+        if ($tag && '!' === $tag[0]) {
+            throw new ParseException(sprintf('The built-in tag "!%s" is not implemented.', $tag));
+        }
+
         if (Yaml::PARSE_CUSTOM_TAGS & $flags) {
             $i = $nextOffset;
 

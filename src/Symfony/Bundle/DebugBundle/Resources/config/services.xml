@@ -38,7 +38,7 @@
             <argument>0</argument> <!-- flags -->
             <call method="setDisplayOptions">
                 <argument type="collection">
-                    <argument key="fileLinkFormat" type="service" id="debug.file_link_formatter"></argument>
+                    <argument key="fileLinkFormat" type="service" id="debug.file_link_formatter" on-invalid="ignore"></argument>
                 </argument>
             </call>
         </service>

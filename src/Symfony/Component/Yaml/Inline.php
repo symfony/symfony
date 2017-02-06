@@ -110,7 +110,7 @@ class Inline
         }
 
         if (null !== $tag) {
-            return new TaggedValue($result, $tag);
+            return new TaggedValue($tag, $result);
         }
 
         // some comments are allowed at the end
@@ -430,7 +430,7 @@ class Inline
             }
 
             if (null !== $tag) {
-                $value = new TaggedValue($value, $tag);
+                $value = new TaggedValue($tag, $value);
             }
 
             $output[] = $value;
@@ -531,7 +531,7 @@ class Inline
 
                 if (!$duplicate) {
                     if (null !== $tag) {
-                        $output[$key] = new TaggedValue($value, $tag);
+                        $output[$key] = new TaggedValue($tag, $value);
                     } else {
                         $output[$key] = $value;
                     }

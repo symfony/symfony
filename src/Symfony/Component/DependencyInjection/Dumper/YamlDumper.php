@@ -255,7 +255,7 @@ class YamlDumper extends Dumper
         if ($value instanceof IteratorArgument || $value instanceof ClosureProxyArgument) {
             $tag = $value instanceof IteratorArgument ? 'iterator' : 'closure_proxy';
 
-            return new TaggedValue($this->dumpValue($value->getValues()), $tag);
+            return new TaggedValue($tag, $this->dumpValue($value->getValues()));
         }
 
         if (is_array($value)) {

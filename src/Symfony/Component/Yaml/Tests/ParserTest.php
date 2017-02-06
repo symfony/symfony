@@ -1495,7 +1495,7 @@ EOF;
 
     public function testTaggedInlineMapping()
     {
-        $this->assertEquals(new TaggedValue(array('foo' => 'bar'), 'foo'), $this->parser->parse('!foo {foo: bar}', Yaml::PARSE_CUSTOM_TAGS));
+        $this->assertEquals(new TaggedValue('foo', array('foo' => 'bar')), $this->parser->parse('!foo {foo: bar}', Yaml::PARSE_CUSTOM_TAGS));
     }
 
     /**
@@ -1510,7 +1510,7 @@ EOF;
     {
         return array(
             'sequences' => array(
-                array(new TaggedValue(array('yaml'), 'foo'), new TaggedValue(array('bar'), '!quz')),
+                array(new TaggedValue('foo', array('yaml')), new TaggedValue('!quz', array('bar'))),
                 <<<YAML
 - !foo
     - yaml
@@ -1518,7 +1518,7 @@ EOF;
 YAML
             ),
             'mappings' => array(
-                new TaggedValue(array('foo' => new TaggedValue(array('bar'), '!quz'), 'quz' => new TaggedValue(array('quz' => 'bar'), 'foo')), 'foo'),
+                new TaggedValue('foo', array('foo' => new TaggedValue('!quz', array('bar')), 'quz' => new TaggedValue('foo', array('quz' => 'bar')))),
                 <<<YAML
 !foo
 foo: !!quz [bar]
@@ -1527,7 +1527,7 @@ quz: !foo
 YAML
             ),
             'inline' => array(
-                array(new TaggedValue(array('foo', 'bar'), 'foo'), new TaggedValue(array('foo' => 'bar', 'quz' => new TaggedValue(array('one' => 'bar'), 'bar')), '!quz')),
+                array(new TaggedValue('foo', array('foo', 'bar')), new TaggedValue('!quz', array('foo' => 'bar', 'quz' => new TaggedValue('bar', array('one' => 'bar'))))),
                 <<<YAML
 - !foo [foo, bar]
 - !!quz {foo: bar, quz: !bar {one: bar}}

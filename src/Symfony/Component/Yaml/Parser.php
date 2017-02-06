@@ -119,7 +119,7 @@ class Parser
 
         // Resolves the tag and returns if end of the document
         if (null !== ($tag = $this->getLineTag($this->currentLine, $flags, false)) && !$this->moveToNextLine()) {
-            return new TaggedValue('', $tag);
+            return new TaggedValue($tag, '');
         }
 
         do {
@@ -149,8 +149,8 @@ class Parser
                     $data[] = $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags);
                 } elseif (null !== $subTag = $this->getLineTag(ltrim($values['value'], ' '), $flags)) {
                     $data[] = new TaggedValue(
-                        $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags),
-                        $subTag
+                        $subTag,
+                        $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags)
                     );
                 } else {
                     if (isset($values['leadspaces'])
@@ -266,7 +266,7 @@ class Parser
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             if (null !== $subTag) {
-                                $data[$key] = new TaggedValue('', $subTag);
+                                $data[$key] = new TaggedValue($subTag, '');
                             } else {
                                 $data[$key] = null;
                             }
@@ -281,7 +281,7 @@ class Parser
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             if (null !== $subTag) {
-                                $data[$key] = new TaggedValue($value, $subTag);
+                                $data[$key] = new TaggedValue($subTag, $value);
                             } else {
                                 $data[$key] = $value;
                             }
@@ -388,7 +388,7 @@ class Parser
         } while ($this->moveToNextLine());
 
         if (null !== $tag) {
-            $data = new TaggedValue($data, $tag);
+            $data = new TaggedValue($tag, $data);
         }
 
         if (isset($mbEncoding)) {

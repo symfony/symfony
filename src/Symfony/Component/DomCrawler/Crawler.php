@@ -1044,6 +1044,8 @@ class Crawler extends \SplObjectStorage
      */
     private function createSubCrawler($nodes)
     {
-        return new static($nodes, $this->uri, $this->baseHref);
+        $crawler = new static($nodes, $this->uri, $this->baseHref);
+
+        return $crawler;
     }
 }

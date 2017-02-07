@@ -42,7 +42,7 @@ class PreloadManager implements PreloadManagerInterface
     public function buildLinkValue()
     {
         if (!$this->resources) {
-            return null;
+            return;
         }
 
         $parts = array();

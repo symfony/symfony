@@ -215,15 +215,16 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('parent', 'stdClass')
-            ->setAutowiredMethods(array('foo', 'bar'));
+            ->setAutowiredCalls(array('foo'))
+        ;
 
         $container->setDefinition('child1', new ChildDefinition('parent'))
-            ->setAutowiredMethods(array('baz'))
+            ->setAutowiredCalls(array('baz'))
         ;
 
         $this->process($container);
 
-        $this->assertEquals(array('baz'), $container->getDefinition('child1')->getAutowiredMethods());
+        $this->assertEquals(array('baz'), $container->getDefinition('child1')->getAutowiredCalls());
     }
 
     public function testSetAutowiredOnServiceIsParent()
@@ -231,14 +232,14 @@ class ResolveDefinitionTemplatesPassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $container->register('parent', 'stdClass')
-            ->setAutowiredMethods(array('__construct', 'set*'))
+            ->setAutowiredCalls(array('__construct', 'set*'))
         ;
 
         $container->setDefinition('child1', new ChildDefinition('parent'));
 
         $this->process($container);
 
-        $this->assertEquals(array('__construct', 'set*'), $container->getDefinition('child1')->getAutowiredMethods());
+        $this->assertEquals(array('__construct', 'set*'), $container->getDefinition('child1')->getAutowiredCalls());
     }
 
     public function testDeepDefinitionsResolving()

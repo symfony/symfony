@@ -24,7 +24,8 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
-use Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
@@ -65,7 +66,7 @@ class PhpDumper extends Dumper
     private $serviceIdToMethodNameMap;
     private $usedMethodNames;
     private $baseClass;
-    private $getterProxies = array();
+    private $inheritanceProxies = array();
     private $useInstantiateProxy;
     private $salt;
 
@@ -124,7 +125,7 @@ class PhpDumper extends Dumper
         ), $options);
 
         $this->salt = substr(strtr(base64_encode(md5($options['namespace'].'\\'.$options['class'].'+'.$options['base_class'], true)), '+/', '__'), 0, -2);
-        $this->getterProxies = array();
+        $this->inheritanceProxies = array();
         $this->useInstantiateProxy = false;
         $this->initializeMethodNamesMap($options['base_class']);
         $this->baseClass = $options['base_class'];
@@ -173,7 +174,7 @@ class PhpDumper extends Dumper
             $this->addProxyClasses()
         ;
         $this->targetDirRegex = null;
-        $this->getterProxies = array();
+        $this->inheritanceProxies = array();
 
         $unusedEnvs = array();
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -277,7 +278,7 @@ class PhpDumper extends Dumper
             $code .= $proxyCode;
         }
 
-        foreach ($this->getterProxies as $proxyClass => $proxyCode) {
+        foreach ($this->inheritanceProxies as $proxyClass => $proxyCode) {
             $code .= sprintf("\nclass %s extends %s", $proxyClass, $proxyCode);
         }
 
@@ -494,11 +495,11 @@ class PhpDumper extends Dumper
         return $calls;
     }
 
-    private function addServiceOverriddenGetters($id, Definition $definition)
+    private function addServiceOverriddenMethods($id, Definition $definition)
     {
         $class = $this->container->getReflectionClass($definition->getClass());
         if ($class->isFinal()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": class "%s" cannot be marked as final.', $id, $class->name));
+            throw new RuntimeException(sprintf('Unable to configure service "%s": class "%s" cannot be marked as final.', $id, $class->name));
         }
 
         if ($r = $class->getConstructor()) {
@@ -510,22 +511,31 @@ class PhpDumper extends Dumper
             }
             if (!$r->isFinal()) {
                 if (0 < $r->getNumberOfParameters()) {
-                    $getters = implode('__construct($container'.$this->salt.', ', explode('(', $this->generateSignature($r), 2));
+                    $constructor = implode('($container'.$this->salt.', ', explode('(', InheritanceProxyHelper::getSignature($r, $call), 2));
                 } else {
-                    $getters = '__construct($container'.$this->salt.')';
+                    $constructor = $r->name.'($container'.$this->salt.')';
+                    $call = $r->name.'()';
                 }
-                $getters = sprintf("\n    public function %s\n    {\n        \$this->container%3\$s = \$container%3\$s;\n        parent::%s;\n    }\n", $getters, $this->generateCall($r), $this->salt);
+                $constructor = sprintf("\n    public function %s\n    {\n        \$this->container%3\$s = \$container%3\$s;\n        parent::%s;\n    }\n", $constructor, $call, $this->salt);
             } else {
-                $getters = '';
+                $constructor = '';
             }
         } else {
-            $getters = sprintf("\n    public function __construct(\$container%1\$s)\n    {\n        \$this->container%1\$s = \$container%1\$s;\n    }\n", $this->salt);
+            $constructor = sprintf("\n    public function __construct(\$container%1\$s)\n    {\n        \$this->container%1\$s = \$container%1\$s;\n    }\n", $this->salt);
         }
 
+        return $constructor.$this->addServiceOverriddenGetters($id, $definition, $class);
+    }
+
+    private function addServiceOverriddenGetters($id, Definition $definition, \ReflectionClass $class)
+    {
+        $getters = '';
+
         foreach ($definition->getOverriddenGetters() as $name => $returnValue) {
-            $r = ContainerBuilder::getGetterReflector($class, $name, $id, $type);
+            $r = InheritanceProxyHelper::getGetterReflector($class, $name, $id);
+
             $getter = array();
-            $getter[] = sprintf('%s function %s()%s', $r->isProtected() ? 'protected' : 'public', $r->name, $type);
+            $getter[] = sprintf('%s function %s', $r->isProtected() ? 'protected' : 'public', InheritanceProxyHelper::getSignature($r));
             $getter[] = '{';
 
             if (false === strpos($dumpedReturnValue = $this->dumpValue($returnValue), '$this')) {
@@ -846,9 +856,10 @@ EOF;
         $class = $this->dumpLiteralClass($class);
 
         if ($definition->getOverriddenGetters()) {
-            $getterProxy = sprintf("%s implements \\%s\n{\n    private \$container%s;\n    private \$getters%3\$s;\n%s}\n", $class, GetterProxyInterface::class, $this->salt, $this->addServiceOverriddenGetters($id, $definition));
-            $class = 'SymfonyProxy_'.md5($getterProxy);
-            $this->getterProxies[$class] = $getterProxy;
+            $inheritanceProxy = "    private \$container{$this->salt};\n    private \$getters{$this->salt};\n";
+            $inheritanceProxy = sprintf("%s implements \\%s\n{\n%s%s}\n", $class, InheritanceProxyInterface::class, $inheritanceProxy, $this->addServiceOverriddenMethods($id, $definition));
+            $class = 'SymfonyProxy_'.md5($inheritanceProxy);
+            $this->inheritanceProxies[$class] = $inheritanceProxy;
             $constructor = $this->container->getReflectionClass($definition->getClass())->getConstructor();
 
             if ($constructor && $constructor->isFinal()) {
@@ -1622,8 +1633,9 @@ EOF;
             if (!$r->isPublic()) {
                 throw new InvalidArgumentException(sprintf('Cannot create closure-proxy for service "%s": method "%s::%s" must be public.', $reference, $class, $method));
             }
+            $signature = preg_replace('/^(&?)[^(]*/', '$1', InheritanceProxyHelper::getSignature($r, $call));
 
-            return sprintf("/** @closure-proxy %s::%s */ function %s {\n            return %s->%s;\n        }", $class, $method, $this->generateSignature($r), $this->dumpValue($reference), $this->generateCall($r));
+            return sprintf("/** @closure-proxy %s::%s */ function %s {\n            return %s->%s;\n        }", $class, $method, $signature, $this->dumpValue($reference), $call);
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
@@ -1882,63 +1894,5 @@ EOF;
         }
 
         return $export;
-    }
-
-    private function generateSignature(\ReflectionFunctionAbstract $r)
-    {
-        $signature = array();
-
-        foreach ($r->getParameters() as $p) {
-            $k = '$'.$p->name;
-            if (method_exists($p, 'isVariadic') && $p->isVariadic()) {
-                $k = '...'.$k;
-            }
-            if ($p->isPassedByReference()) {
-                $k = '&'.$k;
-            }
-            if (method_exists($p, 'getType')) {
-                $type = $p->getType();
-            } elseif (preg_match('/^(?:[^ ]++ ){4}([a-zA-Z_\x7F-\xFF][^ ]++)/', $p, $type)) {
-                $type = $type[1];
-            }
-            if ($type && $type = ContainerBuilder::generateTypeHint($type, $r)) {
-                $k = $type.' '.$k;
-            }
-            if ($type && $p->allowsNull()) {
-                $k = '?'.$k;
-            }
-
-            try {
-                $k .= ' = '.$this->dumpValue($p->getDefaultValue(), false);
-                if ($type && $p->allowsNull() && null === $p->getDefaultValue()) {
-                    $k = substr($k, 1);
-                }
-            } catch (\ReflectionException $e) {
-                if ($type && $p->allowsNull() && !class_exists('ReflectionNamedType', false)) {
-                    $k .= ' = null';
-                    $k = substr($k, 1);
-                }
-            }
-
-            $signature[] = $k;
-        }
-
-        return ($r->returnsReference() ? '&(' : '(').implode(', ', $signature).')';
-    }
-
-    private function generateCall(\ReflectionFunctionAbstract $r)
-    {
-        $call = array();
-
-        foreach ($r->getParameters() as $p) {
-            $k = '$'.$p->name;
-            if (method_exists($p, 'isVariadic') && $p->isVariadic()) {
-                $k = '...'.$k;
-            }
-
-            $call[] = $k;
-        }
-
-        return ($r->isClosure() ? '' : $r->name).'('.implode(', ', $call).')';
     }
 }

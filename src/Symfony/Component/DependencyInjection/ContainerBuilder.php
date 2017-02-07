@@ -33,7 +33,8 @@ use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
-use Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyHelper;
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
@@ -1022,7 +1023,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 if (null === $salt) {
                     $salt = str_replace('.', '', uniqid('', true));
                 }
-                $service = sprintf('%s implements \\%s { private $container%4$s; private $values%4$s; %s }', $r->name, GetterProxyInterface::class, $this->generateOverriddenGetters($id, $definition, $r, $salt), $salt);
+                $service = sprintf('%s implements \\%s { private $container%4$s; private $getters%4$s; %s }', $r->name, InheritanceProxyInterface::class, $this->generateOverriddenMethods($id, $definition, $r, $salt), $salt);
                 if (!class_exists($proxyClass = 'SymfonyProxy_'.md5($service), false)) {
                     eval(sprintf('class %s extends %s', $proxyClass, $service));
                 }
@@ -1032,7 +1033,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                     $constructor = null;
                 }
                 $service = $constructor ? $r->newInstanceWithoutConstructor() : $r->newInstanceArgs($arguments);
-                call_user_func(\Closure::bind(function ($c, $v, $s) { $this->{'container'.$s} = $c; $this->{'values'.$s} = $v; }, $service, $service), $this, $definition->getOverriddenGetters(), $salt);
+                call_user_func(\Closure::bind(function ($c, $g, $s) { $this->{'container'.$s} = $c; $this->{'getters'.$s} = $g; }, $service, $service), $this, $definition->getOverriddenGetters(), $salt);
                 if ($constructor) {
                     $constructor->invokeArgs($service, $arguments);
                 }
@@ -1294,22 +1295,29 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         return $this->envCounters;
     }
 
-    private function generateOverriddenGetters($id, Definition $definition, \ReflectionClass $class, $salt)
+    private function generateOverriddenMethods($id, Definition $definition, \ReflectionClass $class, $salt)
     {
         if ($class->isFinal()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": class "%s" cannot be marked as final.', $id, $class->name));
+            throw new RuntimeException(sprintf('Unable to configure service "%s": class "%s" cannot be marked as final.', $id, $class->name));
         }
+
+        return $this->generateOverriddenGetters($id, $definition, $class, $salt);
+    }
+
+    private function generateOverriddenGetters($id, Definition $definition, \ReflectionClass $class, $salt)
+    {
         $getters = '';
+
         foreach ($definition->getOverriddenGetters() as $name => $returnValue) {
-            $r = self::getGetterReflector($class, $name, $id, $type);
+            $r = InheritanceProxyHelper::getGetterReflector($class, $name, $id);
+            $signature = InheritanceProxyHelper::getSignature($r);
             $visibility = $r->isProtected() ? 'protected' : 'public';
-            $name = var_export($name, true);
             $getters .= <<<EOF
 
-{$visibility} function {$r->name}(){$type} {
+{$visibility} function {$signature} {
     \$c = \$this->container{$salt};
     \$b = \$c->getParameterBag();
-    \$v = \$this->values{$salt}[{$name}];
+    \$v = \$this->getters{$salt}['{$name}'];
 
     foreach (\$c->getServiceConditionals(\$v) as \$s) {
         if (!\$c->has(\$s)) {
@@ -1323,71 +1331,6 @@ EOF;
         }
 
         return $getters;
-    }
-
-    /**
-     * @internal
-     */
-    public static function getGetterReflector(\ReflectionClass $class, $name, $id, &$type)
-    {
-        if (!$class->hasMethod($name)) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" does not exist.', $id, $class->name, $name));
-        }
-        $r = $class->getMethod($name);
-        if ($r->isPrivate()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" must be public or protected.', $id, $class->name, $r->name));
-        }
-        if ($r->isStatic()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot be static.', $id, $class->name, $r->name));
-        }
-        if ($r->isFinal()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot be marked as final.', $id, $class->name, $r->name));
-        }
-        if ($r->returnsReference()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot return by reference.', $id, $class->name, $r->name));
-        }
-        if (0 < $r->getNumberOfParameters()) {
-            throw new RuntimeException(sprintf('Unable to configure getter injection for service "%s": method "%s::%s" cannot have any arguments.', $id, $class->name, $r->name));
-        }
-        if ($type = method_exists($r, 'getReturnType') ? $r->getReturnType() : null) {
-            $type = ': '.($type->allowsNull() ? '?' : '').self::generateTypeHint($type, $r);
-        }
-
-        return $r;
-    }
-
-    /**
-     * @internal
-     */
-    public static function generateTypeHint($type, \ReflectionFunctionAbstract $r)
-    {
-        if (is_string($type)) {
-            $name = $type;
-
-            if ('callable' === $name || 'array' === $name) {
-                return $name;
-            }
-        } else {
-            $name = $type instanceof \ReflectionNamedType ? $type->getName() : $type->__toString();
-
-            if ($type->isBuiltin()) {
-                return $name;
-            }
-        }
-        $lcName = strtolower($name);
-
-        if ('self' !== $lcName && 'parent' !== $lcName) {
-            return '\\'.$name;
-        }
-        if (!$r instanceof \ReflectionMethod) {
-            return;
-        }
-        if ('self' === $lcName) {
-            return '\\'.$r->getDeclaringClass()->name;
-        }
-        if ($parent = $r->getDeclaringClass()->getParentClass()) {
-            return '\\'.$parent->name;
-        }
     }
 
     /**

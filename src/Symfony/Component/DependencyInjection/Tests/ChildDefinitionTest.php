@@ -70,14 +70,14 @@ class ChildDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('lazy' => true), $def->getChanges());
     }
 
-    public function testSetAutowiredMethods()
+    public function testSetAutowiredCalls()
     {
         $def = new ChildDefinition('foo');
 
         $this->assertFalse($def->isAutowired());
-        $this->assertSame($def, $def->setAutowiredMethods(array('foo', 'bar')));
-        $this->assertEquals(array('foo', 'bar'), $def->getAutowiredMethods());
-        $this->assertSame(array('autowired_methods' => true), $def->getChanges());
+        $this->assertSame($def, $def->setAutowiredCalls(array('foo', 'bar')));
+        $this->assertEquals(array('foo', 'bar'), $def->getAutowiredCalls());
+        $this->assertSame(array('autowired_calls' => true), $def->getChanges());
     }
 
     public function testSetArgument()

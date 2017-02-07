@@ -12,12 +12,12 @@
 namespace Symfony\Component\DependencyInjection\LazyProxy;
 
 /**
- * Interface used to label proxy classes with overridden getters as generated while compiling the container.
+ * Interface used to label proxy classes with overridden methods as generated while compiling the container.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  *
  * @experimental in version 3.3
  */
-interface GetterProxyInterface
+interface InheritanceProxyInterface
 {
 }

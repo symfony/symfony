@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Caster;
 
-use Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface;
+use Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface;
 
 /**
  * Represents a PHP class identifier.
@@ -68,9 +68,9 @@ class ClassStub extends ConstStub
             return;
         }
 
-        if (interface_exists(GetterProxyInterface::class, false)) {
+        if (interface_exists(InheritanceProxyInterface::class, false)) {
             $c = $r instanceof \ReflectionMethod ? $r->getDeclaringClass() : $r;
-            if ($c instanceof \ReflectionClass && $c->implementsInterface(GetterProxyInterface::class)) {
+            if ($c instanceof \ReflectionClass && $c->implementsInterface(InheritanceProxyInterface::class)) {
                 $p = $c->getParentClass();
                 $this->value = $identifier = str_replace($c->name, $p->name.'@proxy', $identifier);
                 if (0 < $i = strrpos($identifier, '\\')) {

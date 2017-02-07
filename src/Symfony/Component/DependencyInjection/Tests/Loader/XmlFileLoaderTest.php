@@ -573,10 +573,10 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader->load('services23.xml');
 
         $this->assertTrue($container->getDefinition('bar')->isAutowired());
-        $this->assertEquals(array('__construct'), $container->getDefinition('bar')->getAutowiredMethods());
+        $this->assertEquals(array('__construct'), $container->getDefinition('bar')->getAutowiredCalls());
 
         $loader->load('services27.xml');
-        $this->assertEquals(array('set*', 'bar'), $container->getDefinition('autowire_array')->getAutowiredMethods());
+        $this->assertEquals(array('set*', 'bar'), $container->getDefinition('autowire_array')->getAutowiredCalls());
     }
 
     public function testGetter()
@@ -659,15 +659,15 @@ class XmlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($container->getDefinition('no_defaults_child')->isAutowired());
     }
 
-    public function testDefaultsWithAutowiredMethods()
+    public function testDefaultsWithAutowiredCalls()
     {
         $container = new ContainerBuilder();
         $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
         $loader->load('services30.xml');
 
-        $this->assertSame(array('__construct'), $container->getDefinition('with_defaults')->getAutowiredMethods());
-        $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults')->getAutowiredMethods());
-        $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults_child')->getAutowiredMethods());
-        $this->assertSame(array(), $container->getDefinition('with_defaults_child')->getAutowiredMethods());
+        $this->assertSame(array('__construct'), $container->getDefinition('with_defaults')->getAutowiredCalls());
+        $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults')->getAutowiredCalls());
+        $this->assertSame(array('setFoo'), $container->getDefinition('no_defaults_child')->getAutowiredCalls());
+        $this->assertSame(array(), $container->getDefinition('with_defaults_child')->getAutowiredCalls());
     }
 }

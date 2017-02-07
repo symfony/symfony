@@ -301,15 +301,15 @@ class DefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($def->isAutowired());
         $def->setAutowired(true);
         $this->assertTrue($def->isAutowired());
-        $this->assertEquals(array('__construct'), $def->getAutowiredMethods());
+        $this->assertEquals(array('__construct'), $def->getAutowiredCalls());
 
-        $def->setAutowiredMethods(array('foo'));
+        $def->setAutowiredCalls(array('foo'));
         $def->setAutowired(false);
-        $this->assertSame(array(), $def->getAutowiredMethods());
+        $this->assertSame(array(), $def->getAutowiredCalls());
         $this->assertFalse($def->isAutowired());
 
-        $def->setAutowiredMethods(array('getFoo', 'getBar'));
-        $this->assertEquals(array('getFoo', 'getBar'), $def->getAutowiredMethods());
+        $def->setAutowiredCalls(array('getFoo', 'getBar'));
+        $this->assertEquals(array('getFoo', 'getBar'), $def->getAutowiredCalls());
         $this->assertTrue($def->isAutowired());
     }
 

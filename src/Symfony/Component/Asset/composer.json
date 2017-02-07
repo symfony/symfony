@@ -19,8 +19,7 @@
         "php": ">=5.5.9"
     },
     "suggest": {
-        "symfony/http-foundation": "",
-        "symfony/http-kernel": ""
+        "symfony/http-foundation": ""
     },
     "require-dev": {
         "symfony/http-foundation": "~2.8|~3.0",

@@ -81,7 +81,7 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         $autowiredMethods = $this->getMethodsToAutowire($reflectionClass, $autowiredMethods);
-        $methodCalls = $value->getMethodCalls();
+        $originMethodCalls = $methodCalls = $value->getMethodCalls();
 
         if ($constructor = $reflectionClass->getConstructor()) {
             array_unshift($methodCalls, array($constructor->name, $value->getArguments()));
@@ -100,7 +100,7 @@ class AutowirePass extends AbstractRecursivePass
             }
         }
 
-        if ($methodCalls !== $value->getMethodCalls()) {
+        if ($methodCalls !== $originMethodCalls) {
             $value->setMethodCalls($methodCalls);
         }
 

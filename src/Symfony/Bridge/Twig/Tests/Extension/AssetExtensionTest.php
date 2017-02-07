@@ -23,7 +23,7 @@ class AssetExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetAndPreloadAssetUrl()
     {
         if (!class_exists(PreloadManager::class)) {
-            $this->markTestSkipped('Requires asset 3.3 or superior.');
+            $this->markTestSkipped('Requires Asset 3.3+.');
         }
 
         $preloadManager = new PreloadManager();

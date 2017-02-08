@@ -389,7 +389,7 @@ class PhpDumperTest extends \PHPUnit_Framework_TestCase
         yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getFinal" cannot be marked as final.', 'getFinal');
         yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getRef" cannot return by reference.', 'getRef');
         yield array('Unable to configure getter injection for service "foo": method "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Foo::getParam" cannot have any arguments.', 'getParam');
-        yield array('Unable to configure getter injection for service "bar": class "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Bar" cannot be marked as final.', 'getParam', 'bar');
+        yield array('Unable to configure service "bar": class "Symfony\Component\DependencyInjection\Tests\Fixtures\Container30\Bar" cannot be marked as final.', 'getParam', 'bar');
         yield array('Cannot dump definition for service "baz": factories and overridden getters are incompatible with each other.', 'getParam', 'baz');
     }
 

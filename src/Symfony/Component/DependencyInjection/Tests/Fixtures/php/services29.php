@@ -61,7 +61,7 @@ class Symfony_DI_PhpDumper_Test_Overriden_Getters extends Container
      */
     protected function getBazService()
     {
-        return $this->services['baz'] = $this->instantiateProxy(SymfonyProxy_46eafd3003c2798ed583593e686cb95e::class, array(), true);
+        return $this->services['baz'] = $this->instantiateProxy(SymfonyProxy_1e2f71108c6e0938cdbc9e38cae3dcb5::class, array(), true);
     }
 
     /**
@@ -74,7 +74,7 @@ class Symfony_DI_PhpDumper_Test_Overriden_Getters extends Container
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new SymfonyProxy_78f39120a5353f811849a5b3f3e6d70c($this);
+        return $this->services['foo'] = new SymfonyProxy_4a8df73e139322e3fa994cdec2f5b203($this);
     }
 
     private function instantiateProxy($class, $args, $useConstructor)
@@ -97,7 +97,7 @@ class Symfony_DI_PhpDumper_Test_Overriden_Getters extends Container
     }
 }
 
-class SymfonyProxy_46eafd3003c2798ed583593e686cb95e extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container29\Baz implements \Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface
+class SymfonyProxy_1e2f71108c6e0938cdbc9e38cae3dcb5 extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container29\Baz implements \Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface
 {
     private $container6HqvH3fsTTC6dr66HyT2Jw;
     private $getters6HqvH3fsTTC6dr66HyT2Jw;
@@ -108,7 +108,7 @@ class SymfonyProxy_46eafd3003c2798ed583593e686cb95e extends \Symfony\Component\D
     }
 }
 
-class SymfonyProxy_78f39120a5353f811849a5b3f3e6d70c extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container29\Foo implements \Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface
+class SymfonyProxy_4a8df73e139322e3fa994cdec2f5b203 extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container29\Foo implements \Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface
 {
     private $container6HqvH3fsTTC6dr66HyT2Jw;
     private $getters6HqvH3fsTTC6dr66HyT2Jw;

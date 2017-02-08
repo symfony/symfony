@@ -460,7 +460,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         // manually configure *one* call, to override autowiring
         $container
             ->register('setter_injection', SetterInjection::class)
-            ->setAutowiredMethods(array('set*'))
+            ->setAutowiredCalls(array('set*'))
             ->addMethodCall('setWithCallsConfigured', array('manual_arg1', 'manual_arg2'))
         ;
 
@@ -500,7 +500,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
 
         $container
             ->register('setter_injection', SetterInjection::class)
-            ->setAutowiredMethods(array('setFoo', 'notASetter'))
+            ->setAutowiredCalls(array('setFoo', 'notASetter'))
         ;
 
         $pass = new AutowirePass();
@@ -528,7 +528,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $container
             ->register('getter_overriding', GetterOverriding::class)
             ->setOverriddenGetter('getExplicitlyDefined', new Reference('b'))
-            ->setAutowiredMethods(array('get*'))
+            ->setAutowiredCalls(array('get*'))
         ;
 
         $pass = new AutowirePass();
@@ -603,7 +603,7 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $container->register('c1', CollisionA::class);
         $container->register('c2', CollisionB::class);
         $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollision::class);
-        $aDefinition->setAutowiredMethods(array('set*'));
+        $aDefinition->setAutowiredCalls(array('set*'));
 
         $pass = new AutowirePass();
         $pass->process($container);
@@ -614,23 +614,12 @@ class AutowirePassTest extends \PHPUnit_Framework_TestCase
         $container = new ContainerBuilder();
 
         $definition = $container->register('foo', Foo::class);
-        $definition->setAutowiredMethods(array('not', 'exist*'));
+        $definition->setAutowiredCalls(array('not', 'exist*'));
 
         $pass = new AutowirePass();
         $pass->process($container);
 
         $this->assertEquals(array(AutowirePass::class.': Autowiring\'s patterns "not", "exist*" for service "foo" don\'t match any method.'), $container->getCompiler()->getLog());
-    }
-
-    public function testPartialMethodCalls()
-    {
-        $container = new ContainerBuilder();
-
-        $container->register('a', A::class);
-        $container->register('foo', Foo::class);
-        $definition = $container->register('bar', SetterInjection::class);
-        $definition->setAutowired(true);
-        $definition->addMethodCall('setDependencies', array(new Reference('foo')));
     }
 
     public function testEmptyStringIsKept()

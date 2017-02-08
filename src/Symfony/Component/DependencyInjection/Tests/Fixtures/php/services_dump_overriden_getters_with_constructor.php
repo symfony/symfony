@@ -61,7 +61,7 @@ class Symfony_DI_PhpDumper_Test_Overriden_Getters_With_Constructor extends Conta
      */
     protected function getBazService()
     {
-        return $this->services['baz'] = $this->instantiateProxy(SymfonyProxy_a9f1de23b86d1fe2b860654ab2128883::class, array(), true);
+        return $this->services['baz'] = $this->instantiateProxy(SymfonyProxy_f0afdd0cd14cc92319c3f5d20cec315a::class, array(), true);
     }
 
     /**
@@ -74,7 +74,7 @@ class Symfony_DI_PhpDumper_Test_Overriden_Getters_With_Constructor extends Conta
      */
     protected function getFooService()
     {
-        return $this->services['foo'] = new SymfonyProxy_cbcc1d1a7dc6a97b54a307ad6a012531($this);
+        return $this->services['foo'] = new SymfonyProxy_4fb8f9a44021ab78702917f65fade566($this);
     }
 
     private function instantiateProxy($class, $args, $useConstructor)
@@ -97,7 +97,7 @@ class Symfony_DI_PhpDumper_Test_Overriden_Getters_With_Constructor extends Conta
     }
 }
 
-class SymfonyProxy_a9f1de23b86d1fe2b860654ab2128883 extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container34\Baz implements \Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface
+class SymfonyProxy_f0afdd0cd14cc92319c3f5d20cec315a extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container34\Baz implements \Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface
 {
     private $containerg3aCmsigw5jaB68sqMSEQQ;
     private $gettersg3aCmsigw5jaB68sqMSEQQ;
@@ -108,7 +108,7 @@ class SymfonyProxy_a9f1de23b86d1fe2b860654ab2128883 extends \Symfony\Component\D
     }
 }
 
-class SymfonyProxy_cbcc1d1a7dc6a97b54a307ad6a012531 extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container34\Foo implements \Symfony\Component\DependencyInjection\LazyProxy\GetterProxyInterface
+class SymfonyProxy_4fb8f9a44021ab78702917f65fade566 extends \Symfony\Component\DependencyInjection\Tests\Fixtures\Container34\Foo implements \Symfony\Component\DependencyInjection\LazyProxy\InheritanceProxyInterface
 {
     private $containerg3aCmsigw5jaB68sqMSEQQ;
     private $gettersg3aCmsigw5jaB68sqMSEQQ;

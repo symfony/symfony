@@ -242,7 +242,7 @@ class XmlFileLoader extends FileLoader
             $definition->setDeprecated(true, $deprecated[0]->nodeValue ?: null);
         }
 
-        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument'));
+        $definition->setArguments($this->getArgumentsAsPhp($service, 'argument', false, (bool) $parent));
         $definition->setProperties($this->getArgumentsAsPhp($service, 'property'));
         $definition->setOverriddenGetters($this->getArgumentsAsPhp($service, 'getter'));
 
@@ -325,19 +325,19 @@ class XmlFileLoader extends FileLoader
             $definition->addAutowiringType($type->textContent);
         }
 
-        $autowireTags = array();
-        foreach ($this->getChildren($service, 'autowire') as $type) {
-            $autowireTags[] = $type->textContent;
+        $autowiredCalls = array();
+        foreach ($this->getChildren($service, 'autowire') as $tag) {
+            $autowiredCalls[] = $tag->textContent;
         }
 
-        if ($autowireTags) {
-            if ($service->hasAttribute('autowire')) {
-                throw new InvalidArgumentException(sprintf('The "autowire" attribute cannot be used together with "<autowire>" tags for service "%s" in %s.', (string) $service->getAttribute('id'), $file));
-            }
+        if ($autowiredCalls && $service->hasAttribute('autowire')) {
+            throw new InvalidArgumentException(sprintf('The "autowire" attribute cannot be used together with "<autowire>" tags for service "%s" in %s.', $service->getAttribute('id'), $file));
+        }
 
-            $definition->setAutowiredMethods($autowireTags);
+        if ($autowiredCalls) {
+            $definition->setAutowiredCalls($autowiredCalls);
         } elseif (!$service->hasAttribute('autowire') && !empty($defaults['autowire'])) {
-            $definition->setAutowiredMethods($defaults['autowire']);
+            $definition->setAutowiredCalls($defaults['autowire']);
         }
 
         if ($value = $service->getAttribute('decorates')) {
@@ -439,7 +439,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return mixed
      */
-    private function getArgumentsAsPhp(\DOMElement $node, $name, $lowercase = true)
+    private function getArgumentsAsPhp(\DOMElement $node, $name, $lowercase = true, $isChildDefinition = false)
     {
         $arguments = array();
         foreach ($this->getChildren($node, $name) as $arg) {
@@ -450,7 +450,7 @@ class XmlFileLoader extends FileLoader
             // this is used by ChildDefinition to overwrite a specific
             // argument of the parent definition
             if ($arg->hasAttribute('index')) {
-                $key = 'index_'.$arg->getAttribute('index');
+                $key = ($isChildDefinition ? 'index_' : '').$arg->getAttribute('index');
             } elseif (!$arg->hasAttribute('key')) {
                 // Append an empty argument, then fetch its key to overwrite it later
                 $arguments[] = null;

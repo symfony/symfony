@@ -162,11 +162,11 @@ class ChildDefinition extends Definition
     /**
      * {@inheritdoc}
      */
-    public function setAutowiredMethods(array $autowiredMethods)
+    public function setAutowiredCalls(array $autowiredCalls)
     {
-        $this->changes['autowired_methods'] = true;
+        $this->changes['autowired_calls'] = true;
 
-        return parent::setAutowiredMethods($autowiredMethods);
+        return parent::setAutowiredCalls($autowiredCalls);
     }
 
     /**

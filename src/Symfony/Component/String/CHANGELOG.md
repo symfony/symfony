@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-4.4.0
+5.0.0
 -----
 
- * added the component
+ * added the component as experimental

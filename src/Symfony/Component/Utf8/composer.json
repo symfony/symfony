@@ -1,0 +1,36 @@
+{
+    "name": "symfony/utf8",
+    "type": "library",
+    "description": "Symfony UTF-8 component",
+    "keywords": ["string", "utf8", "utf-8", "grapheme", "i18n"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "symfony/polyfill-intl-grapheme": "~1.0",
+        "symfony/polyfill-mbstring": "~1.0",
+        "symfony/polyfill-xml": "~1.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Utf8\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.3-dev"
+        }
+    }
+}

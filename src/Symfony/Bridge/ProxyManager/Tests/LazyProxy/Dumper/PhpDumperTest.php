@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Dumper;
 
+use PhpUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -21,7 +22,7 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  *
  * @author Marco Pivetta <ocramius@gmail.com>
  */
-class PhpDumperTest extends \PHPUnit_Framework_TestCase
+class PhpDumperTest extends TestCase
 {
     public function testDumpContainerWithProxyService()
     {

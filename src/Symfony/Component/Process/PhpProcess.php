@@ -38,19 +38,15 @@ class PhpProcess extends Process
         $executableFinder = new PhpExecutableFinder();
         if (false === $php = $executableFinder->find()) {
             $php = null;
+        } else {
+            $php = explode(' ', $php);
         }
         if ('phpdbg' === PHP_SAPI) {
             $file = tempnam(sys_get_temp_dir(), 'dbg');
             file_put_contents($file, $script);
             register_shutdown_function('unlink', $file);
-            $php .= ' '.ProcessUtils::escapeArgument($file);
+            $php[] = $file;
             $script = null;
-        }
-        if ('\\' !== DIRECTORY_SEPARATOR && null !== $php) {
-            // exec is mandatory to deal with sending a signal to the process
-            // see https://github.com/symfony/symfony/issues/5030 about prepending
-            // command with exec
-            $php = 'exec '.$php;
         }
         if (null !== $options) {
             @trigger_error(sprintf('The $options parameter of the %s constructor is deprecated since version 3.3 and will be removed in 4.0.', __CLASS__), E_USER_DEPRECATED);
@@ -70,12 +66,13 @@ class PhpProcess extends Process
     /**
      * {@inheritdoc}
      */
-    public function start(callable $callback = null)
+    public function start(callable $callback = null/*, array $env = array()*/)
     {
         if (null === $this->getCommandLine()) {
             throw new RuntimeException('Unable to find the PHP executable.');
         }
+        $env = 1 < func_num_args() ? func_get_arg(1) : null;
 
-        parent::start($callback);
+        parent::start($callback, $env);
     }
 }

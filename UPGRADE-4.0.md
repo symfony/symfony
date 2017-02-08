@@ -228,6 +228,8 @@ HttpKernel
 Process
 -------
 
+ * The `ProcessUtils::escapeArgument()` method has been removed, use a command line array or give env vars to the `Process::start/run()` method instead.
+
  * Environment variables are always inherited in sub-processes.
 
  * Configuring `proc_open()` options has been removed.

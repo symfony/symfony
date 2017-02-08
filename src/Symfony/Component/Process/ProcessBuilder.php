@@ -271,9 +271,7 @@ class ProcessBuilder
         }
 
         $arguments = array_merge($this->prefix, $this->arguments);
-        $script = implode(' ', array_map(array(__NAMESPACE__.'\\ProcessUtils', 'escapeArgument'), $arguments));
-
-        $process = new Process($script, $this->cwd, $this->env, $this->input, $this->timeout, $this->options);
+        $process = new Process($arguments, $this->cwd, $this->env, $this->input, $this->timeout, $this->options);
 
         if ($this->inheritEnv) {
             $process->inheritEnvironmentVariables();

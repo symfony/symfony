@@ -66,6 +66,8 @@ HttpKernel
 Process
 -------
 
+ * The `ProcessUtils::escapeArgument()` method has been deprecated, use a command line array or give env vars to the `Process::start/run()` method instead.
+
  * Not inheriting environment variables is deprecated.
 
  * Configuring `proc_open()` options is deprecated.

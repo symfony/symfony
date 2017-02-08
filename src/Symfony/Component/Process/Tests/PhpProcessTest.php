@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Process\Tests;
 
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\PhpProcess;
 
 class PhpProcessTest extends \PHPUnit_Framework_TestCase
@@ -31,19 +30,18 @@ PHP
     public function testCommandLine()
     {
         $process = new PhpProcess(<<<'PHP'
-<?php echo 'foobar';
+<?php echo phpversion().PHP_SAPI;
 PHP
         );
 
         $commandLine = $process->getCommandLine();
-
-        $f = new PhpExecutableFinder();
-        $this->assertContains($f->find(), $commandLine, '::getCommandLine() returns the command line of PHP before start');
 
         $process->start();
         $this->assertContains($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after start');
 
         $process->wait();
         $this->assertContains($commandLine, $process->getCommandLine(), '::getCommandLine() returns the command line of PHP after wait');
+
+        $this->assertSame(phpversion().PHP_SAPI, $process->getOutput());
     }
 }

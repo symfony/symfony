@@ -90,16 +90,16 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $proc = $pb->setArguments(array('-v'))->getProcess();
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php" "-v"', $proc->getCommandLine());
+            $this->assertEquals('/usr/bin/php -v', $proc->getCommandLine());
         } else {
-            $this->assertEquals("'/usr/bin/php' '-v'", $proc->getCommandLine());
+            $this->assertEquals("exec '/usr/bin/php' '-v'", $proc->getCommandLine());
         }
 
         $proc = $pb->setArguments(array('-i'))->getProcess();
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php" "-i"', $proc->getCommandLine());
+            $this->assertEquals('/usr/bin/php -i', $proc->getCommandLine());
         } else {
-            $this->assertEquals("'/usr/bin/php' '-i'", $proc->getCommandLine());
+            $this->assertEquals("exec '/usr/bin/php' '-i'", $proc->getCommandLine());
         }
     }
 
@@ -110,16 +110,16 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
 
         $proc = $pb->setArguments(array('-v'))->getProcess();
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php" "composer.phar" "-v"', $proc->getCommandLine());
+            $this->assertEquals('/usr/bin/php composer.phar -v', $proc->getCommandLine());
         } else {
-            $this->assertEquals("'/usr/bin/php' 'composer.phar' '-v'", $proc->getCommandLine());
+            $this->assertEquals("exec '/usr/bin/php' 'composer.phar' '-v'", $proc->getCommandLine());
         }
 
         $proc = $pb->setArguments(array('-i'))->getProcess();
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php" "composer.phar" "-i"', $proc->getCommandLine());
+            $this->assertEquals('/usr/bin/php composer.phar -i', $proc->getCommandLine());
         } else {
-            $this->assertEquals("'/usr/bin/php' 'composer.phar' '-i'", $proc->getCommandLine());
+            $this->assertEquals("exec '/usr/bin/php' 'composer.phar' '-i'", $proc->getCommandLine());
         }
     }
 
@@ -129,9 +129,9 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $proc = $pb->getProcess();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertSame('^%"path"^% "foo \\" bar" "%baz%baz"', $proc->getCommandLine());
+            $this->assertSame('""^%"path"^%"" "foo "" bar" ""^%"baz"^%"baz"', $proc->getCommandLine());
         } else {
-            $this->assertSame("'%path%' 'foo \" bar' '%baz%baz'", $proc->getCommandLine());
+            $this->assertSame("exec '%path%' 'foo \" bar' '%baz%baz'", $proc->getCommandLine());
         }
     }
 
@@ -142,9 +142,9 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
         $proc = $pb->getProcess();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertSame('^%"prefix"^% "arg"', $proc->getCommandLine());
+            $this->assertSame('""^%"prefix"^%"" arg', $proc->getCommandLine());
         } else {
-            $this->assertSame("'%prefix%' 'arg'", $proc->getCommandLine());
+            $this->assertSame("exec '%prefix%' 'arg'", $proc->getCommandLine());
         }
     }
 
@@ -163,9 +163,9 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->getProcess();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php"', $process->getCommandLine());
+            $this->assertEquals('/usr/bin/php', $process->getCommandLine());
         } else {
-            $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
+            $this->assertEquals("exec '/usr/bin/php'", $process->getCommandLine());
         }
     }
 
@@ -175,9 +175,9 @@ class ProcessBuilderTest extends \PHPUnit_Framework_TestCase
             ->getProcess();
 
         if ('\\' === DIRECTORY_SEPARATOR) {
-            $this->assertEquals('"/usr/bin/php"', $process->getCommandLine());
+            $this->assertEquals('/usr/bin/php', $process->getCommandLine());
         } else {
-            $this->assertEquals("'/usr/bin/php'", $process->getCommandLine());
+            $this->assertEquals("exec '/usr/bin/php'", $process->getCommandLine());
         }
     }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PhpUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRendererPass;
@@ -18,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FragmentRenderer
 /**
  * @group legacy
  */
-class LegacyFragmentRendererPassTest extends \PHPUnit_Framework_TestCase
+class LegacyFragmentRendererPassTest extends TestCase
 {
     /**
      * Tests that content rendering not implementing FragmentRendererInterface

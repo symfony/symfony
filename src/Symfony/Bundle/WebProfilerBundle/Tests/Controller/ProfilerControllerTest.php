@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Controller;
 
+use PhpUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpFoundation\Request;
 
-class ProfilerControllerTest extends \PHPUnit_Framework_TestCase
+class ProfilerControllerTest extends TestCase
 {
     /**
      * @dataProvider getEmptyTokenCases

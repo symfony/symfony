@@ -11,9 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
+use PhpUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\StopwatchHelper;
 
-class StopwatchHelperTest extends \PHPUnit_Framework_TestCase
+class StopwatchHelperTest extends TestCase
 {
     public function testDevEnvironment()
     {

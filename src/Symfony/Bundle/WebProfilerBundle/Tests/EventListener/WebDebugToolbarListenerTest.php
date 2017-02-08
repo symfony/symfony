@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\EventListener;
 
+use PhpUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class WebDebugToolbarListenerTest extends \PHPUnit_Framework_TestCase
+class WebDebugToolbarListenerTest extends TestCase
 {
     /**
      * @dataProvider getInjectToolbarTests

@@ -11,10 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PhpUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 
-class ProfilerPassTest extends \PHPUnit_Framework_TestCase
+class ProfilerPassTest extends TestCase
 {
     private $profilerDefinition;
 

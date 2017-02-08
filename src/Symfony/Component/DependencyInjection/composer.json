@@ -16,7 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9"
+        "php": ">=5.5.9",
+        "psr/container": "^1.0"
     },
     "require-dev": {
         "symfony/yaml": "~3.2",
@@ -32,6 +33,9 @@
     "conflict": {
         "symfony/config": "<3.3",
         "symfony/yaml": "<3.2"
+    },
+    "provide": {
+        "psr/container-implementation": "1.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },

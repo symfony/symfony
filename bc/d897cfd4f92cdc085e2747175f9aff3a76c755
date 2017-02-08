@@ -1,0 +1,353 @@
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-12T22:42:22Z
+
+About "the mandatory NotFoundExceptionInterface on non-existing service problem", throwing an exception on missing service id is optional in the current implementation while mandatory in the PSR. How should we solve this problem? I was thinking we could deprecate the second argument of `get`, but can we pretend this is a valid implementation if using get with a special argument makes it no longer compliant?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-12T23:16:16Z
+
+> When the 2nd argument is used, we're not in PSR11 anymore
+
+Makes sense. We can't hurt people that don't know which implementation they are using, because if they don't they will probably not risk calling `get` with two arguments. So it's indeed a non-issue.
+
+---------------------------------------------------------------------------
+
+by mnapoli at 2017-01-13T07:41:46Z
+
+@greg0ire
+
+> Makes sense. We can't hurt people that don't know which implementation they are using, because if they don't they will probably not risk calling get with two arguments. So it's indeed a non-issue.
+
+:+1: the interface was designed to be compatible with Symfony's default behavior when called with the PSR signature.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T08:12:58Z
+
+> 👍 the interface was designed to be compatible with Symfony's default behavior when called with the PSR signature.
+
+I did not read the underlying discussions for this spec but there definitely was a "well this is convenient" feeling when implementing it in Symfony 😄
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-13T08:26:12Z
+
+It looks only small changes are required, nice!
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T09:31:46Z
+
+@dunglas yup, that was a breeze :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T12:28:29Z
+
+RuntimeException also isn't it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T12:31:40Z
+
+Why not make ExceptionInterface extend Psr\Container\ContainerExceptionInterface?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T13:20:06Z
+
+> Why not make ExceptionInterface extend Psr\Container\ContainerExceptionInterface?
+
+Only exceptions thrown directly by the container are supposed to implement this, so I only applied it to exceptions listed [here](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Container.php#L14)
+
+This means [this](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Container.php#L253) is an issue doesn't it ? Should I change [this line](https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Container.php#L319) so that the exception thrown here is wrapped into another?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T13:22:30Z
+
+> RuntimeException also isn't it?
+
+Can't find it in Container.php, so no.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T13:28:07Z
+
+In fact, it can, see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php#L601
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T13:29:56Z
+
+And https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L858
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T13:30:33Z
+
+And https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/ContainerBuilder.php#L374
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T13:31:12Z
+
+I suggest to play simpe here. We don't care to add the interface on all exceptions. This wouldn't hurt.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T13:47:32Z
+
+> In fact, it can, see https://github.com/symfony/symfony/blob/master/src/Symfony/Component/DependencyInjection/Dumper/PhpDumper.php#L601
+
+Yeah but :
+
+> Exceptions directly thrown by the container
+
+What does "directly" mean here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T13:50:10Z
+
+I don't know in fact, and that's a good question!
+But throwing this exception in other cases is not going to make things not-PSR11 compliant. It just wouldn't be a normalized use case. Fine, nothing broken.
+I showed you that in fact, via ContainerBuilder, there is a much greater variety of exceptions that can be thrown out there.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T13:51:21Z
+
+Very true, plus, less code, so… I'll change that. @mnapoli , can you advise about the meaning of "directly" here though? You know, for science?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T14:02:44Z
+
+There. The diff is tiny now :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T14:03:50Z
+
+> This means this is an issue doesn't it ? Should I change this line so that the exception thrown here is wrapped into another?
+
+@nicolas-grekas what about this? Any thoughts?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T14:20:49Z
+
+> Should I change this line so that the exception thrown here is wrapped into another?
+
+maybe that's where "directly" applies, meaning "no" to you question.
+
+Why did you remove applying the NotFoundExceptionInterface where applicable?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T14:25:41Z
+
+> maybe that's where "directly" applies, meaning "no" to you question.
+
+indeed :+1:
+
+>  Why did you remove applying the NotFoundExceptionInterface where applicable?
+
+looks like I was to hasty, sorry.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T14:28:35Z
+
+> maybe that's where "directly" applies, meaning "no" to you question.
+
+@mnapoli I'll make a PR to clarify that if you confirm
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T14:29:43Z
+
+> looks like I was to hasty, sorry.
+
+@nicolas-grekas I think I got it right this time
+
+---------------------------------------------------------------------------
+
+by moufmouf at 2017-01-13T17:06:39Z
+
+Hey @greg0ire ,
+
+Looking at the current implementation you are proposing, regarding exceptions, there is a slight hickup.
+
+The `ServiceNotFoundException` from Symfony is used both for saying that the user requested a given service and that a dependency is missing (i.e. one service is performing a lookup on another service that does not exists).
+
+According to PSR-11, we should have 2 different exceptions for this (because only the first case should implement the `ServiceNotFoundExceptionInterface`).
+
+The problem is hopefully easy enough to solve.
+I fixed it in a fork from your fork (inception!), here: https://github.com/moufmouf/symfony/commit/9960c36ae6f42817c34e644df369d6661a46d223
+
+Please merge that change if you find it appropriate.
+
+To solve this issue and keep backward compatibility:
+
+- I created 2 new exceptions: `RequestedServiceNotFoundException` and `MissingDependencyException`.
+- Both exceptions extend the `ServiceNotFoundException` (this way, existing code catching this exception still works)
+- Only the `RequestedServiceNotFoundException` implements the `ServiceNotFoundExceptionInterface`
+
+@nicolas-grekas I've seen your comments on the PHP-FIG mailing list and it's great to have Symfony feedback. We value your opinion and I have a very concrete question: do you think we should standardize a `MissingDependencyExceptionInterface`? Do you think PSR-11 would be a better standard if we do so?
+
+// cc @mnapoli
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T17:20:35Z
+
+At first we think that implementing PSR-11 is trivial - then the exception handling part comes in and the diff becomes a lot less trivial.
+Devil is in the detail (same lesson learned while implementing PSR-16 btw, nothing specific to PSR-11, nor to any PSR really).
+
+> do you think we should standardize a MissingDependencyExceptionInterface? Do you think PSR-11 would be a better standard if we do so?
+
+I do :)
+
+but there are remaining concerns in the recent comments.
+Dunno how to be more constructive here sorry... Fortunately I don't vote on the FIG so it doesn't matter for you if I miss the point :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-13T17:24:13Z
+
+Maybe this, to be constructive: #20658
+I think a PSR with what's currently in PSR-11 + a way for classes/objects to declare a set of services could maybe be worth it.
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T17:34:51Z
+
+@moufmouf @nicolas-grekas I think there might be a contradiction here:
+
+> But throwing this exception in other cases is not going to make things not-PSR11 compliant. It just wouldn't be a normalized use case. Fine, nothing broken.
+
+> because only the first case should implement the ServiceNotFoundExceptionInterface
+
+So which is it? Can exceptions that are not supposed to implement a psr interface implement it anyway or not?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T18:12:28Z
+
+After more thoughts @moufmouf @nicolas-grekas I think you're both right, I just couldn't understand why, but it might be because `ContainerInterface` is just a marker interface, while `ServiceNotFoundExceptionInterface` conveys meaning. Would that be why you did not add the suffix to the latter exception [at first](https://github.com/php-fig/container/pull/9/files), but did add it to the former?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T18:14:57Z
+
+>  I fixed it in a fork from your fork (inception!), here: moufmouf@9960c36
+
+I went all the way through with your inception concept and created a meta-PR : https://github.com/greg0ire/symfony/pull/1/files (will rebase once merged though)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-13T18:32:25Z
+
+Added @moufmouf 's commit to my PR
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-15T19:10:11Z
+
+@keradus : made exceptions introduced by @moufmouf final. Thanks for reviewing!
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-16T10:01:54Z
+
+> given the recent discussion on the FIG about it, maybe you should just wait
+> because it might not be necessary to do this change at all in the end
+
+— @nicolas-grekas , [on the symfony dev slack channel](https://symfony-devs.slack.com/archives/general/p1484559452004865)
+
+I'm putting this on hold until said discussion is resolved
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-23T13:25:43Z
+
+Now that https://github.com/php-fig/fig-standards/pull/869 has been merged, I think we can remove the second commit here, isn't it?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-23T13:56:37Z
+
+> Now that php-fig/fig-standards#869 has been merged
+
+TL;DR There should be no distinction between missing dependency and service not found
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-01-23T13:58:52Z
+
+~~I also should rework the first commit so that it does not reference this interface anymore, shouldn't I?~~ oh no I misread
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T09:42:48Z
+
+Rebase needed + missing autowiring-type for `service_container` in `src/Symfony/Bundle/FrameworkBundle/Resources/config/services.xml`
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-01T10:05:06Z
+
+@nicolas-grekas fixed
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-01T19:19:04Z
+
+Travis passes although there is no stable release yet… I don't get it. It there `minimum-stability: dev` somewhere?
+
+EDIT: answering my own question, it's [right in the composer.json](https://github.com/symfony/symfony/pull/21265/files#diff-b5d0ee8c97c7abd7e3fa29b9a27d1780R126)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-01T23:24:56Z
+
+another rebase please? should be the last :)
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-02T07:23:06Z
+
+Oh wow bye bye autowiring huh? I noticed the service was no longer synthetic too, is that normal? Not sure I got it right…
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-02T07:27:56Z
+
+You got it right. See #21494 for more info about this change.
+The `service_container` is already declared implicitly, it was here only to add autowiring-types, but these are gone now.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2017-02-08T10:43:58Z
+
+Needs review?
+
+---------------------------------------------------------------------------
+
+by greg0ire at 2017-02-08T10:48:23Z
+
+> Needs review?
+
+The more eyeballs the better, not sure you are going to find much to say now though.
+
+I think the `Needs work` label could maybe be removed, this is more `blocked`, because we are waiting for a release of the psr dependency.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-08T11:56:04Z
+
+👍

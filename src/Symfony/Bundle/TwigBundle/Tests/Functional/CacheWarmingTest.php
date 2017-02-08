@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests;
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Filesystem\Filesystem;

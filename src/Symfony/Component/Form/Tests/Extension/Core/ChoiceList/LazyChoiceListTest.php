@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\ChoiceList;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\Tests\Extension\Core\ChoiceList\Fixtures\LazyChoiceListImpl;
@@ -19,7 +20,7 @@ use Symfony\Component\Form\Tests\Extension\Core\ChoiceList\Fixtures\LazyChoiceLi
 /**
  * @group legacy
  */
-class LazyChoiceListTest extends \PHPUnit_Framework_TestCase
+class LazyChoiceListTest extends TestCase
 {
     /**
      * @var LazyChoiceListImpl

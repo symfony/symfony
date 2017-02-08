@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -20,7 +21,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\TestNormalizer;
 use Symfony\Component\Serializer\Tests\Normalizer\TestDenormalizer;
 
-class SerializerTest extends \PHPUnit_Framework_TestCase
+class SerializerTest extends TestCase
 {
     public function testInterface()
     {

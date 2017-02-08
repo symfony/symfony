@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\CssSelector\Tests\Node;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Node\Specificity;
 
-class SpecificityTest extends \PHPUnit_Framework_TestCase
+class SpecificityTest extends TestCase
 {
     /** @dataProvider getValueTestData */
     public function testValue(Specificity $specificity, $value)

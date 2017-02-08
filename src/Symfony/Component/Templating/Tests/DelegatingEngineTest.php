@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Templating\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Templating\StreamingEngineInterface;
 use Symfony\Component\Templating\EngineInterface;
 
-class DelegatingEngineTest extends \PHPUnit_Framework_TestCase
+class DelegatingEngineTest extends TestCase
 {
     public function testRenderDelegatesToSupportedEngine()
     {

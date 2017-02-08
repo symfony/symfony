@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy\Instantiator;
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\Definition;
 

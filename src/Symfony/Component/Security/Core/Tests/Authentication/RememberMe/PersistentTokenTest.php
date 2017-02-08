@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\RememberMe;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 
-class PersistentTokenTest extends \PHPUnit_Framework_TestCase
+class PersistentTokenTest extends TestCase
 {
     public function testConstructor()
     {

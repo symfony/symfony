@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Csrf\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 
-class CsrfValidationListenerTest extends \PHPUnit_Framework_TestCase
+class CsrfValidationListenerTest extends TestCase
 {
     protected $dispatcher;
     protected $factory;

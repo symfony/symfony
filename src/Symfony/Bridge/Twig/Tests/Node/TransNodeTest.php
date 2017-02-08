@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Node;
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\TransNode;
 
 /**

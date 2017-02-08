@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\OptionsResolver\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;
 
 /**
  * @group legacy
  */
-class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
+class LegacyOptionsResolverTest extends TestCase
 {
     /**
      * @var OptionsResolver
@@ -122,7 +123,7 @@ class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->resolver->setDefaults(array(
             'two' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
+                /* @var \PHPUnit\Framework\TestCase $test */
                 $test->assertFalse(isset($options['one']));
 
                 return '2';
@@ -146,7 +147,7 @@ class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->resolver->setDefaults(array(
             'two' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
+                /* @var \PHPUnit\Framework\TestCase $test */
                 $test->assertTrue(isset($options['one']));
 
                 return $options['one'].'2';
@@ -190,7 +191,7 @@ class LegacyOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
         $this->resolver->setDefaults(array(
             'one' => function (Options $options) use ($test) {
-                /* @var \PHPUnit_Framework_TestCase $test */
+                /* @var \PHPUnit\Framework\TestCase $test */
                 $test->fail('Previous closure should not be executed');
             },
         ));

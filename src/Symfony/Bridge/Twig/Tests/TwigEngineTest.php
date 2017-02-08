@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests;
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\TwigEngine;
 use Symfony\Component\Templating\TemplateReference;
 

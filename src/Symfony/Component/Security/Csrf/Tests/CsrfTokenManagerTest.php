@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Security\Csrf\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class CsrfTokenManagerTest extends \PHPUnit_Framework_TestCase
+class CsrfTokenManagerTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

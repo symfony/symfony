@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ContainerAwareHttpKernel;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * @group legacy
  */
-class ContainerAwareHttpKernelTest extends \PHPUnit_Framework_TestCase
+class ContainerAwareHttpKernelTest extends TestCase
 {
     /**
      * @dataProvider getProviderTypes

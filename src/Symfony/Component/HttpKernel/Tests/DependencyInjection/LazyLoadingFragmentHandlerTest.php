@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\DependencyInjection\LazyLoadingFragmentHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LazyLoadingFragmentHandlerTest extends \PHPUnit_Framework_TestCase
+class LazyLoadingFragmentHandlerTest extends TestCase
 {
     public function test()
     {

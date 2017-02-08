@@ -13,7 +13,7 @@ namespace Symfony\Bridge\ProxyManager\Tests\LazyProxy;
 
 require_once __DIR__.'/Fixtures/includes/foo.php';
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

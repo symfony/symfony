@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\NodeVisitor;
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\NodeVisitor\Scope;
 
 class ScopeTest extends TestCase

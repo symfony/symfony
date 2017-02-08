@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddConstraintValidatorsPass;
 
 class AddConstraintValidatorsPassTest extends TestCase

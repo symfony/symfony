@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Tests\Dbal;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Dbal\AclProvider;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -20,7 +21,7 @@ use Doctrine\DBAL\DriverManager;
 /**
  * @group benchmark
  */
-class AclProviderBenchmarkTest extends \PHPUnit_Framework_TestCase
+class AclProviderBenchmarkTest extends TestCase
 {
     /** @var \Doctrine\DBAL\Connection */
     protected $con;

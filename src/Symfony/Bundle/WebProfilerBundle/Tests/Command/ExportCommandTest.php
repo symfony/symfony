@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Command;
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Command\ExportCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\Profiler\Profile;

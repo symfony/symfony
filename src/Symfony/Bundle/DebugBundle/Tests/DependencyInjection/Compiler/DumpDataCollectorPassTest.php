@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\DebugBundle\Tests\DependencyInjection\Compiler;
 
-use PhpUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\DebugBundle\DependencyInjection\Compiler\DumpDataCollectorPass;
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

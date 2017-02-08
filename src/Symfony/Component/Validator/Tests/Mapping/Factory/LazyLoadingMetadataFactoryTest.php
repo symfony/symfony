@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 
-class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
+class LazyLoadingMetadataFactoryTest extends TestCase
 {
     const CLASS_NAME = 'Symfony\Component\Validator\Tests\Fixtures\Entity';
     const PARENT_CLASS = 'Symfony\Component\Validator\Tests\Fixtures\EntityParent';

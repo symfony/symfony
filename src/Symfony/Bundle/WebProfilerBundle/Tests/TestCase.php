@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests;
 
-use PhpUnit\Framework\TestCase as PHPUnitTestCase;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 class TestCase extends PHPUnitTestCase
 {

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Loader;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderResolver;
 
-class LoaderResolverTest extends \PHPUnit_Framework_TestCase
+class LoaderResolverTest extends TestCase
 {
     public function testConstructor()
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -26,7 +27,7 @@ use Symfony\Component\Validator\Validation;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractConstraintValidatorTest extends TestCase
 {
     /**
      * @var ExecutionContextInterface

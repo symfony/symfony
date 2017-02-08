@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ResolvedFormType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
+class ResolvedFormTypeTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -61,7 +62,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
         $assertIndexAndAddOption = function ($index, $option, $default) use (&$i, $test) {
             return function (OptionsResolver $resolver) use (&$i, $test, $index, $option, $default) {
-                /* @var \PHPUnit_Framework_TestCase $test */
+                /* @var \PHPUnit\Framework\TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
@@ -160,7 +161,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
         $assertIndex = function ($index) use (&$i, $test) {
             return function () use (&$i, $test, $index) {
-                /* @var \PHPUnit_Framework_TestCase $test */
+                /* @var \PHPUnit\Framework\TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
@@ -228,7 +229,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
         $assertIndex = function ($index) use (&$i, $test) {
             return function () use (&$i, $test, $index) {
-                /* @var \PHPUnit_Framework_TestCase $test */
+                /* @var \PHPUnit\Framework\TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;
@@ -272,7 +273,7 @@ class ResolvedFormTypeTest extends \PHPUnit_Framework_TestCase
 
         $assertIndex = function ($index) use (&$i, $test) {
             return function () use (&$i, $test, $index) {
-                /* @var \PHPUnit_Framework_TestCase $test */
+                /* @var \PHPUnit\Framework\TestCase $test */
                 $test->assertEquals($index, $i, 'Executed at index '.$index);
 
                 ++$i;

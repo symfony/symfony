@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\OptionsResolver\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
+class OptionsResolver2Dot6Test extends TestCase
 {
     /**
      * @var OptionsResolver
@@ -1024,7 +1025,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('norm', 'baz');
 
         $this->resolver->setNormalizer('norm', function (Options $options) {
-            /* @var \PHPUnit_Framework_TestCase $test */
+            /* @var \PHPUnit\Framework\TestCase $test */
             \PHPUnit_Framework_Assert::assertSame('bar', $options['default']);
 
             return 'normalized';
@@ -1044,7 +1045,7 @@ class OptionsResolver2Dot6Test extends \PHPUnit_Framework_TestCase
         $this->resolver->setDefault('norm', 'baz');
 
         $this->resolver->setNormalizer('norm', function (Options $options) {
-            /* @var \PHPUnit_Framework_TestCase $test */
+            /* @var \PHPUnit\Framework\TestCase $test */
             \PHPUnit_Framework_Assert::assertEquals('bar', $options['lazy']);
 
             return 'normalized';

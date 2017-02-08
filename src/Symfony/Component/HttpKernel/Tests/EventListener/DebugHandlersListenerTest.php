@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Command\Command;
@@ -32,7 +33,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class DebugHandlersListenerTest extends \PHPUnit_Framework_TestCase
+class DebugHandlersListenerTest extends TestCase
 {
     public function testConfigure()
     {

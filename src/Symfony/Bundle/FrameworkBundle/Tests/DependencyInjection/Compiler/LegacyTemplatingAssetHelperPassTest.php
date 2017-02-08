@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TemplatingAssetHelperPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -19,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * @group legacy
  */
-class LegacyTemplatingAssetHelperPassTest extends \PHPUnit_Framework_TestCase
+class LegacyTemplatingAssetHelperPassTest extends TestCase
 {
     public function getScopesTests()
     {

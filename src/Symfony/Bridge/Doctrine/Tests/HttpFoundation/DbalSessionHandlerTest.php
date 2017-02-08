@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\HttpFoundation;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Bridge\Doctrine\HttpFoundation\DbalSessionHandler;
  *
  * @author Drak <drak@zikula.org>
  */
-class DbalSessionHandlerTest extends \PHPUnit_Framework_TestCase
+class DbalSessionHandlerTest extends TestCase
 {
     public function testConstruct()
     {

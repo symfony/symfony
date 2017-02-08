@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
-abstract class AbstractProfilerStorageTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractProfilerStorageTest extends TestCase
 {
     public function testStore()
     {

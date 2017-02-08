@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Tests\Domain;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
@@ -18,7 +19,7 @@ use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\DoctrineAclCache;
 use Doctrine\Common\Cache\ArrayCache;
 
-class DoctrineAclCacheTest extends \PHPUnit_Framework_TestCase
+class DoctrineAclCacheTest extends TestCase
 {
     protected $permissionGrantingStrategy;
 

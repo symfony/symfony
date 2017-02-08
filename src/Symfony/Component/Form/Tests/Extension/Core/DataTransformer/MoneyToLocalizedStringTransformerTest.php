@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class MoneyToLocalizedStringTransformerTest extends \PHPUnit_Framework_TestCase
+class MoneyToLocalizedStringTransformerTest extends TestCase
 {
     public function testTransform()
     {

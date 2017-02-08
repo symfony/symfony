@@ -11,12 +11,13 @@
 
 namespace Symfony\Bridge\Twig\Tests\Command;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Command\LintCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class LintCommandTest extends \PHPUnit_Framework_TestCase
+class LintCommandTest extends TestCase
 {
     private $files;
 

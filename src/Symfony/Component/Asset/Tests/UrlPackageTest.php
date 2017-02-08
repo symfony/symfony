@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Asset\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\UrlPackage;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
 
-class UrlPackageTest extends \PHPUnit_Framework_TestCase
+class UrlPackageTest extends TestCase
 {
     /**
      * @dataProvider getConfigs

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\ArrayKeyChoiceList;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
@@ -18,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\EventListener\FixRadioInputListener;
 /**
  * @group legacy
  */
-class FixRadioInputListenerTest extends \PHPUnit_Framework_TestCase
+class FixRadioInputListenerTest extends TestCase
 {
     private $choiceList;
 

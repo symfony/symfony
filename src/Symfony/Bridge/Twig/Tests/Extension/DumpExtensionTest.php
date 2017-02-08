@@ -11,11 +11,12 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\DumpExtension;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
-class DumpExtensionTest extends \PHPUnit_Framework_TestCase
+class DumpExtensionTest extends TestCase
 {
     /**
      * @dataProvider getDumpTags

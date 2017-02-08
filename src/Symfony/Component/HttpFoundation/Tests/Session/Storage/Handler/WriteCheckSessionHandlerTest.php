@@ -11,12 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
 
 /**
  * @author Adrien Brault <adrien.brault@gmail.com>
  */
-class WriteCheckSessionHandlerTest extends \PHPUnit_Framework_TestCase
+class WriteCheckSessionHandlerTest extends TestCase
 {
     public function test()
     {

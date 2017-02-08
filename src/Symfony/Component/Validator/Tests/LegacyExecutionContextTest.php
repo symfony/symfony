@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
@@ -23,7 +24,7 @@ use Symfony\Component\Validator\ValidationVisitor;
 /**
  * @group legacy
  */
-class LegacyExecutionContextTest extends \PHPUnit_Framework_TestCase
+class LegacyExecutionContextTest extends TestCase
 {
     const TRANS_DOMAIN = 'trans_domain';
 

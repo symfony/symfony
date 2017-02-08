@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ServerBag;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\ServerBag;
  *
  * @author Bulat Shakirzyanov <mallluhuct@gmail.com>
  */
-class ServerBagTest extends \PHPUnit_Framework_TestCase
+class ServerBagTest extends TestCase
 {
     public function testShouldExtractHeadersFromServerArray()
     {

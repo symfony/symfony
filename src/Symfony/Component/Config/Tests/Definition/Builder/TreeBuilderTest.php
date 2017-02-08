@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Tests\Definition\Builder\NodeBuilder as CustomNodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
@@ -18,7 +19,7 @@ require __DIR__.'/../../Fixtures/Builder/NodeBuilder.php';
 require __DIR__.'/../../Fixtures/Builder/BarNodeDefinition.php';
 require __DIR__.'/../../Fixtures/Builder/VariableNodeDefinition.php';
 
-class TreeBuilderTest extends \PHPUnit_Framework_TestCase
+class TreeBuilderTest extends TestCase
 {
     public function testUsingACustomNodeBuilder()
     {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Acl\Tests\Dbal;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Dbal\AclProvider;
 use Symfony\Component\Security\Acl\Domain\PermissionGrantingStrategy;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -20,7 +21,7 @@ use Doctrine\DBAL\DriverManager;
 /**
  * @requires extension pdo_sqlite
  */
-class AclProviderTest extends \PHPUnit_Framework_TestCase
+class AclProviderTest extends TestCase
 {
     protected $con;
     protected $insertClassStmt;

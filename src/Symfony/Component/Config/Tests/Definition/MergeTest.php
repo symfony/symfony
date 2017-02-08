@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
-class MergeTest extends \PHPUnit_Framework_TestCase
+class MergeTest extends TestCase
 {
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException

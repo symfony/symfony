@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Tests\Util
 {
+
+    use PHPUnit\Framework\TestCase;
     use Symfony\Component\Security\Core\Util\ClassUtils;
 
-    class ClassUtilsTest extends \PHPUnit_Framework_TestCase
+    class ClassUtilsTest extends TestCase
     {
         public static function dataGetClass()
         {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\ChoiceList;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\LegacyChoiceListAdapter;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
 
@@ -18,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceListInterface;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @group legacy
  */
-class LegacyChoiceListAdapterTest extends \PHPUnit_Framework_TestCase
+class LegacyChoiceListAdapterTest extends TestCase
 {
     /**
      * @var LegacyChoiceListAdapter

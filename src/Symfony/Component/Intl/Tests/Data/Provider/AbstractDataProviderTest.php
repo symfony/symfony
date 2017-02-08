@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Provider;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Locale;
@@ -18,7 +19,7 @@ use Symfony\Component\Intl\Locale;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractDataProviderTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractDataProviderTest extends TestCase
 {
     // Include the locales statically so that the data providers are decoupled
     // from the Intl class. Otherwise tests will fail if the intl extension is

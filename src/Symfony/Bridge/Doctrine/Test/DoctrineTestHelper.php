@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Test;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\EntityManager;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Provides utility functions needed in tests.
@@ -30,7 +31,7 @@ class DoctrineTestHelper
     public static function createTestEntityManager()
     {
         if (!extension_loaded('pdo_sqlite')) {
-            \PHPUnit_Framework_TestCase::markTestSkipped('Extension pdo_sqlite is required.');
+            TestCase::markTestSkipped('Extension pdo_sqlite is required.');
         }
 
         $config = new \Doctrine\ORM\Configuration();

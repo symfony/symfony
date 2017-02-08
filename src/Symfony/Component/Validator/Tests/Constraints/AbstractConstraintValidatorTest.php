@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -26,7 +28,7 @@ use Symfony\Component\Validator\Validation;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractConstraintValidatorTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractConstraintValidatorTest extends TestCase
 {
     /**
      * @var ExecutionContextInterface
@@ -411,12 +413,12 @@ class ConstraintViolationAssertion
 
         $violations = iterator_to_array($this->context->getViolations());
 
-        \PHPUnit_Framework_Assert::assertSame($expectedCount = count($expected), $violationsCount = count($violations), sprintf('%u violation(s) expected. Got %u.', $expectedCount, $violationsCount));
+        Assert::assertSame($expectedCount = count($expected), $violationsCount = count($violations), sprintf('%u violation(s) expected. Got %u.', $expectedCount, $violationsCount));
 
         reset($violations);
 
         foreach ($expected as $violation) {
-            \PHPUnit_Framework_Assert::assertEquals($violation, current($violations));
+            Assert::assertEquals($violation, current($violations));
             next($violations);
         }
     }

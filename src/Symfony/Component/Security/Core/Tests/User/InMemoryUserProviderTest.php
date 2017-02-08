@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Tests\User;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\User;
 
-class InMemoryUserProviderTest extends \PHPUnit_Framework_TestCase
+class InMemoryUserProviderTest extends TestCase
 {
     public function testConstructor()
     {

@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token\Storage;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
-class TokenStorageTest extends \PHPUnit_Framework_TestCase
+class TokenStorageTest extends TestCase
 {
     public function testGetSetToken()
     {

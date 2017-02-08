@@ -11,10 +11,11 @@
 
 namespace Symfony\Component\Security\Core\Tests\Role;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\Role\Role;
 
-class RoleHierarchyTest extends \PHPUnit_Framework_TestCase
+class RoleHierarchyTest extends TestCase
 {
     public function testGetReachableRoles()
     {

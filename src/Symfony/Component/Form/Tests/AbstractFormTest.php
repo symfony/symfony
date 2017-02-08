@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-abstract class AbstractFormTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractFormTest extends TestCase
 {
     /**
      * @var EventDispatcherInterface

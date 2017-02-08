@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -23,7 +24,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ContextListenerTest extends \PHPUnit_Framework_TestCase
+class ContextListenerTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException

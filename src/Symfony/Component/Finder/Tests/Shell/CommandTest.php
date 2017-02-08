@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Finder\Tests\Shell;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Shell\Command;
 
-class CommandTest extends \PHPUnit_Framework_TestCase
+class CommandTest extends TestCase
 {
     public function testCreate()
     {

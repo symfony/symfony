@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\HttpFoundation\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\HttpFoundation\EventListener\BindRequestListener;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * @author Bernhard Schussek <bschussek@gmail.com>
  * @group legacy
  */
-class LegacyBindRequestListenerTest extends \PHPUnit_Framework_TestCase
+class LegacyBindRequestListenerTest extends TestCase
 {
     private $values;
 

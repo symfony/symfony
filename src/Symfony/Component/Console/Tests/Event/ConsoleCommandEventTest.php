@@ -30,8 +30,8 @@ class ConsoleCommandEventTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->command = new Command('my_mock_command');
-        $this->input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
-        $this->output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $this->input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
+        $this->output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
     }
 
     public function testDisableCommand()

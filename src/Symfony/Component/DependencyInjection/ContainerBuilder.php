@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceExce
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
@@ -658,15 +659,38 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *  * Parameter values are resolved;
      *  * The parameter bag is frozen;
      *  * Extension loading is disabled.
+     *
+     * @param bool $resolveEnvPlaceholders Whether %env()% parameters should be resolved using the current
+     *                                     env vars or be replaced by uniquely identifiable placeholders.
+     *                                     Set to "true" when you want to use the current ContainerBuilder
+     *                                     directly, keep to "false" when the container is dumped instead.
      */
-    public function compile()
+    public function compile(/*$resolveEnvPlaceholders = false*/)
     {
+        if (1 <= func_num_args()) {
+            $resolveEnvPlaceholders = func_get_arg(0);
+        } else {
+            if (__CLASS__ !== static::class) {
+                $r = new \ReflectionMethod($this, __FUNCTION__);
+                if (__CLASS__ !== $r->getDeclaringClass()->getName() && (1 > $r->getNumberOfParameters() || 'resolveEnvPlaceholders' !== $r->getParameters()[0]->name)) {
+                    @trigger_error(sprintf('The %s::compile() method expects a first "$resolveEnvPlaceholders" argument since version 3.3. It will be made mandatory in 4.0.', static::class), E_USER_DEPRECATED);
+                }
+            }
+            $resolveEnvPlaceholders = false;
+        }
         $compiler = $this->getCompiler();
 
         if ($this->trackResources) {
             foreach ($compiler->getPassConfig()->getPasses() as $pass) {
                 $this->addObjectResource($pass);
             }
+        }
+        $bag = $this->getParameterBag();
+
+        if ($resolveEnvPlaceholders && $bag instanceof EnvPlaceholderParameterBag) {
+            $this->parameterBag = new ParameterBag($this->resolveEnvPlaceholders($bag->all(), true));
+            $this->envPlaceholders = $bag->getEnvPlaceholders();
+            $this->parameterBag = $bag = new ParameterBag($this->resolveEnvPlaceholders($this->parameterBag->all()));
         }
 
         $compiler->compile($this);
@@ -681,7 +705,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         $this->extensionConfigs = array();
-        $bag = $this->getParameterBag();
 
         parent::compile();
 

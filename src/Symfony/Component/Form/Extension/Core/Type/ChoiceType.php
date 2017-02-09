@@ -161,8 +161,8 @@ class ChoiceType extends AbstractType
             $builder->addEventSubscriber(new MergeCollectionListener(true, true));
         }
 
-        // To avoid some problem against treating of array (e.g. Array to string conversion),
-        // we have to first ensure the all elements of submitted data ain't an array.
+        // To avoid issues when the submitted choices are arrays (i.e. array to string conversions),
+        // we have to ensure that all elements of the submitted choice data are strings or null.
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
 

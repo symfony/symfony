@@ -114,15 +114,13 @@ EOF
             return array('file' => $file, 'valid' => true);
         }
 
-        $errorMessages = array();
-        foreach (libxml_get_errors() as $error) {
-            // general document errors have a '-1' line number
-            if (-1 === $error->line) {
-                $errorMessages[] = $error->message;
-            } else {
-                $errorMessages[] = sprintf('Line %d, Column %d: %s', $error->line, $error->column, trim($error->message));
-            }
-        }
+        $errorMessages = array_map(function ($error) {
+            return array(
+                'line' => $error->line,
+                'column' => $error->column,
+                'message' => trim($error->message),
+            );
+        }, libxml_get_errors());
 
         libxml_clear_errors();
         libxml_use_internal_errors(false);
@@ -153,7 +151,10 @@ EOF
             } elseif (!$info['valid']) {
                 ++$erroredFiles;
                 $io->text('<error> ERROR </error>'.($info['file'] ? sprintf(' in %s', $info['file']) : ''));
-                $io->listing($info['messages']);
+                $io->listing(array_map(function ($error) {
+                    // general document errors have a '-1' line number
+                    return -1 === $error['line'] ? $error['message'] : sprintf('Line %d, Column %d: %s', $error['line'], $error['column'], $error['message']);
+                }, $info['messages']));
             }
         }
 

@@ -70,7 +70,7 @@ EOF
      */
     public function isEnabled()
     {
-        return class_exists(BaseLintCommand::class) && parent::isEnabled();
+        return class_exists(BaseLintCommand::class);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

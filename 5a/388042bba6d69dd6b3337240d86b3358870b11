@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-07T16:11:13Z
+
+Note that the simpler TaggedValue proposal is still compatible with having the Yaml component hydrate things. It would just require a separate class whose responsibility would be solely to hydrate the TaggedValue objects to something else. This would remove this responsibility from the Yaml parser classes, which looks like a good idea to me.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-11T20:27:08Z
+
+Should I add mappings/sequences support here to be able to implement `!iterator` or do you prefer me to do it later in another PR?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-11T20:40:43Z
+
+ It would be good to have support in this PR I think.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-13T11:30:52Z
+
+@nicolas-grekas thanks, i'll fix your comments this evening.
+I'm locking on the inline part for now and also on how to dump objects, should we add `supportsDump`/`normalize` methods to dump DI iterators? We could also dump iterators as simple arrays but that's a bit annoying.
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-13T20:11:11Z
+
+Last commits added inline support (`!foo {quz: bar}`), a `IteratorTag` in the DependencyInjection component and a way to dump tags (`DumpableTagInterface`) because of DI YamlDumper.
+
+Fabbot failure is normal (the current yaml parser can't parse the updated yaml files).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-15T08:23:21Z
+
+Let me propose a simpler alternative as a first step.
+The current state looks interesting, but we don't need the "TagInterface" right now.
+This looks like over-engineering to me to commit this today.
+
+So, my proposal is the following:
+- keep the first "$tags" argument on Yaml::parse(), but make it a simple array of strings: the tags one opts-in to support
+- let's the parser turn these into "TaggedValue" objects.
+- and the dumper turn these back to tags
+
+On the DI side, lets just convert from/to "TaggedValue". Done.
+
+**Later on if needed**
+
+then we could continue and allow `$tags` to be this array of keyed `TagInterface[]` without any BC issue.
+The parsing side could be the same as the current one.
+And the dumping side would work with `TaggedValue` as the semantical unit for the dumper to know where a tag should be inserted.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-01-15T15:29:57Z
+
+As discussed with @nicolas-grekas, the last commit uses a new flag `Yaml::PARSE_CUSTOM_TAGS` that converts any mapping or sequence tagged with a custom tag (excludes `!!binary`, `!php/const:`, ...) to a `TaggedValue`.
+Tagged scalars are deprecated (`!foo bar` returning `"!foo bar"`) and will be converted to a `TaggedValue` in 4.0. We chose this behaviour because we don't need them yet and it reduces the bc impact.
+
+A small bc break that I chose to let to not complicate the code:
+```yml
+foo: !bar
+    foo bar
+```
+will be the only scalar converted to a `TaggedValue` before 4.0.
+
+Edit: note that tagged keys are not supported.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-15T19:08:50Z
+
+:+1: (just a fabbot failure to fix)
+Status: needs review
+@xabbuh, your turn :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-06T11:51:03Z
+
+rebase needed
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2017-02-09T15:47:26Z
+
+I think we should flag the feature as experimental. @GuilhemN Can you do that?
+
+---------------------------------------------------------------------------
+
+by GuilhemN at 2017-02-09T16:34:56Z
+
+@xabbuh done.

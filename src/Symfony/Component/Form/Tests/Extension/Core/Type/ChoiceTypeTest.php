@@ -2285,16 +2285,6 @@ class ChoiceTypeTest extends TypeTestCase
         $this->assertNull($form->get('subChoice')->getConfig()->getOption('choice_label'));
     }
 
-    public function invalidNestedValueTestMatrix()
-    {
-        return array(
-            'non-multiple, non-expanded' => array(false, false, array(array())),
-            'non-multiple, expanded' => array(false, true, array(array())),
-            'multiple, non-expanded' => array(true, false, array(array())),
-            'multiple, expanded' => array(true, true, array(array())),
-        );
-    }
-
     /**
      * @dataProvider invalidNestedValueTestMatrix
      */
@@ -2309,5 +2299,15 @@ class ChoiceTypeTest extends TypeTestCase
         $form->submit($submissionData);
         $this->assertFalse($form->isSynchronized());
         $this->assertEquals('All choices submitted must be NULL or strings.', $form->getTransformationFailure()->getMessage());
+    }
+
+    public function invalidNestedValueTestMatrix()
+    {
+        return array(
+            'non-multiple, non-expanded' => array(false, false, array(array())),
+            'non-multiple, expanded' => array(false, true, array(array())),
+            'multiple, non-expanded' => array(true, false, array(array())),
+            'multiple, expanded' => array(true, true, array(array())),
+        );
     }
 }

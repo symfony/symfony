@@ -174,10 +174,14 @@ class LazyLoadingMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $reader = new \Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader();
         $factory = new LazyLoadingMetadataFactory($reader);
         $metadata = $factory->getMetadataFor('Symfony\Component\Validator\Tests\Fixtures\EntityStaticCarTurbo');
-        $classMetaData = $metadata->getPropertyMetadata('wheels');
-        $constraints = $classMetaData[0]->getConstraints();
-        $groups = $constraints[0]->groups;
+        $groups = array();
 
+        foreach ($metadata->getPropertyMetadata('wheels') as $propertyMetadata) {
+            $constraints = $propertyMetadata->getConstraints();
+            $groups = array_replace($groups, $constraints[0]->groups);
+        }
+
+        $this->assertCount(4, $groups);
         $this->assertContains('Default', $groups);
         $this->assertContains('EntityStaticCarTurbo', $groups);
         $this->assertContains('EntityStaticCar', $groups);

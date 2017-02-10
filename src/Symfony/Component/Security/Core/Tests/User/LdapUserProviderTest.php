@@ -151,10 +151,7 @@ class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\InvalidArgumentException
-     */
-    public function testLoadUserByUsernameFailsIfEntryHasNoUidKeyAttribute()
+    public function testLoadUserByUsernameShouldNotFailIfEntryHasNoUidKeyAttribute()
     {
         $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
         $query = $this->getMockBuilder(QueryInterface::class)->getMock();

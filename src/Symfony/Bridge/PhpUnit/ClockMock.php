@@ -16,8 +16,16 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class ClockMock
 {
+    /**
+     * @var float
+     */
     private static $now;
 
+    /**
+     * @param null|int $enable
+     *
+     * @return bool
+     */
     public static function withClockMock($enable = null)
     {
         if (null === $enable) {
@@ -27,6 +35,11 @@ class ClockMock
         self::$now = is_numeric($enable) ? (float) $enable : ($enable ? microtime(true) : null);
     }
 
+    /**
+     * Return current Unix timestamp.
+     *
+     * @return int
+     */
     public static function time()
     {
         if (null === self::$now) {
@@ -36,6 +49,13 @@ class ClockMock
         return (int) self::$now;
     }
 
+    /**
+     * Delay execution in seconds.
+     *
+     * @param int $s Halt time in seconds.
+     *
+     * @return int
+     */
     public static function sleep($s)
     {
         if (null === self::$now) {
@@ -47,6 +67,11 @@ class ClockMock
         return 0;
     }
 
+    /**
+     * Delay execution in microseconds.
+     *
+     * @param int $us Halt time in micro seconds
+     */
     public static function usleep($us)
     {
         if (null === self::$now) {
@@ -56,6 +81,13 @@ class ClockMock
         self::$now += $us / 1000000;
     }
 
+    /**
+     * Return current Unix timestamp with microseconds.
+     *
+     * @param bool $asFloat Get a float instead of a string
+     *
+     * @return float|string
+     */
     public static function microtime($asFloat = false)
     {
         if (null === self::$now) {
@@ -69,6 +101,11 @@ class ClockMock
         return sprintf("%0.6f %d\n", self::$now - (int) self::$now, (int) self::$now);
     }
 
+    /**
+     * Registers and configures the clock mock handler.
+     *
+     * @param string $class
+     */
     public static function register($class)
     {
         $self = get_called_class();

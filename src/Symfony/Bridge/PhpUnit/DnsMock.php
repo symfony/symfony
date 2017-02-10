@@ -16,7 +16,14 @@ namespace Symfony\Bridge\PhpUnit;
  */
 class DnsMock
 {
+    /**
+     * @var array
+     */
     private static $hosts = array();
+
+    /**
+     * @var array
+     */
     private static $dnsTypes = array(
         'A' => DNS_A,
         'MX' => DNS_MX,
@@ -42,6 +49,14 @@ class DnsMock
         self::$hosts = $hosts;
     }
 
+    /**
+     * Searches DNS for records of type type corresponding to host.
+     *
+     * @param string $hostname May either be the IP address in dotted-quad notation or the host name.
+     * @param string $type     May be any one of: A, MX, NS, SOA, PTR, CNAME, AAAA, A6, SRV, NAPTR, TXT or ANY.
+     *
+     * @return bool
+     */
     public static function checkdnsrr($hostname, $type = 'MX')
     {
         if (!self::$hosts) {
@@ -63,6 +78,15 @@ class DnsMock
         return false;
     }
 
+    /**
+     * Searches DNS for MX records corresponding to hostname.
+     *
+     * @param string     $hostname The Internet host name.
+     * @param array      $mxhosts  List of the MX records found is placed into the array mxhosts.
+     * @param array|null $weight   If the weight array is given, it will be filled with the weight information gathered.
+     *
+     * @return bool
+     */
     public static function getmxrr($hostname, &$mxhosts, &$weight = null)
     {
         if (!self::$hosts) {
@@ -82,6 +106,13 @@ class DnsMock
         return (bool) $mxhosts;
     }
 
+    /**
+     * Returns the host name of the Internet host specified by ip_address.
+     *
+     * @param string $ipAddress The host IP address.
+     *
+     * @return int|string
+     */
     public static function gethostbyaddr($ipAddress)
     {
         if (!self::$hosts) {
@@ -101,6 +132,13 @@ class DnsMock
         return $ipAddress;
     }
 
+    /**
+     * Returns the IPv4 address of the Internet host specified by hostname.
+     *
+     * @param string $hostname The host name.
+     *
+     * @return string
+     */
     public static function gethostbyname($hostname)
     {
         if (!self::$hosts) {
@@ -117,6 +155,13 @@ class DnsMock
         return $hostname;
     }
 
+    /**
+     * Returns a list of IPv4 addresses to which the Internet host specified by hostname resolves.
+     *
+     * @param string $hostname The host name.
+     *
+     * @return array|bool
+     */
     public static function gethostbynamel($hostname)
     {
         if (!self::$hosts) {
@@ -137,6 +182,18 @@ class DnsMock
         return $ips;
     }
 
+    /**
+     * Fetch DNS Resource Records associated with the given hostname.
+     *
+     * @param string     $hostname The host name.
+     * @param int        $type     May be any one of the following: DNS_A, DNS_CNAME, DNS_HINFO, DNS_MX, DNS_NS, DNS_PTR,
+     *                             DNS_SOA, DNS_TXT, DNS_AAAA, DNS_SRV, DNS_NAPTR, DNS_A6, DNS_ALL or DNS_ANY.
+     * @param array|null $authns   The Resource Records for the Authoritative Name Servers.
+     * @param array|null $addtl    Any Additional Records.
+     * @param bool       $raw      Query only the requestd type.
+     *
+     * @return array|bool
+     */
     public static function dns_get_record($hostname, $type = DNS_ANY, &$authns = null, &$addtl = null, $raw = false)
     {
         if (!self::$hosts) {
@@ -153,7 +210,10 @@ class DnsMock
 
             foreach (self::$hosts[$hostname] as $record) {
                 if (isset(self::$dnsTypes[$record['type']]) && (self::$dnsTypes[$record['type']] & $type)) {
-                    $records[] = array_merge(array('host' => $hostname, 'class' => 'IN', 'ttl' => 1, 'type' => $record['type']), $record);
+                    $records[] = array_merge(
+                        array('host' => $hostname, 'class' => 'IN', 'ttl' => 1, 'type' => $record['type']),
+                        $record
+                    );
                 }
             }
         }
@@ -161,6 +221,11 @@ class DnsMock
         return $records;
     }
 
+    /**
+     * Registers and configures the dns mock handler.
+     *
+     * @param string $class
+     */
     public static function register($class)
     {
         $self = get_called_class();

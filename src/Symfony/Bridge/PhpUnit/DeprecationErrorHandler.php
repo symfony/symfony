@@ -192,6 +192,9 @@ class DeprecationErrorHandler
         }
     }
 
+    /**
+     * @return bool
+     */
     private static function hasColorSupport()
     {
         if ('\\' === DIRECTORY_SEPARATOR) {

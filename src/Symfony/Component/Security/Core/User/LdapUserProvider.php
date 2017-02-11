@@ -48,7 +48,7 @@ class LdapUserProvider implements UserProviderInterface
     public function __construct(LdapInterface $ldap, $baseDn, $searchDn = null, $searchPassword = null, array $defaultRoles = array(), $uidKey = 'sAMAccountName', $filter = '({uid_key}={username})', $passwordAttribute = null)
     {
         if (null === $uidKey) {
-            $uidKey = 'uid';
+            $uidKey = 'sAMAccountName';
         }
 
         $this->ldap = $ldap;
@@ -87,7 +87,13 @@ class LdapUserProvider implements UserProviderInterface
         }
 
         $entry = $entries[0];
-        $username = $this->getAttributeValue($entry, $this->uidKey);
+
+        try {
+            if (null !== $this->uidKey) {
+                $username = $this->getAttributeValue($entry, $this->uidKey);
+            }
+        } catch (InvalidArgumentException $e) {
+        }
 
         return $this->loadUser($username, $entry);
     }
@@ -123,6 +129,7 @@ class LdapUserProvider implements UserProviderInterface
     protected function loadUser($username, Entry $entry)
     {
         $password = null;
+
         if (null !== $this->passwordAttribute) {
             $password = $this->getAttributeValue($entry, $this->passwordAttribute);
         }

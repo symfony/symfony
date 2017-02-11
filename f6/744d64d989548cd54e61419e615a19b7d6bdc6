@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by stof at 2017-02-07T18:56:25Z
+
+shouldn't we rather avoid all the useless info instead of overwriting the existing ones ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-08T09:27:47Z
+
+> shouldn't we rather avoid all the useless info instead of overwriting the existing ones ?
+
+The things is: it's hard to know when property X or property Y has been added in the extension. So If we want to avoid overwriting, we should check for each property if it has been defined before.
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-08T09:44:28Z
+
+Well, you are switching the prefix globally anyway, which implies that they all changed together.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-08T09:49:36Z
+
+Indeed. But anyway `$array  += []` does not overwrite the initial value. So IMHO, it's not an issue. I just specifically, overwrite some properties, to enchance the display.
+
+But just to be sure I understand, you propose something like that:
+
+```php
+
+        // Recent version of the extension already expose internal properties
+        if (isset($a["\x00AMQPConnection\x00login"])) {
+            $a += [
+                Caster::PREFIX_VIRTUAL.'isConnected' => $c->isConnected(),
+            ];
+
+            return $a;
+        }
+
+        $prefix = Caster::PREFIX_VIRTUAL;
+
+        // BC layer in the amqp lib
+        if (method_exists($c, 'getReadTimeout')) {
+            $timeout = $c->getReadTimeout();
+        } else {
+            $timeout = $c->getTimeout();
+        }
+
+        $a += array(
+            $prefix.'isConnected' => $c->isConnected(),
+            $prefix.'login' => $c->getLogin(),
+            $prefix.'password' => $c->getPassword(),
+            $prefix.'host' => $c->getHost(),
+            $prefix.'vhost' => $c->getVhost(),
+            $prefix.'port' => $c->getPort(),
+            $prefix.'read_timeout' => $timeout,
+        );
+
+        return $a;
+```
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-08T10:20:13Z
+
+@stof I updated my PR according to your comments.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-08T10:25:17Z
+
+👍
+
+Btw, don't we need to update some tests ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2017-02-08T10:45:38Z
+
+> Btw, don't we need to update some tests ?
+
+This part is not tested... :/

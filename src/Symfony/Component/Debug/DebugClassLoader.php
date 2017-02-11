@@ -165,17 +165,18 @@ class DebugClassLoader
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
             }
 
-            if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
-                self::$final[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
-            }
-
             $parent = get_parent_class($class);
-            if ($parent && isset(self::$final[$parent])) {
-                @trigger_error(sprintf('The %s class is considered final%s. It may change without further notice as of its next major version. You should not extend it from %s.', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
-            }
 
             // Not an interface nor a trait
             if (class_exists($name, false)) {
+                if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+                    self::$final[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+                }
+
+                if ($parent && isset(self::$final[$parent])) {
+                    @trigger_error(sprintf('The %s class is considered final%s. It may change without further notice as of its next major version. You should not extend it from %s.', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
+                }
+
                 // Inherit @final annotations
                 self::$finalMethods[$name] = $parent && isset(self::$finalMethods[$parent]) ? self::$finalMethods[$parent] : array();
 

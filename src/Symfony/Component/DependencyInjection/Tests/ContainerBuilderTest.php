@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Tests;
 require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
+use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\Alias;
@@ -641,7 +642,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $resources = $container->getResources();
 
-        $this->assertCount(1, $resources, '1 resource was registered');
+        $this->assertCount(2, $resources, '2 resources were registered');
 
         /* @var $resource \Symfony\Component\Config\Resource\FileResource */
         $resource = end($resources);
@@ -667,7 +668,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $resources = $container->getResources();
 
-        $this->assertCount(1, $resources, '1 resource was registered');
+        $this->assertCount(2, $resources, '2 resources were registered');
 
         /* @var $resource \Symfony\Component\Config\Resource\FileResource */
         $resource = end($resources);
@@ -696,9 +697,9 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
 
         $resources = $container->getResources();
 
-        $this->assertCount(2, $resources, '2 resources were registered');
+        $this->assertCount(3, $resources, '3 resources were registered');
 
-        $this->assertSame('reflection.BarClass', (string) $resources[0]);
+        $this->assertSame('reflection.BarClass', (string) $resources[1]);
         $this->assertSame('BarMissingClass', (string) end($resources));
     }
 
@@ -742,6 +743,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
     public function testFileExists()
     {
         $container = new ContainerBuilder();
+        $A = new ComposerResource();
         $a = new FileResource(__DIR__.'/Fixtures/xml/services1.xml');
         $b = new FileResource(__DIR__.'/Fixtures/xml/services2.xml');
         $c = new DirectoryResource($dir = dirname($b));
@@ -755,7 +757,7 @@ class ContainerBuilderTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->assertEquals(array($a, $b, $c), $resources, '->getResources() returns an array of resources read for the current configuration');
+        $this->assertEquals(array($A, $a, $b, $c), $resources, '->getResources() returns an array of resources read for the current configuration');
     }
 
     public function testExtension()

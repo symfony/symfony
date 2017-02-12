@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\Config\Resource\ComposerResource;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
@@ -109,6 +110,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @var int[] a map of env vars to their resolution counter
      */
     private $envCounters = array();
+
+    /**
+     * @var string[] the list of vendor directories
+     */
+    private $vendors;
 
     /**
      * Sets the track resources flag.
@@ -271,13 +277,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 }
                 $file = $interface->getFileName();
                 if (false !== $file && file_exists($file)) {
-                    $this->addResource(new FileResource($file));
+                    $this->fileExists($file);
                 }
             }
             do {
                 $file = $class->getFileName();
                 if (false !== $file && file_exists($file)) {
-                    $this->addResource(new FileResource($file));
+                    $this->fileExists($file);
                 }
                 foreach ($class->getTraitNames() as $name) {
                     $this->addObjectResource($name);
@@ -339,7 +345,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             if (!$classReflector) {
                 $this->addResource($resource ?: new ClassExistenceResource($class, ClassExistenceResource::EXISTS_KO));
             } elseif (!$classReflector->isInternal()) {
-                $this->addResource(new ReflectionClassResource($classReflector));
+                $path = $classReflector->getFileName();
+
+                if (!$this->inVendors($path)) {
+                    $this->addResource(new ReflectionClassResource($classReflector, $this->vendors));
+                }
             }
             $this->classReflectors[$class] = $classReflector;
         }
@@ -362,7 +372,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $exists = file_exists($path);
 
-        if (!$this->trackResources) {
+        if (!$this->trackResources || $this->inVendors($path)) {
             return $exists;
         }
 
@@ -372,12 +382,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             return $exists;
         }
 
-        if ($trackContents) {
-            if (is_file($path)) {
-                $this->addResource(new FileResource($path));
-            } else {
-                $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
-            }
+        if ($trackContents && is_dir($path)) {
+            $this->addResource(new DirectoryResource($path, is_string($trackContents) ? $trackContents : null));
+        } elseif ($trackContents || is_dir($path)) {
+            $this->addResource(new FileResource($path));
         }
 
         return $exists;
@@ -1453,5 +1461,23 @@ EOF;
         }
 
         return $this->expressionLanguage;
+    }
+
+    private function inVendors($path)
+    {
+        if (null === $this->vendors) {
+            $resource = new ComposerResource();
+            $this->vendors = $resource->getVendors();
+            $this->addResource($resource);
+        }
+        $path = realpath($path) ?: $path;
+
+        foreach ($this->vendors as $vendor) {
+            if (0 === strpos($path, $vendor) && false !== strpbrk(substr($path, strlen($vendor), 1), '/'.DIRECTORY_SEPARATOR)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

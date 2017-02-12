@@ -42,7 +42,7 @@ class XmlFileLoader extends FileLoader
 
         $xml = $this->parseFileToDOM($path);
 
-        $this->container->addResource(new FileResource($path));
+        $this->container->fileExists($path);
 
         // anonymous services
         $this->processAnonymousServices($xml, $path);

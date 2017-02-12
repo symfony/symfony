@@ -30,11 +30,21 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class Request
 {
-    const HEADER_FORWARDED = 'forwarded';
-    const HEADER_CLIENT_IP = 'client_ip';
-    const HEADER_CLIENT_HOST = 'client_host';
-    const HEADER_CLIENT_PROTO = 'client_proto';
-    const HEADER_CLIENT_PORT = 'client_port';
+    const HEADER_FORWARDED = 0b00001;
+    const HEADER_X_FORWARDED_ALL = 0b11110;
+    const HEADER_X_FORWARDED_FOR = 2;
+    const HEADER_X_FORWARDED_HOST = 4;
+    const HEADER_X_FORWARDED_PROTO = 8;
+    const HEADER_X_FORWARDED_PORT = 16;
+
+    /** @deprecated since version 3.3, to be removed in 4.0 */
+    const HEADER_CLIENT_IP = self::HEADER_X_FORWARDED_FOR;
+    /** @deprecated since version 3.3, to be removed in 4.0 */
+    const HEADER_CLIENT_HOST = self::HEADER_X_FORWARDED_HOST;
+    /** @deprecated since version 3.3, to be removed in 4.0 */
+    const HEADER_CLIENT_PROTO = self::HEADER_X_FORWARDED_PROTO;
+    /** @deprecated since version 3.3, to be removed in 4.0 */
+    const HEADER_CLIENT_PORT = self::HEADER_X_FORWARDED_PORT;
 
     const METHOD_HEAD = 'HEAD';
     const METHOD_GET = 'GET';
@@ -70,6 +80,8 @@ class Request
      *
      * The other headers are non-standard, but widely used
      * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
+     *
+     * @deprecated since version 3.3, to be removed in 4.0
      */
     protected static $trustedHeaders = array(
         self::HEADER_FORWARDED => 'FORWARDED',
@@ -209,6 +221,17 @@ class Request
 
     private $isHostValid = true;
     private $isClientIpsValid = true;
+
+    private static $trustedHeaderSet = -1;
+
+    /** @deprecated since version 3.3, to be removed in 4.0 */
+    private static $trustedHeaderNames = array(
+        self::HEADER_FORWARDED => 'FORWARDED',
+        self::HEADER_CLIENT_IP => 'X_FORWARDED_FOR',
+        self::HEADER_CLIENT_HOST => 'X_FORWARDED_HOST',
+        self::HEADER_CLIENT_PROTO => 'X_FORWARDED_PROTO',
+        self::HEADER_CLIENT_PORT => 'X_FORWARDED_PORT',
+    );
 
     /**
      * Constructor.
@@ -548,11 +571,26 @@ class Request
      *
      * You should only list the reverse proxies that you manage directly.
      *
-     * @param array $proxies A list of trusted proxies
+     * @param array $proxies          A list of trusted proxies
+     * @param int   $trustedHeaderSet A bit field of Request::HEADER_*, usually either Request::HEADER_FORWARDED or Request::HEADER_X_FORWARDED_ALL, to set which headers to trust from your proxies
+     *
+     * @throws \InvalidArgumentException When $trustedHeaderSet is invalid
      */
-    public static function setTrustedProxies(array $proxies)
+    public static function setTrustedProxies(array $proxies/*, int $trustedHeaderSet*/)
     {
         self::$trustedProxies = $proxies;
+
+        if (2 > func_num_args()) {
+            @trigger_error(sprintf('The %s() method expects a bit field of Request::HEADER_* as second argument. Not defining it is deprecated since version 3.3 and will be required in 4.0.', __METHOD__), E_USER_DEPRECATED);
+
+            return;
+        }
+        $trustedHeaderSet = func_get_arg(1);
+
+        foreach (self::$trustedHeaderNames as $header => $name) {
+            self::$trustedHeaders[$header] = $header & $trustedHeaderSet ? $name : null;
+        }
+        self::$trustedHeaderSet = $trustedHeaderSet;
     }
 
     /**
@@ -563,6 +601,16 @@ class Request
     public static function getTrustedProxies()
     {
         return self::$trustedProxies;
+    }
+
+    /**
+     * Gets the set of trusted headers from trusted proxies.
+     *
+     * @return int A bit field of Request::HEADER_* that defines which headers are trusted from your proxies
+     */
+    public static function getTrustedHeaderSet()
+    {
+        return self::$trustedHeaderSet;
     }
 
     /**
@@ -608,14 +656,22 @@ class Request
      * @param string $value The header name
      *
      * @throws \InvalidArgumentException
+     *
+     * @deprecated since version 3.3, to be removed in 4.0. Use "X-Forwarded-*" headers or the "Forwarded" header defined in RFC7239, and the $trustedHeaderSet argument of the Request::setTrustedProxies() method instead.
      */
     public static function setTrustedHeaderName($key, $value)
     {
+        @trigger_error(sprintf('The "%s()" method is deprecated since version 3.3 and will be removed in 4.0. Use "X-Forwarded-*" headers or the "Forwarded" header defined in RFC7239, and the $trustedHeaderSet argument of the Request::setTrustedProxies() method instead.', __METHOD__), E_USER_DEPRECATED);
+
         if (!array_key_exists($key, self::$trustedHeaders)) {
             throw new \InvalidArgumentException(sprintf('Unable to set the trusted header name for key "%s".', $key));
         }
 
         self::$trustedHeaders[$key] = $value;
+
+        if (null !== $value) {
+            self::$trustedHeaderNames[$key] = $value;
+        }
     }
 
     /**
@@ -626,9 +682,15 @@ class Request
      * @return string The header name
      *
      * @throws \InvalidArgumentException
+     *
+     * @deprecated since version 3.3, to be removed in 4.0. Use the Request::getTrustedHeaderSet() method instead.
      */
     public static function getTrustedHeaderName($key)
     {
+        if (2 > func_num_args() || func_get_arg(1)) {
+            @trigger_error(sprintf('The "%s()" method is deprecated since version 3.3 and will be removed in 4.0. Use the Request::getTrustedHeaderSet() method instead.', __METHOD__), E_USER_DEPRECATED);
+        }
+
         if (!array_key_exists($key, self::$trustedHeaders)) {
             throw new \InvalidArgumentException(sprintf('Unable to get the trusted header name for key "%s".', $key));
         }

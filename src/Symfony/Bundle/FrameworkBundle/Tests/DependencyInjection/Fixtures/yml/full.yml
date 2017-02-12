@@ -6,7 +6,6 @@ framework:
         csrf_protection:
             field_name: _csrf
     http_method_override: false
-    trusted_proxies: ['127.0.0.1', '10.0.0.1']
     esi:
         enabled: true
     profiler:

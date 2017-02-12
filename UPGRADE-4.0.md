@@ -190,6 +190,8 @@ FrameworkBundle
  * The `cache:clear` command does not warmup the cache anymore. Warmup should
    be done via the `cache:warmup` command.
 
+ * The "framework.trusted_proxies" configuration option and the corresponding "kernel.trusted_proxies" parameter have been removed. Use the `Request::setTrustedProxies()` method in your front controller instead.
+
  * Support for absolute template paths has been removed.
 
  * The following form types registered as services have been removed; use their
@@ -279,6 +281,15 @@ FrameworkBundle
 
 HttpFoundation
 ---------------
+
+HttpFoundation
+--------------
+
+ * The `Request::setTrustedProxies()` method takes a new `$trustedHeaderSet` argument.
+   Set it to `Request::HEADER_FORWARDED` if your reverse-proxy uses the RFC7239 `Forwarded` header,
+   or to `Request::HEADER_X_FORWARDED_ALL` if it is using `X-Forwarded-*` headers instead.
+
+ * The `Request::setTrustedHeaderName()` and `Request::getTrustedHeaderName()` methods have been removed.
 
  * Extending the following methods of `Response`
    is no longer possible (these methods are now `final`):

@@ -24,7 +24,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-class LintCommand extends Command
+class XliffLintCommand extends Command
 {
     private $parser;
     private $format;
@@ -46,8 +46,8 @@ class LintCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('lint:translation')
-            ->setDescription('Lints a file and outputs encountered errors')
+            ->setName('lint:xliff')
+            ->setDescription('Lints a XLIFF file and outputs encountered errors')
             ->addArgument('filename', null, 'A file or a directory or STDIN')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The output format', 'txt')
             ->setHelp(<<<EOF

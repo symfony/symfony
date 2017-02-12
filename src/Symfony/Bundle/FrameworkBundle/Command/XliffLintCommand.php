@@ -14,7 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\Command\LintCommand as BaseLintCommand;
+use Symfony\Component\Translation\Command\XliffLintCommand as BaseLintCommand;
 
 /**
  * Validates XLIFF files syntax and outputs encountered errors.
@@ -23,7 +23,7 @@ use Symfony\Component\Translation\Command\LintCommand as BaseLintCommand;
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-class TranslationLintCommand extends Command
+class XliffLintCommand extends Command
 {
     private $command;
 
@@ -32,7 +32,7 @@ class TranslationLintCommand extends Command
      */
     protected function configure()
     {
-        $this->setName('lint:translation');
+        $this->setName('lint:xliff');
 
         if (!$this->isEnabled()) {
             return;

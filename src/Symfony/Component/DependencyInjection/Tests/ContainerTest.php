@@ -148,13 +148,27 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo, $sc->get('foo'), '->set() sets a service');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Unsetting the "foo" service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     * @expectedDeprecation Unsetting the "bar" service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     */
     public function testSetWithNullResetTheService()
     {
         $sc = new Container();
+        $sc->set('foo', new \stdClass());
         $sc->set('foo', null);
         $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+
+        $sc = new ProjectServiceContainer();
+        $sc->set('bar', null);
+        $this->assertFalse($sc->has('bar'), '->set() with null service resets the pre-defined service');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Replacing the "alias" service alias is deprecated since Symfony 3.3 and will set the aliased service instead in Symfony 4.0.
+     */
     public function testSetReplacesAlias()
     {
         $c = new ProjectServiceContainer();
@@ -171,9 +185,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
         $this->assertSame($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
         $this->assertSame($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
-
-        $sc->set('bar', $bar = new \stdClass());
-        $this->assertSame($bar, $sc->get('bar'), '->get() prefers to return a service defined with set() than one defined with a getXXXMethod()');
 
         try {
             $sc->get('');
@@ -337,7 +348,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($sc->initialized('bar'), '->initialized() returns false if a service is defined, but not currently loaded');
         $this->assertFalse($sc->initialized('alias'), '->initialized() returns false if an aliased service is not initialized');
 
-        $sc->set('bar', new \stdClass());
+        $sc->get('bar');
         $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
@@ -453,6 +464,32 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c = new ProjectServiceContainer();
         $c->get('internal');
     }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Replacing the pre-defined "bar" service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     */
+    public function testReplacingAPreDefinedServiceIsDeprecated()
+    {
+        $c = new ProjectServiceContainer();
+        $c->set('bar', new \stdClass());
+        $c->set('bar', $bar = new \stdClass());
+
+        $this->assertSame($bar, $c->get('bar'), '->set() replaces a pre-defined service');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Replacing the initialized "new" service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     */
+    public function testReplacingAnInitializedServiceIsDeprecated()
+    {
+        $c = new ProjectServiceContainer();
+        $c->set('new', new \stdClass());
+        $c->set('new', $new = new \stdClass());
+
+        $this->assertEquals($new, $c->get('new'), '->set() replaces an initialized service');
+    }
 }
 
 class ProjectServiceContainer extends Container
@@ -485,22 +522,22 @@ class ProjectServiceContainer extends Container
 
     protected function getInternalService()
     {
-        return $this->__internal;
+        return $this->services['internal'] = $this->__internal;
     }
 
     protected function getBarService()
     {
-        return $this->__bar;
+        return $this->services['bar'] = $this->__bar;
     }
 
     protected function getFooBarService()
     {
-        return $this->__foo_bar;
+        return $this->services['foo_bar'] = $this->__foo_bar;
     }
 
     protected function getFoo_BazService()
     {
-        return $this->__foo_baz;
+        return $this->services['foo.baz'] = $this->__foo_baz;
     }
 
     protected function getCircularService()

@@ -161,9 +161,6 @@ class Container implements ResettableContainerInterface
     /**
      * Sets a service.
      *
-     * Setting a service to null resets the service: has() returns false and get()
-     * behaves in the same way as if the service was never created.
-     *
      * @param string $id      The service identifier
      * @param object $service The service instance
      */
@@ -175,16 +172,6 @@ class Container implements ResettableContainerInterface
             throw new InvalidArgumentException('You cannot set service "service_container".');
         }
 
-        if (isset($this->aliases[$id])) {
-            unset($this->aliases[$id]);
-        }
-
-        $this->services[$id] = $service;
-
-        if (null === $service) {
-            unset($this->services[$id]);
-        }
-
         if (isset($this->privates[$id])) {
             if (null === $service) {
                 @trigger_error(sprintf('Unsetting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
@@ -192,7 +179,24 @@ class Container implements ResettableContainerInterface
             } else {
                 @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0. A new public service will be created instead.', $id), E_USER_DEPRECATED);
             }
+        } elseif (null === $service) {
+            @trigger_error(sprintf('Unsetting the "%s" service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            unset($this->services[$id], $this->aliases[$id], $this->methodMap[$id]);
+
+            return;
         }
+
+        if (isset($this->aliases[$id])) {
+            @trigger_error(sprintf('Replacing the "%s" service alias is deprecated since Symfony 3.3 and will set the aliased service instead in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            unset($this->aliases[$id]);
+        } elseif (isset($this->services[$id])) {
+            @trigger_error(sprintf('Replacing the initialized "%s" service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+        } elseif (isset($this->methodMap[$id])) {
+            @trigger_error(sprintf('Replacing the pre-defined "%s" service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            unset($this->methodMap[$id]);
+        }
+
+        $this->services[$id] = $service;
     }
 
     /**

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by tristanbes at 2017-02-08T13:36:21Z
+
+This patch seems to fix this issue: https://github.com/symfony/symfony/issues/21559 that is present on v3.2.3
+
+As you can see on blackfire:
+[v3.2.2 to v3.2.3 patched](https://blackfire.io/profiles/compare/8222ecd2-6504-4487-9c90-fd83e9fb0ada/graph)
+and
+[v3.2.3 not patched to v3.2.3 patched](https://blackfire.io/profiles/compare/f6eba9c2-1d4f-4161-a3f7-96aed463a466/graph)
+
+This patch still have a +2,39% negative impact on performance, but it's still better than +2020% of negative impact :-)
+
+---------------------------------------------------------------------------
+
+by lubomir-haralampiev at 2017-02-09T20:14:41Z
+
+also fixes the https://github.com/symfony/symfony/issues/21576
+
+Thanks

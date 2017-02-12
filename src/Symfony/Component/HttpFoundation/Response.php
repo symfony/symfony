@@ -186,34 +186,6 @@ class Response
         511 => 'Network Authentication Required',                             // RFC6585
     );
 
-    private static $deprecatedMethods = array(
-        'setDate', 'getDate',
-        'setExpires', 'getExpires',
-        'setLastModified', 'getLastModified',
-        'setProtocolVersion', 'getProtocolVersion',
-        'setStatusCode', 'getStatusCode',
-        'setCharset', 'getCharset',
-        'setPrivate', 'setPublic',
-        'getAge', 'getMaxAge', 'setMaxAge', 'setSharedMaxAge',
-        'getTtl', 'setTtl', 'setClientTtl',
-        'getEtag', 'setEtag',
-        'hasVary', 'getVary', 'setVary',
-        'isInvalid', 'isSuccessful', 'isRedirection',
-        'isClientError', 'isOk', 'isForbidden',
-        'isNotFound', 'isRedirect', 'isEmpty',
-        'isCacheable', 'isFresh', 'isValidateable',
-        'mustRevalidate', 'setCache', 'setNotModified',
-        'isNotModified', 'isInformational', 'isServerError',
-        'closeOutputBuffers', 'ensureIEOverSSLCompatibility',
-    );
-    private static $deprecationsTriggered = array(
-        __CLASS__ => true,
-        BinaryFileResponse::class => true,
-        JsonResponse::class => true,
-        RedirectResponse::class => true,
-        StreamedResponse::class => true,
-    );
-
     /**
      * Constructor.
      *
@@ -229,23 +201,6 @@ class Response
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
-
-        // Deprecations
-        $class = get_class($this);
-        if ($this instanceof \PHPUnit_Framework_MockObject_MockObject || $this instanceof \Prophecy\Doubler\DoubleInterface) {
-            $class = get_parent_class($class);
-        }
-        if (isset(self::$deprecationsTriggered[$class])) {
-            return;
-        }
-
-        self::$deprecationsTriggered[$class] = true;
-        foreach (self::$deprecatedMethods as $method) {
-            $r = new \ReflectionMethod($class, $method);
-            if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                @trigger_error(sprintf('Extending %s::%s() in %s is deprecated since version 3.2 and won\'t be supported anymore in 4.0 as it will be final.', __CLASS__, $method, $class), E_USER_DEPRECATED);
-            }
-        }
     }
 
     /**

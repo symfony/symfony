@@ -28,6 +28,7 @@ class DebugClassLoader
     private $isFinder;
     private static $caseCheck;
     private static $final = array();
+    private static $finalMethods = array();
     private static $deprecated = array();
     private static $php7Reserved = array('int', 'float', 'bool', 'string', 'true', 'false', 'null');
     private static $darwinCache = array('/' => array('/', array()));
@@ -164,13 +165,40 @@ class DebugClassLoader
                 throw new \RuntimeException(sprintf('Case mismatch between loaded and declared class names: %s vs %s', $class, $name));
             }
 
-            if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
-                self::$final[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
-            }
-
             $parent = get_parent_class($class);
-            if ($parent && isset(self::$final[$parent])) {
-                @trigger_error(sprintf('The %s class is considered final%s. It may change without further notice as of its next major version. You should not extend it from %s.', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
+
+            // Not an interface nor a trait
+            if (class_exists($name, false)) {
+                if (preg_match('#\n \* @final(?:( .+?)\.?)?\r?\n \*(?: @|/$)#s', $refl->getDocComment(), $notice)) {
+                    self::$final[$name] = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+                }
+
+                if ($parent && isset(self::$final[$parent])) {
+                    @trigger_error(sprintf('The %s class is considered final%s. It may change without further notice as of its next major version. You should not extend it from %s.', $parent, self::$final[$parent], $name), E_USER_DEPRECATED);
+                }
+
+                // Inherit @final annotations
+                self::$finalMethods[$name] = $parent && isset(self::$finalMethods[$parent]) ? self::$finalMethods[$parent] : array();
+
+                foreach ($refl->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
+                    if ($method->class !== $name) {
+                        continue;
+                    }
+
+                    if ($parent && isset(self::$finalMethods[$parent][$method->name])) {
+                        @trigger_error(sprintf('%s It may change without further notice as of its next major version. You should not extend it from %s.', self::$finalMethods[$parent][$method->name], $name), E_USER_DEPRECATED);
+                    }
+
+                    $doc = $method->getDocComment();
+                    if (false === $doc || false === strpos($doc, '@final')) {
+                        continue;
+                    }
+
+                    if (preg_match('#\n\s+\* @final(?:( .+?)\.?)?\r?\n\s+\*(?: @|/$)#s', $doc, $notice)) {
+                        $message = isset($notice[1]) ? preg_replace('#\s*\r?\n \* +#', ' ', $notice[1]) : '';
+                        self::$finalMethods[$name][$method->name] = sprintf('The %s::%s() method is considered final%s.', $name, $method->name, $message);
+                    }
+                }
             }
 
             if (in_array(strtolower($refl->getShortName()), self::$php7Reserved)) {

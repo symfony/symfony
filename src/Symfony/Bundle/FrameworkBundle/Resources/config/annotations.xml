@@ -11,7 +11,9 @@
 
         <service id="annotations.cached_reader" class="Doctrine\Common\Annotations\CachedReader" public="false">
             <argument type="service" id="annotations.reader" />
-            <argument /><!-- Cache Implementation -->
+            <argument type="service">
+                <service class="Doctrine\Common\Cache\ArrayCache" />
+            </argument>
             <argument /><!-- Debug-Flag -->
         </service>
 

@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-03T08:21:52Z
+
+Any files in vendors are now excluded from tracking, transferring tracking responsibility to the new ComposerResource. This should save a bunch of checks in practice, thus enhance DX.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-03T18:53:25Z
+
+> This should save a bunch of checks in practice, thus enhance DX.
+
+have you tried profiling the dev environment of Symfony to see the impact this PR has ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-03T19:53:46Z
+
+> have you tried profiling the dev environment of Symfony to see the impact this PR has ?
+
+no, but it's not hard to say that if you happen to have some bundles, everything config-related in them won't be tracked anymore, thus the gain can be huge (esp since this involves i/o). Add autowiring to the mix, which creates resources for every single service when looking for filling type hints - it's even bigger :)
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-07T08:58:56Z
+
+@nicolas-grekas could you try profiling it to give numbers ? (blame the mail I receive from the Sensiolabs marketing telling me I need to measure things to be able to optimize them... 😄  )
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-07T14:32:46Z
+
+@stof and you were right to ask, because that needed some polishing :)
+So, end result on Symfony Demo:
+- `var/cache/dev/appDevDebugProjectContainer.php.meta` deflates from 239K to 15K
+- performance increases by 15% on the home page (which does almost nothing itself), see [Blackfire comparison](https://blackfire.io/profiles/compare/f0b0789c-95ea-470c-b19b-f42be9eb133e/graph).

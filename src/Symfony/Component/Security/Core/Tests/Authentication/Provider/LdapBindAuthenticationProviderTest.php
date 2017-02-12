@@ -81,4 +81,29 @@ class LdapBindAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
 
         $reflection->invoke($provider, 'foo', new UsernamePasswordToken('foo', 'bar', 'key'));
     }
+
+    public function testAuthenticateUser()
+    {
+        $userProvider = $this->getMockBuilder(UserProviderInterface::class)->getMock();
+        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
+        $ldap
+            ->expects($this->any())
+            ->method('escape')
+            ->with('foo')
+            ->will($this->returnValue('foo'))
+        ;
+        $ldap
+            ->expects($this->once())
+            ->method('bind')
+            ->with('foo')
+        ;
+
+        $userChecker = $this->getMockBuilder(UserCheckerInterface::class)->getMock();
+        $provider = new LdapBindAuthenticationProvider($userProvider, $userChecker, 'key', $ldap);
+
+        $reflection = new \ReflectionMethod($provider, 'checkAuthentication');
+        $reflection->setAccessible(true);
+
+        $reflection->invoke($provider, new User('foo', null), new UsernamePasswordToken('foo@example.com', 'bar', 'key'));
+    }
 }

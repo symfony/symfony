@@ -163,6 +163,22 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($foo, $c->get('alias'), '->set() replaces an existing alias');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Unsetting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     */
+    public function testSetWithNullResetPredefinedService()
+    {
+        $sc = new Container();
+        $sc->set('foo', new \stdClass());
+        $sc->set('foo', null);
+        $this->assertFalse($sc->has('foo'), '->set() with null service resets the service');
+
+        $sc = new ProjectServiceContainer();
+        $sc->set('bar', null);
+        $this->assertTrue($sc->has('bar'), '->set() with null service resets the pre-defined service');
+    }
+
     public function testGet()
     {
         $sc = new ProjectServiceContainer();
@@ -171,9 +187,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($sc->__bar, $sc->get('bar'), '->get() returns the service for the given id');
         $this->assertSame($sc->__foo_bar, $sc->get('foo_bar'), '->get() returns the service if a get*Method() is defined');
         $this->assertSame($sc->__foo_baz, $sc->get('foo.baz'), '->get() returns the service if a get*Method() is defined');
-
-        $sc->set('bar', $bar = new \stdClass());
-        $this->assertSame($bar, $sc->get('bar'), '->get() prefers to return a service defined with set() than one defined with a getXXXMethod()');
 
         try {
             $sc->get('');
@@ -337,7 +350,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($sc->initialized('bar'), '->initialized() returns false if a service is defined, but not currently loaded');
         $this->assertFalse($sc->initialized('alias'), '->initialized() returns false if an aliased service is not initialized');
 
-        $sc->set('bar', new \stdClass());
+        $sc->get('bar');
         $this->assertTrue($sc->initialized('alias'), '->initialized() returns true for alias if aliased service is initialized');
     }
 
@@ -426,7 +439,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Setting the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0. A new public service will be created instead.
+     * @expectedDeprecation Setting the "internal" private service is deprecated since Symfony 3.2 and won't be supported anymore in Symfony 4.0.
      */
     public function testChangeInternalPrivateServiceIsDeprecated()
     {
@@ -452,6 +465,19 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $c = new ProjectServiceContainer();
         $c->get('internal');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Setting the "bar" pre-defined service is deprecated since Symfony 3.3 and won't be supported anymore in Symfony 4.0.
+     */
+    public function testReplacingAPreDefinedServiceIsDeprecated()
+    {
+        $c = new ProjectServiceContainer();
+        $c->set('bar', new \stdClass());
+        $c->set('bar', $bar = new \stdClass());
+
+        $this->assertSame($bar, $c->get('bar'), '->set() replaces a pre-defined service');
     }
 }
 
@@ -490,7 +516,7 @@ class ProjectServiceContainer extends Container
 
     protected function getBarService()
     {
-        return $this->__bar;
+        return $this->services['bar'] = $this->__bar;
     }
 
     protected function getFooBarService()

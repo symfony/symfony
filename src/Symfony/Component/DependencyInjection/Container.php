@@ -190,7 +190,13 @@ class Container implements ResettableContainerInterface
                 @trigger_error(sprintf('Unsetting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
                 unset($this->privates[$id]);
             } else {
-                @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0. A new public service will be created instead.', $id), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Setting the "%s" private service is deprecated since Symfony 3.2 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            }
+        } elseif (isset($this->methodMap[$id])) {
+            if (null === $service) {
+                @trigger_error(sprintf('Unsetting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
+            } else {
+                @trigger_error(sprintf('Setting the "%s" pre-defined service is deprecated since Symfony 3.3 and won\'t be supported anymore in Symfony 4.0.', $id), E_USER_DEPRECATED);
             }
         }
     }

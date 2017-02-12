@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleMetadata;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
@@ -613,6 +614,23 @@ abstract class Kernel implements KernelInterface, TerminableInterface
      */
     protected function prepareContainer(ContainerBuilder $container)
     {
+        $bundleMetadata = array();
+        $numBundles = count($this->bundles);
+        $numProcessedBundles = 0;
+        do {
+            foreach ($this->bundles as $name => $bundle) {
+                $parent = $bundle->getParent();
+                if (null !== $parent && !isset($bundleMetadata[$parent])) {
+                    continue;
+                }
+                if (!isset($bundleMetadata[$name])) {
+                    $bundleMetadata[$name] = new BundleMetadata($name, $bundle->getNamespace(), get_class($bundle), $bundle->getPath(), isset($bundleMetadata[$parent]) ? $bundleMetadata[$parent] : null);
+                    ++$numProcessedBundles;
+                }
+            }
+        } while ($numProcessedBundles < $numBundles);
+        $container->set('kernel.bundles', new \ArrayIterator($bundleMetadata));
+
         $extensions = array();
         foreach ($this->bundles as $bundle) {
             if ($extension = $bundle->getContainerExtension()) {

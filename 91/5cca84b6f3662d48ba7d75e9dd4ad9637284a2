@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2017-02-05T10:09:35Z
+
+Shouldnt we deprecate the `null` scenario first? So other conditional deprecations are practically not needed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-05T10:27:41Z
+
+That's the point of this PR: #19668 is deprecating much more than technically required to enhance the dumped containers in 4.0. In fact, even if I listen to the "best practice" arguments in #19668, we know that forbidding altogether not-best-practices can break legitimate edge-case use cases (remember the deprecation of "get" in non dumped containers that we reverted). Thus, I'm not sure at all we should merge  #19668 - but I'm sure we should merge this one, because it will make SF4 better *at the technical level*.
+
+---------------------------------------------------------------------------
+
+by stof at 2017-02-07T10:14:20Z
+
+👍

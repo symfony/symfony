@@ -1,0 +1,369 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-23T22:46:09Z
+
+I like it.
+Should be made to work with method calls.
+Missing resources tracking for now.
+With now two alts to #20738, I think we should close it :)
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-23T22:49:56Z
+
+Note that this conflicts with the implementation of #21313 that was just merged.
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-23T22:53:46Z
+
+> Note that this conflicts with the implementation of #21313 that was just merged.
+
+Not really (AFAIU). But can't be used along with.
+
+Side-note: I've already seen some projects using arguments keys, despite it had no effect until now (simply for "increasing readability"). Shouldn't it be considered as a BC break?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-01-23T22:55:47Z
+
+```yaml
+services:
+    App\Foo\Bar: {'@baz', 'foo', apiKey: "%mandril_api_key%"}
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-23T22:56:22Z
+
+@ogizanagi in my opinion no, it was explicitly documented to support only packed arrays (see my changes in `Definition`).
+If it really matters, I can skip named parameters not matching instead of throwing, but it will be harder to debug.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-23T22:58:34Z
+
+> Not really (AFAIU). But can't be used along with.
+
+Indeed, I'll try to adapt my PR to be able to use both syntaxes together.
+
+This would be nice but it actually doesn't work:
+
+```yaml
+services:
+    Acme\NewsletterManager: { apiKey: "%mandril_api_key%" }
+```
+
+But this works:
+
+```yaml
+services:
+    Acme\NewsletterManager:
+        arguments: { apiKey: "%mandril_api_key%" }
+```
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-23T23:03:20Z
+
+@nicolas-grekas
+
+> Should be made to work with method calls.
+
+It would be a nice addition, I propose to do it in another PR when this one will be reviewed and merged.
+
+> Missing resources tracking for now.
+
+Done, I rely on @weaverryan's implementation for now because conditions to rebuild the container will be the same if we add `calls` support later.
+
+> With now two alts to #20738, I think we should close it :)
+
+Done!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-23T23:21:46Z
+
+@kasparsklavins we are trying to find the best way to inject parameters when using autowiring and service auto-registration (#21289). It will be a brand new way to use Symfony that will change drastically the first experience for new users and allow to develop faster.
+For now, there is no way to do it. Please consider the big picture. Btw, you can already define a service using XML, YAML, PHP, your own loader, autowiring and so on...
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-23T23:22:34Z
+
+@fabpot @ogizanagi I've tried something to support the short syntax: https://github.com/symfony/symfony/pull/21383/commits/b8c0e7cff89818122e7071b5c305c521e002bb61 WDYT?
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-23T23:27:59Z
+
+~~Looks good to me, as soon as we warn in the documentation no argument should be named the same as one of the definition keywords, otherwise it won't work.
+I don't know if we can do better for now :)~~
+
+---------------------------------------------------------------------------
+
+by ogizanagi at 2017-01-24T06:10:54Z
+
+Re-thinking about it, it also means introducing a new keyword someday means a potential BC break for someone using the short syntax along with named arguments 😕
+So maybe this tradeoff isn't worth it and the short syntax should be kept for most simple usages.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-24T06:16:01Z
+
+Enforce a leading `$`, eg `$apiKey: '%foo%'`?
+About method calls, is it that a big change ? Because that feels incomplete to me to not have it right now...
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-24T07:12:11Z
+
+One minor issue I see with this: when you rename a variable in php, it will now crash, but this won't be detected with applications (or bundles) with only unit-tests.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-24T08:34:28Z
+
+@iltar you're right but it's already the case for traditional definitions (if you add or remove an argument it will fail) and for `calls` definitions (if you rename the method it will fail).
+
+It's why unit testing is not enough and apps need to have a pyramid of tests including some functional and UI ones.
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-24T08:38:32Z
+
+@dunglas correct, however, there's a bunch of refactoring tools and find/replaces that might modify the name of a variable. Correctly removing one without causing parse errors is a lot more complex, hence this issue is faster to present itself.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-24T08:48:26Z
+
+PR updated to make named arguments starting with a `$` as suggested by @nicolas-grekas. It solves problems raided by @ogizanagi (no conflict possible now) and partially the one solved by @iltar (the $ makes it explicit that there is a special handling, and IDEs can add support for this new convention to allow fluent refactoring).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2017-01-24T15:13:04Z
+
+I don't like the `$` at all. It makes the YAML file look a mix of PHP and YAML contents. Example:
+
+```yaml
+arguments:
+    $apiKey: "%mandrill_api_key%"
+```
+
+---------------------------------------------------------------------------
+
+by zanderbaldwin at 2017-01-24T16:24:13Z
+
+I think the `$` is appropriate. It makes it much more obvious that the keys are directly referencing PHP variables/parameters (as defined in the method definition) rather than some non-trivial structure defined by something like the config component.
+Making the arguments configuration seem a little less "magic" to newer developers (meaning a lower learning curve) is, to me personally, more important than clean looking configuration files.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-26T17:15:50Z
+
+:+1:
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-01-27T18:27:46Z
+
+Hi guys!
+
+Ok, I like this approach! Obviously, this should only be used by app code, and it's a really sensible way to fill in the "gap" of autowiring with scalar values.
+
+But, because it's a bit of magic, let's make sure it behaves as predictably as possible! Here are some edge cases I've found, which are mostly "mistakes" that yield confusing errors. Btw, if you do *not* enable autowiring on a service (which is legal, but likely an edge case, or maybe an accident!), when you make a mistake, the errors are usually worse.
+
+A) I forget to map an argument:
+
+```php
+    public function __construct($arg1, $arg2)
+    {
+        $this->arg1 = $arg1;
+        $this->arg2 = $arg2;
+    }
+```
+
+```yml
+services:
+    fun_generator:
+        class: AppBundle\Services\FunGenerator
+        arguments:
+            $arg2: 'foo_bar'
+```
+
+Without autowiring, the error is:
+
+> Missing argument 2 for AppBundle\Services\FunGenerator::__construct() ... (from the cached container)
+
+Basically, because arg1 was never mapped, when the container is dumped (or the service is created from the Definition), arg2 becomes the "first" argument.
+
+Instead, ideally, we would say something like (before dumping):
+
+> Missing argument 1 for AppBundle\Services\FunGenerator::__construct() in your service configuration.
+
+This is tricky... because `arg1` might still be autowired (if it had a type-hint)... or... in theory... filled in by some other compiler pass. But allowing `$arg2` to be ultimately passed as `$arg1` is just wrong.
+
+With autowiring, the same situation gives this error
+
+> Cannot autowire service "fun_generator": argument $arg1 of method AppBundle\Services\FunGenerator::__construct() must have a type-hint or be given a value explicitly.
+
+Which seems quite good to me :).
+
+B) I forget the $ prefix!
+
+```yml
+services:
+    fun_generator:
+        class: AppBundle\Services\FunGenerator
+        arguments:
+            arg2: 'foo_bar'
+```
+
+This has the same error as above:
+
+> Missing argument 2 for AppBundle\Services\FunGenerator::__construct() ... (from the cached container)
+
+If we can (from a BC perspective), I think we should fail clearly if we have a string key that does not start with a `$`:
+
+> Unable to resolve service "fun_generator": To specify a named argument, prefix the argument with "$" (e.g. change "arg2" to "$arg2").
+
+Cheers!
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-28T10:04:46Z
+
+> This is tricky... because arg1 might still be autowired (if it had a type-hint)... or... in theory... filled in by some other compiler pass. But allowing $arg2 to be ultimately passed as $arg1 is just wrong.
+
+IMO, this "bug" is already in the code base. The same situation occurs if you use indexed keys like:
+
+```yaml
+services:
+    fun_generator:
+        class: AppBundle\Services\FunGenerator
+        arguments:
+            1: 'foo_bar'
+```
+
+I propose to fix this in another PR (if doable).
+
+> If we can (from a BC perspective), I think we should fail clearly if we have a string key that does not start with a $:
+
+Some people was already using string keys for clarity (even if it wasn't documented as a supported behavior). It's one of the arguments in favor of the `$ ` prefix. If we add this error, it will break some existing app. It's not a big deal because developers was  using undocumented and unsupported behaviors, but is it worth it?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-01-28T23:03:35Z
+
+> IMO, this "bug" is already in the code base. I propose to fix this in another PR (if doable).
+
+I'm very interested in this - since we're really starting to use the `arguments` in more advanced ways, I'd like to be "tighter" on them to keep errors clear. In that other PR, we could propose some final check to make sure all arguments are indexed, and no keys are missing (and throw an exception if there is a problem). And probably more likely (for BC), we could deprecate this loop-hole and first, and then throw a good exception in 4.0 (this means we would not change behavior in 3.x, but could eventually have a really great exception in 4.0).
+
+> Some people was already using string keys for clarity (even if it wasn't documented as a supported behavior).
+
+Other than it being possible to use string keys before, was there any known case (especially public case - e.g. some library, bundle or blog post) where this is happening? Otherwise, my vote would be to throw an exception now, but we could also deprecate its usage in the same way as the above. Definitely, let's do one of them... so 4.0 errors are awesome!
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by iltar at 2017-01-29T08:58:32Z
+
+>> Some people was already using string keys for clarity (even if it wasn't documented as a supported behavior).
+
+> Other than it being possible to use string keys before, was there any known case (especially public case - e.g. some library, bundle or blog post) where this is happening? Otherwise, my vote would be to throw an exception now, but we could also deprecate its usage in the same way as the above. Definitely, let's do one of them... so 4.0 errors are awesome!
+
+This is something I sometimes see coming by, but very rarely though.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-01-30T11:11:03Z
+
+@weaverryan I just added a [second commit](https://github.com/symfony/symfony/pull/21383/commits/63113dcac6ca76b541b438110d4ae1f3dfd54cdd) that deprecates using string keys that do not start with a `$`.
+@dunglas this commit also fixes some things related to ChildDefinition handling.
+
+I think we can now safely add a `CheckArgumentsValidityPass` that throws an exception if
+`array_keys($args) !== range(0, count($args) - 1)` - both for constructor and method args.
+I see no reasonable reason where this could make any existing code fail - but with this new feature I see one like @weaverryan spotted - thus the link.
+
+Doing it in this PR would be great because that's the one that makes this safeguard required now.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-01-31T10:54:59Z
+
+Comments fixed and `CheckArgumentsValidityPass` added (this new pass deserves probably a new PR because it's not related with the current one, but it can be nice to merge everything all together while keeping the 3 commits for clarity).
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-02T18:54:59Z
+
+Love the progress :). I just tried to break everything... again... and have some additional comments. Thanks - this is really tricky... but if we don't get the exceptions & edge cases just right, I'm worried it'll sour the feature.
+
+---------------------------------------------------------------------------
+
+by dunglas at 2017-02-03T20:22:29Z
+
+@weaverryan: should be all good now :) Can you take a look?
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-03T22:18:24Z
+
+Yep, works awesome now! My comments are just error message related. Well, except for this one, but this is "already" a bug and would not work in the current version of things:
+
+```php
+class FunGenerator
+{
+    public function __construct($arg1 = 10, $arg2)
+    {
+        $this->arg1 = $arg1;
+        $this->arg2 = $arg2;
+    }
+}
+```
+
+```yml
+services:
+    fun_generator:
+        class: AppBundle\Services\FunGenerator
+        arguments:
+            $arg2: 'bar'
+```
+
+In 3.2 (if you replaced `$arg2` with `1`), this would fail because the dumped container would incorrectly place `bar` as the first argument. After this PR, we'll hit an error in `CheckArgumentsValidityPass`, as it's not smart enough to realize that we *could* read the default value and set it as the argument 1. It's a slight edge case, but not ridiculous, and just not something we ever needed to worry about before we started allowing specific args to be specified.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2017-02-04T16:06:22Z
+
+> inCheckArgumentsValidityPass`, as it's not smart enough to realize that we could read the default value and set it as the argument
+
+That'd be too smart to me. Requires dealing with reflection, which always adds complexity. I'd prefer consider this an unsupported edge case - the very few needing this will find their way around :)
+
+---------------------------------------------------------------------------
+
+by mvrhov at 2017-02-06T08:21:27Z
+
+@weaverryan: Well that's a beginners mistake I'd say. Parameters with default values should be placed at the end.
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-06T14:58:48Z
+
+@nicolas-grekas yea, I agree - it's actually a decent (and improved) situation now because the user receives a clear error, instead of a dumped container with the second arg placed in the first position.
+
+@mvrhov it's not a beginner mistake, if both arguments are optional :). Still, not something we should "fix".
+
+---------------------------------------------------------------------------
+
+by weaverryan at 2017-02-08T23:10:51Z
+
+👍
+
+---------------------------------------------------------------------------
+
+by fabpot at 2017-02-13T14:33:00Z
+
+@weaverryan Can we close #21376?
